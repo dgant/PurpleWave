@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -36,7 +36,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
         new UpgradeComplete(Zerg.ZerglingSpeed),
         new Not(new EnemyHasUpgrade(Zerg.ZerglingSpeed))),
       new UnitsAtLeast(3, Zerg.Mutalisk, complete = true)),
-    new Attack)
+    new AttackAndHarass)
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvZIdeas.ReactToFourPool,

@@ -46,7 +46,8 @@ object FightOrFlee extends Action {
     decide(false, "BidieSiege", () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
     decide(true,  "Workers",    () => unit.matchups.targets.exists(_.canAttackGround) && unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(true,  "Energized",  () =>
-      unit.unitClass.maxShields > 10
+      unit.unitClass.maxShields > 20
+      && With.frame < Minutes(10)()
       && unit.alliesBattle.exists(ally =>
         Protoss.ShieldBattery(ally)
         && ally.complete

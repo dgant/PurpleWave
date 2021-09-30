@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, AttackWithWorkers}
+import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -38,7 +38,7 @@ class TvZ8Rax extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new EnemyStrategy(With.fingerprints.twelveHatch),
     new Parallel(
-      new Attack,
+      new AttackAndHarass,
       new If(
         new CanBunkerRush,
         new If(

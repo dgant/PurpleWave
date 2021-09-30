@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllInIf, Attack, ConsiderAttacking}
+import Planning.Plans.Army.{AllInIf, AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -27,10 +27,10 @@ class ZvZ12Pool extends GameplanTemplate {
   override def scoutPlan: Plan = NoPlan()
 
   override def attackPlan: Plan = new Parallel(
-    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),
+    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new AttackAndHarass),
     new If(
       new EnemyHasShown(Zerg.Mutalisk),
-      new Attack),
+      new AttackAndHarass),
     new If(
       new UpgradeComplete(Zerg.ZerglingSpeed),
       new ConsiderAttacking))

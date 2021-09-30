@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, FloatBuildings}
+import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
@@ -42,7 +42,7 @@ class TvT2FacTanks extends GameplanTemplate {
       Get(18, Terran.SCV),
       Get(2, Terran.Factory)))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(

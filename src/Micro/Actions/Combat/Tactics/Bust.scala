@@ -26,10 +26,7 @@ object Bust extends Action {
     dragoon: FriendlyUnitInfo,
     threat: UnitInfo,
     pixel: Pixel): Boolean = (
-    threat.is(Terran.Bunker)
-    || threat.is(Terran.SCV)
-    || threat.is(Terran.Marine)
-    || threat.is(Terran.Vulture)
+    threat.isAny(Terran.Bunker, Terran.SCV, Terran.Marine, Terran.Vulture)
     || threat.pixelDistanceEdge(dragoon, pixel) > threat.pixelRangeAgainst(dragoon) + 48.0
   )
   

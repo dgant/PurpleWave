@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -35,7 +35,7 @@ class PvR2Gate4Gate extends GameplanTemplate {
       new UpgradeComplete(Protoss.DragoonRange),
       new EnemyBasesAtLeast(2),
       new EnemyIsTerran),
-    new Attack)
+    new AttackAndHarass)
   override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910

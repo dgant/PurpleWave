@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -31,7 +31,7 @@ class TvRTinfoil extends GameplanTemplateVsRandom {
   
   override def attackPlan: Plan = new If(
     new UpgradeComplete(Terran.MarineRange),
-    new Attack)
+    new AttackAndHarass)
   
   override val buildOrder = Vector(
     Get(9,  Terran.SCV),

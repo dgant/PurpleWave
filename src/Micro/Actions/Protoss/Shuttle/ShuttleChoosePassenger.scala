@@ -14,22 +14,23 @@ object ShuttleChoosePassenger extends Action {
   )
 
   protected def pickupNeed(shuttle: FriendlyUnitInfo, hailer: FriendlyUnitInfo): Double = {
-    val targetedByScarab = hailer.matchups.enemies.exists(r => r.is(Protoss.Reaver) && r.cooldownLeft > 0) &&
-      With.units.inPixelRadius(hailer.pixel, 32*7).exists(s => s.orderTarget.contains(hailer) && s.is(Protoss.Scarab))
-    val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixel) + 2 * shuttle.unitClass.framesToTurn180
-    val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
+    lazy val targetedByScarab = With.unitsShown.allEnemies(Protoss.Reaver) > 0 && With.units.inPixelRadius(hailer.pixel, 32*7).exists(s => Protoss.Scarab(s) && s.orderTarget.exists(_.pixelDistanceEdge(hailer) < 48))
+    lazy val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixel) + 2 * shuttle.unitClass.framesToTurn180
+    lazy val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
     (
-      (if (shuttle.alliesSquadOrBattle.exists(_ == hailer)) 5 else 1)
-      + (if (targetedByScarab) 100 else 1)
-      + (if (endangered) 10 else 1)
-      + (if (sojourning) 1 else 0))
+      (if (Protoss.Reaver(hailer)) 1000 else 1)
+      * (
+        (if (shuttle.alliesSquadOrBattle.exists(_ == hailer)) 5 else 1)
+        + (if (targetedByScarab) 100 else 1)
+        + (if (endangered) 10 else 1)
+        + (if (sojourning) 1 else 0)))
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val pickupCandidates = With.units.ours
       .view
       .filter(passenger =>
-        Protoss.Reaver(passenger) && (
+        passenger.isAny(Protoss.Reaver, Protoss.HighTemplar) && (
           shuttle.agent.passengers.isEmpty
           || shuttle.agent.passengers.headOption.map(_.squad).getOrElse(shuttle.squad).forall(passenger.squad.contains)))
       .flatMap(_.friendly)

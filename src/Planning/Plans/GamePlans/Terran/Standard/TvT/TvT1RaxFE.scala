@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
@@ -30,7 +30,7 @@ class TvT1RaxFE extends GameplanTemplate {
       new UnitsAtLeast(1, Terran.Factory))))
 
   override def scoutPlan = new ScoutAt(12)
-  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
+  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass)
 
   val naturalZone: Zone = With.geography.ourNatural.zone
   override lazy val blueprints: Seq[Blueprint] = Seq(

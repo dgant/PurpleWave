@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 import Lifecycle.With
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -29,7 +29,7 @@ class PvT1015Expand extends GameplanTemplate {
 
   override val removeMineralBlocksAt: Int = 20
   override def scoutPlan = new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutNow)
-  override val attackPlan = new Attack
+  override val attackPlan = new AttackAndHarass
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.PvT1015GateGoon
 
   override def aggressionPlan: Plan = new If(

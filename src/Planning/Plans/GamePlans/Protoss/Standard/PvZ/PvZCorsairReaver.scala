@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -41,7 +41,7 @@ class PvZCorsairReaver extends GameplanTemplate {
           new UnitsAtLeast(2, Protoss.Reaver, complete = true),
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true))),
       new Parallel(
-        new Attack,
+        new AttackAndHarass,
         new PvZRequireMiningBases(3))),
     new If(
       new Or(

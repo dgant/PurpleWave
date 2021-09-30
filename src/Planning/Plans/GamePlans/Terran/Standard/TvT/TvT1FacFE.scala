@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Attack, FloatBuildings}
+import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
@@ -20,7 +20,7 @@ class TvT1FacFE extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(2, Terran.Factory))
 
   override def scoutPlan = new ScoutAt(13)
-  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack)
+  override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass)
 
   override def buildOrder: Seq[BuildRequest] = Seq(
     Get(9, Terran.SCV),

@@ -331,7 +331,7 @@ class PvPOpening extends GameplanImperative {
 
     if (enemies(Protoss.Dragoon) == 0 && ! enemyStrategy(With.fingerprints.proxyGateway)) {
       if (employing(PvP1012)) {
-        if ( ! foundEnemyBase) {
+        if ( ! foundEnemyBase && ! PvPIdeas.attackFirstZealot) {
           scoutOn(Protoss.Gateway, quantity = 2)
         }
       } else if (starts > 3) {
@@ -354,7 +354,7 @@ class PvPOpening extends GameplanImperative {
         // Wait until we have at least three Zealots together; then go in hard
         aggression(0.75)
         val zealots = With.units.ours.filter(u => Protoss.Zealot(u) && u.battle.exists(_.us.units.count(Protoss.Zealot) > 2)).toVector
-        commitZealots ||= zealots.size > 2
+        commitZealots ||= zealots.size >= (if (employing(PvP3Zealot)) 3 else 5)
         if (commitZealots) {
           //With.blackboard.pushKiters.set(true)
           With.units.ours.filter(Protoss.Zealot).filter(_.complete).foreach(_.agent.commit = true)
@@ -371,7 +371,6 @@ class PvPOpening extends GameplanImperative {
       Get(Protoss.Pylon),
       Get(10, Protoss.Probe),
       Get(Protoss.Gateway))
-
 
     /////////////////////////
     // React against proxy //

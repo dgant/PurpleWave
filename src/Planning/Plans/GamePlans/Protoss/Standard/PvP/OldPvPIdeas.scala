@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Mathematics.Maff
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel, _}
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -90,7 +90,7 @@ object OldPvPIdeas {
           new UnitsAtLeast(1, Protoss.Shuttle, complete = true)),
         new Not(new EnemyStrategy(With.fingerprints.fourGateGoon)))))
 
-  class AttackSafely extends If(new OldPvPIdeas.PvPSafeToMoveOut, new Attack)
+  class AttackSafely extends If(new OldPvPIdeas.PvPSafeToMoveOut, new AttackAndHarass)
 
   class ReactToCannonRush extends If(
     new And(
@@ -338,7 +338,7 @@ object OldPvPIdeas {
     new Parallel(
       new WriteStatus("ReactToProxyGate"),
       new PerformReactionTo2Gate,
-      new If(new UpgradeStarted(Protoss.DragoonRange), new Attack),
+      new If(new UpgradeStarted(Protoss.DragoonRange), new AttackAndHarass),
       new If(
         new Not(new SafeAtHome),
         new Build(

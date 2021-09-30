@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
@@ -20,7 +20,7 @@ class ZergReactionVsWorkerRush extends GameplanTemplate {
   override val activationCriteria: Predicate = new EnemyStrategy(With.fingerprints.workerRush)
   override val completionCriteria: Predicate = new And(new UnitsAtLeast(6, Zerg.Zergling, complete = true), new UpgradeStarted(Zerg.ZerglingSpeed))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
 
   override def buildPlans: Seq[Plan] = Seq(
     new If(

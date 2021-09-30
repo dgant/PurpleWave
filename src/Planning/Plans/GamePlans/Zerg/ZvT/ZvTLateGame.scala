@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -18,7 +18,7 @@ class ZvTLateGame extends GameplanTemplate  {
 
   override def attackPlan: Plan = new If(
     new BasesAtLeast(3),
-    new Attack,
+    new AttackAndHarass,
     new ConsiderAttacking)
 
   override def buildPlans: Seq[Plan] = Seq(

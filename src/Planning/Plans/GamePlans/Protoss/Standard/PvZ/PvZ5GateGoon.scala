@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.PvZRequireMiningBases
@@ -27,7 +27,7 @@ class PvZ5GateGoon extends GameplanTemplate {
       new UnitsAtLeast(3, Protoss.Reaver)))
   override def attackPlan: Plan = new Trigger(
     new UpgradeComplete(Protoss.DragoonRange),
-    new Attack,
+    new AttackAndHarass,
     new PvZIdeas.ConditionalAttack)
 
   override def archonPlan: Plan = new PvZIdeas.MeldArchonsUntilStorm

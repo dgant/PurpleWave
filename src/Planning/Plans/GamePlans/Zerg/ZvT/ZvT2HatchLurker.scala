@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -50,14 +50,14 @@ class ZvT2HatchLurker extends GameplanTemplate {
       new ScoutNow))
 
   override def attackPlan: Plan = new Parallel(
-    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new Attack),
-    new If(new TechComplete(Zerg.LurkerMorph), new Attack),
+    new If(new UnitsAtLeast(1, Zerg.Mutalisk, complete = true), new AttackAndHarass),
+    new If(new TechComplete(Zerg.LurkerMorph), new AttackAndHarass),
     new If(
       new EnemyMech,
       new If(
         new UpgradeComplete(Zerg.HydraliskSpeed),
-        new Attack),
-      new Attack))
+        new AttackAndHarass),
+      new AttackAndHarass))
 
   class EnoughLurkersToAttack extends UnitsAtLeast(4, Zerg.Lurker, complete = true)
 

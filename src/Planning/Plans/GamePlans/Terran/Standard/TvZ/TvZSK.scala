@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack, FloatBuildings}
+import Planning.Plans.Army.{Aggression, AttackAndHarass, FloatBuildings}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -48,7 +48,7 @@ class TvZSK extends GameplanTemplate {
       new EnemiesAtLeast(4, MatchOr(Zerg.SunkenColony, Zerg.CreepColony))))
 
   override def scoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new If(new CanAttack, new Attack)
+  override def attackPlan: Plan = new If(new CanAttack, new AttackAndHarass)
   override def workerPlan: Plan = new Parallel(
     new Trigger(
       new Or(

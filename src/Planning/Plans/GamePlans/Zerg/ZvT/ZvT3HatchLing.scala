@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllInIf, Attack}
+import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -26,12 +26,12 @@ class ZvT3HatchLing extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvT3HatchLing)
 
   override def attackPlan: Plan = new Parallel(
-    new If(new UpgradeComplete(Zerg.HydraliskRange), new Attack),
+    new If(new UpgradeComplete(Zerg.HydraliskRange), new AttackAndHarass),
     new If(
       new Or(
         new EnemiesAtMost(0, Terran.Factory),
         new UpgradeComplete(Zerg.ZerglingSpeed)),
-      new Attack))
+      new AttackAndHarass))
 
   override def scoutPlan: Plan = new If(
     new And(

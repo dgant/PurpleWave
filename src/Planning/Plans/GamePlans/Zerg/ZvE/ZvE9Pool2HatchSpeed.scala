@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, AllInIf, Attack}
+import Planning.Plans.Army.{Aggression, AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -34,7 +34,7 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new EnemyIsZerg,
     super.attackPlan,
-    new Attack)
+    new AttackAndHarass)
 
   override val buildOrder = Seq(
     Get(9, Zerg.Drone),

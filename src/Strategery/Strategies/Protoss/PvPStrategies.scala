@@ -16,6 +16,7 @@ abstract class PvPStrategy extends Strategy {
 ///////////////////
 
 object PvP3Zealot extends PvPStrategy {
+  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.coreBeforeZ)
   // Longer maps
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Arcadia, Heartbreak, Aztec, MatchPoint, TauCross)
 }

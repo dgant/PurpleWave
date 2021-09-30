@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllInIf, Attack}
+import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -24,7 +24,7 @@ class ZvT7Pool extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvT7Pool)
   override val completionCriteria: Predicate = new BasesAtLeast(2)
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
 
   override def scoutPlan: Plan = new If(
     new And(

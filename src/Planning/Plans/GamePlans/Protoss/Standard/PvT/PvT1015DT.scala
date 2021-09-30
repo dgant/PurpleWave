@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Macro.BuildRequests.BuildRequest
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.Trigger
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
@@ -18,7 +18,7 @@ class PvT1015DT extends GameplanTemplate {
   
   override val activationCriteria = new Employing(PvT1015DT)
   override val completionCriteria = new MiningBasesAtLeast(2)
-  override val attackPlan = new Attack
+  override val attackPlan = new AttackAndHarass
   override def scoutPlan = new ScoutOn(Protoss.Gateway, quantity = 2)
 
   override def workerPlan: Plan = new PumpWorkers(oversaturate = true)

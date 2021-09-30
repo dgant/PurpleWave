@@ -6,15 +6,15 @@ object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
-  val defaultPvT = StrategySelectionFixed(PvTZZCoreZ, PvT2BaseReaver, PvT3BaseArbiter, PvEStormYes)
+  val defaultPvT = StrategySelectionFixed(PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes)
   val defaultPvP = new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvPGateCoreGate)
   val defaultPvZ = StrategySelectionFixed(PvZ2GateFlex)
 
   // AIIDE 2021
   // Terran
   val dragon      : Opponent = add("Dragon",      defaultPvT)
-  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvT2BaseReaver, PvT3BaseArbiter, PvEStormYes))
-  val taiji       : Opponent = add("Taiji",       defaultPvT)
+  val willyt      : Opponent = add("WillyT",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes))
+  val taiji       : Opponent = add("Taiji",       new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes))
   // Protoss
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
@@ -25,7 +25,7 @@ object Opponents {
   val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val freshmeat   : Opponent = add("FreshMeat",   defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
-  val real5drone  : Opponent = add("real5Drone",  new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseForgeTech, PvZMidgameBisu, PvZLateGameTemplar))
+  val real5drone  : Opponent = add("real5Drone",  defaultPvZ) //new StrategySelectionRecommended(defaultPvZ, PvZ1BaseForgeTech, PvZMidgameBisu, PvZLateGameTemplar))
   val crona       : Opponent = add("Crona",       freshmeat.policy)
   val zzzkbot     : Opponent = add("ZZZKBot",     real5drone.policy)
   // Random

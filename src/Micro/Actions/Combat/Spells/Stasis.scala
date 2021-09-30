@@ -39,11 +39,10 @@ object Stasis extends TargetedSpell {
           + (if (target.unitClass.isDetector) 2.0 else 0.0)
           + (if (target.is(Terran.SiegeTankSieged)) 0.5 else if (target.is(Terran.SiegeTankUnsieged)) 0.25 else 0.0)
         )
-      else 0.0)
-      )
-
+      else 0.0))
+    val fightValue = if (caster.agent.shouldEngage) 1.0 else 0.25
     
-    val output = target.subjectiveValue * teamValue
+    val output = target.subjectiveValue * teamValue * fightValue
     output
   }
 }

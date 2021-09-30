@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Aggression, AllInIf, Attack}
+import Planning.Plans.Army.{Aggression, AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -45,7 +45,7 @@ class ZvE4Pool extends GameplanTemplate {
   
   override def supplyPlan: Plan = NoPlan()
   
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
   
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(0, 0),

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.{AllInIf, Attack}
+import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -28,7 +28,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
       new ScoutOn(Zerg.Extractor),
       new ScoutOn(Zerg.HydraliskDen)))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
   override def supplyPlan: Plan = new Trigger(
     new UnitsAtLeast(1, Zerg.HydraliskDen),
     new If(

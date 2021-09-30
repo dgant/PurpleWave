@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -27,7 +27,7 @@ class ZvT13PoolMuta extends GameplanTemplate {
     new ZergReactionVsWorkerRush)
 
   override def scoutPlan: Plan = NoPlan()
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
   
   override def buildOrderPlan: Plan = new Parallel (
     new BuildOrder(

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.Situational.PlacementForgeFastExpand
 import Planning.Plans.Macro.Automatic._
@@ -23,7 +23,7 @@ object PvZIdeas {
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3)),
-    new Attack)
+    new AttackAndHarass)
 
   class TemplarUpToEight extends MeldArchons(49) { override def maximumTemplar = 8 }
 

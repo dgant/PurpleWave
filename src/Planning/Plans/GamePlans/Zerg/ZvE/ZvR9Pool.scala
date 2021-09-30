@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvE
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -36,7 +36,7 @@ class ZvR9Pool extends GameplanTemplate {
         new Not(EnemyStrategy(With.fingerprints.fourPool))),
       UnitsAtLeast(1, Zerg.Mutalisk, complete = true),
       UnitsAtLeast(1, Zerg.Lurker, complete = true)),
-    new Attack)
+    new AttackAndHarass)
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvZIdeas.ReactToFourPool,

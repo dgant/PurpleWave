@@ -51,7 +51,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
   override def attackPlan: Plan = new If(
     new ReadyToAttack,
     new Parallel(
-      new Delay(Seconds(7)(), new Attack),
+      new Delay(Seconds(7)(), new AttackAndHarass),
       new AttackWithWorkers(new CountExcept(4, MatchWorker))))
 
   override def supplyPlan: Plan = NoPlan()

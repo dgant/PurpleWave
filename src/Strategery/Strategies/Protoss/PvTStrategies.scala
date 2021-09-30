@@ -35,7 +35,6 @@ object PvT13Nexus extends PvTBasicOpener {
 }
 object PvT24Nexus extends PvTBasicOpener
 object PvTZZCoreZ extends PvTBasicOpener
-object PvT4Gate extends PvTBasicOpener
 object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.twoRax1113,
@@ -47,6 +46,7 @@ object PvT2GateRangeExpand extends PvTBasicOpener {
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
+    With.fingerprints.bunkerRush,
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE)
 }
@@ -118,14 +118,15 @@ object PvT2BaseReaver extends PvTStrategy {
 }
 object PvT3rdFast extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bio)
 }
 object PvT3rdObs extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvT3BaseArbiter, PvT3BaseCarrier, PvT3BaseGateway))
 }
-object PvT2BaseCarrier extends PvTEndgame
-object PvT2BaseArbiter extends PvTEndgame
+object PvT2BaseCarrier extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bio) }
+object PvT2BaseArbiter extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bio) }
 object PvT2BaseGateway extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
-object PvT3BaseCarrier extends PvTEndgame
+object PvT3BaseCarrier extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.bio) }
 object PvT3BaseArbiter extends PvTEndgame
 object PvT3BaseGateway extends PvTEndgame { override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.oneArmoryUpgrades, With.fingerprints.twoArmoryUpgrades) }
 

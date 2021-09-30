@@ -109,7 +109,6 @@ class PvZ2GateFlex extends GameplanImperative{
     val safeFromGround = (upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.GroundDamage)) || enemyMutalisksLikely
     if (safeFromGround && safeFromMutalisks && safeToMoveOut) {
       attack()
-      harass()
       requireMiningBases(2)
     }
 

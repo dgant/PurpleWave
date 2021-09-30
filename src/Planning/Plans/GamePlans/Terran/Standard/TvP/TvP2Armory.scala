@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -26,7 +26,7 @@ class TvP2Armory extends GameplanTemplate {
     new TvPIdeas.TvPAttack,
     new If(
       new UpgradeComplete(Terran.MechDamage, 2),
-      new Attack))
+      new AttackAndHarass))
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

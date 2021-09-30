@@ -35,6 +35,7 @@ object PsionicStorm extends TargetedSpell {
 
     // Don't wander into tank range
     if (target.isEnemy
+      && ! caster.agent.shouldEngage
       && templar < 3
       && Terran.SiegeTankSieged(target)
       && caster.pixelDistanceCenter(target) > 32 * castRangeTiles
@@ -51,8 +52,15 @@ object PsionicStorm extends TargetedSpell {
     val multiplierMany    = if (templar > 5) 2.0 else if (templar > 2) 1.4 else 1.0
     val multiplierRich    = if (storms >= 3) 2.0 else if (storms >= 2) 1.5 else 1.0
     val multiplierSpeed   = Maff.clamp(Maff.nanToOne(Protoss.Dragoon.topSpeed / target.topSpeed), 0, 1)
-    val multiplierSilly   = if (target.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Overlord)) 0.2 else 1.0
-    val output            = multiplayerPlayer * multiplierUnit * multiplierDanger * multiplierMany * multiplierRich * multiplierSpeed * multiplierSilly
+    val multiplierFight   = if (caster.agent.shouldEngage) 1.0 else 0.25
+    val multiplierSilly =
+      if (target.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Overlord))
+        0.2
+      else if (target.isAny(Terran.Vulture, Zerg.Mutalisk, Protoss.Dragoon) && target.matchups.targetsInRange.isEmpty && target.matchups.threatsInRange.isEmpty)
+        0.2
+      else
+        1.0
+    val output            = multiplayerPlayer * multiplierUnit * multiplierDanger * multiplierMany * multiplierRich * multiplierSpeed * multiplierFight * multiplierSilly
     output
   }
   

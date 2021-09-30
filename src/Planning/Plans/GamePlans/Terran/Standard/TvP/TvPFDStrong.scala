@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -29,7 +29,7 @@ class TvPFDStrong extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(2, Protoss.Gateway),
       new ConsiderAttacking,
-      new Attack))
+      new AttackAndHarass))
   
   override def emergencyPlans: Seq[Plan] = super.emergencyPlans ++
     TvPIdeas.emergencyPlans

@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWorker}
+import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWarriors, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.GameTime
@@ -63,7 +63,7 @@ class PvTBasic extends GameplanTemplate {
       new Or(new Latch(new UnitsAtLeast(1, Protoss.Reaver, complete = true)),       new Not(new Employing(PvT1GateReaver)),   new UpgradeStarted(Protoss.DragoonRange))),
     new PvTIdeas.AttackSafely)
 
-  override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToBBS, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush)
+  override def emergencyPlans: Seq[Plan] = Vector(new PvTIdeas.ReactToRaxCheese, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush)
 
   override def buildOrderPlan: Plan = new Parallel(
     new If(new Employing(PvT13Nexus),           new BuildOrder(ProtossBuilds.PvT13Nexus_GateCoreGateZ: _*)),
@@ -238,18 +238,8 @@ class PvTBasic extends GameplanTemplate {
       new Latch(new BasesAtLeast(3)),
       new SafeToMoveOut,
       new Or(
-        // We can always match base count
-        new EnemyBasesAtLeast(4),
-        new EnemiesAtLeast(4, Terran.CommandCenter),
-        // Vs Armory + 3rd CC can take 4 bases
-        new And(
-          new EnemiesAtLeast(3, Terran.CommandCenter),
-          new EnemyStrategy(With.fingerprints.oneArmoryUpgrades)),
-        // Vs Double Armory (or Armory + Starport) can take 4-5 base
-        new EnemyStrategy(With.fingerprints.twoArmoryUpgrades)),
-        new And(
-          new EnemyStrategy(With.fingerprints.bio),
-          new UnitsAtLeast(1, Protoss.Arbiter, complete = true))),
+        new EnemyBasesAtLeast(3),
+        new EnemiesAtLeast(3, Terran.CommandCenter))),
     new Parallel(
       new WriteStatus("Instant4th"),
       new RequireMiningBases(3),
@@ -321,9 +311,9 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
-        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),                                   new GoCarrier),
-        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun), new Employing(PvEStormYes)),  new GoStorm),
-        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),                              new GoArbiter))),
+        new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier),
+        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun), new Employing(PvEStormYes), new UnitsAtLeast(12, MatchWarriors)), new GoStorm),
+        new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter))),
 
     new HighPriorityTech,
     new PvTIdeas.TrainArmy,

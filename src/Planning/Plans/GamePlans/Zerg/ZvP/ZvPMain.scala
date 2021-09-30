@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -23,7 +23,7 @@ class ZvPMain extends GameplanTemplate {
 
   override val completionCriteria: Predicate = new Latch(new UnitsAtLeast(5, Zerg.Hatchery))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
   override def scoutPlan: Plan = NoPlan()
 
   class AttemptZerglingBust extends And(

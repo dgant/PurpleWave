@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -29,7 +29,7 @@ class TvP2FacJoyO extends GameplanTemplate {
     new Or(
       new UnitsAtLeast(3, MatchTank, complete = true),
       new EnemyStrategy(With.fingerprints.nexusFirst)),
-    new Attack)
+    new AttackAndHarass)
 
   val vulturesVs2Gate = 7
   override def emergencyPlans: Seq[Plan] = Seq(new If(

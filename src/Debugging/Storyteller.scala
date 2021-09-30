@@ -17,7 +17,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Strategery.Strategies.Strategy
-import Utilities.Time.{Frames, GameTime, Minutes}
+import Utilities.Time.{Frames, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.JavaConverters._
@@ -182,6 +182,7 @@ class Storyteller {
         DrawScreen.padTable(
           Vector(
             Vector("A* pathfinds:", With.paths.aStarPathfinds.toString),
+            Vector("Exploration maxed:", With.paths.aStarExplorationMaxed.toString),
             Vector("Over 1ms:", With.paths.aStarOver1ms.toString),
             Vector("Max ms:", (With.paths.aStarNanosMax / 1e6).toString),
             Vector("Mean ms:", formatterMs.format(With.paths.aStarNanosTotal / 1e6d / With.paths.aStarPathfinds)),

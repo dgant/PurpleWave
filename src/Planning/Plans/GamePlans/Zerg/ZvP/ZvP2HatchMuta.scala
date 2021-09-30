@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
@@ -77,7 +77,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       UpgradeComplete(Zerg.ZerglingSpeed),
       ShouldDoSpeedlingAllIn,
       EnemyBasesAtLeast(2)),
-    new Attack)
+    new AttackAndHarass)
 
   override def buildOrderPlan: Plan = new Parallel(
     new BuildOrder(

@@ -27,6 +27,7 @@ object Commander {
   }
   
   def stop(unit: FriendlyUnitInfo): Unit = {
+    unit.agent.setRideGoal(unit.pixel)
     leadFollower(unit, stop)
     if (unit.unready) return
     unit.bwapiUnit.stop()
@@ -35,6 +36,7 @@ object Commander {
   }
   
   def hold(unit: FriendlyUnitInfo): Unit = {
+    unit.agent.setRideGoal(unit.pixel)
     leadFollower(unit, hold)
     if (unit.unready) return
     if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
@@ -51,8 +53,8 @@ object Commander {
   private val tryingToMoveThreshold = 32
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    leadFollower(unit, attack(_, target))
     unit.agent.setRideGoal(target.pixel)
+    leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
     if (Protoss.Reaver(unit)) {
@@ -63,7 +65,7 @@ object Commander {
       return
     }
 
-    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    if ( ! unit.is(Zerg.Lurker) && autoUnburrow(unit)) return
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
 
     // We used to skip Photon Cannons here due to inadvertent attack cancelling.
@@ -199,8 +201,8 @@ object Commander {
 
   def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(attackMove(unit, _))
   private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
-    leadFollower(unit, attackMove(_, destination))
     unit.agent.setRideGoal(destination)
+    leadFollower(unit, attackMove(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
@@ -214,8 +216,8 @@ object Commander {
 
   def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(patrol(unit, _))
   private def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
-    leadFollower(unit, patrol(_, destination))
     unit.agent.setRideGoal(destination)
+    leadFollower(unit, patrol(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = getAdjustedDestination(unit, destination)
@@ -226,11 +228,11 @@ object Commander {
 
   def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
   private def move(unit: FriendlyUnitInfo, destination: Pixel) {
-    leadFollower(unit, move(_, destination))
     unit.agent.setRideGoal(destination)
+    leadFollower(unit, move(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
-    autoUnburrow(unit)
+    if (autoUnburrow(unit)) return
     val to = getAdjustedDestination(unit, destination)
     if (Terran.Medic(unit) && unit.agent.shouldEngage) {
       attackMove(unit, to)
@@ -266,32 +268,35 @@ object Commander {
   }
   
   def useTech(unit: FriendlyUnitInfo, tech: Tech) {
-    if (unit.unready) return
-    autoUnburrow(unit)
     if (tech == Terran.Stim) {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
     }
+    if (unit.unready) return
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     unit.bwapiUnit.useTech(tech.bwapiTech)
     sleep(unit)
   }
   
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
-    if (unit.unready) return
     unit.agent.setRideGoal(target.pixel)
-    autoUnburrow(unit)
+    if (unit.unready) return
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapiUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
       sleep(unit, 48)
-    }
-    else {
+    } else {
       sleep(unit)
     }
   }
   
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
+    unit.agent.setRideGoal(target)
     if (unit.unready) return
-    autoUnburrow(unit)
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapi)
     if (tech == Terran.SpiderMinePlant) {
       sleep(unit, 12)
@@ -301,15 +306,19 @@ object Commander {
   }
   
   def repair(unit: FriendlyUnitInfo, target: UnitInfo) {
+    unit.agent.setRideGoal(target.pixel)
     if (unit.unready) return
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     unit.bwapiUnit.repair(target.bwapiUnit)
     sleep(unit, 24)
   }
   
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     if (unit.carrying) {
-      autoUnburrow(unit)
       unit.bwapiUnit.returnCargo()
       sleepReturnCargo(unit)
     }
@@ -317,8 +326,10 @@ object Commander {
 
   def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
   private def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
+    unit.agent.setRideGoal(resource.pixel)
     if (unit.unready) return
-    autoUnburrow(unit)
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     if (unit.carrying) {
       // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
@@ -378,14 +389,17 @@ object Commander {
 
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
     if (unit.unready) return
-    autoUnburrow(unit)
+    if (autoUnburrow(unit)) return
+    // Don't auto-unload! We have a separate process for building Scarabs in loaded Reavers
     unit.bwapiUnit.build(unitClass.bwapiType)
     sleepBuild(unit)
   }
   
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
+    unit.agent.setRideGoal(tile.center)
     if (unit.unready) return
-    autoUnburrow(unit)
+    if (autoUnburrow(unit)) return
+    if (autoUnload(unit)) return
     if (unit.pixelDistanceSquared(tile.center) > Math.pow(32.0 * 5.0, 2)) {
       move(unit, tile.center)
       return
@@ -491,9 +505,18 @@ object Commander {
     sleep(unit)
   }
   
-  private def autoUnburrow(unit: FriendlyUnitInfo): Unit = {
-    if (unit.unready) return
-    if (unit.burrowed) unburrow(unit)
+  private def autoUnburrow(unit: FriendlyUnitInfo): Boolean = {
+    if (unit.unready) return false
+    if ( ! unit.burrowed) return false
+    unburrow(unit)
+    true
+  }
+
+  private def autoUnload(unit: FriendlyUnitInfo): Boolean = {
+    if (unit.unready) return false
+    if (unit.transport.isEmpty) return false
+    unload(unit.transport.get, unit)
+    true
   }
 
   private def autoUnburrowUnlessLurkerInRangeOf(unit: FriendlyUnitInfo, to: Pixel): Unit = {

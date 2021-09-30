@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
@@ -30,7 +30,7 @@ class TvP6Fac extends GameplanTemplate {
       new Or(
         new UnitsAtLeast(6, Terran.Factory, complete = true),
         new UnitsAtLeast(8, MatchTank, complete = true)),
-    new Attack))
+    new AttackAndHarass))
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

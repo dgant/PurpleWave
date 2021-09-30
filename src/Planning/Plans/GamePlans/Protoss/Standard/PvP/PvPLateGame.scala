@@ -105,7 +105,6 @@ class PvPLateGame extends GameplanImperative {
     if (shouldSecondaryTech) status("2ndTech")
     if (shouldExpand) status("shouldExpand")
     if (shouldAttack) attack()
-
     if (shouldHarass) harass()
     primaryTech.map(_.toString).foreach(status)
 

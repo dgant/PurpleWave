@@ -21,7 +21,7 @@ class PvTStove extends GameplanTemplate {
   override def scoutPlan = new ScoutOn(Protoss.Pylon)
 
   override def emergencyPlans: Seq[Plan] = Vector(
-    new PvTIdeas.ReactToBBS,
+    new PvTIdeas.ReactToRaxCheese,
     new PvTIdeas.ReactToWorkerRush)
 
   override def attackPlan = new If(

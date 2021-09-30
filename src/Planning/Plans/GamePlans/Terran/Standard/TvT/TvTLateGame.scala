@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, FloatBuildings}
+import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -21,7 +21,7 @@ class TvTLateGame extends GameplanTemplate {
     new Or(
       new UnitsAtLeast(5, Terran.Factory, complete = true),
       new TechStarted(Terran.WraithCloak)),
-    new Attack)
+    new AttackAndHarass)
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

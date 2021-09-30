@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{Aggression, Attack, AttackWithWorkers}
+import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -41,7 +41,7 @@ class TvEProxyBBS extends GameplanTemplate {
   }
   
   override def attackPlan: Plan = new Parallel(
-    new Attack,
+    new AttackAndHarass,
     new Trigger(
       new UnitsAtLeast(2, Terran.Marine),
       new AttackWithWorkers(new CountExcept(8, MatchWorker))))

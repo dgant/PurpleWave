@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -25,7 +25,7 @@ class ZvPOpening extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(ZvP12Hatch, ZvPOverpool, ZvP9Pool)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(3))
 
-  override def attackPlan: Plan = new Attack
+  override def attackPlan: Plan = new AttackAndHarass
 
   override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.forgeFe)),

@@ -4,6 +4,6 @@ import Planning.Plans.Compound.If
 import Planning.Predicates.Reactive.SafeToMoveOut
 
 class ConsiderAttacking extends If(new SafeToMoveOut) {
-  val attack: Attack = new Attack
+  val attack: AttackAndHarass = new AttackAndHarass
   whenTrue.set(attack)
 }

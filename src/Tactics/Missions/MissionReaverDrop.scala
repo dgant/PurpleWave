@@ -7,15 +7,18 @@ import Planning.ResourceLocks.LockUnits
 import Planning.UnitCounters.{CountOne, CountUpTo}
 import Planning.UnitMatchers._
 import Planning.UnitPreferences.PreferClose
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
 
 class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
-    (With.enemies.exists(_.isTerran) && With.frame < Minutes(8)())
-    || ((With.scouting.enemyProgress > 0.5 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
-      && (MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)()))
+    (With.enemies.exists(_.isTerran) && With.frame < Minutes(9)())
+    || (
+      // Will their base be empty?
+      (With.scouting.enemyProgress > 0.35 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
+      // Can we get there safely?
+      && (MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)()) || With.unitsShown.allEnemies(Terran.Wraith, Terran.Goliath, Protoss.Dragoon, Zerg.Scourge, Zerg.Mutalisk) == 0)
       && With.recruiter.available.exists(reaverLock.matcher)))
 
   override protected def shouldStopRaiding: Boolean = passengers.view

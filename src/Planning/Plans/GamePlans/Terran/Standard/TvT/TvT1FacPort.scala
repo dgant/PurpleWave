@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -22,10 +22,10 @@ class TvT1FacPort extends GameplanTemplate {
 
   override def scoutPlan = new ScoutAt(13)
   override def attackPlan = new Parallel(
-    new If(new EnemyStrategy(With.fingerprints.fourteenCC), new Attack),
+    new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass),
     new Trigger(
       new UnitsAtLeast(1, Terran.Wraith, complete = true),
-      new Attack))
+      new AttackAndHarass))
 
 
   override def buildOrder: Seq[BuildRequest] = Seq(

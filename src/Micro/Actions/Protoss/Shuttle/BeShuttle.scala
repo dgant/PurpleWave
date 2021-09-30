@@ -9,6 +9,7 @@ object BeShuttle extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Shuttle(unit)
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
+    ShuttleDitchPassengers.consider(shuttle)
     ShuttleChoosePassenger.consider(shuttle)
     ShuttlePickup.consider(shuttle)
     ShuttleCarry.consider(shuttle)

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -32,7 +32,7 @@ class ZvT7PoolLurker extends GameplanTemplate {
 
   override def attackPlan: Plan = new If(
     new UnitsAtLeast(1, Zerg.Lurker, complete = true),
-    new Attack,
+    new AttackAndHarass,
     super.attackPlan
   )
 

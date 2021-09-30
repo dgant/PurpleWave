@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.{Aggression, Attack}
+import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -29,7 +29,7 @@ class TvPDeep4 extends GameplanTemplate {
       new UnitsAtLeast(12, MatchOr(Terran.Marine, Terran.Medic), complete = true),
       new Parallel(
         new Aggression(1.5),
-        new Attack)))
+        new AttackAndHarass)))
 
   override def workerPlan: Plan = new Parallel(
     new If(

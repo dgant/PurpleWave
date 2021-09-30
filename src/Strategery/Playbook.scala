@@ -30,6 +30,8 @@ object StrategyGroups {
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
     PvTStove, // TODO: For ladder/fun play only
+
+    PvT2BaseGateway // Has issues and isn't good anyway
   )
 }
 

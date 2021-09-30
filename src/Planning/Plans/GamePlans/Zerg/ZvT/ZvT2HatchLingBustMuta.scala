@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.{AllInIf, Attack}
+import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -23,7 +23,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Trigger(
     new UpgradeComplete(Zerg.ZerglingSpeed, 1, Seconds(10)()),
-    new Attack)
+    new AttackAndHarass)
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,

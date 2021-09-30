@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.{Attack, ConsiderAttacking}
+import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
@@ -52,7 +52,7 @@ object TvPIdeas {
       // Otherwise, wait for our later timing
       new Trigger(
         new Not(new SafeToMoveOut),
-        initialBefore = new Attack)),
+        initialBefore = new AttackAndHarass)),
     new Trigger(
       new Or(
         new MiningBasesAtLeast(3),
@@ -60,7 +60,7 @@ object TvPIdeas {
         new EnemyHasShown(Protoss.Carrier),
         new EnemyHasShown(Protoss.Interceptor),
         new EnemyHasShown(Protoss.FleetBeacon)),
-      new Attack))
+      new AttackAndHarass))
 
   class CutGasDuringFactory extends If(
     new And(

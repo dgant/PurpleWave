@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
 import Macro.BuildRequests.{BuildRequest, Get}
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -25,7 +25,7 @@ class TerranReactionVsWorkerRush extends GameplanTemplate {
     Get(8, Terran.SCV),
     Get(Terran.Barracks))
 
-  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Vulture), new Attack)
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Vulture), new AttackAndHarass)
 
   override def workerPlan: Plan = NoPlan()
 

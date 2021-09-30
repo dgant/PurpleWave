@@ -14,9 +14,11 @@ trait TilePathfinder {
   val stampDefault: Long = Long.MinValue
   var stampCurrent: Long = 0L
   private var tilesExplored: Long = 0
+  private val tilesExploredMax: Long = 2 * (With.mapTileWidth + With.mapTileHeight)
 
   // Performance metrics
   var aStarPathfinds: Long = 0
+  var aStarExplorationMaxed: Long = 0
   var aStarOver1ms: Long = 0
   var aStarNanosMax: Long = 0
   var aStarNanosTotal: Long = 0
@@ -109,6 +111,7 @@ trait TilePathfinder {
     val nanosDelta = Math.max(0, System.nanoTime() - nanosBefore)
     val pathLength = output.tiles.map(_.length).getOrElse(0)
     aStarPathfinds += 1
+    aStarExplorationMaxed += Maff.fromBoolean(tilesExplored >= tilesExploredMax)
     aStarOver1ms += Maff.fromBoolean(nanosDelta > 1e6)
     aStarNanosMax = Math.max(aStarNanosMax, nanosDelta)
     aStarNanosTotal += nanosDelta
@@ -141,8 +144,7 @@ trait TilePathfinder {
     horizon += startTileState
     tilesExplored = 0
 
-    while (horizon.nonEmpty) {
-
+    while (horizon.nonEmpty && tilesExplored < tilesExploredMax) {
       tilesExplored += 1
       val bestTileState = horizon.dequeue()
       val bestTile = bestTileState.tile

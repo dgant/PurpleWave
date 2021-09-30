@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.BuildRequests.Get
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
@@ -32,7 +32,7 @@ object PvTIdeas {
 
   class AttackSafely extends If(
     new NeedToPressureBarracksCheese,
-    new Attack,
+    new AttackAndHarass,
     new If(
       new Or(
         new Latch(new UnitsAtLeast(8, MatchWarriors)),
@@ -61,7 +61,7 @@ object PvTIdeas {
                 new Latch(new UnitsAtLeast(12, MatchWarriors)),
                 new Not(new EnemyStrategy(With.fingerprints.threeFac))),
               new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
-          new Attack)))
+          new AttackAndHarass)))
 
   class ReactToFiveRaxAs2GateCore extends If(
     new And(
@@ -114,43 +114,46 @@ object PvTIdeas {
         new Pump(Protoss.Dragoon, 3),
         new Pump(Protoss.Zealot, 3))))
 
-  class ReactToBBS extends If(
-    new And(
-      new FrameAtMost(GameTime(10, 0)()),
-      new EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
+  class ReactToRaxCheese extends If(
+    And(
+      FrameAtMost(GameTime(10, 0)()),
+      EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113)),
     new Parallel(
-      new WriteStatus("ReactToBBS"),
-      new CapGasAt(250),
-      new If(new UnitsAtMost(1, Protoss.Gateway, complete = true), new CapGasWorkersAt(1)),
-      new If(new UnitsAtMost(5, MatchWarriors), new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives)),
-      new If(new UnitsAtMost(1, Protoss.Gateway), new CancelIncomplete(MatchOr(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus, Protoss.Stargate))),
-      new RequireSufficientSupply,
-      new If(new UnitsAtLeast(1, Protoss.Reaver, complete = true), new RequireMiningBases(2)),
-      new Pump(Protoss.Reaver),
-      new If(new UnitsAtLeast(2, Protoss.Gateway), new PumpWorkers, new PumpWorkers(cap = 12)),
-      new Build(Get(Protoss.DragoonRange)),
-      new Pump(Protoss.Dragoon),
-      new Pump(Protoss.Zealot, 7),
-      new Build(
+      new WriteStatus("ReactToRaxCheese"),
+      new CapGasAt(200),
+      new BuildOrder(
+        Get(8, Protoss.Probe),
         Get(Protoss.Pylon),
-        Get(2, Protoss.Gateway),
-        Get(18, Protoss.Probe)),
-      new If(new BasesAtMost(1), new Build(Get(Protoss.ShieldBattery))),
-      new Pump(Protoss.Probe),
+        Get(9, Protoss.Probe),
+        Get(Protoss.Gateway),
+        Get(10, Protoss.Probe)),
+      new RequireSufficientSupply,
+      // Worker cut rax cheese requires more extreme measures
+      new If(
+        EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs),
+        new Parallel(
+          new If(UnitsAtMost(1, Protoss.Gateway),
+            new Parallel(
+              new CapGasWorkersAt(0),
+              new CancelIncomplete(MatchOr(Protoss.Assimilator, Protoss.CyberneticsCore)))))),
+      new Pump(Protoss.Reaver),
+      new Pump(Protoss.Zealot, 3),
+      new PumpWorkers,
+      new If(
+        UnitsAtLeast(2, Protoss.Reaver),
+        new RequireMiningBases(2),
+        new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)),
+      new Pump(Protoss.Zealot),
       new Build(
         Get(2, Protoss.Gateway),
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),
-        Get(Protoss.DragoonRange),
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay),
+        Get(3, Protoss.Gateway),
         Get(2, Protoss.Nexus))))
 
-  class TrainMinimumDragoons extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
-    new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))
-
-  class EnemyHasMines extends Or(new EnemyHasShown(Terran.SpiderMine), new EnemyHasTech(Terran.SpiderMinePlant))
+  class EnemyHasMines extends Or(EnemyHasShown(Terran.SpiderMine), EnemyHasTech(Terran.SpiderMinePlant))
 
   class TrainDarkTemplar extends If(
     new And(
@@ -189,28 +192,34 @@ object PvTIdeas {
       new Employing(PvTStove)),
     new Pump(Protoss.Scout, 5))
 
+  class TrainMinimumDragoons extends Parallel(
+    new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
+    new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))
+
   class TrainGatewayUnits extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Terran.Wraith, 2.0), Enemy(Terran.Battlecruiser, 5.0))),
-    new PumpRatio(Protoss.Dragoon, 8, 24, Seq(Flat(4.0), Enemy(Terran.Vulture, .75))),
+    new PumpRatio(Protoss.Dragoon, 1, 100, Seq(Enemy(Terran.Wraith, 2.0), Enemy(Terran.Battlecruiser, 5.0))),
+    new PumpRatio(Protoss.Dragoon, 8, 20, Seq(Enemy(Terran.Vulture, .75))),
     new If(
-      new EnemyStrategy(With.fingerprints.bio),
+      EnemyStrategy(With.fingerprints.bio),
       new Parallel(
         new Pump(Protoss.HighTemplar),
         new Pump(Protoss.Zealot)),
       new Parallel(
         new If(
-          new Or(new UpgradeStarted(Protoss.ZealotSpeed), new And(new MineralsAtLeast(600), new GasAtMost(200))),
+          Or(UpgradeStarted(Protoss.ZealotSpeed), And(MineralsAtLeast(600), GasAtMost(200))),
           new PumpRatio(Protoss.Zealot, 0, 50, Seq(
             Enemy(MatchTank, 2.5),
             Enemy(Terran.Goliath,     1.5),
             Enemy(Terran.Marine,      1.0),
             Enemy(Terran.Vulture,     -1.25)))),
-        new If(new GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
-        new If(new Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(MatchWarriors, 0.1)))),
-        new Pump(Protoss.Dragoon))))
+        new If(GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
+        new If(Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(MatchWarriors, 0.1)))),
+        new Pump(Protoss.Dragoon))),
+    new If(Not(UpgradeStarted(Protoss.ZealotSpeed)), new Pump(Protoss.Dragoon)),
+    new Pump(Protoss.Zealot))
 
   class TrainCarriers extends If(
-    new Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),
+    Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),
     new Pump(Protoss.Carrier))
 
   class TrainArmy extends Parallel(

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Macro.BuildRequests.Get
 import Planning.Plan
-import Planning.Plans.Army.Attack
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
@@ -21,7 +21,7 @@ class TvT2BaseBC extends GameplanTemplate {
   override val activationCriteria = new Employing(TvT2BaseBC)
   override val completionCriteria = new Latch(new MiningBasesAtLeast(3))
 
-  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Battlecruiser, complete = true), new Attack)
+  override def attackPlan: Plan = new If(new UnitsAtLeast(1, Terran.Battlecruiser, complete = true), new AttackAndHarass)
 
   override def workerPlan: Plan = new Parallel(
     new Pump(Terran.Comsat),

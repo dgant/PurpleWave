@@ -34,5 +34,6 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
     }
   }
 
-  override def toString = f"StrategySelectionRecommended: ${recommendedBranch.map(_.toString).mkString(" + ")}, falling back to $fallback"
+  override def toString = f"StrategySelectionRecommended: $branchString, falling back to $fallback"
+  protected def branchString: String = recommendedBranch.map(_.toString).mkString(" + ")
 }

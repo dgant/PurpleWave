@@ -26,6 +26,7 @@ abstract class PvTEndgame extends PvTStrategy {
 }
 
 object PvT13Nexus extends PvTBasicOpener {
+  override def startLocationsMin: Int = 4
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,

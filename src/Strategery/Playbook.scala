@@ -23,14 +23,11 @@ object StrategyGroups {
     TvR1Rax, // Why is this disabled? Is it broken?
 
     PvEStormNo, // Let's try storming again with the fixed storm micro
-    PvT13Nexus, // Good Terran bots are bunker rushing this too effectively
 
     PvRProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
-
-    PvZ1BaseForgeTech,
 
     PvTStove, // TODO: For ladder/fun play only
   )

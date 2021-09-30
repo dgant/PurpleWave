@@ -86,7 +86,7 @@ class Storyteller {
     new Story                           ("Sluggishness",        () => With.reaction.sluggishness),
     new Story                           ("Gas worker floor",    () => With.blackboard.gasWorkerFloor()),
     new Story                           ("Gas worker ceiling",  () => With.blackboard.gasWorkerCeiling()),
-    new Story                           ("Gas worker ratio",    () => With.blackboard.gasWorkerRatio),
+    new Story                           ("Gas worker ratio",    () => With.blackboard.gasWorkerRatio()),
     new Story                           ("Gas limit floor",     () => With.blackboard.gasLimitFloor()),
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
   )

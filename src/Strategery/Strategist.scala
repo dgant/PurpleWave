@@ -37,7 +37,8 @@ class Strategist {
   def deselected: Iterator[Strategy] = _deselected.iterator
   def isActive(strategy: Strategy): Boolean = selected.contains(strategy) && _active.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
-    val output = _selected.contains(strategy)
+    // Use public "selected" to force initialization
+    val output = selected.contains(strategy)
     if (output && ! _active.contains(strategy)) {
       With.logger.debug(f"Activating strategy $strategy")
       _active += strategy
@@ -51,14 +52,16 @@ class Strategist {
     _active -= strategy
   }
   def swapIn(strategy: Strategy): Unit = {
-    if ( ! _selected.contains(strategy)) {
+    // Use public "selected" to force initialization
+    if ( ! selected.contains(strategy)) {
       With.logger.debug(f"Swapping in strategy $strategy")
       _selected += strategy
       _deselected -= strategy
     }
   }
   def swapOut(strategy: Strategy): Unit = {
-    if (_selected.contains(strategy)) {
+    // Use public "selected" to force initialization
+    if (selected.contains(strategy)) {
       With.logger.debug(f"Swapping out strategy $strategy")
       _selected -= strategy
       _deselected += strategy
@@ -67,7 +70,12 @@ class Strategist {
   }
 
   private lazy val _standardGamePlan = new StandardGamePlan
-  def gameplan: Plan = _selected.find(_.gameplan.isDefined).map(_.gameplan.get).getOrElse(_standardGamePlan)
+  def gameplan: Plan = {
+    // Use public "selected" to force initialization
+    val selectedWithGameplan = selected.find(_.gameplan.isDefined)
+    selectedWithGameplan.foreach(activate)
+    selectedWithGameplan.map(_.gameplan.get).getOrElse(_standardGamePlan)
+  }
 
   lazy val heightMain       : Double  = With.self.startTile.altitude
   lazy val heightNatural    : Double  = With.geography.ourNatural.townHallTile.altitude

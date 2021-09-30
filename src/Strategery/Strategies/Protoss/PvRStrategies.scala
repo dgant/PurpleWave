@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRForgeDT, PvRTinfoil}
+import Planning.Plans.GamePlans.Protoss.Standard.PvR.{PvR2Gate4Gate, PvRForgeDT}
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
@@ -46,11 +46,8 @@ object PvR2Gate4Gate extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
 
-object PvRTinfoil2018 extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRTinfoil)
-}
-
 object PvR1BaseDT extends PvRStrategy {
+  override def allowedVsHuman: Boolean = false
   override def gameplan: Option[Plan] = Some(new PvRForgeDT)
 }
 

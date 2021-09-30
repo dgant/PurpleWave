@@ -39,6 +39,11 @@ class PvZ2GateFlex extends GameplanImperative{
       Get(18, Protoss.Probe),
       Get(4, Protoss.Pylon))
     if (massZealot) {
+      buildOrder(
+        Get(19, Protoss.Probe),
+        Get(3, Protoss.Gateway),
+        Get(7, Protoss.Zealot),
+        Get(21, Protoss.Probe))
     } else {
       buildOrder(
         Get(Protoss.Assimilator),

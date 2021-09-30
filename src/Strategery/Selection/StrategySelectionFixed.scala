@@ -6,4 +6,6 @@ case class StrategySelectionFixed(strategies: Strategy*) extends StrategySelecti
   duration = 100000
   override def respectMap       : Boolean = false
   override def respectHistory   : Boolean = false
+
+  override def toString: String = f"StrategySelectionFixed: $branchString"
 }

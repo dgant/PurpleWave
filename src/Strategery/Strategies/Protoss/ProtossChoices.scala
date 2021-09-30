@@ -12,7 +12,6 @@ object ProtossChoices {
     PvRDT,
     PvRProxy2Gate,
     PvR2Gate4Gate,
-    PvRTinfoil2018,
     PvR1BaseDT,
     ProtossFFA,
     ProtossHuntersFFA,

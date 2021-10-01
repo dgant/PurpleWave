@@ -1,63 +1,35 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Lifecycle.With
-import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.BuildRequests.{BuildRequest, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, UpgradeContinuously}
-import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Compound.Or
-import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
-import Planning.Predicates.Reactive.EnemyBasesAtLeast
-import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyStrategy}
-import Tactics.DefendFightersAgainstRush
+import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
+import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Predicates.Milestones.UpgradeComplete
+import Planning.Predicates.Strategy.Employing
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR2Gate4Gate
 
 class PvR2Gate4Gate extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(PvR2Gate4Gate)
-
-  override lazy val blueprints = Vector(
-    new Blueprint(Protoss.Pylon,    placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Protoss.Gateway,  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Protoss.Gateway,  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Protoss.Pylon,    placement = Some(PlacementProfiles.hugTownHall)))
+  override val activationCriteria: Predicate = Employing(PvR2Gate4Gate)
 
   override def attackPlan: Plan = new Trigger(
-    new Or(
-      new UpgradeComplete(Protoss.DragoonRange),
-      new EnemyBasesAtLeast(2),
-      new EnemyIsTerran),
+    UpgradeComplete(Protoss.DragoonRange),
     new AttackAndHarass)
-  override def scoutPlan: Plan = new ScoutOn(Protoss.Gateway, quantity = 2)
 
   override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
 
   override def buildPlans = Vector(
-    new CapGasAt(400),
-
-    new BuildOrder(Get(5, Protoss.Zealot)),
-    new If(
-      new EnemyStrategy(With.fingerprints.fourPool),
-      new Pump(Protoss.Zealot, 7)),
-    new UpgradeContinuously(Protoss.DragoonRange),
+    new CapGasAt(250),
     new Pump(Protoss.Dragoon),
-
+    new Pump(Protoss.Zealot),
     new Build(
       Get(Protoss.Assimilator),
       Get(Protoss.CyberneticsCore),
       Get(Protoss.DragoonRange),
-      Get(4, Protoss.Gateway)),
-
-    new If(
-      new UnitsAtLeast(4, Protoss.Gateway),
-      new Pump(Protoss.Zealot))
-  )
+      Get(4, Protoss.Gateway)))
 }

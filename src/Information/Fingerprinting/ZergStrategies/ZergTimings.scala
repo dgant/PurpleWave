@@ -17,7 +17,7 @@ object ZergTimings {
   object NinePool9Gas_GasCompleteBy               extends GameTime(1, 43)
   object NinePool9Hatch_HatchCompleteBy           extends GameTime(3, 7) // Hatch before Overlord. I think it's an awful build but bots have done it
   object NinePool10Hatch_HatchCompleteBy          extends GameTime(3, 18)
-  object NinePool13Hatch_HatchCompleteBy          extends GameTime(3, 43)
+  object NinePool13Hatch_HatchCompleteBy          extends GameTime(3, 35)
   object NinePool13Hatch12Gas_GasCompleteBy       extends GameTime(2, 57)
   object Overpool_PoolCompleteBy                  extends GameTime(2, 7)
   object Overpool8Gas_GasCompleteBy               extends GameTime(1, 53)

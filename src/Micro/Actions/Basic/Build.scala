@@ -39,7 +39,7 @@ object Build extends Action {
           blocker != unit
           && ! blocker.unitClass.isGas
           && ! blocker.flying
-          && blocker.likelyStillThere)
+          && blocker.visible)
     }
     
     val ignoreBlockers        = distance > 32.0 * 8.0 || With.yolo.active()

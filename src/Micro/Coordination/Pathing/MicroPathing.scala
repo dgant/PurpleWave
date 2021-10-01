@@ -33,7 +33,7 @@ object MicroPathing {
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.costEnemyVision   = 5
     pathfindProfile.costThreat        = 25
-    pathfindProfile.lengthMaximum     = Some(32)
+    pathfindProfile.lengthMaximum     = Some(24)
     pathfindProfile.find
   }
 

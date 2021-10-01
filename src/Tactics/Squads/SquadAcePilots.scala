@@ -68,7 +68,7 @@ class SquadAcePilots extends Squad {
     }
 
     // Help clear detection
-    val squadsFacingDetection = otherSquads.filter(s => s.units.exists(u => Protoss.DarkTemplar(u) && u.matchups.enemyDetectors.forall(_.flying))).toVector
+    val squadsFacingDetection = otherSquads.filter(s => s.units.exists(u => Protoss.DarkTemplar(u) && u.matchups.enemyDetectors.nonEmpty && u.matchups.enemyDetectors.forall(_.flying))).toVector
     if (squadsFacingDetection.nonEmpty) {
       activity = "AceCloakDT"
       followSquad(squadsFacingDetection.minBy(_.centroidAir.pixelDistanceSquared(centroidAir)))

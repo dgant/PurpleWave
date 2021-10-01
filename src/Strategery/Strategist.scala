@@ -70,11 +70,22 @@ class Strategist {
   }
 
   private lazy val _standardGamePlan = new StandardGamePlan
+  private var _lastSelectedWithGameplan: Option[Strategy] = None
+  private var _lastCustomGameplan: Option[Plan] = None
   def gameplan: Plan = {
     // Use public "selected" to force initialization
     val selectedWithGameplan = selected.find(_.gameplan.isDefined)
-    selectedWithGameplan.foreach(activate)
-    selectedWithGameplan.map(_.gameplan.get).getOrElse(_standardGamePlan)
+    if (selectedWithGameplan.isDefined) {
+      selectedWithGameplan.get.activate()
+      if ( ! _lastSelectedWithGameplan.contains(selectedWithGameplan.get)) {
+        _lastSelectedWithGameplan = selectedWithGameplan
+        _lastCustomGameplan = _lastSelectedWithGameplan.get.gameplan
+      }
+    } else {
+      _lastSelectedWithGameplan = None
+      _lastCustomGameplan = None
+    }
+    _lastCustomGameplan.getOrElse(_standardGamePlan)
   }
 
   lazy val heightMain       : Double  = With.self.startTile.altitude

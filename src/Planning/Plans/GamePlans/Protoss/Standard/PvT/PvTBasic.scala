@@ -408,6 +408,7 @@ class PvTBasic extends GameplanTemplate {
     // Two-base tech: Go get your tech
     // Three-base tech: If fast-thirding, take it now; otherwise get Observer + Gateways and react
     new If(new EmployingReavers, new GoReaver),
+    new Trigger(new And(new EmployingReavers, new UnitsAtLeast(2, Protoss.Reaver)), new GoObs),
     new If(
       new EmployingThreeBase,
       new If(

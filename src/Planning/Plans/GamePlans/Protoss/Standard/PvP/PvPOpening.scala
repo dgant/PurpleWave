@@ -235,6 +235,7 @@ class PvPOpening extends GameplanImperative {
         || PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
       shouldExpand &&= ! employing(PvPTechBeforeRange)
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
+      shouldExpand ||= unitsComplete(MatchWarriors) >= 20 && safeToMoveOut
     } else if (employing(PvPDT)) {
       // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
       // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
@@ -309,7 +310,7 @@ class PvPOpening extends GameplanImperative {
     if (speedlotAttack) status("Speedlot")
     if (shouldAttack) status("Attack")
     if (shouldExpand) status("ExpandNow")
-    oversaturate = (units(Protoss.Reaver) > 0 || units(Protoss.DarkTemplar) > 0 || minerals >= 450) && ! speedlotAttack && ! employing(PvP3GateGoon, PvP4GateGoon)
+    oversaturate = (units(Protoss.Reaver) > 0 || employing(PvPDT) || minerals >= 450 || enemyBases > 1 || enemyRobo) && ! speedlotAttack && ! employing(PvP3GateGoon, PvP4GateGoon)
     if (shouldAttack) { attack() }
     if (upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1) { harass() }
 
@@ -637,6 +638,9 @@ class PvPOpening extends GameplanImperative {
         pump(Protoss.Reaver)
       } else {
         trainRoboUnits()
+        if (units(Protoss.Reaver) > 1) {
+          get(Protoss.ShuttleSpeed)
+        }
       }
 
       if (units(Protoss.Reaver) > 1) {
@@ -653,6 +657,7 @@ class PvPOpening extends GameplanImperative {
       trainGatewayUnits()
       get(2, Protoss.Gateway)
       get(Protoss.DragoonRange)
+      pump(Protoss.Zealot)
       get(3, Protoss.Gateway)
     } else if (speedlotAttack) {
       get(Protoss.CitadelOfAdun)
@@ -667,15 +672,15 @@ class PvPOpening extends GameplanImperative {
     } else if (employing(PvPDT)) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
-      buildOrder(Get(2, Protoss.DarkTemplar))
+      buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
+      get(2, Protoss.Gateway)
       if (getCannons) { buildCannonsAtNatural.update() }
       if (shouldExpand) { requireMiningBases(2) }
       if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
       trainGatewayUnits()
-      if (units(Protoss.TemplarArchives) > 0) {
+      if (With.scouting.enemyProgress < 0.7 || unitsComplete(Protoss.DarkTemplar) > 0) {
         requireMiningBases(2)
       }
-      get(4, Protoss.Gateway)
     } else if (employing(PvP3GateGoon)) {
       if (shouldExpand) { requireMiningBases(2) }
       buildOrder(Get(2, Protoss.Dragoon))
@@ -717,6 +722,7 @@ class PvPOpening extends GameplanImperative {
       pump(Protoss.Dragoon, maximumConcurrently = 2)
       pump(Protoss.Zealot, 12)
       pump(Protoss.Dragoon)
+      pump(Protoss.Zealot)
     } else {
       pump(Protoss.Dragoon)
       if (gas < 42 || ! employing(PvP3GateGoon, PvP4GateGoon)) {

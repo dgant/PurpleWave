@@ -29,7 +29,7 @@ object Opponents {
   val crona       : Opponent = add("Crona",       freshmeat.policy)
   val zzzkbot     : Opponent = add("ZZZKBot",     real5drone.policy)
   // Random
-  val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR1BaseDT))
+  val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR2Gate4Gate))
 
   /*
   // COG 2021

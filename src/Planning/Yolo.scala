@@ -3,11 +3,12 @@ package Planning
 import Lifecycle.With
 import Performance.Cache
 import Performance.Tasks.TimedTask
+import Planning.Plans.GamePlans.MacroActions
 import Planning.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Minutes
 
-class Yolo extends TimedTask {
+class Yolo extends TimedTask with MacroActions {
 
   private def activeByDefault: Boolean = With.blackboard.yoloing() && (
     ! With.units.existsOurs(MatchWorker)
@@ -44,6 +45,7 @@ class Yolo extends TimedTask {
       With.blackboard.wantToAttack.set(true)
       With.blackboard.wantToHarass.set(true)
       With.blackboard.safeToMoveOut.set(true)
+      status("YOLO")
     }
   }
 }

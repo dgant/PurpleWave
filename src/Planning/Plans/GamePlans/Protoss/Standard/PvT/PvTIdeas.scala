@@ -9,9 +9,8 @@ import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases
-import Planning.Plans.Macro.Protoss.MeldDarkArchons
 import Planning.Predicates.Compound._
-import Planning.Predicates.Economy.{GasAtLeast, GasAtMost, MineralsAtLeast}
+import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
@@ -156,31 +155,25 @@ object PvTIdeas {
   class EnemyHasMines extends Or(EnemyHasShown(Terran.SpiderMine), EnemyHasTech(Terran.SpiderMinePlant))
 
   class TrainDarkTemplar extends If(
-    new And(
+    And(
       // Can't spare gas on top of Carriers
-      new UnitsAtMost(0, Protoss.FleetBeacon),
-      // Use DTs to drain ComSet energy prior to Arbiters,
+      UnitsAtMost(0, Protoss.FleetBeacon),
+      // Use DTs to drain ComSat energy prior to Arbiters,
       // but there's no point in having both at the same time
-      new UnitsAtMost(0, Protoss.ArbiterTribunal, complete = true),
-      new UnitsAtMost(0, Protoss.Arbiter),
-      new EnemiesAtMost(0, Terran.ScienceVessel)),
+      UnitsAtMost(0, Protoss.ArbiterTribunal, complete = true),
+      UnitsAtMost(0, Protoss.Arbiter),
+      EnemiesAtMost(0, Terran.ScienceVessel),
+      Not(new EnemyHasMines)),
     new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
-    new Or(
-      new UnitsAtLeast(24, MatchWarriors),
+    Or(UnitsAtLeast(24, MatchWarriors),
       new EnemyHasShownWraithCloak),
     new Pump(Protoss.Observer, 4),
     new If(
-      new UnitsAtLeast(18, MatchWarriors),
+      UnitsAtLeast(18, MatchWarriors),
       new Pump(Protoss.Observer, 3),
       new Pump(Protoss.Observer, 2)))
-
-  class TrainReavers extends Parallel(
-    new PumpRatio(Protoss.Reaver, 2, 6, Seq(
-      Enemy(Terran.Marine, 1.0/6.0),
-      Enemy(Terran.Goliath, 1.0/6.0),
-      Enemy(Terran.Vulture, 1.0/8.0))))
 
   class TrainScouts extends If(
     new And(
@@ -192,58 +185,34 @@ object PvTIdeas {
       new Employing(PvTStove)),
     new Pump(Protoss.Scout, 5))
 
-  class TrainMinimumDragoons extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 1, 5, Seq(Enemy(Terran.Vulture, 1.0), Enemy(Terran.Wraith, 1.0))),
-    new PumpRatio(Protoss.Dragoon, 1, 20, Seq(Enemy(Terran.Vulture, 0.75), Enemy(Terran.Wraith, 0.5))))
-
-  class TrainGatewayUnits extends Parallel(
-    new PumpRatio(Protoss.Dragoon, 1, 100, Seq(Enemy(Terran.Wraith, 2.0), Enemy(Terran.Battlecruiser, 5.0))),
-    new PumpRatio(Protoss.Dragoon, 8, 20, Seq(Enemy(Terran.Vulture, .75))),
+  class PvTPumpReaverShuttle(count: Int) extends If(
+    Or(
+      Employing(PvT1GateReaver, PvT2BaseReaver),
+      EnemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.bio)),
     new If(
-      EnemyStrategy(With.fingerprints.bio),
-      new Parallel(
-        new Pump(Protoss.HighTemplar),
-        new Pump(Protoss.Zealot)),
-      new Parallel(
-        new If(
-          Or(UpgradeStarted(Protoss.ZealotSpeed), And(MineralsAtLeast(600), GasAtMost(200))),
-          new PumpRatio(Protoss.Zealot, 0, 50, Seq(
-            Enemy(MatchTank, 2.5),
-            Enemy(Terran.Goliath,     1.5),
-            Enemy(Terran.Marine,      1.0),
-            Enemy(Terran.Vulture,     -1.25)))),
-        new If(GasAtLeast(800), new Pump(Protoss.HighTemplar, 6, maximumConcurrently = 2)),
-        new If(Employing(PvEStormYes), new PumpRatio(Protoss.HighTemplar, 0, 4, Seq(Flat(-2.0), Friendly(MatchWarriors, 0.1)))),
-        new Pump(Protoss.Dragoon))),
-    new If(Not(UpgradeStarted(Protoss.ZealotSpeed)), new Pump(Protoss.Dragoon)),
-    new Pump(Protoss.Zealot))
-
-  class TrainCarriers extends If(
-    Check(() => With.units.countEnemy(Terran.Goliath) < 8 + 3 * With.units.countOurs(Protoss.Carrier)),
-    new Pump(Protoss.Carrier))
+      UnitsAtLeast(1, Protoss.Observatory),
+      new PumpShuttleAndReavers(count, shuttleFirst = false),
+      new PumpShuttleAndReavers(count)))
 
   class TrainArmy extends Parallel(
     new TrainDarkTemplar,
-    new PumpRatio(Protoss.Shuttle, 0, 1, Seq(Friendly(Protoss.Reaver, 1.0))),
-    new PumpRatio(Protoss.Shuttle, 0, 2, Seq(Friendly(Protoss.Reaver, 0.5))),
-    new TrainReavers,
+    new PvTPumpReaverShuttle(2),
+    new PumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Terran.Vulture, .4), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0))),
     new TrainObservers,
-    new TrainMinimumDragoons,
-    new If(new And(new EnemyStrategy(With.fingerprints.bio), new UnitsAtLeast(5, Protoss.Gateway), new Employing(PvEStormYes)), new PumpRatio(Protoss.HighTemplar, 1, 5, Seq(Enemy(Terran.Marine, 1.0/5.0)))),
-    new If(new And(new UnitsAtLeast(8, Protoss.Carrier), new Employing(PvEStormYes)), new Pump(Protoss.HighTemplar, 2)),
+    new PvTPumpReaverShuttle(6),
     new If(
-      new EnemyHasTech(Terran.Lockdown),
-      new Parallel(
-        new If(
-          new UnitsAtMost(2, Protoss.DarkArchon),
-          new MeldDarkArchons,
-          new Pump(Protoss.DarkTemplar, maximumTotal = 4, maximumConcurrently = 2)))),
+      And(UnitsAtLeast(12, MatchWarriors), Employing(PvEStormYes)),
+      new Pump(Protoss.HighTemplar, 2)),
     new If(
-      new And(new UnitsAtLeast(1, Protoss.FleetBeacon), new EnemyHasShownWraithCloak),
+      UnitsAtLeast(1, Protoss.FleetBeacon),
       new PumpRatio(Protoss.Corsair, 0, 8, Seq(Enemy(Terran.Wraith, 2.0)))),
-    new TrainCarriers,
+    new Pump(Protoss.Carrier, 8),
     new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(MatchTank, 0.5))),
     new TrainScouts,
-    new TrainGatewayUnits)
+    new If(
+      Or(Employing(PvEStormYes), EnemyStrategy(With.fingerprints.bio), GasAtLeast(800)),
+      new Pump(Protoss.HighTemplar, maximumConcurrently = 2)),
+    new If(Not(UpgradeStarted(Protoss.ZealotSpeed)), new Pump(Protoss.Dragoon)),
+    new Pump(Protoss.Zealot))
 }
 

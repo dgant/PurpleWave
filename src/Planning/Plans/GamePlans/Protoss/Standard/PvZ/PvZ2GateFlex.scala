@@ -4,14 +4,18 @@ import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
+import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.Time.{GameTime, Minutes}
 import Utilities.DoQueue
+import Utilities.Time.{GameTime, Minutes}
 
-class PvZ2GateFlex extends GameplanImperative{
+class PvZ2GateFlex extends GameplanImperative {
 
-  var massZealot: Boolean = false
+  var anticipateSpeedlings: Boolean = false
+  var goSpeedlots: Boolean = false
+  var goCorsair: Boolean = true
+  var goObserver: Boolean = false
 
   override def executeBuild(): Unit = {
     buildOrder(
@@ -37,29 +41,29 @@ class PvZ2GateFlex extends GameplanImperative{
       Get(17, Protoss.Probe),
       Get(5, Protoss.Zealot),
       Get(18, Protoss.Probe),
-      Get(4, Protoss.Pylon))
-    if (massZealot) {
+      Get(4, Protoss.Pylon),
+      Get(Protoss.Assimilator),
+      Get(19, Protoss.Probe))
+    if (goCorsair) {
       buildOrder(
-        Get(19, Protoss.Probe),
-        Get(3, Protoss.Gateway),
-        Get(7, Protoss.Zealot),
-        Get(21, Protoss.Probe))
-    } else {
-      buildOrder(
-        Get(Protoss.Assimilator),
-        Get(19, Protoss.Probe),
         Get(Protoss.CyberneticsCore),
         Get(7, Protoss.Zealot),
         Get(21, Protoss.Probe),
         Get(8, Protoss.Zealot),
         Get(1, Protoss.Dragoon))
+    } else if (goSpeedlots) {
+      buildOrder(
+        Get(Protoss.Forge),
+        Get(7, Protoss.Zealot),
+        Get(21, Protoss.Probe),
+        Get(Protoss.GroundDamage),
+        Get(9, Protoss.Zealot))
     }
   }
   override def executeMain(): Unit = {
     if (enemyHydralisksLikely) status("Hydras")
     if (enemyMutalisksLikely) status("Mutas")
     if (enemyLurkersLikely) status("Lurkers")
-    if (enemyHasUpgrade(Zerg.ZerglingSpeed)) status("LingSpeed")
     if (bases < 2) {
       status("Early")
       earlyGame()
@@ -69,38 +73,99 @@ class PvZ2GateFlex extends GameplanImperative{
     }
   }
 
+  private val meldArchons = new MeldArchons(0)
   def earlyGame(): Unit = {
     // Goal is to be home before any Mutalisks can pop.
     // Optimization: Detect 2 vs 3 hatch muta and stay out the extra 30s vs 3hatch
     scoutOn(Protoss.Gateway, quantity = 2)
 
-    val shouldExpand = (safeAtHome || unitsComplete(MatchWarriors) >= 9) && (enemiesComplete(Zerg.SunkenColony) > 2 || frame > GameTime(5, 40)())
+    anticipateSpeedlings = enemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
+    anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()
+    anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(4, 30)()
+    anticipateSpeedlings &&= ! enemyHydralisksLikely
+    anticipateSpeedlings &&= ! enemyMutalisksLikely
+    anticipateSpeedlings &&= ! enemyLurkersLikely
+    anticipateSpeedlings ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
+    goCorsair = ! anticipateSpeedlings
+    goCorsair &&= ! enemyHydralisksLikely
+    goCorsair ||= enemyMutalisksLikely
+    goCorsair ||= units(Protoss.Stargate) > 0
+    goSpeedlots = anticipateSpeedlings || enemyBases > 2 || ! goCorsair
+    goObserver = With.frame > Minutes(8)()
+    goObserver &&= bases == 1
+    goObserver &&= minerals >= 400
+    goObserver &&= With.units.ours.exists(u => u.intent.toBuild.contains(Protoss.Nexus) && u.pixelDistanceCenter(u.agent.destination) < 8)
+    goObserver &&= safeAtHome
+    goObserver ||= enemyLurkersLikely
+
+    val mutaFrame = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
+
+    var safeOutside = ! anticipateSpeedlings
+    safeOutside ||= upgradeComplete(Protoss.GroundDamage)
+    safeOutside ||= upgradeComplete(Protoss.ZealotSpeed)
+    safeOutside &&= safeToMoveOut
+    var safeToExpand = safeOutside
+    safeToExpand &&= unitsComplete(MatchWarriors) >= 20
+    safeToExpand &&= unitsComplete(MatchWarriors) >= 9 && ! anticipateSpeedlings
+    var shouldExpand = frame > mutaFrame
+    shouldExpand ||= enemiesComplete(Zerg.SunkenColony) > 1
+    shouldExpand &&= safeToExpand
+    shouldExpand &&= ! goSpeedlots || upgradeComplete(Protoss.ZealotSpeed)
+    shouldExpand &&= ! goCorsair || units(Protoss.Corsair) > 0
+
+    var shouldAttack = frame < mutaFrame
+    shouldAttack ||= enemyHydralisksLikely
+    shouldAttack ||= enemyLurkersLikely
+    shouldAttack &&= safeOutside
+    shouldAttack ||= (shouldExpand && With.scouting.enemyProgress > 0.6)
+
+    if (anticipateSpeedlings) status("Speedlings")
+    if (goSpeedlots) status("Speedlots")
+    if (goCorsair) status("Corsair")
+    if (goObserver) status("Obs")
+    if (safeOutside) status("SafeOutside")
+    if (safeToExpand) status("SafeToExpand")
     if (shouldExpand) {
       status("Expand")
       requireMiningBases(2)
     }
-
-    var shouldAttack = frame < GameTime(6, 10)()
-    shouldAttack || enemyHydralisksLikely
-    shouldAttack &&= safeToMoveOut
-    shouldAttack ||= shouldExpand
-    if (shouldAttack) { attack() }
-
-    if (enemyMutalisksLikely) {
-      get(Protoss.Stargate)
-      pump(Protoss.Corsair, 5)
-    } else if ( ! enemyHydralisksLikely) {
-      get(Protoss.Stargate)
-      pump(Protoss.Corsair, 1)
+    if (shouldAttack) {
+      status("Attack")
+      attack()
     }
 
-    pump(Protoss.Dragoon)
-    get(Protoss.DragoonRange)
-    get(3, Protoss.Gateway)
-    if (enemyHasUpgrade(Zerg.ZerglingSpeed)) {
-      get(4, Protoss.Gateway)
+    if (goCorsair) {
+      get(Protoss.Assimilator)
+      get(Protoss.CyberneticsCore)
+      get(Protoss.Stargate)
+      pump(Protoss.Corsair, if (enemyMutalisksLikely) 8 else if (enemyHydralisksLikely) 1 else 5)
+    }
+    if (goObserver) {
+      get(Protoss.Assimilator)
+      get(Protoss.CyberneticsCore)
+      get(Protoss.RoboticsFacility)
+      get(Protoss.Observatory)
+      pump(Protoss.Observer, 1)
+    }
+    if (enemyMutalisksLikely) {
+      get(Protoss.DragoonRange)
+      pump(Protoss.Dragoon)
+    }
+    meldArchons.update()
+    pump(Protoss.DarkTemplar, 1)
+    pump(Protoss.HighTemplar)
+    pump(Protoss.Zealot, 12)
+    if (goSpeedlots) {
+      get(Protoss.Assimilator)
+      get(Protoss.Forge)
+      get(Protoss.CyberneticsCore)
+      get(Protoss.GroundDamage)
+      get(Protoss.CitadelOfAdun)
+      get(Protoss.ZealotSpeed)
+      get(Protoss.TemplarArchives)
     }
     pump(Protoss.Zealot)
+    get(5, Protoss.Gateway)
     requireMiningBases(2)
   }
 
@@ -162,6 +227,9 @@ class PvZ2GateFlex extends GameplanImperative{
   }
 
   def doTrainMainArmy(): Unit = {
+    if (units(Protoss.HighTemplar) > 1 && ! techStarted(Protoss.PsionicStorm)) {
+      meldArchons.update()
+    }
     if (minerals > 800 && gas < 50) {
       pump(Protoss.Zealot)
     }
@@ -175,11 +243,10 @@ class PvZ2GateFlex extends GameplanImperative{
       }
       pump(Protoss.Zealot, 24)
       pump(Protoss.Dragoon)
-      pump(Protoss.Zealot)
     } else {
       pump(Protoss.Dragoon, 16)
-      pump(Protoss.Zealot)
     }
+    pump(Protoss.Zealot)
   }
 
   def doUpgrades(): Unit = {

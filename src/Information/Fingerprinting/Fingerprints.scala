@@ -53,11 +53,24 @@ class Fingerprints {
     (if (With.enemies.exists(_.isUnknownOrZerg)) Seq(
       fourPool,
       ninePool,
+      ninePoolGas,
+      ninePoolHatch,
       overpool,
-      tenHatch,
+      overpoolGas,
+      overpoolHatch,
       twelvePool,
+      twelvePoolGas,
+      tenHatch,
+      tenHatchPool,
+      tenHatchPoolGas,
       twelveHatch,
-      oneHatchGas
+      twelveHatchPool,
+      twelveHatchPoolGas,
+      twelveHatchPoolHatch,
+      oneHatchGas,
+      twoHatchGas,
+      threeHatchGas,
+      twoHatchMain
     ) else Seq.empty)
 
   private def addFingerprint(fingerprint: Fingerprint): Fingerprint = {

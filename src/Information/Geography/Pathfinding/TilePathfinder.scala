@@ -14,7 +14,7 @@ trait TilePathfinder {
   val stampDefault: Long = Long.MinValue
   var stampCurrent: Long = 0L
   private var tilesExplored: Long = 0
-  private val tilesExploredMax: Long = 2 * (With.mapTileWidth + With.mapTileHeight)
+  private val tilesExploredMax: Long = 4 * (With.mapTileWidth + With.mapTileHeight)
 
   // Performance metrics
   var aStarPathfinds: Long = 0
@@ -151,7 +151,7 @@ trait TilePathfinder {
       bestTileState.setVisited()
 
       // Are we done?
-      val atEnd = profile.end.exists(end =>
+      val atProfileEnd = profile.end.exists(end =>
         end.i == bestTileState.i
         || (
           profile.endDistanceMaximum > 0
@@ -159,8 +159,9 @@ trait TilePathfinder {
           && (profile.crossUnwalkable || end.pixelDistanceGround(bestTile) <= 32 * profile.endDistanceMaximum)))
       if (
         profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
+        || (tilesExplored == tilesExploredMax && profile.acceptPartialPath)
         || (
-          (atEnd || (profile.end.isEmpty && (profile.endUnwalkable || bestTile.walkableUnchecked)))
+          (atProfileEnd || (profile.end.isEmpty && (profile.endUnwalkable || bestTile.walkableUnchecked)))
           && profile.lengthMinimum.forall(_ <= bestTileState.pathLength)
           && profile.threatMaximum.forall(_ >= profile.threatGrid.getUnchecked(bestTile.i)))) {
         val output = TilePath(

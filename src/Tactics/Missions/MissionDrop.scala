@@ -37,7 +37,7 @@ abstract class MissionDrop extends Mission {
   protected def requireWorkers: Boolean = false
   protected def shouldStopRaiding: Boolean = false
   protected def shouldGoHome: Boolean = false
-  protected def recruitable(unit: UnitInfo): Boolean = unit.complete && ! unit.visibleToOpponents && ! unit.team.exists(t => t.engagingOn || t.engagedUpon)
+  protected def recruitable(unit: UnitInfo): Boolean = unit.complete && unit.matchups.threatsInRange.isEmpty
   protected def recruitablePassenger(unit: UnitInfo): Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
   protected val transportLock = new LockUnits(this)
   transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
@@ -220,20 +220,25 @@ abstract class MissionDrop extends Mission {
         With.mapTileHeight - vicinity.tile.y).min)
       val profile = new PathfindProfile(transport.tile)
       profile.end                 = Some(vicinity.tile)
-      profile.costEnemyVision     = 5
-      profile.costRepulsion       = 25
-      profile.costThreat          = 125
+      profile.costEnemyVision     = 5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
+      profile.costRepulsion       = 10
+      profile.costThreat          = 50
       profile.canCrossUnwalkable  = Some(true)
       profile.canEndUnwalkable    = Some(true)
+      profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
       profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
+      //profile.acceptPartialPath   = true
       val path = profile.find
       if (path.pathExists) {
+        With.logger.debug(f"$this: Following path from ${path.start} to ${path.end} via ${path.tiles.get.drop(1).headOption.getOrElse(path.end)}")
         MicroPathing.tryMovingAlongTilePath(transport, path)
       } else {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)
         transport.agent.toReturn = Some(vicinity)
-        Retreat.delegate(transport)
+        if (transport.matchups.framesOfSafety < 24) {
+          Retreat.delegate(transport)
+        }
         Move.delegate(transport)
       }
     }

@@ -8,7 +8,7 @@ import ProxyBwapi.Races.Zerg
 import Utilities.Time.{Frames, Seconds}
 
 class FingerprintOverpoolHatch extends FingerprintAnd(
-  With.fingerprints.ninePool,
+  With.fingerprints.overpool,
   new FingerprintNot(With.fingerprints.overpoolGas),
   new FingerprintOr(
     new FingerprintCompleteBy(MatchHatchlike, ZergTimings.Overpool11Hatch_HatchCompleteBy + Seconds(10)),

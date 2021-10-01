@@ -62,9 +62,13 @@ object FormationGeneric {
     floodCostVulnerability  = 0
     if (style == FormationStyleMarch || style == FormationStyleDisengage) {
       if ( ! path.pathExists) return FormationEmpty
-      var stepSizeTiles = Seq(4.0,
-        if (style == FormationStyleDisengage) 5.0 + floodCentroid.enemyRange else 0.0,
-        With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 0.5).max.toInt
+      var stepSizeTiles =
+        Seq(
+          4.0,
+          if (style == FormationStyleDisengage) 6.0 + floodCentroid.enemyRange else 0.0,
+          With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 1.0)
+        .max
+        .toInt
       if (style == FormationStyleDisengage) {
         stepSizeTiles = Math.max(stepSizeTiles, 2 + Maff.max(units.view.map(_.matchups.pixelsOfEntanglement.toInt)).getOrElse(0) / 32)
       }

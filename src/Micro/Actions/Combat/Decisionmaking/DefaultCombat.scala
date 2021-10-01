@@ -211,7 +211,7 @@ object DefaultCombat extends Action {
 
     def techniqueIs(techniques: Technique*): Boolean = techniques.contains(technique)
 
-    val goalPotshot = techniqueIs(Abuse, Fallback) || Protoss.Reaver(unit)
+    val goalPotshot = techniqueIs(Abuse, Fallback) || Protoss.Reaver(unit) || (Protoss.Zealot(unit) && unit.matchups.targetsInRange.exists(u => Zerg.Zergling(u) && u.player.hasUpgrade(Zerg.ZerglingSpeed)))
     val goalDance   = techniqueIs(Abuse, Dance)
     val goalEngage  = techniqueIs(Fight, Abuse, Dance)
     val goalRetreat = techniqueIs(Fallback, Flee, Excuse)

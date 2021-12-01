@@ -14,13 +14,16 @@ object Meld extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val besties = unit.metro.map(_.units).getOrElse(unit.zone.units).filter(u =>
-      u != unit
-      && u.friendly.exists(_.intent.shouldMeld)
-      && u.unitClass == unit.unitClass)
+    val besties = unit
+      .metro.map(_.units)
+      .getOrElse(unit.zone.units)
+      .filter(other =>
+        other != unit
+        && other.friendly.exists(_.intent.shouldMeld)
+        && other.unitClass == unit.unitClass)
     
     if (besties.nonEmpty) {
-      val bestBestie = besties.minBy(_.pixelDistanceEdge(unit))
+      val bestBestie = besties.minBy(_.pixelDistanceTravelling(unit.pixel))
       Commander.useTechOnUnit(
         unit,
         if (Protoss.HighTemplar(unit)) Protoss.ArchonMeld else Protoss.DarkArchonMeld,

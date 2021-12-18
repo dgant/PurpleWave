@@ -3,6 +3,7 @@ package ProxyBwapi.UnitInfo
 import Debugging.Visualizations.Colors
 import Information.Battles.Clustering.BattleCluster
 import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
+import Information.Battles.Prediction.Skimulation.SkimulationUnit
 import Information.Battles.Types.{BattleLocal, Team}
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
@@ -24,7 +25,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities.Time.{Forever, Frames, Seconds}
 import bwapi._
 
-abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -263,7 +264,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(_.confidence)).getOrElse(1.0))
+  val confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidenceAir else j.confidenceGround)).getOrElse(1.0))
 
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

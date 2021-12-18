@@ -43,6 +43,7 @@ class Configuration {
   // Battles //
   /////////////
 
+  var skimulate                     = true
   var avatarBattleDistancePixels    = 32.0 * 6.0
   var battleHysteresisFrames        = Seconds(6)()
   var simulationFrames              = Seconds(15)()

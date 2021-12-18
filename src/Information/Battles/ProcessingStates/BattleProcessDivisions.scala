@@ -67,7 +67,7 @@ class BattleProcessDivisions extends BattleProcessState {
 
     With.battles.nextDivisions = nextDivisions
 
-    transitionTo(new BattleProcessSimulate)
+    transitionTo(new BattleProcessPredict)
   }
 
   private def distance(unit: UnitInfo, base: Base): Double = unit.pixelDistanceTravelling(base.heart)

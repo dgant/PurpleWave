@@ -61,7 +61,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def run() {
     if (units.isEmpty) return
-    lazy val withdrawing        = units.count( ! _.metro.contains(base.metro))
+    lazy val withdrawing        = units.count(u => ! u.metro.contains(base.metro) && guardChoke.forall(c => c.pixelCenter.travelPixelsFor(base.heart.center, u) < 192 + u.pixelDistanceTravelling(base.heart.center)))
     lazy val wander             = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
     lazy val breached           = scourables.exists(isBreaching)
     lazy val scourables         = enemies.filter(isScourable)

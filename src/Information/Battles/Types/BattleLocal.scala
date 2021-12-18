@@ -5,7 +5,7 @@ import Mathematics.Points.Pixel
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleLocal(unitsUs: Vector[UnitInfo], unitsEnemy: Vector[UnitInfo]) extends Battle(unitsUs, unitsEnemy) with PredictionLocal{
+class BattleLocal(unitsUs: Vector[UnitInfo], unitsEnemy: Vector[UnitInfo]) extends Battle(unitsUs, unitsEnemy) with PredictionLocal {
 
   val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
   val gainedValueMultiplier: Double = judgmentModifiers.map(_.gainedValueMultiplier).product

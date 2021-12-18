@@ -16,6 +16,6 @@ trait FriendlyUnitGroup extends UnitGroup {
   def fightConsensus  = _fightConsensus()
   def homeConsensus   = _homeConsensus()
 
-  private val _fightConsensus = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldEngage || u.battle.forall(_.judgement.exists(_.shouldFight)))).getOrElse(true))
+  private val _fightConsensus = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldEngage || u.battle.forall(_.judgement.exists(_.shouldFightUnit(u))))).getOrElse(true))
   private val _homeConsensus  = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.home)).getOrElse(With.geography.home.center))
 }

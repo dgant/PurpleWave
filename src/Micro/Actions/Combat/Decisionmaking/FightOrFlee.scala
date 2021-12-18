@@ -70,7 +70,7 @@ object FightOrFlee extends Action {
     }
     var shouldEngage = false
     unit.agent.fightReason = "No"
-    if (unit.battle.get.judgement.get.shouldFight) {
+    if (unit.battle.get.judgement.get.shouldFightUnit(unit)) {
       shouldEngage = true
       unit.agent.fightReason = "Yes"
     }

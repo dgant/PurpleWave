@@ -102,6 +102,18 @@ object DrawMap {
     if (irrelevant(position)) return
     labelBox(Vector(text), position, drawBackground, backgroundColor, drawBorder, borderColor)
   }
+
+  def labelDot(
+    text            : String,
+    position        : Pixel,
+    backgroundColor : Color = Colors.DefaultGray) {
+    if (irrelevant(position)) return
+    val width = 9 * text.length / 2
+    val height = 11
+    val radius = 1 + Math.max(width, height) / 2
+    circle(position, radius, backgroundColor, solid = true)
+    With.game.drawTextMap(position.x - width / 2, position.y - height / 2, text)
+  }
   
   def labelBox(
     textLines       : Iterable[String],

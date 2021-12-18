@@ -29,11 +29,11 @@ final class Simulation {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
     prediction.simulationFrames += 1
-    prediction.simulationComplete ||= prediction.simulationFrames >= With.configuration.simulationFrames
-    prediction.simulationComplete ||= ! simulacraOurs.exists(_.alive)
-    prediction.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
-    prediction.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
-    if (prediction.simulationComplete) {
+    prediction.predictionComplete ||= prediction.simulationFrames >= With.configuration.simulationFrames
+    prediction.predictionComplete ||= ! simulacraOurs.exists(_.alive)
+    prediction.predictionComplete ||= ! simulacraEnemy.exists(_.alive)
+    prediction.predictionComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    if (prediction.predictionComplete) {
       cleanup()
     } else if (prediction.simulationFrames - prediction.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
       checkpoint()

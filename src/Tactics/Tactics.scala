@@ -134,7 +134,10 @@ class Tactics extends TimedTask {
     val freelancerValueInitial = freelancerValue
 
     // First satisfy each defense squad
+    // First pass gets essential defenders
+    // Second pass gets additional defenders to be sure
     assign(freelancers, squadsDefending.view.map(_._2), 1.0)
+    assign(freelancers, squadsDefending.view.map(_._2), 0.5)
 
     // Proactive drop/harassment defense
     if (With.scouting.enemyProgress < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Dropship)) {

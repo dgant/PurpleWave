@@ -1,5 +1,6 @@
 package Information.Battles.Types
 
+import Information.Battles.Prediction.Skimulation.SkimulationTeam
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -7,7 +8,7 @@ import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactics.Squads.UnitGroup
 
-class Team(val battle: Battle, val units: Vector[UnitInfo]) extends UnitGroup {
+class Team(val battle: Battle, val units: Vector[UnitInfo]) extends UnitGroup with SkimulationTeam {
 
   final def groupUnits: Seq[UnitInfo] = units
 

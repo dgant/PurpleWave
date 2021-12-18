@@ -9,7 +9,13 @@ import scala.collection.mutable
 
 trait PredictionLocal {
   val battle: BattleLocal = this.asInstanceOf[BattleLocal]
-  var simulationComplete: Boolean = false
+  var predictionComplete: Boolean = false
+  var skimulated: Boolean = false
+
+  ///////////////////////////
+  // Simulation properties //
+  ///////////////////////////
+
   var simulationFrames = 0
   var simulationDeaths = 0.0
   var logSimulation: Boolean = With.configuration.debugging

@@ -233,9 +233,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _transport            = if (loaded) With.units.get(bwapiUnit.getTransport).flatMap(_.friendly) else None
       } else {
         _scarabs              = if (unitClass == Protoss.Reaver) 5 else 0
-        _hitPoints            = if (_detected || ! _cloaked) bwapiUnit.getHitPoints           else if (_hitPoints == 0) _unitClass.maxHitPoints else _hitPoints
-        _shieldPoints         = if (_detected || ! _cloaked) bwapiUnit.getShields             else if (_hitPoints == 0) _unitClass.maxShields   else _shieldPoints
-        _matrixPoints         = if (_detected || ! _cloaked) bwapiUnit.getDefenseMatrixPoints else _matrixPoints
+        _hitPoints            = if (_detected || ( ! _cloaked && ! _burrowed)) bwapiUnit.getHitPoints           else if (_hitPoints == 0) _unitClass.maxHitPoints else _hitPoints
+        _shieldPoints         = if (_detected || ( ! _cloaked && ! _burrowed)) bwapiUnit.getShields             else if (_hitPoints == 0) _unitClass.maxShields   else _shieldPoints
+        _matrixPoints         = if (_detected || ( ! _cloaked && ! _burrowed)) bwapiUnit.getDefenseMatrixPoints else _matrixPoints
         // TODO: Model energy
       }
     } else if (_player.isEnemy) {

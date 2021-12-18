@@ -36,12 +36,27 @@ object ShowBattles extends View {
     units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => f"${p._2.size} ${p._1.toString.take(4)}").mkString(", ")
   }
 
+  def renderSkimulationScreen(battle: BattleLocal): Unit = {
+    val x = 5
+    DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
+      Vector("",          "Us",                                   "Enemy"),
+      Vector("Total",     format(battle.us.skimStrengthTotal),    format(battle.enemy.skimStrengthTotal)),
+      Vector("Ground",    format(battle.us.skimStrengthGround),   format(battle.enemy.skimStrengthGround)),
+      Vector("Air",       format(battle.us.skimStrengthAir),      format(battle.enemy.skimStrengthAir)),
+      Vector("Vs Ground", format(battle.us.skimStrengthVsGround), format(battle.enemy.skimStrengthVsGround)),
+      Vector("Vs Air",    format(battle.us.skimStrengthVsAir),    format(battle.enemy.skimStrengthVsAir))
+    ))
+  }
+
   def renderBattleScreen(battle: BattleLocal) {
-    val barHeight = With.visualization.lineHeightSmall
+    if (With.configuration.skimulate) {
+      renderSkimulationScreen(battle)
+      return
+    }
     val x = 5
     battle.simulationCheckpoints.lastOption.foreach(metrics => {
-      DrawScreen.table(x, 4 * barHeight, Vector(
-        Vector("Score",       format(battle.judgement.get.scoreFinal),        "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly)  .filter(_._2.alive).keys)),
+      DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
+        Vector("Score",       format(battle.judgement.get.scoreTotal),        "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly)  .filter(_._2.alive).keys)),
         Vector("Target",      format(battle.judgement.get.scoreTarget),       "Foe survivors:", describeTeam(battle.simulationReport.filter(_._1.isEnemy)     .filter(_._2.alive).keys)),
         Vector("LVLR",        format(metrics.localValueLostRatio)),
         Vector("LHLR",        format(metrics.localHealthLostRatio),           "Our deaths:",    describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
@@ -49,7 +64,7 @@ object ShowBattles extends View {
         Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet),        f"${metrics.framesIn / 24} second duration"),
         Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet),   f"${battle.simulationCheckpoints.size} metrics checkpoints"),
-        Vector("Confidence",  format(battle.judgement.get.confidence))))
+        Vector("Confidence",  format(battle.judgement.get.confidenceTotal))))
     })
 
     val graphWidth = 82
@@ -61,7 +76,7 @@ object ShowBattles extends View {
         GraphCurve(Color.Black,         battle.simulationCheckpoints.map(unused =>  0.0)),
         GraphCurve(Color.Black,         battle.simulationCheckpoints.map(unused => -1.0)),
         GraphCurve(Colors.MediumRed,    battle.simulationCheckpoints.map(unused => battle.judgement.get.scoreTarget)),
-        GraphCurve(Colors.BrightOrange, battle.simulationCheckpoints.map(unused => battle.judgement.get.scoreFinal)),
+        GraphCurve(Colors.BrightOrange, battle.simulationCheckpoints.map(unused => battle.judgement.get.scoreTotal)),
         GraphCurve(Color.Yellow,        battle.simulationCheckpoints.map(_.totalScore))),
       fixedYMin = Some(-1.0),
       fixedYMax = Some(1.0),
@@ -69,7 +84,16 @@ object ShowBattles extends View {
       height = graphWidth)
   }
 
+  def renderSkimulationMap(battle: BattleLocal): Unit = {
+    battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrength), u.pixel, u.player.colorDark))
+  }
+
   def renderBattleMap(battle: BattleLocal) {
+    if (With.configuration.skimulate) {
+      renderSkimulationMap(battle)
+      return
+    }
+
     val shouldFight = battle.judgement.get.shouldFight
     battle.units.view.filter(_.simulacrum.initialized).foreach(unit => {
       val sim = unit.simulacrum

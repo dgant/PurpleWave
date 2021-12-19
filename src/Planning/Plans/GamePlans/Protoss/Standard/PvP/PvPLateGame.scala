@@ -67,7 +67,7 @@ class PvPLateGame extends GameplanImperative {
     shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways
-    shouldAttack ||= dtBravery
+    shouldAttack ||= (dtBravery && enemiesComplete(Protoss.PhotonCannon) == 0)
     shouldAttack ||= shouldHarass
     shouldAttack &&= ! fearDeath
     shouldAttack &&= ! fearDT

@@ -29,7 +29,7 @@ object JudgmentModifiers {
     add("HornetNest", Colors.NeonIndigo,    hornetNest(battle))
     add("Commitment", Colors.NeonViolet,    commitment(battle))
     add("Towers",     Colors.MediumGreen,   towers(battle))
-    add("Anchors",    Colors.MediumOrange,   anchored(battle))
+    add("Anchors",    Colors.MediumOrange,  anchored(battle))
     output
   }
 

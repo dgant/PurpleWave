@@ -65,7 +65,7 @@ object FormationGeneric {
       var stepSizeTiles =
         Seq(
           4.0,
-          if (style == FormationStyleDisengage) 6.0 + floodCentroid.enemyRange else 0.0,
+          if (style == FormationStyleDisengage) 10.0 + 2.0 * floodCentroid.enemyRange else 0.0,
           With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 1.0)
         .max
         .toInt

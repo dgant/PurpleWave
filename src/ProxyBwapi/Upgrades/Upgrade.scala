@@ -1,5 +1,6 @@
 package ProxyBwapi.Upgrades
 
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.UpgradeType
 
@@ -15,6 +16,8 @@ case class Upgrade(bwapiType: UpgradeType) {
   val gasPrice             = levels.map(i => (i, bwapiType.gasPrice(i))).toMap
   val upgradeFrames        = levels.map(i => (i, bwapiType.upgradeTime(i))).toMap
   lazy val whatsRequired   = levels.map(i => (i, UnitClasses.get(bwapiType.whatsRequired(i)))).toMap
+
+  def apply(player: PlayerInfo, level: Int = 1): Boolean = player.getUpgradeLevel(this) >= level
   
   override val toString :String =  bwapiType.toString.replaceAll("_", " ")
 }

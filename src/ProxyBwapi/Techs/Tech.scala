@@ -1,5 +1,6 @@
 package ProxyBwapi.Techs
 
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClasses
 import bwapi.TechType
 
@@ -16,6 +17,8 @@ case class Tech(bwapiTech: TechType) {
   val targetsPixel        = bwapiTech.targetsPosition
   val targetsUnits        = bwapiTech.targetsUnit
   lazy val whatResearches = UnitClasses.get(bwapiTech.whatResearches)
+
+  def apply(player: PlayerInfo): Boolean = player.hasTech(this)
   
   override val toString: String = bwapiTech.toString.replaceAll("_", " ")
 }

@@ -16,6 +16,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def castRangeTiles   : Int       = 9
   override protected def thresholdValue   : Double    = 12 * Terran.Marine.subjectiveValue
   override protected def lookaheadPixels  : Int       = 24
+  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldEngage || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isEnemy)
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tile)) return 0.0

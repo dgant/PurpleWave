@@ -13,6 +13,7 @@ object Stasis extends TargetedSpell {
   override protected def aoe            : Boolean   = true
   override protected def castRangeTiles : Int       = 9
   override protected def thresholdValue : Double    = casterClass.subjectiveValue
+  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldEngage
   
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tile)) return 0.0

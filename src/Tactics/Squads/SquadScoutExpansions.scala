@@ -27,8 +27,7 @@ class SquadScoutExpansions extends Squad {
     }
   }
 
-  lock.counter = CountOne
-  lock.matcher = MatchOr(
+  val matchAll = MatchOr(
     Terran.Marine,
     Terran.Firebat,
     Terran.Vulture,
@@ -40,8 +39,16 @@ class SquadScoutExpansions extends Squad {
     Protoss.Observer,
     Zerg.Zergling,
     Zerg.Hydralisk,
+    Zerg.Overlord,
+    Zerg.Scourge)
+  val matchFlying = MatchOr(
+    Terran.Wraith,
+    Protoss.Observer,
+    Zerg.Overlord,
     Zerg.Scourge)
 
+  lock.counter = CountOne
+  lock.matcher = matchAll
   val scoutableBases = new Cache(() =>
     With.geography.neutralBases
       .view
@@ -61,6 +68,7 @@ class SquadScoutExpansions extends Squad {
     if (With.geography.ourBases.size < 2) return
     if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return
     if (scoutableBases().isEmpty) return
+    lock.matcher = if (With.blackboard.wantToAttack()) matchAll else matchFlying
 
     val toScoutBases = Maff.orElse(
       scoutableBases().filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(90)()),

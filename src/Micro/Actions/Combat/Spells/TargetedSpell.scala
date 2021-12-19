@@ -29,7 +29,7 @@ abstract class TargetedSpell extends Action {
 
   def hasEnoughEnergy(unit: UnitInfo): Boolean = unit.energy >= tech.energyCost
   def canCast(unit: UnitInfo): Boolean = casterClass(unit) && unit.player.hasTech(tech) && hasEnoughEnergy(unit)
-  override def allowed(unit: FriendlyUnitInfo): Boolean = canCast(unit) && unit.matchups.enemies.nonEmpty && additionalConditions(unit)
+  final override def allowed(unit: FriendlyUnitInfo): Boolean = canCast(unit) && unit.matchups.enemies.nonEmpty && additionalConditions(unit)
   
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   

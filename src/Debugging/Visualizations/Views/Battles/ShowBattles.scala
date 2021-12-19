@@ -38,13 +38,16 @@ object ShowBattles extends View {
 
   def renderSkimulationScreen(battle: BattleLocal): Unit = {
     val x = 5
+    val us = battle.us
+    val enemy = battle.enemy
+    val judge = battle.judgement.get
     DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
-      Vector("",          "Us",                                   "Enemy"),
-      Vector("Total",     format(battle.us.skimStrengthTotal),    format(battle.enemy.skimStrengthTotal)),
-      Vector("Ground",    format(battle.us.skimStrengthGround),   format(battle.enemy.skimStrengthGround)),
-      Vector("Air",       format(battle.us.skimStrengthAir),      format(battle.enemy.skimStrengthAir)),
-      Vector("Vs Ground", format(battle.us.skimStrengthVsGround), format(battle.enemy.skimStrengthVsGround)),
-      Vector("Vs Air",    format(battle.us.skimStrengthVsAir),    format(battle.enemy.skimStrengthVsAir))
+      Vector("",          "Us",                            "Enemy",                             "Score",                    "Target",                   "Fight?"),
+      Vector("Total",     format(us.skimStrengthTotal),    format(enemy.skimStrengthTotal),     format(judge.scoreTotal),   format(judge.scoreTarget),  if (judge.shouldFight)        "YES" else ""),
+      Vector("Ground",    format(us.skimStrengthGround),   format(enemy.skimStrengthGround)     format(judge.scoreGround),  format(judge.scoreTarget),  if (judge.shouldFightGround)  "YES" else ""),
+      Vector("Air",       format(us.skimStrengthAir),      format(enemy.skimStrengthAir)        format(judge.scoreAir),     format(judge.scoreTarget),  if (judge.shouldFightAir)     "YES" else ""),
+      Vector("Vs Ground", format(us.skimStrengthVsGround), format(enemy.skimStrengthVsGround)),
+      Vector("Vs Air",    format(us.skimStrengthVsAir),    format(enemy.skimStrengthVsAir))
     ))
   }
 

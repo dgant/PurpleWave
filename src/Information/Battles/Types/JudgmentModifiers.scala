@@ -6,7 +6,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import Planning.UnitMatchers.{MatchTank, MatchWorker}
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Terran
 import bwapi.Color
 
 import scala.collection.mutable.ArrayBuffer
@@ -21,7 +21,6 @@ object JudgmentModifiers {
         m.color = color
         output += m })
     }
-    add("Aggression", Colors.MidnightRed,   aggression(battle))
     add("Choke",      Colors.BrightGreen,   choke(battle))
     add("Proximity",  Colors.NeonRed,       proximity(battle))
     add("Maxed",      Colors.MediumTeal,    maxed(battle))
@@ -29,14 +28,7 @@ object JudgmentModifiers {
     add("HornetNest", Colors.NeonIndigo,    hornetNest(battle))
     add("Commitment", Colors.NeonViolet,    commitment(battle))
     add("Towers",     Colors.MediumGreen,   towers(battle))
-    add("Anchors",    Colors.MediumOrange,  anchored(battle))
     output
-  }
-
-  // Evaluate gains proportionate to aggression
-  def aggression(local: BattleLocal): Option[JudgmentModifier] = {
-    val aggro = With.blackboard.aggressionRatio()
-    if (aggro == 1) None else Some(JudgmentModifier(gainedValueMultiplier = aggro))
   }
 
   // Avoid fighting through a choke
@@ -85,8 +77,8 @@ object JudgmentModifiers {
     val distanceMax   = With.mapPixelWidth
     val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid.groundPixels).min
     val distanceRatio = Maff.clamp(distanceHome.toDouble / distanceMax, 0, 1)
-    val multiplier    = 1.2 - 0.4 * distanceRatio
-    Some(JudgmentModifier(gainedValueMultiplier = multiplier))
+    val multiplier    = (distanceRatio * 2 - 1) * 0.25
+    Some(JudgmentModifier(targetDelta = multiplier))
   }
 
   // Prefer fighting
@@ -144,28 +136,11 @@ object JudgmentModifiers {
   //   in a fight we have not yet committed to
   //   until conditions look advantageous
   //     because surprise is on the enemy's side
+  //     and because patience will tend to let us gather more force to fight
   def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
     val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))
-  }
-
-  // Avoid disengaging
-  //   from a fight we have already committed to
-  //   if we have unshuttled Reavers engaged
-  //     because they are crawly slugs
-  //     and love dying
-  def anchored(battleLocal: BattleLocal): Option[JudgmentModifier] = {
-    lazy val fragileSlugs = battleLocal.us.units.exists(u =>
-      u.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.Lurker)
-      && ! u.friendly.exists(_.agent.ride.isDefined)
-      && u.matchups.pixelsOfEntanglement > -32)
-    /* Disabled due to this causing index out of bounds on engagedUpon()
-    if (With.self.isProtoss && battleLocal.us.engagedUpon && fragileSlugs) {
-      Some(JudgmentModifier(targetDelta = -0.25))
-    } else None
-    */
-    None
   }
 
   // Avoid fighting
@@ -178,7 +153,7 @@ object JudgmentModifiers {
     lazy val haveGround = battleLocal.us.units.exists( ! _.flying)
     lazy val staticDefenseCount = battleLocal.enemy.units.count(u => u.complete && u.unitClass.isBuilding && ((haveAir && u.unitClass.attacksAir) || (haveGround && u.unitClass.attacksGround)))
     if (satisfied && staticDefenseCount > 0) {
-      Some(JudgmentModifier(gainedValueMultiplier = 1.0 - 0.1 * Math.min(5, staticDefenseCount)))
+      Some(JudgmentModifier(targetDelta = 0.05 * Math.min(6, staticDefenseCount)))
     } else None
   }
 }

@@ -227,7 +227,7 @@ abstract class MissionDrop extends Mission {
       profile.canEndUnwalkable    = Some(true)
       profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
       profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
-      //profile.acceptPartialPath   = true
+      profile.acceptPartialPath   = true
       val path = profile.find
       if (path.pathExists) {
         With.logger.debug(f"$this: Following path from ${path.start} to ${path.end} via ${path.tiles.get.drop(1).headOption.getOrElse(path.end)}")

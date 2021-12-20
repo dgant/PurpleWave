@@ -8,7 +8,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 class BattleLocal(unitsUs: Vector[UnitInfo], unitsEnemy: Vector[UnitInfo]) extends Battle(unitsUs, unitsEnemy) with PredictionLocal {
 
   val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
-  val gainedValueMultiplier: Double = judgmentModifiers.map(_.gainedValueMultiplier).product
+  val speedMultiplier: Double = judgmentModifiers.map(_.speedMultiplier).product
   var judgement: Option[BattleJudgment] = None
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units

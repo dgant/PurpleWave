@@ -1,13 +1,34 @@
 package Information.Battles.Prediction.Skimulation
 
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.{BattleLocal, Team}
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 object Skimulator {
 
+  def durabilityFrames(team: Team): Double = team.meanTotalHealth / team.opponent.meanDpf
+
   def predict(battle: BattleLocal): Unit = {
-    // Calculate unit properties
+
+    // Calculate unit participation
+    battle.teams.foreach(team => team.units.foreach(unit => {
+      // TODO: Consider: Does this achieve everything the reference logic does?
+      // TODO: Definitely doesn't include ground distance considerations, which for some reason are enemy->friendly and not the reverse
+      unit.skimDistanceToEngage = Math.max(0d,
+        Maff.min(
+          team.opponent.units.map(e =>
+            unit.pixelDistanceEdge(e)
+              - Math.max(
+              if (e.canAttack(unit)) e.pixelRangeAgainst(unit) else 0,
+              if (unit.canAttack(e)) unit.pixelRangeAgainst(e) else 0))).getOrElse(0d))}))
+    battle.teams.foreach(team => team.skimMinDistanceToEngage = Maff.min(team.units.view.map(_.skimDistanceToEngage)).getOrElse(0.0))
+    battle.teams.foreach(team => team.units.foreach(unit => {
+      val delayFrames           = Maff.nanToOne((unit.skimDistanceToEngage - team.skimMinDistanceToEngage) / unit.topSpeed / (if (unit.isFriendly) battle.speedMultiplier else 1.0))
+      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
+      unit.skimPresence         = Maff.clamp(Maff.nanToOne(teamDurabilityFrames / delayFrames), 0.0, 1.0)
+    }))
+
+    // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
       val energy = if (unit.isFriendly) unit.energy else 100
       val player = unit.player
@@ -51,6 +72,7 @@ object Skimulator {
       if (unit.canStim)                                                   unit.skimStrength *= 1.2
       if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.2
       if (Terran.Medic(unit))                                             unit.skimStrength *= 1.0 // TODO: Cap on bio allies
+      if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size / 8.0
       if (Protoss.Reaver(unit)  && unit.isFriendly && unit.scarabs == 0)  unit.skimStrength *= 0
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
@@ -60,6 +82,9 @@ object Skimulator {
       if (Zerg.Zergling(unit)   && Zerg.ZerglingAttackSpeed(player))      unit.skimStrength *= 1.2
       if (Zerg.Hydralisk(unit)  && Zerg.HydraliskSpeed(player))           unit.skimStrength *= 1.2
       if (Zerg.Hydralisk(unit)  && Zerg.HydraliskRange(player))           unit.skimStrength *= 1.2
+
+      // Major upgrade thresholds
+      if (Protoss.Zealot(unit) && unit.presumptiveTarget.exists(t => Zerg.Zergling(t) && unit.damageUpgradeLevel > t.armorHealth)) unit.skimStrength *= 1.3
 
       // Count spells
       unit.skimMagic = 0
@@ -73,39 +98,19 @@ object Skimulator {
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * 6)   // TODO: Capped by team melee valud
       unit.skimStrength += unit.skimMagic
 
-      // TODO: Consider: Does this achieve everything the reference logic does?
-      // TODO: Definitely doesn't include ground distance considerations, which for some reason are enemy->friendly and not the reverse
-      unit.skimDistanceToEngage = Math.max(0d,
-        Maff.min(
-          team.opponent.units.map(e =>
-            unit.pixelDistanceEdge(e)
-              - Math.max(
-              if (e.canAttack(unit)) e.pixelRangeAgainst(unit) else 0,
-              if (unit.canAttack(e)) unit.pixelRangeAgainst(e) else 0))).getOrElse(0d))
+      // Count presence
+      unit.skimStrength *= unit.skimPresence
     }))
 
     // Calculate team properties
     // TODO: Terrain influence: Choke
-    // TODO: Terrain influence: High Ground
-    battle.teams.foreach(team => {
-      team.skimUnitsClosest = team.units.sortBy(_.skimDistanceToEngage)
-      team.skimFrontStart = team.skimUnitsClosest.indices.find(team.units(_).canMove).getOrElse(team.skimUnitsClosest.length)
-      if (team.skimFrontStart < team.skimUnitsClosest.length) {
-        team.skimFrontEnd = team.skimFrontStart
-        var maxGap = 64
-        val startDistance = team.skimUnitsClosest(team.skimFrontStart).skimDistanceToEngage
-        while (team.skimFrontEnd < team.skimUnitsClosest.length && team.skimUnitsClosest(team.skimFrontEnd).skimDistanceToEngage < startDistance + maxGap) {
-          val unit = team.skimUnitsClosest(team.skimFrontEnd)
-          team.skimStrengthTotal    += unit.skimStrength
-          team.skimStrengthAir      += unit.skimStrength * Maff.fromBoolean(unit.flying)
-          team.skimStrengthGround   += unit.skimStrength * Maff.fromBoolean(! unit.flying)
-          team.skimStrengthVsAir    += unit.skimStrength * Maff.fromBoolean(unit.canAttackAir || ! unit.canAttack)
-          team.skimStrengthVsGround += unit.skimStrength * Maff.fromBoolean(unit.canAttackGround || ! unit.canAttack)
-          team.skimFrontEnd += 1
-          maxGap = Math.min(maxGap + 32, 32 * 16)
-        }
-      }
-    })
+    battle.teams.foreach(team => team.units.foreach(unit => {
+      team.skimStrengthTotal    += unit.skimStrength
+      team.skimStrengthAir      += unit.skimStrength * Maff.fromBoolean(unit.flying)
+      team.skimStrengthGround   += unit.skimStrength * Maff.fromBoolean(! unit.flying)
+      team.skimStrengthVsAir    += unit.skimStrength * Maff.fromBoolean(unit.canAttackAir || ! unit.canAttack)
+      team.skimStrengthVsGround += unit.skimStrength * Maff.fromBoolean(unit.canAttackGround || ! unit.canAttack)
+    }))
 
     battle.predictionComplete = true
   }

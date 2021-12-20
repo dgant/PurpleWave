@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Targeting.Target
 import Micro.Agency.Commander
-import Micro.Targeting.Target.bestUnfiltered
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Race
 

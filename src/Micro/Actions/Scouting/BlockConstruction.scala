@@ -30,8 +30,7 @@ object BlockConstruction extends Action {
       || unit.totalHealth > builder.totalHealth
       || unit.pixelDistanceEdge(builder) > 8) {
       Commander.attack(unit)
-    }
-    else {
+    } else {
       Retreat.delegate(unit)
     }
   }
@@ -53,8 +52,9 @@ object BlockConstruction extends Action {
       lazy val movingToRelevantBase = (
         hasRelevantOrder
         && targetPixel.base.exists(base =>
-          (base.owner.isEnemy
-          || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.isNaturalOf.exists(_.owner.isEnemy))))))
+          base.townHall.isEmpty
+          && (base.owner.isEnemy
+            || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.isNaturalOf.exists(_.owner.isEnemy))))))
       val output                    = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
       output
     })

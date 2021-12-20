@@ -91,15 +91,10 @@ class PvZ2GateFlex extends GameplanImperative {
     goCorsair &&= ! enemyHydralisksLikely
     goCorsair ||= enemyMutalisksLikely
     goSpeedlots = ! goCorsair || enemyBases > 2
-    goObserver = With.frame > Minutes(8)()
-    goObserver &&= minerals >= 400
-    goObserver &&= With.units.ours.exists(u => u.intent.toBuild.contains(Protoss.Nexus) && u.pixelDistanceCenter(u.agent.destination) < 8)
+    goObserver = With.frame > GameTime(8, 30)()
+    goObserver &&= With.units.ours.exists(u => u.intent.toBuild.contains(Protoss.Nexus))
     goObserver &&= safeAtHome
     goObserver ||= enemyLurkersLikely
-
-    // TEMPORARY! DELETE!
-    goSpeedlots = true
-    goCorsair = false
 
     val mutaFrame = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
 

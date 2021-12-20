@@ -177,7 +177,7 @@ class PvTBasic extends GameplanTemplate {
       new And(new UnitsAtLeast(1, Protoss.Shuttle), new UnitsAtLeast(1, Protoss.Reaver), new GasPumpsAtLeast(2)),
       new UpgradeContinuously(Protoss.ShuttleSpeed)),
     new If(
-      new Or(new MineralOnlyBase, new And(new MiningBasesAtLeast(4), new EmployingCarriers), new And(new MiningBasesAtLeast(5))),
+      new Or(new MineralOnlyBase, new And(new MiningBasesAtLeast(3), new EmployingCarriers), new And(new MiningBasesAtLeast(5))),
       new Build(Get(Protoss.CitadelOfAdun), Get(Protoss.ZealotSpeed))),
     new GatewayUpgrades)
 
@@ -249,7 +249,7 @@ class PvTBasic extends GameplanTemplate {
   class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, MatchOr(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, MatchTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
   class GoDT      extends Parallel(new WriteStatus("GoDT"),       new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(2, Protoss.DarkTemplar)))
   class GoStorm   extends Parallel(new WriteStatus("GoStorm"),    new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm), Get(2, Protoss.HighTemplar)))
-  class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(Protoss.AirDamage), Get(4, Protoss.Gateway), Get(Protoss.CarrierCapacity)))
+  class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(Protoss.AirDamage), Get(4, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(Protoss.CarrierCapacity)))
   class GoArbiter extends Parallel(new WriteStatus("GoArbiter"),  new BuildOrder(Get(Protoss.CitadelOfAdun), Get(2, Protoss.Gateway), Get(Protoss.Stargate), Get(Protoss.TemplarArchives), Get(Protoss.ArbiterTribunal), Get(Protoss.ArbiterEnergy), Get(Protoss.Arbiter), Get(6, Protoss.Gateway)))
   class GoGateway extends Parallel(new WriteStatus("GoGateway"),  new BuildOrder(Get(3, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(2, Protoss.Forge), Get(5, Protoss.Gateway), Get(Protoss.GroundDamage), Get(Protoss.GroundArmor), Get(Protoss.ZealotSpeed), Get(Protoss.TemplarArchives), Get(7, Protoss.Gateway)))
 
@@ -312,7 +312,7 @@ class PvTBasic extends GameplanTemplate {
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
         new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier),
-        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun), new Employing(PvEStormYes), new UnitsAtLeast(12, MatchWarriors)), new GoStorm),
+        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun),   new Employing(PvEStormYes), new UnitsAtLeast(12, MatchWarriors)), new GoStorm),
         new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter))),
 
     new HighPriorityTech,

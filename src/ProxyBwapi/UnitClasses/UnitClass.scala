@@ -410,11 +410,12 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Terran.Firebat) 0.3
     else if (this == Terran.Ghost) 0.25
     else if (this == Terran.Medic) 1.25
-    else if (this == Terran.Vulture) 1
+    else if (this == Terran.SpiderMine) 0.25
+    else if (this == Terran.Vulture) 0.75
     else if (this == Terran.Goliath) 1.25
-    else if (this == Terran.SiegeTankUnsieged) 1.5
+    else if (this == Terran.SiegeTankUnsieged) 1.75
     else if (this == Terran.SiegeTankSieged) 2.5
-    else if (this == Terran.Valkyrie) 1
+    else if (this == Terran.Valkyrie) 1.75
     else if (this == Terran.Wraith) 1.25
     else if (this == Terran.Battlecruiser) 4
     else if (this == Terran.MissileTurret) 5
@@ -422,15 +423,15 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Zealot) 1
     else if (this == Protoss.Dragoon) 1.0
     else if (this == Protoss.DarkTemplar) 1
-    else if (this == Protoss.Archon) 3
+    else if (this == Protoss.Archon) 3.5
     else if (this == Protoss.Corsair) 1.5
     else if (this == Protoss.Scout) 1
-    else if (this == Protoss.Carrier) 4.5
+    else if (this == Protoss.Carrier) 5
     else if (this == Protoss.Arbiter) 1
     else if (this == Protoss.Reaver) 4
     else if (this == Protoss.PhotonCannon) 1
     else if (this == Zerg.Zergling) 0.25
-    else if (this == Zerg.Hydralisk) 1
+    else if (this == Zerg.Hydralisk) 0.85
     else if (this == Zerg.Lurker) 2
     else if (this == Zerg.Mutalisk) 1.25
     else if (this == Zerg.Ultralisk) 3

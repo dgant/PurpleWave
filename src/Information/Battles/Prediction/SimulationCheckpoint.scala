@@ -13,7 +13,7 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   @inline final def unitHealthValueLeft(simulacrum: Simulacrum) : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPoints + simulacrum.shieldPoints
   @inline final def unitHealthValueMax(simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
 
-  val gainedValueMultiplier           : Double = simulation.prediction.battle.gainedValueMultiplier
+  val gainedValueMultiplier           : Double = 1.0 // simulation.prediction.battle.gainedValueMultiplier
   val framesIn                        : Int    = simulation.prediction.simulationFrames
   val localValueTotalUs               : Double = simulation.simulacraOurs.view.map(ValueMax).sum
   val localValueTotalEnemy            : Double = simulation.simulacraEnemy.view.map(ValueMax).sum * gainedValueMultiplier

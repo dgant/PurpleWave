@@ -25,6 +25,7 @@ object PsionicStorm extends TargetedSpell {
     if (target.stasised)    return 0.0
     if (target.invincible)  return 0.0
     if ( ! target.visible)  return 0.0
+    if (target.isFriendly && target.isTransport && target.loadedUnitCount == 0) return 0.0 // Dumb hack to ensure our storm drops don't try too hard to avoid the shuttle
     if (target.isAny(
       Protoss.Interceptor,
       Zerg.Larva,

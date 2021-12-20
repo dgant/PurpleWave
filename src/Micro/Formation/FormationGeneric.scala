@@ -62,9 +62,12 @@ object FormationGeneric {
     floodCostVulnerability  = 0
     if (style == FormationStyleMarch || style == FormationStyleDisengage) {
       if ( ! path.pathExists) return FormationEmpty
+      val pixelsToEngage = units.view.map(u => Math.min(
+        Maff.min(u.matchups.threats.map(_.pixelsToGetInRange(u))).getOrElse(1024.0),
+        Maff.min(u.matchups.targets.map(u.pixelsToGetInRange)).getOrElse(1024.0))).min
       var stepSizeTiles =
         Seq(
-          4.0,
+          Maff.clamp(pixelsToEngage / 32, 2, 4),
           if (style == FormationStyleDisengage) 10.0 + 2.0 * floodCentroid.enemyRange else 0.0,
           With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 1.0)
         .max

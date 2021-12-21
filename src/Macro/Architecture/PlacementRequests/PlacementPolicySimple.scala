@@ -1,5 +1,5 @@
 package Macro.Architecture.PlacementRequests
-import Mathematics.Heuristics.HeuristicMathMultiplicative
+import Placement.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 
 class PlacementPolicySimple(request: PlacementRequest) extends PlacementPolicy {

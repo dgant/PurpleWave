@@ -1,7 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
-import Mathematics.Heuristics.HeuristicMathMultiplicative
+import Placement.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Maff
 import Mathematics.Points.Tile
 

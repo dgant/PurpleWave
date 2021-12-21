@@ -1,4 +1,4 @@
-package Mathematics.Heuristics
+package Placement.Heuristics
 
 object HeuristicMathMultiplicative {
   

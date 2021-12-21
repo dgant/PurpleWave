@@ -5,7 +5,7 @@ import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import Planning.Plans.Placement.BuildCannonsAtNatural
-import Planning.UnitMatchers.MatchWarriors
+import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
@@ -288,6 +288,11 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
     shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
+
+    // Chill vs. 2-Gate until we're ready to defend
+    if ( ! employing(PvP1012) && enemyStrategy(With.fingerprints.twoGate) && unitsEver(MatchAnd(Protoss.Dragoon, MatchComplete)) == 0) {
+      aggression(0.6)
+    }
 
     /////////////
     // Logging //

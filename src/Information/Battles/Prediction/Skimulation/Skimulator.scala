@@ -27,6 +27,9 @@ object Skimulator {
       val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
       unit.skimPresence         = Maff.clamp(Maff.nanToOne(teamDurabilityFrames / delayFrames), 0.0, 1.0)
     }))
+    // Boost presence of hidden enemy units, assuming they've come along
+    val enemyMinVisiblePresence = Maff.min(battle.enemy.units.view.filter(_.visible).map(_.skimPresence)).getOrElse(1.0)
+    battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimPresence = Math.max(u.skimPresence, enemyMinVisiblePresence))
 
     // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
@@ -68,11 +71,12 @@ object Skimulator {
       }
 
       // Count other unit properties
-      if ( ! unit.complete)                                               unit.skimStrength *= 0
       if (unit.canStim)                                                   unit.skimStrength *= 1.2
+      if (unit.ensnared)                                                  unit.skimStrength *= 0.5
       if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.2
       if (Terran.Medic(unit))                                             unit.skimStrength *= 1.0 // TODO: Cap on bio allies
       if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
+      if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
       if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size / 8.0
       if (Protoss.Reaver(unit)  && unit.isFriendly && unit.scarabs == 0)  unit.skimStrength *= 0
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
@@ -100,6 +104,15 @@ object Skimulator {
 
       // Count presence
       unit.skimStrength *= unit.skimPresence
+
+      // Count incapability
+      var incapable = ! unit.complete
+      incapable ||= unit.stasised
+      incapable ||= unit.maelstrommed
+      incapable ||= unit.underDisruptionWeb
+      incapable ||= unit.lockedDown
+      incapable ||= unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm
+      if (incapable) { unit.skimStrength = 0 }
     }))
 
     // Calculate team properties

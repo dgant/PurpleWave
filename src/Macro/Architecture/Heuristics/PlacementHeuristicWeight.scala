@@ -1,7 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
-import Mathematics.Heuristics.{Heuristic, HeuristicWeight}
+import Placement.Heuristics.{Heuristic, HeuristicWeight}
 import Mathematics.Points.Tile
 import bwapi.Color
 

@@ -1,4 +1,4 @@
-package Mathematics.Heuristics
+package Placement.Heuristics
 
 class HeuristicWeight[TContext, TCandidate] (
   val heuristic : Heuristic[TContext, TCandidate],

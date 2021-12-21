@@ -1,7 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
-import Mathematics.Heuristics.Heuristic
+import Placement.Heuristics.Heuristic
 import Mathematics.Points.Tile
 
 abstract class PlacementHeuristic extends Heuristic[Blueprint, Tile] {

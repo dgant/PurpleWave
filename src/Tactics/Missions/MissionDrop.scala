@@ -221,13 +221,12 @@ abstract class MissionDrop extends Mission {
       val profile = new PathfindProfile(transport.tile)
       profile.end                 = Some(vicinity.tile)
       profile.costEnemyVision     = 5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
-      profile.costRepulsion       = 10
-      profile.costThreat          = 50
+      profile.costRepulsion       = 25
+      profile.costThreat          = 125
       profile.canCrossUnwalkable  = Some(true)
       profile.canEndUnwalkable    = Some(true)
       profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
       profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
-      profile.acceptPartialPath   = true
       val path = profile.find
       if (path.pathExists) {
         With.logger.debug(f"$this: Following path from ${path.start} to ${path.end} via ${path.tiles.get.drop(1).headOption.getOrElse(path.end)}")
@@ -236,7 +235,7 @@ abstract class MissionDrop extends Mission {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)
         transport.agent.toReturn = Some(vicinity)
-        if (transport.matchups.framesOfSafety < 24) {
+        if (transport.matchups.pixelsOfEntanglement > -64) {
           Retreat.delegate(transport)
         }
         Move.delegate(transport)

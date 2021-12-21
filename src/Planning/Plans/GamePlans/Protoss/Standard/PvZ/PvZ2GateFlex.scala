@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Lifecycle.With
 import Macro.BuildRequests.Get
 import Planning.Plans.GamePlans.GameplanImperative
-import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
+import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -99,7 +99,7 @@ class PvZ2GateFlex extends GameplanImperative {
     val mutaFrame = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
 
     var safeOutside = safeToMoveOut
-    safeOutside &&= ! goSpeedlots || (upgradeComplete(Protoss.GroundDamage) && upgradeComplete(Protoss.ZealotSpeed))
+    safeOutside &&= ! goSpeedlots || upgradeComplete(Protoss.GroundDamage, 10) || unitsComplete(Protoss.Zealot) >= 11
     var safeToExpand = safeOutside
     safeToExpand &&= unitsComplete(MatchWarriors) + 2 * unitsComplete(Protoss.Archon) >= 9
     safeToExpand ||= unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Corsair) > 0 && enemies(Zerg.Hydralisk) == 0 && enemies(Zerg.Mutalisk) == 0
@@ -141,6 +141,9 @@ class PvZ2GateFlex extends GameplanImperative {
       pump(Protoss.Dragoon)
     }
     meldAllArchons.update()
+    if (units(Protoss.TemplarArchives) > 0) {
+      buildOrder(Get(2, Protoss.HighTemplar))
+    }
     pump(Protoss.DarkTemplar, 1)
     pump(Protoss.HighTemplar)
     pump(Protoss.Zealot, 12)
@@ -158,6 +161,7 @@ class PvZ2GateFlex extends GameplanImperative {
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)
     get(Protoss.ZealotSpeed)
+    pumpWorkers(oversaturate = true)
     get(4, Protoss.Gateway)
     if (units(Protoss.TemplarArchives) > 0) {
       get(5, Protoss.Gateway)
@@ -184,7 +188,7 @@ class PvZ2GateFlex extends GameplanImperative {
     get(Protoss.Gateway); get(Protoss.Assimilator); get(3, Protoss.Gateway); get(Protoss.Stargate)
     if (saturated || (gas < 200 && units(Protoss.Gateway, Protoss.Stargate) >= 4)) buildGasPumps()
 
-    var shouldConsiderExpanding = upgradeComplete(Protoss.ZealotSpeed)
+    var shouldConsiderExpanding = upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(Protoss.Gateway) >= 6 && unitsComplete(Protoss.Observer) > 0
     shouldConsiderExpanding ||= miningBases < 2 && safeAtHome
     if (shouldConsiderExpanding) {
       status("ExpandUnlocked")
@@ -231,11 +235,14 @@ class PvZ2GateFlex extends GameplanImperative {
     if (units(Protoss.Dragoon) > 1) {
       get(Protoss.DragoonRange)
     }
+    if (unitsComplete(Protoss.Corsair) > 5 || (enemies(Zerg.Scourge, Zerg.Mutalisk) == 0 && ! enemyHasUpgrade(Zerg.OverlordSpeed))) {
+      pumpRatio(Protoss.DarkTemplar, 1, 3, Seq(Friendly(MatchWarriors, 0.1)))
+    }
     if (minerals > 500 && gas < 50) {
       pump(Protoss.Zealot)
     }
     pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Corsair, -1.5), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
-    pump(Protoss.DarkTemplar, 1)
+    pumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(-12), Friendly(Protoss.Zealot, 2.0)))
     pumpRatio(Protoss.HighTemplar, 4, 12, Seq(Friendly(MatchWarriors, 0.15)))
     if (upgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)) {
       pump(Protoss.Shuttle, 1)

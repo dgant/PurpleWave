@@ -2,7 +2,7 @@ package Macro.Architecture.Heuristics
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Mathematics.Heuristics.HeuristicMathMultiplicative
+import Placement.Heuristics.HeuristicMathMultiplicative
 import Mathematics.Points.Tile
 import Utilities.Time.Forever
 

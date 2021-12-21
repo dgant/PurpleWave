@@ -1,7 +1,7 @@
 package Macro.Architecture.Heuristics
 
 import Macro.Architecture.Blueprint
-import Mathematics.Heuristics.{Heuristic, HeuristicEvaluation}
+import Placement.Heuristics.{Heuristic, HeuristicEvaluation}
 import Mathematics.Points.Tile
 
 class PlacementHeuristicEvaluation(

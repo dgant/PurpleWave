@@ -405,7 +405,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
           / copiesProduced
         )
   lazy val skimulationValue: Double =
-    if (isWorker) 0.05
+    if (isWorker) 0.01
     else if (this == Terran.Marine) 0.4
     else if (this == Terran.Firebat) 0.3
     else if (this == Terran.Ghost) 0.25

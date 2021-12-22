@@ -145,15 +145,14 @@ class Tactics extends TimedTask {
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.units).count(_.isAny(MatchAnd(MatchComplete, MatchOr(Terran.Factory, Terran.Barracks, Protoss.Gateway, MatchHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
+      val qualifiedClasses = if (With.enemies.exists(_.isTerran))
+        Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
+      else
+        Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
       assign(
         freelancers,
         dropVulnerableBases.map(baseSquads(_)),
-        filter = (f, s) =>
-          if (With.enemies.exists(_.isTerran))
-            f.isAny(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Zerg.Hydralisk, Zerg.Lurker)
-          else
-            f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
-          && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
+        filter = (f, s) => f.isAny(qualifiedClasses: _*) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
 
     catchDTRunby.launch()

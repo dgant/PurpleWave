@@ -130,7 +130,7 @@ object Target extends {
     output
   }
 
-  def injury(target: UnitInfo): Double = (target.unitClass.maxTotalHealth - target.totalHealth) / target.unitClass.maxTotalHealth
+  def injury(target: UnitInfo): Double = Maff.nanToZero((target.unitClass.maxTotalHealth - target.totalHealth).toDouble / target.unitClass.maxTotalHealth)
 
   def getTargetBaseValue(target: UnitInfo, recur: Boolean = true): Double = {
     var output = target.subjectiveValue

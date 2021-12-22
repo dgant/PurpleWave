@@ -39,9 +39,9 @@ class Visualization extends TimedTask {
     ShowStatus,
     ShowPerformanceSummary,
     ShowStoryteller,
-
-    ShowBattles,
     ShowJudgment,
+
+    ShowSquads,
     ShowFormations
   )
 

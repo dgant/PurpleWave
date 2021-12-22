@@ -31,6 +31,7 @@ trait UnitGroup {
   def attackCentroidGround    = _centroidGround()
   def attackCentroidKey       = _centroidKey()
   def meanTopSpeed            = _meanTopSpeed()
+  def meanAttackerSpeed       = _meanAttackerSpeed()
   def meanTotalHealth         = _meanTotalHealth()
   def meanDpf                 = _meanDpf()
 
@@ -53,6 +54,7 @@ trait UnitGroup {
   private val _attackCentroidGround     = new Cache(() => GroupCentroid.ground(centroidUnits(attackers)))
   private val _attackCentroidKey        = new Cache(() => if (_hasGround()) attackCentroidGround else attackCentroidAir)
   private val _meanTopSpeed             = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
+  private val _meanAttackerSpeed        = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanTotalHealth          = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(_.hitPoints.toDouble)))
   private val _meanDpf                  = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(u => Math.max(u.dpfGround, u.dpfAir))))
   private def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)

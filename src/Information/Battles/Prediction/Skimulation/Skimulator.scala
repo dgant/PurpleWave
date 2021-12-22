@@ -2,7 +2,9 @@ package Information.Battles.Prediction.Skimulation
 
 import Information.Battles.Types.{BattleLocal, Team}
 import Mathematics.Maff
+import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.Time.Forever
 
 object Skimulator {
 
@@ -21,13 +23,17 @@ object Skimulator {
               - Math.max(
               if (e.canAttack(unit)) e.pixelRangeAgainst(unit) else 0,
               if (unit.canAttack(e)) unit.pixelRangeAgainst(e) else 0))).getOrElse(0d))}))
-    battle.teams.foreach(team => team.skimMinDistanceToEngage = Maff.min(team.units.view.map(_.skimDistanceToEngage)).getOrElse(0.0))
+    battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(MatchWarriors).map(_.skimDistanceToEngage)).getOrElse(Forever()))
     battle.teams.foreach(team => team.units.foreach(unit => {
-      val delayFrames           = Maff.nanToOne((unit.skimDistanceToEngage - team.skimMinDistanceToEngage) / unit.topSpeed / (if (unit.isFriendly) battle.speedMultiplier else 1.0))
+      val delayFrames           = Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / unit.topSpeed / (if (unit.isFriendly) battle.speedMultiplier else 1.0))
+      val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
       val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
-      unit.skimPresence         = 1.0 - Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
+      unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 0.9)
+      unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames / teamDurabilityFrames), 0.0, 0.75)
+      unit.skimPresence         = 1.0 - Math.max(unit.skimDelay, unit.skimExtension)
     }))
-    // Boost presence of hidden enemy units, assuming they've come along
+    // Boost presence of hidden enemy units, assuming they've come along.
+    // Note that this can significantly swing our perception of hidden army strength
     val enemyMinVisiblePresence = Maff.min(battle.enemy.units.view.filter(_.visible).map(_.skimPresence)).getOrElse(1.0)
     battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimPresence = Math.max(u.skimPresence, enemyMinVisiblePresence))
 

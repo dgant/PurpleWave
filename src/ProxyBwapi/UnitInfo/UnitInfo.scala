@@ -254,6 +254,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def canAttack(enemy: CombatUnit): Boolean = (
     canAttack
+    && ! enemy.unitClass.isSpell
     && enemy.asInstanceOf[UnitInfo].canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked

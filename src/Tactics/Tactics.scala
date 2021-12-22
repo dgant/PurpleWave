@@ -149,7 +149,10 @@ class Tactics extends TimedTask {
         freelancers,
         dropVulnerableBases.map(baseSquads(_)),
         filter = (f, s) =>
-          f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
+          if (With.enemies.exists(_.isTerran))
+            f.isAny(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Zerg.Hydralisk, Zerg.Lurker)
+          else
+            f.isAny(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
           && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
 

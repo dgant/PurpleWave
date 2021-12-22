@@ -84,6 +84,9 @@ class SquadDefendBase(base: Base) extends Squad {
     formations.clear()
     if (canWithdraw) {
       lastAction = "Withdraw"
+      if (canScour) {
+        formations += formationScour
+      }
       formations += formationWithdraw
       scour()
     } else if (canScour) {

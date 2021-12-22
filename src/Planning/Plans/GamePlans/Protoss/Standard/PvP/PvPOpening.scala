@@ -17,6 +17,7 @@ class PvPOpening extends GameplanImperative {
   // General properties
   var shouldExpand: Boolean = false
   var shouldAttack: Boolean = false
+  var shouldHarass: Boolean = false
   // 10-12 properties
   var commitZealots: Boolean = false
   var sevenZealot: Boolean = false
@@ -183,6 +184,11 @@ class PvPOpening extends GameplanImperative {
         speedlotAttack = true
       }
     }
+    // Robo + tech before range die to DTs due to lack of gas for Observers
+    if (employing(PvPRobo) && employing(PvPTechBeforeRange) && enemyRecentStrategy(With.fingerprints.dtRush)) {
+      PvPTechBeforeRange.swapOut()
+      PvPGateCoreTech.swapIn()
+    }
 
     /////////////////////////////
     // Tech-specific decisions //
@@ -254,9 +260,9 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= With.frame >= timeToStartCannons
         getCannons &&= safeAtHome
         getCannons &&= ! enemyRobo
-        getCannons &&= enemyBases < 2
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
         getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
+        getCannons ||= enemyStrategy(With.fingerprints.dtRush)
       }
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 20)
     } else if (employing(PvP3GateGoon)) {
@@ -288,11 +294,21 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
     shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
+    shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! employing(PvP1012) && enemyStrategy(With.fingerprints.twoGate) && unitsEver(MatchAnd(Protoss.Dragoon, MatchComplete)) == 0) {
       aggression(0.6)
     }
+
+    oversaturate = units(Protoss.Reaver) > 0
+    oversaturate ||= employing(PvPDT)
+    oversaturate ||= minerals >= 450
+    oversaturate ||= enemyBases > 1
+    oversaturate ||= enemyRobo
+    oversaturate ||= enemyDarkTemplarLikely
+    oversaturate &&= ! speedlotAttack
+    oversaturate &&= ! employing(PvP3GateGoon, PvP4GateGoon)
 
     /////////////
     // Logging //
@@ -313,11 +329,13 @@ class PvPOpening extends GameplanImperative {
     if (employing(PvPDT)) status(f"Cannon@${Frames(timeToStartCannons)}")
     if (getCannons) status("Cannons")
     if (speedlotAttack) status("Speedlot")
+    if (oversaturate) status("Oversaturate")
     if (shouldAttack) status("Attack")
+    if (shouldHarass) status("Harass")
     if (shouldExpand) status("ExpandNow")
-    oversaturate = (units(Protoss.Reaver) > 0 || employing(PvPDT) || minerals >= 450 || enemyBases > 1 || enemyRobo) && ! speedlotAttack && ! employing(PvP3GateGoon, PvP4GateGoon)
+
     if (shouldAttack) { attack() }
-    if (upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1) { harass() }
+    if (shouldHarass) { harass() }
 
     ////////////////////////////
     // Emergency DT reactions //
@@ -677,9 +695,9 @@ class PvPOpening extends GameplanImperative {
     } else if (employing(PvPDT)) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
+      if (getCannons) { buildCannonsAtNatural.update() }
       buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
       get(2, Protoss.Gateway)
-      if (getCannons) { buildCannonsAtNatural.update() }
       if (shouldExpand) { requireMiningBases(2) }
       if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
       trainGatewayUnits()

@@ -6,10 +6,11 @@ object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
-  val defaultPvT = StrategySelectionFixed(PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes)
-  val defaultPvP = new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvPGateCoreGate)
+  val defaultPvT = StrategySelectionGreedy() //StrategySelectionFixed(PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes)
+  val defaultPvP = StrategySelectionGreedy() //new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvPGateCoreGate)
   val defaultPvZ = StrategySelectionFixed(PvZ2GateFlex)
 
+  /*
   // AIIDE 2021
   // Terran
   val dragon      : Opponent = add("Dragon",      defaultPvT)
@@ -30,6 +31,7 @@ object Opponents {
   val zzzkbot     : Opponent = add("ZZZKBot",     real5drone.policy)
   // Random
   val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR2Gate4Gate))
+  */
 
   /*
   // COG 2021
@@ -69,9 +71,9 @@ object Opponents {
   //val zzzkbot     : Opponent = add("ZZZKBot")
 
   // Aliases
-  val mcravez           : Opponent = add("McRaveZ",             mcrave.policy)
-  val chriscoxe         : Opponent = add("Chris Coxe",          zzzkbot.policy)
-  val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
+  //val mcravez           : Opponent = add("McRaveZ",             mcrave.policy)
+  //val chriscoxe         : Opponent = add("Chris Coxe",          zzzkbot.policy)
+  //val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
   val saida             : Opponent = add("SAIDA",               adias.policy)
   val jadien            : Opponent = add("jadien",              adias.policy) // Local testing policy
   

@@ -36,7 +36,6 @@ object PvPGateCoreGate extends PvPStrategy {
 object PvPTechBeforeRange extends PvPStrategy {
   override def entranceInverted: Boolean = false
   override def entranceFlat: Boolean = false
-  // TODO: Add a minimumGames = 1
 }
 
 ////////////////////////

@@ -126,7 +126,14 @@ object Target extends {
           threat.pixel.projectUpTo(firingPixelSafer, threat.topSpeed * firingPixelFrames),
           firingPixelSafer))
     }
-    val output = scoreBasic * preferenceBonus / threatPenalty / threatPenalty
+    var splashBonus = 1.0
+    if (attacker.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.Lurker)) {
+      splashBonus = Math.max(splashBonus, target.tile.adjacent9.view
+        .filter(_.valid)
+        .map(t => With.grids.units(t).count(u => attacker.canAttack(u) && u.isEnemy))
+        .sum)
+    }
+    val output = splashBonus * scoreBasic * preferenceBonus / threatPenalty / threatPenalty
     output
   }
 

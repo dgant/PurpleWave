@@ -56,7 +56,7 @@ class Configuration {
   ///////////
   
   var minimumMineralsBeforeMinedOut   = 150 * 8
-  var maxFramesToSendAdvanceBuilder   = Seconds(40)()
+  var maxFramesToSendAdvanceBuilder   = Seconds(50)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var enableTightBuildingPlacement    = false
   

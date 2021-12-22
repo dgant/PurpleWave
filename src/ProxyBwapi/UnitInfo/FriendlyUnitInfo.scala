@@ -70,7 +70,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     }
   }
   def targetsAssigned: Option[Seq[UnitInfo]] = intent.targets.orElse(squad.flatMap(_.targets))
-  def targets: Seq[UnitInfo] = targetsAssigned.getOrElse(matchups.targets)
   def formationSpot(style: FormationStyle): Option[Pixel] = squad.flatMap(_.formations.find(_.style == style).flatMap(_.placements.get(this)))
   def formationEngage: Option[Pixel] = formationSpot(FormationStyleEngage)
   def formationMarch: Option[Pixel] = formationSpot(FormationStyleMarch)

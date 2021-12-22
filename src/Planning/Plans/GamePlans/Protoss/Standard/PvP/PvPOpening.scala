@@ -222,8 +222,8 @@ class PvPOpening extends GameplanImperative {
             getObservatory = false
             getObservers = false
           } else {
-            getObservatory = roll("SpeculativeObservatory", 0.5)
-            getObservers = getObservatory && roll("SpeculativeObservers", 0.5) // So the probability of obs is the *joint* probability
+            getObservatory = roll("SpeculativeObservatory", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 0.8 else 0.5)
+            getObservers = getObservatory && roll("SpeculativeObservers", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 1.0 else 0.75) // So the probability of obs is the *joint* probability
           }
         }
       }

@@ -194,6 +194,9 @@ class PvZ2GateFlex extends GameplanImperative {
       status("ExpandUnlocked")
       expand()
     }
+    if (enemyLurkersLikely) {
+      techRobo()
+    }
     upgrades()
     trainCorsairs()
     if (safeAtHome && unitsComplete(MatchWarriors) >= 10) {

@@ -140,14 +140,15 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   }
 
   def needBuilder: Boolean = {
+    lazy val proposedBuilder = builderLock.inquire().flatMap(_.headOption)
+    lazy val maxFramesToSendAdvanceBuilder = With.blackboard.maxFramesToSendAdvanceBuilder * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs) && proposedBuilder.isDefined))
     if (building.isDefined) {
       return buildingClass.isTerran
     } else if (desiredTile.isEmpty) {
       return false
-    } else  if (currencyLock.expectedFrames > With.blackboard.maxFramesToSendAdvanceBuilder) {
+    } else if (currencyLock.expectedFrames > maxFramesToSendAdvanceBuilder) {
       return false
     }
-    val proposedBuilder = builderLock.inquire().flatMap(_.headOption)
     if (proposedBuilder.isEmpty) {
       return false
     }

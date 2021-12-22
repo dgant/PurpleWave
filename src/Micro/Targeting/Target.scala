@@ -13,17 +13,33 @@ object Target extends {
     attacker.agent.toAttack
   }
 
+  private def hasCombatPriority(unit: UnitInfo): Boolean = {
+    unit.unitClass.attacksOrCastsOrDetectsOrTransports
+  }
+  private def acceleratesDemise(attacker: UnitInfo, target: UnitInfo): Boolean = {
+    target.doomFrameAbsolute > With.frame + attacker.framesToConnectDamage(target) + 24
+  }
+
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
     // If we have no squad guidance at all, use default targeting
     if (attacker.targetsAssigned.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
 
-    val targets = legal(attacker, attacker.targets, filters: _*)
-    lazy val combatTargetInRangeSquad = targets.find(t => t.unitClass.attacksOrCastsOrDetectsOrTransports && attacker.inRangeToAttack(t))
-    lazy val combatTargetInRangeAny = bestUnfiltered(attacker, legal(attacker, attacker.matchups.targetsInRange.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports), filters: _*))
-    val output = combatTargetInRangeSquad
-      .orElse(combatTargetInRangeAny)
-      .orElse(targets.find(t => t.doomFrameAbsolute > With.frame + attacker.framesToConnectDamage(t) + 24)) // The +delta is a buffer to avoid being too greedy about hastening a unit's death
-      .orElse(targets.headOption)
+    val assigned = attacker.targetsAssigned.getOrElse(Seq.empty)
+    val matchups = attacker.matchups.targets
+    val engaged = attacker.team.exists(_.engagedUpon)
+    val strataUnfiltered = Seq(
+      (true, assigned.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
+      (true, matchups.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
+      (true, assigned.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority)),
+      (true, matchups.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority)),
+      (true, (if (engaged) assigned.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)) else Seq.empty)),
+      (true, (if (engaged) assigned.view.filter(hasCombatPriority) else Seq.empty)),
+      (false, assigned),
+      (true, (if (engaged) matchups.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)) else Seq.empty)),
+      (true, (if (engaged) matchups.view.filter(hasCombatPriority) else Seq.empty)),
+      (true, matchups))
+    val stratum = strataUnfiltered.view.map(p => (p._1, legal(attacker, p._2, filters: _*))).find(_._2.nonEmpty)
+    val output = stratum.flatMap(p => if (p._1) bestUnfiltered(attacker, p._2) else p._2.headOption)
     output
   }
 

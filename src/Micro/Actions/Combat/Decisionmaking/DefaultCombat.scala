@@ -199,7 +199,7 @@ object DefaultCombat extends Action {
       unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
       || (
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
-        && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate).forall(_.topSpeed > unit.topSpeed))))
+        && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate + 12).forall(_.topSpeed > unit.topSpeed))))
     transition(Dance,     () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
     //transition(Excuse,    () => unit.agent.receivedPushPriority() > unit.agent.priority)
 

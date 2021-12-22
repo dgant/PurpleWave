@@ -10,6 +10,7 @@ import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.Time.Minutes
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -61,17 +62,22 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def run() {
     if (units.isEmpty) return
-    lazy val withdrawing        = units.count(u => ! u.metro.contains(base.metro) && guardChoke.forall(c => c.pixelCenter.travelPixelsFor(base.heart.center, u) < 192 + u.pixelDistanceTravelling(base.heart.center)))
-    lazy val wander             = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
-    lazy val breached           = scourables.exists(isBreaching)
-    lazy val scourables         = enemies.filter(isScourable)
-    lazy val canWithdraw        = withdrawing >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
-    lazy val canScour           = scourables.nonEmpty && (wander || breached)
-    lazy val canGuard           = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
-    lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(vicinity))
+
+    val canWander         = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
+    val scourables        = enemies.filter(isScourable)
+    val breached          = scourables.exists(isBreaching)
+    val canScour          = scourables.nonEmpty && (canWander || breached)
+    val travelGoal        = if (canScour) vicinity else guardChoke.map(_.pixelCenter).getOrElse(bastion())
+    val withdrawingUnits  = units.count(u => ! u.metro.contains(base.metro) && travelGoal.travelPixelsFor(heart, u) < 192 + u.pixelDistanceTravelling(heart))
+
+    lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(travelGoal))
     lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel))
     lazy val formationBastion   = FormationGeneric.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
+
+    val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
+    val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
+
     val targetsUnranked = if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else if (canScour) scourables else enemies.filter(threateningBase)
     targets = Some(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
@@ -137,14 +143,13 @@ class SquadDefendBase(base: Base) extends Squad {
       && ! guardZone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
   private def isScourable(enemy: UnitInfo): Boolean = (
-    ! (Zerg.Drone(enemy) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
-    && (units.exists(_.canAttack(enemy)) || (enemy.cloaked && units.exists(_.unitClass.isDetector)))
-    && (enemy.matchups.targets.nonEmpty || enemy.matchups.allies.forall(_.matchups.targets.isEmpty)) // Don't, for example, chase Overlords that have ally Zerglings nearby
+    ! (With.frame < Minutes(4)() && Zerg.Drone(enemy) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
+    // Don't scour what we can't kill
+    && (units.exists(_.canAttack(enemy)) || ((enemy.cloaked || enemy.burrowed) && units.exists(_.unitClass.isDetector)))
+    // Don't chase Overlords or floating buildings when there are actual threats nearby
+    && ((enemy.unitClass.attacksOrCastsOrDetectsOrTransports && ! Zerg.Overlord(enemy)) || enemies.forall(_.matchups.targets.isEmpty))
     // If we don't really want to fight, wait until they push into the base
-    && (
-      enemy.flying
-      || With.blackboard.wantToAttack()
-      || (enemy.base.contains(base) && ! base.zone.exit.exists(_.contains(enemy.pixel)))))
+    && (enemy.flying || With.blackboard.wantToAttack() || enemy.metro.contains(base.metro)))
 
   private val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
   private def threateningBase(enemy: UnitInfo): Boolean = {

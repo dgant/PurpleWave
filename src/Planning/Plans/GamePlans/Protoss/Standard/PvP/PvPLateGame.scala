@@ -103,9 +103,9 @@ class PvPLateGame extends GameplanImperative {
     if (expectCarriers) status("ExpectCarriers")
     if (shouldDetect) status("Detect")
     if (shouldSecondaryTech) status("2ndTech")
-    if (shouldExpand) status("shouldExpand")
-    if (shouldAttack) attack()
-    if (shouldHarass) harass()
+    if (shouldExpand) status("ShouldExpand")
+    if (shouldAttack) { status("Attack"); attack() }
+    if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString).foreach(status)
 
     // Emergency reactions
@@ -231,7 +231,8 @@ class PvPLateGame extends GameplanImperative {
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
-    if (shouldDetect || ( ! fearDeath && ! fearContain)) {
+    val getObservers = shouldDetect || ( ! fearDeath && ! fearContain)
+    if (getObservers) {
       get(Protoss.Observatory)
       buildOrder(Get(Protoss.Observer))
       if (enemyDarkTemplarLikely || enemyShownCloakedThreat) {
@@ -245,7 +246,7 @@ class PvPLateGame extends GameplanImperative {
     if (fearContain && ! fearDeath) {
       get(Protoss.ShuttleSpeed)
     }
-    buildOrder(Get(Protoss.Reaver))
+    pump(Protoss.Reaver, 1)
     get(Protoss.ShuttleSpeed)
     if (upgradeComplete(Protoss.ShuttleSpeed) && units(Protoss.Reaver) >= 4) {
       get(Protoss.ScarabDamage)

@@ -77,7 +77,7 @@ object JudgmentModifiers {
     val distanceMax   = With.mapPixelWidth
     val distanceHome  = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.nearestWalkableTile)).map(centroid.groundPixels).min
     val distanceRatio = Maff.clamp(distanceHome.toDouble / distanceMax, 0, 1)
-    val multiplier    = (distanceRatio * 2 - 1) * 0.25
+    val multiplier    = (distanceRatio * 2 - 1) * 0.3
     Some(JudgmentModifier(targetDelta = multiplier))
   }
 

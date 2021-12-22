@@ -65,15 +65,13 @@ object FormationGeneric {
       val pixelsToEngage = units.view.map(u => Math.min(
         Maff.min(u.matchups.threats.map(_.pixelsToGetInRange(u))).getOrElse(1024.0),
         Maff.min(u.matchups.targets.map(u.pixelsToGetInRange)).getOrElse(1024.0))).min
-      var stepSizeTiles =
-        Seq(
+      var stepSizeTiles = Math.max(
           Maff.clamp(pixelsToEngage / 32, 2, 4),
-          if (style == FormationStyleDisengage) 10.0 + 2.0 * floodCentroid.enemyRange else 0.0,
-          With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 1.0)
-        .max
+          With.reaction.estimationAverage * group.meanTopSpeed / 32.0 + 1)
         .toInt
       if (style == FormationStyleDisengage) {
         stepSizeTiles = Math.max(stepSizeTiles, 2 + Maff.max(units.view.map(_.matchups.pixelsOfEntanglement.toInt)).getOrElse(0) / 32)
+        stepSizeTiles = Math.max(stepSizeTiles, 10 + 2 * floodCentroid.enemyRange)
       }
       floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodGoal) - 1
       floodMinDistanceTarget  = floodMaxDistanceTarget - stepSizeTiles

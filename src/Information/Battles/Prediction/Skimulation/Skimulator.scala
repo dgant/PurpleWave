@@ -25,7 +25,7 @@ object Skimulator {
     battle.teams.foreach(team => team.units.foreach(unit => {
       val delayFrames           = Maff.nanToOne((unit.skimDistanceToEngage - team.skimMinDistanceToEngage) / unit.topSpeed / (if (unit.isFriendly) battle.speedMultiplier else 1.0))
       val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
-      unit.skimPresence         = Maff.clamp(Maff.nanToOne(teamDurabilityFrames / delayFrames), 0.0, 1.0)
+      unit.skimPresence         = 1.0 - Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
     }))
     // Boost presence of hidden enemy units, assuming they've come along
     val enemyMinVisiblePresence = Maff.min(battle.enemy.units.view.filter(_.visible).map(_.skimPresence)).getOrElse(1.0)

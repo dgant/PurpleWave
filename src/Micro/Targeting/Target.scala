@@ -21,9 +21,6 @@ object Target extends {
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    // If we have no squad guidance at all, use default targeting
-    if (attacker.targetsAssigned.isEmpty) return bestUnfiltered(attacker, legal(attacker, filters: _*))
-
     val assigned = attacker.targetsAssigned.getOrElse(Seq.empty)
     val matchups = attacker.matchups.targets
     val engaged = attacker.team.exists(_.engagedUpon)

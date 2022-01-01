@@ -10,6 +10,7 @@ object TargetFilterFutility extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if (actor.inRangeToAttack(target)) return true
     if ( ! actor.canMove ) return false
+    if (target.burrowed) return true
 
     val targetReachable = (
       actor.flying

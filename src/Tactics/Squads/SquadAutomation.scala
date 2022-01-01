@@ -1,6 +1,7 @@
 package Tactics.Squads
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationGeneric, FormationStyleDisengage, FormationStyleGuard}
@@ -22,9 +23,17 @@ object SquadAutomation {
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
     squad.targets = Some(
-      SquadAutomation.rankForArmy(squad, unrankedEnRouteTo(squad, to).filter(t => t.unitClass.isWorker || squad.units.exists(u => (t.canAttack(u) || t.unitClass.canAttack(u)) && t.inRangeToAttack(u))))
-        .sortBy(t => ! t.unitClass.isWorker)
-        .sortBy(t => - squad.units.count(_.inRangeToAttack(t))))
+      Maff.orElse(
+        SquadAutomation
+          .rankForArmy(squad,
+            unrankedEnRouteTo(squad, to).filter(t =>
+                t.unitClass.isWorker
+                || squad.units.exists(t.canAttack)
+                || squad.units.exists(u => t.unitClass.canAttack(u) && t.inRangeToAttack(u))))
+          .sortBy(t => ! t.unitClass.isWorker)
+          .sortBy(t => - squad.units.count(_.inRangeToAttack(t))),
+        SquadAutomation.rankForArmy(squad, to.base.map(_.units).getOrElse(Seq.empty).filter(_.isEnemy)))
+      .toSeq)
   }
 
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {

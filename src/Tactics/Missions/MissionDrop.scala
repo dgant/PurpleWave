@@ -1,6 +1,7 @@
 package Tactics.Missions
 
 import Debugging.SimpleString
+import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -47,12 +48,17 @@ abstract class MissionDrop extends Mission {
   val transports = new ArrayBuffer[FriendlyUnitInfo]
   val passengers = new ArrayBuffer[FriendlyUnitInfo]
   var state: DropState = Assembling
+  var path: Option[TilePath] = None
+  var pathItineraryBase: Base = _
+  var pathValues: Array[PathValues] = Array.fill(256)(PathValues())
+  case class PathValues(enemyRange: Int = 0, enemyVision: Boolean = false)
 
   override def reset(): Unit = {
     itinerary.clear()
     transports.clear()
     passengers.clear()
     state = Assembling
+    path = None
   }
 
   final override protected def shouldForm: Boolean = {
@@ -72,25 +78,30 @@ abstract class MissionDrop extends Mission {
     if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     if (shouldStopRaiding && units.exists(_.base.contains(base))) return true
-    With.framesSince(base.lastScoutedFrame) < Seconds(45)() && ! base.owner.isEnemy
+    With.framesSince(base.lastScoutedFrame) < Seconds(90)() && ! base.owner.isEnemy
   }
 
   protected def populateItinerary(): Unit = {
-    val bases = Maff.orElse(
-      With.geography.enemyBases,
-      With.geography.neutralBases.filter(b => With.framesSince(b.lastScoutedFrame) > Minutes(2)()),
-      With.geography.neutralBases).toVector
+    val eligibleBases = With.geography.bases.view
+      .filter(_.mineralsLeft > 1500)
+      .filterNot(_.owner.isFriendly)
+      .filter(b => b.owner.isEnemy || With.framesSince(b.lastScoutedFrame) > Seconds(90)())
+    val bases = Maff.orElse(eligibleBases.filter(_.owner.isEnemy), eligibleBases).toVector
     if (bases.isEmpty) return
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
-      if (b.owner.isNeutral) With.framesSince(b.lastScoutedFrame)
-      else if (b.mineralsLeft < 5000) 1
-      else if (With.scouting.enemyMain.contains(b)) if (With.frame > Minutes(12)()) 0 else 32 + 32 * With.scouting.enemyProgress
-      else if (With.scouting.enemyNatural.contains(b)) if (With.frame > Minutes(16)()) 0 else 1 + 32 * With.scouting.enemyProgress
+      if (b.owner.isNeutral) Maff.nanToOne(
+        With.framesSince(b.lastScoutedFrame).toDouble
+        * b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)
+        / b.heart.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile))
+      else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProgress + 1)
+      else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProgress - 0.5)
       else b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)).get
-    val itineraries = Vector(With.geography.itineraryCounterwise(With.geography.ourMain, targetBase), With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
+    val itineraries = Vector(
+        With.geography.itineraryCounterwise(With.geography.ourMain, targetBase),
+        With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
       .sortBy(_.size)
       .sortBy(_.count(_.owner.isEnemy))
-    itinerary ++= itineraries.head
+    itinerary ++= itineraries.head.filter(eligibleBases.contains)
     With.logger.debug(f"$this itinerary: ${itinerary.view.map(_.toString).mkString(" -> ")}")
   }
 
@@ -176,6 +187,32 @@ abstract class MissionDrop extends Mission {
     passengers.foreach(_.intend(this, new Intention { action = DoNothing }))
   }
 
+  private def createPath(transport: FriendlyUnitInfo): Unit = {
+    val mapEdgeMarginTiles = Math.min(With.mapPixelWidth, With.mapPixelHeight) - Math.max(3, Seq(
+      vicinity.tile.x,
+      vicinity.tile.y,
+      With.mapTileWidth - vicinity.tile.x,
+      With.mapTileHeight - vicinity.tile.y).min)
+    val profile = new PathfindProfile(transport.tile)
+    profile.end                 = Some(vicinity.tile)
+    profile.costEnemyVision     = 5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
+    profile.costRepulsion       = 25
+    profile.costThreat          = 125
+    profile.canCrossUnwalkable  = Some(true)
+    profile.canEndUnwalkable    = Some(true)
+    profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
+    profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
+    path = Some(profile.find)
+    pathItineraryBase = itinerary.headOption.orNull
+    if (path.get.pathExists) {
+      var i = 0
+      while (i < Math.min(pathValues.length, path.get.tiles.get.length)) {
+        val tile = path.get.tiles.get(i)
+        pathValues(i) = PathValues(enemyRange = tile.enemyRange, enemyVision = tile.visibleToEnemy)
+      }
+    }
+  }
+
   class ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       passengers.foreach(transport.agent.addPassenger)
@@ -213,24 +250,15 @@ abstract class MissionDrop extends Mission {
 
   class ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      val mapEdgeMarginTiles = Math.min(With.mapPixelWidth, With.mapPixelHeight) - Math.max(3, Seq(
-        vicinity.tile.x,
-        vicinity.tile.y,
-        With.mapTileWidth - vicinity.tile.x,
-        With.mapTileHeight - vicinity.tile.y).min)
-      val profile = new PathfindProfile(transport.tile)
-      profile.end                 = Some(vicinity.tile)
-      profile.costEnemyVision     = 5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
-      profile.costRepulsion       = 25
-      profile.costThreat          = 125
-      profile.canCrossUnwalkable  = Some(true)
-      profile.canEndUnwalkable    = Some(true)
-      profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
-      profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
-      val path = profile.find
-      if (path.pathExists) {
-        With.logger.debug(f"$this: Following path from ${path.start} to ${path.end} via ${path.tiles.get.drop(1).headOption.getOrElse(path.end)}")
-        MicroPathing.tryMovingAlongTilePath(transport, path)
+      lazy val pathValueChanged = pathValues.indices.take(path.get.length).exists(i =>
+            path.get.tiles.get(i).enemyRange != pathValues(i).enemyRange
+        ||  path.get.tiles.get(i).visibleToEnemy != pathValues(i).enemyVision)
+      if (path.isEmpty || pathItineraryBase != itinerary.headOption.orNull || pathValueChanged) {
+        createPath(transport)
+      }
+      if (path.exists(_.pathExists)) {
+        With.logger.debug(f"$this: Following path from ${path.get.start} to ${path.get.end} via ${path.get.tiles.get.drop(1).headOption.getOrElse(path.get.end)}")
+        MicroPathing.tryMovingAlongTilePath(transport, path.get)
       } else {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)

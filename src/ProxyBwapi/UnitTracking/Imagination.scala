@@ -8,7 +8,6 @@ import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import Utilities.Time.{Forever, Minutes, Seconds}
-import Utilities._
 
 object Imagination {
 
@@ -22,10 +21,10 @@ object Imagination {
       unit.visibility == Visibility.InvisibleBurrowed
       || unit.burrowed
       || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
-      || (unit.is(Terran.SpiderMine) && With.framesSince(unit.frameDiscovered) < 48))
+      || (Terran.SpiderMine(unit) && With.framesSince(unit.frameDiscovered) < 48))
     lazy val shouldUnburrow = (
       likelyBurrowed
-      && unit.is(Terran.SpiderMine)
+      && Terran.SpiderMine(unit)
       && unit.inTileRadius(3).exists(tripper =>
         tripper.unitClass.triggersSpiderMines
         && tripper.isEnemyOf(unit)
@@ -48,7 +47,7 @@ object Imagination {
         unit.removalFrames - With.framesSince(unit.lastSeen)
       else if (unit.unitClass.isOrganic && unit.irradiated)
         unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
-      else if (unit.is(MatchWarriors))
+      else if (MatchWarriors(unit))
         if (With.strategy.isFfa)
           Minutes(4)()
         else
@@ -98,14 +97,17 @@ object Imagination {
     }
 
     // Invalidate long-absent units in the middle of the map
-    if (With.framesSince(unit.lastSeen) > Seconds(60)() && ! unit.base.exists(_.owner.isPlayer)) {
+    lazy val friendsNearby = unit.team.exists(_.units.exists(f => f.visible && f.pixelDistanceEdge(unit) < 32 * 5 + unit.effectiveRangePixels))
+    lazy val outrangesVision = unit.matchups.targets.nonEmpty && unit.matchups.enemies.forall(_.sightPixels <= unit.effectiveRangePixels)
+    lazy val inferProximityFrames = Seconds(10 + 20 * Maff.fromBoolean(friendsNearby) + 20 * Maff.fromBoolean(outrangesVision))()
+    if ( ! unit.base.exists(_.owner.isPlayer) && With.framesSince(unit.lastSeen) > inferProximityFrames) {
       unit.changeVisibility(Visibility.InvisibleMissing)
       return
     }
 
     // Predict the unit's location
     // If we fail to come up with a reasonable prediction, treat the unit as missing
-    val predictedPixel = predictPixel(unit)
+    val predictedPixel: Option[Pixel] = predictPixel(unit)
     if (predictedPixel.isDefined) {
       unit.changePixel(predictedPixel.get)
     } else {
@@ -129,6 +131,7 @@ object Imagination {
           tile.valid
           && tile.traversableBy(unit)
           && ! tile.visibleBwapi
+          && tile.lastSeen < unit.lastSeen
           && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
           && (unit.flying || PixelRay(unit.pixel, tile.center).forall(_.traversableBy(unit)))
         ))(_.center.pixelDistanceSquared(unit.projectFrames(8))))

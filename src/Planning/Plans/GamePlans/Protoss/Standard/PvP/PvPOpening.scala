@@ -608,6 +608,9 @@ class PvPOpening extends GameplanImperative {
   def executeMain(): Unit = {
 
     gasLimitCeiling(350)
+    if (zBeforeCore && employing(PvP3GateGoon, PvP4GateGoon) && unitsComplete(Protoss.CyberneticsCore) < 1) {
+      gasWorkerCeiling(1)
+    }
     if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
       gasWorkerCeiling(2)
     }

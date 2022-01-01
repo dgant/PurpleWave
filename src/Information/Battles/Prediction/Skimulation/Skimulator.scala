@@ -1,6 +1,7 @@
 package Information.Battles.Prediction.Skimulation
 
 import Information.Battles.Types.{BattleLocal, Team}
+import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -23,19 +24,23 @@ object Skimulator {
               - Math.max(
               if (e.canAttack(unit)) e.pixelRangeAgainst(unit) else 0,
               if (unit.canAttack(e)) unit.pixelRangeAgainst(e) else 0))).getOrElse(0d))}))
+
+    // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
+    // Note that this can significantly swing our perception of hidden army strength
+    if (battle.enemy.units.exists(_.visible)) {
+      val enemyMeanVisibleDistance = Maff.mean(battle.enemy.units.view.filter(_.visible).map(_.skimDistanceToEngage))
+      battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimDistanceToEngage = Maff.clamp(u.skimDistanceToEngage - u.topSpeed * With.framesSince(u.lastSeen), u.skimDistanceToEngage, enemyMeanVisibleDistance))
+    }
+
     battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(MatchWarriors).map(_.skimDistanceToEngage)).getOrElse(Forever()))
     battle.teams.foreach(team => team.units.foreach(unit => {
       val delayFrames           = Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / unit.topSpeed / (if (unit.isFriendly) battle.speedMultiplier else 1.0))
       val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
       val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
-      unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 0.9)
+      unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
       unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames / teamDurabilityFrames), 0.0, 0.75)
       unit.skimPresence         = 1.0 - Math.max(unit.skimDelay, unit.skimExtension)
     }))
-    // Boost presence of hidden enemy units, assuming they've come along.
-    // Note that this can significantly swing our perception of hidden army strength
-    val enemyMinVisiblePresence = Maff.min(battle.enemy.units.view.filter(_.visible).map(_.skimPresence)).getOrElse(1.0)
-    battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimPresence = Math.max(u.skimPresence, enemyMinVisiblePresence))
 
     // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
@@ -79,7 +84,9 @@ object Skimulator {
       // Count other unit properties
       if (unit.canStim)                                                   unit.skimStrength *= 1.2
       if (unit.ensnared)                                                  unit.skimStrength *= 0.5
-      if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.2
+      if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.3
+      if (Terran.Marine(unit)   && Terran.Stim(player))                   unit.skimStrength *= 1.3
+      if (Terran.Firebat(unit)  && Terran.Stim(player))                   unit.skimStrength *= 1.3
       if (Terran.Medic(unit))                                             unit.skimStrength *= 1.0 // TODO: Cap on bio allies
       if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5

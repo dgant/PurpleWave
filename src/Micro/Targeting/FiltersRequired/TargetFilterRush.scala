@@ -13,8 +13,9 @@ object TargetFilterRush extends TargetFilter {
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = With.frame < timeThreshold
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     ! target.unitClass.isBuilding
-    || target.is(MatchProxied)
-    || target.zone.walledIn
+    || target.base.forall(_.heart.explored)
+    || MatchProxied(target)
+    || With.geography.zones.exists(z => z.walledIn && ! z.owner.isFriendly)
     || target.isAny(
         Terran.Bunker,
         Terran.MissileTurret,

@@ -304,13 +304,13 @@ object Maff {
 
   @inline final def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     if (seq.isEmpty) return None
-    val denominator = seq.map(extract).sum
+    val denominator = seq.map(extract).map(v => Math.max(v, 0)).sum
     val numerator   = Random.nextDouble() * denominator
     var passed      = 0.0
     var index       = 0
     if (denominator <= 0) return Some(sample(seq))
     for (value <- seq) {
-      passed += extract(value)
+      passed += Math.max(0, extract(value))
       if (passed > numerator) {
         return Some(value)
       }

@@ -23,7 +23,11 @@ class SquadDarkTemplar extends Squad {
     With.geography.bases
       .filterNot(_.owner.isUs)
       .filterNot(_.metro.units.exists(u => u.isEnemy && MatchMobileDetector(u)))
-      .filterNot(_.units.exists(u => u.isEnemy && u.complete && u.unitClass.isDetector && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <=  u.sightPixels)))),
+      .filterNot(_.units.exists(u =>
+        u.isEnemy
+        && u.complete
+        && u.unitClass.isDetector
+        && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <=  u.sightPixels)))),
     24)
 
   def run(): Unit = {

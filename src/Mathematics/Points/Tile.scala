@@ -243,6 +243,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def enemyVulnerabilityGround: Int = {
     With.grids.enemyVulnerabilityGround(this)
   }
+  @inline def lastSeen: Int = {
+    With.grids.lastSeen(this)
+  }
   @inline def visibleBwapi: Boolean = {
     With.game.isVisible(x, y)
   }

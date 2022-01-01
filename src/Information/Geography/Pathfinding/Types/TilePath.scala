@@ -12,6 +12,8 @@ case class TilePath(
   
   def pathExists: Boolean = tiles.isDefined
 
+  def length: Int = tiles.map(_.length).getOrElse(0)
+
   def renderMap(color: Color, from: Option[Pixel] = None): Unit = {
     val offset = from.map(_.offsetFromTileCenter).getOrElse(Pixel(0, 0))
       for (i <- 0 until tiles.get.size - 1) {

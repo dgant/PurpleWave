@@ -70,8 +70,11 @@ object MicroPathing {
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
-  def getWaypointAlongTilePath(path: TilePath): Option[Pixel] = {
-    if (path.pathExists) Some(path.tiles.get.take(waypointDistanceTiles).last.center) else None
+  def getWaypointAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Option[Pixel] = {
+    if (path.pathExists) {
+      val currentIndex = path.tiles.get.indices.minBy(i => path.tiles.get(i).center.pixelDistanceSquared(unit.pixel))
+      Some(path.tiles.get.take(currentIndex + waypointDistanceTiles).last.center)
+    } else None
   }
 
   // More rays = more accurate movement, but more expensive
@@ -119,7 +122,7 @@ object MicroPathing {
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
-    val waypoint = getWaypointAlongTilePath(path).map(_.add(unit.pixel.offsetFromTileCenter))
+    val waypoint = getWaypointAlongTilePath(unit, path).map(_.add(unit.pixel.offsetFromTileCenter))
     waypoint.foreach(pixel => {
       unit.agent.toTravel = waypoint
       Commander.move(unit)

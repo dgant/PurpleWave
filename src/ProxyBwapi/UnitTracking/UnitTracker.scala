@@ -63,14 +63,14 @@ final class UnitTracker {
   // Access //
   ////////////
 
-  @inline final def ours        : Iterable[FriendlyUnitInfo]  = With.units.bufferFriendly.all
-  @inline final def enemy       : Iterable[ForeignUnitInfo]   = With.units.bufferEnemy.all
-  @inline final def neutral     : Iterable[ForeignUnitInfo]   = With.units.bufferNeutral.all
-  @inline final def playerOwned : Iterable[UnitInfo]          = ours ++ enemy
-  @inline final def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
-  @inline final def all         : Iterable[UnitInfo]          = playerOwned ++ neutral
-  @inline final def ever        : Iterable[UnitInfo]          = all ++ bufferHistoric.all
-  @inline final def selected    : Iterable[UnitInfo]          = all.filter(_.selected)
+  @inline def ours        : Iterable[FriendlyUnitInfo]  = With.units.bufferFriendly.all
+  @inline def enemy       : Iterable[ForeignUnitInfo]   = With.units.bufferEnemy.all
+  @inline def neutral     : Iterable[ForeignUnitInfo]   = With.units.bufferNeutral.all
+  @inline def playerOwned : Iterable[UnitInfo]          = ours ++ enemy
+  @inline def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
+  @inline def all         : Iterable[UnitInfo]          = playerOwned ++ neutral
+  @inline def ever        : Iterable[UnitInfo]          = all ++ bufferHistoric.all
+  @inline def selected    : Iterable[UnitInfo]          = all.filter(_.selected)
 
   def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)

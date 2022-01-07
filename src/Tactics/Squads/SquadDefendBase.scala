@@ -71,7 +71,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val withdrawingUnits  = units.count(u => ! u.metro.contains(base.metro) && travelGoal.travelPixelsFor(heart, u) < 192 + u.pixelDistanceTravelling(heart))
 
     lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(travelGoal))
-    lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel))
+    lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
     lazy val formationBastion   = FormationGeneric.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
 

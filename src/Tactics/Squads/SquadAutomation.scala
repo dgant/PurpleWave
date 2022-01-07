@@ -77,7 +77,7 @@ object SquadAutomation {
     if (squad.fightConsensus) {
       val engageTarget = squad.targets.flatMap(_.headOption.map(_.pixel))
       if (engageTarget.isDefined && (squad.engagingOn || squad.engagedUpon)) {
-        output += FormationGeneric.engage(squad, engageTarget)
+        output += FormationGeneric.engage(squad, engageTarget.get)
       } else {
         output += FormationGeneric.march(squad, to)
       }

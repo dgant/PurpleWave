@@ -4,7 +4,7 @@ package Information.Grids
 import Information.Grids.Construction._
 import Information.Grids.Floody._
 import Information.Grids.Movement._
-import Information.Grids.Spells.GridPsionicStorm
+import Information.Grids.Miscellaneous.{GridFormationSlots, GridPsionicStorm}
 import Information.Grids.Versioned.{GridVersionedBoolean, GridVersionedDouble, GridVersionedInt}
 import Information.Grids.Vision._
 import Lifecycle.With
@@ -54,6 +54,9 @@ class Grids extends TimedTask {
   val enemyDetection              = add("ed",   new GridEnemyDetection)
   val enemyVision                 = add("ev",   new GridEnemyVision)
   val friendlyDetection           = add("fd",   new GridFriendlyDetection)
+
+  // Other
+  val formationSlots              = add("fs",   new GridFormationSlots)
 
   private var _selected: Option[Grid] = None
   def selected: Option[Grid] = _selected

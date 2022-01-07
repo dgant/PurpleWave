@@ -164,10 +164,10 @@ object DrawMap {
     With.game.drawBoxMap(rectangle.startPixel.bwapi, rectangle.endPixel.bwapi, color)
   }
   
-  def polygonPixels(points: Iterable[Pixel], color: Color = Colors.DefaultGray) {
-    if (points.size < 2) return
-    points.reduce((p1, p2) => { line(p1, p2, color); p2 })
-    line(points.head, points.last, color)
+  def polygon(pixels: Iterable[Pixel], color: Color = Colors.DefaultGray) {
+    if (pixels.size < 2) return
+    pixels.reduce((p1, p2) => { line(p1, p2, color); p2 })
+    line(pixels.head, pixels.last, color)
   }
   
   def drawSkull(pixel: Pixel, colorDark: Color = Colors.DarkGray, colorBright: Color = Colors.BrightGray, f: Int = 1): Unit = {

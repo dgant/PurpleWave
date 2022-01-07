@@ -47,13 +47,13 @@ object ZoneBuilder {
 
   private def metroDistance(origin: Metro, other: Metro): Double = {
     val originBases = if (origin.main.isDefined) origin.main ++ origin.natural else origin.bases
-    other.bases.view.flatMap(b => originBases.map(o => (o, b))).map(p => p._1.heart.pixelDistanceGround(p._2.heart)).min
+    other.bases.view.flatMap(b => originBases.map(o => (o, b))).map(p => p._1.heart.groundPixels(p._2.heart)).min
   }
   def metros: Iterable[Metro] = {
     val mainMetros = With.geography.startBases.map(main => Metro(Seq(main) ++ main.natural))
     val otherMetros = With.geography.bases
       .filterNot(base => mainMetros.exists(_.bases.contains(base)))
-      .sortBy(base => With.geography.startLocations.map(_.pixelDistanceGround(base.heart)).min)
+      .sortBy(base => With.geography.startLocations.map(_.groundPixels(base.heart)).min)
       .map(base => Metro(Seq(base)))
     var metros = mainMetros ++ otherMetros
     var i = 0
@@ -96,7 +96,7 @@ object ZoneBuilder {
   }
   
   def buildZone(thisRegion: Region, name: String): Zone = {
-    val tiles = With.geography.allTiles.filter(tile => BWTA.getRegion(tile.center.nearestWalkableTile.bwapi) == thisRegion)
+    val tiles = With.geography.allTiles.filter(tile => BWTA.getRegion(tile.center.walkableTile.bwapi) == thisRegion)
     val x = tiles.map(_.x)
     val y = tiles.map(_.y)
     val boundingBox = TileRectangle(

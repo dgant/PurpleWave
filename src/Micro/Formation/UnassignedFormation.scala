@@ -46,7 +46,7 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
     // Rank slots by front-outsideness (a metric which may need some tuning)
     // Rank units by proximity to goal
     // Assign units to slot of equal rank
-    val orderedSlots = slots.map(p => (p._1, p._2.toVector.sortBy(p => 5 * p.tile.tileDistanceGroundManhattan(to) - p.tile.tileDistanceGroundManhattan(centroid))))
+    val orderedSlots = slots.map(p => (p._1, p._2.toVector.sortBy(p => 5 * p.tile.groundTiles(to) - p.tile.groundTiles(centroid))))
     val orderedUnits = group
       .groupOrderable
       .groupBy(_.unitClass)

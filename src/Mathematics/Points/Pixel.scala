@@ -127,7 +127,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     nwtTest(t0).orElse(nwtTest(t1))
   else
     nwtTest(t1).orElse(nwtTest(t0))
-  @inline def nearestWalkableTile: Tile = {
+  @inline def walkableTile: Tile = {
     val ti = tile
     if (ti.walkable) return ti
     val tx = x / 32
@@ -147,17 +147,17 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def traversableBy(unit: UnitInfo): Boolean = {
     unit.flying || walkable
   }
-  @inline def nearestTraversableBy(unit: UnitInfo): Pixel = {
-    if (unit.flying) this else nearestWalkablePixel
+  @inline def traversiblePixel(unit: UnitInfo): Pixel = {
+    if (unit.flying) this else walkablePixel
   }
-  @inline def nearestWalkablePixel: Pixel = if (walkable) this else {
-    val center = nearestWalkableTile.center
+  @inline def walkablePixel: Pixel = if (walkable) this else {
+    val center = walkableTile.center
     Pixel(
       Maff.clamp(x, center.x - 16, center.x + 16),
       Maff.clamp(y, center.y - 16, center.y + 16))
   }
   @inline def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
-    val center = nearestWalkableTile.center
+    val center = walkableTile.center
     Pixel(
       Maff.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       Maff.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))

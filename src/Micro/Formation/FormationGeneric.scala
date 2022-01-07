@@ -3,7 +3,8 @@ package Micro.Formation
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, SpecificPoints, Tile}
+import Mathematics.Points.{Pixel, PixelRay, SpecificPoints, Tile}
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactics.Squads.FriendlyUnitGroup
 import Utilities.LightYear
@@ -13,53 +14,60 @@ import scala.collection.mutable.ArrayBuffer
 
 object FormationGeneric {
   def march(group: FriendlyUnitGroup, destination: Pixel) : Formation = {
-    form(group, FormationStyleMarch, face = destination, approach = destination)
+    face = destination
+    approach = destination
+    form(group, FormationStyleMarch)
   }
 
   def guard(group: FriendlyUnitGroup, toGuard: Option[Pixel]): Formation = {
     val guardZone = toGuard.getOrElse(group.homeConsensus).zone
+    face = targetPixel(group)
+    approach = group.centroidKey
     guardZone.exit
       .map(exit => FormationZone(group, guardZone, exit))
-      .getOrElse(form(group, FormationStyleGuard, face = targetPixel(group), approach = group.centroidKey))
+      .getOrElse(form(group, FormationStyleGuard))
   }
 
   def engage(group: FriendlyUnitGroup, towards: Option[Pixel]): Formation = {
-    val finalTowards = towards.getOrElse(targetPixel(group))
-    //form(group, FormationStyleEngage, face = finalTowards, approach = finalTowards)
-    form(group, FormationStyleMarch, face = finalTowards, approach = finalTowards)
+    face = towards.getOrElse(targetPixel(group))
+    approach = face
+    form(group, FormationStyleMarch)
   }
 
   def disengage(group: FriendlyUnitGroup, towards: Option[Pixel] = None): Formation = {
-    form(group, FormationStyleDisengage, face = targetPixel(group), approach = towards.getOrElse(group.homeConsensus))
+    face = targetPixel(group)
+    approach = towards.getOrElse(group.homeConsensus)
+    form(group, FormationStyleDisengage)
   }
 
   private def targetPixel(group: FriendlyUnitGroup): Pixel = {
     Maff.modeOpt(group.groupFriendlyOrderable.view.flatMap(u => Maff.minBy(u.matchups.targets.view.map(_.pixel))(u.pixelDistanceCenter))).getOrElse(With.scouting.threatOrigin.center)
   }
 
-  private case class ClassSlots(unitClass: UnitClass, var slots: Int)
+  private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
 
   private val inf = LightYear()
-  private def form(group: FriendlyUnitGroup, style: FormationStyle, face: Pixel, approach: Pixel): Formation = {
+  private def form(group: FriendlyUnitGroup, style: FormationStyle): Formation = {
     val units = group.groupFriendlyOrderable
+    val airUnits = units.filter(_.flying)
     val groundUnits = units.filterNot(_.flying)
     if (groundUnits.isEmpty) return FormationEmpty
 
+    centroid           = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
+    goal               = approach
+    apex               = goal
+    minTilesToGoal  = - inf
+    maxTilesToGoal  = inf
+    maxThreat          = inf
+    costDistanceGoal   = 0
+    costDistanceApex   = 0
+    costThreat         = 0
+    costVulnerability  = 0
+
     lazy val vanguardUnits  = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(face)))
-    lazy val centroid       = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue)))
-    lazy val path           = new PathfindProfile(floodCentroid, Some(floodGoal), lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5).find
+    lazy val path           = new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile), lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5).find
     lazy val patht          = path.tiles.get.view
 
-    floodCentroid           = centroid.nearestWalkableTile
-    floodGoal               = approach.nearestWalkableTile
-    floodApex               = floodGoal
-    floodMinDistanceTarget  = - inf
-    floodMaxDistanceTarget  = inf
-    floodMaxThreat          = inf
-    floodCostDistanceGoal   = 0
-    floodCostDistanceApex   = 0
-    floodCostThreat         = 0
-    floodCostVulnerability  = 0
     if (style == FormationStyleMarch || style == FormationStyleDisengage) {
       if ( ! path.pathExists) return FormationEmpty
       val pixelsToEngage = units.view.map(u => Math.min(
@@ -71,59 +79,75 @@ object FormationGeneric {
         .toInt
       if (style == FormationStyleDisengage) {
         stepSizeTiles = Math.max(stepSizeTiles, 2 + Maff.max(units.view.map(_.matchups.pixelsOfEntanglement.toInt)).getOrElse(0) / 32)
-        stepSizeTiles = Math.max(stepSizeTiles, 10 + 2 * floodCentroid.enemyRange)
+        stepSizeTiles = Math.max(stepSizeTiles, 10 + 2 * centroid.tile.enemyRange)
       }
-      floodMaxDistanceTarget  = floodCentroid.tileDistanceGroundManhattan(floodGoal) - 1
-      floodMinDistanceTarget  = floodMaxDistanceTarget - stepSizeTiles
-      floodApex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.tileDistanceGroundManhattan(floodGoal) >= floodMinDistanceTarget).orElse(patht.find(_.tileDistanceGroundManhattan(floodGoal) == floodMinDistanceTarget + 1)).getOrElse(floodGoal)
-      floodMaxThreat          = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin else With.grids.enemyRangeGround.defaultValue
-      floodCostDistanceGoal   = 5
-      floodCostDistanceApex   = 1
+      maxTilesToGoal  = centroid.tile.groundTiles(goal) - 1
+      minTilesToGoal  = maxTilesToGoal - stepSizeTiles
+      apex               = patht.reverseIterator.filterNot(t => t.zone.edges.exists(_.contains(t.center))).find(_.groundTiles(goal) >= minTilesToGoal).orElse(patht.find(_.groundTiles(goal) == minTilesToGoal + 1)).map(_.center).getOrElse(goal)
+      maxThreat          = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin else With.grids.enemyRangeGround.defaultValue
+      costDistanceGoal   = 5
+      costDistanceApex   = 1
     } else if (style == FormationStyleGuard) {
-      floodMinDistanceTarget  = 1
-      floodCostDistanceGoal   = 5
-      floodCostDistanceApex   = 1
+      minTilesToGoal  = 1
+      costDistanceGoal   = 5
+      costDistanceApex   = 1
     } else if (style == FormationStyleEngage) {
-      floodGoal               = floodCentroid
-      floodCostVulnerability  = 1
-      floodCostThreat         = 1
-      floodCostDistanceApex   = 1
-      floodCostDistanceGoal   = 1
+      goal               = centroid
+      costVulnerability  = 1
+      costThreat         = 1
+      costDistanceApex   = 1
+      costDistanceGoal   = 1
     }
 
-    val slots         = new mutable.HashMap[UnitClass, ArrayBuffer[Pixel]]()
+    val classCount = groundUnits
+      .groupBy(_.unitClass)
+      .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))
+      .toVector
+      .sortBy(_.formationRangePixels)
+    var slots = if (style == FormationStyleGuard || style == FormationStyleEngage || PixelRay(centroid, apex).forall(_.walkable)) {
+      arcSlots(classCount, 32 + apex.pixelDistance(face))
+    } else {
+      floodSlots(classCount)
+    }
+
+    lazy val groundPlacementCentroid = Maff.exemplarOption(slots.values.view.flatten).getOrElse(apex)
+    slots ++= airUnits
+      .groupBy(_.unitClass)
+      .map(u => (u._1, u._2.map(x => groundPlacementCentroid)))
+    val unassigned = UnassignedFormation(style, slots, group)
+    val output = unassigned.outwardFromCentroid
+    if (style == FormationStyleMarch || style == FormationStyleDisengage) { output.path = Some(path) }
+    output
+  }
+
+  private def floodSlots(classSlots: Vector[ClassSlots]): Map[UnitClass, Seq[Pixel]] = {
+    val output        = new mutable.HashMap[UnitClass, ArrayBuffer[Pixel]]()
     val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(-_._2))
     val explored      = With.grids.disposableBoolean()
-    val unplaced      = groundUnits
-      .groupBy(_.unitClass)
-      .map(g => (ClassSlots(g._1, g._2.size), g._2.head.formationRangePixels / 32))
-      .toVector
-      .sortBy(_._2)
-    floodHorizon += ((floodApex, cost(floodApex)))
+    floodHorizon += ((apex.tile, cost(apex.tile)))
     floodHorizon.foreach(tile => explored.set(tile._1, true))
-    while (floodHorizon.nonEmpty && unplaced.exists(_._1.slots > 0) ) {
+    while (floodHorizon.nonEmpty && classSlots.exists(_.slots > 0) ) {
       val tile = floodHorizon.dequeue()._1
-      lazy val distanceTileToGoal = tile.tileDistanceGroundManhattan(floodGoal)
+      lazy val distanceTileToGoal = tile.groundTiles(goal)
       if (tile.walkable
-          && (floodMinDistanceTarget  <= 0    || floodMinDistanceTarget <= distanceTileToGoal)
-          && (floodMaxDistanceTarget  >= inf  || floodMaxDistanceTarget >= distanceTileToGoal)
-          && (floodMaxThreat >= tile.enemyRangeGroundUnchecked)
+          && (minTilesToGoal  <= 0    || minTilesToGoal <= distanceTileToGoal)
+          && (maxTilesToGoal  >= inf  || maxTilesToGoal >= distanceTileToGoal)
+          && (maxThreat >= tile.enemyRangeGroundUnchecked)
           && (tile.units.forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
-        val unplacedClass = unplaced.find(_._1.slots > 0).get
+        val unplacedClass = classSlots.find(_.slots > 0).get
 
         // To avoid diving with Engage formations:
         // If we care about enemy vulnerability, position units only as close as is necessary to hit something
         // Allow pushing through chokes so we can actually take fights there if necessary
         if (
-          floodCostVulnerability == 0
+          costVulnerability == 0
           || tile.enemyRangeGround == 0
-          || unplacedClass._2 < (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
-          val classSlot = unplacedClass._1
-          classSlot.slots -= 1
-          if (!slots.contains(classSlot.unitClass)) {
-            slots(classSlot.unitClass) = ArrayBuffer.empty
+          || unplacedClass.formationRangePixels < (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
+          unplacedClass.slots -= 1
+          if (!output.contains(unplacedClass.unitClass)) {
+            output(unplacedClass.unitClass) = ArrayBuffer.empty
           }
-          slots(classSlot.unitClass) += tile.center
+          output(unplacedClass.unitClass) += tile.center
         }
       }
       val neighbors = tile
@@ -131,45 +155,86 @@ object FormationGeneric {
         .view
         .filter(_.valid)
         .filterNot(explored.get)
-        .filter(floodMaxDistanceTarget >= _.tileDistanceGroundManhattan(floodGoal))
+        .filter(maxTilesToGoal >= _.groundTiles(goal))
         .map(tile => (tile, cost(tile)))
       floodHorizon ++= neighbors
       neighbors.foreach(neighbor => explored.set(neighbor._1, true))
     }
-
-    lazy val groundPlacementCentroid = Maff.exemplarOption(slots.values.view.flatten).getOrElse(floodApex.center)
-    units
-      .filter(_.flying)
-      .foreach(u => {
-        if ( ! slots.contains(u.unitClass)) {
-          slots(u.unitClass) = ArrayBuffer.empty
-        }
-        slots(u.unitClass) += groundPlacementCentroid
-      })
-    val unassigned = UnassignedFormation(style, slots.toMap, group)
-    //val output = if (style == FormationStyleGuard || style == FormationStyleEngage) unassigned.outwardFromCentroid else unassigned.sprayToward(approach)
-    val output = unassigned.outwardFromCentroid
-    if (style == FormationStyleMarch || style == FormationStyleDisengage) { output.path = Some(path) }
-    output
+    output.toMap
   }
 
-  private var floodCentroid           = SpecificPoints.tileMiddle
-  private var floodGoal               = SpecificPoints.tileMiddle
-  private var floodApex               = SpecificPoints.tileMiddle
-  private var floodMaxDistanceTarget  = inf
-  private var floodMinDistanceTarget  = - inf
-  private var floodMaxThreat          = inf
-  private var floodCostDistanceGoal   = 0
-  private var floodCostDistanceApex   = 0
-  private var floodCostThreat         = 0
-  private var floodCostVulnerability  = 0
+  private val maxArcSteps = 1000
+  private def arcSlots(classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
+    With.grids.formationSlots.reset()
+    var unitClass = Terran.Marine
+    var zone = apex.zone
+    val dr = 4d
+    val a0 = face.radiansTo(apex)
+    var r = Math.max(0, face.pixelDistance(apex) - dr)
+    var da = 0d
+    var i = -1
+    var n = 0
+    var haltNegative = false
+    var haltPositive = false
+    def nextRow(): Unit = {
+      r += dr
+      da = dr / r
+      i = -1
+      haltNegative = false
+      haltPositive = false
+    }
+    nextRow()
+    def proceed(): Boolean = {
+      n += 1
+      if (n > 10000) return false
+      i += 1
+      val s = if (i % 2 == 0) 1 else -1
+      if (s < 0 && haltNegative) return true
+      if (s > 0 && haltPositive) return true
+      val m = s * i / 2
+      val p = face.radiateRadians(a0 + da * m, r)
+      if ( ! p.walkable) {
+        if (p.zone != zone) {
+          haltNegative ||= s < 0
+          haltPositive ||= s > 0
+          if (haltNegative && haltPositive) {
+            nextRow()
+          }
+        }
+        return true
+      }
+      val groundTilesToGoal = p.groundPixels(goal) / 32
+      if (groundTilesToGoal > maxTilesToGoal) return false // We've gone too far and will never find a slot
+      if (groundTilesToGoal < minTilesToGoal) return true // If we keep going we may find a slot
+      if (p.tile.enemyRangeGround > maxThreat) return true
+      ! With.grids.formationSlots.tryPlace(unitClass, p)
+    }
+    classSlots.foreach(classSlot => {
+      unitClass = classSlot.unitClass
+      (0 until classSlot.slots).foreach(i => while(proceed()) {})
+    })
+    With.grids.formationSlots.placed.groupBy(_._1).map(p => (p._1, p._2.map(_._2)))
+  }
+
+  private var approach          = SpecificPoints.middle
+  private var face              = SpecificPoints.middle
+  private var centroid          = SpecificPoints.middle
+  private var goal              = SpecificPoints.middle
+  private var apex              = SpecificPoints.middle
+  private var maxTilesToGoal = inf
+  private var minTilesToGoal = - inf
+  private var maxThreat         = inf
+  private var costDistanceGoal  = 0
+  private var costDistanceApex  = 0
+  private var costThreat        = 0
+  private var costVulnerability = 0
   @inline private final def vGrid = With.grids.enemyVulnerabilityGround
   private final def cost(tile: Tile): Int = {
     if ( ! tile.walkable) return inf
-    val costDistanceGoal    = if (floodCostDistanceGoal == 0)   0 else floodCostDistanceGoal  * tile.tileDistanceGroundManhattan(floodGoal)
-    val costDistanceOrigin  = if (floodCostDistanceApex == 0)   0 else floodCostDistanceApex  * tile.tileDistanceGroundManhattan(floodCentroid)
-    val costThreat          = if (floodCostThreat == 0)         0 else floodCostThreat        * tile.enemyRangeGround
-    val costVulnerability   = if (floodCostVulnerability == 0)  0 else floodCostVulnerability * Maff.fromBoolean(vGrid(tile) == 0)
-    costDistanceGoal + costDistanceOrigin + costThreat + costVulnerability
+    val tCostDistanceGoal   = if (costDistanceGoal == 0)   0 else costDistanceGoal  * tile.groundTiles(goal)
+    val tCostDistanceApex   = if (costDistanceApex == 0)   0 else costDistanceApex  * tile.groundTiles(centroid)
+    val tCostThreat         = if (costThreat == 0)         0 else costThreat        * tile.enemyRangeGround
+    val tCostVulnerability  = if (costVulnerability == 0)  0 else costVulnerability * Maff.fromBoolean(vGrid(tile) == 0)
+    costDistanceGoal + tCostDistanceApex + tCostThreat + tCostVulnerability
   }
 }

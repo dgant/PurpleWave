@@ -19,7 +19,7 @@ class Base(val townHallTile: Tile)
   lazy val metro            : Metro             = With.geography.metros.find(_.bases.contains(this)).get
   lazy val isStartLocation  : Boolean           = With.geography.startLocations.contains(townHallTile)
   lazy val isOurMain        : Boolean           = With.geography.ourMain == this
-  lazy val tiles            : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < 50 && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.pixelDistanceGround(t) < heart.pixelDistanceGround(t))).toSet
+  lazy val tiles            : Set[Tile]         = zone.tiles.view.filter(t => t.tileDistanceSlow(heart) < 50 && ! zone.bases.view.filter(_.heart != heart).exists(_.heart.groundPixels(t) < heart.groundPixels(t))).toSet
   lazy val economicValue    : Cache[Double]     = new Cache(() => units.view.filter(_.isAny(MatchBuilding, MatchWorker)).map(_.subjectiveValue).sum)
   lazy val plannedExpo      : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
     With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))

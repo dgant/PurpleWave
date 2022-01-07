@@ -6,7 +6,7 @@ import Utilities.Time.Forever
 object BehaviorGather extends SimulacrumBehavior {
   val fighting: Boolean = false
   override def act(simulacrum: Simulacrum): Unit = {
-    val base = Maff.minBy(simulacrum.player.bases)(b => simulacrum.pixel.nearestWalkablePixel.groundPixels(b.heart))
+    val base = Maff.minBy(simulacrum.player.bases)(b => simulacrum.pixel.walkablePixel.groundPixels(b.heart))
     base.foreach(b => {
       val to = b.heart.center
       if (simulacrum.pixelDistanceCenter(to) > 16) {

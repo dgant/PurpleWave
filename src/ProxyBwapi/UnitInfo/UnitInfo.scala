@@ -312,7 +312,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           Maff.clamp(usToEnemyGapFacingLeft, 0, enemy.unitClass.dimensionRight + unitClass.dimensionLeft)  - Maff.clamp(usToEnemyGapFacingRight, 0, enemy.unitClass.dimensionLeft + unitClass.dimensionRight),
           Maff.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - Maff.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
       if ( ! exhaustive || With.reaction.sluggishness > 0) {
-        return pixelFar.nearestTraversableBy(this)
+        return pixelFar.traversiblePixel(this)
       } else if (ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, pixelFar) == 0 && ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, pixelFar) > 0) {
         return pixelFar
       }
@@ -324,7 +324,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           .map(enemy.tile.add(_).center.add(offset))
           .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
       val ringSpot = Maff.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
-      val output = ringSpot.getOrElse(pixelFar.nearestTraversableBy(this))
+      val output = ringSpot.getOrElse(pixelFar.traversiblePixel(this))
       return output
     }
     // If the enemy isn't visible (likely uphill) we not only need to get in physical range, but altitude-adjusted sight range as well
@@ -332,7 +332,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     PixelRay(sightPixel, enemy.pixel)
       .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
       .map(_.center)
-      .getOrElse(enemy.pixel.nearestTraversableBy(this))
+      .getOrElse(enemy.pixel.traversiblePixel(this))
   }
   @inline final def canSee(other: UnitInfo): Boolean = (
     (sightPixels >= pixelDistanceEdge(other) && (flying|| altitude >= other.altitude))

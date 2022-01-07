@@ -45,23 +45,17 @@ object SquadAutomation {
       + 160)
       * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! squad.engagedUpon) 1 else 2))
   }
-  // Ratio of path distance to (target combined distance from origin and goal) required to include a target as "on the way"
-  // This equates to 34 degree deviation from a straight line
-  val distanceRatio = 1.2
   def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    val units         = group.groupUnits
-    val originAir     = group.homeConsensus
-    val origin        = if (group.hasGround) originAir.nearestWalkableTile    else originAir.tile
-    val goal          = if (group.hasGround) to.nearestWalkableTile           else to.tile
-    val distancePx    = if (group.hasGround) origin.pixelDistanceGround(goal) else origin.pixelDistance(goal)
-    val output        = With.units.enemy
+    val combatEnemiesInRoute = With.units.enemy
       .filterNot(Protoss.Interceptor)
       .filter(e => if (e.flying) group.attacksAir else group.attacksGround)
       .filter(_.likelyStillThere)
-      .filter(e =>
-        e.pixelDistanceTravelling(origin) + e.pixelDistanceTravelling(goal) < distanceRatio * distancePx
-        || e.presumptiveTarget.exists(t => units.contains(t) && e.inRangeToAttack(t)))
+      .filter(e => (e.canAttack || e.team.isDefined) && group.groupUnits.exists(u =>
+        e.canAttack(u)
+        && e.pixelsToGetInRange(u) < 32 * (if (u.visibleToOpponents && u.pixelDistanceTravelling(to) < e.pixelDistanceTravelling(to)) 1 else 8)))
       .toVector
+    val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct
+    val output = combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.filter(_.team.isEmpty)
     output
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {

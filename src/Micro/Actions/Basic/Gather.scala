@@ -33,7 +33,7 @@ object Gather extends Action {
       if (With.reaction.sluggishness < 2) {
         val baseOriginal = resource.base
         lazy val baseOpposite = baseOriginal.flatMap(b => b.isNaturalOf.orElse(b.natural))
-        lazy val baseRemote = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.pixelDistanceGround(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
+        lazy val baseRemote = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
         lazy val basePaired = baseOpposite.orElse(baseRemote)
 
         def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
@@ -110,7 +110,7 @@ object Gather extends Action {
     // Take safe/hidden route to expansion
     if (unit.metro != resource.metro && ! unit.carrying) {
       val nextZone = Maff.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
-      unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(unit, MicroPathing.getSneakyPath(unit, Some(resource.tile.nearestWalkableTile)))
+      unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(unit, MicroPathing.getSneakyPath(unit, Some(resource.tile.walkableTile)))
       if (unit.agent.toTravel.isDefined) {
         Commander.move(unit)
       }

@@ -11,8 +11,8 @@ case class Metro(bases: Seq[Base]) {
   val zones: Vector[Zone] = With.geography.zones.filter(z =>
     z.bases.exists(bases.contains)
     || (z.bases.isEmpty && {
-      val center = z.centroid.nearestWalkableTile
-      With.paths.aStar(center, With.geography.startLocations.maxBy(_.tileDistanceGroundManhattan(center))).tiles.exists(_.exists(_.base.exists(bases.contains)))
+      val center = z.centroid.walkableTile
+      With.paths.aStar(center, With.geography.startLocations.maxBy(_.groundTiles(center))).tiles.exists(_.exists(_.base.exists(bases.contains)))
     })
   )
   val tiles: Set[Tile] = zones.flatMap(_.tiles.view).toSet

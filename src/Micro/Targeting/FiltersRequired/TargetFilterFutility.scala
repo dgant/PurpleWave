@@ -28,7 +28,7 @@ object TargetFilterFutility extends TargetFilter {
       if (actor.team.exists(t => if (target.flying) t.catchesAir else t.catchesGround)) return true
       if (target.presumptiveTarget.exists(u => u.isOurs && u.unitClass.isWorker)) return true
     }
-    val to = actor.agent.destination.nearestWalkablePixel
+    val to = actor.agent.destination.walkablePixel
     // COG 2021: Horrifyingly disabling this at the last minute to restore traditional Futility filter behavior
     //if (target.pixelDistanceTravelling(to) < actor.pixelDistanceTravelling(to) * SquadAutomation.distanceRatio) return true
     false

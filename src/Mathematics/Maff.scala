@@ -345,7 +345,7 @@ object Maff {
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  @inline final def convexHull(points: Seq[Point]): Seq[Point] = {
+  @inline def convexHull(points: Seq[Pixel]): Seq[Pixel] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
     if (points.isEmpty) return Seq.empty
     if (points.size == 2) return Seq(points.head, points.last)
@@ -355,7 +355,7 @@ object Maff {
     val origin = points.view.filter(_.y == yMax).maxBy(_.x)
 
     // Get points sorted by polar angle with the origin, discarding closer points
-    var sortedPoints = new ArrayBuffer[(Point, Double)]
+    var sortedPoints = new ArrayBuffer[(Pixel, Double)]
     sortedPoints ++= points.view.map(p => (p, origin.radiansTo(p)))
     sortedPoints = sortedPoints.sortBy(_._2).sortBy(_._1 != origin)
     var i: Int = 1
@@ -363,13 +363,13 @@ object Maff {
       val a = sortedPoints(i - 1)
       val b = sortedPoints(i)
       if (a._2 == b._2) {
-        sortedPoints.remove(if (origin.distanceSquared(a._1) < origin.distanceSquared(b._1)) i - 1 else i)
+        sortedPoints.remove(if (origin.pixelDistanceSquared(a._1) < origin.pixelDistanceSquared(b._1)) i - 1 else i)
       } else {
         i += 1
       }
     }
 
-    val stack = new mutable.Stack[Point]
+    val stack = new mutable.Stack[Pixel]
     sortedPoints.foreach(point => {
       while (stack.size > 1 && clockDirection(point._1, stack.head, stack(1)) < 0)
         stack.pop()

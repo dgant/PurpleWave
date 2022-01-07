@@ -32,6 +32,6 @@ abstract class LinearPush extends Push {
   }
 
   override def draw(): Unit = {
-    DrawMap.polygonPixels(corners,  priority.color)
+    DrawMap.polygon(corners,  priority.color)
   }
 }

@@ -109,7 +109,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val squad = this
     scourer.intend(this, new Intention {
       targets = targets.map(target +: _)
-      toTravel = Some(target.pixel.nearestTraversableBy(scourer))
+      toTravel = Some(target.pixel.traversiblePixel(scourer))
       toReturn = SquadAutomation.getReturn(scourer, squad)
     })
   }

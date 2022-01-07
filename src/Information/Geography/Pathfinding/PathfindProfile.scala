@@ -57,7 +57,7 @@ final class PathfindProfile(
   private var finalized: Boolean = false
   def find: TilePath = {
     finalized = true
-    end = end.map(e => if (endUnwalkable) e else e.nearestWalkableTile)
+    end = end.map(e => if (endUnwalkable) e else e.walkableTile)
     With.paths.aStar(this)
   }
 

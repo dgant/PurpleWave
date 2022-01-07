@@ -69,16 +69,16 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def pixelDistance(pixel: Pixel): Double = {
     center.pixelDistance(pixel)
   }
-  @inline def pixelDistanceGround(other: Pixel): Double = {
+  @inline def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(center, other)
   }
-  @inline def pixelDistanceGround(other: Tile): Double = {
+  @inline def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(center, other.center)
   }
-  @inline def tileDistanceGroundManhattan(other: Tile): Int = {
+  @inline def groundTiles(other: Tile): Int = {
     With.paths.groundTilesManhattan(this, other)
   }
-  @inline def tileDistanceGroundManhattan(other: Pixel): Int = {
+  @inline def groundTiles(other: Pixel): Int = {
     With.paths.groundTilesManhattan(this, other.tile)
   }
   @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
@@ -183,10 +183,10 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def traversableBy(unit: UnitInfo): Boolean = {
     unit.flying || walkable
   }
-  @inline def nearestTraversableBy(unit: UnitInfo): Tile = {
-    if (unit.flying) this else center.nearestTraversableBy(unit).tile
+  @inline def traversableTile(unit: UnitInfo): Tile = {
+    if (unit.flying) this else center.traversiblePixel(unit).tile
   }
-  @inline def nearestWalkableTile: Tile = {
+  @inline def walkableTile: Tile = {
     if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)
   }
   @inline def buildable: Boolean = {

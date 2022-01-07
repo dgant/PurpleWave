@@ -14,11 +14,11 @@ object ShowTileInfo extends View {
     val mousePixelScreen  = new Pixel(With.game.getMousePosition)
     val mousePixelMap     = mousePixelScreen + With.viewport.start
     val mouseTile         = mousePixelMap.tile
-    val walkableTile      = mousePixelMap.nearestWalkableTile
+    val walkableTile      = mousePixelMap.walkableTile
     val zone              = With.geography.zoneByTile(mouseTile)
 
     if (true || With.game.getMouseState(MouseButton.M_LEFT)) {
-      val pathfindProfile = new PathfindProfile(With.geography.home.nearestWalkableTile)
+      val pathfindProfile = new PathfindProfile(With.geography.home.walkableTile)
       pathfindProfile.end = Some(walkableTile)
       val path = pathfindProfile.find
       if (path.pathExists) {
@@ -31,7 +31,7 @@ object ShowTileInfo extends View {
     DrawMap.line(mouseTile.center, walkableTile.center, Colors.BrightYellow)
     DrawMap.tileRectangle(mouseTile.toRectangle, Colors.BrightYellow)
     DrawMap.tileRectangle(walkableTile.toRectangle, Colors.hsv((System.currentTimeMillis() % 256L).toInt, 255, 192))
-    DrawScreen.text(mousePixelScreen.add(4, -6), (walkableTile.pixelDistanceGround(With.geography.home).toInt / 32).toString)
+    DrawScreen.text(mousePixelScreen.add(4, -6), (walkableTile.groundPixels(With.geography.home).toInt / 32).toString)
 
     zone.border.foreach(t => DrawMap.circle(t.center, 4, Colors.DarkBlue))
   }

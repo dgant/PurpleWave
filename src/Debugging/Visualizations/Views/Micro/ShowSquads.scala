@@ -26,7 +26,8 @@ object ShowSquads extends View {
         borderColor = With.enemy.colorMedium))
 
     val centroid = Maff.centroid(squad.units.view.map(_.pixel))
-    With.game.drawCircleMap(centroid.bwapi, squad.units.map(_.pixelDistanceCenter(centroid)).max.toInt, color)
+    val hull = Maff.convexHull(squad.units.flatMap(_.corners))
+    DrawMap.polygon(hull, color)
 
     squad.targets.foreach(q => {
       var i = 0

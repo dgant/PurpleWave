@@ -25,7 +25,7 @@ class Geography extends TimedTask {
   lazy val metros             : Vector[Metro]         = ZoneBuilder.metros.toVector
   lazy val ourMain            : Base                  = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
   lazy val ourMetro           : Metro                 = ourMain.metro
-  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.pixelDistanceGround(s2))).sorted
+  lazy val rushDistances      : Vector[Double]        = startLocations.flatMap(s1 => startLocations.filterNot(_ == s1).map(s2 => s1.groundPixels(s2))).sorted
   lazy val clockwiseBases     : Vector[Base]          = With.geography.bases.sortBy(b => SpecificPoints.middle.radiansTo(b.townHallArea.center))
   lazy val counterwiseBases   : Vector[Base]          = clockwiseBases.reverse
 
@@ -80,7 +80,7 @@ class Geography extends TimedTask {
   private val ourNaturalCache = new Cache(() =>
     (if (ourMain.owner.isUs) ourMain.natural else None)
       .getOrElse(bases.find(_.isNaturalOf.exists(_.owner.isUs))
-      .getOrElse(bases.minBy(_.townHallTile.pixelDistanceGround(ourMain.townHallTile)))))
+      .getOrElse(bases.minBy(_.townHallTile.groundPixels(ourMain.townHallTile)))))
 
   private lazy val zoneByTileCacheValid = allTiles.map(tile => zones.find(_.tiles.contains(tile)).getOrElse(getZoneForTile(tile)))
   private lazy val baseByTileCacheValid = allTiles.map(getBaseForTile)

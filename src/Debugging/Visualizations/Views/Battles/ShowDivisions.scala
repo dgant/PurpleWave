@@ -4,7 +4,6 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Mathematics.Points.Point
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
@@ -25,11 +24,14 @@ object ShowDivisions extends View {
   
   override def renderMap() {
     With.battles.divisions.foreach(division => {
-      val enemyPoints = division.enemies.flatMap(u => u.corners.map(p => Point(
-        p.x + 3 * Maff.toSign(p.x > u.x),
-        p.y + 3 * Maff.toSign(p.y > u.y)))).toVector
+      val enemyPoints = division.enemies.flatMap(u =>
+        u.corners
+          .map(p => p.add(
+            3 * Maff.toSign(p.x > u.x),
+            3 * Maff.toSign(p.y > u.y))))
+          .toVector
       val hull = Maff.convexHull(enemyPoints)
-      DrawMap.polygonPixels(hull.view.map(_.asPixel), Color.White)
+      DrawMap.polygon(hull.view.map(_.asPixel), Color.White)
     })
   }
 }

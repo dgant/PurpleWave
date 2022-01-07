@@ -19,7 +19,7 @@ object DownhillPathfinder {
     val path = new ArrayBuffer[Tile](MicroPathing.waypointDistanceTiles)
     path += from
 
-    def distance(tile: Tile): Double = tile.pixelDistanceGround(to)
+    def distance(tile: Tile): Double = tile.groundPixels(to)
     def here = path.last
 
     while (path.length < MicroPathing.waypointDistanceTiles) {

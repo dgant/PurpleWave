@@ -86,7 +86,7 @@ object BeVulture extends Action {
       vulture.agent.toTravel = Some(
         vulture.pixel
           .project(target.pixel, vulture.pixelDistanceEdge(target) + 64)
-          .nearestWalkableTile
+          .walkableTile
           .center)
       Commander.move(vulture)
     }

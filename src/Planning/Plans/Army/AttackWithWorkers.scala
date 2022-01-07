@@ -35,7 +35,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     }
   }
 
-  lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.startBases.filterNot(_.owner.isUs).map(_.heart.pixelDistanceGround(tile)).sum)
+  lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.startBases.filterNot(_.owner.isUs).map(_.heart.groundPixels(tile)).sum)
   def findStartLocation() {
     // 2-Player: We know where they are. Go SMOrc.
     // 3-player: Scout one base with one probe while keeping the others in the middle.

@@ -2,6 +2,7 @@ package Tactics.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
@@ -13,49 +14,32 @@ class SquadAttack extends Squad {
 
   override def run() {
     if (units.isEmpty) return
-    chooseVicinity()
+    vicinity = getVicinity
     SquadAutomation.targetFormAndSend(this, minToForm = 6)
   }
 
-  protected def chooseVicinity(): Unit = {
-    val threatOrigin = With.scouting.threatOrigin
-    val centroid = Maff.centroid(units.view.map(_.pixel)).tile
-    val threatDistanceToUs =
-      Maff.min(With.geography.ourBases.map(_.heart.tileDistanceFast(threatOrigin)))
-        .getOrElse(With.geography.home.tileDistanceFast(threatOrigin))
-    val threatDistanceToEnemy =
-      Maff.min(With.geography.enemyBases.map(_.heart.tileDistanceFast(centroid)))
-        .getOrElse(With.scouting.mostBaselikeEnemyTile.tileDistanceFast(centroid))
-
-    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => u.is(MatchWarriors) && u.likelyStillThere && ! u.is(Terran.Vulture) && u.detected)
+  protected def getVicinity: Pixel = {
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => MatchWarriors(u) && u.likelyStillThere && ! Terran.Vulture(u) && u.detected)
+    lazy val baseScores = With.geography.enemyBases.map(b => {
+      val distanceThreat = With.scouting.threatOrigin.walkableTile.groundPixels(b.heart.center)
+      val distanceArmy = keyDistanceTo(b.heart.center)
+      (b, 2 * distanceThreat - distanceArmy)
+    }).toMap
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3
-      && threatDistanceToUs < threatDistanceToEnemy
+      && With.scouting.enemyProgress > 0.4
       && enemyNonTrollyThreats > 6) {
-      vicinity = With.scouting.threatOrigin.center
-      return
+      return With.scouting.threatOrigin.center
     }
-    vicinity =
-      // Horror proxies/Gas steals
-      Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
+    // Horror proxies/Gas steals
+    Maff.orElse(
+      Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center)),
       // Remote proxies
-      .orElse(
-        if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None
-        else Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)))
-      // Enemy base furthest from their army
-      .orElse(
-        Maff.maxBy(With.geography.enemyBases)(base => {
-            val distance      = With.scouting.threatOrigin.center.pixelDistance(base.heart.center)
-            val distanceLog   = 1 + Math.log(1 + distance)
-            val defendersLog  = 1 + Math.log(1 + base.defenseValue)
-            val output        = distanceLog / defendersLog
-            output
-          })
-          .map(base => base.natural.filter(_.owner == base.owner).getOrElse(base))
-          .map(base => Maff.minBy(base.units.filter(u => u.isEnemy && u.unitClass.isBuilding))(_.pixelDistanceCenter(base.townHallArea.center))
-            .map(_.pixel)
-            .getOrElse(base.townHallArea.center)))
-      .orElse(if (enemyNonTrollyThreats > 0) Some(With.scouting.threatOrigin.center) else None)
+      if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)),
+      // Highest scoring enemy base
+      Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.units.view.filter(_.isEnemy).filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center)),
+      // Threat option, if there's an army to pursue
+      Some(With.scouting.threatOrigin.center).filter(unused => enemyNonTrollyThreats > 0)).headOption
       .getOrElse(With.scouting.mostBaselikeEnemyTile.center)
   }
 }

@@ -91,7 +91,7 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.pixelDistanceGround(end) / 32.0).getOrElse(0.0)
+    val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0)
     val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Double = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
@@ -156,7 +156,7 @@ trait TilePathfinder {
         || (
           profile.endDistanceMaximum > 0
           && end.tileDistanceFast(bestTile) <= profile.endDistanceMaximum
-          && (profile.crossUnwalkable || end.pixelDistanceGround(bestTile) <= 32 * profile.endDistanceMaximum)))
+          && (profile.crossUnwalkable || end.groundPixels(bestTile) <= 32 * profile.endDistanceMaximum)))
       if (
         profile.lengthMaximum.exists(_ <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
         || (tilesExplored >= tilesExploredMax && profile.acceptPartialPath)

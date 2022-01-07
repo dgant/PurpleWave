@@ -1,4 +1,4 @@
-package Information.Grids.Spells
+package Information.Grids.Miscellaneous
 
 import Information.Grids.ArrayTypes.AbstractGridFramestamp
 import Lifecycle.With

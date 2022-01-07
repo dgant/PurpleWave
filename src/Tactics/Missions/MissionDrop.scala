@@ -91,11 +91,11 @@ abstract class MissionDrop extends Mission {
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) Maff.nanToOne(
         With.framesSince(b.lastScoutedFrame).toDouble
-        * b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)
-        / b.heart.tileDistanceGroundManhattan(With.scouting.mostBaselikeEnemyTile))
+        * b.heart.groundTiles(With.scouting.enemyMuscleOrigin)
+        / b.heart.groundTiles(With.scouting.mostBaselikeEnemyTile))
       else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProgress + 1)
       else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProgress - 0.5)
-      else b.heart.tileDistanceGroundManhattan(With.scouting.enemyMuscleOrigin)).get
+      else b.heart.groundTiles(With.scouting.enemyMuscleOrigin)).get
     val itineraries = Vector(
         With.geography.itineraryCounterwise(With.geography.ourMain, targetBase),
         With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
@@ -250,10 +250,22 @@ abstract class MissionDrop extends Mission {
 
   class ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      lazy val pathValueChanged = pathValues.indices.take(path.get.length).exists(i =>
+      lazy val pathValueChanged = pathValues.indices.take(path.get.length).find(i =>
             path.get.tiles.get(i).enemyRange != pathValues(i).enemyRange
         ||  path.get.tiles.get(i).visibleToEnemy != pathValues(i).enemyVision)
-      if (path.isEmpty || pathItineraryBase != itinerary.headOption.orNull || pathValueChanged) {
+      var shouldCreatePath = false
+      if (path.isEmpty) {
+        With.logger.debug(f"${this}: Calculating a path because none exists.")
+        shouldCreatePath = true
+      } else if (pathItineraryBase != itinerary.headOption.orNull) {
+        With.logger.debug(f"${this}: Calculating a path because we are going to ${itinerary.headOption.orNull} instead of $pathItineraryBase.")
+        shouldCreatePath = true
+      } else if (pathValueChanged.isDefined) {
+        val i = pathValueChanged.get
+        With.logger.debug(f"${this}: Calculating a path because step #$i changed from ${pathValues(i)} to (${pathValues(i).enemyRange}, ${pathValues(i).enemyVision})")
+        shouldCreatePath = true
+      }
+      if (shouldCreatePath) {
         createPath(transport)
       }
       if (path.exists(_.pathExists)) {

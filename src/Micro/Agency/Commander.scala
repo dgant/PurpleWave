@@ -173,7 +173,7 @@ object Commander {
     walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight, - unit.unitClass.dimensionUp    ).walkable
     walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,    unit.unitClass.dimensionDown  ).walkable
     if ( ! walkabilityAssured && unit.pixelDistanceCenter(to) > 32) {
-      to = to.nearestWalkableTile.center
+      to = to.walkableTile.center
     }
 
     // Apply noise

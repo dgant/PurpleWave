@@ -58,7 +58,7 @@ class SquadScoutExpansions extends Squad {
         With.scouting.enemyMain.exists(m =>
           m.metro == b.metro
           && With.scouting.enemyNatural.exists(n =>
-            b.heart.tileDistanceGroundManhattan(m.heart) < n.heart.tileDistanceGroundManhattan(m.heart))))
+            b.heart.groundTiles(m.heart) < n.heart.groundTiles(m.heart))))
       .toVector
       .sortBy(base => -With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy(b => lock.units.exists(_.flying) || b.zone.island))
@@ -76,7 +76,7 @@ class SquadScoutExpansions extends Squad {
       scoutableBases())
     val toScoutBaseSorted = toScoutBases.toVector.sortBy(b =>
       Maff.maxBy(units)(_.squadAge).map(_.framesToTravelTo(b.heart))
-      .getOrElse(b.heart.tileDistanceGroundManhattan(With.geography.home)))
+      .getOrElse(b.heart.groundTiles(With.geography.home)))
 
     vicinity = toScoutBaseSorted.head.townHallArea.center
 

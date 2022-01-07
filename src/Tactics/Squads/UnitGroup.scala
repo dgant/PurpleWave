@@ -2,41 +2,42 @@ package Tactics.Squads
 
 import Information.Battles.Types.GroupCentroid
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Performance.Cache
 import Planning.UnitMatchers.MatchGroundWarriors
 import ProxyBwapi.UnitInfo.UnitInfo
 
-import scala.collection.SeqView
-
 trait UnitGroup {
   def groupUnits: Seq[UnitInfo]
 
-  def groupOrderable: SeqView[UnitInfo, Seq[UnitInfo]] = groupUnits.view.filter(_.unitClass.orderable)
-  def attackers               = _attackers()
-  def detectors               = _detectors()
-  def attacksAir              = _attacksAir()
-  def attacksGround           = _attacksGround()
-  def catchesAir              = _catchesAir()
-  def catchesGround           = _catchesGround()
-  def splashesAir             = _splashesAir()
-  def splashesGround          = _splashesGround()
-  def hasGround               = _hasGround()
-  def engagingOn              = _engagingOn()
-  def engagedUpon             = _engagedUpon()
-  def widthPixels             = _widthPixels()
-  def centroidAir             = _centroidAir()
-  def centroidGround          = _centroidGround()
-  def centroidKey             = _centroidKey()
-  def attackCentroidAir       = _centroidAir()
-  def attackCentroidGround    = _centroidGround()
-  def attackCentroidKey       = _centroidKey()
-  def meanTopSpeed            = _meanTopSpeed()
-  def meanAttackerSpeed       = _meanAttackerSpeed()
-  def meanTotalHealth         = _meanTotalHealth()
-  def meanDpf                 = _meanDpf()
+  def groupOrderable  : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
+  def attackers       : Seq[UnitInfo] = _attackers()
+  def detectors       : Seq[UnitInfo] = _detectors()
+  def attacksAir                      = _attacksAir()
+  def attacksGround                   = _attacksGround()
+  def catchesAir                      = _catchesAir()
+  def catchesGround                   = _catchesGround()
+  def splashesAir                     = _splashesAir()
+  def splashesGround                  = _splashesGround()
+  def hasGround                       = _hasGround()
+  def engagingOn                      = _engagingOn()
+  def engagedUpon                     = _engagedUpon()
+  def widthPixels                     = _widthPixels()
+  def centroidAir                     = _centroidAir()
+  def centroidGround                  = _centroidGround()
+  def centroidKey                     = _centroidKey()
+  def attackCentroidAir               = _centroidAir()
+  def attackCentroidGround            = _centroidGround()
+  def attackCentroidKey               = _centroidKey()
+  def meanTopSpeed                    = _meanTopSpeed()
+  def meanAttackerSpeed               = _meanAttackerSpeed()
+  def meanTotalHealth                 = _meanTotalHealth()
+  def meanDpf                         = _meanDpf()
+  def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
+  def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
 
-  private def _attackers()      = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
-  private def _detectors()      = groupOrderable.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
+  private def _attackers()              = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
+  private def _detectors()              = groupOrderable.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
   private val _attacksAir               = new Cache(() => attackers.exists(_.canAttackAir))
   private val _attacksGround            = new Cache(() => attackers.exists(_.canAttackGround))
   private val _catchesAir               = new Cache(() => attackers.exists(a => (a.pixelRangeAir > 96 || a.flying) && a.canAttackAir))

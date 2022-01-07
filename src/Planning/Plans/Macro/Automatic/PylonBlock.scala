@@ -41,8 +41,8 @@ class PylonBlock extends Plan {
     val basesByProxmity = With.geography.bases
       .filterNot(_.zone.island)
       .sortBy(base =>
-        Maff.min(With.geography.ourBases.map(_.heart.pixelDistanceGround(base.heart))).getOrElse(0.0)
-        - Maff.min(With.geography.enemyBases.map(_.heart.pixelDistanceGround(base.heart))).getOrElse(0.0) )
+        Maff.min(With.geography.ourBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0)
+        - Maff.min(With.geography.enemyBases.map(_.heart.groundPixels(base.heart))).getOrElse(0.0) )
 
     // Take the most distant bases
     // For maps with a middle base, ignore it

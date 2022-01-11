@@ -3,18 +3,18 @@ package Micro.Formation
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
-import Tactics.Squads.UnitGroup
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Tactics.Squads.FriendlyUnitGroup
 
 import scala.collection.mutable.ListBuffer
 
-case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iterable[Pixel]], group: UnitGroup) {
-  private def assignOutwardFromCentroid(unitClass: UnitClass): Map[UnitInfo, Pixel] = {
-    val classUnits = group.groupOrderable.view.filter(unitClass)
+case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iterable[Pixel]], group: FriendlyUnitGroup) {
+  private def assignOutwardFromCentroid(unitClass: UnitClass): Map[FriendlyUnitInfo, Pixel] = {
+    val classUnits = group.groupFriendlyOrderable.view.filter(unitClass)
     if (classUnits.isEmpty) return Map.empty
     val centroid = Maff.centroid(classUnits.map(_.pixel))
     val pixels = slots(unitClass).toSeq.sortBy(-_.pixelDistanceSquared(centroid))
-    val unitsLeft = new ListBuffer[UnitInfo]
+    val unitsLeft = new ListBuffer[FriendlyUnitInfo]
     unitsLeft ++= classUnits
     pixels.flatMap(pixel =>
       if (unitsLeft.nonEmpty) {
@@ -25,18 +25,15 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
     ).toMap
   }
 
-  def outwardFromCentroid: Formation = {
-    if (slots.isEmpty) return FormationEmpty
-    new Formation(
-      style,
-      slots
-        .keys
-        .map(unitClass => assignOutwardFromCentroid(unitClass))
-        .reduce(_ ++ _))
+  def outwardFromCentroid: Map[FriendlyUnitInfo, Pixel] = {
+    if (slots.isEmpty) return Map.empty
+    slots
+      .keys
+      .map(unitClass => assignOutwardFromCentroid(unitClass))
+      .reduce(_ ++ _)
   }
 
-  def sprayToward(to: Pixel): Formation = {
-    if (slots.isEmpty) return FormationEmpty
+  def sprayToward(to: Pixel): Map[FriendlyUnitInfo, Pixel] = {
     // Goal: Solve what https://www.gamasutra.com/view/feature/3314/coordinated_unit_movement.php?print=1
     // calls the "stacked canyon" problem.
     // In Brood War ALL army movement is a stacked canyon problem
@@ -48,22 +45,20 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
     // Assign units to slot of equal rank
     val orderedSlots = slots.map(p => (p._1, p._2.toVector.sortBy(p => 5 * p.tile.groundTiles(to) - p.tile.groundTiles(centroid))))
     val orderedUnits = group
-      .groupOrderable
+      .groupFriendlyOrderable
       .groupBy(_.unitClass)
       .map(p => (
         p._1,
         p._2.toVector.sortBy(_.pixelDistanceTravelling(to))))
-    val output = new Formation(
-      style,
-      orderedUnits
-        .view
-        .filter(p => orderedSlots.contains(p._1))
-        .flatMap(p =>
-          //The .take() is protection against array bounds issues I never investigated
-          orderedSlots(p._1).indices.take(p._2.size).map(i =>
-            (p._2(i),
-            orderedSlots(p._1)(i))))
-        .toMap)
+    val output = orderedUnits
+      .view
+      .filter(p => orderedSlots.contains(p._1))
+      .flatMap(p =>
+        //The .take() is protection against array bounds issues I never investigated
+        orderedSlots(p._1).indices.take(p._2.size).map(i =>
+          (p._2(i),
+          orderedSlots(p._1)(i))))
+      .toMap
     output
   }
 }

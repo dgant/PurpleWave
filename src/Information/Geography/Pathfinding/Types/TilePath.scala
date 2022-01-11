@@ -1,7 +1,7 @@
 package Information.Geography.Pathfinding.Types
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import bwapi.Color
 
 case class TilePath(
@@ -9,6 +9,10 @@ case class TilePath(
   end       : Tile,
   distance  : Double,
   tiles     : Option[IndexedSeq[Tile]]) {
+
+  def this() {
+    this(SpecificPoints.tileMiddle, SpecificPoints.tileMiddle, 0, None)
+  }
   
   def pathExists: Boolean = tiles.isDefined
 

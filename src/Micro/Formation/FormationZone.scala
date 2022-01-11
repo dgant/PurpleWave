@@ -111,6 +111,6 @@ object FormationZone {
         .mapValues(_.map(_._2)),
       group)
     val output = unassigned.outwardFromCentroid
-    output
+    FormationBasic(FormationStyleGuard, output)
   }
 }

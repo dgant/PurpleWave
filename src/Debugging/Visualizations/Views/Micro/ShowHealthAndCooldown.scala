@@ -56,11 +56,21 @@ object ShowHealthAndCooldown extends View {
     
     if (unit.totalHealth != unit.unitClass.maxTotalHealth) {
       DrawMap.box(Pixel(xStart - 1, yStartHp - 1), Pixel(xStart + width + 2, yEndHp + 1), Color.Black, solid = true)
-      DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmMax, yEndHp), colorDm, solid = false)
-      DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShMax, yEndHp), colorSh, solid = false)
+      /*
+      if (unit.matrixPoints > 0) {
+        DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmMax, yEndHp), colorDm, solid = false)
+      }
+      if (unit.unitClass.maxShields > 0) {
+        DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShMax, yEndHp), colorSh, solid = false)
+      }
       DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart + widthHpMax, yEndHp), colorHp, solid = false)
-      DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmNow, yEndHp), colorDm, solid = true)
-      DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
+      */
+      if (unit.matrixPoints > 0) {
+        DrawMap.box(Pixel(xStartDm, yStartHp), Pixel(xStartDm + widthDmNow, yEndHp), colorDm, solid = true)
+      }
+      if (unit.unitClass.maxShields > 0) {
+        DrawMap.box(Pixel(xStartSh, yStartHp), Pixel(xStartSh + widthShNow, yEndHp), colorSh, solid = true)
+      }
       DrawMap.box(Pixel(xStart, yStartHp), Pixel(xStart + widthHpNow, yEndHp), colorHp, solid = true)
   
       val healthBarEvery = Math.max(3, width * 25 / (unit.unitClass.maxTotalHealth + unit.matrixPoints))

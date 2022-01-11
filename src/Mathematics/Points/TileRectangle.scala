@@ -18,7 +18,7 @@ final case class TileRectangle(
     this(tile, tile.add(1, 1))
   }
 
-  def this(included: Seq[Tile]) {
+  def this(included: Iterable[Tile]) {
     this(
       Tile(
         Maff.min(included.view.map(_.x)).getOrElse(0),

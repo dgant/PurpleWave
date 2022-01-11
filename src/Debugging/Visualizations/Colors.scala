@@ -24,6 +24,17 @@ object Colors {
   
   private def hv(h: Int, v: Int): Color = hsv(h, 192, v)
 
+  def brighten(color: Color) = new Color(
+    brightenValue(color.red()),
+    brightenValue(color.green()),
+    brightenValue(color.blue()))
+  def darken(color: Color) = new Color(
+    darkenValue(color.red()),
+    darkenValue(color.green()),
+    darkenValue(color.blue()))
+  private def brightenValue(v: Int): Int = (v + 255) / 2
+  private def darkenValue(v: Int): Int = v / 2
+
   private val shadow    = 24
   private val midnight  = 48
   private val deep      = 96

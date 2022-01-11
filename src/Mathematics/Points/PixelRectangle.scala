@@ -1,13 +1,29 @@
 package Mathematics.Points
 
+import Mathematics.Maff
+
 import scala.collection.immutable
 
 case class PixelRectangle(
   startInclusive : Pixel,
   endExclusive   : Pixel) {
 
-  def this(Pixel: Pixel) {
-    this(Pixel, Pixel.add(1, 1))
+  def this() {
+    this(Pixel(0, 0), Pixel(1, 1))
+  }
+
+  def this(pixel: Pixel) {
+    this(pixel, pixel.add(1, 1))
+  }
+
+  def this(included: Iterable[Pixel]) {
+    this(
+      Pixel(
+        Maff.min(included.view.map(_.x)).getOrElse(0),
+        Maff.min(included.view.map(_.y)).getOrElse(0)),
+      Pixel(
+        Maff.max(included.view.map(_.x + 1)).getOrElse(0),
+        Maff.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
   if (endExclusive.x < startInclusive.x || endExclusive.y < startInclusive.y) {

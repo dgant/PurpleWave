@@ -2,7 +2,6 @@ package ProxyBwapi.UnitInfo
 
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Micro.Agency.{Agent, Intention}
 import Micro.Formation._
 import Performance.Cache
@@ -70,11 +69,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     }
   }
   def targetsAssigned: Option[Seq[UnitInfo]] = intent.targets.orElse(squad.flatMap(_.targets))
-  def formationSpot(style: FormationStyle): Option[Pixel] = squad.flatMap(_.formations.find(_.style == style).flatMap(_.placements.get(this)))
-  def formationEngage: Option[Pixel] = formationSpot(FormationStyleEngage)
-  def formationMarch: Option[Pixel] = formationSpot(FormationStyleMarch)
-  def formationGuard: Option[Pixel] = formationSpot(FormationStyleGuard)
-  def formationDisengage: Option[Pixel] = formationSpot(FormationStyleDisengage)
 
   def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
   def alliesBattle                  : Iterable[FriendlyUnitInfo]      = team.map(_.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)

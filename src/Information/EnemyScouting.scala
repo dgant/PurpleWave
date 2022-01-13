@@ -7,8 +7,8 @@ import ProxyBwapi.Races.Zerg
 
 trait EnemyScouting {
   def enemyHasScoutedUsWithWorker: Boolean = _enemyHasScoutedUsWithWorker
-  val basesToLookForEnemyScouts = new Cache(() => (With.geography.ourBases :+ With.geography.ourNatural).distinct)
-  val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorker) && u.likelyStillThere && u.base.exists(basesToLookForEnemyScouts().contains)))
+  val zonesToLookForEnemyScouts = new Cache(() => With.geography.home.metro.map(_.zones).getOrElse(Vector(With.geography.home.zone, With.geography.ourNatural.zone)))
+  val enemyScouts = new Cache(() => With.units.enemy.filter(u => u.isAny(Zerg.Overlord, MatchWorker) && u.likelyStillThere && zonesToLookForEnemyScouts().contains(u.zone)))
 
   private var _enemyHasScoutedUsWithWorker = false
 

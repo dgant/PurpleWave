@@ -190,7 +190,7 @@ trait MacroCounting {
   def scoutCleared: Boolean = {
     With.scouting.enemyScouts().isEmpty || (
       With.scouting.enemyScouts().forall( ! _.likelyStillThere)
-      && With.scouting.basesToLookForEnemyScouts().forall(_.zone.tiles.forall(_.explored)))
+      && With.scouting.zonesToLookForEnemyScouts().forall(_.tiles.forall(_.explored)))
   }
 
   def enemyBases: Int = With.geography.enemyBases.size

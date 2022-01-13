@@ -27,9 +27,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
   lazy val perimeter: Int = 2 * width + 2 * height
 
-  lazy val topLeft: Point = Point(dimensionLeft, dimensionUp)
-  lazy val topRight: Point = Point(dimensionRight, dimensionUp)
-  lazy val bottomLeft: Point = Point(dimensionLeft, dimensionDown)
+  lazy val topLeft: Point = Point(-dimensionLeft, -dimensionUp)
+  lazy val topRight: Point = Point(dimensionRight, -dimensionUp)
+  lazy val bottomLeft: Point = Point(-dimensionLeft, dimensionDown)
   lazy val bottomRight: Point = Point(dimensionRight, dimensionDown)
   lazy val corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
 

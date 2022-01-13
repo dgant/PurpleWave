@@ -14,7 +14,7 @@ class SquadEjectScout extends Squad {
   override def toString: String = "Eject"
 
   val targetScout = new Cache(() => Maff.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
-  private val tilesToConsider = new Cache(() => With.scouting.basesToLookForEnemyScouts().view.flatMap(_.zone.tiles))
+  private val tilesToConsider = new Cache(() => With.scouting.zonesToLookForEnemyScouts().view.flatMap(_.tiles).toSeq)
   private val destination = new Cache(() => targetScout()
     .map(_.pixel)
     .getOrElse(Maff.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
@@ -25,7 +25,7 @@ class SquadEjectScout extends Squad {
     if (scoutCleared.apply) return
     if (targetScout().isEmpty) return
 
-    lock.matcher = MatchAnd(MatchScoutCatcher, (unit) => unit.base.exists(With.scouting.basesToLookForEnemyScouts().contains) || unit.pixelsToGetInRange(targetScout().get) < 32)
+    lock.matcher = MatchAnd(MatchScoutCatcher, (unit) => With.scouting.zonesToLookForEnemyScouts().exists(_ == unit.zone) || unit.pixelsToGetInRange(targetScout().get) < 32)
     lock.counter = CountOne
     lock.preference = PreferClose(targetScout().get.pixel)
     lock.acquire()

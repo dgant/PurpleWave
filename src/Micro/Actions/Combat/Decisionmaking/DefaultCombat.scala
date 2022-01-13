@@ -188,7 +188,7 @@ object DefaultCombat extends Action {
     lazy val purring            = unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit))
     lazy val canAbuseTarget     = target.exists(t => ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
     lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate)
-    lazy val hasTimeToPoke      = framesToPokeTarget.exists(framesToPoke => unit.matchups.threats.forall(_.framesToGetInRange(unit) > framesToPoke + 8))
+    lazy val hasTimeToPoke      = framesToPokeTarget.exists(framesToPoke => unit.matchups.threats.forall(t => t.pixelsToGetInRange(unit) - unit.pixelsToGetInRange(target.get) / (unit.topSpeed + t.topSpeed)  > framesToPoke))
 
     transition(Aim,       () => ! unit.canMove, () => aim(unit))
     transition(Dodge,     () => unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge, () => dodge(unit))

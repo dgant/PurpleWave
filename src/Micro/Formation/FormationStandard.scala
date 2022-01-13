@@ -80,17 +80,13 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
         // Move all the way past any narrow choke except one that's in our goal
         stepSizePace    = Maff.clamp((16 + 24 * group.meanTopSpeed) / 32, 1, 8).toInt
         stepSizeCross   = firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0)
-        stepSizeEngage  = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= vGrid.margin)).getOrElse(0)
+        stepSizeEngage  = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= vGrid.margin)).getOrElse(LightYear())
         stepSizeEvade   = 1 + groupWidthTiles + centroid.tile.enemyRangeGround
         stepSizeTiles   = Math.max(stepSizePace, stepSizeCross)
         if (style == FormationStyleDisengage) {
           stepSizeTiles = Math.max(stepSizeTiles, stepSizeEvade) // Make sure we go far enough to evade
         } else if (goalTowardsTarget) {
-          if (style == FormationStyleEngage) {
-            stepSizeTiles = stepSizeEngage // Make sure we go far enough to fight
-          } else {
-            stepSizeTiles = Math.min(stepSizeTiles, stepSizeEngage) // Don't try to move past the enemy
-          }
+          stepSizeTiles = Math.min(stepSizeTiles, stepSizeEngage) // Don't try to move past the enemy
         }
         maxTilesToGoal    = centroid.tile.groundTiles(goal) - 1
         minTilesToGoal    = maxTilesToGoal - stepSizeTiles
@@ -112,12 +108,11 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
       .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))
       .toVector
       .sortBy(_.formationRangePixels)
-    val preferArc = true //style == FormationStyleGuard || style == FormationStyleEngage || PixelRay(centroid, apex).forall(_.walkable)
     lazy val ourArcSlots = arcSlots(classCount, 32 + apex.pixelDistance(face))
     lazy val ourFloodSlots = floodSlots(classCount)
-    var output = if (preferArc) ourArcSlots else ourFloodSlots
-    if (output.isEmpty) {
-      output = if (preferArc) ourFloodSlots else ourArcSlots
+    var output = ourArcSlots
+    if (output.size < groundUnits.size) {
+      output = if (ourArcSlots.size > ourFloodSlots.size) ourArcSlots else ourFloodSlots
     }
 
     val groundPlacementCentroid = Maff.exemplarOption(output.values.view.flatten).getOrElse(apex)

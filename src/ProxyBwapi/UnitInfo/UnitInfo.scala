@@ -1,7 +1,6 @@
 package ProxyBwapi.UnitInfo
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Clustering.BattleCluster
 import Information.Battles.Prediction.Simulation.{ReportCard, Simulacrum}
 import Information.Battles.Prediction.Skimulation.SkimulationUnit
 import Information.Battles.Types.{BattleLocal, Team}
@@ -205,9 +204,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val simulacrum: Simulacrum = new Simulacrum(this)
-  var clusteringEnabled: Boolean = _
-  var clusteringRadiusSquared: Double = _
-  var cluster: Option[BattleCluster] = _
+  var nextInCluster: Option[UnitInfo] = None
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
   @inline final def armorHealth: Int = armorHealthCache()

@@ -1,6 +1,5 @@
 package Information.Battles
 
-import Information.Battles.Clustering.BattleClustering
 import Information.Battles.ProcessingStates.{BattleProcessInitial, BattleProcessState}
 import Information.Battles.Types.{BattleGlobal, BattleLocal, Division}
 import Lifecycle.With

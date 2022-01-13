@@ -8,7 +8,7 @@ class ReactionTimes {
   val runtimeQueueDuration: Int = 24 * 8
   
   def agencyLast          : Int = With.framesSince(With.agents.lastQueueCompletion)
-  def clusteringLast      : Int = With.framesSince(With.battles.clustering.lastClusterCompletion)
+  def clusteringLast      : Int = With.framesSince(With.battles.clustering.lastCompletion)
   def estimationLast      : Int = With.framesSince(With.battles.lastEstimationCompletion)
   def planningLast        : Int = With.framesSince(With.prioritizer.lastRun)
   def agencyMin           : Int = agencyMinCache()

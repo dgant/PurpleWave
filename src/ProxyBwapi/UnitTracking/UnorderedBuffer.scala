@@ -50,6 +50,12 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
       i += 1
     }
   }
+  @inline def removeAt(index: Int): Unit = {
+    if (index < _size) {
+      values(index) = values(_size - 1)
+      _size -= 1
+    }
+  }
 
   @inline def addAll(values: TraversableOnce[T]): Unit = { values.foreach(add) }
   @inline def removeAll(values: TraversableOnce[T]): Unit = { values.foreach(remove) }

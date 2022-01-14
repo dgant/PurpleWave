@@ -16,7 +16,7 @@ import Utilities.LightYear
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle, val goal: Pixel) extends Formation {
+class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
 
   private val units = group.groupFriendlyOrderable
@@ -56,6 +56,7 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
   var minTilesToGoal    = - LightYear()
   var maxTilesToGoal    = LightYear()
   var maxThreat         = LightYear()
+  var minAltitude       = -1
   var costDistanceGoal  = 1
   var costDistanceApex  = 1
   var costThreat        = 0
@@ -65,6 +66,9 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
   val placements: Map[FriendlyUnitInfo, Pixel] = UnassignedFormation(style, slots, group).outwardFromCentroid
 
   private def parameterize(): Unit = {
+    if (style == FormationStyleMarch && goalTowardsTarget && targetTowards.exists(t => units.exists(u => u.pixelsToGetInRange(t) < 32 * 6 && u.targetsAssigned.forall(_.contains(t))))) {
+      style == FormationStyleEngage
+    }
     if (style == FormationStyleGuard) {
       minTilesToGoal    = 1
       costDistanceGoal  = 5
@@ -86,7 +90,7 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
         if (style == FormationStyleDisengage) {
           stepSizeTiles = Math.max(stepSizeTiles, stepSizeEvade) // Make sure we go far enough to evade
         } else if (goalTowardsTarget) {
-          stepSizeTiles = Math.min(stepSizeTiles, stepSizeEngage) // Don't try to move past the enemy
+          stepSizeTiles = Math.min(stepSizeTiles, Math.max(1, stepSizeEngage)) // Don't try to move past the enemy
         }
         maxTilesToGoal    = centroid.tile.groundTiles(goal) - 1
         minTilesToGoal    = maxTilesToGoal - stepSizeTiles
@@ -112,7 +116,7 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
     lazy val ourFloodSlots = floodSlots(classCount)
     var output = ourArcSlots
     if (output.size < groundUnits.size) {
-      output = if (ourArcSlots.size > ourFloodSlots.size) ourArcSlots else ourFloodSlots
+      output = if (ourArcSlots.size >= ourFloodSlots.size) ourArcSlots else ourFloodSlots
     }
 
     val groundPlacementCentroid = Maff.exemplarOption(output.values.view.flatten).getOrElse(apex)
@@ -138,7 +142,8 @@ class FormationStandard(val group: FriendlyUnitGroup, val style: FormationStyle,
       if (tile.walkable
           && (minTilesToGoal  <= 0            || minTilesToGoal <= distanceTileToGoal)
           && (maxTilesToGoal  >= LightYear()  || maxTilesToGoal >= distanceTileToGoal)
-          && (maxThreat >= tile.enemyRangeGroundUnchecked)
+          && (maxThreat       >= tile.enemyRangeGroundUnchecked)
+          && (minAltitude     <= tile.altitudeUnchecked)
           && (tile.units.forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
         val unplacedClass = classSlots.find(_.slots > 0).get
 

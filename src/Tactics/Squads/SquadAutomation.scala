@@ -80,11 +80,7 @@ object SquadAutomation {
     // If advancing, give a formation for forward movement
     if (squad.fightConsensus) {
       val engageTarget = squad.targets.flatMap(_.headOption.map(_.pixel))
-      if (engageTarget.isDefined && (squad.engagingOn || squad.engagedUpon)) {
-        output += FormationGeneric.engage(squad, engageTarget.get)
-      } else {
-        output += FormationGeneric.march(squad, to)
-      }
+      output += FormationGeneric.march(squad, to)
     }
     // Always include a disengagey formation for units that want to retreat/kite
     if (squad.centroidKey.zone == squad.homeConsensus.zone && With.scouting.threatOrigin.zone != squad.homeConsensus.zone) {

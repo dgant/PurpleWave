@@ -13,7 +13,9 @@ trait Formation {
       val unit = p._1
       val slot = p._2
       val c = unit.unitClass
-      DrawMap.line(p._1.pixel, slot, style.color)
+      if (p._1.pixelDistanceCenter(slot) < 320) {
+        DrawMap.line(p._1.pixel, slot, style.color)
+      }
       DrawMap.box(
         slot
           .subtract(c.dimensionLeft, c.dimensionUp)

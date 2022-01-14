@@ -32,6 +32,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
       With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())
       With.yolo.forceBlackboard()
+      With.strategy.update()
       With.strategy.gameplan.update()
       With.yolo.forceBlackboard() // YOLO trumps gameplan
     }),

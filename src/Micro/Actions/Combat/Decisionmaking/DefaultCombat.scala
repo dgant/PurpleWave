@@ -93,7 +93,7 @@ object DefaultCombat extends Action {
     lazy val rangeAgainstUs     = if (target.canAttack(unit)) Some(target.pixelRangeAgainst(unit)) else None
     lazy val rangeEqual         = rangeAgainstUs.contains(range)
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
-    lazy val confidentToChase   = unit.confidence() > .25
+    lazy val confidentToChase   = unit.confidence11() > .25
     lazy val scourgeApproaching = unit.matchups.threats.exists(t => Zerg.Scourge(t) && t.pixelDistanceEdge(unit) < 32 * 5)
     lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
     lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)

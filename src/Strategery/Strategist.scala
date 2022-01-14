@@ -23,7 +23,7 @@ class Strategist {
   private val _deselected     = new mutable.HashSet[Strategy]
   private val _active         = new mutable.HashSet[Strategy]
 
-  def selected: mutable.Set[Strategy] = {
+  def update(): Unit = {
     val enemyRaceNow = With.enemy.raceCurrent
     if (_selected.isEmpty) {
       _selected ++= selectedInitially
@@ -32,8 +32,9 @@ class Strategist {
       toRemove.foreach(swapOut)
     }
     _lastEnemyRace = enemyRaceNow
-    _selected
   }
+
+  def selected: mutable.Set[Strategy] = _selected
   def deselected: Iterator[Strategy] = _deselected.iterator
   def isActive(strategy: Strategy): Boolean = selected.contains(strategy) && _active.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
@@ -52,16 +53,14 @@ class Strategist {
     _active -= strategy
   }
   def swapIn(strategy: Strategy): Unit = {
-    // Use public "selected" to force initialization
-    if ( ! selected.contains(strategy)) {
+    if ( ! _selected.contains(strategy)) {
       With.logger.debug(f"Swapping in strategy $strategy")
       _selected += strategy
       _deselected -= strategy
     }
   }
   def swapOut(strategy: Strategy): Unit = {
-    // Use public "selected" to force initialization
-    if (selected.contains(strategy)) {
+    if (_selected.contains(strategy)) {
       With.logger.debug(f"Swapping out strategy $strategy")
       _selected -= strategy
       _deselected += strategy
@@ -73,8 +72,7 @@ class Strategist {
   private var _lastSelectedWithGameplan: Option[Strategy] = None
   private var _lastCustomGameplan: Option[Plan] = None
   def gameplan: Plan = {
-    // Use public "selected" to force initialization
-    val selectedWithGameplan = selected.find(_.gameplan.isDefined)
+    val selectedWithGameplan = _selected.find(_.gameplan.isDefined)
     if (selectedWithGameplan.isDefined) {
       selectedWithGameplan.get.activate()
       if ( ! _lastSelectedWithGameplan.contains(selectedWithGameplan.get)) {

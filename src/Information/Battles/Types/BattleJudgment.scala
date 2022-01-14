@@ -5,16 +5,16 @@ import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleJudgment(battle: BattleLocal) {
-  val scoreTotal        : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthTotal,   battle.enemy.skimStrengthTotal)     else calculateSimulationScore
-  val scoreAir          : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthAir,     battle.enemy.skimStrengthVsAir)     else scoreTotal
-  val scoreGround       : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthGround,  battle.enemy.skimStrengthVsGround)  else scoreTotal
-  val scoreTarget       : Double  = calculateTarget
-  val shouldFight       : Boolean = scoreTotal >= scoreTarget
-  val shouldFightAir    : Boolean = scoreAir    >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreGround)
-  val shouldFightGround : Boolean = scoreGround >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreAir)
-  val confidenceTotal   : Double  = calculateConfidence(scoreTotal, scoreTarget)
-  val confidenceAir     : Double  = Math.max(confidenceTotal, calculateConfidence(scoreAir, scoreTarget))
-  val confidenceGround  : Double  = Math.max(confidenceTotal, calculateConfidence(scoreGround, scoreTarget))
+  val scoreTotal          : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthTotal,   battle.enemy.skimStrengthTotal)     else calculateSimulationScore
+  val scoreAir            : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthAir,     battle.enemy.skimStrengthVsAir)     else scoreTotal
+  val scoreGround         : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthGround,  battle.enemy.skimStrengthVsGround)  else scoreTotal
+  val scoreTarget         : Double  = calculateTarget
+  val shouldFight         : Boolean = scoreTotal >= scoreTarget
+  val shouldFightAir      : Boolean = scoreAir    >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreGround)
+  val shouldFightGround   : Boolean = scoreGround >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreAir)
+  val confidence11Total   : Double  = calculateConfidence11(scoreTotal, scoreTarget)
+  val confidence11Air     : Double  = Math.max(confidence11Total, calculateConfidence11(scoreAir, scoreTarget))
+  val confidence11Ground  : Double  = Math.max(confidence11Total, calculateConfidence11(scoreGround, scoreTarget))
 
   def calculateSkimulationScore(us: Double, enemy: Double): Double = {
     Maff.nanToOne((us - enemy) / (us + enemy))
@@ -31,7 +31,7 @@ class BattleJudgment(battle: BattleLocal) {
     Maff.clamp(battle.judgmentModifiers.view.map(_.targetDelta).sum, -1, 1)
   }
 
-  def calculateConfidence(score: Double, target: Double): Double = {
+  def calculateConfidence11(score: Double, target: Double): Double = {
     Maff.nanToN((score - target) / Math.abs(Math.signum(score - target) - target), if (score >= target) 1 else -1)
   }
 

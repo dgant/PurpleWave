@@ -67,7 +67,7 @@ object ShowBattles extends View {
         Vector("RLVLN",       format(metrics.ratioLocalValueLostNet)),
         Vector("RLHLN",       format(metrics.ratioLocalHealthLostNet),        f"${metrics.framesIn / 24} second duration"),
         Vector("RLHVLN",      format(metrics.ratioLocalHealthValueLostNet),   f"${battle.simulationCheckpoints.size} metrics checkpoints"),
-        Vector("Confidence",  format(battle.judgement.get.confidenceTotal))))
+        Vector("Confidence",  format(battle.judgement.get.confidence11Total))))
     })
 
     val graphWidth = 82

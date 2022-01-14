@@ -5,6 +5,7 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
 import Planning.UnitMatchers.MatchGroundWarriors
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 
 trait UnitGroup {
@@ -33,6 +34,7 @@ trait UnitGroup {
   def meanAttackerSpeed               = _meanAttackerSpeed()
   def meanTotalHealth                 = _meanTotalHealth()
   def meanDpf                         = _meanDpf()
+  def storms                          = _storms()
   def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
   def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
 
@@ -58,5 +60,6 @@ trait UnitGroup {
   private val _meanAttackerSpeed        = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanTotalHealth          = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(_.hitPoints.toDouble)))
   private val _meanDpf                  = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(u => Math.max(u.dpfGround, u.dpfAir))))
+  private val _storms                   = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
   private def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)
 }

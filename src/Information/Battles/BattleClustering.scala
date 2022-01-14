@@ -2,6 +2,7 @@ package Information.Battles
 
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
@@ -9,31 +10,39 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class BattleClustering {
-  private val clusterDistanceTiles = 16
-  private val clusterDistancePixels = 32 * clusterDistanceTiles
-  private val clusterDistanceSquared: Int = clusterDistancePixels * clusterDistancePixels
-
-  private val _clusters = new ArrayBuffer[ArrayBuffer[UnitInfo]]()
   var lastCompletion = 0
   val runtimes = new mutable.Queue[Int]
 
-  def clusters: Seq[Seq[UnitInfo]] = _clusters
+  private class Cluster(val units: ArrayBuffer[UnitInfo] = new ArrayBuffer[UnitInfo]()) {
+    var hull: Seq[UnitInfo] = Maff.convexHull(units, (u: UnitInfo) => u.pixel)
+    def merge(other: Cluster): Unit = {
+      hull = Maff.convexHull(hull ++ other.hull, (u: UnitInfo) => u.pixel)
+      units ++= other.units
+    }
+    def intersects(other: Cluster): Boolean = {
+      hull.exists(u => Maff.convexPolygonContains(other.hull.view.map(_.pixel), u.pixel))
+    }
+  }
 
   def recalculate() {
-    _clusters.clear()
-    val unclustered = new UnorderedBuffer[UnitInfo]()
-    unclustered.addAll(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal))
-    unclustered.foreach(_.nextInCluster = None)
+    // Cluster units, as fixed-radius nearest neighbors.
+    // This solution is not optimal but is faster to implement than a KD tree
+
+    // Step 1: Do a super-fast approximate clustering
+    // This clustering doesn't guarantee full merging of clusters but in practice comes very close
+    val fastClusters = new UnorderedBuffer[UnitInfo]()
+    fastClusters.addAll(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal))
+    fastClusters.foreach(_.nextInCluster = None)
     var i = 0
-    while(i < unclustered.length) {
-      val u1 = unclustered(i)
+    while(i < fastClusters.length) {
+      val u1 = fastClusters(i)
       var j = i + 1
-      while (j < unclustered.length) {
-        val u2 = unclustered(j)
-        if (u1.pixelDistanceSquared(u2) < clusterDistanceSquared) {
+      while (j < fastClusters.length) {
+        val u2 = fastClusters(j)
+        if (u1.pixelDistanceSquared(u2) < Clustering.clusterDistanceSquared) {
           u2.nextInCluster = u1.nextInCluster
           u1.nextInCluster = Some(u2)
-          unclustered.removeAt(j)
+          fastClusters.removeAt(j)
         } else {
           j += 1
         }
@@ -41,23 +50,38 @@ class BattleClustering {
       i += 1
     }
 
-    unclustered.foreach(u => {
-      val cluster = new ArrayBuffer[UnitInfo]()
-      _clusters += cluster
+    // Step 2: Merge our raw clusters in slower but guaranteed fashion
+    val clusters = new UnorderedBuffer(fastClusters.view.map(u => {
+      val output = new ArrayBuffer[UnitInfo]
       var next: Option[UnitInfo] = Some(u)
       while (next.isDefined) {
-        cluster ++= next
+        output ++= next
         next = next.get.nextInCluster
       }
-    })
+      new Cluster(output)
+    }))
+    var m = 0
+    while(m < clusters.length) {
+      var n = m + 1
+      while (n < clusters.length) {
+        if (clusters(m).intersects(clusters(n))) {
+          clusters(m).merge(clusters(n))
+          clusters.removeAt(n)
+
+        } else {
+          n += 1
+        }
+      }
+      m += 1
+    }
 
     // Publish clusters as battles
     With.battles.nextBattlesLocal = clusters
       .view
       .map(cluster =>
         new BattleLocal(
-          cluster.view.filter(_.isOurs).toVector,
-          cluster.view.filter(_.isEnemy).toVector))
+          cluster.units.view.filter(_.isOurs).toVector,
+          cluster.units.view.filter(_.isEnemy).toVector))
       .filter(_.teams.forall(_.units.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports)))
       .toVector
 

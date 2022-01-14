@@ -345,37 +345,56 @@ object Maff {
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  @inline def convexHull(points: Seq[Pixel]): Seq[Pixel] = {
+  def convexHull[T](points: Seq[T], extract: T => Pixel): Seq[T] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
-    if (points.isEmpty) return Seq.empty
-    if (points.size == 2) return Seq(points.head, points.last)
+    if (points.size <= 2) return points
 
     // Find an extremum, guaranteed to be on the hull
-    val yMax = points.view.map(_.y).max
-    val origin = points.view.filter(_.y == yMax).maxBy(_.x)
+    val yMax = points.view.map(extract(_).y).max
+    val origin = points.view.filter(extract(_).y == yMax).maxBy(extract(_).x)
 
     // Get points sorted by polar angle with the origin, discarding closer points
-    var sortedPoints = new ArrayBuffer[(Pixel, Double)]
-    sortedPoints ++= points.view.map(p => (p, origin.radiansTo(p)))
+    var sortedPoints = new ArrayBuffer[(T, Double)]
+    sortedPoints ++= points.view.map(p => (p, extract(origin).radiansTo(extract(p))))
     sortedPoints = sortedPoints.sortBy(_._2).sortBy(_._1 != origin)
     var i: Int = 1
     while(i < sortedPoints.length) {
       val a = sortedPoints(i - 1)
       val b = sortedPoints(i)
       if (a._2 == b._2) {
-        sortedPoints.remove(if (origin.pixelDistanceSquared(a._1) < origin.pixelDistanceSquared(b._1)) i - 1 else i)
+        sortedPoints.remove(if (extract(origin).pixelDistanceSquared(extract(a._1)) < extract(origin).pixelDistanceSquared(extract(b._1))) i - 1 else i)
       } else {
         i += 1
       }
     }
-
-    val stack = new mutable.Stack[Pixel]
+    val stack = new mutable.Stack[T]
     sortedPoints.foreach(point => {
-      while (stack.size > 1 && clockDirection(point._1, stack.head, stack(1)) < 0)
+      while (stack.size > 1 && clockDirection(extract(point._1), extract(stack.head), extract(stack(1))) < 0)
         stack.pop()
       stack.push(point._1)
     })
     stack
+  }
+
+  def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
+
+  @inline def convexPolygonContains[T](points: Seq[AbstractPoint], point: AbstractPoint): Boolean = {
+    // A point is inside a convex polygon if it is on the same side of each segment
+    if (points.length < 2) return false
+    var consensusSide: Option[Boolean] = None
+    var i = 0
+    while(i < points.length) {
+      val p1 = points(i)
+      val p2 = points((i + 1) % points.length)
+      val side = (point.y - p1.y) * (p2.x - p1.x) - (point.x - p1.x) * (p2.y - p1.y)
+      if (side != 0) {
+        val binarySide = side > 0
+        consensusSide = consensusSide.orElse(Some(binarySide))
+        if ( ! consensusSide.contains(binarySide)) return false
+      }
+      i += 1
+    }
+    true
   }
 
   @inline final def projectedPointOnLine(p: Pixel, v1: Pixel, v2: Pixel): Pixel = {

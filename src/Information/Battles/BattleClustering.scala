@@ -87,8 +87,8 @@ class BattleClustering {
       .view
       .map(cluster =>
         new BattleLocal(
-          cluster.units.view.filter(_.isOurs).toVector,
-          cluster.units.view.filter(_.isEnemy).toVector))
+          cluster.units.view.filter(_.isOurs),
+          cluster.units.view.filter(_.isEnemy)))
       .filter(_.teams.forall(_.units.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports)))
       .toVector
 

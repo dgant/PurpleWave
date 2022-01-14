@@ -20,10 +20,13 @@ class SquadAttack extends Squad {
 
   protected def getVicinity: Pixel = {
     lazy val enemyNonTrollyThreats = With.units.enemy.count(u => MatchWarriors(u) && u.likelyStillThere && ! Terran.Vulture(u) && u.detected)
+    lazy val airValue = units.view.filter(_.flying).map(_.subjectiveValue).sum
+    lazy val totalValue = units.view.map(_.subjectiveValue).sum
     lazy val baseScores = With.geography.enemyBases.map(b => {
       val distanceThreat = With.scouting.threatOrigin.walkableTile.groundPixels(b.heart.center)
       val distanceArmy = keyDistanceTo(b.heart.center)
-      (b, 2 * distanceThreat - distanceArmy)
+      val accessibility = if (b.zone.island) Math.pow(Maff.nanToZero(airValue / totalValue), 2) else 1.0
+      (b, accessibility * (2 * distanceThreat - distanceArmy))
     }).toMap
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3

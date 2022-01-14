@@ -3,7 +3,7 @@ package Micro.Matchups
 import Information.Battles.BattleClassificationFilters
 import Lifecycle.With
 import Mathematics.Maff
-import Performance.Cache
+import Performance.{Cache, KeyedCache}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactics.Squads.{GenericUnitGroup, UnitGroup}
@@ -16,9 +16,11 @@ case class MatchupAnalysis(me: UnitInfo) {
   def groupUs: UnitGroup = _groupUs()
   def groupEnemy: UnitGroup = _groupEnemy()
   private val _groupUs = new Cache(() => me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me))))
-  private val _groupEnemy = new Cache(() => me.team.map(_.opponent)
-    .orElse(me.friendly.flatMap(_.targetsAssigned).map(GenericUnitGroup))
-    .getOrElse(GenericUnitGroup(defaultUnits)))
+  private val _groupEnemy = new KeyedCache(
+    () => me.team.map(_.opponent)
+      .orElse(me.friendly.flatMap(_.targetsAssigned).map(GenericUnitGroup))
+      .getOrElse(GenericUnitGroup(defaultUnits)),
+    () => me.friendly.flatMap(_.targetsAssigned)) // Modifying targetsAssigned invalidates any unit group constructed from it
 
   private def battleAll     : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
   private def battleUs      : Option[Seq[UnitInfo]] = me.team.map(_.units.view)

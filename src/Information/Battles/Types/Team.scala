@@ -8,7 +8,7 @@ import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactics.Squads.UnitGroup
 
-class Team(val battle: Battle, val units: Vector[UnitInfo]) extends UnitGroup with SkimulationTeam {
+class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with SkimulationTeam {
 
   final def groupUnits: Seq[UnitInfo] = units
 

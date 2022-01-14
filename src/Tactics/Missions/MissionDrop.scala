@@ -91,11 +91,11 @@ abstract class MissionDrop extends Mission {
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) Maff.nanToOne(
         With.framesSince(b.lastScoutedFrame).toDouble
-        * b.heart.groundTiles(With.scouting.enemyMuscleOrigin)
-        / b.heart.groundTiles(With.scouting.mostBaselikeEnemyTile))
+        * Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin),      10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))
+        / Math.min(b.heart.groundTiles(With.scouting.mostBaselikeEnemyTile),  10 * b.heart.tileDistanceFast(With.scouting.mostBaselikeEnemyTile)))
       else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProgress + 1)
       else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProgress - 0.5)
-      else b.heart.groundTiles(With.scouting.enemyMuscleOrigin)).get
+      else Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin), 10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))).get
     val itineraries = Vector(
         With.geography.itineraryCounterwise(With.geography.ourMain, targetBase),
         With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
@@ -139,6 +139,7 @@ abstract class MissionDrop extends Mission {
       }
     }
     if (state == Assembling && allAboard)                                                                 { transition(Travelling)  }
+    if (state == Travelling && ! allAboard)                                                               { transition(Assembling)  } // Can happen if passenger is in process of dropping out
     if (state == Travelling && transports.exists(_.base.exists(vicinity.base.contains)))                  { transition(Landing)     }
     if (state == Landing    && allLanded)                                                                 { transition(Raiding)     }
     if (Seq(Travelling, Landing, Raiding).contains(state) && ! vicinity.base.exists(itinerary.contains))  { transition(Evacuating)  }
@@ -254,7 +255,7 @@ abstract class MissionDrop extends Mission {
             path.get.tiles.get(i).enemyRange != pathValues(i).enemyRange
         ||  path.get.tiles.get(i).visibleToEnemy != pathValues(i).enemyVision)
       var shouldCreatePath = false
-      if (path.isEmpty) {
+      if (path.forall( ! _.pathExists)) {
         With.logger.debug(f"${this}: Calculating a path because none exists.")
         shouldCreatePath = true
       } else if (pathItineraryBase != itinerary.headOption.orNull) {

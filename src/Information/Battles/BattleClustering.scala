@@ -3,6 +3,7 @@ package Information.Battles
 import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
@@ -15,12 +16,18 @@ class BattleClustering {
 
   private class Cluster(val units: ArrayBuffer[UnitInfo] = new ArrayBuffer[UnitInfo]()) {
     var hull: Seq[UnitInfo] = Maff.convexHull(units, (u: UnitInfo) => u.pixel)
+    var hullCentroid: Option[Pixel] = None
+    def hullExpanded: Seq[Pixel] = {
+      hullCentroid = hullCentroid.orElse(Some(Maff.centroid(hull.view.map(_.pixel))))
+      hull.view.map(_.pixel).map(p => hullCentroid.get.project(p, hullCentroid.get.pixelDistance(p) + Clustering.clusterDistancePixels))
+    }
     def merge(other: Cluster): Unit = {
       hull = Maff.convexHull(hull ++ other.hull, (u: UnitInfo) => u.pixel)
+      hullCentroid = None
       units ++= other.units
     }
     def intersects(other: Cluster): Boolean = {
-      hull.exists(u => Maff.convexPolygonContains(other.hull.view.map(_.pixel), u.pixel))
+      hull.exists(u => Maff.convexPolygonContains(other.hullExpanded, u.pixel))
     }
   }
 

@@ -20,7 +20,8 @@ object Surveyor {
       TileSourceGas,
       TileSourceOurBases,
       TileSourceOurNonBaseZones,
-      TileSourceOurPylons),
+      TileSourceOurPylons,
+      TileSourceCreep),
     Seq(
       TileSourceAnywhere))
   

@@ -54,11 +54,12 @@ class ZvE4Pool extends GameplanTemplate {
   
     new Pump(Zerg.Drone, 3),
     
-    new BuildOrder(
-      Get(Zerg.SpawningPool),
-      Get(5, Zerg.Drone)),
+    new BuildOrder(Get(Zerg.SpawningPool)),
+    new If(
+      new UnitsAtLeast(1, Zerg.SpawningPool),
+      new BuildOrder(Get(5, Zerg.Drone))),
+
     new Build(Get(Zerg.Overlord)),
-    
     new ExtractorTrick,
     new Pump(Zerg.Zergling),
     new If(

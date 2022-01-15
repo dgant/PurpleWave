@@ -63,6 +63,7 @@ class SquadInitialOverlordScout extends Squad {
     if (bases().isEmpty) return
 
     vicinity = bases().head.townHallArea.center
+    lock.matcher = Zerg.Overlord
     lock.preference = PreferClose(vicinity)
     lock.acquire()
   }

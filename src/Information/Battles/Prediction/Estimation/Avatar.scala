@@ -37,8 +37,6 @@ class Avatar {
     this()
   
     val splashFactor = unit.unitClass.splashFactor
-
-    val contributes   = unit.unitClass.dealsDamage
     val range         = unit.pixelRangeMax + 32.0 * (if (attacking || ! unit.canMove) 1.0 else 3.0)
     val pixelsAway    = With.configuration.avatarBattleDistancePixels
     val framesAway    = if (pixelsAway <= range) 0.0 else Maff.nanToInfinity(Math.max(0.0, pixelsAway - range) / unit.topSpeed * 0.5)

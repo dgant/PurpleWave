@@ -42,7 +42,7 @@ object Build extends Action {
           && blocker.visible)
     }
     
-    val ignoreBlockers        = distance > 32.0 * 8.0 || With.yolo.active()
+    val ignoreBlockers        = distance > 32.0 * 8.0 || With.yolo.active
     lazy val blockersIn       = if (ignoreBlockers) Seq.empty else buildArea.tiles.flatMap(blockersForTile).toSeq
     lazy val blockersNear     = if (ignoreBlockers) Seq.empty else buildArea.expand(2, 2).tiles.flatMap(blockersForTile).toSeq
     lazy val blockersOurs     = blockersNear.filter(_.isOurs)

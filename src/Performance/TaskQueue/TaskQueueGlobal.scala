@@ -31,10 +31,10 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
       With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())
-      With.yolo.forceBlackboard()
+      With.yolo.updateBlackboard()
       With.strategy.update()
       With.strategy.gameplan.update()
-      With.yolo.forceBlackboard() // YOLO trumps gameplan
+      With.yolo.updateBlackboard() // YOLO trumps gameplan
     }),
     With.tactics,
     // We are running Tactics.Squads inside Tactics for the moment,

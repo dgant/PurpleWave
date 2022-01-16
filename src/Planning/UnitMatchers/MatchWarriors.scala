@@ -7,9 +7,9 @@ object MatchWarriors extends UnitMatcher {
 
   override def apply(unit: UnitInfo): Boolean = (
     unit.aliveAndComplete
-    && unit.unitClass.dealsDamage
     && unit.unitClass.orderable
-    && (unit.unitClass.canMove || Terran.SiegeTankSieged(unit))
+    && unit.unitClass.attacksOrCasts
     && ! unit.unitClass.isWorker
+    && (unit.unitClass.canMove || Terran.SiegeTankSieged(unit))
   )
 }

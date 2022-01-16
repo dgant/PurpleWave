@@ -4,7 +4,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
-import Planning.UnitMatchers.MatchWorker
+import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Minutes
@@ -27,7 +27,7 @@ object FightOrFlee extends Action {
     }
 
     decide(true,  "Static",     () => ! unit.canMove)
-    decide(true,  "YOLO",       () => With.yolo.active() && unit.canAttack)
+    decide(true,  "YOLO",       () => With.yolo.active && MatchWarriors(unit))
     decide(true,  "Committed",  () => unit.agent.commit)
     decide(true,  "Irradiated", () => unit.irradiated && unit.unitClass.canBeIrradiateBurned)
     decide(true,  "CantFlee",   () => ! unit.intent.canFlee)

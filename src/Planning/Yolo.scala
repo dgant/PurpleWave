@@ -1,7 +1,6 @@
 package Planning
 
 import Lifecycle.With
-import Performance.Cache
 import Performance.Tasks.TimedTask
 import Planning.Plans.GamePlans.MacroActions
 import Planning.UnitMatchers.MatchWorker
@@ -9,43 +8,49 @@ import ProxyBwapi.Races.Protoss
 import Utilities.Time.Minutes
 
 class Yolo extends TimedTask with MacroActions {
+  var lastUpdate: Int = 0
+  var maxoutFramesCharged: Int = 0
+  var desperationTriggered: Boolean = false
+  var maxoutTriggered: Boolean = false
 
-  private def activeByDefault: Boolean = With.blackboard.yoloing() && (
-    ! With.units.existsOurs(MatchWorker)
-    || With.geography.ourBases.forall(_.mineralsLeft == 0)
-    || With.blackboard.allIn())
-
-  private var lastUpdate: Int = 0
-  private var maxoutFramesCharged: Int = 0
-  private var maxoutYolo: Boolean = false
-  private val maxoutYoloFrameThreshold = Minutes(2)()
-
-  private def maxouted = With.self.supplyUsed / 2 >= 192 && With.units.ours.forall(u => ! u.is(Protoss.Carrier) || u.interceptorCount > 7)
-
-  val active = new Cache(() => activeByDefault || maxoutYolo)
+  def maxed: Boolean = With.units.ours.filter(_.complete).filterNot(u => Protoss.Carrier(u) && u.interceptorCount < 7).map(_.unitClass.supplyRequired).sum / 2 >= 192
+  def active: Boolean = desperationTriggered || maxoutTriggered || With.blackboard.allIn()
 
   override protected def onRun(budgetMs: Long): Unit = {
-    var frames = With.framesSince(lastUpdate)
+    // Trigger desparation
+    val weCanNeverMineAgain = ! With.units.existsOurs(MatchWorker) || With.geography.ourBases.forall(_.mineralsLeft == 0)
+    val enemyIsMining = With.units.existsEnemy(MatchWorker) && With.geography.enemyBases.exists(_.mineralsLeft >= 400)
+    desperationTriggered = weCanNeverMineAgain && enemyIsMining
+
+    // Trigger mineout
+    val frameDelta: Int = With.framesSince(lastUpdate)
     lastUpdate = With.frame
-    if (maxouted && With.frame > Minutes(20)()) {
-      maxoutFramesCharged += frames
+    if (maxed && With.frame > Minutes(15)()) {
+      maxoutFramesCharged += frameDelta
     } else {
-      maxoutFramesCharged -= 2 * frames
+      maxoutFramesCharged -= 2 * frameDelta
     }
+
+    val maxoutFrameTarget = Minutes(2)() * With.enemies.size * (if (With.self.isTerran) 5 else if (With.enemies.exists(_.isTerran)) 1 else 3)
     if (maxoutFramesCharged <= 0) {
       maxoutFramesCharged = 0
-      maxoutYolo = false
-    } else if (maxoutFramesCharged > maxoutYoloFrameThreshold){
-      maxoutYolo = true
+      maxoutTriggered = false
+    } else if (maxoutFramesCharged > maxoutFrameTarget){
+      maxoutTriggered = true
     }
   }
 
-  def forceBlackboard(): Unit = {
-    if (active()) {
+  def updateBlackboard(): Unit = {
+    if (active) {
       With.blackboard.wantToAttack.set(true)
       With.blackboard.wantToHarass.set(true)
       With.blackboard.safeToMoveOut.set(true)
-      status("YOLO")
+    }
+    if (maxoutTriggered) {
+      status("YOLO: Maxout")
+    }
+    if (desperationTriggered) {
+      status("YOLO: Desperation")
     }
   }
 }

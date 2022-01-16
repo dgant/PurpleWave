@@ -5,12 +5,11 @@ import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
-import Utilities.Time.Minutes
 
 object GlobalSafeToMoveOut {
   def apply(): Boolean = {
     val output =
-      if (With.yolo.active()) true
+      if (With.yolo.active) true
       else if (With.self.isProtoss  && With.enemies.forall(_.isTerran))   pvtSafeToAttack
       else if (With.self.isProtoss  && With.enemies.forall(_.isProtoss))  pvpSafeToAttack
       else if (With.self.isProtoss  && With.enemies.forall(_.isZerg))     pvzSafeToAttack

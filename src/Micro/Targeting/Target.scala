@@ -54,7 +54,7 @@ object Target extends {
 
   def legal(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], filters: TargetFilter*): Seq[UnitInfo] = {
     val allFilters = filtersRequired(attacker) ++ filters
-    targets.view.filter(target => With.yolo.active() || allFilters.forall(_.legal(attacker, target)))
+    targets.view.filter(target => With.yolo.active || allFilters.forall(_.legal(attacker, target)))
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {

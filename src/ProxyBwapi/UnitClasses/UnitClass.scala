@@ -137,8 +137,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   def canAttack(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
   def canAttack(enemy: UnitInfo): Boolean = if (enemy.flying) attacksAir else attacksGround
 
-  lazy val dealsDamage: Boolean = rawCanAttack || isSpellcaster || this == Terran.Bunker || this == Protoss.Carrier || this == Protoss.Reaver || this == Zerg.Lurker
-
   lazy val pixelRangeGround: Double =
     if (this == Terran.Bunker) Terran.Marine.pixelRangeGround + 32.0
     else if (this == Protoss.Carrier) 32.0 * 8.0
@@ -148,7 +146,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     if (this == Terran.Bunker) Terran.Marine.pixelRangeGround + 32.0
     else if (this == Protoss.Carrier) 32.0 * 8.0
     else airRangeRaw
-
   lazy val pixelRangeMax: Double = Math.max(pixelRangeGround, pixelRangeAir)
 
   lazy val effectiveRangePixels: Double =
@@ -425,10 +422,10 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.DarkTemplar) 1
     else if (this == Protoss.Archon) 3.5
     else if (this == Protoss.Corsair) 1.5
-    else if (this == Protoss.Scout) 1
+    else if (this == Protoss.Scout) 0.75
     else if (this == Protoss.Carrier) 5
-    else if (this == Protoss.Arbiter) 1
-    else if (this == Protoss.Reaver) 4
+    else if (this == Protoss.Arbiter) 0.25
+    else if (this == Protoss.Reaver) 1.75
     else if (this == Protoss.PhotonCannon) 1
     else if (this == Zerg.Zergling) 0.25
     else if (this == Zerg.Hydralisk) 0.85
@@ -544,7 +541,8 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Queen) Array(Zerg.Ensnare, Zerg.InfestCommandCenter, Zerg.Parasite, Zerg.SpawnBroodlings)
     else Array()
   lazy val castsSpells: Boolean = spells.nonEmpty
-  lazy val attacksOrCastsOrDetectsOrTransports: Boolean = canAttack || castsSpells || isDetector || isTransport || this == Zerg.LurkerEgg
+  lazy val attacksOrCasts: Boolean = canAttack || castsSpells || this == Zerg.LurkerEgg
+  lazy val attacksOrCastsOrDetectsOrTransports: Boolean = attacksOrCasts || isDetector || isTransport
 
   //////////////////////////////
   // Performance optimization //

@@ -15,7 +15,7 @@ object ShowBattles extends View {
   
   override def renderScreen() {
     localBattle.foreach(renderBattleScreen)
-    if (With.yolo.active() && With.frame / 24 % 2 == 0) {
+    if (With.yolo.active && With.frame / 24 % 2 == 0) {
       DrawScreen.column(610, 230, "YOLO")
     }
   }

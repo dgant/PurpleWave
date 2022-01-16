@@ -8,4 +8,5 @@ abstract class Battle(unitsUs: Seq[UnitInfo], unitsEnemy: Seq[UnitInfo]) {
   val enemy = new Team(this, unitsEnemy)
   val teams: Vector[Team] = Vector(us, enemy)
   val frameCreated: Int = With.frame
+  def speedMultiplier: Double = 1.0
 }

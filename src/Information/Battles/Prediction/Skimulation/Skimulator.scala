@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Skimulation
 
-import Information.Battles.Types.{BattleLocal, Team}
+import Information.Battles.Types.{Battle, BattleLocal, Team}
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers._
@@ -11,7 +11,7 @@ object Skimulator {
 
   def durabilityFrames(team: Team): Double = team.meanTotalHealth / team.opponent.meanDpf
 
-  def predict(battle: BattleLocal): Unit = {
+  def predict(battle: Battle): Unit = {
 
     // Calculate unit distance
     battle.teams.foreach(team => team.units.foreach(unit => {
@@ -135,7 +135,5 @@ object Skimulator {
       team.skimStrengthVsAir    += unit.skimStrength * Maff.fromBoolean(unit.canAttackAir || ! unit.canAttack)
       team.skimStrengthVsGround += unit.skimStrength * Maff.fromBoolean(unit.canAttackGround || ! unit.canAttack || (Protoss.Corsair(unit) && unit.energy >= 125 && Protoss.DisruptionWeb(unit.player)))
     }))
-
-    battle.predictionComplete = true
   }
 }

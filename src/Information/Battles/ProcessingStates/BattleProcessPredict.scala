@@ -16,6 +16,7 @@ class BattleProcessPredict extends BattleProcessState {
       unpredicted.get.skimulated = With.configuration.skimulate
       if (unpredicted.get.skimulated) {
         Skimulator.predict(unpredicted.get)
+        unpredicted.get.predictionComplete = true
       } else {
         if (With.simulation.prediction != unpredicted.get) {
           With.simulation.reset(unpredicted.get)

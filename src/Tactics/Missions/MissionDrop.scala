@@ -35,6 +35,7 @@ abstract class MissionDrop extends Mission {
   object Escaping extends DropState
 
   protected def additionalFormationConditions: Boolean
+  protected def additionalItineraryConditions(base: Base): Boolean = true
   protected def requireWorkers: Boolean = false
   protected def shouldStopRaiding: Boolean = false
   protected def shouldGoHome: Boolean = false
@@ -70,22 +71,27 @@ abstract class MissionDrop extends Mission {
     state = newState
   }
 
-  final private def skipBase(base: Base): Boolean = {
-    if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
-    if (base.owner.isUs) return true
+  private def ignore(base: Base): Boolean = {
+    if (base.owner.isFriendly) return true
     if (base.heart.tileDistanceFast(SpecificPoints.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
-    if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
-    if (shouldStopRaiding && units.exists(_.base.contains(base))) return true
+    if ( ! additionalItineraryConditions(base)) return true
     With.framesSince(base.lastScoutedFrame) < Seconds(90)() && ! base.owner.isEnemy
+  }
+
+  final private def skipBase(base: Base): Boolean = {
+    if (ignore(base)) return true
+    if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
+    if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
+    if (shouldStopRaiding && units.exists(_.base.contains(base))) return true
+    false
   }
 
   protected def populateItinerary(): Unit = {
     val eligibleBases = With.geography.bases.view
       .filter(_.mineralsLeft > 1500)
-      .filterNot(_.owner.isFriendly)
-      .filter(b => b.owner.isEnemy || With.framesSince(b.lastScoutedFrame) > Seconds(90)())
+      .filterNot(ignore)
     val bases = Maff.orElse(eligibleBases.filter(_.owner.isEnemy), eligibleBases).toVector
     if (bases.isEmpty) return
     val targetBase = Maff.sampleWeighted[Base](bases, b =>

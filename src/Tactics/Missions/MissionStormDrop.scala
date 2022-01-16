@@ -11,9 +11,7 @@ import Tactics.Squads.SquadAutomation
 
 class MissionStormDrop extends MissionDrop {
 
-  override protected def additionalFormationConditions: Boolean = (
-    With.self.hasTech(Protoss.PsionicStorm)
-    && With.recruiter.available.exists(MatchStormDroppable))
+  override protected def additionalFormationConditions: Boolean = Protoss.PsionicStorm(With.self) && With.recruiter.available.exists(MatchStormDroppable)
   override protected def requireWorkers = true
   override protected def shouldStopRaiding: Boolean = shouldGoHome
   override protected def shouldGoHome: Boolean = passengers.forall(_.energy < 75)
@@ -31,11 +29,7 @@ class MissionStormDrop extends MissionDrop {
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.mostBaselikeEnemyTile).center
     transportLock.preference = PreferClose(vicinity)
     transportLock.acquire()
-    if (transportLock.units.isEmpty) {
-      terminate("No transports available")
-      return
-    }
-
+    if (transportLock.units.isEmpty) { terminate("No transports available"); return }
     val transportPixel = transportLock.units.head.pixel
     stormLock.preference = PreferClose(transportPixel)
     stormLock.acquire()

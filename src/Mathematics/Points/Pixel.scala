@@ -112,8 +112,14 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def walkable: Boolean = {
     tile.walkable
   }
+  @inline def walkableTerrain: Boolean = {
+    tile.walkableTerrain
+  }
   @inline def walkableUnchecked: Boolean = {
     tile.walkableUnchecked
+  }
+  @inline def walkableTerrainUnchecked: Boolean = {
+    tile.walkableTerrainUnchecked
   }
   @inline def altitude: Double = {
     tile.altitude

@@ -43,7 +43,7 @@ object Bust extends Action {
     && unit.matchups.targets.exists(bunker =>
       (bunker.visible || bunker.altitude <= unit.altitude)
       && bunker.aliveAndComplete
-      && bunker.is(Terran.Bunker)
+      && Terran.Bunker(bunker)
       && ! bunker.player.hasUpgrade(Terran.MarineRange)
       && unit.matchups.threats.forall(threat =>
         threat == bunker || (
@@ -69,7 +69,7 @@ object Bust extends Action {
       Retreat.delegate(unit)
     }
 
-    unit.agent.toAttack = Maff.minBy(unit.matchups.targets)(_.pixelDistanceEdge(unit))
+    unit.agent.toAttack = Maff.minBy(unit.matchups.targets.filter(_.unitClass.attacksGround))(_.pixelDistanceEdge(unit))
     if (unit.agent.toAttack.exists(t => t.unitClass == Terran.Bunker && ! unit.inRangeToAttack(t))) {
       val bunker = unit.agent.toAttack.get
       val range = unit.pixelRangeAgainst(bunker)

@@ -2,6 +2,7 @@ package Information.Grids.Miscellaneous
 
 import Information.Grids.ArrayTypes.AbstractGridArray
 import Mathematics.Points.{Pixel, PixelRectangle}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
@@ -9,11 +10,17 @@ class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitClass, P
   override protected val values: Array[UnorderedBuffer[(UnitClass, Pixel)]] = indices.map(x => new UnorderedBuffer[(UnitClass, Pixel)]()).toArray
   override val defaultValue: UnorderedBuffer[(UnitClass, Pixel)] = new UnorderedBuffer[(UnitClass, Pixel)]()
 
-  val placed = new UnorderedBuffer[(UnitClass, Pixel)]()
+  def placed: Seq[(UnitClass, Pixel)] = _placed.view.filterNot(_._1 == blockClass)
+  val _placed = new UnorderedBuffer[(UnitClass, Pixel)]()
 
   override def reset(): Unit = {
-    placed.foreach(p => get(p._2.tile).clear())
-    placed.clear()
+    _placed.foreach(p => get(p._2.tile).clear())
+    _placed.clear()
+  }
+
+  private val blockClass = Protoss.FenixDragoon
+  def block(pixel: Pixel): Boolean = {
+    tryPlace(blockClass, pixel)
   }
 
   def tryPlace(unitClass: UnitClass, pixel: Pixel): Boolean = {
@@ -32,7 +39,7 @@ class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitClass, P
             other._2.add(other._1.dimensionRight, other._1.dimensionDown)))
         .exists(rectangle.intersects))
     if (output) {
-      placed.add((unitClass, pixel))
+      _placed.add((unitClass, pixel))
       get(tile).add((unitClass, pixel))
     }
     output

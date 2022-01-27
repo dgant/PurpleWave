@@ -180,6 +180,12 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def walkableUnchecked: Boolean = {
     With.grids.walkable.getUnchecked(i)
   }
+  @inline def walkableTerrain: Boolean = {
+    valid && walkableTerrainUnchecked
+  }
+  @inline def walkableTerrainUnchecked: Boolean = {
+    With.grids.walkableTerrain.getUnchecked(i)
+  }
   @inline def traversableBy(unit: UnitInfo): Boolean = {
     unit.flying || walkable
   }

@@ -13,8 +13,23 @@ import Utilities.Time.Minutes
 import scala.collection.mutable
 
 object FormationZone {
-
   def apply(group: FriendlyUnitGroup, zone: Zone, edge: Edge): Formation = {
+    new FormationStandard(group, FormationStyleGuard, edge.pixelCenter, Some(zone))
+  }
+
+  def oldApply(group: FriendlyUnitGroup, zone: Zone, edge: Edge): Formation = {
+    // Notes: These are the restrictions used
+    // [x] Don't stand in harvesting area (TBH this should just be mining path, as harvesting area is massive when gas is opposite minerals)
+    // [-] Don't stand in town hall area, which would block construction
+    // - If we have Reavers, leave a path up the middle for Scarabs
+    // [x] Min distance = expected enemy range
+    // [x] If expected enemy range > 32px and we are ramped, require upstairs tiles
+    // [x] Don't stand in groundskeeper-reserved tiles
+    //
+    // We probably also want to:
+    // - Preserve melee plug against melee enemies
+    // - Arc: Replace min/max distance with ordered depth tiers
+
     val units = group.groupFriendlyOrderable
     if (units.isEmpty) return FormationEmpty
 

@@ -68,6 +68,8 @@ object Protoss {
   lazy val DisruptionWeb        = Techs.get(TechType.Disruption_Web)
   lazy val Recall               = Techs.get(TechType.Recall)
   lazy val Stasis               = Techs.get(TechType.Stasis_Field)
+
+  lazy val FenixDragoon = UnitClasses.get(UnitType.Hero_Fenix_Dragoon)
 }
 
 

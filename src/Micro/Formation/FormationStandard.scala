@@ -5,7 +5,6 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
-import Information.Grids.Floody.GridEnemyVulnerabilityGround
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
@@ -15,9 +14,6 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactics.Squads.FriendlyUnitGroup
 import Utilities.LightYear
 import Utilities.Time.Minutes
-
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
@@ -50,7 +46,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val edge              : Option[Edge]          = Maff.minBy(zone.edges)(_.pixelCenter.groundPixels(goal))
   val altitudeInside    : Int                   = zone.centroid.altitude
   val altitudeOutside   : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
-  var altitudeRequired  : Int                   = if (expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
+  val altitudeRequired  : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
   val face              : Pixel                 =
     if (style == FormationStyleEngage || style == FormationStyleMarch) targetTowards.map(_.pixel).getOrElse(goal)
     else if (style == FormationStyleGuard) goal
@@ -66,19 +62,11 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   var stepSizeEvade     : Int                   = 0
   var stepSizeCross     : Int                   = 0
   var stepSizeTiles     : Int                   = 0
-  var minTilesToGoal    : Int                   = - LightYear()
-  var maxTilesToGoal    : Int                   = LightYear()
   var maxThreat         : Int                   = LightYear()
   var minAltitude       : Int                   = -1
-  var costDistanceGoal  : Int                   = 1
-  var costDistanceApex  : Int                   = 1
-  var costThreat        : Int                   = 0
-  var costVulnerability : Int                   = 0
 
-  parameterize()
-
-  val slots: Map[UnitClass, Seq[Pixel]] = slotsByClass()
-  val placements: Map[FriendlyUnitInfo, Pixel] = UnassignedFormation(style, slots, group).outwardFromCentroid
+  val slots       : Map[UnitClass,        Seq[Pixel]] = slotsByClass()
+  val placements  : Map[FriendlyUnitInfo, Pixel]      = UnassignedFormation(style, slots, group).outwardFromCentroid
 
   private def parameterize(): Unit = {
     if (style == FormationStyleMarch && goalTowardsTarget && targetTowards.exists(t => units.exists(u => u.pixelsToGetInRange(t) < 32 * 6 && u.targetsAssigned.forall(_.contains(t))))) {
@@ -86,19 +74,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     }
     if (style == FormationStyleGuard) {
       apex              = edge.map(_.endPixels.minBy(_.groundPixels(zone.centroid))).getOrElse(apex)
-      minTilesToGoal    = expectRangeTiles
-      costDistanceGoal  = 5
-      if (altitudeInside <= altitudeOutside) {
-        maxThreat = 0
-      }
+      maxThreat         = With.grids.enemyRangeGround.margin - 1
     } else {
-      altitudeRequired = -1
-    }
-    if (style == FormationStyleEngage) {
-      costVulnerability = 1
-      costThreat        = 1
-    }
-    if (style == FormationStyleEngage || style == FormationStyleMarch || style == FormationStyleDisengage) {
       if (goalPath.pathExists) {
         // Engage: Walk far enough to be in range
         // March: Walk far enough to advance our army
@@ -106,7 +83,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
         // Move all the way past any narrow choke except one that's in our goal
         stepSizePace    = Maff.clamp((16 + 24 * group.meanTopSpeed) / 32, 1, 8).toInt
         stepSizeCross   = firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0)
-        stepSizeEngage  = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= vGrid.margin)).getOrElse(LightYear())
+        stepSizeEngage  = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= With.grids.enemyVulnerabilityGround.margin)).getOrElse(LightYear())
         stepSizeEvade   = 1 + groupWidthTiles + centroid.tile.enemyRangeGround
         stepSizeTiles   = Math.max(stepSizePace, stepSizeCross)
         if (style == FormationStyleDisengage) {
@@ -114,9 +91,9 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
         } else if (goalTowardsTarget) {
           stepSizeTiles = Math.min(stepSizeTiles, Math.max(1, stepSizeEngage)) // Don't try to move past the enemy
         }
-        maxTilesToGoal    = centroid.tile.groundTiles(goal) - 1
-        minTilesToGoal    = maxTilesToGoal - stepSizeTiles
-        maxThreat         = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin else With.grids.enemyRangeGround.defaultValue
+        maxThreat = if (style == FormationStyleMarch) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
+        val maxTilesToGoal = centroid.tile.groundTiles(goal) - 1
+        val minTilesToGoal = maxTilesToGoal - stepSizeTiles
         apex = goalPathTiles
           .reverseIterator
           .filterNot(t => t.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(t.center)))
@@ -129,75 +106,21 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   }
 
   private def slotsByClass(): Map[UnitClass, Seq[Pixel]] = {
+    parameterize()
+    With.grids.formationSlots.reset()
+    With.geography.ourBases.foreach(_.resourcePathTiles.foreach(t => With.grids.formationSlots.block(t.center)))
+    With.groundskeeper.reserved.view.map(_.target).foreach(t => With.grids.formationSlots.block(t.center))
     val classCount = groundUnits
       .groupBy(_.unitClass)
       .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))
       .toVector
       .sortBy(_.formationRangePixels)
-    With.grids.formationSlots.reset()
-    With.geography.ourBases.foreach(_.resourcePathTiles.foreach(t => With.grids.formationSlots.block(t.center)))
-    With.groundskeeper.reserved.view.map(_.target).foreach(t => With.grids.formationSlots.block(t.center))
-
-    lazy val ourArcSlots = arcSlots(classCount, 32 + apex.pixelDistance(face))
-    lazy val ourFloodSlots = floodSlots(classCount)
-    var output = ourArcSlots
-    if (output.map(_._2.size).sum < groundUnits.size) {
-      output = if (ourArcSlots.map(_._2.size).sum >= ourFloodSlots.map(_._2.size).sum) ourArcSlots else ourFloodSlots
-    }
-
-    val groundPlacementCentroid = Maff.exemplarOption(output.values.view.flatten).getOrElse(apex)
-    output ++= airUnits
+    val arc = arcSlots(classCount, 32 + apex.pixelDistance(face))
+    val groundPlacementCentroid = Maff.exemplarOption(arc.values.view.flatten).getOrElse(apex)
+    val output = arc ++ airUnits
       .groupBy(_.unitClass)
       .map(u => (u._1, u._2.map(x => groundPlacementCentroid)))
     output
-  }
-
-  /**
-  * Position formation slots by flooding outwards from the apex
-  */
-  private final def vGrid: GridEnemyVulnerabilityGround = With.grids.enemyVulnerabilityGround
-  private def floodSlots(classSlots: Vector[ClassSlots]): Map[UnitClass, Seq[Pixel]] = {
-    val output        = new mutable.HashMap[UnitClass, ArrayBuffer[Pixel]]()
-    val floodHorizon  = new mutable.PriorityQueue[(Tile, Int)]()(Ordering.by(-_._2))
-    val explored      = With.grids.disposableBoolean()
-    floodHorizon += ((apex.tile, cost(apex.tile)))
-    floodHorizon.foreach(tile => explored.set(tile._1, true))
-    while (floodHorizon.nonEmpty && classSlots.exists(_.slots > 0) ) {
-      val tile = floodHorizon.dequeue()._1
-      lazy val distanceTileToGoal = tile.groundTiles(goal)
-      if (tile.walkable
-          && (minTilesToGoal  <= 0            || minTilesToGoal <= distanceTileToGoal)
-          && (maxTilesToGoal  >= LightYear()  || maxTilesToGoal >= distanceTileToGoal)
-          && (maxThreat       >= tile.enemyRangeGroundUnchecked)
-          && (minAltitude     <= tile.altitudeUnchecked)
-          && (tile.units.forall(u => u.flying || (u.isFriendly && ! u.unitClass.isBuilding)))) {
-        val unplacedClass = classSlots.find(_.slots > 0).get
-
-        // To avoid diving with Engage formations:
-        // If we care about enemy vulnerability, position units only as close as is necessary to hit something
-        // Allow pushing through chokes so we can actually take fights there if necessary
-        if (
-          costVulnerability == 0
-          || tile.enemyRangeGround == 0
-          || unplacedClass.formationRangePixels < (vGrid.margin + vGrid.maxVulnerability - vGrid(tile))) {
-          unplacedClass.slots -= 1
-          if (!output.contains(unplacedClass.unitClass)) {
-            output(unplacedClass.unitClass) = ArrayBuffer.empty
-          }
-          output(unplacedClass.unitClass) += tile.center
-        }
-      }
-      val neighbors = tile
-        .adjacent4
-        .view
-        .filter(_.valid)
-        .filterNot(explored.get)
-        .filter(maxTilesToGoal >= _.groundTiles(goal))
-        .map(tile => (tile, cost(tile)))
-      floodHorizon ++= neighbors
-      neighbors.foreach(neighbor => explored.set(neighbor._1, true))
-    }
-    output.toMap
   }
 
   /**
@@ -208,7 +131,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     var angleIncrement = 0d
     val angleCenter = face.radiansTo(apex)
     val radiusIncrement = 4d
-    var radius = Math.max(32 * minTilesToGoal, face.pixelDistance(apex) - radiusIncrement)
+    var radius = face.pixelDistance(apex) - radiusIncrement
     var rowSlot = -1
     var slotsEvaluated = 0
     var haltNegative = false
@@ -244,8 +167,6 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
         return true
       }
       val groundTilesToGoal = p.groundPixels(goal) / 32
-      if (groundTilesToGoal > maxTilesToGoal) return false // We've gone too far and will never find a slot
-      //if (groundTilesToGoal < minTilesToGoal) return true // If we keep going we may find a slot
       if (p.altitude < minAltitude) return true
       if (p.tile.enemyRangeGround > maxThreat) return true
       ! With.grids.formationSlots.tryPlace(unitClass, p)
@@ -255,15 +176,6 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       (0 until classSlot.slots).foreach(i => while(proceed()) {})
     })
     With.grids.formationSlots.placed.groupBy(_._1).map(p => (p._1, p._2.map(_._2)))
-  }
-
-  private def cost(tile: Tile): Int = {
-    if ( ! tile.walkable) return LightYear()
-    val tCostDistanceGoal   = if (costDistanceGoal == 0)   0 else costDistanceGoal  * tile.groundTiles(goal)
-    val tCostDistanceApex   = if (costDistanceApex == 0)   0 else costDistanceApex  * tile.groundTiles(centroid)
-    val tCostThreat         = if (costThreat == 0)         0 else costThreat        * tile.enemyRangeGround
-    val tCostVulnerability  = if (costVulnerability == 0)  0 else costVulnerability * Maff.fromBoolean(vGrid.get(tile) == 0)
-    costDistanceGoal + tCostDistanceApex + tCostThreat + tCostVulnerability
   }
 
   override def renderMap(): Unit = {
@@ -278,7 +190,5 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     if (placements.nonEmpty) {
       DrawMap.label(style.name, Maff.centroid(placements.values), drawBackground = true, style.color)
     }
-    DrawMap.circle(goal, 32 * minTilesToGoal - 16, style.color)
-    DrawMap.circle(goal, 32 * maxTilesToGoal - 16, style.color)
   }
 }

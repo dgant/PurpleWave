@@ -174,7 +174,7 @@ object DefaultCombat extends Action {
 
     var technique: Technique =
       if ( ! unit.canMove) Fight
-      else if ((unit.agent.shouldEngage || unit.battle.isEmpty) && (unit.agent.withinSafetyMargin || unit.matchups.targets.nonEmpty || unit.matchups.threatsInFrames(48).forall(MatchWorker)))
+      else if (unit.agent.withinSafetyMargin || unit.agent.shouldEngage || unit.matchups.threatsInFrames(48).forall(MatchWorker))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {

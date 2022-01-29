@@ -143,9 +143,12 @@ object MicroPathing {
     val to = unit.agent.safety
 
     // Where to go
-    unit.agent.forces(Forces.travel)      = (Potential.preferTravel(unit, to) * 1 * Maff.toInt(goalOrigin))
-    unit.agent.forces(Forces.threat)      = (Potential.avoidThreats(unit)     * 2 * Maff.toInt(goalSafety))
-    unit.agent.forces(Forces.sneaking)    = (Potential.detectionRepulsion(unit))
+    unit.agent.forces(Forces.sneaking)  = Potential.detectionRepulsion(unit)
+    unit.agent.forces(Forces.travel)    = Potential.preferTravel(unit, to) * 1 * Maff.toInt(goalOrigin)
+    unit.agent.forces(Forces.threat)    = Potential.avoidThreats(unit)     * 2 * Maff.toInt(goalSafety)
+    if (unit.agent.forces.forall(_._2.lengthSquared == 0)) {
+      unit.agent.forces(Forces.travel)  = Potential.preferTravel(unit, unit.agent.destination)
+    }
 
     // How to get there
     unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * Maff.toInt(goalSafety))

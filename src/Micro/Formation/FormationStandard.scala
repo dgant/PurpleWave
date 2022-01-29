@@ -89,7 +89,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       minTilesToGoal    = expectRangeTiles
       costDistanceGoal  = 5
       if (altitudeInside <= altitudeOutside) {
-        maxThreat = vGrid.margin
+        maxThreat = 0
       }
     } else {
       altitudeRequired = -1
@@ -141,8 +141,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     lazy val ourArcSlots = arcSlots(classCount, 32 + apex.pixelDistance(face))
     lazy val ourFloodSlots = floodSlots(classCount)
     var output = ourArcSlots
-    if (output.size < groundUnits.size) {
-      output = if (ourArcSlots.size >= ourFloodSlots.size) ourArcSlots else ourFloodSlots
+    if (output.map(_._2.size).sum < groundUnits.size) {
+      output = if (ourArcSlots.map(_._2.size).sum >= ourFloodSlots.map(_._2.size).sum) ourArcSlots else ourFloodSlots
     }
 
     val groundPlacementCentroid = Maff.exemplarOption(output.values.view.flatten).getOrElse(apex)
@@ -208,7 +208,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     var angleIncrement = 0d
     val angleCenter = face.radiansTo(apex)
     val radiusIncrement = 4d
-    var radius = Math.max(0, face.pixelDistance(apex) - radiusIncrement)
+    var radius = Math.max(32 * minTilesToGoal, face.pixelDistance(apex) - radiusIncrement)
     var rowSlot = -1
     var slotsEvaluated = 0
     var haltNegative = false
@@ -220,7 +220,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       rowSlot = -1
       haltNegative = false
       haltPositive = false
-      return true
+      true
     }
     nextRow()
     def proceed(): Boolean = {

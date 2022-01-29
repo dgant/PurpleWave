@@ -43,7 +43,7 @@ object FightOrFlee extends Action {
     decide(false, "Scarabs",    () => Protoss.Reaver(unit) && unit.scarabs == 0 && ! unit.trainee.exists(_.remainingCompletionFrames < Math.max(unit.matchups.framesOfSafety, unit.cooldownLeft)))
     decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))
-    decide(false, "BidieSiege", () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
+    decide(false, "BideSiege",  () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
     decide(true,  "Workers",    () => unit.matchups.targets.exists(_.canAttackGround) && unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(true,  "Energized",  () =>
       unit.unitClass.maxShields > 20

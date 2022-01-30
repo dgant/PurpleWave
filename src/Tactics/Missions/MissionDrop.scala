@@ -216,6 +216,7 @@ abstract class MissionDrop extends Mission {
       while (i < Math.min(pathValues.length, path.get.tiles.get.length)) {
         val tile = path.get.tiles.get(i)
         pathValues(i) = PathValues(enemyRange = tile.enemyRange, enemyVision = tile.visibleToEnemy)
+        i += 1
       }
     }
   }

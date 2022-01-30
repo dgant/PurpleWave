@@ -91,23 +91,21 @@ object SquadAutomation {
     output
   }
 
-  def send(squad: Squad, toReturn: Option[Pixel] = None): Unit = {
-    if (squad.formations.isEmpty) {
-      squad.units.foreach(_.intend(squad, new Intention { toTravel = Some(squad.vicinity); toReturn = toReturn }))
-    } else {
-      squad.units.foreach(unit => {
-        unit.intend(squad, new Intention {
-          toTravel = getTravel(unit, squad, toReturn)
-          toReturn = getReturn(unit, squad, toReturn)
-        })
+  def send(squad: Squad, defaultReturn: Option[Pixel] = None): Unit = {
+    squad.units.foreach(unit => {
+      lazy val finalTravel = getTravel(unit, squad, defaultReturn)
+      lazy val finalReturn = getReturn(unit, squad, defaultReturn)
+      unit.intend(squad, new Intention {
+        toTravel = if (squad.fightConsensus) finalTravel else finalReturn
+        toReturn = finalReturn
       })
-    }
+    })
   }
 
   def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] = squad
     .formations
     .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
-    .find(_.placements.contains(unit))
+    .filter(_.placements.contains(unit))
     .map(_.placements(unit))
     .orElse(defaultReturn)
     .orElse(Some(squad.homeConsensus))
@@ -117,7 +115,7 @@ object SquadAutomation {
     .headOption
     .find(_.placements.contains(unit))
     .map(_.placements(unit))
-    .orElse(Some(if (squad.fightConsensus) squad.vicinity else getReturn(unit, squad, defaultReturn).getOrElse(squad.homeConsensus)))
+    .orElse(if (squad.fightConsensus) Some(squad.vicinity) else getReturn(unit, squad, defaultReturn).orElse(Some(squad.homeConsensus)))
 
   //////////////////////
   // Full automation! //
@@ -126,13 +124,13 @@ object SquadAutomation {
   def targetAndSend(squad: Squad): Unit = targetAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def targetAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     target(squad)
-    send(squad, toReturn = Some(from))
+    send(squad, defaultReturn = Some(from))
   }
 
   def targetFormAndSend(squad: Squad): Unit = targetFormAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def targetFormAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     target(squad)
     squad.formations = form(squad, from, to)
-    send(squad, toReturn = Some(from))
+    send(squad, defaultReturn = Some(from))
   }
 }

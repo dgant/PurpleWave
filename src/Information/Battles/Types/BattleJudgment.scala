@@ -35,5 +35,5 @@ class BattleJudgment(battle: BattleLocal) {
     Maff.nanToN((score - target) / Math.abs(Math.signum(score - target) - target), if (score >= target) 1 else -1)
   }
 
-  def shouldFightUnit(unit: UnitInfo): Boolean = if (unit.flying) shouldFightAir else shouldFightGround
+  def unitShouldFight(unit: UnitInfo): Boolean = if (unit.flying) shouldFightAir else shouldFightGround
 }

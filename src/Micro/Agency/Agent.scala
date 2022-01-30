@@ -23,7 +23,6 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastFrame             : Int = 0
   var lastStim              : Int = 0
   var lastCloak             : Int = 0
-  var fightHysteresisFrames : Int = 0
   var impatience            : Int = 0
 
   var tryingToMove: Boolean = false
@@ -98,7 +97,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     lastFrame = With.frame
     resetState()
     followIntent()
-    fightHysteresisFrames = Math.max(0, fightHysteresisFrames - With.framesSince(lastFrame))
     updateRiding()
     unit.intent.action.consider(unit)
   }

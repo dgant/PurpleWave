@@ -11,9 +11,7 @@ import Utilities.Time.Minutes
 
 object FightOrFlee extends Action {
 
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.canMove
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove
 
   override def perform(unit: FriendlyUnitInfo) {
 
@@ -21,18 +19,17 @@ object FightOrFlee extends Action {
 
     def decide(shouldEngage: Boolean, description: String, condition: () => Boolean) {
       if (decision.isEmpty && condition()) {
-        unit.agent.fightReason = description
         decision = Some(shouldEngage)
+        unit.agent.fightReason = description
       }
     }
-
     decide(true,  "Static",     () => ! unit.canMove)
     decide(true,  "YOLO",       () => With.yolo.active && MatchWarriors(unit))
     decide(true,  "Committed",  () => unit.agent.commit)
     decide(true,  "Irradiated", () => unit.irradiated && unit.unitClass.canBeIrradiateBurned)
     decide(true,  "CantFlee",   () => ! unit.intent.canFlee)
     decide(true,  "Hug",        () => ! unit.flying && unit.matchups.targetsInRange.exists(t => unit.pixelDistanceEdge(t) < t.pixelRangeMin))
-    decide(true,  "Safe",       () => unit.matchups.threats.isEmpty)
+    decide(true,  "Safe",       () => unit.battle.isDefined && unit.matchups.threats.isEmpty)
     decide(true,  "Detonated",  () => unit.unitClass.suicides && unit.matchups.targets.exists(t => t.canAttack(unit) && t.matchups.targetsInRange.nonEmpty))
     decide(true,  "Archon",     () => Protoss.Archon(unit) && unit.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(false, "CantFight",  () => ! unit.intent.canFight)
@@ -55,10 +52,9 @@ object FightOrFlee extends Action {
         && ally.pixelDistanceEdge(unit, otherAt = Maff.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
     if (decision.isDefined) {
       unit.agent.shouldEngage = decision.get
-      unit.agent.fightHysteresisFrames = 0
-      return
+    } else {
+      applyEstimation(unit)
     }
-    applyEstimation(unit)
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo) {
@@ -66,18 +62,9 @@ object FightOrFlee extends Action {
       // Important for things which care about unit willingness to trot around
       unit.agent.shouldEngage = true
       unit.agent.fightReason = ""
-      return
+    } else {
+      unit.agent.shouldEngage = unit.battle.get.judgement.get.unitShouldFight(unit)
+      unit.agent.fightReason = if (unit.agent.shouldEngage) "Yes" else "No"
     }
-    var shouldEngage = false
-    unit.agent.fightReason = "No"
-    if (unit.battle.get.judgement.get.shouldFightUnit(unit)) {
-      shouldEngage = true
-      unit.agent.fightReason = "Yes"
-    }
-  
-    if (unit.agent.shouldEngage != shouldEngage) {
-      unit.agent.fightHysteresisFrames = With.configuration.battleHysteresisFrames
-    }
-    unit.agent.shouldEngage = shouldEngage
   }
 }

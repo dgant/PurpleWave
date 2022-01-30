@@ -188,7 +188,7 @@ object DefaultCombat extends Action {
     lazy val purring            = unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit))
     lazy val canAbuseTarget     = target.exists(t => ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
     lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate)
-    lazy val hasTimeToPoke      = framesToPokeTarget.exists(framesToPoke => unit.matchups.threats.forall(t => t.pixelsToGetInRange(unit) - unit.pixelsToGetInRange(target.get) / (unit.topSpeed + t.topSpeed)  > framesToPoke))
+    lazy val hasTimeToPoke      = framesToPokeTarget.exists(f => unit.matchups.threats.forall(t => f < t.framesToGetInRange(unit) + With.reaction.agencyMax))
 
     transition(Aim,       () => ! unit.canMove, () => aim(unit))
     transition(Dodge,     () => unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge, () => dodge(unit))
@@ -200,8 +200,7 @@ object DefaultCombat extends Action {
       || (
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
         && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate + 12).forall(_.topSpeed > unit.topSpeed))))
-    transition(Dance,     () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
-    //transition(Excuse,    () => unit.agent.receivedPushPriority() > unit.agent.priority)
+    transition(Dance, () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
 
     if (unit.unready) return
 

@@ -5,8 +5,10 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationGeneric, FormationStyleDisengage, FormationStyleGuard}
+import Planning.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Time.Minutes
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -110,7 +112,10 @@ object SquadAutomation {
     .orElse(defaultReturn)
     .orElse(Some(squad.homeConsensus))
 
-  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] = squad
+  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] =
+    // Rush scenarios: Send army directly to vicinity
+    if (With.frame < Minutes(5)() && ! With.units.existsEnemy(MatchWarriors)) Some(squad.vicinity) else
+    squad
     .formations
     .headOption
     .find(_.placements.contains(unit))

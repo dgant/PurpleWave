@@ -139,6 +139,7 @@ trait CombatUnit {
   @inline final def inRangeToAttackFrom(enemy: CombatUnit, usAt: Pixel)   : Boolean = pixelDistanceEdgeFrom(enemy, usAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdgeFrom(enemy, usAt) > pixelRangeMin)
   @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy) - pixelRangeAgainst(enemy)) else LightYear()
   @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else LightYear()
+  @inline final def pixelsToGetInRangeTraveling(enemy: CombatUnit)        : Double = Math.max(pixelsToGetInRange(enemy), if ( ! canAttack(enemy) || flying || inRangeToAttack(enemy)) 0 else pixelDistanceTravelling(enemy.pixel) - pixelRangeAgainst(enemy) - unitClass.dimensionMin - enemy.unitClass.dimensionMin)
   @inline final def framesToTravelTo(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   @inline final def framesToTravelTo(destination: Tile)     : Int = framesToTravelTo(destination.center)
   @inline final def framesToTravelPixels(pixels: Double)    : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || unitClass == Terran.SiegeTankSieged) 24 else 0)

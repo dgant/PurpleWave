@@ -1,6 +1,7 @@
 package Macro.MacroSim
 
 import Lifecycle.With
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades
@@ -35,8 +36,10 @@ final class MacroSim {
     With.units.ours.filter(_.remainingOccupationFrames == 0).foreach(u => state.producers(u.unitClass) += 1)
     With.units.ours.filter(_.remainingOccupationFrames > 0).foreach(u => {
       val event = new MacroEvent
-      event.dFrames = u.remainingCompletionFrames
-      event.dSupplyAvailable += u.unitClass.supplyProvided
+      event.dFrames = u.remainingOccupationFrames
+      if ( ! u.complete && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
+        event.dSupplyAvailable += u.unitClass.supplyProvided
+      }
       if (u.upgrading) {
         event.dUpgrade = u.upgradingType
         event.dUpgradeLevel = 1 + state.upgrades(u.upgradingType)
@@ -44,11 +47,11 @@ final class MacroSim {
         event.dTech = u.techingType
       } else if (u.unitClass.isGas) {
         event.dGeysers += 1
-      } else if (u.unitClass.isResourceDepot) {
+      } else if ( ! u.complete && u.unitClass.isResourceDepot && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
         val base = u.base.filter(_.townHall.contains(u))
         base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
       } else if (u.morphing) {
-        // TODO: Subtract types that are going away if required
+        // TODO: Add/Subtract
       }
       event.dProducer = u.unitClass
       event.dProducerN = 1
@@ -66,15 +69,15 @@ final class MacroSim {
     // Binary search to figure out where to fit the step
     val dFrames = step.event.dFrames
     var min = 0
-    var max = steps.length - 1
+    var max = steps.length
     while(true) {
       val at = (min + max) / 2
-      val dFramesBefore = if (at == 0) Int.MinValue else steps(at - 1).event.dFrames
-      val dFramesAfter = if (at == steps.length) Int.MaxValue else steps(at).event.dFrames
-      if (dFramesBefore <= dFrames) {
-        min = at + 1
-      } else if (dFramesAfter < dFrames) {
+      val dFramesBefore = if (at <= 0) Int.MinValue else steps(at - 1).event.dFrames
+      val dFramesAfter = if (at >= steps.length) Int.MaxValue else steps(at).event.dFrames
+      if (dFramesBefore > dFrames) {
         max = at - 1
+      } else if (dFramesAfter < dFrames) {
+        min = at + 1
       } else {
         steps.insert(at, step)
         return
@@ -86,38 +89,37 @@ final class MacroSim {
   def gasMinedBy(dFrame: Int): Int = (With.accounting.incomePerFrameGas * dFrame).toInt
 
   def updateStatesAfter(index: Int): Unit = {
-    var state: MacroState = null
-    var i = index
+    var i = index + 1
     while (i < steps.length) {
-      val step = steps(i)
-      if (i > index) {
-        val newState = step.state
-        val event = step.event
-        newState.supplyAvailable = state.supplyAvailable + event.dSupplyAvailable
-        newState.supplyUsed = state.supplyUsed + event.dSupplyUsed
-        newState.mineralPatches = state.mineralPatches + event.dMineralPatches
-        newState.geysers = state.geysers + event.dGeysers
-        newState.techs = state.techs
-        newState.upgrades = state.upgrades
-        newState.units = state.units.clone
-        newState.producers = state.producers.clone
-        if (event.dTech != Techs.None) {
-          newState.techs += event.dTech
-        }
-        if (event.dUpgrade != Upgrades.None) {
-          newState.upgrades(event.dUpgrade) = event.dUpgradeLevel
-        }
-        if (event.dUnit1 != UnitClasses.None) {
-          newState.units(event.dUnit1) += event.dUnit1N
-        }
-        if (event.dUnit2 != UnitClasses.None) {
-          newState.units(event.dUnit2) += event.dUnit2N
-        }
-        if (event.dProducer != UnitClasses.None) {
-          newState.producers(event.dProducer) += event.dProducerN
-        }
+      val stateLast = steps(i - 1).state
+      val stateNext = steps(i).state
+      val event = steps(i).event
+      val dFrames = event.dFrames - steps(i - 1).event.dFrames
+      stateNext.minerals = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.incomePerFrameMinerals).toInt
+      stateNext.gas = stateLast.gas + event.dGas + (dFrames * With.accounting.incomePerFrameGas).toInt
+      stateNext.supplyAvailable = stateLast.supplyAvailable + event.dSupplyAvailable
+      stateNext.supplyUsed = stateLast.supplyUsed + event.dSupplyUsed
+      stateNext.mineralPatches = stateLast.mineralPatches + event.dMineralPatches
+      stateNext.geysers = stateLast.geysers + event.dGeysers
+      stateNext.techs = stateLast.techs
+      stateNext.upgrades = stateLast.upgrades
+      stateNext.units = stateLast.units.clone
+      stateNext.producers = stateLast.producers.clone
+      if (event.dTech != Techs.None) {
+        stateNext.techs += event.dTech
       }
-      state = steps(index).state
+      if (event.dUpgrade != Upgrades.None) {
+        stateNext.upgrades(event.dUpgrade) = event.dUpgradeLevel
+      }
+      if (event.dUnit1 != UnitClasses.None) {
+        stateNext.units(event.dUnit1) += event.dUnit1N
+      }
+      if (event.dUnit2 != UnitClasses.None) {
+        stateNext.units(event.dUnit2) += event.dUnit2N
+      }
+      if (event.dProducer != UnitClasses.None) {
+        stateNext.producers(event.dProducer) += event.dProducerN
+      }
       i += 1
     }
   }

@@ -202,9 +202,9 @@ abstract class MissionDrop extends Mission {
       With.mapTileHeight - vicinity.tile.y).min)
     val profile = new PathfindProfile(transport.tile)
     profile.end                 = Some(vicinity.tile)
-    profile.costEnemyVision     = 5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
-    profile.costRepulsion       = 25
-    profile.costThreat          = 125
+    profile.costEnemyVision     = 2.5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
+    profile.costRepulsion       = 5.0 // 25
+    profile.costThreat          = 10.0 //125
     profile.canCrossUnwalkable  = Some(true)
     profile.canEndUnwalkable    = Some(true)
     profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat

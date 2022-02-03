@@ -1,63 +1,53 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Mathematics.Points.Pixel
+import Utilities.Time.Minutes
 import bwapi.Color
 
 object ShowMacroSim extends View {
-  val y0 = 240
-  val pixelsPerFrame: Double = 2.0 / 24.0
-  val pixelsPerResource: Double = 1.0 / 8.0
-  val pixelsPerSupply: Double = 1.0
-  val widthThreshold: Double = 10
+  val y0 = 300
+  val pixelsPerFrame          : Double = 638.0 / Minutes(1)()
+  val pixelsPerResource       : Double = y0 / 1000.0
+  val pixelsPerSupply         : Double = y0 / 400.0
+  val colorMinerals           : Color = Colors.NeonTeal
+  val colorGas                : Color = Colors.BrightGreen
+  val colorSupplyUsed         : Color = Colors.BrightRed
+  val colorSupplyAvailable    : Color = Colors.MidnightRed
 
-  val colorMinerals: Color = Colors.NeonTeal
-  val colorGas: Color = Colors.NeonGreen
-  val colorSupplyComplete: Color = Colors.White
-  val colorSupplyIncomplete: Color = Colors.MediumGray
-  val colorWorkersComplete: Color = Colors.BrightRed
-  val colorWorkersIncomplete: Color = Colors.DarkRed
-  val colorUnitsComplete: Color = Colors.BrightBlue
-  val colorUnitsIncomplete: Color = Colors.DarkBlue
+  private def x0i(i: Int): Int = 1 + (With.macroSim.steps(i).event.dFrames * pixelsPerFrame).toInt
 
   override def renderMap(): Unit = {
-    val sim = With.macroSim
-    var x0 = 5
+    val steps = With.macroSim.steps
+    if (steps.isEmpty) return
     var i = 0
-    while (i < sim.steps.size) {
-      val step                  = sim.steps(i)
-      val dFrames               = step.event.dFrames
-      val width                 = Math.ceil(dFrames * pixelsPerFrame).toInt
-      val x1                    = x0 + width
-      val ySupplyIncomplete     = y0 - pixelsPerSupply    * step.state.units.view.map(p => p._1.supplyProvided * p._2).sum
-      val ySupplyComplete       = y0 - pixelsPerSupply    * step.state.supplyAvailable
-      val ySupplyUsedIncomplete = y0 - pixelsPerSupply    * step.state.units.view.map(p => p._1.supplyRequired * p._2).sum
-      val yWorkersIncomplete    = y0 - pixelsPerSupply    * step.state.units.view.filter(_._1.isWorker).map(_._2).sum
-      val yWorkersComplete      = y0 - pixelsPerSupply    * step.state.producers.view.filter(_._1.trainsUpgradesOrTechs).map(_._2).sum
-      val yMinerals             = y0 + pixelsPerResource  * step.state.minerals
-      val yGas                  = y0 + pixelsPerResource  * step.state.gas
-      def draw(y: Double, color: Color): Unit = {
-        val y1 = Math.round(y).toInt
-        DrawMap.box(Pixel(x0, Math.min(y0, y1)), Pixel(x1, Math.max(y0, y1)), color, solid = true)
+    while (i < steps.size) {
+      val x0 = x0i(i)
+      val x1 = if (i == steps.size - 1) 639 else 1 + Math.ceil(steps(i + 1).event.dFrames * pixelsPerFrame).toInt
+      val state = steps(i).state
+      def box(color: Color, y: Double, isSolid: Boolean): Unit = With.game.drawBoxScreen(x0, (y0 - y).toInt, x1, y0, color, isSolid)
+      val ySupplyAvailable = pixelsPerSupply * state.supplyAvailable
+      val ySupplyUsed = pixelsPerSupply * state.supplyUsed
+      box(colorSupplyAvailable, ySupplyAvailable, isSolid = true)
+      box(colorSupplyUsed, ySupplyUsed, isSolid = true)
+      box(colorSupplyAvailable, ySupplyAvailable, isSolid = false)
+      if (i < steps.size - 1) {
+        val y0Minerals = (y0 - pixelsPerResource * steps(i).state.minerals).toInt
+        val y1Minerals = (y0 - pixelsPerResource * steps(i + 1).state.minerals).toInt
+        val y0Gas = (y0 - pixelsPerResource * steps(i).state.gas).toInt
+        val y1Gas = (y0 - pixelsPerResource * steps(i + 1).state.gas).toInt
+        With.game.drawLineScreen(x0, y0Minerals, x1, y1Minerals, colorMinerals)
+        With.game.drawLineScreen(x0, y0Gas, x1, y1Gas, colorGas)
       }
-
-      if (yMinerals > yGas) {
-        draw(yMinerals, colorMinerals)
-        draw(yGas, colorGas)
-      } else {
-        draw(yGas, colorGas)
-        draw(yMinerals, colorMinerals)
-      }
-      draw(ySupplyIncomplete,     colorSupplyIncomplete)
-      draw(ySupplyComplete,       colorSupplyComplete)
-      draw(ySupplyUsedIncomplete, colorUnitsIncomplete)
-      draw(yWorkersIncomplete,    colorWorkersIncomplete)
-      draw(yWorkersComplete,      colorWorkersComplete)
-      x0 = x1
+      i += 1
+    }
+    i = 1
+    while (i < steps.size) {
+      val x0 = x0i(i)
+      With.game.drawTextScreen(x0, y0 - With.visualization.lineHeightSmall * i - 2, steps(i).event.toString)
       i += 1
     }
   }
+
 }

@@ -29,6 +29,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.recruiter.update()
       With.prioritizer.update()
       With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
+      With.macroSim.reset()
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
       With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())
       With.yolo.updateBlackboard()

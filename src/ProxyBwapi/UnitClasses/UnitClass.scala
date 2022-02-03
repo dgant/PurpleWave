@@ -512,9 +512,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Capabilities //
   //////////////////
 
-  // These largely exist for performance reasons;
-  // We want to avoid calling isTHING methods for units where it will always be true
-
   lazy val canFly: Boolean = isFlyer || isFlyingBuilding
   lazy val canBurrow: Boolean = Vector(Terran.SpiderMine, Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker, Zerg.Defiler).contains(this)
   lazy val canStim: Boolean = this == Terran.Marine || this == Terran.Firebat
@@ -543,6 +540,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val castsSpells: Boolean = spells.nonEmpty
   lazy val attacksOrCasts: Boolean = canAttack || castsSpells || this == Zerg.LurkerEgg
   lazy val attacksOrCastsOrDetectsOrTransports: Boolean = attacksOrCasts || isDetector || isTransport
+  lazy val trainsUpgradesOrTechs = unitsTrained.nonEmpty || techsWhat.nonEmpty || upgradesWhat.nonEmpty
 
   //////////////////////////////
   // Performance optimization //

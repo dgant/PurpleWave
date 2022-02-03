@@ -27,24 +27,23 @@ object ShowMacroSim extends View {
     val sim = With.macroSim
     var x0 = 5
     var i = 0
-    var frameBefore = -24
-    while (i < sim.states.size && sim.states(i).exists) {
-      val state                 = sim.states(i)
-      val dFrame                = state.framesAhead
-      val width                 = Math.ceil((dFrame - frameBefore) * pixelsPerFrame).toInt
+    while (i < sim.steps.size) {
+      val step                  = sim.steps(i)
+      val dFrames               = step.event.dFrames
+      val width                 = Math.ceil(dFrames * pixelsPerFrame).toInt
       val x1                    = x0 + width
-      val ySupplyIncomplete     = y0 - pixelsPerSupply * state.units.view.map(p => p._1.supplyProvided * p._2).sum
-      val ySupplyComplete       = y0 - pixelsPerSupply * state.supplyAvailable
-      val ySupplyUsedIncomplete = y0 - pixelsPerSupply * state.units.view.map(p => p._1.supplyRequired * p._2).sum
-      val ySupplyUsedComplete   = y0 - pixelsPerSupply * state.unitsAvailable.view.map(p => p._1.supplyRequired * p._2).sum
-      val yWorkersIncomplete    = y0 - pixelsPerSupply * state.units.view.filter(_._1.isWorker).map(_._2).sum
-      val yWorkersComplete      = y0 - pixelsPerSupply * state.unitsAvailable.view.filter(_._1.isWorker).map(_._2).sum
-      val yMinerals             = y0 + pixelsPerResource * state.minerals
-      val yGas                  = y0 + pixelsPerResource * state.gas
+      val ySupplyIncomplete     = y0 - pixelsPerSupply    * step.state.units.view.map(p => p._1.supplyProvided * p._2).sum
+      val ySupplyComplete       = y0 - pixelsPerSupply    * step.state.supplyAvailable
+      val ySupplyUsedIncomplete = y0 - pixelsPerSupply    * step.state.units.view.map(p => p._1.supplyRequired * p._2).sum
+      val yWorkersIncomplete    = y0 - pixelsPerSupply    * step.state.units.view.filter(_._1.isWorker).map(_._2).sum
+      val yWorkersComplete      = y0 - pixelsPerSupply    * step.state.producers.view.filter(_._1.trainsUpgradesOrTechs).map(_._2).sum
+      val yMinerals             = y0 + pixelsPerResource  * step.state.minerals
+      val yGas                  = y0 + pixelsPerResource  * step.state.gas
       def draw(y: Double, color: Color): Unit = {
         val y1 = Math.round(y).toInt
         DrawMap.box(Pixel(x0, Math.min(y0, y1)), Pixel(x1, Math.max(y0, y1)), color, solid = true)
       }
+
       if (yMinerals > yGas) {
         draw(yMinerals, colorMinerals)
         draw(yGas, colorGas)
@@ -55,7 +54,6 @@ object ShowMacroSim extends View {
       draw(ySupplyIncomplete,     colorSupplyIncomplete)
       draw(ySupplyComplete,       colorSupplyComplete)
       draw(ySupplyUsedIncomplete, colorUnitsIncomplete)
-      draw(ySupplyUsedComplete,   colorUnitsComplete)
       draw(yWorkersIncomplete,    colorWorkersIncomplete)
       draw(yWorkersComplete,      colorWorkersComplete)
       x0 = x1

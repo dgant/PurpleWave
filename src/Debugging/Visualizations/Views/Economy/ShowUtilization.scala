@@ -9,7 +9,7 @@ object ShowUtilization extends View {
   val max = Math.log(24 * 60)
   override def renderMap(): Unit = {
     With.units.ours
-      .filter(u => u.unitClass.unitsTrained.nonEmpty || u.unitClass.techsWhat.nonEmpty || u.unitClass.upgradesWhat.nonEmpty)
+      .filter(_.unitClass.trainsUpgradesOrTechs)
       .filterNot(_.canMove)
       .foreach(unit => {
         val frames = With.framesSince(unit.lastFrameOccupied)

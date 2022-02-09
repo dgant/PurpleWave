@@ -13,7 +13,7 @@ import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
 import Macro.MacroSim.MacroSim
-import Macro.Scheduling.{MasterBuildOrderHistory, MasterBuildPlans, Projections, Scheduler}
+import Macro.Scheduling.{ProductionHistory, MasterBuildPlans, Projections, Scheduler}
 import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
@@ -56,56 +56,56 @@ object With {
   var mapWalkHeight     : Int                 = 0
   var mapWalkArea       : Int                 = 0
 
-  var game              : bwapi.Game              = _
-  var agents            : Agency                  = _
-  var animations        : Animations              = _
-  var architecture      : Architecture            = _
-  var bank              : Bank                    = _
-  var blackboard        : Blackboard              = _
-  var battles           : Battles                 = _
-  var buildOrderHistory : MasterBuildOrderHistory = _
-  var buildPlans        : MasterBuildPlans        = _
-  var bullets           : Bullets                 = _
-  var bwapiData         : BwapiData               = _
-  var camera            : Camera                  = _
-  var coordinator       : Coordinator             = _
-  var configuration     : Configuration           = _
-  var accounting        : Accounting              = _
-  var fingerprints      : Fingerprints            = _
-  var gathering         : Gathering               = _
-  var geo               : NeoGeo                  = _
-  var geography         : Geography               = _
-  var grids             : Grids                   = _
-  var groundskeeper     : Groundskeeper           = _
-  var history           : History                 = _
-  var lambdas           : LambdaQueue             = _
-  var latency           : Latency                 = _
-  var logger            : Logger                  = _
-  var macroSim          : MacroSim                = _
-  var manners           : Manners                 = _
-  var matchups          : MatchupGraph            = _
-  var paths             : Paths                   = _
-  var performance       : PerformanceMonitor      = _
-  var placement         : PlacementCycle          = _
-  var preplacement      : Preplacement            = _
-  var projections       : Projections             = _
-  var proxy             : ProxyBWAPI              = _
-  var prioritizer       : Prioritizer             = _
-  var reaction          : ReactionTimes           = _
-  var recruiter         : Recruiter               = _
-  var scheduler         : Scheduler               = _
-  var scouting          : Scouting                = _
-  var simulation        : Simulation              = _
-  var strategy          : Strategist              = _
-  var storyteller       : Storyteller             = _
-  var squads            : Squads                  = _
-  var tactics           : Tactics                 = _
-  var tasks             : TaskQueueParallel       = _
-  var units             : UnitTracker             = _
-  var unitsShown        : UnitsShown              = _
-  var viewport          : Viewport                = _
-  var visualization     : Visualization           = _
-  var yolo              : Yolo                    = _
+  var game              : bwapi.Game          = _
+  var agents            : Agency              = _
+  var animations        : Animations          = _
+  var architecture      : Architecture        = _
+  var bank              : Bank                = _
+  var blackboard        : Blackboard          = _
+  var battles           : Battles             = _
+  var productionHistory : ProductionHistory   = _
+  var buildPlans        : MasterBuildPlans    = _
+  var bullets           : Bullets             = _
+  var bwapiData         : BwapiData           = _
+  var camera            : Camera              = _
+  var coordinator       : Coordinator         = _
+  var configuration     : Configuration       = _
+  var accounting        : Accounting          = _
+  var fingerprints      : Fingerprints        = _
+  var gathering         : Gathering           = _
+  var geo               : NeoGeo              = _
+  var geography         : Geography           = _
+  var grids             : Grids               = _
+  var groundskeeper     : Groundskeeper       = _
+  var history           : History             = _
+  var lambdas           : LambdaQueue         = _
+  var latency           : Latency             = _
+  var logger            : Logger              = _
+  var macroSim          : MacroSim            = _
+  var manners           : Manners             = _
+  var matchups          : MatchupGraph        = _
+  var paths             : Paths               = _
+  var performance       : PerformanceMonitor  = _
+  var placement         : PlacementCycle      = _
+  var preplacement      : Preplacement        = _
+  var projections       : Projections         = _
+  var proxy             : ProxyBWAPI          = _
+  var prioritizer       : Prioritizer         = _
+  var reaction          : ReactionTimes       = _
+  var recruiter         : Recruiter           = _
+  var scheduler         : Scheduler           = _
+  var scouting          : Scouting            = _
+  var simulation        : Simulation          = _
+  var strategy          : Strategist          = _
+  var storyteller       : Storyteller         = _
+  var squads            : Squads              = _
+  var tactics           : Tactics             = _
+  var tasks             : TaskQueueParallel   = _
+  var units             : UnitTracker         = _
+  var unitsShown        : UnitsShown          = _
+  var viewport          : Viewport            = _
+  var visualization     : Visualization       = _
+  var yolo              : Yolo                = _
 
   def enemy: PlayerInfo = enemies.head
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
@@ -165,7 +165,7 @@ object With {
     }
 
     // Order-dependent initialization:
-    // PerformanceMonitor required to exist for creating any task
+    // PerformanceMonitor must exist when creating any task
     performance       = new PerformanceMonitor
 
     agents            = new Agency
@@ -174,7 +174,7 @@ object With {
     bank              = new Bank
     battles           = new Battles
     blackboard        = new Blackboard
-    buildOrderHistory = new MasterBuildOrderHistory
+    productionHistory = new ProductionHistory
     buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
     camera            = new Camera

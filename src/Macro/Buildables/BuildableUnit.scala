@@ -4,7 +4,6 @@ import ProxyBwapi.UnitClasses._
 
 case class BuildableUnit(unit: UnitClass) extends Buildable {
   override def unitOption       : Option[UnitClass]   = Some(unit)
-  override def unitsProduced    : Int                 = unit.copiesProduced
   override def toString         : String              = unit.toString
   override def frames           : Int                 = unit.buildFrames
 }

@@ -6,7 +6,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable
 
-class MasterBuildOrderHistory extends TimedTask {
+class ProductionHistory extends TimedTask {
   
   private val countByClassAllTime = new mutable.HashMap[UnitClass, mutable.HashSet[Int]] {
     override def default(key: UnitClass): mutable.HashSet[Int] = {

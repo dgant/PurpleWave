@@ -7,7 +7,6 @@ import ProxyBwapi.Upgrades.Upgrade
 abstract class Buildable {
   
   def unitOption      : Option[UnitClass]   = None
-  def unitsProduced   : Int                 = 0
   def techOption      : Option[Tech]        = None
   def upgradeOption   : Option[Upgrade]     = None
   def upgradeLevel    : Int                 = 0

@@ -1,3 +1,7 @@
 package Macro.MacroSim
 
-case class MacroStep(state: MacroState, event: MacroEvent, request: Option[MacroRequest] = None)
+class MacroStep {
+  val state: MacroState = new MacroState
+  var event: MacroEvent = new MacroEvent
+  var request: Option[MacroRequest] = None
+}

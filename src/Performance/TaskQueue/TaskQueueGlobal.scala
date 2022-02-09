@@ -23,7 +23,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
     "Planning",
     With.accounting,
     With.unitsShown,
-    With.buildOrderHistory,
+    With.productionHistory,
     new SimpleTask("Gameplan", () => {
       With.bank.update()
       With.recruiter.update()
@@ -35,6 +35,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.yolo.updateBlackboard()
       With.strategy.update()
       With.strategy.gameplan.update()
+      With.macroSim.simulate()
       With.yolo.updateBlackboard() // YOLO trumps gameplan
     }),
     With.tactics,

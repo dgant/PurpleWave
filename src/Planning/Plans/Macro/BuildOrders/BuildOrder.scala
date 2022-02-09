@@ -18,7 +18,7 @@ class BuildOrder(initialRequests: BuildRequest*) extends Plan {
     val modifiedRequests = requests.get.flatMap(request => {
       val unit = request.buildable.unitOption.filter( ! _.isBuilding)
       if (unit.isDefined && request.total > 0) {
-        val quantityLost = Math.max(0, With.buildOrderHistory.doneAllTime(unit.get) - countFriendlyComplete(unit.get))
+        val quantityLost = Math.max(0, With.productionHistory.doneAllTime(unit.get) - countFriendlyComplete(unit.get))
 
         val quantityToRequest = request.total - quantityLost
         if (quantityToRequest > 0) {

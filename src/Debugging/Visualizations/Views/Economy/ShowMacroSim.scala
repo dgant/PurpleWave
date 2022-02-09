@@ -8,7 +8,7 @@ import bwapi.Color
 
 object ShowMacroSim extends View {
   val y0 = 300
-  val pixelsPerFrame          : Double = 638.0 / Minutes(1)()
+  val pixelsPerFrame          : Double = 638.0 / Minutes(3)()
   val pixelsPerResource       : Double = y0 / 1000.0
   val pixelsPerSupply         : Double = y0 / 400.0
   val colorMinerals           : Color = Colors.NeonTeal

@@ -1,10 +1,12 @@
 package Macro.MacroSim
 
 import Lifecycle.With
-import ProxyBwapi.Races.Zerg
+import Mathematics.Maff
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades
+import Utilities.Time.Forever
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -12,37 +14,43 @@ import scala.collection.mutable.ArrayBuffer
 final class MacroSim {
   var startFrame: Int = 0
   val requests  =  new ArrayBuffer[MacroRequest]
+  val denied    = new ArrayBuffer[MacroRequest]()
   val steps     =  new mutable.ArrayBuffer[MacroStep]()
+
 
   def reset(): Unit = {
     startFrame = With.frame
     requests.clear()
+    denied.clear()
     steps.clear()
 
     // Construct initial state
-    val state = new MacroState
-    state.minerals = With.self.minerals
-    state.gas = With.self.gas
-    state.supplyAvailable = With.units.ours.filter(_.complete).map(_.unitClass.supplyProvided).sum
-    state.supplyUsed = With.units.ours.map(_.unitClass.supplyRequired).sum
-    state.mineralPatches = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
-    state.geysers = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
-    Upgrades.all.foreach(u => state.upgrades(u) = With.self.getUpgradeLevel(u))
-    state.techs ++= Techs.all.view.filter(With.self.hasTech)
-    insert(MacroStep(state, new MacroEvent))
+    val initialStep = new MacroStep
+    val initialState = initialStep.state
+    initialState.minerals = With.self.minerals
+    initialState.gas = With.self.gas
+    initialState.supplyAvailable = With.units.ours.filter(_.complete).map(_.unitClass.supplyProvided).sum
+    initialState.supplyUsed = With.units.ours.map(_.unitClass.supplyRequired).sum
+    initialState.mineralPatches = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
+    initialState.geysers = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
+    Upgrades.all.foreach(u => initialState.upgrades(u) = With.self.getUpgradeLevel(u))
+    initialState.techs ++= Techs.all.view.filter(With.self.hasTech)
+    insert(initialStep)
 
     // Construct events for things in progress
-    With.units.ours.foreach(u => state.units(u.unitClass) += 1)
-    With.units.ours.filter(_.remainingOccupationFrames == 0).foreach(u => state.producers(u.unitClass) += 1)
+    // TODO: Count Eggs/Cocoon/Lurker Egg as what they're making
+    With.units.ours.foreach(u => initialState.units(u.unitClass) += 1)
+    With.units.ours.filter(_.remainingOccupationFrames == 0).foreach(u => initialState.producers(u.unitClass) += 1)
     With.units.ours.filter(_.remainingOccupationFrames > 0).foreach(u => {
-      val event = new MacroEvent
+      val step = new MacroStep
+      val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
         event.dSupplyAvailable += u.unitClass.supplyProvided
       }
       if (u.upgrading) {
         event.dUpgrade = u.upgradingType
-        event.dUpgradeLevel = 1 + state.upgrades(u.upgradingType)
+        event.dUpgradeLevel = 1 + initialState.upgrades(u.upgradingType)
       } else if (u.teching) {
         event.dTech = u.techingType
       } else if (u.unitClass.isGas) {
@@ -53,22 +61,129 @@ final class MacroSim {
       } else if (u.morphing) {
         // TODO: Add/Subtract
       }
-      event.dProducer = u.unitClass
-      event.dProducerN = 1
-      insert(MacroStep(new MacroState, event))
-      state.producers(u.unitClass) += 1
+      event.dProducer1 = u.unitClass
+      event.dProducer1N = 1
+      steps += step
+      initialState.producers(u.unitClass) += 1
     })
 
     // Populate states as of each event
-    updateStatesAfter(0)
-
-    // Construct events for our requests
+    updateStatesFrom(1)
   }
 
-  def insert(step: MacroStep): Unit = {
+  def simulate(): Unit = {
+    // Temporary: Populate requests from the scheduler to test the sim
+    // This will need to be replaced once BuildRequests are replaced with MacroRequests
+    With.scheduler.audit.view.flatMap(_._2).foreach(buildRequest => {
+      if (buildRequest.buildable.upgradeOption.exists(u => steps.last.state.upgrades(u) < buildRequest.total)) {
+        requests += new MacroRequest
+        requests.last.upgrade = buildRequest.buildable.upgradeOption
+        requests.last.min = buildRequest.total
+        requests.last.max = buildRequest.total
+      } else if (buildRequest.buildable.techOption.exists(t => ! steps.last.state.techs.contains(t))) {
+        requests += new MacroRequest
+        requests.last.tech = buildRequest.buildable.techOption
+      } else if (buildRequest.buildable.unitOption.isDefined) {
+        requests += new MacroRequest
+        requests.last.unit = buildRequest.buildable.unitOption
+        requests.last.min = buildRequest.total
+        requests.last.max = buildRequest.total
+      }
+      val macroRequest = new MacroRequest
+    })
+
+    // Construct events for our requests
+    // TODO: Skip fulfilled requests
+    requests.foreach(request => {
+      val insertAfter = steps.indices.find(canInsertAfter(request, _))
+      insertAfter.foreach(i => {
+        val stepBefore = steps(i)
+        var framesAfter = Math.ceil(Seq(
+          stepBefore.event.dFrames,
+          stepBefore.event.dFrames + Maff.nanToN((request.mineralsRequired - stepBefore.state.minerals) / With.accounting.incomePerFrameMinerals, Forever()),
+          stepBefore.event.dFrames + Maff.nanToN((request.gasRequired - stepBefore.state.gas) / With.accounting.incomePerFrameGas, Forever())).max).toInt
+        if (framesAfter < Forever()) {
+          val stepStart           = new MacroStep
+          val stepFinish          = new MacroStep
+          val eventStart          = stepStart.event
+          val eventFinish         = stepFinish.event
+          stepStart.request       = Some(request)
+          stepFinish.request      = Some(request)
+          eventStart.dFrames      = framesAfter
+          eventStart.dMinerals    = - request.mineralsRequired
+          eventStart.dGas         = -request.gasRequired
+          eventStart.dSupplyUsed  = request.supplyRequired
+          eventStart.dProducer1   = request.producerRequired
+          eventStart.dProducer1N  = - request.producersRequired
+          eventFinish.dFrames     = eventStart.dFrames + request.framesRequired
+          eventFinish.dProducer1  = eventStart.dProducer1
+          eventFinish.dProducer1N = - eventStart.dProducer1N
+          request.unit.foreach(u => {
+            eventStart.dUnit1 = u
+            eventStart.dUnit1N = u.copiesProduced
+            if (u.isGas) {
+              eventFinish.dGeysers = 1
+            }
+          })
+          if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Spire, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
+            eventStart.dUnit2 = request.producerRequired
+            eventStart.dUnit2N = - request.producersRequired
+          }
+          request.unit.foreach(unit => {
+            eventFinish.dSupplyAvailable = unit.supplyProvided
+            eventFinish.dProducer2 = unit
+            eventFinish.dProducer2N = unit.copiesProduced
+          })
+          request.tech.foreach(eventFinish.dTech = _)
+          request.upgrade.foreach(upgrade => {
+            eventFinish.dUpgrade = upgrade
+            eventFinish.dUpgradeLevel = request.min
+          })
+          val iStart = insert(stepStart)
+          insert(stepFinish)
+          updateStatesFrom(iStart)
+        }
+      })
+    })
+  }
+
+  private def canInsertAfter(request: MacroRequest, i: Int): Boolean = {
+    // Find a state where we can build the request
+    val step = steps(i)
+    val mineralsAfter = if (i >= steps.length - 1) Int.MaxValue else steps(i + 1).state.minerals
+    val gasAfter = if (i >= steps.length - 1) Int.MaxValue else steps(i + 1).state.gas
+    if (request.mineralsRequired > step.state.minerals || request.gasRequired > step.state.gas) {
+      if (request.mineralsRequired > step.state.minerals && With.accounting.incomePerFrameMinerals == 0) return false
+      if (request.gasRequired > step.state.gas && With.accounting.incomePerFrameGas == 0) return false
+      if (request.mineralsRequired > mineralsAfter || request.gasRequired > gasAfter) return false
+    }
+    // TODO: Inject supply?
+    if (request.supplyRequired > step.state.supplyAvailable - step.state.supplyUsed) return false
+    // TODO: Inject prerequisites?
+    if (request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)) return false
+    if (request.techRequired.exists(t => ! step.state.techs.contains(t))) return false
+    if (request.producersRequired > 0 && step.state.units(request.producerRequired) < request.producersRequired) return false
+    if (request.unitsRequired.exists(step.state.units(_) == 0)) return false
+    canInsertBefore(request, i)
+  }
+
+  private def canInsertBefore(request: MacroRequest, i: Int): Boolean = {
+    var j = i
+    while(j < steps.length) {
+      val state = steps(j).state
+      if (request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired) return false
+      if (request.mineralsRequired > Math.max(0, state.minerals)) return false
+      if (request.gasRequired > Math.max(0, state.gas)) return false
+      if (request.supplyRequired > Math.max(0, state.supplyAvailable - state.supplyUsed)) return false
+      j += 1
+    }
+    true
+  }
+
+  def insert(step: MacroStep): Int = {
     // Binary search to figure out where to fit the step
     val dFrames = step.event.dFrames
-    var min = 0
+    var min = 1
     var max = steps.length
     while(true) {
       val at = (min + max) / 2
@@ -80,16 +195,17 @@ final class MacroSim {
         min = at + 1
       } else {
         steps.insert(at, step)
-        return
+        return at
       }
     }
+    throw new RuntimeException("Failed to insert a MacroStep")
   }
 
   def mineralsMinedBy(dFrame: Int): Int = (With.accounting.incomePerFrameMinerals * dFrame).toInt
   def gasMinedBy(dFrame: Int): Int = (With.accounting.incomePerFrameGas * dFrame).toInt
 
-  def updateStatesAfter(index: Int): Unit = {
-    var i = index + 1
+  def updateStatesFrom(index: Int): Unit = {
+    var i = index
     while (i < steps.length) {
       val stateLast = steps(i - 1).state
       val stateNext = steps(i).state
@@ -117,10 +233,14 @@ final class MacroSim {
       if (event.dUnit2 != UnitClasses.None) {
         stateNext.units(event.dUnit2) += event.dUnit2N
       }
-      if (event.dProducer != UnitClasses.None) {
-        stateNext.producers(event.dProducer) += event.dProducerN
+      if (event.dProducer1 != UnitClasses.None) {
+        stateNext.producers(event.dProducer1) += event.dProducer1N
+      }
+      if (event.dProducer2 != UnitClasses.None) {
+        stateNext.producers(event.dProducer2) += event.dProducer2N
       }
       i += 1
     }
   }
 }
+

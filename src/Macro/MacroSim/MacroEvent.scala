@@ -29,7 +29,7 @@ final class MacroEvent {
     if (value > 0) f"+$value" else f"$value"
   }
   private def free(value: Int): String = {
-    if (value > 0) f"Avail $value" else f"Occupy $value"
+    if (value > 0) f"Avail $value" else f"Occupy ${-value}"
   }
   override def toString: String = {
     var output = f"${Frames(dFrames)} "
@@ -37,8 +37,8 @@ final class MacroEvent {
     if (dUpgrade != Upgrades.None)      output += f"$dUpgrade $dUpgradeLevel "
     if (dUnit1 != UnitClasses.None)     output += f"${sign(dUnit1N)} $dUnit1 "
     if (dUnit2 != UnitClasses.None)     output += f"${sign(dUnit2N)} $dUnit2 "
-    if (dProducer1 != UnitClasses.None) output += f"${free(dProducer1N)} $dProducer1) "
-    if (dProducer2 != UnitClasses.None) output += f"${free(dProducer2N)} $dProducer2) "
+    if (dProducer1 != UnitClasses.None) output += f"${free(dProducer1N)} $dProducer1 "
+    if (dProducer2 != UnitClasses.None) output += f"${free(dProducer2N)} $dProducer2 "
     if (dMinerals != 0)                 output += f"${sign(dMinerals)}m "
     if (dGas != 0)                      output += f"${sign(dGas)}g "
     if (dSupplyUsed != 0)               output += f"${sign(-dSupplyUsed)}s "

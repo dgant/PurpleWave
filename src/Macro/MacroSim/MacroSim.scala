@@ -66,7 +66,7 @@ final class MacroSim {
       }
       event.dProducer1 = u.unitClass
       event.dProducer1N = 1
-      steps += step
+      insert(step)
     })
 
     // Populate states as of each event
@@ -110,8 +110,8 @@ final class MacroSim {
           val stepBefore = steps(i)
           val framesAfter = Math.ceil(Seq(
             stepBefore.event.dFrames,
-            if (request.mineralsRequired == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralsRequired  - stepBefore.state.minerals)  / With.accounting.incomePerFrameMinerals, Forever()),
-            if (request.gasRequired      == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasRequired       - stepBefore.state.gas)       / With.accounting.incomePerFrameGas,    Forever()))
+            if (request.mineralsRequired == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralsRequired  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals, Forever()),
+            if (request.gasRequired      == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasRequired       - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,    Forever()))
             .max).toInt
           if (framesAfter < Forever()) {
             val stepStart           = new MacroStep
@@ -162,8 +162,8 @@ final class MacroSim {
   private def canInsertAfter(request: MacroRequest, i: Int): Boolean = {
     // Find a state where we can build the request
     val step = steps(i)
-    if (request.mineralsRequired > Math.max(0, step.state.minerals) && With.accounting.incomePerFrameMinerals == 0) return false
-    if (request.gasRequired > Math.max(0, step.state.gas) && With.accounting.incomePerFrameGas == 0) return false
+    if (request.mineralsRequired > Math.max(0, step.state.minerals) && With.accounting.ourIncomePerFrameMinerals == 0) return false
+    if (request.gasRequired > Math.max(0, step.state.gas) && With.accounting.ourIncomePerFrameGas == 0) return false
     // TODO: Inject supply?
     if (request.supplyRequired > step.state.supplyAvailable - step.state.supplyUsed) return false
     // TODO: Inject prerequisites?
@@ -208,9 +208,6 @@ final class MacroSim {
     throw new RuntimeException("Failed to insert a MacroStep")
   }
 
-  def mineralsMinedBy(dFrame: Int): Int = (With.accounting.incomePerFrameMinerals * dFrame).toInt
-  def gasMinedBy(dFrame: Int): Int = (With.accounting.incomePerFrameGas * dFrame).toInt
-
   def updateStatesFrom(index: Int): Unit = {
     var i = index
     while (i < steps.length) {
@@ -218,8 +215,8 @@ final class MacroSim {
       val stateNext = steps(i).state
       val event = steps(i).event
       val dFrames = event.dFrames - steps(i - 1).event.dFrames
-      stateNext.minerals = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.incomePerFrameMinerals).toInt
-      stateNext.gas = stateLast.gas + event.dGas + (dFrames * With.accounting.incomePerFrameGas).toInt
+      stateNext.minerals = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
+      stateNext.gas = stateLast.gas + event.dGas + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
       stateNext.supplyAvailable = stateLast.supplyAvailable + event.dSupplyAvailable
       stateNext.supplyUsed = stateLast.supplyUsed + event.dSupplyUsed
       stateNext.mineralPatches = stateLast.mineralPatches + event.dMineralPatches

@@ -37,8 +37,8 @@ class Bank {
   
   private def recountResources() {
     val framesAhead = 4 * With.reaction.planningAverage
-    mineralsLeft  = With.self.minerals  + (framesAhead * With.accounting.incomePerFrameMinerals).toInt
-    gasLeft       = With.self.gas       + (framesAhead * With.accounting.incomePerFrameGas).toInt
+    mineralsLeft  = With.self.minerals  + (framesAhead * With.accounting.ourIncomePerFrameMinerals).toInt
+    gasLeft       = With.self.gas       + (framesAhead * With.accounting.ourIncomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
     requests.foreach(queueBuyer)
   }

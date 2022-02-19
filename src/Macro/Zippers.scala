@@ -63,7 +63,6 @@ trait Zippers {
         && unit.pixelDistanceSquared(mineral.pixel) <= accelerationPixel.pixelDistanceSquared(mineral.pixel))
   }
 
-
   def updateAccelerantPixels(): Unit = {
     if (With.frame == 0) { onStart() }
     val arrivingWorkers = With.units.ours.filter(u =>

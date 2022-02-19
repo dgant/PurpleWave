@@ -34,7 +34,7 @@ class FingerprintGasCompleteBy(frameCount: FrameCount) extends Fingerprint {
             keyFrame
           + u.unitClass.buildFrames
           - u.remainingCompletionFrames
-          + u.unitClass.gasPrice / With.accounting.incomePerFrameGas / 3)
+          + u.unitClass.gasPrice / With.accounting.workerIncomePerFrameGas / 3)
     if (gasUnitProof.isDefined) return UnitProof(gasUnitProof.get)
     val gasUpgradeProof = Upgrades.all
       .filter(u => With.enemies.exists(_.hasUpgrade(u)))
@@ -42,7 +42,7 @@ class FingerprintGasCompleteBy(frameCount: FrameCount) extends Fingerprint {
         With.frame <
           keyFrame
         + u.upgradeFrames.head._2
-        + u.gasPrice.head._2 / With.accounting.incomePerFrameGas / 3)
+        + u.gasPrice.head._2 / With.accounting.workerIncomePerFrameGas / 3)
     if (gasUpgradeProof.isDefined) return UpgradeProof(gasUpgradeProof.get)
     NoProof
   }

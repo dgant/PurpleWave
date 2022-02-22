@@ -5,7 +5,7 @@ import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Utilities.Time.Frames
 
-final class MacroEvent {
+final class MacroEvent(val state: MacroState) {
   var dFrames           : Int = 0
   var dMinerals         : Int = 0
   var dGas              : Int = 0
@@ -28,14 +28,18 @@ final class MacroEvent {
   private def sign(value: Int): String = {
     if (value > 0) f"+$value" else f"$value"
   }
+
+  private def count(value: Int): String = {
+    f"($value)"
+  }
   override def toString: String = {
     var output = f"${Frames(dFrames)} "
     if (dTech != Techs.None)            output += f"$dTech "
     if (dUpgrade != Upgrades.None)      output += f"$dUpgrade $dUpgradeLevel "
-    if (dUnit1 != UnitClasses.None)     output += f"${sign(dUnit1N)} $dUnit1 "
-    if (dUnit2 != UnitClasses.None)     output += f"${sign(dUnit2N)} $dUnit2 "
-    if (dProducer1 != UnitClasses.None) output += f"${sign(dProducer1N)} Free $dProducer1 "
-    if (dProducer2 != UnitClasses.None) output += f"${sign(dProducer2N)} Free $dProducer2 "
+    if (dUnit1 != UnitClasses.None)     output += f"${sign(dUnit1N)} ${count(dUnit1N + state.units(dUnit1))} $dUnit1 "
+    if (dUnit2 != UnitClasses.None)     output += f"${sign(dUnit2N)} ${count(dUnit2N + state.units(dUnit2))} $dUnit2 "
+    if (dProducer1 != UnitClasses.None) output += f"${sign(dProducer1N)} ${dProducer1N + count(state.producers(dProducer1))} Free $dProducer1 "
+    if (dProducer2 != UnitClasses.None) output += f"${sign(dProducer2N)} ${dProducer2N + count(state.producers(dProducer2))} Free $dProducer2 "
     if (dMinerals != 0)                 output += f"${sign(dMinerals)}m "
     if (dGas != 0)                      output += f"${sign(dGas)}g "
     if (dSupplyUsed != 0)               output += f"${sign(-dSupplyUsed)}s "

@@ -4,7 +4,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.Upgrades.Upgrade
 
-abstract class Buildable {
+trait Buildable {
   
   def unitOption      : Option[UnitClass]   = None
   def techOption      : Option[Tech]        = None

@@ -53,8 +53,8 @@ trait MacroActions {
   def pump(unitClass: UnitClass, maximumTotal: Int = Int.MaxValue, maximumConcurrently : Int = Int.MaxValue): Unit = {
     new Pump(unitClass, maximumTotal, maximumConcurrently).update()
   }
-  def pumpWorkers(oversaturate: Boolean = false, cap: Int = 75, maximumConcurrently: Int = 2, maximumTotal: Int = 200): Unit = {
-    new PumpWorkers(oversaturate, cap, maximumConcurrently, maximumTotal).update()
+  def pumpWorkers(oversaturate: Boolean = false, maximumTotal: Int = 75, maximumConcurrently: Int = 2): Unit = {
+    new PumpWorkers(oversaturate, maximumTotal, maximumConcurrently).update()
   }
   def pumpSupply(): Unit = {
     new RequireSufficientSupply().update()

@@ -3,12 +3,12 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Utilities.Time.Minutes
+import Utilities.Time.Seconds
 import bwapi.Color
 
 object ShowMacroSim extends View {
   val y0 = 300
-  val pixelsPerFrame          : Double = 638.0 / Minutes(3)()
+  val pixelsPerFrame          : Double = 638.0 / Seconds(90)()
   val pixelsPerResource       : Double = y0 / 1000.0
   val pixelsPerSupply         : Double = y0 / 400.0
   val colorMinerals           : Color = Colors.NeonTeal

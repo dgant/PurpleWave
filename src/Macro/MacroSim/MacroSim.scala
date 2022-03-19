@@ -20,7 +20,7 @@ final class MacroSim {
 
   def queue: Seq[Buildable] = steps.view.filter(_.request.isDefined).map(_.request.get)
 
-  private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && unit.remainingOccupationFrames == 0
+  private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
     val requests = new ArrayBuffer[Buildable]
     redundant.clear()

@@ -18,9 +18,8 @@ class PumpRatio(
   ratios        : Seq[MatchingRatio],
   round         : Rounding = Rounding.Up)
   extends Pump(unitClass) {
-
   
-  description.set("Train " + unitClass + " based on ratios")
+  description.set("Pump " + unitClass + " to ratio")
   
   override def maxDesirable: Int = Maff.clamp(
     (round match {

@@ -3,8 +3,8 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Planning.Plans.Macro.Build.Production
 import ProxyBwapi.Races.Zerg
+import Tactics.Production.Production
 import bwapi.Color
 
 object ShowProduction extends View {
@@ -19,8 +19,8 @@ object ShowProduction extends View {
           unitClass.toString,
           unitClass.buildFrames,
           if (unit.complete) unit.remainingTrainFrames else unit.remainingCompletionFrames,
-          if (unit.friendly.forall(_.getProducer.isEmpty)) Colors.DarkRed else Colors.DarkBlue,
-          if (unit.friendly.forall(_.getProducer.isEmpty)) Colors.NeonRed else Colors.NeonBlue))
+          if (unit.friendly.forall(_.producer.isEmpty)) Colors.DarkRed else Colors.DarkBlue,
+          if (unit.friendly.forall(_.producer.isEmpty)) Colors.NeonRed else Colors.NeonBlue))
       else if (unit.teching)
         unit.techProducing.map(t => Producible(
           t.toString,
@@ -46,22 +46,15 @@ object ShowProduction extends View {
       .withFilter(_.owner.isInstanceOf[Production])
       .map(request => {
         val productionPlan = request.owner.asInstanceOf[Production]
-        val duration = if (productionPlan != null) productionPlan.buildable.frames else 24 * 45
+        val duration = if (productionPlan != null) productionPlan.buildable.buildFrames else 24 * 45
         Producible(
-          request.owner.toString
-            .replaceAll("Morph a ", "")
-            .replaceAll("Train a ", "")
-            .replaceAll("Build a ", "")
-            .replaceAll("Upgrade ", "")
-            .replaceAll("Research ", "")
-            .replaceAll(" 1", "")
-          ,
+          request.owner.toString.replaceAll("Produce ", ""),
           duration,
           Math.min(request.expectedFrames, duration),
           colorDenominator = Colors.ShadowGray,
           colorNumerator = Colors.ShadowGray,
           started = false,
-          paid = productionPlan.producerCurrencyLocks.forall(_.isSatisfied)
+          paid = With.bank.requests.view.filter(_.owner == productionPlan).forall(_.isSatisfied)
         )})
 
     producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)

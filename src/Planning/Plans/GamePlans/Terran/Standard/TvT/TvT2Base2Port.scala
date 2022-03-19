@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Plans.Army.FloatBuildings
 import Planning.Plans.Compound.{If, Parallel}

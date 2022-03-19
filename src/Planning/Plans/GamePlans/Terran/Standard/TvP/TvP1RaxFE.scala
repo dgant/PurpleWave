@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._

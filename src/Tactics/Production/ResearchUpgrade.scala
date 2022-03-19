@@ -1,38 +1,33 @@
-package Planning.Plans.Macro.Build
+package Tactics.Production
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, BuildableUpgrade}
+import Macro.Buildables.Buildable
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{MatchAnd, MatchIdle}
 import Planning.UnitPreferences.PreferIdle
-import ProxyBwapi.UnitClasses.UnitClasses
+import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.Upgrade
 
-class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
+class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
 
-  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def buildable: Buildable = BuildableUpgrade(upgrade, level)
-  
-  val upgraderClass = upgrade.whatUpgrades
-  val currencyLock = new LockCurrencyForUpgrade(this, upgrade, level)
-  val upgraders = new LockUnits(this)
+  setBuildable(buildableUpgrade)
+  val upgrade       : Upgrade       = buildable.upgrade.get
+  val level         : Int           = buildable.quantity
+  val upgraderClass : UnitClass     = upgrade.whatUpgrades
+  val currencyLock  : LockCurrency  = new LockCurrencyFor(this, upgrade, level)
+  val upgraders     : LockUnits     = new LockUnits(this)
   upgraders.counter = CountOne
   upgraders.matcher = MatchAnd(upgraderClass, MatchIdle)
   upgraders.preference = PreferIdle
 
-  override def isComplete: Boolean = With.self.getUpgradeLevel(upgrade) >= level
+  override def isComplete: Boolean = upgrade(With.self, level)
 
   override def onUpdate() {
     if (isComplete) return
     if (With.units.ours.exists(u => u.upgradingType == upgrade && ! upgraders.units.contains(u))) return
-
     val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(_ == UnitClasses.None)
-
-    // Don't even stick a projected expenditure in the queue if we're this far out.
-    if (requiredClasses.exists(c => ! With.units.existsOurs(c))) return
-
     currencyLock.framesPreordered = (
       upgraders.units.view.map(_.remainingOccupationFrames)
       ++ requiredClasses.map(With.projections.unit)).max
@@ -43,6 +38,4 @@ class ResearchUpgrade(upgrade: Upgrade, level: Int) extends Production {
     upgraders.acquire()
     upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
   }
-
-  override val toString: String = f"Research $upgrade"
 }

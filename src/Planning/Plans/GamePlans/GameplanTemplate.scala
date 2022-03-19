@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans
 
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.BuildRequest
+import Macro.Buildables.Buildable
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.If
@@ -17,24 +17,24 @@ import Planning.Predicates.{Always, Never}
 import Planning.{Plan, Predicate}
 
 abstract class GameplanTemplate extends Plan with Modal {
-  val activationCriteria    : Predicate         = new Always
-  val completionCriteria    : Predicate         = new Never
-  val meldArchonsAt         : Int               = 40
-  val removeMineralBlocksAt : Int               = 80
-  def status                : String            = this.toString
-  def blueprints            : Seq[Blueprint]    = Seq.empty
-  def buildOrder            : Seq[BuildRequest] = Vector.empty
-  def emergencyPlans        : Seq[Plan]         = Vector.empty
-  def buildPlans            : Seq[Plan]         = Vector.empty
-  def aggressionPlan        : Plan              = NoPlan()
-  def statusPlan            : Plan              = new WriteStatus(() => status)
-  def placementPlan         : Plan              = new ProposePlacement(blueprints: _*)
-  def archonPlan            : Plan              = new MeldArchons(meldArchonsAt)
-  def buildOrderPlan        : Plan              = new BuildOrder(buildOrder: _*)
-  def supplyPlan            : Plan              = new RequireSufficientSupply
-  def workerPlan            : Plan              = new If(new Not(new WeAreZerg), new PumpWorkers)
-  def scoutPlan             : Plan              = new ConsiderScoutingWithWorker
-  def attackPlan            : Plan              = new ConsiderAttacking
+  val activationCriteria    : Predicate       = new Always
+  val completionCriteria    : Predicate       = new Never
+  val meldArchonsAt         : Int             = 40
+  val removeMineralBlocksAt : Int             = 80
+  def status                : String          = this.toString
+  def blueprints            : Seq[Blueprint]  = Seq.empty
+  def buildOrder            : Seq[Buildable]  = Vector.empty
+  def emergencyPlans        : Seq[Plan]       = Vector.empty
+  def buildPlans            : Seq[Plan]       = Vector.empty
+  def aggressionPlan        : Plan            = NoPlan()
+  def statusPlan            : Plan            = new WriteStatus(() => status)
+  def placementPlan         : Plan            = new ProposePlacement(blueprints: _*)
+  def archonPlan            : Plan            = new MeldArchons(meldArchonsAt)
+  def buildOrderPlan        : Plan            = new BuildOrder(buildOrder: _*)
+  def supplyPlan            : Plan            = new RequireSufficientSupply
+  def workerPlan            : Plan            = new If(new Not(new WeAreZerg), new PumpWorkers)
+  def scoutPlan             : Plan            = new ConsiderScoutingWithWorker
+  def attackPlan            : Plan            = new ConsiderAttacking
 
   private lazy val children = (Vector(statusPlan)
     ++ Vector(placementPlan)

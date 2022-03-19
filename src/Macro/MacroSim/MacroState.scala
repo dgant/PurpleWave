@@ -14,6 +14,7 @@ final class MacroState {
   var geysers         : Int = _
   var techs           : Set[Tech]           = Set.empty
   var upgrades        : CountMap[Upgrade]   = new CountMap[Upgrade]
-  var units           : CountMap[UnitClass] = new CountMap[UnitClass]
+  var unitsExtant     : CountMap[UnitClass] = new CountMap[UnitClass]
+  var unitsComplete   : CountMap[UnitClass] = new CountMap[UnitClass]
   var producers       : CountMap[UnitClass] = new CountMap[UnitClass]
 }

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel, Trigger}

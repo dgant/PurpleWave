@@ -6,7 +6,6 @@ import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitClasses.UnitClass
 
-
 object Rounding extends Enumeration {
   type Rounding = Value
   val Up, Down, Round = Value

@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Macro.Scheduling.MacroCounter
 import Planning.Plan
 import Planning.UnitMatchers._
@@ -26,9 +26,7 @@ class Pump(
     val unitsToAddCeiling   = Math.max(0, Math.min(maximumTotal, maxDesirable) - unitsComplete) // TODO: Clamp Nukes to #Silos
     val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatchlike, MatchComplete)) else 0
     val buildersExisting    = getBuildersExisting
-    val buildersAllocated   = getBuildersAllocated
     val buildersTotal       = buildersExisting.size + larvaSpawning
-    val buildersAllocatable = Math.max(0, buildersTotal - buildersAllocated)
 
     val minerals            = With.self.minerals  // To improve: Measure existing expediture commitments
     val gas                 = With.self.gas       // To improve: Measure existing expediture commitments
@@ -38,7 +36,7 @@ class Pump(
     val budgetedByGas       = if (gasPrice      <= 0) 400 else (gas      + With.accounting.ourIncomePerFrameGas      * unitClass.buildFrames) / gasPrice
     val budgeted            = Math.max(1, Math.ceil(Math.min(budgetedByMinerals, budgetedByGas))) // 3/4/2020 change: To encourage saving budget for eg. Dragoon instead of burning on Zealot, using ceil instead of round
 
-    val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, buildersAllocatable, budgeted, unitsToAddCeiling / unitClass.copiesProduced).min.toInt)
+    val buildersToConsume   = Math.max(0, Vector(maximumConcurrently, buildersTotal, budgeted, unitsToAddCeiling / unitClass.copiesProduced).min.toInt)
     val unitsToAdd          = buildersToConsume * unitClass.copiesProduced
     val unitsToRequest      = unitsComplete + unitsToAdd
 
@@ -66,13 +64,6 @@ class Pump(
         && ( ! unitClass.isAddon                                          || unitClass.buildUnitsEnabling.forall(t => With.units.ours.exists(u => u.completeOrNearlyComplete && u.is(t)))) // Hack -- don't reserve buildings before we have the tech to build the addon.
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
-
-  final protected def getBuildersAllocated: Int = builderClass.unitsTrained.view.map(u =>
-    (
-      Math.max(0, With.scheduler.unitsWanted(u) - With.scheduler.unitsCounted(u))
-      + unitClass.copiesProduced
-      - 1
-    ) / unitClass.copiesProduced).sum
 
   description.set(f"Pump $unitClass")
 }

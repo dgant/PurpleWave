@@ -1,12 +1,12 @@
 package Planning.Plans.GamePlans
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.Build.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
+import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.UnitMatchers.UnitMatcher
@@ -39,12 +39,12 @@ trait MacroActions {
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))
-  def get(buildRequest: BuildRequest): Unit = {
-    With.scheduler.request(_requesterPlan, buildRequest)
+  def get(item: Buildable): Unit = {
+    With.scheduler.request(_requesterPlan, item)
   }
   private def _requesterPlan = new Plan()
 
-  def buildOrder(items: BuildRequest*): Unit = {
+  def buildOrder(items: Buildable*): Unit = {
     new BuildOrder(items: _*).update()
   }
   def requireEssentials(): Unit = {

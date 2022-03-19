@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.DoQueue

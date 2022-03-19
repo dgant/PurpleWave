@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Expanding
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.{Plan, Property}
 
 class RequireBases(basesInitial: Int = 1) extends Plan {

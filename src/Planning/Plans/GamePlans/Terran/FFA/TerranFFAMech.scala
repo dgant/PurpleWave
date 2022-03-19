@@ -1,12 +1,12 @@
 package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Predicates.Compound.{And, Check}
 import Planning.UnitMatchers.{MatchTank, MatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Basic.NoPlan
+import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
@@ -45,21 +45,14 @@ class TerranFFAMech extends GameplanTemplate {
     new UpgradeContinuously(Terran.AirArmor),
     new Build(Get(1, Terran.ScienceFacility)))
   
-  private class BuildScienceFacilityForAddon(addon: UnitClass) extends Plan {
-    val build = new Build()
-    override def onUpdate() {
-      val numberOfCovertOps         = With.units.countOurs(Terran.CovertOps)
-      val numberOfPhysicsLab        = With.units.countOurs(Terran.PhysicsLab)
-      val numberOfThisAddon         = if (addon == Terran.CovertOps) numberOfCovertOps else numberOfPhysicsLab
-      val numberOfOtherAddon        = numberOfCovertOps + numberOfPhysicsLab - numberOfThisAddon
-      val numberOfScienceFacilities = if (numberOfThisAddon > 0) 0 else 1 + numberOfOtherAddon
-      
-      if (numberOfScienceFacilities > 0) {
-        build.requests.set(Vector(Get(numberOfScienceFacilities, Terran.ScienceFacility)))
-      }
-      build.update()
-    }
-  }
+  private class BuildScienceFacilityForAddon(addon: UnitClass) extends Do(() => {
+    val numberOfCovertOps         = With.units.countOurs(Terran.CovertOps)
+    val numberOfPhysicsLab        = With.units.countOurs(Terran.PhysicsLab)
+    val numberOfThisAddon         = if (addon == Terran.CovertOps) numberOfCovertOps else numberOfPhysicsLab
+    val numberOfOtherAddon        = numberOfCovertOps + numberOfPhysicsLab - numberOfThisAddon
+    val numberOfScienceFacilities = if (numberOfThisAddon > 0) 0 else 1 + numberOfOtherAddon
+    With.scheduler.request(this, Get(numberOfScienceFacilities, Terran.ScienceFacility))
+  })
   
   override def attackPlan: Plan = new If(
     new UnitsAtLeast(20, MatchWarriors),

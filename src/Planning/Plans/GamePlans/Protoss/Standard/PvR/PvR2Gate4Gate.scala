@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -21,7 +21,7 @@ class PvR2Gate4Gate extends GameplanTemplate {
     UpgradeComplete(Protoss.DragoonRange),
     new AttackAndHarass)
 
-  override val buildOrder: Vector[BuildRequest] = ProtossBuilds.TwoGate910
+  override val buildOrder: Vector[Buildable] = ProtossBuilds.TwoGate910
 
   override def buildPlans = Vector(
     new CapGasAt(250),

@@ -1,36 +1,21 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
-import Macro.Scheduling.MacroCounter
-import Planning.{Plan, Property}
+import Macro.Buildables.{Buildable, BuildableUnit}
+import Planning.Plan
 
-class BuildOrder(initialRequests: BuildRequest*) extends Plan {
-  
-  // Follow a build order,
-  // in which we rebuild missing buildings
-  // but not missing units
-  
-  val requests = new Property[Seq[BuildRequest]](initialRequests)
-  
+/**
+  * Requests buildables without replacing non-tech units
+  */
+class BuildOrder(requests: Buildable*) extends Plan {
   override def onUpdate() {
-    val countFriendlyComplete = MacroCounter.countFriendlyComplete
-    val modifiedRequests = requests.get.flatMap(request => {
-      val unit = request.buildable.unitOption.filter( ! _.isBuilding)
-      if (unit.isDefined && request.total > 0) {
-        val quantityLost = Math.max(0, With.productionHistory.doneAllTime(unit.get) - countFriendlyComplete(unit.get))
-
-        val quantityToRequest = request.total - quantityLost
-        if (quantityToRequest > 0) {
-          Some(Get(quantityToRequest, unit.get))
-        } else {
-          None
-        }
-      } else {
-        Some(request)
-      }
-    })
-    
-    modifiedRequests.foreach(With.scheduler.request(this, _))
+    val modifiedRequests = requests.flatMap(request =>
+      if (request.unit.forall(_.isBuilding) || request.quantity <= 0) Some(request) else {
+        val unit = request.unit.get
+        val quantityLost = Math.max(0, With.productionHistory.doneAllTime(unit) - With.macroCounts.oursComplete(unit))
+        val quantityToRequest = request.quantity - quantityLost
+        Some(BuildableUnit(unit, quantityToRequest)).filter(_.quantity > 0)
+      })
+    With.scheduler.requestAll(this, modifiedRequests)
   }
 }

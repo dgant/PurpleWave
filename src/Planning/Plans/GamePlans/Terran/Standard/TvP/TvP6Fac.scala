@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate

@@ -8,7 +8,7 @@ import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Selection.{ExpandStrategy, StrategySelectionFixed, WinProbability}
 import Strategery.Strategies.{AllChoices, Strategy}
-import bwapi.Race
+import bwapi.{GameType, Race}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -94,7 +94,7 @@ class Strategist {
   lazy val isFixedOpponent  : Boolean = With.configuration.playbook.policy.isInstanceOf[StrategySelectionFixed]
   lazy val rushDistanceMean : Double  = Maff.mean(With.geography.rushDistances)
   lazy val isIslandMap      : Boolean = With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
-  lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly)
+  lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly) && With.game.getGameType != GameType.Top_vs_Bottom
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
     .zipWithIndex

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build

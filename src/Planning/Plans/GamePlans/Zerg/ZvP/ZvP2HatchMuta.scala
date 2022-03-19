@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate

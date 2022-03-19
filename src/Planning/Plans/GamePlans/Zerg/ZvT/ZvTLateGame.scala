@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel}

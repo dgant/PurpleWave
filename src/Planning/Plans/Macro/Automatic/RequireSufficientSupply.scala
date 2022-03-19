@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Predicates.Milestones.TechStarted
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}

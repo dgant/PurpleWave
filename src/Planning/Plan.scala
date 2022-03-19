@@ -15,7 +15,6 @@ class Plan extends Prioritized with SimpleString {
     With.prioritizer.prioritize(this)
     onUpdate()
   }
-
   
-  final override def toString: String = description.get
+  override def toString: String = description.get
 }

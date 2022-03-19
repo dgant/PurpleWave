@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvR
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Predicates.Compound.{Not, Or}
 import Planning.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}

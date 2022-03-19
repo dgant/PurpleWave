@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -28,7 +28,7 @@ class TvT1FacPort extends GameplanTemplate {
       new AttackAndHarass))
 
 
-  override def buildOrder: Seq[BuildRequest] = Seq(
+  override def buildOrder: Seq[Buildable] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(12, Terran.SCV),

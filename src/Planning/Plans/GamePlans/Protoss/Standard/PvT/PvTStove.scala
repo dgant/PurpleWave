@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.If

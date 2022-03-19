@@ -1,13 +1,13 @@
-package Planning.Plans.Macro.Build
+package Tactics.Production
 
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
-import Macro.Buildables.{Buildable, BuildableUnit}
+import Macro.Buildables.Buildable
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
-import Planning.ResourceLocks.{LockCurrency, LockCurrencyForUnit, LockUnits}
+import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
 import Planning.UnitCounters.CountOne
 import Planning.UnitMatchers.{Match, MatchAnd, MatchSpecific}
 import Planning.UnitPreferences.PreferCloseAndNotMining
@@ -15,25 +15,21 @@ import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
+class BuildBuilding(buildableBuilding: Buildable) extends Production {
 
-class BuildBuilding(val buildingClass: UnitClass) extends Production {
-
-  override def producerCurrencyLocks: Seq[LockCurrency] = Seq(currencyLock)
-  override def buildable: Buildable = BuildableUnit(buildingClass)
-
-  private var orderedTile : Option[Tile]              = None
-  private var building    : Option[FriendlyUnitInfo]  = None
-  
-  val currencyLock = new LockCurrencyForUnit(this, buildingClass)
-
-  val builderMatcher: UnitClass = buildingClass.whatBuilds._1
-  val builderLock: LockUnits = new LockUnits(this)
+  setBuildable(buildableBuilding)
+  val buildingClass   : UnitClass       = buildable.unit.get
+  val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
+  val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
+  val builderLock     : LockUnits       = new LockUnits(this)
   builderLock.interruptable = false
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
-    
-  var waitForBuilderToRecallUntil: Option[Int] = None
-  var placement: Option[PlacementRequest] = None
+
+  private var orderedTile : Option[Tile]                = None
+  private var building    : Option[FriendlyUnitInfo]    = None
+  private var placement   : Option[PlacementRequest]    = None
+  private var waitForBuilderToRecallUntil: Option[Int]  = None
 
   def desiredTile: Option[Tile] = building.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
 
@@ -44,12 +40,11 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
   }
 
   override def onUpdate() {
-
     lazy val possibleBuildings = With.units.ours.filter(u =>
       u.is(buildingClass)
       && ! u.complete
       && MacroCounter.countComplete(u)(buildingClass) == 0
-      && u.getProducer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
+      && u.producer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
 
     building = building
       // Remove dead buildings
@@ -95,12 +90,9 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     builderLock.acquire()
     
     if (waitForBuilderToRecallUntil.isDefined) {
-      if (With.frame < waitForBuilderToRecallUntil.get) {
-        return
-      } else {
-        orderedTile = None
-        waitForBuilderToRecallUntil = None
-      }
+      if (With.frame < waitForBuilderToRecallUntil.get) return
+      orderedTile = None
+      waitForBuilderToRecallUntil = None
     }
     
     if (builderLock.satisfied) {
@@ -157,6 +149,4 @@ class BuildBuilding(val buildingClass: UnitClass) extends Production {
     val travelHysteresisMultiplier  = if (builderLock.units.nonEmpty) 1.35 else 1.2
     travelHysteresisFrames + travelHysteresisMultiplier * travelFrames >= currencyLock.expectedFrames
   }
-
-  override val toString = f"Build $buildingClass"
 }

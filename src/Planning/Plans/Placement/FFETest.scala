@@ -2,7 +2,7 @@ package Planning.Plans.Placement
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -44,7 +44,7 @@ class FFETest extends Plan {
 class PvEFFETestBuild extends GameplanTemplate {
   override def scoutPlan: Plan = new ScoutOn(Protoss.Pylon)
 
-  override def buildOrder: Seq[BuildRequest] = Seq(
+  override def buildOrder: Seq[Buildable] = Seq(
     Get(8, Protoss.Probe),
     Get(Protoss.Pylon),
     Get(11, Protoss.Probe),

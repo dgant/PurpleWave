@@ -1,14 +1,14 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
-import Planning.Plans.Macro.Build.CancelIncomplete
 import Planning.Plans.Macro.BuildOrders.Build
+import Planning.Plans.Macro.CancelIncomplete
 import Planning.Plans.Placement.BuildBunkersAtMain
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -21,7 +21,7 @@ class TerranReactionVsWorkerRush extends GameplanTemplate {
   override val activationCriteria: Predicate = new EnemyStrategy(With.fingerprints.workerRush)
   override val completionCriteria: Predicate = new UnitsAtLeast(2, Terran.Vulture, complete = true)
 
-  override def buildOrder: Seq[BuildRequest] = Seq(
+  override def buildOrder: Seq[Buildable] = Seq(
     Get(8, Terran.SCV),
     Get(Terran.Barracks))
 

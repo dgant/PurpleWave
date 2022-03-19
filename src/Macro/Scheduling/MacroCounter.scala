@@ -9,6 +9,11 @@ import Utilities.CountMap
 
 object MacroCounter {
 
+  /**
+   * Whether we count this unit effectively-complete for macro purposes
+   */
+  def completeOrNearlyComplete(unit: FriendlyUnitInfo): Boolean = unit.completeOrNearlyComplete
+
   /*
   Transitions for Zerg units:
   Larva morphing into Drone:
@@ -16,10 +21,8 @@ object MacroCounter {
     Egg:    Incomplete,     Morphing, BuildType: Drone, Remaining Frames: 0-N
     Drone:  Incomplete, Not Morphing, BuildType: None,  Remaining Frames: 0
    */
-
   def countComplete(unit: FriendlyUnitInfo): CountMap[UnitClass] = {
     val output = new CountMap[UnitClass]
-
     if ( ! unit.alive) return output
 
     if (unit.completeOrNearlyComplete) {
@@ -34,18 +37,17 @@ object MacroCounter {
     // * Hive
     // * Lair
     // * Greater Spire
-    //
-    if (unit.is(Zerg.Hive)) {
+    if (Zerg.Hive(unit)) {
       output(Zerg.Lair) = 1
       output(Zerg.Hatchery) = 1
-    } else if (unit.is(Zerg.Lair)) {
+    } else if (Zerg.Lair(unit)) {
       output(Zerg.Hatchery) = 1
-    } else if (unit.is(Zerg.GreaterSpire)) {
+    } else if (Zerg.GreaterSpire(unit)) {
       output(Zerg.Spire) = 1
     }
 
     // Count all tanks
-    if (unit.is(MatchTank)) {
+    if (MatchTank(unit)) {
       output(Terran.SiegeTankUnsieged) = 1
       output(Terran.SiegeTankSieged) = 1
     }
@@ -53,9 +55,8 @@ object MacroCounter {
     output
   }
 
-  def countCompleteOrIncomplete(unit: FriendlyUnitInfo): CountMap[UnitClass] = {
+  def countExtant(unit: FriendlyUnitInfo): CountMap[UnitClass] = {
     val output = countComplete(unit)
-
     if ( ! unit.alive) return output
 
     output(unit.unitClass) = 1
@@ -66,15 +67,15 @@ object MacroCounter {
     output
   }
 
-  def countFriendlyComplete: CountMap[UnitClass] = {
+  def countOursComplete: CountMap[UnitClass] = {
     val output = new CountMap[UnitClass]
     With.units.ours.map(countComplete).foreach(_.foreach(countPair => output(countPair._1) += countPair._2))
     output
   }
 
-  def countFriendlyCompleteOrIncomplete: CountMap[UnitClass] = {
+  def countOursExtant: CountMap[UnitClass] = {
     val output = new CountMap[UnitClass]
-    With.units.ours.map(countCompleteOrIncomplete).foreach(_.foreach(countPair => output(countPair._1) += countPair._2))
+    With.units.ours.map(countExtant).foreach(_.foreach(countPair => output(countPair._1) += countPair._2))
     output
   }
 }

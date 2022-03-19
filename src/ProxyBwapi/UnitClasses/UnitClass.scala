@@ -5,6 +5,7 @@ import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.Maff
 import Micro.Heuristics.MicroValue
 import Planning.UnitMatchers.UnitMatcher
+import ProxyBwapi.BuildableType
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -13,7 +14,7 @@ import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher {
+final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitMatcher with BuildableType {
 
   //////////////
   // Geometry //
@@ -617,4 +618,8 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   }
 
   override val hashCode: Int = toString.hashCode
+
+  override def productionFrames(quantity: Int): Int = buildFrames
+  override def mineralCost(quantity: Int): Int = mineralPrice
+  override def gasCost(quantity: Int): Int = gasPrice
 }

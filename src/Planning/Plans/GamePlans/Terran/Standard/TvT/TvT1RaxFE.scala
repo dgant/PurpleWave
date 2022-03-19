@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -40,7 +40,7 @@ class TvT1RaxFE extends GameplanTemplate {
     new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
   )
 
-  override def buildOrder: Seq[BuildRequest] = Seq(
+  override def buildOrder: Seq[Buildable] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

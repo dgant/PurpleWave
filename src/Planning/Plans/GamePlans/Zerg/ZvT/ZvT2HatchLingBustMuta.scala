@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
@@ -33,7 +33,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
   // Based on Effort vs. Flash's 1-1-1:
   // https://www.youtube.com/watch?v=3sb47YGI7l8&feature=youtu.be&t=2280
   // https://docs.google.com/spreadsheets/d/1m6nU6FewJBC2LGQX_DPuo4PqzxH8hF3bazp8T6QlqRs/edit#gid=1166229923
-  override def buildOrder: Seq[BuildRequest] = Seq(
+  override def buildOrder: Seq[Buildable] = Seq(
     Get(9, Zerg.Drone),
     Get(2, Zerg.Overlord),
     Get(12, Zerg.Drone),

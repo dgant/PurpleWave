@@ -1,4 +1,4 @@
-package Planning.Plans.Macro.Build
+package Planning.Plans.Macro
 
 import Lifecycle.With
 import Micro.Agency.Commander

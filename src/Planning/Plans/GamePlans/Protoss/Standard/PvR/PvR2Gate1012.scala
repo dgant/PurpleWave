@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.{Plan, Predicate}
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump

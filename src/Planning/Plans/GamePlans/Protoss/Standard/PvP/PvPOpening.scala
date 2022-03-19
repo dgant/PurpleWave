@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import Planning.Plans.Placement.BuildCannonsAtNatural

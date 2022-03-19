@@ -1,20 +1,17 @@
 package Planning.Plans.Macro.BuildOrders
 
-import Macro.BuildRequests.BuildRequest
-import Planning.{Plan, Property}
 import Lifecycle.With
+import Macro.Buildables.Buildable
+import Planning.Plan
 
-class Build(initialRequests: BuildRequest*) extends Plan {
-  
-  val requests = new Property[Seq[BuildRequest]](initialRequests)
-  
+class Build(requests: Buildable*) extends Plan {
+
+  override def toString: String = (
+    "Build " +
+    requests.take(3).map(_.toString).mkString(", ") +
+    (if (requests.size > 3) "..." else ""))
+
   override def onUpdate() {
-    
-    description.set(
-      "Build " +
-      requests.get.take(3).map(_.toString).mkString(", ") +
-      (if (requests.get.size > 3) "..." else ""))
-    
-    requests.get.foreach(With.scheduler.request(this, _))
+    With.scheduler.requestAll(this, requests)
   }
 }

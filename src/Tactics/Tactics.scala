@@ -9,6 +9,7 @@ import Planning.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactics.Missions._
+import Tactics.Production.Produce
 import Tactics.Squads._
 import Utilities.Time.Minutes
 
@@ -40,7 +41,7 @@ class Tactics extends TimedTask {
   private val acePilots                 = addPriorityTactic(new SquadAcePilots)
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
   private val ejectScout                = addPriorityTactic(new SquadEjectScout)
-  private val followBuildOrder          = addPriorityTactic(new FollowBuildOrder)
+  private val followBuildOrder          = addPriorityTactic(new Produce)
   private val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
   private val defendAgainstProxy        = addPriorityTactic(new DefendAgainstProxy)
   private val defendFightersAgainstRush = addPriorityTactic(new DefendFightersAgainstRush)

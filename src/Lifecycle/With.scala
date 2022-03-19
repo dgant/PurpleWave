@@ -13,7 +13,7 @@ import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
 import Macro.MacroSim.MacroSim
-import Macro.Scheduling.{ProductionHistory, MasterBuildPlans, Projections, Scheduler}
+import Macro.Scheduling.{MacroCounts, ProductionHistory, Projections, Scheduler}
 import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
@@ -64,7 +64,6 @@ object With {
   var blackboard        : Blackboard          = _
   var battles           : Battles             = _
   var productionHistory : ProductionHistory   = _
-  var buildPlans        : MasterBuildPlans    = _
   var bullets           : Bullets             = _
   var bwapiData         : BwapiData           = _
   var camera            : Camera              = _
@@ -81,6 +80,7 @@ object With {
   var lambdas           : LambdaQueue         = _
   var latency           : Latency             = _
   var logger            : Logger              = _
+  var macroCounts       : MacroCounts         = _
   var macroSim          : MacroSim            = _
   var manners           : Manners             = _
   var matchups          : MatchupGraph        = _
@@ -175,7 +175,6 @@ object With {
     battles           = new Battles
     blackboard        = new Blackboard
     productionHistory = new ProductionHistory
-    buildPlans        = new MasterBuildPlans
     bullets           = new Bullets
     camera            = new Camera
     coordinator       = new Coordinator
@@ -188,6 +187,7 @@ object With {
     history           = new History
     lambdas           = new LambdaQueue
     latency           = new Latency
+    macroCounts       = new MacroCounts
     macroSim          = new MacroSim
     manners           = new Manners
     matchups          = new MatchupGraph
@@ -217,7 +217,7 @@ object With {
   }
   
   private def analyzeTerrain() {
-    With.logger.debug(f"Loading fake BWTA for ${With.game.mapName} at ${With.game.mapFileName()}")
+    With.logger.debug(f"Loading fake BWTA for ${With.game.mapName} at ${With.game.mapFileName}")
     try {
       BWTA.readMap(With.game)
       BWTA.analyze()

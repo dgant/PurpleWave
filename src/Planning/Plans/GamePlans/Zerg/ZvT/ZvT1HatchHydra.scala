@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.BuildRequests.{BuildRequest, Get}
+import Macro.Buildables.{Buildable, Get}
 import Planning.Plan
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
@@ -56,7 +56,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
     new ZergReactionVsWorkerRush
   )
 
-  override def buildOrder: Seq[BuildRequest] = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
+  override def buildOrder: Seq[Buildable] = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
 
   override def buildPlans = Seq(
     new Write(With.blackboard.pushKiters, true),

@@ -42,11 +42,7 @@ final class UnitTracker {
     units(id) = None
   }
   def onFrame() {
-    With.game.getAllUnits.asScala.foreach(u => {
-      // TODO: First remove a unit if its isFriendly/isEnemy/isNeutral status has changed
-      if (units(u.getID).isEmpty) { birth(u) }
-      // TODO: With new unit proxies, update proxy info here
-    })
+    With.game.getAllUnits.asScala.foreach(u => if (units(u.getID).isEmpty) { birth(u) })
     all.foreach(_.update())
     foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
   }

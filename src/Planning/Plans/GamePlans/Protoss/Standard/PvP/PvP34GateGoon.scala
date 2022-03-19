@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.BuildRequests.Get
+import Macro.Buildables.Get
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic._

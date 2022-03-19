@@ -10,6 +10,6 @@ class ScoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1) 
   Check(() =>
     With.units.ours.count(u =>
       unitMatcher(u)
-      && u.getProducer.forall(With.recruiter.lockedBy(_).isEmpty)) // Make sure we can scout with the builder
+      && u.producer.forall(With.recruiter.lockedBy(_).isEmpty)) // Make sure we can scout with the builder
       >= quantity),
   new Do(() => With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))))

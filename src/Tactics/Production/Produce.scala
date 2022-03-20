@@ -24,13 +24,17 @@ class Produce extends Tactic {
     val matched       = new mutable.HashSet[Production]
 
     // Requeue any paid-for production, in the same order
-    _queueNext ++= _queueLast.view.filter(With.bank.hasSpentRequest)
+    _queueNext ++= _queueLast.view.filter(_.hasSpent)
 
     // Retain required production or add new production
     requests.foreach(request => {
-      val existing = (_queueNext.view ++ _queueLast.view.filterNot(With.bank.hasSpentRequest)).find(p => p.buildable == request && ! matched.contains(p))
-      _queueNext += existing.getOrElse(request.makeProduction)
-      matched ++= existing
+      val       existingNext = _queueNext.view                        .find(p => p.buildable == request && ! matched.contains(p))
+      lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(p => p.buildable == request && ! matched.contains(p))
+      matched ++= existingNext
+      if (existingNext.isEmpty) {
+        matched ++= existingLast
+        _queueNext += existingLast.getOrElse(request.makeProduction)
+      }
     })
 
     // Remove completed production

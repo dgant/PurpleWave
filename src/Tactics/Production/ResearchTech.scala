@@ -16,22 +16,22 @@ class ResearchTech(buildableTech: Buildable) extends Production {
   val tech          : Tech          = buildable.tech.get
   val techerClass   : UnitClass     = tech.whatResearches
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, tech, 1)
-  val techerLock    : LockUnits     = new LockUnits(this)
-  techerLock.matcher    = techerClass
-  techerLock.counter    = CountOne
-  techerLock.preference = PreferIdle
+  val techers       : LockUnits     = new LockUnits(this)
+  techers.matcher    = u => techerClass(u) && u.techProducing.forall(_ == tech)
+  techers.counter    = CountOne
+  techers.preference = PreferIdle
 
   override def isComplete: Boolean = tech(With.self)
+  override def hasSpent: Boolean = techers.units.exists(_.techProducing.contains(tech))
 
   override def onUpdate() {
     if (isComplete) return
     currencyLock.framesPreordered = Math.max(
-      Maff.max(techerLock.units.map(_.remainingOccupationFrames)).getOrElse(0),
+      Maff.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
       With.projections.unit(techerClass))
-    currencyLock.acquire()
-    currencyLock.isSpent = With.units.ours.exists(techer => techer.teching && techer.techingType == tech)
-    if ( ! currencyLock.satisfied) return
-    techerLock.acquire()
-    techerLock.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
+    if (hasSpent || currencyLock.acquire()) {
+      techers.acquire()
+      techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
+    }
   }
 }

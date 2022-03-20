@@ -22,12 +22,10 @@ object ShowResources extends View {
       .map(request =>
         Iterable(
           "",
-          {minerals  -= (if (request.isSpent) 0 else request.minerals); minerals  }.toString,
-          {gas       -= (if (request.isSpent) 0 else request.gas);      gas       }.toString,
-          {supply    -= (if (request.isSpent) 0 else request.supply);   supply / 2}.toString,
-          if (request.isSpent)
-            "Spent"
-          else if (request.satisfied)
+          {minerals  -= request.minerals  ; minerals  }.toString,
+          {gas       -= request.gas       ; gas       }.toString,
+          {supply    -= request.supply    ; supply / 2}.toString,
+          if (request.satisfied)
             "Available"
           else if (request.onSchedule)
             "On schedule"

@@ -24,9 +24,10 @@ class MorphUnit(val buildableUnit: Buildable) extends Production {
   morpherLock.counter = CountOne
   morpherLock.preference = PreferTrainerFor(classOutput)
 
-  private var morpher: Option[FriendlyUnitInfo] = None
+  var morpher: Option[FriendlyUnitInfo] = None
 
   def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classOutput) > 0)
+  def hasSpent: Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
   def onUpdate() {
 
@@ -44,10 +45,7 @@ class MorphUnit(val buildableUnit: Buildable) extends Production {
     currencyLock.framesPreordered = (
       classOutput.buildUnitsEnabling.map(With.projections.unit)
       :+ With.projections.unit(classInput)).max
-
-    currencyLock.isSpent = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
-    currencyLock.acquire()
-    if (currencyLock.satisfied && ! currencyLock.isSpent) {
+    if (hasSpent || currencyLock.acquire()) {
       morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(classInput)
       morpherLock.acquire()
       morpher = morpherLock.units.headOption
@@ -58,6 +56,7 @@ class MorphUnit(val buildableUnit: Buildable) extends Production {
         canFight = classOutput != Zerg.Lurker
       }))
     }
+
     // TODO: Send Hydras/Mutas somewhere smart soon before they morph based on currency projection
     morpher.foreach(_.setProducer(this))
   }

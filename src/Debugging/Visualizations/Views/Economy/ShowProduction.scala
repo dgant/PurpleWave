@@ -4,12 +4,18 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
-import Tactics.Production.Production
 import bwapi.Color
 
 object ShowProduction extends View {
 
-  case class Producible(name: String, framesTotal: Int, framesLeft: Int, colorDenominator: Color, colorNumerator: Color, started: Boolean = true, paid: Boolean = true)
+  case class Producible(
+    name: String,
+    framesTotal: Int,
+    framesLeft: Int,
+    colorDenominator: Color,
+    colorNumerator: Color,
+    started: Boolean = true,
+    paid: Boolean = true)
 
   override def renderScreen() {
     val producibles: Seq[Producible] = With.units.ours.view.map(unit => {
@@ -41,20 +47,18 @@ object ShowProduction extends View {
       else None
     })
     .flatten
-    .toVector ++ (if (With.bank.requests.isEmpty) With.bank.requestsLast else With.bank.requests)
-      .withFilter( ! _.isSpent)
-      .withFilter(_.owner.isInstanceOf[Production])
-      .map(request => {
-        val productionPlan = request.owner.asInstanceOf[Production]
-        val duration = if (productionPlan != null) productionPlan.buildable.buildFrames else 24 * 45
+    .toVector ++ With.tactics.produce.queue.view
+      .filterNot(_.hasSpent)
+      .map(production => {
+        val duration = production.buildable.buildFrames
         Producible(
-          request.owner.toString.replaceAll("Produce ", ""),
+          production.toString.replaceAll("Produce ", ""),
           duration,
-          Math.min(request.expectedFrames, duration),
+          Math.min(duration, With.bank.requestsLast.find(_.owner == production).map(_.expectedFrames).getOrElse(0)),
           colorDenominator = Colors.ShadowGray,
           colorNumerator = Colors.ShadowGray,
           started = false,
-          paid = With.bank.requests.view.filter(_.owner == productionPlan).forall(_.isSatisfied)
+          paid = production.hasSpent
         )})
 
     producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)

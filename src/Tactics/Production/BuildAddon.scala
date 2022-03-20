@@ -16,26 +16,24 @@ class BuildAddon(buildableAddon: Buildable) extends Production {
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass, 1)
   val builderLock   : LockUnits     = new LockUnits(this)
   builderLock.counter = CountOne
-  builderLock.matcher = MatchAnd(addonClass.whatBuilds._1, (unit: UnitInfo) => unit.addon.forall(addon.contains))
+  builderLock.matcher = MatchAnd(addonClass.whatBuilds._1, (unit: UnitInfo) => ! unit.addon.exists(_.complete))
 
-  private def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
-  private def addon: Option[UnitInfo] = builder.flatMap(_.addon).filter(addonClass)
-  
+  def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
+  def addon: Option[UnitInfo] = builder.flatMap(_.addon).filter(addonClass)
   override def isComplete: Boolean = addon.exists(_.aliveAndComplete)
+  override def hasSpent: Boolean = addon.isDefined
   
   override def onUpdate() {
     if (isComplete) return
       
     currencyLock.framesPreordered = (addonClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
-    currencyLock.isSpent = addon.isDefined
-    currencyLock.acquire()
-    builderLock.acquire()
-
-    if (currencyLock.satisfied && builderLock.satisfied) {
-      addon.foreach(_.setProducer(this))
+    if (hasSpent || currencyLock.acquire()) {
+      builderLock.acquire()
       if (addon.isEmpty) {
         builder.foreach(_.intend(this, new Intention { toAddon = if (currencyLock.satisfied) Some(addonClass) else None }))
       }
     }
+
+    addon.foreach(_.setProducer(this))
   }
 }

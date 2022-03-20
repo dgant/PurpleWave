@@ -29,7 +29,8 @@ class TrainUnit(val buildableUnit: Buildable) extends Production {
   
   def trainer: Option[FriendlyUnitInfo] = trainerLock.units.headOption
   def trainee: Option[FriendlyUnitInfo] = trainer.flatMap(_.trainee.filter(traineeClass))
-  def isComplete: Boolean = trainee.exists(MacroCounter.countComplete(_)(traineeClass) > 0)
+  override def isComplete: Boolean = trainee.exists(MacroCounter.countComplete(_)(traineeClass) > 0)
+  override def hasSpent: Boolean = trainee.isDefined
   
   override def onUpdate() {
     if (isComplete) return
@@ -42,9 +43,7 @@ class TrainUnit(val buildableUnit: Buildable) extends Production {
       traineeClass.buildUnitsEnabling.map(With.projections.unit)
       :+ With.projections.unit(trainerClass)
       :+ trainer.map(_.remainingOccupationFrames).getOrElse(0)).max
-    currencyLock.isSpent = trainee.isDefined
-    currencyLock.acquire()
-    if (currencyLock.satisfied) {
+    if (hasSpent || currencyLock.acquire()) {
       trainerLock.acquire()
       if (trainee.isEmpty && trainer.forall(_.buildUnit.exists( ! _.completeOrNearlyComplete))) {
         // If this trainer is occupied right now, release it,

@@ -5,6 +5,7 @@ import Planning.Prioritized
 
 trait Production extends Prioritized {
   def isComplete: Boolean
+  def hasSpent: Boolean
   def onUpdate(): Unit
   def onCompletion(): Unit = {}
   final def update(): Unit = {
@@ -19,5 +20,5 @@ trait Production extends Prioritized {
     buildable
   }
 
-  final override def toString: String = f"Produce $buildable}"
+  final override def toString: String = f"Produce ${buildable.toString.replaceAll("Buildable ", "")}"
 }

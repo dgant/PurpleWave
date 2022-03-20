@@ -51,8 +51,12 @@ final class MacroSim {
       val step = new MacroStep
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
-      if ( ! u.complete && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
-        event.dSupplyAvailable += u.unitClass.supplyProvided
+      if ( ! u.complete) {
+        event.dUnitComplete = u.unitClass
+        event.dUnitCompleteN = 1
+        if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
+          event.dSupplyAvailable += u.unitClass.supplyProvided
+        }
       }
       if (u.upgrading) {
         event.dUpgrade = u.upgradingType
@@ -64,8 +68,6 @@ final class MacroSim {
       } else if ( ! u.complete && u.unitClass.isResourceDepot && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
         val base = u.base.filter(_.townHall.contains(u))
         base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
-      } else if (u.morphing) {
-        // TODO: Add/Subtract
       }
       event.dProducer1 = u.unitClass
       event.dProducer1N = 1
@@ -88,12 +90,13 @@ final class MacroSim {
 
     // For each request, associate it with an existing event or attempt to insert a new event
     requests.foreach(request => {
+      // By the end of our simulation, have we not yet met the request?
       // TODO: Don't occupy Probes
       // TODO: Don't return producers which morph
       // TODO: Reduce diff for zergling/scourge
-      val unitDiff    = request.unit.map(u => request.quantity - steps.head.state.unitsComplete(u)).getOrElse(0)
-      val upgradeDiff = request.upgrade.map(u => request.quantity - steps.head.state.upgrades(u)).getOrElse(0)
-      val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.head.state.techs.contains(t)))
+      val unitDiff    = request.unit.map(u => request.quantity - steps.last.state.unitsComplete(u)).getOrElse(0)
+      val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
+      val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
       val diff        = Seq(unitDiff, upgradeDiff, techDiff).max
       if (diff <= 0) {
         redundant += request
@@ -175,7 +178,7 @@ final class MacroSim {
     cant ||= request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)
     cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
     cant ||= step.state.producers(request.producerRequired) < request.producersRequired
-    cant ||= request.unitsRequired.exists(step.state.unitsExtant(_) == 0)
+    cant ||= request.unitsRequired.exists(step.state.unitsComplete(_) == 0)
     cant ||= ! canInsertBefore(request, i + 1)
     // TODO: Treat addons as producers
     ! cant
@@ -233,6 +236,7 @@ final class MacroSim {
       stateNext.techs           = stateLast.techs
       stateNext.upgrades        = stateLast.upgrades
       stateNext.unitsExtant     = stateLast.unitsExtant.clone
+      stateNext.unitsComplete   = stateLast.unitsComplete.clone
       stateNext.producers       = stateLast.producers.clone
       if (event.dTech         != Techs.None)        stateNext.techs                               += event.dTech
       if (event.dUpgrade      != Upgrades.None)     stateNext.upgrades(event.dUpgrade)            =  event.dUpgradeLevel

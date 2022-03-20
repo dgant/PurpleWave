@@ -34,6 +34,7 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
   def desiredTile: Option[Tile] = building.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
 
   override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
+  override def hasSpent: Boolean = building.isDefined
 
   override def onCompletion(): Unit = {
     placement.foreach(p => With.groundskeeper.consume(p.blueprint, building.get))
@@ -61,9 +62,8 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
     }
 
     // Reserve money if we have a place to build
-    if (desiredTile.isDefined) {
+    if (desiredTile.isDefined && ! hasSpent) {
       currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
-      currencyLock.isSpent = building.isDefined
       currencyLock.acquire()
     }
 
@@ -115,7 +115,7 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
         } else {
           orderedTile = desiredTile
           builder.intend(this, new Intention {
-            toBuild     = if (currencyLock.satisfied) Some(buildingClass) else None
+            toBuild     = if (hasSpent || currencyLock.satisfied) Some(buildingClass) else None
             toBuildTile = orderedTile
             toTravel    = orderedTile.map(_.center)
             canFight    = false

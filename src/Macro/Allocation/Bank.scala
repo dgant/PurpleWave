@@ -2,7 +2,6 @@ package Macro.Allocation
 
 import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
-import Planning.Prioritized
 import Planning.ResourceLocks.LockCurrency
 import Utilities.Time.Forever
 
@@ -30,10 +29,6 @@ class Bank {
     requests += request
     recountResources()
   }
-
-  def hasSpentRequest(plan: Prioritized): Boolean = {
-    requests.exists(request => request.owner == plan && request.isSpent)
-  }
   
   private def recountResources() {
     val framesAhead = 4 * With.reaction.planningAverage
@@ -49,14 +44,12 @@ class Bank {
     //
     val framesToEarnCost = Math.max(framesToEarnMinerals(request.minerals), framesToEarnGas(request.gas))
     if (request.framesPreordered > framesToEarnCost || (request.framesPreordered > 0 && framesToEarnCost > 24 * 60 * 90)) {
-      request.isSatisfied = false
+      request.satisfied = false
     } else {
-      request.isSatisfied = request.isSpent || isAvailableNow(request)
-      if ( ! request.isSpent) {
-        mineralsLeft -= request.minerals
-        gasLeft      -= request.gas
-        supplyLeft   -= request.supply
-      }
+      request.satisfied = isAvailableNow(request)
+      mineralsLeft -= request.minerals
+      gasLeft      -= request.gas
+      supplyLeft   -= request.supply
     }
     request.expectedFrames = expectedFrames(request)
   }

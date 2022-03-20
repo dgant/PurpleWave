@@ -31,10 +31,10 @@ class Accounting extends TimedTask {
   def ourActiveMiners   : Int = ourActiveMinersCache()
   def ourActiveDrillers : Int = ourActiveDrillersCache()
 
-  private val ourPatchesMineralsCache = new Cache(() => With.geography.ourBases.map(_.minerals.size).sum)
-  private val ourPatchesGasCache      = new Cache(() => With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)
-  private val ourActiveMinersCache    = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.mineralsLeft > 0))) // Subtract one to account for a lone miner+builder
-  private val ourActiveDrillersCache  = new Cache(() => With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.gasLeft > 0)))
+  private val ourPatchesMineralsCache = new Cache(() => if (With.frame == 0) 9 else With.geography.ourBases.map(_.minerals.size).sum)
+  private val ourPatchesGasCache      = new Cache(() =>                             With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)
+  private val ourActiveMinersCache    = new Cache(() => if (With.frame == 0) 4 else With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.mineralsLeft > 0))) // Subtract one to account for a lone miner+builder
+  private val ourActiveDrillersCache  = new Cache(() =>                             With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.gasLeft > 0)))
   private val ourIncomePerFrameMineralsCache  = new Cache(() => Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache())   * workerIncomePerFrameMinerals)
   private val ourIncomePerFrameGasCache       = new Cache(() => Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()) * workerIncomePerFrameGas)
 

@@ -45,5 +45,5 @@ abstract class Buildable(val buildableType: BuildableType, val quantity: Int = 0
     buildableType == other.buildableType && quantity == other.quantity
   }
 
-  override def toString: String = f"Request ${if (unit.isDefined) f"$quantity "}$buildableType ${if (upgrade.isDefined) f"lvl $quantity"}"
+  override def toString: String = f"Buildable ${if (unit.isDefined) f"$quantity " else ""}$buildableType${if (upgrade.isDefined) f" lvl $quantity" else ""}"
 }

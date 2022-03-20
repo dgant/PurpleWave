@@ -9,17 +9,15 @@ class LockCurrency(prioritized: Prioritized) {
   var minerals            = 0
   var gas                 = 0
   var supply              = 0
-  var isSpent             = false
-  var isSatisfied         = false
+  var satisfied           = false
   var expectedFrames      = 0
   var owner: Prioritized  = _
   
-  def satisfied: Boolean = isSatisfied || isSpent
-  
-  def acquire() {
+  def acquire(): Boolean = {
     owner = prioritized
     owner.prioritize()
     With.bank.request(this)
+    satisfied
   }
   
   def onSchedule: Boolean = expectedFrames <= framesPreordered

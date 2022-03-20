@@ -7,5 +7,5 @@ class MacroStep {
   var event: MacroEvent = new MacroEvent(state)
   var request: Option[Buildable] = None
 
-  override def toString: String = f"${event.toString}${request.map(" " + _.toString).getOrElse("")}"
+  override def toString: String = f"${request.map(r => f"[$r] ").getOrElse("")}$event"
 }

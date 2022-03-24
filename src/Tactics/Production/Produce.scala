@@ -28,8 +28,8 @@ class Produce extends Tactic {
 
     // Retain required production or add new production
     requests.foreach(request => {
-      val       existingNext = _queueNext.view                        .find(p => p.buildable == request && ! matched.contains(p))
-      lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(p => p.buildable == request && ! matched.contains(p))
+      val       existingNext = _queueNext.view                        .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
+      lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
       matched ++= existingNext
       if (existingNext.isEmpty) {
         matched ++= existingLast

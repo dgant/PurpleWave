@@ -25,8 +25,8 @@ object ShowProduction extends View {
           unitClass.toString,
           unitClass.buildFrames,
           if (unit.complete) unit.remainingTrainFrames else unit.remainingCompletionFrames,
-          if (unit.friendly.forall(_.producer.isEmpty)) Colors.DarkRed else Colors.DarkBlue,
-          if (unit.friendly.forall(_.producer.isEmpty)) Colors.NeonRed else Colors.NeonBlue))
+          if (unit.producer.isEmpty) Colors.DarkRed else Colors.DarkBlue,
+          if (unit.producer.isEmpty) Colors.NeonRed else Colors.NeonBlue))
       else if (unit.teching)
         unit.techProducing.map(t => Producible(
           t.toString,

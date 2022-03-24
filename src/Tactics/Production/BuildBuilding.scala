@@ -51,7 +51,7 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
       // Remove dead buildings
       .filter(b => b.alive && ! b.is(Neutral.Geyser))
       // Take any matching incomplete building; preferably being produced by existing builder, and preferably on the targeted square
-      .orElse(possibleBuildings.find(pb => pb.buildUnit.flatMap(_.friendly).exists(_.friendly.exists(builderLock.units.contains))))
+      .orElse(possibleBuildings.find(pb => pb.buildUnit.exists(_.friendly.exists(builderLock.units.contains))))
       .orElse(possibleBuildings.find(pb => orderedTile.contains(pb.tileTopLeft)))
       .orElse(possibleBuildings.find(pb => desiredTile.contains(pb.tileTopLeft)))
       .orElse(Maff.minBy(possibleBuildings)(_.frameDiscovered))

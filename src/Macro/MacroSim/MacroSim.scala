@@ -1,9 +1,9 @@
 package Macro.MacroSim
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.{Buildable, BuildableTech, BuildableUnit, BuildableUpgrade}
 import Mathematics.Maff
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -32,7 +32,7 @@ final class MacroSim {
     val initialState = initialStep.state
     initialState.minerals         = With.self.minerals
     initialState.gas              = With.self.gas
-    initialState.supplyAvailable  = With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum
+    initialState.supplyAvailable  = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum)
     initialState.supplyUsed       = With.units.ours.map(_.unitClass.supplyRequired).sum
     initialState.mineralPatches   = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
     initialState.geysers          = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
@@ -52,6 +52,7 @@ final class MacroSim {
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
+        step.request = Some(BuildableUnit(u.unitClass, initialState.unitsExtant(u.unitClass)))
         event.dUnitComplete = u.unitClass
         event.dUnitCompleteN = 1
         if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
@@ -59,9 +60,11 @@ final class MacroSim {
         }
       }
       if (u.upgrading) {
+        step.request = Some(BuildableUpgrade(u.upgradingType, 1 + With.self.getUpgradeLevel(u.upgradingType)))
         event.dUpgrade = u.upgradingType
         event.dUpgradeLevel = 1 + initialState.upgrades(u.upgradingType)
       } else if (u.teching) {
+        step.request = Some(BuildableTech(u.techingType))
         event.dTech = u.techingType
       } else if (u.unitClass.isGas) {
         event.dGeysers += 1
@@ -102,68 +105,54 @@ final class MacroSim {
         redundant += request
       } else {
         (0 until diff).foreach(iDiff => {
-          // Is there an existing event which satisfies this request?
-          val matching = steps.find(step => {
-            var matches = step.request.isEmpty
-            matches &&= request.unit.forall(_ == step.event.dUnitComplete)
-            matches &&= request.upgrade.forall(_ == step.event.dUpgrade && request.quantity == step.event.dUpgradeLevel)
-            matches &&= request.tech.forall(_ == step.event.dTech)
-            matches
-          })
-          matching.foreach(_.request = Some(request))
-          if (matching.isEmpty) {
-            // There's no event which satisfies this request.
-            // Find the first step where we could fulfill it.
-            val insertAfter = steps.indices.find(canInsertAfter(request, _))
-            if (insertAfter.isEmpty) { denied += request }
-            insertAfter.foreach(i => {
-              val stepBefore = steps(i)
-              val framesAfter = Math.ceil(Seq(
-                stepBefore.event.dFrames,
-                if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals,  Forever()),
-                if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,       Forever()))
-                .max).toInt
-              if (framesAfter < Forever()) {
-                val stepStart           = new MacroStep
-                val stepFinish          = new MacroStep
-                val eventStart          = stepStart.event
-                val eventFinish         = stepFinish.event
-                stepStart.request       = Some(request)
-                stepFinish.request      = Some(request)
-                eventStart.dFrames      = framesAfter
-                eventStart.dMinerals    = - request.mineralCost
-                eventStart.dGas         = - request.gasCost
-                eventStart.dSupplyUsed  = request.supplyRequired
-                eventStart.dProducer1   = request.producerRequired
-                eventStart.dProducer1N  = - request.producersRequired
-                eventFinish.dFrames     = eventStart.dFrames + request.buildFrames
-                eventFinish.dProducer1  = eventStart.dProducer1
-                eventFinish.dProducer1N = - eventStart.dProducer1N
-                request.unit.foreach(u => {
-                  eventStart.dUnitExtant1       = u
-                  eventStart.dUnitExtant1N      = u.copiesProduced
-                  eventFinish.dUnitComplete     = u
-                  eventFinish.dUnitCompleteN    = u.copiesProduced
-                  eventFinish.dProducer2        = u
-                  eventFinish.dProducer2N       = u.copiesProduced
-                  eventFinish.dSupplyAvailable  = u.supplyProvided
-                  eventFinish.dGeysers          = Maff.fromBoolean(u.isGas)
-                })
-                if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
-                  eventStart.dUnitExtant2 = request.producerRequired
-                  eventStart.dUnitExtant2N = - request.producersRequired
-                }
-                request.tech.foreach(eventFinish.dTech = _)
-                request.upgrade.foreach(upgrade => {
-                  eventFinish.dUpgrade = upgrade
-                  eventFinish.dUpgradeLevel = request.quantity
-                })
-                val iStart = insert(stepStart)
-                insert(stepFinish)
-                updateStatesFrom(iStart)
+          val insertAfter = steps.indices.find(canInsertAfter(request, _))
+          if (insertAfter.isEmpty) { denied += request }
+          insertAfter.foreach(i => {
+            val stepBefore = steps(i)
+            val framesAfter = Math.ceil(Seq(
+              stepBefore.event.dFrames,
+              if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals,  Forever()),
+              if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,       Forever()))
+              .max).toInt
+            if (framesAfter < Forever()) {
+              val stepStart           = new MacroStep
+              val stepFinish          = new MacroStep
+              val eventStart          = stepStart.event
+              val eventFinish         = stepFinish.event
+              stepStart.request       = Some(request)
+              eventStart.dFrames      = framesAfter
+              eventStart.dMinerals    = - request.mineralCost
+              eventStart.dGas         = - request.gasCost
+              eventStart.dSupplyUsed  = request.supplyRequired
+              eventStart.dProducer1   = request.producerRequired
+              eventStart.dProducer1N  = - request.producersRequired
+              eventFinish.dFrames     = eventStart.dFrames + request.buildFrames
+              eventFinish.dProducer1  = eventStart.dProducer1
+              eventFinish.dProducer1N = - eventStart.dProducer1N
+              request.unit.foreach(u => {
+                eventStart.dUnitExtant1       = u
+                eventStart.dUnitExtant1N      = u.copiesProduced
+                eventFinish.dUnitComplete     = u
+                eventFinish.dUnitCompleteN    = u.copiesProduced
+                eventFinish.dProducer2        = u
+                eventFinish.dProducer2N       = u.copiesProduced
+                eventFinish.dSupplyAvailable  = u.supplyProvided
+                eventFinish.dGeysers          = Maff.fromBoolean(u.isGas)
+              })
+              if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
+                eventStart.dUnitExtant2 = request.producerRequired
+                eventStart.dUnitExtant2N = - request.producersRequired
               }
-            })
-          }
+              request.tech.foreach(eventFinish.dTech = _)
+              request.upgrade.foreach(upgrade => {
+                eventFinish.dUpgrade = upgrade
+                eventFinish.dUpgradeLevel = request.quantity
+              })
+              val iStart = insert(stepStart)
+              insert(stepFinish)
+              updateStatesFrom(iStart)
+            }
+          })
         })
       }
     })
@@ -174,7 +163,10 @@ final class MacroSim {
     val step = steps(i)
     var cant = false
     cant ||= request.mineralCost > Math.max(0, step.state.minerals) && With.accounting.ourIncomePerFrameMinerals == 0
-    cant ||= request.supplyRequired > step.state.supplyAvailable - step.state.supplyUsed
+    // TODO: Restore once we update income per-state
+    //cant ||= request.gasCost > Math.max(0, step.state.gas) && With.accounting.ourIncomePerFrameGas == 0
+    cant ||= request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0
+    cant ||= request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed)
     cant ||= request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)
     cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
     cant ||= step.state.producers(request.producerRequired) < request.producersRequired
@@ -229,7 +221,7 @@ final class MacroSim {
       val dFrames   = event.dFrames - steps(i - 1).event.dFrames
       stateNext.minerals        = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
       stateNext.gas             = stateLast.gas + event.dGas + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
-      stateNext.supplyAvailable = stateLast.supplyAvailable + event.dSupplyAvailable
+      stateNext.supplyAvailable = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
       stateNext.supplyUsed      = stateLast.supplyUsed + event.dSupplyUsed
       stateNext.mineralPatches  = stateLast.mineralPatches + event.dMineralPatches
       stateNext.geysers         = stateLast.geysers + event.dGeysers

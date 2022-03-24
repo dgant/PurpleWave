@@ -38,6 +38,17 @@ abstract class Buildable(val buildableType: BuildableType, val quantity: Int = 0
     }
   }
 
+  /**
+    * Is this buildable a satisfactory instance of producing some requirement?
+    */
+  def satisfies(requirement: Buildable): Boolean = {
+    if (tech != requirement.tech) return false
+    if (upgrade != requirement.upgrade) return false
+    if (unit != requirement.unit) return false
+    if (upgrade.isDefined && quantity < requirement.quantity) return false
+    true
+  }
+
   override def hashCode(): Int = buildableType.hashCode() ^ quantity
   override def equals(anyOther: scala.Any): Boolean = {
     if ( ! anyOther.isInstanceOf[Buildable]) return false

@@ -26,6 +26,11 @@ class LockUnits(val owner: Prioritized) {
     units
   }
 
+  def reacquire(): collection.Set[FriendlyUnitInfo] = {
+    release()
+    acquire()
+  }
+
   def inquire(): Option[Vector[FriendlyUnitInfo]] = {
     owner.prioritize()
     With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner

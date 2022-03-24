@@ -20,5 +20,5 @@ trait Production extends Prioritized {
     buildable
   }
 
-  final override def toString: String = f"Produce ${buildable.toString.replaceAll("Buildable ", "")}"
+  final override def toString: String = f"Produce ${buildable.toString.replaceAll("Buildable ", "")}${if (isComplete) " (Complete)" else if (hasSpent) " (Spent)" else ""}"
 }

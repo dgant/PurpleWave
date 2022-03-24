@@ -115,7 +115,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   private var _producer: Option[Prioritized] = None
   @inline final def setProducer(plan: Prioritized) { _producer = Some(plan) }
-  @inline final def producer: Option[Prioritized] = _producer.filter(p => p.isPrioritized)
+  @inline final def producer: Option[Prioritized] = _producer
 
   @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
   @inline final def tiles     : Seq[Tile]     = cacheTiles() // TODO: Set this on type/pixel change

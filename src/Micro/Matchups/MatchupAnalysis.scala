@@ -46,6 +46,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val framesToLive               : Double  = _framesToLive()
   lazy val framesOfSafety             : Double  = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement       : Double  = _pixelsOfEntanglement()
+  def pixelsOfSafety                  : Double = -pixelsOfEntanglement
   private val _framesToLive = new Cache(() => me.likelyDoomedInFrames)
   private val _pixelsOfEntanglement = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
 

@@ -55,9 +55,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastFrameStartingAttack     : Int = - Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   private var lastUnitClass       : UnitClass = _
-  private val previousPixels      : Array[Pixel] = Array.fill(24)(new Pixel(bwapiUnit.getPosition))
-  private var previousPixelIndex  : Int = 0
-  @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((previousPixels.length + previousPixelIndex - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
+  private val previousPixels      : Array[Pixel] = Array.fill(48)(new Pixel(bwapiUnit.getPosition))
+  @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((With.frame + previousPixels.length - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update() {
     _hasEverBeenVisibleToOpponents ||= visibleToOpponents
     // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
@@ -79,8 +78,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lastMatrixPoints  = matrixPoints
     lastCooldown      = cooldownLeft
     hasEverBeenCompleteHatch ||= complete && is(MatchHatchlike)
-    previousPixelIndex = (previousPixelIndex + 1) % previousPixels.length
-    previousPixels(previousPixelIndex) = pixel
+    previousPixels(With.frame % previousPixels.length) = pixel
   }
 
   @inline final def aliveAndComplete: Boolean = alive && complete
@@ -258,7 +256,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
   @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
 
-  val confidence11 = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))
+  def confidence11: Double = _confidence()
+  private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))
 
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

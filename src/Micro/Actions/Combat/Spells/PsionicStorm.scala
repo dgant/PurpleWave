@@ -28,7 +28,7 @@ object PsionicStorm extends TargetedSpell {
     if (target.isFriendly && target.isTransport && target.loadedUnitCount == 0) return 0.0 // Dumb hack to ensure our storm drops don't try too hard to avoid the shuttle
     if (target.isAny(Protoss.Interceptor, Zerg.Larva, Zerg.Egg, Zerg.LurkerEgg)) return 0.0
 
-    val multiplierConfidence  = Math.max(1.0, Maff.nanToOne(1 / (1 + caster.confidence11())))
+    val multiplierConfidence  = Math.max(1.0, Maff.nanToOne(1 / (1 + caster.confidence11)))
     val multiplierPlayer      = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
     val multiplierUnit        = 3 * Terran.Marine.subjectiveValue + Math.min(target.unitClass.subjectiveValue, Terran.SiegeTankUnsieged.subjectiveValue)
     val multiplierDanger      = if (caster.matchups.threatsInRange.nonEmpty) 2.0 else 1.0

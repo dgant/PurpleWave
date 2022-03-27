@@ -87,13 +87,14 @@ object DefaultCombat extends Action {
     true
   }
 
+  val confidenceChaseThreshold = 0.25
   def idealTargetDistance(unit: FriendlyUnitInfo, target: UnitInfo): Double = {
     lazy val distance           = unit.pixelDistanceEdge(target)
     lazy val range              = unit.pixelRangeAgainst(target)
     lazy val rangeAgainstUs     = if (target.canAttack(unit)) Some(target.pixelRangeAgainst(unit)) else None
     lazy val rangeEqual         = rangeAgainstUs.contains(range)
     lazy val pixelsOutranged    = rangeAgainstUs.map(_ - unit.pixelRangeAgainst(target)).filter(_ > 0)
-    lazy val confidentToChase   = unit.confidence11() > .25
+    lazy val confidentToChase   = unit.confidence11 > confidenceChaseThreshold
     lazy val scourgeApproaching = unit.matchups.threats.exists(t => Zerg.Scourge(t) && t.pixelDistanceEdge(unit) < 32 * 5)
     lazy val projectedUs        = unit.pixel.projectUpTo(target.pixel, 16)
     lazy val projectedTarget    = target.pixel.projectUpTo(target.presumptiveStep, 16)
@@ -187,13 +188,16 @@ object DefaultCombat extends Action {
 
     lazy val purring            = unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit))
     lazy val canAbuseTarget     = target.exists(t => ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
-    lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate)
-    lazy val hasTimeToPoke      = framesToPokeTarget.exists(f => unit.matchups.threats.forall(t => f < t.framesToGetInRange(unit) + With.reaction.agencyMax))
+    lazy val pixelToPokeTarget  = target.map(unit.pixelToFireAt)
+    lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate + With.reaction.agencyMax + With.latency.latencyFrames)
+    lazy val hasSpacetimeToPoke = framesToPokeTarget.exists(framesToPoke => unit.matchups.threats.forall(threat =>
+      framesToPoke < Math.min(threat.framesToGetInRange(unit), threat.framesToGetInRange(unit, pixelToPokeTarget.get))
+      && ! threat.inRangeToAttack(unit, pixelToPokeTarget.get.project(threat.pixel, 16))))
 
     transition(Aim,       () => ! unit.canMove, () => aim(unit))
     transition(Dodge,     () => unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge, () => dodge(unit))
     transition(Aim,       () => purring, () => aim(unit))
-    transition(Abuse,     () => unit.unitClass.abuseAllowed && canAbuseTarget && hasTimeToPoke)
+    transition(Abuse,     () => unit.unitClass.abuseAllowed && canAbuseTarget && hasSpacetimeToPoke)
     transition(Fallback,  () => unit.unitClass.fallbackAllowed && (
       // Only Fallback if our shots are too valuable to waste or we can do it without endangering allies
       unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
@@ -233,6 +237,9 @@ object DefaultCombat extends Action {
           unit.inRangeToAttack(targ)
           // Break if we are closer to range than the formation, and already pretty close
           || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
+          // Break if we're just pillaging
+          || unit.confidence11 > confidenceChaseThreshold
+          || unit.matchups.threats.forall(MatchWorker)
           // Break if the fight has already begun and the formation isn't helping us
           || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
     if (goalEngage && Brawl.consider(unit)) return

@@ -21,7 +21,9 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   private def units = group.groupFriendlyOrderable
   private def airUnits = units.filter(_.flying)
   private def groundUnits = units.filterNot(_.flying)
+  private val paceAge = 48
 
+  val pace11            : Double                = Maff.mean(groundUnits.view.map(u => Maff.clamp(Maff.nanToZero(u.pixelDistanceCenter(u.previousPixel(paceAge)) / u.topSpeed / paceAge), -1, 1)))
   val raceRangeTiles    : Int                   = if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6 else if (With.enemies.exists(_.isTerran)) 4 else 1
   val expectRangeTiles  : Int                   = Math.max(raceRangeTiles, Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels.toInt / 32)).getOrElse(0))
   val targetsNear       : Seq[UnitInfo]         = group.groupUnits.flatMap(_.battle).distinct.flatMap(_.enemy.units).filter(e => e.canAttack && group.groupUnits.exists(_.pixelsToGetInRangeTraveling(e) < 32 * 5))
@@ -74,7 +76,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       // March: Walk far enough to advance our army
       // Disengage: Walk far enough to be comfortable outside enemy range
       // Move all the way past any narrow choke except one that's in our goal
-      stepSizePace    = Maff.clamp((16 + 24 * group.meanTopSpeed) / 32, 1, 8).toInt
+      stepSizePace    = Maff.clamp(group.meanTopSpeed + 6 * (1 - pace11), 1, 12).toInt
       stepSizeCross   = firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0)
       stepSizeEngage  = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= With.grids.enemyVulnerabilityGround.margin)).getOrElse(LightYear())
       stepSizeEvade   = 1 + groupWidthTiles + centroid.tile.enemyRangeGround
@@ -86,13 +88,15 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       }
       val maxTilesToGoal = centroid.tile.groundTiles(goal) - 1
       val minTilesToGoal = maxTilesToGoal - stepSizeTiles
-      apex = goalPathTiles
-        .reverseIterator
-        .filterNot(t => t.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(t.center)))
-        .find(_.groundTiles(goal) >= minTilesToGoal)
-        .orElse(goalPathTiles.find(_.groundTiles(goal) == minTilesToGoal + 1))
-        .map(_.center)
-        .getOrElse(goal)
+      def scoreApex(tile: Tile): Double = {
+        val distance = tile.groundTiles(goal)
+        var output = distance - minTilesToGoal
+        if (distance > maxTilesToGoal) output *= 10
+        if (output < 0) output *= -100
+        if (tile.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(tile.center))) output *= 10000
+        output
+      }
+      apex = Maff.minBy(goalPathTiles)(scoreApex).map(_.center).getOrElse(goal)
     }
   }
 
@@ -175,8 +179,12 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     goalPath.renderMap(Colors.brighten(style.color))
     targetPath.renderMap(Colors.darken(style.color))
     DrawMap.polygon(Maff.convexHull(vanguardUnits.view.flatMap(_.corners)), Colors.MediumGray)
-    DrawMap.label("Target", target.add(0, 16), drawBackground = true, style.color)
-    DrawMap.label("Goal", goal, drawBackground = true, style.color)
+    if (goal == target) {
+      DrawMap.label("Goal & Target", goal, drawBackground = true, style.color)
+    } else {
+      DrawMap.label("Target", target, drawBackground = true, style.color)
+      DrawMap.label("Goal", goal, drawBackground = true, style.color)
+    }
     DrawMap.label("Apex", apex, drawBackground = true, style.color)
     DrawMap.label("Centroid", centroid, drawBackground = true, style.color)
     if (placements.nonEmpty) {

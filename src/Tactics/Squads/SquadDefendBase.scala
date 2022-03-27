@@ -24,19 +24,22 @@ class SquadDefendBase(base: Base) extends Squad {
 
   val zoneAndChoke = new Cache(() => {
     val zone: Zone = base.zone
-    val threat = With.scouting.threatOrigin.zone
+    val muscleZone = With.scouting.enemyMuscleOrigin.zone
     var output = (zone, zone.exitNow)
-    if ( ! threat.bases.exists(_.owner.isUs)) {
-      val possiblePath = With.paths.zonePath(zone, threat)
+    if ( ! muscleZone.bases.exists(_.owner.isUs)) {
+      val possiblePath = With.paths.zonePath(zone, muscleZone)
       possiblePath.foreach(path => {
         val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).indices.map(i => {
-          val step = path.steps(i)
+          val step          = path.steps(i)
           val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
           val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 5
-          val altitudeDiff = Maff.signum(step.to.centroid.altitude - step.from.centroid.altitude)
-          val altitudeMult = Math.pow(altitudeValue, altitudeDiff)
-          val width = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
-          val score = width * turtlePenalty * (3 + i) * altitudeMult
+          val altitudeDiff  = Maff.signum(step.to.centroid.altitude - step.from.centroid.altitude)
+          val altitudeMult  = Math.pow(altitudeValue, altitudeDiff)
+          val distanceFrom  = step.edge.pixelCenter.groundPixels(With.geography.home)
+          val distanceTo    = step.edge.pixelCenter.groundPixels(With.scouting.threatOrigin)
+          val distanceMult  = distanceFrom / Math.max(1.0, distanceFrom + distanceTo)
+          val width         = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
+          val score         = width * turtlePenalty * (3 + i) * altitudeMult * distanceMult
           (step, score)
         })
         val scoreBest = Maff.minBy(stepScores)(_._2)

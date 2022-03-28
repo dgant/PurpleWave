@@ -116,7 +116,7 @@ class Groundskeeper extends TimedTask {
 
   private def matchSuggestion(plan: Prioritized, unitClass: UnitClass): Option[PlacementRequest] = {
     // Put the blueprint consumer check at the end because it's the slowest
-    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(_ == plan))
+    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(plan==))
   }
 
   def isReserved(tile: Tile, plan: Option[Prioritized] = None): Boolean = {

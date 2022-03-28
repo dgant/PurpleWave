@@ -13,7 +13,7 @@ class BuildBunkersAtExpansions(
   
   override def eligibleBases: Iterable[Base] = {
     With.geography.ourBasesAndSettlements
-      .filterNot(_ == With.geography.ourMain)
-      .filterNot(_ == With.geography.ourNatural)
+      .filterNot(With.geography.ourMain==)
+      .filterNot(With.geography.ourNatural==)
   }
 }

@@ -43,8 +43,8 @@ class Blueprint(
   respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
     .orElse(Some(building).filter(_.canAttack).map(_.effectiveRangePixels.toDouble))
-    .orElse(Some(building).filter(_ == Protoss.ShieldBattery).map(b => 0.0))
-    .orElse(Some(building).filter(_ == Zerg.CreepColony).map(b => 32.0 * 7.0))
+    .orElse(Some(building).filter(Protoss.ShieldBattery ==).map(b => 0.0))
+    .orElse(Some(building).filter(Zerg.CreepColony ==).map(b => 32.0 * 7.0))
     .orElse(Some(32.0 * 11.0))
 
   def relativeBuildStart  : Tile  = Tile(0, 0)

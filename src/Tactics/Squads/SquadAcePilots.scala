@@ -25,11 +25,11 @@ class SquadAcePilots extends Squad {
   }
 
   var activity: String = toString
-  override def toString = activity
+  override def toString: String = activity
 
   override def run(): Unit = {
     // Help other squads with anti-air
-    val otherSquads = With.squads.all.view.filterNot(_ == this)
+    val otherSquads = With.squads.all.view.filterNot(==)
     val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(MatchFlyingWarriors))).toVector
     if (squadsToCover.nonEmpty) {
       val squad = squadsToCover

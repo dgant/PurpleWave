@@ -9,11 +9,6 @@ import Utilities.CountMap
 
 object MacroCounter {
 
-  /**
-   * Whether we count this unit effectively-complete for macro purposes
-   */
-  def completeOrNearlyComplete(unit: FriendlyUnitInfo): Boolean = unit.completeOrNearlyComplete
-
   /*
   Transitions for Zerg units:
   Larva morphing into Drone:
@@ -25,7 +20,7 @@ object MacroCounter {
     val output = new CountMap[UnitClass]
     if ( ! unit.alive) return output
 
-    if (unit.completeOrNearlyComplete) {
+    if (unit.complete) {
       if (unit.morphing && unit.buildType != UnitClasses.None) {
         output(unit.buildType) = unit.buildType.copiesProduced
       } else {

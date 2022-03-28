@@ -39,7 +39,7 @@ class SquadDefendBase(base: Base) extends Squad {
           val distanceTo    = step.edge.pixelCenter.groundPixels(With.scouting.threatOrigin)
           val distanceMult  = distanceFrom / Math.max(1.0, distanceFrom + distanceTo)
           val width         = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
-          val score         = width * turtlePenalty * (3 + i) * altitudeMult * distanceMult
+          val score         = width * turtlePenalty * altitudeMult * distanceMult // * (3 + i)
           (step, score)
         })
         val scoreBest = Maff.minBy(stepScores)(_._2)

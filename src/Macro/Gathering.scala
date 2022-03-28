@@ -162,11 +162,11 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     // The magical drop(5) is because the first five slots are usually all roughly-equally good
     else if (unassigned.isEmpty) {
       val underemployed = bases.view
-        .flatMap(mineralSlots(_).view.drop(5).filter(s => With.framesSince(s.lastUpdate) > 480)) // Take tenured workers from mediocre slots
+        .flatMap(mineralSlots(_).view.drop(5).filter(s => s.worker.isDefined && With.framesSince(s.lastUpdate) > 480)) // Take tenured workers from mediocre slots
         .filter(s1 => bases.view
         .filter(baseCosts(_, s1.base) <= naturalCost) // Look at bases which are close enough to merit a low-priority transfer
         .exists(base => mineralSlots(base).exists(s2 =>
-        s2.order > s1.order // Allow transfers even base-to-base to even slot saturation
+          s2.order > s1.order // Allow transfers even base-to-base to even slot saturation
           || (s2.distance > s1.distance + 16 && s2.base == s1.base)))) // Only allow same-base transfers for using faster minerals
       Maff.minBy(underemployed)(_.lastUpdate).foreach(_.worker.foreach(reassignWorker))
     }

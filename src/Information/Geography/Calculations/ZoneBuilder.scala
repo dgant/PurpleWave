@@ -66,7 +66,7 @@ object ZoneBuilder {
         val closestMetroDistance = metroDistance(closestMetro, metro)
         if (closestMetroDistance < 32 * 30) {
           val j = metros.indexOf(closestMetro)
-          metros = metros.take(j) ++ Vector(closestMetro.merge(metro)) ++ metros.drop(j + 1).filterNot(_ == metro)
+          metros = metros.take(j) ++ Vector(closestMetro.merge(metro)) ++ metros.drop(j + 1).filterNot(metro==)
         } else {
           i += 1
         }

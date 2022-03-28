@@ -50,7 +50,7 @@ class QualityCounter {
           .flatMap(enemyQuality =>
             enemyQuality._1.counteredBy
               .view
-              .filter(_ == friendlyQuality)
+              .filter(friendlyQuality==)
               .map(unused => {
                 val valueRequired = enemyQuality._2
                 val valuePossessed = qualitiesFriendly(friendlyQuality) * friendlyQuality.counterScaling

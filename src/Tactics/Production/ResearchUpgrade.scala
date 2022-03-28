@@ -17,7 +17,7 @@ class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
   val upgraderClass : UnitClass     = upgrade.whatUpgrades
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, upgrade, level)
   val upgraders     : LockUnits     = new LockUnits(this)
-  upgraders.matcher     = u => upgraderClass(u) && u.upgradeProducing.forall(_ == upgrade)
+  upgraders.matcher     = u => upgraderClass(u) && u.upgradeProducing.forall(upgrade==)
   upgraders.counter     = CountOne
   upgraders.preference  = PreferIdle
 

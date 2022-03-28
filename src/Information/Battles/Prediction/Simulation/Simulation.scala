@@ -60,6 +60,6 @@ final class Simulation {
   def simulacra       : Seq[Simulacrum] = realUnits.view.map(_.simulacrum)
   def simulacraOurs   : Seq[Simulacrum] = realUnitsOurs.view.map(_.simulacrum)
   def simulacraEnemy  : Seq[Simulacrum] = realUnitsEnemy.view.map(_.simulacrum)
-  def simulacraAlliesOf(sim: Simulacrum): Seq[Simulacrum] = (if (sim.isFriendly) simulacraOurs else simulacraEnemy).filterNot(_ == sim)
+  def simulacraAlliesOf(sim: Simulacrum): Seq[Simulacrum] = (if (sim.isFriendly) simulacraOurs else simulacraEnemy).filterNot(sim==)
   def simulacraEnemiesOf(sim: Simulacrum): Seq[Simulacrum] = if (sim.isFriendly) simulacraEnemy else simulacraOurs
 }

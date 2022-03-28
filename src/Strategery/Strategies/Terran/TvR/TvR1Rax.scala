@@ -7,7 +7,7 @@ import bwapi.Race
 object TvR1Rax extends Strategy {
   
   override lazy val choices = Vector(
-    TerranChoices.tvtOpeners.filterNot(_ == TvT14CC),
+    TerranChoices.tvtOpeners.filterNot(TvT14CC==),
     TerranChoices.tvpOpeners,
     TerranChoices.tvzOpeners)
   

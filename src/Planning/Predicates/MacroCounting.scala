@@ -30,7 +30,7 @@ trait MacroCounting {
   def after(gameTime: FrameCount): Boolean = frame > gameTime()
   def before(gameTime: FrameCount): Boolean = frame < gameTime()
 
-  def isMiningBase(base: Base) = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
+  def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
   def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)
   def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
   def gasPumps: Int = With.geography.ourBases.map(_.gas.view.filter(_.isOurs).count(_.gasLeft > 300)).sum

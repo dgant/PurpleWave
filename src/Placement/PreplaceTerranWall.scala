@@ -54,7 +54,7 @@ object PreplaceTerranWall {
     if (unbuildable.isDefined) {
       return false
     }
-    val intersection = areas.flatMap(a1 => areas.view.filterNot(_ == a1).map(a2 => (a1._1, a2._1))).find(a => a._1.intersects(a._2))
+    val intersection = areas.flatMap(a1 => areas.view.filterNot(a1==).map(a2 => (a1._1, a2._1))).find(a => a._1.intersects(a._2))
     if (intersection.isDefined) {
       return false
     }

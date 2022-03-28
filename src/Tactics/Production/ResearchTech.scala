@@ -17,7 +17,7 @@ class ResearchTech(buildableTech: Buildable) extends Production {
   val techerClass   : UnitClass     = tech.whatResearches
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, tech, 1)
   val techers       : LockUnits     = new LockUnits(this)
-  techers.matcher    = u => techerClass(u) && u.techProducing.forall(_ == tech)
+  techers.matcher    = u => techerClass(u) && u.techProducing.forall(tech==)
   techers.counter    = CountOne
   techers.preference = PreferIdle
 

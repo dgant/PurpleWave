@@ -509,6 +509,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Ultralisk) 15
     else 0
 
+  // Source: http://satirist.org/ai/starcraft/blog/archives/916-when-will-that-enemy-building-complete.html
+  lazy val extraCompletionFrames: Int = if (isBuilding) { if (isTerran) 2 else if (isProtoss) 72 else 9 } else 0
+
   //////////////////
   // Capabilities //
   //////////////////

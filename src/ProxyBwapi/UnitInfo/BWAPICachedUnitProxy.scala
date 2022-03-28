@@ -127,7 +127,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def hasNuke                 : Boolean           = _hasNuke
   @inline final def loaded                  : Boolean           = _loaded
   @inline final def lastSeen                : Int               = _lastSeen
-  @inline final def lastClassChange          : Int               = _lastTypeChange
+  @inline final def lastClassChange         : Int               = _lastTypeChange
   @inline final def initialResources        : Int               = _resourcesInitial
   @inline final def resourcesLeft           : Int               = _resourcesLeft
   @inline final def hitPoints               : Int               = _hitPoints

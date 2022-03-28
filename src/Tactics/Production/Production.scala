@@ -2,12 +2,14 @@ package Tactics.Production
 
 import Macro.Buildables.Buildable
 import Planning.Prioritized
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait Production extends Prioritized {
   def isComplete: Boolean
   def hasSpent: Boolean
   def onUpdate(): Unit
   def onCompletion(): Unit = {}
+  def expectUnit(unit: FriendlyUnitInfo): Boolean = false
   final def update(): Unit = {
     prioritize()
     onUpdate()

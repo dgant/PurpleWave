@@ -20,7 +20,7 @@ object ShuttleChoosePassenger extends Action {
     (
       (if (Protoss.Reaver(hailer)) 1000 else 1)
       * (
-        (if (shuttle.alliesSquadOrBattle.exists(_ == hailer)) 5 else 1)
+        (if (shuttle.alliesSquadOrBattle.exists(hailer==)) 5 else 1)
         + (if (targetedByScarab) 100 else 1)
         + (if (endangered) 10 else 1)
         + (if (sojourning) 1 else 0)))

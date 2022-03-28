@@ -11,7 +11,7 @@ class BuildCannonsInMain(initialCount: Int) extends BuildTowersAtBases(
   PlacementProfiles.hugTownHall) {
   
   override def eligibleBases: Vector[Base] = {
-    var output = With.geography.ourBasesAndSettlements.filter(_ == With.geography.ourMain)
+    var output = With.geography.ourBasesAndSettlements.filter(With.geography.ourMain==)
     if (output.isEmpty) {
       output = Vector(With.geography.ourMain)
     }

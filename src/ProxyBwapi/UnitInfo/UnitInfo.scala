@@ -86,10 +86,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
 
-  // The isAny(Zerg morphers) check is because when a Larva is about to morph, but hasn't turned into an egg, remainingCompletionFrames is ZERO
-  @inline final def completeOrNearlyComplete: Boolean = complete ||
-    (remainingCompletionFrames < With.latency.framesRemaining + With.reaction.planningMax && ( ! isAny(Zerg.Larva, Zerg.Hydralisk, Zerg.Mutalisk)))
-
   lazy val isBlocker: Boolean = (unitClass.isMinerals || unitClass.isGas) && gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
   lazy val inefficientGasPosition: Boolean = unitClass.isGas && base.map(_.townHallTile).exists(t => t.y + 3 < tileTopLeft.y || t.x + 4 < tileTopLeft.x)
   lazy val gasMinersRequired: Int = if (unitClass.isGas) (if (inefficientGasPosition) 4 else 3) else 0
@@ -379,7 +375,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     isBeingViolent &&
     isEnemyOf(victim) &&
     canAttack(victim) &&
-    target.forall(_ == victim) &&
+    target.forall(victim==) &&
     framesToGetInRange(victim) < 48
   }
 

@@ -3,7 +3,6 @@ package ProxyBwapi.UnitInfo
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Micro.Agency.{Agent, Intention}
-import Micro.Formation._
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -24,6 +23,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _framesFailingToAttack  : Int     = 0
   override def update() {
     if (frameDiscovered < With.frame) readProxy()
+    if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectUnit(this)).foreach(setProducer)
     super.update()
     _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
@@ -104,14 +104,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def hijack(): Unit = nextOrderFrame = None
 
   def trainee: Option[FriendlyUnitInfo] = _traineeCache()
-  private val _traineeCache = new Cache[Option[FriendlyUnitInfo]](() =>
-    if (training)
-      With.units.ours.find(u =>
-        ! u.complete
-        && u.alive
-        && u.pixel == pixel
-        && is(u.unitClass.whatBuilds._1))
-    else None)
+  private val _traineeCache = new Cache(() => if (training) With.units.ours.find(u => ! u.complete && u.pixel == pixel && is(u.unitClass.whatBuilds._1)) else None)
 
   override def loadedUnitCount: Int = loadedUnits.size
   def loadedUnits: Vector[FriendlyUnitInfo] = _loadedUnitsCache()
@@ -122,8 +115,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     isTransport
     && passenger.unitClass.canBeTransported
     && passenger.canMove
-    && passenger.transport.forall(_ == this)
-    && loadedUnits.view.filterNot(_ == passenger).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided)
+    && passenger.transport.forall(==)
+    && loadedUnits.view.filterNot(passenger==).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided)
 
   def enemyRangeGrid: AbstractGridFloody = if (flying || transport.exists(_.flying)) With.grids.enemyRangeAir else With.grids.enemyRangeGround
 }

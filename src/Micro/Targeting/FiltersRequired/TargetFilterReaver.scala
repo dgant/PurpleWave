@@ -15,7 +15,7 @@ object TargetFilterReaver extends TargetFilter {
     if (actor.loaded
       && Terran.SiegeTankSieged(target)
       && target.cooldownLeft < Math.max(actor.cooldownLeft, With.game.getRemainingLatencyFrames)
-      && target.matchups.targetsInRange.forall(_ == actor)) {
+      && target.matchups.targetsInRange.forall(actor==)) {
       return false
     }
 

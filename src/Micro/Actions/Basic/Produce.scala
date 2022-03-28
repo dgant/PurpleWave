@@ -11,8 +11,8 @@ object Produce extends Action {
     (unit.intent.toTrain.isDefined
       || unit.intent.toTech.isDefined
       || unit.intent.toUpgrade.isDefined)
-      && (unit.trainingQueue.isEmpty
-        || (unit.trainingQueue.size == 1 && unit.remainingTrainFrames < + With.latency.latencyFrames + With.reaction.agencyMax)))
+      && (unit.trainingQueue.isEmpty || unit.trainee.exists(_.remainingCompletionFrames <= 1 + With.latency.latencyFrames + With.reaction.agencyMax))
+      && unit.trainingQueue.size < 2)
   
   override def perform(unit: FriendlyUnitInfo) {
     if (unit.intent.toTrain.isDefined) {

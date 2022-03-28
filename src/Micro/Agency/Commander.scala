@@ -520,7 +520,7 @@ object Commander {
   }
 
   private def autoUnburrowUnlessLurkerInRangeOf(unit: FriendlyUnitInfo, to: Pixel): Unit = {
-    if ( ! unit.is(Zerg.Lurker) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) autoUnburrow(unit)
+    if ( ! Zerg.Lurker(unit) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) autoUnburrow(unit)
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo) {
@@ -528,8 +528,9 @@ object Commander {
   }
   
   private def sleepBuild(unit: FriendlyUnitInfo) {
-    // Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
-    sleep(unit, 1 + 2 * With.latency.latencyFrames)
+    // Adapted from https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
+    // In practice (1 + 2 * With.latency.latencyFrames) was too low
+    sleep(unit, 3 + 2 * With.latency.latencyFrames)
   }
   
   private def sleepReturnCargo(unit:FriendlyUnitInfo) {

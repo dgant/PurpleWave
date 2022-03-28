@@ -30,17 +30,24 @@ class Produce extends Tactic {
     requests.foreach(request => {
       val       existingNext = _queueNext.view                        .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
       lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
-      matched ++= existingNext
+      existingNext.foreach(matched+=)
       if (existingNext.isEmpty) {
-        matched ++= existingLast
-        _queueNext += existingLast.getOrElse(request.makeProduction)
+        existingLast.foreach(_queueNext+=)
+        existingLast.foreach(matched+=)
+        if (existingLast.isEmpty) {
+          val newProduction = request.makeProduction
+          _queueNext += newProduction
+          matched += newProduction
+        }
       }
     })
 
     // Remove completed production
     // Do this after adding builds to avoid accidentally restarting just-completed builds
     val completed = _queueNext.filter(_.isComplete)
-    _queueNext --= completed
+    if (completed.nonEmpty) {
+      _queueNext --= completed
+    }
 
     // Execute production
     queue.foreach(_.update())

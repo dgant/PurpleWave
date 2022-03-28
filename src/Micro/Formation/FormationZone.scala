@@ -76,7 +76,7 @@ object FormationZone {
     val meleeSlots    = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val arcSlots      = new mutable.ArrayBuffer[(UnitClass, Pixel)]
     val escapeAir     = With.geography.home.center
-    val escapeGround  = Maff.minBy(zone.edges.view.filterNot(_ == edge).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
+    val escapeGround  = Maff.minBy(zone.edges.view.filterNot(edge==).map(_.pixelCenter))(_.groundPixels(With.geography.home)).getOrElse(zone.centroid.center)
     units.toVector.sortBy(_.formationRangePixels).foreach(unit => {
       val escape = if (unit.flying) escapeAir else escapeGround
       val rangeTiles = unit.formationRangePixels.toInt / 32

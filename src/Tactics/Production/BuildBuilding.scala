@@ -33,8 +33,14 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
 
   def desiredTile: Option[Tile] = building.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
 
-  override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
   override def hasSpent: Boolean = building.isDefined
+  override def isComplete: Boolean = building.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
+  override def expectUnit(unit: FriendlyUnitInfo): Boolean = {
+    if (orderedTile.contains(unit.tileTopLeft) && buildingClass(unit)) {
+      building = Some(unit)
+      true
+    } else false
+  }
 
   override def onCompletion(): Unit = {
     placement.foreach(p => With.groundskeeper.consume(p.blueprint, building.get))
@@ -42,14 +48,14 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
 
   override def onUpdate() {
     lazy val possibleBuildings = With.units.ours.filter(u =>
-      u.is(buildingClass)
+      buildingClass(u)
       && ! u.complete
       && MacroCounter.countComplete(u)(buildingClass) == 0
       && u.producer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
 
     building = building
       // Remove dead buildings
-      .filter(b => b.alive && ! b.is(Neutral.Geyser))
+      .filter(b => b.alive && ! Neutral.Geyser(b))
       // Take any matching incomplete building; preferably being produced by existing builder, and preferably on the targeted square
       .orElse(possibleBuildings.find(pb => pb.buildUnit.exists(_.friendly.exists(builderLock.units.contains))))
       .orElse(possibleBuildings.find(pb => orderedTile.contains(pb.tileTopLeft)))

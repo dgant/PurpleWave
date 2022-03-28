@@ -31,7 +31,7 @@ class StrategyLegality(strategy: Strategy) {
   val startLocations          = With.geography.startLocations.size
   val disabledInPlaybook      = With.configuration.playbook.disabled.contains(strategy)
   val disabledOnMap           = strategy.mapsBlacklisted.exists(_.matches) || ! strategy.mapsWhitelisted.forall(_.exists(_.matches))
-  val appropriateForOurRace   = strategy.ourRaces.exists(_ == ourRace)
+  val appropriateForOurRace   = strategy.ourRaces.exists(ourRace==)
   val appropriateForEnemyRace = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
   val allowedGivenHumanity    = strategy.allowedVsHuman || ! With.configuration.humanMode
   val allowedGivenHistory     = allowedGivenOpponentHistory(strategy)

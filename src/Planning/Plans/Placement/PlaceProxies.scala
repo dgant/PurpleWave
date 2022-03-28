@@ -98,7 +98,7 @@ abstract class PlaceProxies(buildings: UnitClass*) extends Plan {
     // ++++++++++++
 
     val walkableMargin  = if (buildings.exists(_.trainsGroundUnits)) 1 else 0
-    val countPylons     = Math.max(buildings.count(_ == Protoss.Pylon), (buildings.count(_.requiresPsi) + 3) / 4)
+    val countPylons     = Math.max(buildings.count(Protoss.Pylon==), (buildings.count(_.requiresPsi) + 3) / 4)
     val countNonPylons  = buildings.count(_ != Protoss.Pylon)
     val buildableWidth  = 2 * countPylons + 4 * (1 + countNonPylons) / 2
     val buildableHeight = 3 * Math.min(2, countNonPylons)

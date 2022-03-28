@@ -226,7 +226,7 @@ final class MacroSim {
       stateNext.mineralPatches  = stateLast.mineralPatches + event.dMineralPatches
       stateNext.geysers         = stateLast.geysers + event.dGeysers
       stateNext.techs           = stateLast.techs
-      stateNext.upgrades        = stateLast.upgrades
+      stateNext.upgrades        = stateLast.upgrades.clone
       stateNext.unitsExtant     = stateLast.unitsExtant.clone
       stateNext.unitsComplete   = stateLast.unitsComplete.clone
       stateNext.producers       = stateLast.producers.clone

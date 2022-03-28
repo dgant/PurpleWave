@@ -26,7 +26,7 @@ class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
 
   override def onUpdate() {
     if (isComplete) return
-    val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(_ == UnitClasses.None)
+    val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(UnitClasses.None==)
     currencyLock.framesPreordered = (
       upgraders.units.view.map(_.remainingOccupationFrames)
       ++ requiredClasses.map(With.projections.unit)).max

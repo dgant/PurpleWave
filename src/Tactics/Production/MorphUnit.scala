@@ -36,7 +36,7 @@ class MorphUnit(val buildableUnit: Buildable) extends Production {
     lazy val alreadyMorphing = With.units.ours.filter(u =>
       MacroCounter.countExtant(u)(classOutput) > 0
       && MacroCounter.countComplete(u)(classOutput) == 0
-      && u.producer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
+      && u.producer.forall(p => p == this || ! p.isPrioritized))
     morpher = morpher
       .filter(m => m.alive && (m.is(classInput) || MacroCounter.countExtant(m)(classOutput) > 0))
       .orElse(Maff.minBy(alreadyMorphing)(_.frameDiscovered))

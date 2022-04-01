@@ -51,7 +51,7 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
       buildingClass(u)
       && ! u.complete
       && MacroCounter.countComplete(u)(buildingClass) == 0
-      && u.producer.forall(p => p == this || ! With.prioritizer.isPrioritized(p)))
+      && u.producer.forall(p => p == this || ! p.isPrioritized))
 
     building = building
       // Remove dead buildings

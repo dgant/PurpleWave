@@ -90,7 +90,7 @@ object With {
   var preplacement      : Preplacement        = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
-  var prioritizer       : Prioritizer         = _
+  var priorities       : Priorities         = _
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
   var scheduler         : Scheduler           = _
@@ -194,7 +194,7 @@ object With {
     paths             = new Paths
     placement         = new PlacementCycle
     preplacement      = new Preplacement
-    prioritizer       = new Prioritizer
+    priorities       = new Priorities
     projections       = new Projections
     reaction          = new ReactionTimes
     recruiter         = new Recruiter

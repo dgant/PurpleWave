@@ -27,7 +27,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
     new SimpleTask("Gameplan", () => {
       With.bank.update()
       With.recruiter.update()
-      With.prioritizer.update()
+      With.priorities.update()
       With.scheduler.reset() // Synchronous with gameplan; Flickers ShowProduction otherwise
       With.blackboard.reset() // Synchronous with gameplan; Flickers flags otherwise
       With.blackboard.safeToMoveOut.set(GlobalSafeToMoveOut())

@@ -3,10 +3,23 @@ package Planning
 import Lifecycle.With
 
 trait Prioritized {
-  final def isPrioritized: Boolean = With.prioritizer.isPrioritized(this)
-  final def priorityUntouched: Int = With.prioritizer.getPriority(this)
+
+  private var _priority: Int = Int.MaxValue
+  private var _lastPrioritizationFrame: Int = Int.MinValue
+
+  final def isPrioritized: Boolean = {
+    _lastPrioritizationFrame >= With.priorities.lastResetFrame
+  }
+
+  final def priorityUntouched: Int = {
+    if (isPrioritized) _priority else Int.MaxValue
+  }
+
   final def prioritize(): Int = {
-    With.prioritizer.prioritize(this)
-    priorityUntouched
+    if ( ! isPrioritized) {
+      _lastPrioritizationFrame = With.frame
+      _priority = With.priorities.nextPriority()
+    }
+    _priority
   }
 }

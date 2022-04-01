@@ -3,7 +3,7 @@ package Macro.Allocation
 import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
 import Planning.ResourceLocks.LockCurrency
-import Utilities.Time.Forever
+import Utilities.Time.{Forever, Seconds}
 
 import scala.collection.mutable
 
@@ -29,11 +29,11 @@ class Bank {
     requests += request
     recountResources()
   }
-  
+
+  private val resourceLookaheadFrames = Seconds(2)()
   private def recountResources() {
-    val framesAhead = 4 * With.reaction.planningAverage
-    mineralsLeft  = With.self.minerals  + (framesAhead * With.accounting.ourIncomePerFrameMinerals).toInt
-    gasLeft       = With.self.gas       + (framesAhead * With.accounting.ourIncomePerFrameGas).toInt
+    mineralsLeft  = With.self.minerals  + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameMinerals).toInt
+    gasLeft       = With.self.gas       + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
     requests.foreach(queueBuyer)
   }

@@ -18,11 +18,11 @@ class Priorities {
   }
   
   def update() {
-    _lastResetFrame = With.frame
-    _nextPriority = 0
     frameDelays.enqueue(With.framesSince(_lastResetFrame))
     while(frameDelays.sum > 24 * 10) {
       frameDelays.dequeue()
     }
+    _lastResetFrame = With.frame
+    _nextPriority = 0
   }
 }

@@ -14,9 +14,10 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 final class MacroSim {
-  val redundant = new ArrayBuffer[Buildable]()
-  val denied    = new ArrayBuffer[Buildable]()
-  val steps     = new mutable.ArrayBuffer[MacroStep]()
+  val redundant   = new ArrayBuffer[Buildable]() // We don't need this for bot operation; it's just here for debugging
+  val denied      = new ArrayBuffer[Buildable]() // We don't need this for bot operation; it's just here for debugging
+  val steps       = new mutable.ArrayBuffer[MacroStep]()
+  val minInsert  = new mutable.OpenHashMap[Buildable, Int]()
 
   def queue: Seq[Buildable] = steps.view.filter(_.request.isDefined).map(_.request.get)
 
@@ -26,6 +27,7 @@ final class MacroSim {
     redundant.clear()
     denied.clear()
     steps.clear()
+    minInsert.clear()
 
     // Construct initial state
     val initialStep = new MacroStep
@@ -105,7 +107,7 @@ final class MacroSim {
         redundant += request
       } else {
         (0 until diff).foreach(iDiff => {
-          val insertAfter = steps.indices.find(canInsertAfter(request, _))
+          val insertAfter = steps.indices.drop(minInsert.getOrElse(request, 0)).find(canInsertAfter(request, _))
           if (insertAfter.isEmpty) { denied += request }
           insertAfter.foreach(i => {
             val stepBefore = steps(i)
@@ -162,6 +164,7 @@ final class MacroSim {
     // Find a state where we can fulfill the request
     val step = steps(i)
     var cant = false
+    cant ||= exceedsMinInsert(request, i + 1)
     cant ||= request.mineralCost > Math.max(0, step.state.minerals) && With.accounting.ourIncomePerFrameMinerals == 0
     // TODO: Restore once we update income per-state
     //cant ||= request.gasCost > Math.max(0, step.state.gas) && With.accounting.ourIncomePerFrameGas == 0
@@ -173,6 +176,9 @@ final class MacroSim {
     cant ||= request.unitsRequired.exists(step.state.unitsComplete(_) == 0)
     cant ||= ! canInsertBefore(request, i + 1)
     // TODO: Treat addons as producers
+    if (cant) {
+      minInsert(request) = Math.max(i, minInsert.getOrElse(request, i))
+    }
     ! cant
   }
 
@@ -189,6 +195,10 @@ final class MacroSim {
       j += 1
     }
     ! cant
+  }
+
+  private def exceedsMinInsert(request: Buildable, i: Int): Boolean = {
+    ! minInsert.get(request).exists(_ >= i)
   }
 
   private def insert(step: MacroStep): Int = {

@@ -15,6 +15,7 @@ import Performance.Tasks.TimedTask
 import bwapi.{MouseButton, Text}
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 class Visualization extends TimedTask {
@@ -26,7 +27,7 @@ class Visualization extends TimedTask {
   // Settings //
   //////////////
   
-  var views = mutable.ArrayBuffer[View](
+  var views: ArrayBuffer[View] = mutable.ArrayBuffer[View](
     // Evergreen views
     ShowClock,
     ShowStrategyName,

@@ -2,7 +2,9 @@ package Utilities
 
 import scala.collection.mutable
 
-class CountMap[T] extends mutable.ListMap[T, Int] {
+// OpenHashMap looks most favorable for our use cases based on:
+// https://github.com/dvmlls/scala-map-benchmarking/blob/master/src/R/plot.png
+class CountMap[T] extends mutable.OpenHashMap[T, Int] {
   override def default(key: T): Int = { put(key, 0); 0 }
   def add         (key: T, value:Int)   : Option[Int] = put(key, this(key) + value)
   def addOne      (key: T)              : Option[Int] = add(key, 1)

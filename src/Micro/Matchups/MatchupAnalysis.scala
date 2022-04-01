@@ -20,7 +20,9 @@ case class MatchupAnalysis(me: UnitInfo) {
     () => me.team.map(_.opponent)
       .orElse(me.friendly.flatMap(_.targetsAssigned).map(GenericUnitGroup))
       .getOrElse(GenericUnitGroup(defaultUnits)),
-    () => me.friendly.flatMap(_.targetsAssigned)) // Modifying targetsAssigned invalidates any unit group constructed from it
+    () => (
+      me.zone.units.size, // Modifying the zone units invalidates views based on the mutable underlying container (zone.units) and can cause IndexOutOfBoundsException
+      me.friendly.flatMap(_.targetsAssigned))) // Modifying targetsAssigned invalidates any unit group constructed from it
 
   private def battleAll     : Option[Seq[UnitInfo]] = me.battle.map(_.teams.view.flatMap(_.units))
   private def battleUs      : Option[Seq[UnitInfo]] = me.team.map(_.units.view)

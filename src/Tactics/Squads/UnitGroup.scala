@@ -11,7 +11,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 
 trait UnitGroup {
-  def groupUnits: Seq[UnitInfo]
+  def groupUnits        : Seq[UnitInfo]
   def groupOrderable    : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
   def attackers         : Seq[UnitInfo] = _attackers()
   def detectors         : Seq[UnitInfo] = _detectors()

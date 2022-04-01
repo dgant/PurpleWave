@@ -66,6 +66,8 @@ final class UnitTracker {
   @inline def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
   @inline def all         : Iterable[UnitInfo]          = playerOwned ++ neutral
   @inline def ever        : Iterable[UnitInfo]          = all ++ bufferHistoric.all
+  @inline def everOurs    : Iterable[UnitInfo]          = ours ++ bufferHistoric.all.view.filter(_.isOurs)
+  @inline def everEnemy   : Iterable[UnitInfo]          = enemy ++ bufferHistoric.all.view.filter(_.isEnemy)
   @inline def selected    : Iterable[UnitInfo]          = all.filter(_.selected)
 
   def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
@@ -98,4 +100,14 @@ final class UnitTracker {
   @inline def existsEver(matcher: UnitMatcher*): Boolean = countEver(matcher: _*) > 0
   @inline def countEver(matcher: UnitMatcher*): Int = counterEver(matcher: _*)
   @inline def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate)
+
+  private val counterEverOurs = new TotalUnitCounter(() => With.units.everOurs)
+  @inline def existsEverOurs(matcher: UnitMatcher*): Boolean = counterEverOurs(matcher: _*) > 0
+  @inline def countEverOurs(matcher: UnitMatcher*): Int = counterEverOurs(matcher: _*)
+  @inline def countEverOursP(predicate: (UnitInfo) => Boolean): Int = counterEverOurs.p(predicate)
+
+  private val counterEverEnemy = new TotalUnitCounter(() => With.units.everEnemy)
+  @inline def existsEverEnemy(matcher: UnitMatcher*): Boolean = counterEverEnemy(matcher: _*) > 0
+  @inline def countEverEnemy(matcher: UnitMatcher*): Int = counterEverEnemy(matcher: _*)
+  @inline def countEverEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEverEnemy.p(predicate)
 }

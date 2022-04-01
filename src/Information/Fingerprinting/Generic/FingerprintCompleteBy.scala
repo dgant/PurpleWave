@@ -26,7 +26,7 @@ class FingerprintCompleteBy(
   }
 
   private def observed: Int = {
-    var output = With.units.countEverP(u => u.isEnemy && (unitMatcher(u) && u.completionFrame <= endFrame))
+    var output = With.units.countEverEnemyP(u => unitMatcher(u) && u.completionFrame <= endFrame)
     if (unitMatcher == MatchHatchlike) {
       output += With.geography.enemyBases.count(_.townHall.exists(u => u.isEnemy && u.isAny(Zerg.Lair, Zerg.Hive)))
     }

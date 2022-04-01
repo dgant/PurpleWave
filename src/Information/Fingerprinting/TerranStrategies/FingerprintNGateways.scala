@@ -9,7 +9,7 @@ class FingerprintNGateways(thresholdGateways: Int) extends Fingerprint {
   override protected def investigate: Boolean = {
     if (With.frame < GameTime(5, 10)()) return false
     val discoveryRatio = 0.8
-    var gatewayTimeObserved = With.units.ever.filter(_.isEnemy).filter(_.unitClass.whatBuilds._1 == Protoss.Gateway).map(_.unitClass.buildFrames).sum
+    var gatewayTimeObserved = With.units.everEnemy.filter(_.unitClass.whatBuilds._1 == Protoss.Gateway).map(_.unitClass.buildFrames).sum
     val expectedGatewaySpawns =
       (if (With.fingerprints.twoGate())
         Seq(GameTime(2, 5), GameTime(2, 30), GameTime(4, 30), GameTime(4, 40)).take(thresholdGateways)

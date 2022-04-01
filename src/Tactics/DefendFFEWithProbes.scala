@@ -24,7 +24,7 @@ class DefendFFEWithProbes extends Tactic {
   defenders.matcher = MatchWorker
   
   protected def probeCount: Int = {
-    val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEver(Zerg.Zergling)).max
+    val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEverEnemy(Zerg.Zergling)).max
     val cannonsComplete     = With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete))
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
     val workerCount         = With.units.countOurs(MatchWorker)

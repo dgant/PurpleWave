@@ -45,5 +45,5 @@ class Pump(
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
 
-  description.set(f"Pump $unitClass")
+  override def toString: String = f"Pump $unitClass"
 }

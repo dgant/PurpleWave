@@ -19,8 +19,6 @@ class PumpRatio(
   round         : Rounding = Rounding.Up)
   extends Pump(unitClass) {
   
-  description.set("Pump " + unitClass + " to ratio")
-  
   override def maxDesirable: Int = Maff.clamp(
     (round match {
       case Rounding.Up => x: Double => Math.ceil(x)
@@ -29,6 +27,8 @@ class PumpRatio(
     })(ratios.map(_.quantity).sum).toInt,
     minimum,
     maximum)
+
+  override def toString: String = "Pump " + unitClass + " to ratio"
 }
 
 trait MatchingRatio { def quantity: Double }

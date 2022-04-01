@@ -59,9 +59,9 @@ object SquadAutomation {
     val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct
     val output =
       Maff.orElse(
-        combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.filter(_.team.isEmpty),
+        combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.view.filter(_.team.isEmpty),
         // If there's no battle (defenseless targets) then wipe the zone!
-        to.base.map(_.units.view.filter(_.isEnemy)).getOrElse(to.zone.units.view.filter(_.isEnemy))).toVector
+        to.base.map(_.units.view.filter(_.isEnemy)).getOrElse(to.zone.units.view.filter(e => e.isEnemy && (if (e.flying) group.attacksAir else group.attacksGround)))).toVector
     output
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {

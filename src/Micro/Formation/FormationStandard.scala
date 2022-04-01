@@ -103,9 +103,9 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   private def slotsByClass(): Map[UnitClass, Seq[Pixel]] = {
     parameterize()
     With.grids.formationSlots.reset()
-    With.geography.ourBases.foreach(_.resourcePathTiles.foreach(t => With.grids.formationSlots.block(t.center)))
-    With.groundskeeper.reserved.view.map(_.target).foreach(t => With.grids.formationSlots.block(t.center))
-    With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(t => With.grids.formationSlots.block(t.center)))
+    With.geography.ourBases.foreach(_.resourcePathTiles.foreach(With.grids.formationSlots.block))
+    With.groundskeeper.reserved.view.map(_.target).foreach(With.grids.formationSlots.block)
+    With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(With.grids.formationSlots.block))
     val classCount = groundUnits
       .groupBy(_.unitClass)
       .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))

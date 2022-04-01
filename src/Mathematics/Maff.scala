@@ -110,7 +110,8 @@ object Maff {
   }
 
   @inline final def weightedExemplar(values: Iterable[(Pixel, Double)]): Pixel = {
-    minBy(values)(_._1.pixelDistanceSquared(weightedCentroid(values))).map(_._1).getOrElse(SpecificPoints.middle)
+    val centroid = weightedCentroid(values)
+    minBy(values)(_._1.pixelDistanceSquared(centroid)).map(_._1).getOrElse(SpecificPoints.middle)
   }
 
   @inline final def weightedExemplarPercentile(values: Iterable[(Pixel, Double)], percentile: Double): Pixel = {

@@ -26,7 +26,6 @@ trait Tugging {
     else Maff.weightedExemplar(muscle.map(u => (u.pixel, u.subjectiveValue))).walkableTile
   })
 
-
   private val _ourMuscleOrigin = new Cache(() => {
     val muscle = With.units.ours.filter(countMuscle)
     if (muscle.isEmpty) With.geography.home

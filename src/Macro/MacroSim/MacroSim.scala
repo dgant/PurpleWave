@@ -226,10 +226,14 @@ final class MacroSim {
       stateNext.mineralPatches  = stateLast.mineralPatches + event.dMineralPatches
       stateNext.geysers         = stateLast.geysers + event.dGeysers
       stateNext.techs           = stateLast.techs
-      stateNext.upgrades        = stateLast.upgrades.clone
-      stateNext.unitsExtant     = stateLast.unitsExtant.clone
-      stateNext.unitsComplete   = stateLast.unitsComplete.clone
-      stateNext.producers       = stateLast.producers.clone
+      stateNext.upgrades        = stateLast.upgrades
+      stateNext.unitsExtant     = stateLast.unitsExtant
+      stateNext.unitsComplete   = stateLast.unitsComplete
+      stateNext.producers       = stateLast.producers
+      if (event.dUpgrade      != Upgrades.None)                                               stateNext.upgrades      = stateNext.upgrades.clone
+      if (event.dUnitExtant1  != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)  stateNext.unitsExtant   = stateNext.unitsExtant.clone
+      if (event.dUnitComplete != UnitClasses.None)                                            stateNext.unitsComplete = stateNext.unitsComplete.clone
+      if (event.dProducer1    != UnitClasses.None || event.dProducer2 != UnitClasses.None)    stateNext.producers     = stateNext.producers.clone
       if (event.dTech         != Techs.None)        stateNext.techs                               += event.dTech
       if (event.dUpgrade      != Upgrades.None)     stateNext.upgrades(event.dUpgrade)            =  event.dUpgradeLevel
       if (event.dUnitExtant1  != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant1)     += event.dUnitExtant1N

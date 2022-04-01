@@ -6,7 +6,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Planning.UnitCounters.CountOne
 import Planning.UnitPreferences.PreferIdle
-import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
+import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
 class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
@@ -22,17 +22,15 @@ class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
   upgraders.preference  = PreferIdle
 
   override def isComplete: Boolean = upgrade(With.self, level)
-  override def hasSpent: Boolean = upgraders.units.exists(u => u.upgrading && u.upgradingType == upgrade)
+  override def hasSpent: Boolean = upgraders.units.exists(_.upgradeProducing.contains(upgrade))
 
   override def onUpdate() {
     if (isComplete) return
-    val requiredClasses = (upgrade.whatsRequired.get(level).toVector :+ upgraderClass).filterNot(UnitClasses.None==)
-    currencyLock.framesPreordered = (
-      upgraders.units.view.map(_.remainingOccupationFrames)
-      ++ requiredClasses.map(With.projections.unit)).max
     if (hasSpent || currencyLock.acquire()) {
       upgraders.acquire()
-      upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
+      if ( ! hasSpent) {
+        upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
+      }
     }
   }
 }

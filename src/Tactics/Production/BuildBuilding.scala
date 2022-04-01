@@ -69,7 +69,6 @@ class BuildBuilding(buildableBuilding: Buildable) extends Production {
 
     // Reserve money if we have a place to build
     if (desiredTile.isDefined && ! hasSpent) {
-      currencyLock.framesPreordered = (buildingClass.buildUnitsEnabling.map(With.projections.unit) :+ 0).max
       currencyLock.acquire()
     }
 

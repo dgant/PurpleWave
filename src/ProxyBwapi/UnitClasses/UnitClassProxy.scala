@@ -66,7 +66,8 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val producesLarva            = bwapiType.producesLarva
   val regeneratesHP            = bwapiType.regeneratesHP
   lazy val requiredTechRaw     = Techs.get(bwapiType.requiredTech)
-  lazy val requiredUnits       = bwapiType.requiredUnits.asScala.map(pair => (UnitClasses.get(pair._1), pair._2.toInt))
+  // BWAPI's data includes "whatBuilds" in this this list, but we prefer them separate, partly because it lets us store it as a vector instead of a map
+  lazy val requiredUnits       = bwapiType.requiredUnits.asScala.filterNot(_._1 == bwapiType.whatBuilds().getKey).map(pair => UnitClasses.get(pair._1)).toVector
   val requiresCreep            = bwapiType.requiresCreep
   val requiresPsi              = bwapiType.requiresPsi
   lazy val techsWhat           = bwapiType.researchesWhat.asScala.map(Techs.get)

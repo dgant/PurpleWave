@@ -42,9 +42,6 @@ class MorphUnit(val buildableUnit: Buildable) extends Production {
       .orElse(Maff.minBy(alreadyMorphing)(_.frameDiscovered))
 
     // Shared somewhat with TrainUnit
-    currencyLock.framesPreordered = (
-      classOutput.buildUnitsEnabling.map(With.projections.unit)
-      :+ With.projections.unit(classInput)).max
     if (hasSpent || currencyLock.acquire()) {
       morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(classInput)
       morpherLock.acquire()

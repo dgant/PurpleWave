@@ -27,8 +27,6 @@ object ShowResources extends View {
           {supply    -= request.supply    ; supply / 2}.toString,
           if (request.satisfied)
             "Available"
-          else if (request.onSchedule)
-            "On schedule"
           else
             "",
           if (request.expectedFrames > 0 && request.expectedFrames < 24 * 60 * 5) (request.expectedFrames/24).toString + " seconds" else "",

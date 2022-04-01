@@ -2,7 +2,6 @@ package Tactics.Production
 
 import Lifecycle.With
 import Macro.Buildables.Buildable
-import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Planning.UnitCounters.CountOne
@@ -26,9 +25,6 @@ class ResearchTech(buildableTech: Buildable) extends Production {
 
   override def onUpdate() {
     if (isComplete) return
-    currencyLock.framesPreordered = Math.max(
-      Maff.max(techers.units.map(_.remainingOccupationFrames)).getOrElse(0),
-      With.projections.unit(techerClass))
     if (hasSpent || currencyLock.acquire()) {
       techers.acquire()
       techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))

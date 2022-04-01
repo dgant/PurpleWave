@@ -4,8 +4,7 @@ import Lifecycle.With
 import Planning.Prioritized
 
 class LockCurrency(prioritized: Prioritized) {
-  
-  var framesPreordered    = 0
+
   var minerals            = 0
   var gas                 = 0
   var supply              = 0
@@ -19,6 +18,4 @@ class LockCurrency(prioritized: Prioritized) {
     With.bank.request(this)
     satisfied
   }
-  
-  def onSchedule: Boolean = expectedFrames <= framesPreordered
 }

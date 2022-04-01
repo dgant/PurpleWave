@@ -14,7 +14,7 @@ class FingerprintCompleteBy(
   private val endFrame = gameTime()
   override def investigate: Boolean = {
     if (quantity == 1) {
-      val produced = With.units.enemy.filter(u => u.unitClass.whatBuilds._1 == unitMatcher || u.unitClass.requiredUnits.exists(_._1 == unitMatcher))
+      val produced = With.units.enemy.filter(u => u.unitClass.whatBuilds._1 == unitMatcher || u.unitClass.requiredUnits.exists(unitMatcher==))
       val proof = produced.find(u => {
         val frameProven = if (u.unitClass.isBuilding) With.frame else With.frame - u.unitClass.buildFrames
         frameProven <= endFrame

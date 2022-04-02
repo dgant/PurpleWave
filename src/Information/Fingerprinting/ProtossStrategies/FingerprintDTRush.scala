@@ -19,6 +19,6 @@ class FingerprintDTRush extends FingerprintOr(
   
   override def sticky: Boolean = (
     With.frame >= FingerprintDTRushConstants.dtArrivalFrame()
-    || new FingerprintArrivesBy(Protoss.DarkTemplar, FingerprintDTRushConstants.dtArrivalFrame).matches
-    || new FingerprintCompleteBy(Protoss.TemplarArchives, FingerprintDTRushConstants.archiveFrame).matches)
+    || new FingerprintArrivesBy(Protoss.DarkTemplar, FingerprintDTRushConstants.dtArrivalFrame)()
+    || new FingerprintCompleteBy(Protoss.TemplarArchives, FingerprintDTRushConstants.archiveFrame)())
 }

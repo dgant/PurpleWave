@@ -117,7 +117,7 @@ object Gather extends Action {
     }
 
     // Benzene travel hack
-    if (Benzene.matches && resource.zone != unit.zone && unit.zone == With.geography.ourMain.zone) {
+    if (Benzene() && resource.zone != unit.zone && unit.zone == With.geography.ourMain.zone) {
       Commander.move(unit)
     }
     

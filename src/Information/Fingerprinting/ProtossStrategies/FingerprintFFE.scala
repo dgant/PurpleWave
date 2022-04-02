@@ -55,7 +55,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private def conclusivelyGateway(status: Status): Boolean = (
     status.buildingsProxied.isEmpty
       && (
-      (With.fingerprints.gatewayFirst.matches && With.units.existsEnemy(Protoss.Forge))
+      (With.fingerprints.gatewayFirst() && With.units.existsEnemy(Protoss.Forge))
       || (With.units.existsEnemy(MatchAnd(Protoss.Gateway, MatchComplete)) && With.units.existsEnemy(MatchAnd(Protoss.Gateway, MatchNot(MatchComplete))))
       || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
   )

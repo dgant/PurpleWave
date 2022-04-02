@@ -53,7 +53,7 @@ object BaseFinder {
   }
   
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
-    val shouldLimitRegion = ! Hunters.matches // Hack -- fix the top-right position on Hunters
+    val shouldLimitRegion = ! Hunters() // Hack -- fix the top-right position on Hunters
     Clustering.group[ForeignUnitInfo](
       resources,
       baseRadiusPixels,

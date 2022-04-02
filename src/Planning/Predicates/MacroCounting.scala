@@ -119,7 +119,7 @@ trait MacroCounting {
     strategies.exists(_.activate())
   }
 
-  def onMap(map: StarCraftMap*): Boolean = map.exists(_.matches)
+  def onMap(map: StarCraftMap*): Boolean = map.exists(_())
 
   def starts: Int = With.geography.startLocations.size
 
@@ -158,7 +158,7 @@ trait MacroCounting {
       Zerg.Lurker))
 
   def enemyDarkTemplarLikely: Boolean = (
-    With.fingerprints.dtRush.matches
+    With.fingerprints.dtRush()
     || enemyHasUpgrade(Protoss.ZealotSpeed)
     || enemiesShown(Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Arbiter) > 0
   )
@@ -204,10 +204,7 @@ trait MacroCounting {
   def enemyIsZerg: Boolean = enemyIs(Race.Zerg)
   def enemyIsRandom: Boolean = enemyIs(Race.Unknown)
   def enemyRaceKnown: Boolean = enemyIsTerran || enemyIsProtoss || enemyIsZerg
-
-  def enemyStrategy(fingerprints: Fingerprint*): Boolean = {
-    fingerprints.exists(_.matches)
-  }
+  def enemyStrategy(fingerprints: Fingerprint*): Boolean = fingerprints.exists(_())
 
   def enemyRecentStrategy(fingerprints: Fingerprint*): Boolean = {
     enemyStrategy(fingerprints: _*) || fingerprints.map(_.toString).exists(With.strategy.enemyRecentFingerprints.contains)

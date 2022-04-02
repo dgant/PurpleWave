@@ -25,7 +25,7 @@ class FingerprintGasCompleteBy(frameCount: FrameCount) extends Fingerprint {
   private val keyFrame: Int = frameCount()
 
   protected def proof: Proof = {
-    if (pumpCompleteBy.matches) return PumpProof(pumpCompleteBy)
+    if (pumpCompleteBy()) return PumpProof(pumpCompleteBy)
     val gasUnitProof =
       With.units.enemy
         .filter(_.unitClass.gasPrice >= 25) // Amazingly, larva "cost" 1 gas

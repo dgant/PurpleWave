@@ -6,8 +6,8 @@ import NeoGeo.MapIdentifier
 abstract class StarCraftMap {
   val name: String = ToString(this)
   val nameStub: String = MapIdentifier.apply(name)
-  def matches: Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
   var mineralWalkingOkay: Boolean = true
+  def apply(): Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
 }
 object Alchemist extends StarCraftMap
 object Arcadia extends StarCraftMap

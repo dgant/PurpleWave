@@ -81,7 +81,7 @@ class Blueprint(
 
     val thisZone = tile.zone
     if (thisZone.island
-      && ! Plasma.matches
+      && ! Plasma()
       && ( ! With.blackboard.allowIslandBases() || ! thisZone.bases.exists(_.minerals.exists(_.visible)))
       && ! With.architecture.accessibleZones.contains(thisZone)) {
       return ArchitecturalAssessment.InaccessibleIsland

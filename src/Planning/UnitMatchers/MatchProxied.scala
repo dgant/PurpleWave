@@ -2,26 +2,20 @@ package Planning.UnitMatchers
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
 abstract class MatchAnyProxy extends UnitMatcher {
 
-  private def mainBases(player: PlayerInfo): Seq[Base] = {
+  private def mainBases(player: PlayerInfo): Iterable[Base] = {
     if (player.isUs) return Seq(With.geography.ourMain)
-    var bases = With.geography.startBases.filter(_.owner == player)
-    if (bases.isEmpty) {
-      bases = With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame == 0)
-    }
-    if (bases.isEmpty) {
-      bases = With.geography.startBases.filter(base => base.owner.isNeutral)
-    }
-    if (bases.isEmpty) {
-      bases = With.geography.bases.filter( ! _.owner.isUs)
-    }
-    if (bases.isEmpty) {
-      bases = With.geography.bases
-    }
+    val bases = Maff.orElse(
+      With.geography.startBases.filter(_.owner == player),
+      With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame == 0),
+      With.geography.startBases.filter(base => base.owner.isNeutral),
+      With.geography.bases.filter( ! _.owner.isUs),
+      With.geography.bases)
     bases
   }
 

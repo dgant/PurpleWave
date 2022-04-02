@@ -9,7 +9,7 @@ import Strategery.MapGroups
 class GridWalkableTerrain extends AbstractGridArrayBoolean {
 
   override def onInitialization() {
-    val walkableGoal = if (MapGroups.narrowRamp.exists(_.matches)) 12 else 16
+    val walkableGoal = if (MapGroups.narrowRamp.exists(_())) 12 else 16
     indices.foreach(i => set(
       i,
       Square.pointsDownAndRight(4)

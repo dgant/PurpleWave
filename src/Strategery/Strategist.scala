@@ -15,7 +15,7 @@ import scala.util.Random
 
 class Strategist {
 
-  lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_.matches)
+  lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_())
   lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.toSet
 
   private var _lastEnemyRace  = With.enemy.raceInitial

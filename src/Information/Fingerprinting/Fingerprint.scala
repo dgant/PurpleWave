@@ -14,8 +14,9 @@ abstract class Fingerprint {
   protected val children: Seq[Fingerprint] = Seq.empty
 
   @inline final def lastUpdateFrame: Int = _lastUpdateFrame
-  @inline final def matches: Boolean = matched
-  @inline final def apply(): Boolean = matches
+  //@inline final def matches: Boolean = matched
+  @inline final def apply(): Boolean = matched
+  @inline final def recently: Boolean = matched || With.strategy.enemyRecentFingerprints.contains(toString)
   @inline final def update() {
     if (_lastUpdateFrame == With.frame) return
     _lastUpdateFrame = With.frame

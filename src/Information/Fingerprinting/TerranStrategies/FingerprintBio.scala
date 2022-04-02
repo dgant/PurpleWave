@@ -9,7 +9,7 @@ import Utilities.Time.GameTime
 class FingerprintBio extends Fingerprint {
   override protected def investigate: Boolean = {
     if (With.units.countEnemy(Terran.Barracks) > 2) return true
-    if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs.matches) return true
+    if (With.units.countEnemy(Terran.Barracks) > 1 && ! With.fingerprints.bbs()) return true
     if (With.unitsShown.allEnemies(Terran.Vulture) < 4) {
       if (With.enemies.exists(_.hasUpgrade(Terran.MarineRange))) return true
       if (With.enemies.exists(_.hasTech(Terran.Stim))) return true

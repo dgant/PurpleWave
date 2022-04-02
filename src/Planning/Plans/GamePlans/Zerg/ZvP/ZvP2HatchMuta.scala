@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
+import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Buildables.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
@@ -21,7 +21,6 @@ import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
-import Strategery.Transistor
 
 class ZvP2HatchMuta extends GameplanTemplate {
   
@@ -63,13 +62,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
       MineralsAtLeast(400),
       new RequireMiningBases(4)))
   
-  private def sunkenProfile = if (Transistor.matches)
-    new PlacementProfile(
-      "TransistorSunkens",
-      avoidDistanceFromBase = 1.0,
-      preferDistanceFromEnemy = 0.25)
-  else
-    PlacementProfiles.defensive
+  private def sunkenProfile = PlacementProfiles.defensive
 
   override def attackPlan: Plan = new If(
     new Or(

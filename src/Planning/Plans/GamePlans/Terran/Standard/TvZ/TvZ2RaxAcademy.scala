@@ -2,10 +2,10 @@ package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
 import Macro.Buildables.{Buildable, Get}
+import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Protoss.Standard.PvP.OldPvPIdeas.AttackSafely
 import Planning.Plans.GamePlans.Terran.Standard.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -25,7 +25,7 @@ class TvZ2RaxAcademy extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(TvZ2RaxAcademy)
   override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
 
-  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Terran.Firebat, complete = true), new AttackSafely)
+  override def attackPlan: Plan = new Trigger(new UnitsAtLeast(1, Terran.Firebat, complete = true), new ConsiderAttacking)
   override def scoutPlan: Plan = new If(
     new Not(new EnemyStrategy(With.fingerprints.fourPool)),
     new If(

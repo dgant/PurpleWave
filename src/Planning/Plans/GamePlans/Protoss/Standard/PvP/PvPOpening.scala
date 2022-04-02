@@ -38,7 +38,7 @@ class PvPOpening extends GameplanImperative {
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
   val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
-  val reactToDTEmergencies = new OldPvPIdeas.ReactToDarkTemplarEmergencies
+  val reactToDTEmergencies = new OldPvPReactions.ReactToDarkTemplarEmergencies
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -85,13 +85,20 @@ class PvPOpening extends GameplanImperative {
         zAfterCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
         zAfterCore ||= PvPGateCoreGate() || PvPTechBeforeRange() || PvPDT()
       }
-      if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility) < 1 && units(Protoss.CitadelOfAdun) < 1) {
-        if (enemyStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.nexusFirst)) {
+      if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) < 1) {
+        if (With.fingerprints.twoGate() || With.fingerprints.proxyGateway() || With.fingerprints.nexusFirst()) {
           PvPGateCoreGate.swapIn()
           PvPGateCoreTech.swapOut()
           PvPTechBeforeRange.swapOut()
-        } // Last minute COG2021 hack to ensure we can use GateCoreGate as a default fixed strategy
-        else if (PvPGateCoreGate() && With.strategy.isRamped) {
+        } else if (With.fingerprints.cannonRush() || (With.fingerprints.earlyForge() && With.fingerprints.cannonRush.recently)) {
+          PvPGateCoreTech.swapIn()
+          PvPTechBeforeRange.swapIn()
+          PvPRobo.swapIn()
+          PvP1012.swapOut()
+          PvPDT.swapOut()
+          PvP3GateGoon.swapOut()
+          PvP4GateGoon.swapOut()
+        } else if (PvPGateCoreGate() && With.strategy.isRamped) {
           PvPGateCoreGate.swapOut()
           PvPGateCoreTech.swapIn()
         }
@@ -160,10 +167,10 @@ class PvPOpening extends GameplanImperative {
       if (PvPRobo()
         && ! With.strategy.isFixedOpponent
         && enemyRecentStrategy(With.fingerprints.robo) ) {
-        if (roll("SwapRoboInto3Gate", if (enemyStrategy(With.fingerprints.robo)) 0.35 else 0.2)) {
+        if (roll("SwapRoboInto3Gate", if (With.fingerprints.robo()) 0.35 else 0.2)) {
           PvPRobo.swapOut()
           PvP3GateGoon.swapIn()
-        } else if (roll("SwapRoboInto4Gate", if (enemyStrategy(With.fingerprints.robo)) 0.35 else 0.2)) {
+        } else if (roll("SwapRoboInto4Gate", if (With.fingerprints.robo()) 0.35 else 0.2)) {
           PvPRobo.swapOut()
           PvP4GateGoon.swapIn()
         }
@@ -239,7 +246,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
       shouldExpand &&= safeToMoveOut
       shouldExpand &&= (
-        enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 0
+        With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0
         || PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
       shouldExpand &&= ! PvPTechBeforeRange()
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
@@ -252,8 +259,8 @@ class PvPOpening extends GameplanImperative {
       // We can delay this based on things we've seen
       timeToStartCannons = GameTime(4, 30)()
       // TODO: Delay if they went Zealot-first into core
-      if (enemyStrategy(With.fingerprints.twoGate)) timeToStartCannons += GameTime(1, 10)()
-      if (enemyStrategy(With.fingerprints.dragoonRange)) timeToStartCannons += GameTime(0, 30)()
+      if (With.fingerprints.twoGate()) timeToStartCannons += GameTime(1, 10)()
+      if (With.fingerprints.dragoonRange()) timeToStartCannons += GameTime(0, 30)()
       // Look for reasons to avoid getting cannons
       if (enemyDarkTemplarLikely) {
         getCannons = true
@@ -264,7 +271,7 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= ! enemyRobo
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
         getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
-        getCannons ||= enemyStrategy(With.fingerprints.dtRush)
+        getCannons ||= With.fingerprints.dtRush()
       }
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 20)
     } else if (PvP3GateGoon()) {
@@ -284,14 +291,14 @@ class PvPOpening extends GameplanImperative {
       && units(Protoss.CitadelOfAdun, Protoss.RoboticsFacility) > 0
       && unitsComplete(Protoss.DarkTemplar) == 0
       && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) == 0
-      && (enemyStrategy(With.fingerprints.oneGateCore) || enemyHasUpgrade(Protoss.DragoonRange))
+      && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
       && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural
     shouldAttack ||= shouldExpand
     // 2-Gate vs 1-Gate core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
     shouldAttack &&= ! (With.frame > GameTime(5, 10)()
       && PvP1012()
-      && (enemyStrategy(With.fingerprints.oneGateCore) || enemyHasUpgrade(Protoss.DragoonRange))
+      && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
       && ! upgradeComplete(Protoss.DragoonRange)
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
@@ -299,7 +306,7 @@ class PvPOpening extends GameplanImperative {
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend
-    if ( ! PvP1012() && enemyStrategy(With.fingerprints.twoGate) && unitsEver(MatchAnd(Protoss.Dragoon, MatchComplete)) == 0) {
+    if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(MatchAnd(Protoss.Dragoon, MatchComplete)) == 0) {
       aggression(0.6)
     }
 
@@ -354,7 +361,7 @@ class PvPOpening extends GameplanImperative {
     // Scouting //
     //////////////
 
-    if (enemies(Protoss.Dragoon) == 0 && ! enemyStrategy(With.fingerprints.proxyGateway)) {
+    if (enemies(Protoss.Dragoon) == 0 && ! With.fingerprints.proxyGateway()) {
       if (PvP1012()) {
         if ( ! foundEnemyBase && ! PvPIdeas.attackFirstZealot) {
           scoutOn(Protoss.Gateway, quantity = 2)
@@ -400,7 +407,7 @@ class PvPOpening extends GameplanImperative {
     // React against proxy //
     /////////////////////////
 
-    if (enemyStrategy(With.fingerprints.proxyGateway) && With.frame < Minutes(5)() && unitsComplete(MatchWarriors) < 7) {
+    if (With.fingerprints.proxyGateway() && With.frame < Minutes(5)() && unitsComplete(MatchWarriors) < 7) {
       pumpSupply()
       pumpWorkers()
       if (units(Protoss.Gateway) < 2) {
@@ -658,7 +665,7 @@ class PvPOpening extends GameplanImperative {
       }
       if (PvPTechBeforeRange() && ! getObservers) {
         get(Protoss.ShuttleSpeed)
-        if (unitsEver(Protoss.Shuttle) == 0 && unitsComplete(Protoss.Reaver) > 0) {
+        if (unitsComplete(Protoss.Reaver) > 0) {
           buildOrder(Get(Protoss.Shuttle))
         }
         pump(Protoss.Reaver)

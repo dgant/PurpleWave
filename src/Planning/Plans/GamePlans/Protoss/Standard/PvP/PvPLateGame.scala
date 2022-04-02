@@ -53,8 +53,9 @@ class PvPLateGame extends GameplanImperative {
       fearContain = false
     }
 
-    expectCarriers = enemyCarriersLikely || (enemyStrategy(With.fingerprints.forgeFe) && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+    expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldDetect = enemyDarkTemplarLikely
+    shouldDetect ||= enemyHasShown(Protoss.ArbiterTribunal, Protoss.Arbiter)
     shouldExpand = fearMacro || ! fearDeath
     shouldExpand &&= ! fearContain
     shouldExpand &&= ! fearDT
@@ -88,10 +89,10 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(RoboTech).filter(x => units(Protoss.RoboticsFacility) > 0))
       .orElse(Some(TemplarTech).filter(x => units(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.PhotonCannon) > 0))
       .orElse(Some(RoboTech).filter(x => enemyDarkTemplarLikely))
-      .orElse(Some(RoboTech).filter(x => enemyStrategy(With.fingerprints.cannonRush)))
+      .orElse(Some(RoboTech).filter(x => With.fingerprints.cannonRush()))
       .orElse(Some(TemplarTech).filter(x => commitToTech && expectCarriers))
       .orElse(Some(TemplarTech).filter(x => commitToTech && bases > 2))
-      .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (enemyStrategy(With.fingerprints.fourGateGoon)) 0.5 else 0.25)))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (With.fingerprints.fourGateGoon()) 0.5 else 0.25)))
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
     if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
@@ -109,9 +110,7 @@ class PvPLateGame extends GameplanImperative {
     primaryTech.map(_.toString).foreach(status)
 
     // Emergency reactions
-    new OldPvPIdeas.ReactToDarkTemplarEmergencies().update()
-    new OldPvPIdeas.ReactToCannonRush().update()
-    new OldPvPIdeas.ReactToArbiters().update()
+    new OldPvPReactions.ReactToDarkTemplarEmergencies().update()
   }
 
   override def executeMain(): Unit = {
@@ -162,8 +161,7 @@ class PvPLateGame extends GameplanImperative {
   def doTrainArmy(): Unit = {
     // Pump 2 Observer vs. DT. This is important because we refuse to attack without DT backstab protection
     if (enemyDarkTemplarLikely || enemyShownCloakedThreat) pump(Protoss.Observer, 2)
-    if (expectCarriers && units(Protoss.DarkArchon) + units(Protoss.DarkTemplar) / 2 < Maff.clamp(enemies(Protoss.Carrier), 8, 16)) {
-      pump(Protoss.DarkTemplar)
+    if (expectCarriers) {
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
     if (enemies(Protoss.Observer) == 0 || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists(b => ! b.units.exists(u => u.player == b.owner && u.unitClass.isDetector)))) {
@@ -186,12 +184,10 @@ class PvPLateGame extends GameplanImperative {
       pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))
     }
     pump(Protoss.Dragoon)
-    if (gas > 400 && techStarted(Protoss.PsionicStorm)) {
+    if (techStarted(Protoss.PsionicStorm)) {
       pump(Protoss.HighTemplar)
     }
-    if (gas < 42 || minerals > 225) {
-      pump(Protoss.Zealot)
-    }
+    pump(Protoss.Zealot)
   }
 
   def targetGateways: Int = miningBases * 5 - 2 * units(Protoss.RoboticsFacility)

@@ -14,7 +14,7 @@ object SabotageProxy extends Action {
     unit.agent.isScout
     && unit.unitClass.isWorker
     && unit.matchups.targets.exists(MatchProxied)
-    && ! ZvE4Pool.activate)
+    && ! ZvE4Pool())
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val buildingTarget = Maff.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)

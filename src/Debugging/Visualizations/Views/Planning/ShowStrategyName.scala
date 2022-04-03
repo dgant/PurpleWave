@@ -6,8 +6,8 @@ import Lifecycle.With
 object ShowStrategyName extends View {
   
   override def renderScreen() {
-    val active = With.strategy.selected.filter(_)
-    val inactive = With.strategy.selected.filterNot(_)
+    val active = With.strategy.selected.filter(_.isActive)
+    val inactive = With.strategy.selected.filterNot(_.isActive)
     val swapped = With.strategy.deselected
     With.game.drawTextScreen(
       5,

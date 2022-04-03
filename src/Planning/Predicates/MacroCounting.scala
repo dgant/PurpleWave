@@ -116,7 +116,7 @@ trait MacroCounting {
   )
 
   def employing(strategies: Strategy*): Boolean = {
-    strategies.exists(_.activate())
+    strategies.exists(_())
   }
 
   def onMap(map: StarCraftMap*): Boolean = map.exists(_())

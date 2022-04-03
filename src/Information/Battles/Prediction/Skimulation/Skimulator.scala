@@ -1,6 +1,6 @@
 package Information.Battles.Prediction.Skimulation
 
-import Information.Battles.Types.{Battle, BattleLocal, Team}
+import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.UnitMatchers._
@@ -120,7 +120,8 @@ object Skimulator {
       var incapable = ! unit.complete
       incapable ||= unit.stasised
       incapable ||= unit.maelstrommed
-      incapable ||= unit.underDisruptionWeb
+      incapable ||= unit.unitClass.canAttack && unit.underDisruptionWeb
+      incapable ||= unit.unitClass.canBeStormed && unit.underStorm // Units under storm are presumably preoccupied with dodging
       incapable ||= unit.lockedDown
       incapable ||= unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm
       if (incapable) { unit.skimStrength *= -0.25 } // Encourage fighting when units are disabled!

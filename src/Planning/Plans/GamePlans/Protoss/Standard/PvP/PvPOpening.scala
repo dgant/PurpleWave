@@ -34,7 +34,7 @@ class PvPOpening extends GameplanImperative {
   var getCannons: Boolean = false
   var speedlotAttack: Boolean = false
 
-  override def activated: Boolean = PvPRobo() || PvPDT() || PvP3GateGoon() || PvP4GateGoon()
+  override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
   val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
@@ -56,8 +56,8 @@ class PvPOpening extends GameplanImperative {
     }
     if (PvP1012()) {
       if (units(Protoss.Assimilator) == 0) {
-        PvP3Zealot.activate()
-        PvP5Zealot.activate()
+        PvP3Zealot()
+        PvP5Zealot()
         // TODO: Against 10-12 it's okay to stay 3-Zealot. We only need 5-Zealot vs 9-9.
         if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)) {
           PvP5Zealot.swapIn()
@@ -246,8 +246,8 @@ class PvPOpening extends GameplanImperative {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
       shouldExpand &&= safeToMoveOut
       shouldExpand &&= (
-        With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0
-        || PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0)
+        (With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0)
+        || (PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0))
       shouldExpand &&= ! PvPTechBeforeRange()
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
       shouldExpand ||= unitsComplete(MatchWarriors) >= 20 && safeToMoveOut
@@ -337,7 +337,6 @@ class PvPOpening extends GameplanImperative {
     if (PvPDT()) status(f"Cannon@${Frames(timeToStartCannons)}")
     if (getCannons) status("Cannons")
     if (speedlotAttack) status("Speedlot")
-    if (oversaturate) status("Oversaturate")
     if (shouldAttack) status("Attack")
     if (shouldHarass) status("Harass")
     if (shouldExpand) status("ExpandNow")
@@ -664,17 +663,13 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.RoboticsSupportBay)
       }
       if (PvPTechBeforeRange() && ! getObservers) {
-        buildOrder(Get(Protoss.Reaver))
-        get(Protoss.ShuttleSpeed)
-        if (unitsComplete(Protoss.Reaver) > 0) {
-          buildOrder(Get(Protoss.Shuttle))
-        }
+        buildOrder(
+          Get(Protoss.Reaver),
+          Get(Protoss.ShuttleSpeed),
+          Get(Protoss.Shuttle))
         pump(Protoss.Reaver)
       } else {
         trainRoboUnits()
-        if (units(Protoss.Reaver) > 1) {
-          get(Protoss.ShuttleSpeed)
-        }
       }
 
       if (units(Protoss.Reaver) > 1) {
@@ -702,15 +697,15 @@ class PvPOpening extends GameplanImperative {
         () => trainGatewayUnits(),
         () => get(5, Protoss.Gateway))
     } else if (PvPDT()) {
+      if (getCannons) { buildCannonsAtNatural.update() }
+      if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
+        buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
+      }
+      trainGatewayUnits()
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
-      if (getCannons) { buildCannonsAtNatural.update() }
-      buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
       get(2, Protoss.Gateway)
       if (shouldExpand) { requireMiningBases(2) }
-      if ( ! enemyRobo) pump(Protoss.DarkTemplar, 1)
-      trainGatewayUnits()
-      requireMiningBases(2)
     } else if (PvP3GateGoon()) {
       if (shouldExpand) { requireMiningBases(2) }
       buildOrder(Get(2, Protoss.Dragoon))
@@ -733,14 +728,12 @@ class PvPOpening extends GameplanImperative {
   }
 
   private def trainRoboUnits(): Unit = {
-    if (units(Protoss.RoboticsFacility) > 0) {
-      if (getObservers) {
-        buildOrder(Get(Protoss.Observer))
-        if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)
-      }
-      if (shuttleFirst) buildOrder(Get(Protoss.Shuttle))
-      if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+    if (getObservers) {
+      pump(Protoss.Observer, 2)
+      if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)
     }
+    if (shuttleFirst) buildOrder(Get(Protoss.Shuttle))
+    if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
   }
 
   private def trainGatewayUnits(): Unit = {

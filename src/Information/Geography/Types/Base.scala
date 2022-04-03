@@ -31,9 +31,9 @@ class Base(val townHallTile: Tile)
   var gas                   : Vector[UnitInfo]  = Vector.empty
   var minerals              : Vector[UnitInfo]  = Vector.empty
   var owner                 : PlayerInfo        = With.neutral
-  var lastOwnerChangeFrame  : Int = 0
+  var lastOwnerChangeFrame  : Int               = 0
   var name                  : String            = "Nowhere"
-  var defenseValue          : Double            = _
+  var enemyCombatValue      : Double            = _
   var workerCount           : Int               = _
   val saturation            : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
 

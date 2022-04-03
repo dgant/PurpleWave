@@ -93,11 +93,7 @@ object Target extends {
     totalHealth: Double,
     framesOutOfTheWay: Double,
     dpf: Double = 1.0): Double = (
-    baseTargetValue
-    * dpf
-    / (
-      Math.max(1.0, totalHealth)
-      * Math.max(6.0, framesOutOfTheWay)))
+    baseTargetValue * dpf / (Math.max(1.0, totalHealth) * Math.max(6.0, framesOutOfTheWay)))
 
   // TODO: Re-inline
   def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {

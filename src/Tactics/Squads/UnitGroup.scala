@@ -40,6 +40,7 @@ trait UnitGroup {
   def meanTotalHealth                   = _meanTotalHealth()
   def meanDpf                           = _meanDpf()
   def storms                            = _storms()
+  def pace01                            = _pace01()
   def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
   def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
 
@@ -49,6 +50,7 @@ trait UnitGroup {
     _count(matcher)
   }
 
+  private val _paceAge = 24
   private def _attackers()              = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
   private def _detectors()              = groupOrderable.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
   private val _attackersCastersCount    = new Cache(() => attackersCasters.size)
@@ -74,5 +76,7 @@ trait UnitGroup {
   private val _meanTotalHealth          = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(_.hitPoints.toDouble)))
   private val _meanDpf                  = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(u => Math.max(u.dpfGround, u.dpfAir))))
   private val _storms                   = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
+  private val _pace01                   = new Cache(() => Maff.clamp(groupOrderable.view.map(u => (u.pixel - u.previousPixel(_paceAge)) / Math.max(0.01, u.topSpeed)).foldLeft(Pixel(0, 0))(_ + _).length / _paceAge, -1, 1))
   private def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)
+
 }

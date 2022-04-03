@@ -29,17 +29,17 @@ class ScoutForCannonRush extends Tactic {
   })
 
   def launch(): Unit = {
-    val gettingCannonRushed = With.fingerprints.cannonRush.matches || (
-      With.fingerprints.earlyForge.matches
-      && ! With.fingerprints.forgeFe.matches
-      && ! With.fingerprints.gatewayFirst.matches
+    val gettingCannonRushed = With.fingerprints.cannonRush() || (
+      With.fingerprints.earlyForge()
+      && ! With.fingerprints.forgeFe()
+      && ! With.fingerprints.gatewayFirst()
       && With.geography.enemyBases.size < 2)
 
     var shouldScout = (
       previouslyCannonRushed
         && With.enemies.exists(_.isUnknownOrProtoss)
         && ! With.units.existsEnemy(MatchAnd(Protoss.PhotonCannon, MatchComplete))
-        && ! With.fingerprints.gatewayFirst.matches
+        && ! With.fingerprints.gatewayFirst()
         && With.frame > GameTime(1, 30)()
         && With.frame < GameTime(6, 0)())
     shouldScout = shouldScout || (gettingCannonRushed && With.frame < GameTime(10, 0)())

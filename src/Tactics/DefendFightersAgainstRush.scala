@@ -23,7 +23,7 @@ class DefendFightersAgainstRush extends Tactic {
     lazy val aggressors   = With.units.enemy.filter(u => u.aliveAndComplete && u.is(MatchWarriors) && inOurBase(u))
     lazy val workers      = With.units.ours .filter(u => u.aliveAndComplete && u.unitClass.isWorker)
     lazy val threatening  = aggressors.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
-    if ( ! fingerprintsRequiringFighterProtection.exists(_.matches)) return
+    if ( ! fingerprintsRequiringFighterProtection.exists(_())) return
     if (fighters.isEmpty)     return
     if (fighters.size > 4)    return
     if (cannons.nonEmpty)     return

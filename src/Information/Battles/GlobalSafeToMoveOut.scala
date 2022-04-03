@@ -160,9 +160,9 @@ object GlobalSafeToMoveOut {
     val speedEnemy = With.enemy.hasUpgrade(Zerg.ZerglingSpeed)
     val speedExpectedFirst = (
       ZvZ9PoolSpeed.activate
-      || ( ! With.fingerprints.ninePool.matches && ! With.fingerprints.overpool.matches && new EnemyRecentStrategy(With.fingerprints.twelveHatch).apply)
-      || With.fingerprints.twelveHatch.matches
-      || With.fingerprints.twelvePool.matches)
+      || ( ! With.fingerprints.ninePool() && ! With.fingerprints.overpool() && EnemyRecentStrategy(With.fingerprints.twelveHatch).apply)
+      || With.fingerprints.twelveHatch()
+      || With.fingerprints.twelvePool())
     val okayOnSpeed = speedUs || (speedExpectedFirst && ! speedEnemy)
 
     val okayOnZerglings = okayOnSpeed && (

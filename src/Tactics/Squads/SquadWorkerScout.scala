@@ -67,7 +67,7 @@ class SquadWorkerScout extends Squad {
       Zerg.Spire)))
 
     // Abandon scouting when we have all the information we could possibly want
-    abandonScouting ||= Seq(With.fingerprints.fourPool).exists(_.matches)
+    abandonScouting ||= With.fingerprints.fourPool()
 
     if (abandonScouting) return
 

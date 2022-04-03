@@ -43,11 +43,11 @@ object PvPIdeas extends MacroCounting {
     output ||= unitsComplete(Protoss.DarkTemplar) > 0 && enemies(Protoss.Observer) == 0
 
     // Don't let cannon rushes encroach
-    output ||= With.fingerprints.cannonRush.matches
+    output ||= With.fingerprints.cannonRush()
 
     // Attack when we have range advantage (and they're not hiding behind a wall
     if ( ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.forgeFe)) {
-      output ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate.matches)
+      output ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate())
       output ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)
     }
 

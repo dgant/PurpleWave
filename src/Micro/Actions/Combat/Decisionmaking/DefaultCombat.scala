@@ -215,41 +215,44 @@ object DefaultCombat extends Action {
     def techniqueIs(techniques: Technique*): Boolean = techniques.contains(technique)
 
     val goalPotshot = techniqueIs(Abuse, Fallback) || Protoss.Reaver(unit) || (Protoss.Zealot(unit) && unit.matchups.targetsInRange.exists(u => Zerg.Zergling(u) && u.player.hasUpgrade(Zerg.ZerglingSpeed)))
-    val goalDance   = techniqueIs(Abuse, Dance)
-    val goalEngage  = techniqueIs(Fight, Abuse, Dance)
     val goalRetreat = techniqueIs(Fallback, Flee, Excuse)
+    val goalEngage  = techniqueIs(Fight, Abuse, Dance)
+    val goalDance   = techniqueIs(Abuse, Dance)
+
+    unit.agent.shouldEngage ||= goalEngage
+    if (goalRetreat) unit.agent.toTravel = Some(unit.agent.safety)
 
     /////////////
     // Execute //
     /////////////
 
-    unit.agent.shouldEngage ||= goalEngage
-    if (goalRetreat) unit.agent.toTravel = Some(unit.agent.safety)
-
-    val breakFormationThreshold = 64
-    lazy val targetDistanceHere = unit.pixelDistanceEdge(target.get)
-    lazy val targetDistanceThere = unit.pixelDistanceEdgeFrom(target.get, unit.agent.destination)
-    lazy val formationHelpsEngage = targetDistanceThere <= Math.min(targetDistanceHere, unit.pixelRangeAgainst(target.get))
-    lazy val breakFormationToAttack = unit.squad.forall(_.formations.isEmpty) || target.exists(targ =>
-        // If we're not ready to attack yet, just slide into formation
-        (readyToAttackTarget(unit) || unit.unitClass.melee) && (
-          // Break if we are already in range
-          unit.inRangeToAttack(targ)
-          // Break if we are closer to range than the formation, and already pretty close
-          || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
-          // Break if we're just pillaging
-          || unit.confidence11 > confidenceChaseThreshold
-          || unit.matchups.threats.forall(MatchWorker)
-          // Break if the fight has already begun and the formation isn't helping us
-          || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
+    if (goalRetreat && retreat(unit)) return
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
-    if (goalEngage && breakFormationToAttack && attackIfReady(unit)) return
 
-    if (goalRetreat) {
-      retreat(unit)
+    val breakFormationThreshold = 64
+    val targetDistanceHere = target.map(unit.pixelDistanceEdge).getOrElse(0d)
+    val targetDistanceThere = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
+    val formationExists = unit.squad.exists(_.formations.nonEmpty)
+    val formationHelpsEngage = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
+    lazy val breakFormationToAttack = ! formationExists || target.exists(targ =>
+      // If we're not ready to attack yet, just slide into formation
+      (readyToAttackTarget(unit) || unit.unitClass.melee) && (
+        // Break if we are already in range
+        unit.inRangeToAttack(targ)
+        // Break if we are closer to range than the formation, and already pretty close
+        || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
+        // Break if we're just pillaging
+        || unit.confidence11 > confidenceChaseThreshold
+        || unit.matchups.threats.forall(MatchWorker)
+        // Break if the fight has already begun and the formation isn't helping us
+        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
+    if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {
+      unit.agent.lastAction = Some(if (formationExists) "Break" else "Charge")
       return
-    } else if (goalDance) {
+    }
+
+    if (goalDance) {
       val distanceIdeal   = idealTargetDistance(unit, target.get)
       val distanceCurrent = unit.pixelDistanceEdge(target.get)
       val distanceTowards = distanceCurrent - distanceIdeal
@@ -265,7 +268,7 @@ object DefaultCombat extends Action {
             move(unit)
             return
           } else {
-            unit.agent.act("Charge")
+            unit.agent.act("Approach")
             Commander.attack(unit)
             return
           }

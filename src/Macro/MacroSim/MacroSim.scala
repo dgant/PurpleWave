@@ -198,7 +198,7 @@ final class MacroSim {
   }
 
   private def exceedsMinInsert(request: Buildable, i: Int): Boolean = {
-    ! minInsert.get(request).exists(_ >= i)
+    minInsert.get(request).exists(_ >= i)
   }
 
   private def insert(step: MacroStep): Int = {

@@ -36,16 +36,16 @@ class DefendAgainstProxy extends Tactic {
     defenders.release()
     defenders.counter = CountEverything
     defenders.matcher = MatchOr(MatchWorker, MatchWarriors)
-    defenders.inquire().toVector.foreach(defendersAvailable ++= _)
+    defenders.inquire().foreach(defendersAvailable++=)
 
     val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony))
 
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
-      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => u.is(Protoss.Pylon) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
+      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Protoss.Gateway) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => Protoss.Pylon(u) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
       val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
-      val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(_.center.pixelDistance(proxy.pixel) < proxy.effectiveRangePixels + 32))
+      val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(t => proxy.pixelDistanceEdge(t.center) < proxy.effectiveRangePixels))
       val framesBeforeDamage  = Maff
         .min(With.units.enemy.filter(u =>
           u.dpfGround > 0
@@ -99,7 +99,7 @@ class DefendAgainstProxy extends Tactic {
       ! e.flying
       && e.likelyStillThere
       && e.isAny(scaryTypes: _*)
-      && e.is(MatchProxied))
+      && MatchProxied(e))
   }
   
   lazy val scaryTypes = Vector(

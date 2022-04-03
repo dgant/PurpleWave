@@ -4,7 +4,7 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
-import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
+import Planning.UnitMatchers.{MatchTank, MatchWarriors, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Minutes
@@ -42,6 +42,7 @@ object FightOrFlee extends Action {
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))
     decide(false, "BideSiege",  () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
     decide(true,  "Workers",    () => unit.matchups.targets.exists(_.canAttackGround) && unit.matchups.allies.flatMap(_.friendly).exists(a => MatchWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
+    decide(true,  "Raze",       () => ((MatchTank(unit) && Terran.SiegeMode()) || unit.isAny(Protoss.Reaver, Zerg.Guardian) && unit.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding)))
     decide(true,  "Energized",  () =>
       unit.unitClass.maxShields > 20
       && With.frame < Minutes(10)()

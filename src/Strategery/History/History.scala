@@ -55,7 +55,7 @@ class History {
         Vector(Frames(With.frame).toString)
         ++ With.strategy.selected.filter(With.strategy.isActive).map(_.toString)
         ++ With.strategy.selected.filterNot(With.strategy.isActive).map(s => f"[$s]").toVector
-        ++ With.fingerprints.all.filter(_.matches).map(_.toString).sorted).distinct)
+        ++ With.fingerprints.all.filter(_()).map(_.toString).sorted).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)
   }
 

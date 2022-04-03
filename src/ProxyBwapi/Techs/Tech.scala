@@ -1,5 +1,6 @@
 package ProxyBwapi.Techs
 
+import Lifecycle.With
 import ProxyBwapi.BuildableType
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
@@ -19,6 +20,7 @@ case class Tech(bwapiTech: TechType) extends BuildableType{
   val targetsUnits        : Boolean     = bwapiTech.targetsUnit
   lazy val whatResearches : UnitClass   = UnitClasses.get(bwapiTech.whatResearches)
 
+  def apply(): Boolean = apply(With.self)
   def apply(player: PlayerInfo): Boolean = player.hasTech(this)
   
   override val toString: String = bwapiTech.toString.replaceAll("_", " ")

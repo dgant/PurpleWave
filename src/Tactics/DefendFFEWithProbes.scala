@@ -43,13 +43,13 @@ class DefendFFEWithProbes extends Tactic {
     if (With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete)) > 3) return
     if ( ! haveMinedEnoughForTwoCannons) return
     if ( ! With.enemies.exists(_.isUnknownOrZerg)) return
-    if (With.fingerprints.twelveHatch.matches) return
-    if (With.fingerprints.tenHatch.matches) return
-    if (With.fingerprints.twelvePool.matches) return
-    if (With.fingerprints.overpool.matches) return
-    if (With.fingerprints.ninePool.matches) return
+    if (With.fingerprints.twelveHatch()) return
+    if (With.fingerprints.tenHatch()) return
+    if (With.fingerprints.twelvePool()) return
+    if (With.fingerprints.overpool()) return
+    if (With.fingerprints.ninePool()) return
     if ( ! EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
-    if ( ! With.fingerprints.fourPool.matches && ! With.scouting.enemyHasScoutedUsWithWorker) return
+    if ( ! With.fingerprints.fourPool() && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
     var cannons = With.units.ours.filter(Protoss.PhotonCannon)
     if (cannons.isEmpty) cannons = With.units.ours.filter(Protoss.Forge)

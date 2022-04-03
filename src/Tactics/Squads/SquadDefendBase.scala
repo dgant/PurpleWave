@@ -149,7 +149,7 @@ class SquadDefendBase(base: Base) extends Squad {
       && ! guardZone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
   private def isScourable(enemy: UnitInfo): Boolean = (
-    ! (With.frame < Minutes(4)() && Zerg.Drone(enemy) && With.fingerprints.fourPool.matches) // Don't get baited by 4-pool scouts
+    ! (With.frame < Minutes(4)() && Zerg.Drone(enemy) && With.fingerprints.fourPool()) // Don't get baited by 4-pool scouts
     // Don't scour what we can't kill
     && (units.exists(_.canAttack(enemy)) || ((enemy.cloaked || enemy.burrowed) && units.exists(_.unitClass.isDetector)))
     // Don't chase Overlords or floating buildings when there are actual threats nearby

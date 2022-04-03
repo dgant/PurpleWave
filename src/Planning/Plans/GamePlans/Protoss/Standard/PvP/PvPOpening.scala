@@ -664,6 +664,7 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.RoboticsSupportBay)
       }
       if (PvPTechBeforeRange() && ! getObservers) {
+        buildOrder(Get(Protoss.Reaver))
         get(Protoss.ShuttleSpeed)
         if (unitsComplete(Protoss.Reaver) > 0) {
           buildOrder(Get(Protoss.Shuttle))

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
@@ -30,7 +30,7 @@ class PvRZCoreZ extends GameplanTemplateVsRandom {
       new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.oneGateCore, With.fingerprints.nexusFirst)),
     new ConsiderAttacking)
 
-  override val buildOrder: Vector[Buildable] = ProtossBuilds.ZCoreZ
+  override val buildOrder: Vector[RequestProduction] = ProtossBuilds.ZCoreZ
 
   override def buildPlans: Vector[Plan] = Vector(
     new Pump(Protoss.Dragoon)

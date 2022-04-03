@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Compound.FlipIf
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -19,7 +19,7 @@ class TvT2Port extends GameplanTemplate {
 
   override def workerPlan: Plan = new PumpWorkers(oversaturate = false)
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

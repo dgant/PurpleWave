@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
@@ -21,7 +21,7 @@ class TerranReactionVsWorkerRush extends GameplanTemplate {
   override val activationCriteria: Predicate = new EnemyStrategy(With.fingerprints.workerRush)
   override val completionCriteria: Predicate = new UnitsAtLeast(2, Terran.Vulture, complete = true)
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(8, Terran.SCV),
     Get(Terran.Barracks))
 

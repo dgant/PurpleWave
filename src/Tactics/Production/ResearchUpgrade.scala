@@ -1,7 +1,7 @@
 package Tactics.Production
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Planning.UnitCounters.CountOne
@@ -9,7 +9,7 @@ import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
-class ResearchUpgrade(buildableUpgrade: Buildable) extends Production {
+class ResearchUpgrade(buildableUpgrade: RequestProduction) extends Production {
 
   setBuildable(buildableUpgrade)
   val upgrade       : Upgrade       = buildable.upgrade.get

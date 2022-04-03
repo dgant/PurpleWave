@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans
 
 import Macro.Architecture.Blueprint
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.If
@@ -23,7 +23,7 @@ abstract class GameplanTemplate extends Plan with Modal {
   val removeMineralBlocksAt : Int             = 80
   def status                : String          = this.toString
   def blueprints            : Seq[Blueprint]  = Seq.empty
-  def buildOrder            : Seq[Buildable]  = Vector.empty
+  def buildOrder            : Seq[RequestProduction]  = Vector.empty
   def emergencyPlans        : Seq[Plan]       = Vector.empty
   def buildPlans            : Seq[Plan]       = Vector.empty
   def aggressionPlan        : Plan            = NoPlan()

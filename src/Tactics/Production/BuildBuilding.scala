@@ -2,7 +2,7 @@ package Tactics.Production
 
 import Lifecycle.With
 import Macro.Architecture.PlacementRequests.PlacementRequest
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Mathematics.Points.Tile
@@ -15,7 +15,7 @@ import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class BuildBuilding(buildableBuilding: Buildable) extends Production {
+class BuildBuilding(buildableBuilding: RequestProduction) extends Production {
 
   setBuildable(buildableBuilding)
   val buildingClass   : UnitClass       = buildable.unit.get

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
@@ -48,7 +48,7 @@ class ZvR9Pool extends GameplanTemplate {
       UnitsAtMost(0, Zerg.Spire),
       new EnemyIsTerran))
 
-  override def buildOrder: Seq[Buildable] = Vector(
+  override def buildOrder: Seq[RequestProduction] = Vector(
     Get(9, Zerg.Drone),
     Get(Zerg.SpawningPool),
     Get(10, Zerg.Drone),

@@ -11,13 +11,13 @@ import ProxyBwapi.Upgrades.Upgrade
   */
 object Get {
 
-  def apply(quantity: Int, buildableType: BuildableType): Buildable = {
+  def apply(quantity: Int, buildableType: BuildableType): RequestProduction = {
     buildableType match {
-      case v: UnitClass  => BuildableUnit(v, quantity)
-      case v: Tech       => BuildableTech(v)
-      case v: Upgrade    => BuildableUpgrade(v, quantity)
+      case v: UnitClass  => RequestUnit(v, quantity)
+      case v: Tech       => RequestTech(v)
+      case v: Upgrade    => RequestUpgrade(v, quantity)
     }
   }
 
-  def apply(buildableType: BuildableType, quantity: Int = 1): Buildable = apply(quantity, buildableType)
+  def apply(buildableType: BuildableType, quantity: Int = 1): RequestProduction = apply(quantity, buildableType)
 }

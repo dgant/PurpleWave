@@ -1,6 +1,6 @@
 package Tactics.Production
 
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
@@ -9,7 +9,7 @@ import Planning.UnitPreferences.PreferTrainerFor
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class TrainUnit(val buildableUnit: Buildable) extends Production {
+class TrainUnit(val buildableUnit: RequestProduction) extends Production {
   setBuildable(buildableUnit)
   val traineeClass    : UnitClass         = buildable.unit.get
   val trainerClass    : UnitClass         = traineeClass.whatBuilds._1

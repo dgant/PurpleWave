@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZIdeas.MeldArchonsUntilStorm
@@ -47,7 +47,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
         new Pump(Protoss.Probe, 12),
         new Build(Get(4, Protoss.PhotonCannon)))))
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(8, Protoss.Probe),
     Get(Protoss.Pylon),
     Get(9, Protoss.Probe),

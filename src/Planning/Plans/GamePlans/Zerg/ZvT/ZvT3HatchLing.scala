@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.{Do, Write}
 import Planning.Plans.Compound._
@@ -50,7 +50,7 @@ class ZvT3HatchLing extends GameplanTemplate {
     new ZergReactionVsWorkerRush
   )
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9, Zerg.Drone),
     Get(2, Zerg.Overlord),
     Get(12, Zerg.Drone),

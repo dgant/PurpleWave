@@ -1,6 +1,6 @@
 package Tactics.Production
 
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Planning.UnitCounters.CountOne
@@ -9,7 +9,7 @@ import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-class BuildAddon(buildableAddon: Buildable) extends Production {
+class BuildAddon(buildableAddon: RequestProduction) extends Production {
 
   setBuildable(buildableAddon)
   def addonClass    : UnitClass     = buildable.unit.get

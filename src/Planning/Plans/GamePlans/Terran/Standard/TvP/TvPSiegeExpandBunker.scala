@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Army.{AttackWithWorkers, ConsiderAttacking}
 import Planning.Plans.Compound.{FlipIf, If, Parallel}
@@ -35,7 +35,7 @@ class TvPSiegeExpandBunker extends GameplanTemplate {
     new EnemyStrategy(With.fingerprints.nexusFirst),
     new ConsiderAttacking)
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9,  Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

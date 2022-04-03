@@ -1,10 +1,10 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Planning.Plan
 
-class Build(requests: Buildable*) extends Plan {
+class Build(requests: RequestProduction*) extends Plan {
 
   override def toString: String = (
     "Build " +

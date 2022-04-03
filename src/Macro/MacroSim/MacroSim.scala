@@ -1,7 +1,7 @@
 package Macro.MacroSim
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, BuildableTech, BuildableUnit, BuildableUpgrade}
+import Macro.Buildables.{RequestProduction, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
@@ -14,16 +14,16 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 final class MacroSim {
-  val redundant   = new ArrayBuffer[Buildable]() // We don't need this for bot operation; it's just here for debugging
-  val denied      = new ArrayBuffer[Buildable]() // We don't need this for bot operation; it's just here for debugging
+  val redundant   = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
+  val denied      = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
   val steps       = new mutable.ArrayBuffer[MacroStep]()
-  val minInsert  = new mutable.OpenHashMap[Buildable, Int]()
+  val minInsert  = new mutable.OpenHashMap[RequestProduction, Int]()
 
-  def queue: Seq[Buildable] = steps.view.filter(_.request.isDefined).map(_.request.get)
+  def queue: Seq[RequestProduction] = steps.view.filter(_.request.isDefined).map(_.request.get)
 
   private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
-    val requests = new ArrayBuffer[Buildable]
+    val requests = new ArrayBuffer[RequestProduction]
     redundant.clear()
     denied.clear()
     steps.clear()
@@ -54,7 +54,7 @@ final class MacroSim {
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
-        step.request = Some(BuildableUnit(u.unitClass, initialState.unitsExtant(u.unitClass)))
+        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass)))
         event.dUnitComplete = u.unitClass
         event.dUnitCompleteN = 1
         if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
@@ -62,11 +62,11 @@ final class MacroSim {
         }
       }
       if (u.upgrading) {
-        step.request = Some(BuildableUpgrade(u.upgradingType, 1 + With.self.getUpgradeLevel(u.upgradingType)))
+        step.request = Some(RequestUpgrade(u.upgradingType, 1 + With.self.getUpgradeLevel(u.upgradingType)))
         event.dUpgrade = u.upgradingType
         event.dUpgradeLevel = 1 + initialState.upgrades(u.upgradingType)
       } else if (u.teching) {
-        step.request = Some(BuildableTech(u.techingType))
+        step.request = Some(RequestTech(u.techingType))
         event.dTech = u.techingType
       } else if (u.unitClass.isGas) {
         event.dGeysers += 1
@@ -160,7 +160,7 @@ final class MacroSim {
     })
   }
 
-  private def canInsertAfter(request: Buildable, i: Int): Boolean = {
+  private def canInsertAfter(request: RequestProduction, i: Int): Boolean = {
     // Find a state where we can fulfill the request
     val step = steps(i)
     var cant = false
@@ -182,7 +182,7 @@ final class MacroSim {
     ! cant
   }
 
-  private def canInsertBefore(request: Buildable, i: Int): Boolean = {
+  private def canInsertBefore(request: RequestProduction, i: Int): Boolean = {
     // Ensure no future states would be rendered impossible by inserting the request
     var j = i
     var cant = false
@@ -197,7 +197,7 @@ final class MacroSim {
     ! cant
   }
 
-  private def exceedsMinInsert(request: Buildable, i: Int): Boolean = {
+  private def exceedsMinInsert(request: RequestProduction, i: Int): Boolean = {
     minInsert.get(request).exists(_ >= i)
   }
 

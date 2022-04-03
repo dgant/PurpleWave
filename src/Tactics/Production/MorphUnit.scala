@@ -1,7 +1,7 @@
 package Tactics.Production
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention
@@ -13,7 +13,7 @@ import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class MorphUnit(val buildableUnit: Buildable) extends Production {
+class MorphUnit(val buildableUnit: RequestProduction) extends Production {
 
   setBuildable(buildableUnit)
   val classOutput  : UnitClass      = buildable.unit.get

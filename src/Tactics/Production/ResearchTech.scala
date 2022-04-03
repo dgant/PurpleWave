@@ -1,7 +1,7 @@
 package Tactics.Production
 
 import Lifecycle.With
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Planning.UnitCounters.CountOne
@@ -9,7 +9,7 @@ import Planning.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 
-class ResearchTech(buildableTech: Buildable) extends Production {
+class ResearchTech(buildableTech: RequestProduction) extends Production {
 
   setBuildable(buildableTech)
   val tech          : Tech          = buildable.tech.get

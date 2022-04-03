@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
@@ -39,12 +39,12 @@ trait MacroActions {
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))
-  def get(item: Buildable): Unit = {
+  def get(item: RequestProduction): Unit = {
     With.scheduler.request(_requesterPlan, item)
   }
   private def _requesterPlan = new Plan()
 
-  def buildOrder(items: Buildable*): Unit = {
+  def buildOrder(items: RequestProduction*): Unit = {
     new BuildOrder(items: _*).update()
   }
   def requireEssentials(): Unit = {

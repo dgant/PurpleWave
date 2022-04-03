@@ -1,6 +1,6 @@
 package Tactics.Production
 
-import Macro.Buildables.Buildable
+import Macro.Buildables.RequestProduction
 import Planning.Prioritized
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -15,9 +15,9 @@ trait Production extends Prioritized {
     onUpdate()
   }
 
-  private var _buildable: Buildable = _
-  final def buildable: Buildable = _buildable
-  final def setBuildable(buildable: Buildable): Buildable = {
+  private var _buildable: RequestProduction = _
+  final def buildable: RequestProduction = _buildable
+  final def setBuildable(buildable: RequestProduction): RequestProduction = {
     _buildable = buildable
     buildable
   }

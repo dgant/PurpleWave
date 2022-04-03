@@ -7,7 +7,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Tactics.Production._
 import bwapi.Race
 
-abstract class Buildable(val buildableType: BuildableType, val quantity: Int = 0) extends {
+abstract class RequestProduction(val buildableType: BuildableType, val quantity: Int = 0) extends {
   def tech      : Option[Tech]      = buildableType match { case c: Tech      => Some(c) case _ => None }
   def upgrade   : Option[Upgrade]   = buildableType match { case c: Upgrade   => Some(c) case _ => None }
   def unit      : Option[UnitClass] = buildableType match { case c: UnitClass => Some(c) case _ => None }
@@ -41,7 +41,7 @@ abstract class Buildable(val buildableType: BuildableType, val quantity: Int = 0
   /**
     * Is this buildable a satisfactory instance of producing some requirement?
     */
-  def satisfies(requirement: Buildable): Boolean = {
+  def satisfies(requirement: RequestProduction): Boolean = {
     if (tech != requirement.tech) return false
     if (upgrade != requirement.upgrade) return false
     if (unit != requirement.unit) return false
@@ -51,8 +51,8 @@ abstract class Buildable(val buildableType: BuildableType, val quantity: Int = 0
 
   override def hashCode(): Int = buildableType.hashCode() ^ quantity
   override def equals(anyOther: scala.Any): Boolean = {
-    if ( ! anyOther.isInstanceOf[Buildable]) return false
-    val other = anyOther.asInstanceOf[Buildable]
+    if ( ! anyOther.isInstanceOf[RequestProduction]) return false
+    val other = anyOther.asInstanceOf[RequestProduction]
     buildableType == other.buildableType && quantity == other.quantity
   }
 

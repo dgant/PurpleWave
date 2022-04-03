@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -22,7 +22,7 @@ class TvT1FacFE extends GameplanTemplate {
   override def scoutPlan = new ScoutAt(13)
   override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass)
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(12, Terran.SCV),

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -33,7 +33,7 @@ class TvZ1RaxFE extends GameplanTemplate {
       new ScoutOn(Terran.Barracks, scoutCount = 2),
       new ScoutOn(Terran.Barracks)))
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

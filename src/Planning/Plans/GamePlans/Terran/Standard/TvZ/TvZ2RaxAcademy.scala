@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Buildables.{Buildable, Get}
+import Macro.Buildables.{RequestProduction, Get}
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -43,7 +43,7 @@ class TvZ2RaxAcademy extends GameplanTemplate {
         new UnitsAtLeast(2, Terran.Barracks)),
       new BuildBunkersAtMain(1)))
 
-  override def buildOrder: Seq[Buildable] = Seq(
+  override def buildOrder: Seq[RequestProduction] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

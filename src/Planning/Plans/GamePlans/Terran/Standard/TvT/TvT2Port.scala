@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Compound.FlipIf
 import Planning.Plans.GamePlans.GameplanTemplate

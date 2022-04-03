@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate

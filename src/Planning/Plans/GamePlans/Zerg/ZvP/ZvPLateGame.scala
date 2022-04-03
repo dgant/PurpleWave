@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Performance.Cache
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass

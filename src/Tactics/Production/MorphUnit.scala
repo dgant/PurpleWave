@@ -1,7 +1,7 @@
 package Tactics.Production
 
 import Lifecycle.With
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention

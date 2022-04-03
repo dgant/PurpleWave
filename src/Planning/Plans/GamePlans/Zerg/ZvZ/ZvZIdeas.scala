@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Enemy, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build

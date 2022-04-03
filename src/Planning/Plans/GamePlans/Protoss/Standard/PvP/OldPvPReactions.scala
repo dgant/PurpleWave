@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Mathematics.Maff
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel}

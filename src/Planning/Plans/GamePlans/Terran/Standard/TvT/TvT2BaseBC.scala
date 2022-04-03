@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}

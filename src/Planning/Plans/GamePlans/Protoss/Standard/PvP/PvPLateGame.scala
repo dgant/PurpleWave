@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Debugging.SimpleString
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Mathematics.Maff
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}

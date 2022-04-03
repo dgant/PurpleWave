@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}

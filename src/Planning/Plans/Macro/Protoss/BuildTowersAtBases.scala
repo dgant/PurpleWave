@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Pump
 import ProxyBwapi.Races.{Protoss, Terran}

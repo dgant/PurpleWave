@@ -1,6 +1,6 @@
 package Macro.MacroSim
 
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 
 class MacroStep {
   val state: MacroState = new MacroState

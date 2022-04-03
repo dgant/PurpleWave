@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 
 class UpgradeContinuously(upgrade: ProxyBwapi.Upgrades.Upgrade, maxLevel: Int = 3) extends Plan {

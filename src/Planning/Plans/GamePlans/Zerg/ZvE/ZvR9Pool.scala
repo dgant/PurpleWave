@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvE
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan

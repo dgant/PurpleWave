@@ -1,4 +1,4 @@
-package Macro.Buildables
+package Macro.Requests
 
 import ProxyBwapi.BuildableType
 import ProxyBwapi.Techs.Tech

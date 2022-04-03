@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound.{If, Trigger}

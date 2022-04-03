@@ -2,7 +2,7 @@ package Planning.Plans.Placement
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate

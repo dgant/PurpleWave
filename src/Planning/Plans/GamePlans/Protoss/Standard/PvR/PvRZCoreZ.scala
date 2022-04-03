@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Lifecycle.With
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom

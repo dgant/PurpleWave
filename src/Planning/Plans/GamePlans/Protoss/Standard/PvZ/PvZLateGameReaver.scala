@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplate

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom

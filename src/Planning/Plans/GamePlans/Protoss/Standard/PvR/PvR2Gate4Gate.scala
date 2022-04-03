@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate

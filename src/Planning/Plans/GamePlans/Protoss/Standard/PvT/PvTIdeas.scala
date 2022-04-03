@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, _}

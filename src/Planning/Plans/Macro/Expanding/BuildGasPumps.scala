@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Expanding
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import ProxyBwapi.UnitClasses.UnitClass
 

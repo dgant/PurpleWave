@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.AllRaces
 
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import ProxyBwapi.Races.Protoss
 

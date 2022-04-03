@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvE
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._

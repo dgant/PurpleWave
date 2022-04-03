@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._

@@ -1,6 +1,6 @@
 package Tactics.Production
 
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Planning.UnitCounters.CountOne

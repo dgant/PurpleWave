@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Micro.Agency.Intention
 import Planning.Plan
 import ProxyBwapi.Races.Zerg

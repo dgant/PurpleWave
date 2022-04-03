@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}

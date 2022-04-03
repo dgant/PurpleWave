@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvZ
 
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._

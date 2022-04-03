@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans
 
 import Macro.Architecture.Blueprint
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.If

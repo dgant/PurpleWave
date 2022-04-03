@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel, Trigger}

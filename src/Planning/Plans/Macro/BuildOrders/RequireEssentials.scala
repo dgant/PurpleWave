@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Compound._
 import Planning.Plans.Macro.Expanding.{MaintainMiningBases, RequireMiningBases}
 import Planning.Predicates.Strategy.WeAreZerg

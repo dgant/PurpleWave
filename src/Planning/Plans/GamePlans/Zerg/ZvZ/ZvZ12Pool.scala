@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._

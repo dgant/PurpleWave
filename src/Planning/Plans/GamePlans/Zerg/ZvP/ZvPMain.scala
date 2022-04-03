@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Parallel, Trigger}

@@ -1,6 +1,6 @@
 package Macro.Scheduling
 
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Prioritized
 
 import scala.collection.mutable

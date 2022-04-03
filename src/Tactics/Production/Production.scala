@@ -1,6 +1,6 @@
 package Tactics.Production
 
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Prioritized
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

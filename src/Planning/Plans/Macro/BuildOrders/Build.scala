@@ -1,7 +1,7 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.Buildables.RequestProduction
+import Macro.Requests.RequestProduction
 import Planning.Plan
 
 class Build(requests: RequestProduction*) extends Plan {

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._

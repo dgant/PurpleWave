@@ -1,7 +1,7 @@
 package Macro.MacroSim
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, RequestTech, RequestUnit, RequestUpgrade}
+import Macro.Requests.{RequestProduction, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs

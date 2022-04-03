@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
-import Macro.Buildables.{RequestProduction, Get}
+import Macro.Requests.{RequestProduction, Get}
 import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate

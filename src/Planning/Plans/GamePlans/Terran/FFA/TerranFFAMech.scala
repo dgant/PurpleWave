@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
-import Macro.Buildables.Get
+import Macro.Requests.Get
 import Planning.Predicates.Compound.{And, Check}
 import Planning.UnitMatchers.{MatchTank, MatchWarriors}
 import Planning.Plan

@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
 

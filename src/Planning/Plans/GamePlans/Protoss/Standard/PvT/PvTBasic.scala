@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchTank, MatchWarriors, MatchWorker}
+import Utilities.UnitMatchers.{MatchOr, MatchTank, MatchWarriors, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.GameTime

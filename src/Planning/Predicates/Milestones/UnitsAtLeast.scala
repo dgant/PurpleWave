@@ -2,7 +2,7 @@ package Planning.Predicates.Milestones
 
 import Planning.Predicate
 import Planning.Predicates.MacroFacts
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 
 case class UnitsAtLeast(quantity: Int, matcher: UnitMatcher, complete: Boolean = false) extends Predicate {
   override def apply: Boolean = {

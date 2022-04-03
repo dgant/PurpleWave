@@ -3,9 +3,9 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.UnitCounters.CountExactly
-import Planning.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountExactly
+import Utilities.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
+import Utilities.UnitPreferences.PreferClose
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.Minutes
 

@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Planning.UnitMatchers.MatchOr
+import Utilities.UnitMatchers.MatchOr
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT7Pool

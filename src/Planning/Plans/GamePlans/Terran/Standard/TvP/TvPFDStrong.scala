@@ -13,7 +13,7 @@ import Planning.Predicates.Compound.Latch
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPFDStrong

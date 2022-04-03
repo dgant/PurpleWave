@@ -6,9 +6,9 @@ import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchMorphingInto, MatchOr, MatchSpecific}
-import Planning.UnitPreferences._
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{MatchMorphingInto, MatchOr, MatchSpecific}
+import Utilities.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

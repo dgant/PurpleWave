@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene

@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

@@ -5,8 +5,8 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
-import Planning.UnitCounters.CountEverything
-import Planning.UnitMatchers.{MatchFlyingWarriors, MatchOr}
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitMatchers.{MatchFlyingWarriors, MatchOr}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Tactic.Missions.MissionDrop
 import Utilities.Time.Seconds

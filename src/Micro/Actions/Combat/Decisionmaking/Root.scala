@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Targeting.FiltersSituational.TargetFilterVisibleInRange
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 

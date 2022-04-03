@@ -2,7 +2,7 @@ package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
 import Utilities.Time.GameTime
 

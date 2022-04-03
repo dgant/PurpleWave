@@ -3,7 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Fingerprint
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchProxied}
+import Utilities.UnitMatchers.{MatchAnd, MatchProxied}
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
 

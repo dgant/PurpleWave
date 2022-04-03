@@ -2,7 +2,7 @@ package Planning.Predicates.Milestones
 
 import Planning.Predicate
 import Planning.Predicates.MacroFacts
-import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
+import Utilities.UnitMatchers.{MatchAnything, UnitMatcher}
 
 case class EnemiesAtMost(quantity: Int = 0, matcher: UnitMatcher = MatchAnything, complete: Boolean = false) extends Predicate {
   override def apply: Boolean = {

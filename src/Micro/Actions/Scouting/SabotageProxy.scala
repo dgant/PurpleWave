@@ -4,7 +4,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Planning.UnitMatchers.MatchProxied
+import Utilities.UnitMatchers.MatchProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 

@@ -10,7 +10,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast, UpgradeComplete}
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}
 
 

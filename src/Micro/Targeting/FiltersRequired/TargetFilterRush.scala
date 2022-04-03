@@ -2,7 +2,7 @@ package Micro.Targeting.FiltersRequired
 
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
-import Planning.UnitMatchers.MatchProxied
+import Utilities.UnitMatchers.MatchProxied
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.GameTime

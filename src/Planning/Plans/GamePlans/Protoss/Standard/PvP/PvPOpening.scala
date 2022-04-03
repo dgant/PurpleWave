@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import Planning.Plans.Placement.BuildCannonsAtNatural
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._

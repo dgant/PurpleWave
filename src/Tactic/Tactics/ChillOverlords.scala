@@ -6,7 +6,7 @@ import Mathematics.Shapes.Circle
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountEverything
+import Utilities.UnitCounters.CountEverything
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

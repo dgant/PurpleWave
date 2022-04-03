@@ -22,7 +22,7 @@ abstract class RequestProduction(val buildableType: BuildableType, val quantity:
   // TODO: Count addons as producers
   def techRequired      : Option[Tech]            = unit.flatMap(_.buildTechEnabling)
   def upgradeRequired   : Option[(Upgrade, Int)]  = upgrade.map(u => (u, quantity - 1)).filter(_._2 > 0)
-  def unitsRequired     : Iterable[UnitClass]     = unit.map(_.requiredUnits).orElse(upgrade.map(u => Seq(u.whatsRequired(quantity)))).getOrElse(tech.map(_.requiredUnit).toSeq).filterNot(UnitClasses.None==)
+  def unitsRequired     : Seq[UnitClass]          = unit.map(_.requiredUnits).orElse(upgrade.map(u => Seq(u.whatsRequired(quantity)))).getOrElse(tech.map(_.requiredUnit).toSeq).filterNot(UnitClasses.None==)
   def producerRequired  : UnitClass               = unit.map(_.whatBuilds._1).orElse(upgrade.map(_.whatUpgrades)).orElse(tech.map(_.whatResearches)).getOrElse(UnitClasses.None)
   def producersRequired : Int                     = unit.map(_.whatBuilds._2).getOrElse(1)
 

@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {

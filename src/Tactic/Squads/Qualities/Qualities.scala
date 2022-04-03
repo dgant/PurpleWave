@@ -1,6 +1,6 @@
 package Tactic.Squads.Qualities
 
-import Planning.UnitMatchers.{MatchCombatSpellcaster, MatchWorker}
+import Utilities.UnitMatchers.{MatchCombatSpellcaster, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 

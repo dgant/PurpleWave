@@ -159,7 +159,7 @@ trait CombatUnit {
   @inline final def guaranteedToHit(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
     val tileFrom  = from.getOrElse(pixel)       .tile
     val tileTo    =   to.getOrElse(enemy.pixel) .tile
-    flying || enemy.flying || unitClass.unaffectedByDarkSwarm || tileFrom.altitude >= tileTo.altitude
+    flying || enemy.flying || unitClass.affectedByDarkSwarm || tileFrom.altitude >= tileTo.altitude
   }
   @inline final def damageTypeAgainst (enemy: CombatUnit)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
   @inline final def attacksAgainst    (enemy: CombatUnit)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround

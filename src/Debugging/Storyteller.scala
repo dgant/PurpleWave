@@ -10,7 +10,7 @@ import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStr
 import Lifecycle.{JBWAPIClient, Main, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}

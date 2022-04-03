@@ -3,9 +3,9 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.MatchAnd
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
 

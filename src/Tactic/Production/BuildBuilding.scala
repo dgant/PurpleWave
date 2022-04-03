@@ -8,9 +8,9 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{Match, MatchAnd, MatchSpecific}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{Match, MatchAnd, MatchSpecific}
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

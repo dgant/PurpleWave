@@ -1,6 +1,6 @@
 package ProxyBwapi.Races
 
-import Planning.UnitMatchers.MatchOr
+import Utilities.UnitMatchers.MatchOr
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades

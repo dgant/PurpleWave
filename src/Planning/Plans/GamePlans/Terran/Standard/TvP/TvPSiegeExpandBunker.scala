@@ -16,7 +16,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitCounters.CountUpTo
+import Utilities.UnitCounters.CountUpTo
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPSiegeExpandBunker
 

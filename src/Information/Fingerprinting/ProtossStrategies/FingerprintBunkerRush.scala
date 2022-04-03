@@ -1,7 +1,7 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
-import Planning.UnitMatchers.{MatchAnd, MatchProxied}
+import Utilities.UnitMatchers.{MatchAnd, MatchProxied}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.GameTime
 

@@ -2,7 +2,7 @@ package Macro.Architecture.Tiles
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Mathematics.Points.{Tile, TileRectangle}
-import Planning.UnitMatchers.{MatchHatchlike, MatchOr}
+import Utilities.UnitMatchers.{MatchHatchlike, MatchOr}
 import ProxyBwapi.Races.Zerg
 
 object TileSourceCreep extends TileSource {

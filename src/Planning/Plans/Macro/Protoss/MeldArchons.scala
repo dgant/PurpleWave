@@ -3,8 +3,8 @@ package Planning.Plans.Macro.Protoss
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitPreferences.PreferLowEnergy
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitPreferences.PreferLowEnergy
 import Planning.Plan
 import ProxyBwapi.Races.Protoss
 

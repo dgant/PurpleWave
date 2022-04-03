@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{PixelRay, SpecificPoints, Tile, TileRectangle}
 import Mathematics.Maff
 import Performance.Cache
-import Planning.UnitMatchers.{MatchBuilding, MatchWorker}
+import Utilities.UnitMatchers.{MatchBuilding, MatchWorker}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo

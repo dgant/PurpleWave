@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{Not, Or}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{MatchOr, MatchTank}
+import Utilities.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP6Fac

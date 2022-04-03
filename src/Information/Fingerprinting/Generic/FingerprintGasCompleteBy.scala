@@ -3,7 +3,6 @@ package Information.Fingerprinting.Generic
 import Debugging.SimpleString
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.MatchGasPump
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Utilities.Time.FrameCount
@@ -16,7 +15,7 @@ class FingerprintGasCompleteBy(frameCount: FrameCount) extends Fingerprint {
   case class UpgradeProof(upgrade: Upgrade) extends Proof
   object NoProof extends Proof with SimpleString
 
-  private val pumpCompleteBy = new FingerprintCompleteBy(MatchGasPump, frameCount)
+  private val pumpCompleteBy = new FingerprintCompleteBy(_.unitClass.isGas, frameCount)
   override protected val children = Seq(pumpCompleteBy)
   override protected def investigate: Boolean = proof != NoProof
   override val sticky = true

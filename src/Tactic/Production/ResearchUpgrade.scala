@@ -4,8 +4,8 @@ import Lifecycle.With
 import Macro.Requests.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
-import Planning.UnitCounters.CountOne
-import Planning.UnitPreferences.PreferIdle
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 

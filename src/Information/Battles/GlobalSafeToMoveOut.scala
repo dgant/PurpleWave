@@ -2,7 +2,7 @@ package Information.Battles
 
 import Lifecycle.With
 import Planning.Predicates.Strategy.EnemyRecentStrategy
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
 

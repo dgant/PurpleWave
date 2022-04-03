@@ -4,8 +4,8 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
 
 class DefendAgainstWorkerRush extends Tactic {
   

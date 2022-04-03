@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchMobileDetector
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.MatchMobileDetector
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 
 class SquadCatchDTRunby extends Squad {

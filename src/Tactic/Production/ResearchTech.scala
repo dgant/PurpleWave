@@ -4,8 +4,8 @@ import Lifecycle.With
 import Macro.Requests.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitPreferences.PreferIdle
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 

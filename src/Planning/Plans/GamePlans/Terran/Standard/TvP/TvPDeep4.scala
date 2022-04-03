@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.EnemyDarkTemplarLikely
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.{MatchOr, MatchTank}
+import Utilities.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPDeep4

@@ -2,7 +2,7 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorker}
+import Utilities.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorker}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Utilities.Time.GameTime
 

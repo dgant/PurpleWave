@@ -3,9 +3,9 @@ package Tactic.Production
 import Macro.Requests.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchAnd
-import Planning.UnitPreferences.PreferIdle
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 

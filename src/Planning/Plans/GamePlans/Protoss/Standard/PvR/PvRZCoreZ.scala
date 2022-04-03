@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Automatic.Pump
 import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpenZCoreZ

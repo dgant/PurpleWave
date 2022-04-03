@@ -1,7 +1,7 @@
 package Tactic.Squads.Qualities
 
 import Mathematics.Maff
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 

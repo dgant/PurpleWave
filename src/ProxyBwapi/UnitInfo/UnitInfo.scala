@@ -15,7 +15,7 @@ import Micro.Matchups.MatchupAnalysis
 import Micro.Targeting.Target
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
-import Planning.UnitMatchers.{MatchHatchlike, UnitMatcher}
+import Utilities.UnitMatchers.{MatchHatchlike, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -245,8 +245,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && enemy.asInstanceOf[UnitInfo].canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
     && ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked
-    && (enemy.unitClass.triggersSpiderMines || ! is(Terran.SpiderMine))
-    && (unitClass.unaffectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
+    && (enemy.unitClass.triggersSpiderMines || ! Terran.SpiderMine(this))
+    && ( ! unitClass.affectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
 
   @inline final def canAttackAir: Boolean = canAttack && attacksAgainstAir > 0
   @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0

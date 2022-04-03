@@ -4,8 +4,8 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.UnitCounters.CountEverything
-import Planning.UnitMatchers.MatchMobileDetector
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitMatchers.MatchMobileDetector
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Seconds
 

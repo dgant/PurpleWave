@@ -3,8 +3,8 @@ package Planning.Plans.Macro.Terran
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitPreferences.PreferClose
 import Planning.Plan
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

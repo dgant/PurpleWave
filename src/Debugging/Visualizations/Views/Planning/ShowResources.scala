@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Planning
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 
 import scala.collection.mutable.ArrayBuffer
 

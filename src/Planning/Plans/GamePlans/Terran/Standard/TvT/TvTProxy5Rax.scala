@@ -14,8 +14,8 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Planning.UnitCounters.CountExcept
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitCounters.CountExcept
+import Utilities.UnitMatchers.MatchWorker
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax

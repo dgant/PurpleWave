@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.FFA
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Predicates.Compound.{And, Check}
-import Planning.UnitMatchers.{MatchTank, MatchWarriors}
+import Utilities.UnitMatchers.{MatchTank, MatchWarriors}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.{Do, NoPlan}

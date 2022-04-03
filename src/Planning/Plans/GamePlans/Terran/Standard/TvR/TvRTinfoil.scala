@@ -13,7 +13,7 @@ import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Macro.Terran.PopulateBunkers
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil

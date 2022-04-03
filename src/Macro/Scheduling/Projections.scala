@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Planning.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass

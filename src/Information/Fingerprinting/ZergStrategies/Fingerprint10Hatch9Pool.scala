@@ -3,7 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintCompleteBy, FingerprintNot}
 import Information.Fingerprinting.Strategies.ZergTimings
 import Lifecycle.With
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.GameTime
 

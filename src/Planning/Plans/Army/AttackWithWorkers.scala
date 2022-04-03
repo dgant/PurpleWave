@@ -6,8 +6,8 @@ import Mathematics.Points.{Pixel, Tile}
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountEverything, UnitCounter}
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitCounters.{CountEverything, UnitCounter}
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable

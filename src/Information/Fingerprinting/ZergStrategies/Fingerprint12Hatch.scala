@@ -2,7 +2,7 @@ package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
-import Planning.UnitMatchers.MatchNonStartingTownHall
+import Utilities.UnitMatchers.MatchNonStartingTownHall
 import Utilities.Time.GameTime
 import bwapi.Race
 

@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Terran.Standard.TvR
 
 import Macro.Requests.Get
 import Planning.Predicates.Compound.{Not, Or}
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import Planning.{Plan, Predicate}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom

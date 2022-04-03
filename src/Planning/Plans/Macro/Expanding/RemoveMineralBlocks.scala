@@ -4,9 +4,9 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchWorker
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitPreferences.PreferClose
 
 class RemoveMineralBlocks extends Plan {
   

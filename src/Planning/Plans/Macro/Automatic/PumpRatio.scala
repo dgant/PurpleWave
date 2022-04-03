@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitClasses.UnitClass
 
 object Rounding extends Enumeration {

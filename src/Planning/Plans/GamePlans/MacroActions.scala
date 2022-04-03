@@ -9,7 +9,7 @@ import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
@@ -78,9 +78,6 @@ trait MacroActions {
   }
   def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Unit = {
     new UpgradeContinuously(upgrade, maxLevel).update()
-  }
-  def techContinuously(tech: Tech): Unit = {
-    new TechContinuously(tech).update()
   }
   def extractorTrick(): Unit = {
     new ExtractorTrick().update()

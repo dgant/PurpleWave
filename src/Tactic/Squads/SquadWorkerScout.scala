@@ -6,9 +6,9 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
-import Planning.UnitPreferences.PreferScout
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitPreferences.PreferScout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer

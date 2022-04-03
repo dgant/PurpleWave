@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT2Base2Port
 

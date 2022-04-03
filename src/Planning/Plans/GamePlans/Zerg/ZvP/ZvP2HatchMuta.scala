@@ -17,7 +17,7 @@ import Planning.Predicates.MacroFacts
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchOr}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta

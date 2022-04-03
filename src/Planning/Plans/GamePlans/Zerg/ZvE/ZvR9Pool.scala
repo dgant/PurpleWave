@@ -17,7 +17,7 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones.{TechComplete, TechStarted, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.MatchOr
+import Utilities.UnitMatchers.MatchOr
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvR9Pool
 

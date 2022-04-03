@@ -6,8 +6,8 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrency, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.GameTime

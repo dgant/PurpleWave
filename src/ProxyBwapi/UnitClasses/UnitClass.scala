@@ -1,15 +1,15 @@
 package ProxyBwapi.UnitClasses
 
 import Lifecycle.With
-import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.Maff
+import Mathematics.Points.{Point, Tile, TileRectangle}
 import Micro.Heuristics.MicroValue
-import Planning.UnitMatchers.UnitMatcher
 import ProxyBwapi.BuildableType
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.UnitMatchers.UnitMatcher
 import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
@@ -23,10 +23,10 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val dimensionMin: Int = Math.min(width, height)
   lazy val dimensionMax: Int = Math.max(width, height)
   lazy val area: Int = dimensionMin * dimensionMax
-  lazy val occupancy: Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
   lazy val sqrtArea: Int = Math.sqrt(area).toInt
-  lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
   lazy val perimeter: Int = 2 * width + 2 * height
+  lazy val occupancy: Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
+  lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
 
   lazy val topLeft: Point = Point(-dimensionLeft, -dimensionUp)
   lazy val topRight: Point = Point(dimensionRight, -dimensionUp)
@@ -38,13 +38,15 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Movement //
   //////////////
 
-  lazy val accelerationFrames: Int = if (acceleration > 1) Math.ceil(256.0 * topSpeed / acceleration).toInt else 1
+  lazy val accelerationFrames: Int = if (acceleration256 > 1) Math.ceil(256.0 * topSpeed / acceleration256).toInt else 1
+
+  def framesToTurn(radians: Double): Int = Math.abs(Maff.nanToZero(Math.ceil(Maff.normalizePiToPi(radians) / turnRadians))).toInt
+  lazy val turnRadians: Double = turnRadius256 * 2 * Math.PI / 256d
   lazy val framesToTurn180: Int = framesToTurn(Math.PI)
+  lazy val framesToTurn360: Int = framesToTurn(2 * Math.PI)
 
-  def framesToTurn(radians: Double): Int = Math.abs(Maff.nanToZero(Math.ceil(127.0 * Maff.normalizePiToPi(radians) / Math.PI / turnRadius))).toInt
-
-  lazy val needsToTurnToShoot: Boolean = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
-  lazy val framesToTurnShootTurnAccelerate: Int = stopFrames + accelerationFrames + (if (needsToTurnToShoot) 2 * framesToTurn180 else 0) + With.latency.latencyFrames
+  lazy val turnsToShoot: Boolean = ! Vector(Terran.Goliath, Terran.SiegeTankUnsieged, Protoss.Dragoon).contains(this)
+  lazy val framesToPotshot: Int = stopFrames + accelerationFrames + Maff.fromBoolean(turnsToShoot) * framesToTurn360 + 2 * With.latency.latencyFrames
   lazy val hasMomentum: Boolean = isFlyer || floats
 
   ////////////
@@ -53,7 +55,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   lazy val ranged: Boolean = canAttack && pixelRangeMax > 32 * 2
   lazy val melee: Boolean = canAttack && ! ranged
-  lazy val logHealth: Double = Math.log10(maxTotalHealth)
 
   lazy val suicides: Boolean = Array(
     Terran.SpiderMine,
@@ -92,14 +93,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     Zerg.InfestedTerran)
     .contains(this)
 
-  // Subjective measure of splashiness
-  lazy val splashFactor: Double = if (dealsRadialSplashDamage || this == Zerg.Lurker)
-    2.5
-  else if (this == Zerg.Mutalisk)
-    1.25
-  else
-    1.0
-
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
 
   // Via http://www.starcraftai.com/wiki/Regeneration
@@ -116,7 +109,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Reaver) Protoss.Scarab.groundDamageRaw
     else groundDamageRaw
 
-  private def cooldownZeroBecomesInfinity(cooldown: Int): Int = if (cooldown == 0) Int.MaxValue else cooldown
+  private def cooldownZeroBecomesInfinity(cooldown: Int): Int = if (cooldown <= 0) Int.MaxValue else cooldown
 
   lazy val airDamageCooldown: Int =
     if (this == Terran.Bunker) Terran.Marine.airDamageCooldown
@@ -166,9 +159,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val isGas: Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isResource: Boolean = isMinerals || isGas
   lazy val isTownHall: Boolean = isResourceDepot
-  lazy val isStaticDefense: Boolean = (isBuilding && canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery) && this != Terran.SiegeTankSieged
+  lazy val isStaticDefense: Boolean = isBuilding && (canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery)
   lazy val isTransport: Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
-  lazy val unaffectedByDarkSwarm: Boolean = Vector(
+  lazy val affectedByDarkSwarm: Boolean = ! Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
     Protoss.Zealot,
@@ -185,22 +178,31 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Macro //
   ///////////
 
-  lazy val unitsTrained: Vector[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this).toVector
-
-  lazy val trainsUnits: Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this)
-  lazy val trainsAirUnits: Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && unit.isFlyer)
-  lazy val trainsGroundUnits: Boolean = UnitClasses.all.exists(unit => unit.whatBuilds._1 == this && !unit.isFlyer && !unit.isBuilding)
-
   lazy val isProtoss: Boolean = race == Race.Protoss
   lazy val isTerran: Boolean = race == Race.Terran
   lazy val isZerg: Boolean = race == Race.Zerg
 
-  lazy val framesToFinishCompletion: Int = if (isProtoss) 75 else if (isZerg) 12 else 0
+  // Source: http://satirist.org/ai/starcraft/blog/archives/916-when-will-that-enemy-building-complete.html
+  lazy val framesToFinishCompletion: Int = if (isBuilding) { if (isProtoss) 75 else if (isZerg) 9 else 2 } else 0
+
+  lazy val unitsTrained: Vector[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this)
+
+  lazy val trainsUnits: Boolean = unitsTrained.nonEmpty
+  lazy val trainsAirUnits: Boolean = unitsTrained.exists(_.isFlyer)
+  lazy val trainsGroundUnits: Boolean = unitsTrained.exists(unit => ! unit.isFlyer && !unit.isBuilding)
+  lazy val trainsUpgradesOrTechs: Boolean = unitsTrained.nonEmpty || techsWhat.nonEmpty || upgradesWhat.nonEmpty
 
   lazy val buildTechEnabling: Option[Tech] = if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown) None else Some(requiredTechRaw)
   lazy val buildUnitsEnabling: Vector[UnitClass] = _buildUnitsEnabling
   lazy val buildUnitsBorrowed: Vector[UnitClass] = _buildUnitsBorrowed
   lazy val buildUnitsSpent: Vector[UnitClass] = _buildUnitsSpent
+
+  lazy val macroSubstitutes: Seq[UnitClass] =
+    if (this == Zerg.Spire) Seq(Zerg.GreaterSpire)
+    else if (this == Zerg.Hatchery) Seq(Zerg.Lair, Zerg.Hive)
+    else if (this == Zerg.Lair) Seq(Zerg.Hive)
+    else Seq.empty
+  lazy val withMacroSubstitutes: Seq[UnitClass] = Seq(this) ++ macroSubstitutes
 
   private def _buildUnitsEnabling: Vector[UnitClass] = {
     lazy val output = new ListBuffer[UnitClass]
@@ -283,6 +285,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
     lazy val output = new ListBuffer[UnitClass]
 
+    // SCV (for all Terran building except add-ons)
+    addBuildUnitIf(output, isBuilding && race == Race.Terran && !isAddon, Terran.SCV)
+
     // All Terran units that train from buildings
     addBuildUnitIf(output, Terran.SCV, Terran.CommandCenter)
     addBuildUnitIf(output, Terran.Marine, Terran.Barracks)
@@ -298,9 +303,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(output, Terran.ScienceVessel, Terran.Starport)
     addBuildUnitIf(output, Terran.Battlecruiser, Terran.Starport)
     addBuildUnitIf(output, Terran.NuclearMissile, Terran.NuclearSilo)
-
-    // SCV (for all Terran building except add-ons)
-    addBuildUnitIf(output, isBuilding && race == Race.Terran && !isAddon, Terran.SCV)
 
     // Factory (for Machine Shop)
     // Starport (for Control Tower)
@@ -429,7 +431,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Reaver) 1.75
     else if (this == Protoss.PhotonCannon) 1
     else if (this == Zerg.Zergling) 0.25
-    else if (this == Zerg.Hydralisk) 0.85
+    else if (this == Zerg.Hydralisk) 0.75
     else if (this == Zerg.Lurker) 2
     else if (this == Zerg.Mutalisk) 1.25
     else if (this == Zerg.Scourge) 0.75
@@ -509,9 +511,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Ultralisk) 15
     else 0
 
-  // Source: http://satirist.org/ai/starcraft/blog/archives/916-when-will-that-enemy-building-complete.html
-  lazy val extraCompletionFrames: Int = if (isBuilding) { if (isTerran) 2 else if (isProtoss) 72 else 9 } else 0
-
   //////////////////
   // Capabilities //
   //////////////////
@@ -544,7 +543,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val castsSpells: Boolean = spells.nonEmpty
   lazy val attacksOrCasts: Boolean = canAttack || castsSpells || this == Zerg.LurkerEgg
   lazy val attacksOrCastsOrDetectsOrTransports: Boolean = attacksOrCasts || isDetector || isTransport
-  lazy val trainsUpgradesOrTechs = unitsTrained.nonEmpty || techsWhat.nonEmpty || upgradesWhat.nonEmpty
 
   //////////////////////////////
   // Performance optimization //

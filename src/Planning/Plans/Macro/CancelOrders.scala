@@ -3,7 +3,7 @@ package Planning.Plans.Macro
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.{MatchOr, UnitMatcher}
+import Utilities.UnitMatchers.{MatchOr, UnitMatcher}
 
 class CancelOrders(matchers: UnitMatcher*) extends Plan {
 

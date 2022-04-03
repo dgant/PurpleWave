@@ -5,9 +5,9 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Plans.Scouting.ScoutCleared
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchAnd, MatchScoutCatcher}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{MatchAnd, MatchScoutCatcher}
+import Utilities.UnitPreferences.PreferClose
 import Utilities.Time.Minutes
 
 class SquadEjectScout extends Squad {

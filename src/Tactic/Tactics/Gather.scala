@@ -3,7 +3,7 @@ package Tactic.Tactics
 import Debugging.ToString
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 
 class Gather extends Tactic {
 

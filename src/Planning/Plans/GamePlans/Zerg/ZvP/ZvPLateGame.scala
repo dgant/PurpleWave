@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Compound.{Check, Not, Or}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class ZvPLateGame extends GameplanTemplate {

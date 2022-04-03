@@ -7,7 +7,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
 import Micro.Targeting.TargetFilter
-import Planning.UnitMatchers.{MatchTank, MatchWorker}
+import Utilities.UnitMatchers.{MatchTank, MatchWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Seconds

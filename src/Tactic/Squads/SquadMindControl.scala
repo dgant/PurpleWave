@@ -3,8 +3,8 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Planning.UnitCounters.CountEverything
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer

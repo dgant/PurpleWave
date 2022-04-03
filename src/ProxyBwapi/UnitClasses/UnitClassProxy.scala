@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 abstract class UnitClassProxy(val bwapiType: UnitType) {
   val id                       = bwapiType.id
   lazy val abilities           = bwapiType.abilities.asScala.map(Techs.get)
-  val acceleration             = bwapiType.acceleration
+  val acceleration256             = bwapiType.acceleration
   val armor                    = bwapiType.armor
   val buildScore               = bwapiType.buildScore
   val buildFrames              = bwapiType.buildTime
@@ -67,7 +67,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val regeneratesHP            = bwapiType.regeneratesHP
   lazy val requiredTechRaw     = Techs.get(bwapiType.requiredTech)
   // BWAPI's data includes "whatBuilds" in this this list, but we prefer them separate, partly because it lets us store it as a vector instead of a map
-  lazy val requiredUnits       = bwapiType.requiredUnits.asScala.filterNot(_._1 == bwapiType.whatBuilds().getKey).map(pair => UnitClasses.get(pair._1)).toVector
+  lazy val requiredUnits       = bwapiType.requiredUnits.asScala.filterNot(_._1 == bwapiType.whatBuilds().getKey).keys.map(UnitClasses.get).toVector
   val requiresCreep            = bwapiType.requiresCreep
   val requiresPsi              = bwapiType.requiresPsi
   lazy val techsWhat           = bwapiType.researchesWhat.asScala.map(Techs.get)
@@ -81,7 +81,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val tileSize                 = new Tile(bwapiType.tileSize)
   val tileWidth                = bwapiType.tileWidth
   val topSpeed                 = bwapiType.topSpeed
-  val turnRadius               = bwapiType.turnRadius
+  val turnRadius256            = bwapiType.turnRadius
   lazy val upgrades            = bwapiType.upgrades.asScala.map(Upgrades.get)
   lazy val upgradesWhat        = bwapiType.upgradesWhat.asScala.map(Upgrades.get)
   lazy val whatBuilds          = new Pair(UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue.toInt)

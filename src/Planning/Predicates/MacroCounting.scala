@@ -3,7 +3,7 @@ package Planning.Predicates
 import Information.Fingerprinting.Fingerprint
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass

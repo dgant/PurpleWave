@@ -2,7 +2,7 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.{MatchHatchlike, UnitMatcher}
+import Utilities.UnitMatchers.{MatchHatchlike, UnitMatcher}
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.FrameCount
 

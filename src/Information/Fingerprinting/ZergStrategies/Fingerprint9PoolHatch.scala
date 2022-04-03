@@ -3,7 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic._
 import Information.Fingerprinting.Strategies.ZergTimings
 import Lifecycle.With
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import Utilities.Time.{GameTime, Seconds}
 
 class Fingerprint9PoolHatch extends FingerprintAnd(

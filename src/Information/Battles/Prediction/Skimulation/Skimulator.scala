@@ -3,7 +3,7 @@ package Information.Battles.Prediction.Skimulation
 import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.LightYear
 
@@ -123,7 +123,7 @@ object Skimulator {
       incapable ||= unit.unitClass.canAttack && unit.underDisruptionWeb
       incapable ||= unit.unitClass.canBeStormed && unit.underStorm // Units under storm are presumably preoccupied with dodging
       incapable ||= unit.lockedDown
-      incapable ||= unit.underDarkSwarm && ! unit.unitClass.unaffectedByDarkSwarm
+      incapable ||= unit.underDarkSwarm && unit.unitClass.affectedByDarkSwarm
       if (incapable) { unit.skimStrength *= -0.25 } // Encourage fighting when units are disabled!
     }))
 

@@ -3,7 +3,7 @@ package Micro.Actions.Combat.Tactics
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import Planning.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

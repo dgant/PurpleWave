@@ -4,9 +4,9 @@ import Lifecycle.With
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountOne, CountUpTo}
-import Planning.UnitMatchers._
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.{CountOne, CountUpTo}
+import Utilities.UnitMatchers._
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
 

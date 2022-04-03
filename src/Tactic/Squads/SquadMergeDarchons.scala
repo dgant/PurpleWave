@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Planning.UnitCounters.CountEverything
+import Utilities.UnitCounters.CountEverything
 import ProxyBwapi.Races.Protoss
 
 class SquadMergeDarchons extends Squad {

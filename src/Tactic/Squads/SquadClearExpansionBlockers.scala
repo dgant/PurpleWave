@@ -3,9 +3,9 @@ package Tactic.Squads
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchMobileDetector, MatchOr}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{MatchMobileDetector, MatchOr}
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
 

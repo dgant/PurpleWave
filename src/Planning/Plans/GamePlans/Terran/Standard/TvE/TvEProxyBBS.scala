@@ -16,8 +16,8 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitCounters.CountExcept
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitCounters.CountExcept
+import Utilities.UnitMatchers.MatchWorker
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS

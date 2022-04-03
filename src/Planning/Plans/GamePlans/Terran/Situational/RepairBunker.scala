@@ -5,8 +5,8 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.Seconds
 

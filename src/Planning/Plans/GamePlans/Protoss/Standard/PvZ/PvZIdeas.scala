@@ -13,7 +13,7 @@ import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisksLikely, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy._
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
 

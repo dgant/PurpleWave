@@ -3,8 +3,8 @@ package Tactic.Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.{CountEverything, CountUpTo}
-import Planning.UnitMatchers._
+import Utilities.UnitCounters.{CountEverything, CountUpTo}
+import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadRazeProxies

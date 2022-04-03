@@ -12,7 +12,7 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchOr, MatchTank}
+import Utilities.UnitMatchers.{MatchOr, MatchTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO

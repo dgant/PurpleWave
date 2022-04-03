@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Planning.UnitMatchers.{MatchProxied, MatchWarriors}
+import Utilities.UnitMatchers.{MatchProxied, MatchWarriors}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 

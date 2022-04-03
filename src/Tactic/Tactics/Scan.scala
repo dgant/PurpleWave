@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
 
 class Scan extends Tactic {

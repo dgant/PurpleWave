@@ -13,7 +13,7 @@ import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchAnd, MatchInNatural, MatchTank}
+import Utilities.UnitMatchers.{MatchAnd, MatchInNatural, MatchTank}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand
 

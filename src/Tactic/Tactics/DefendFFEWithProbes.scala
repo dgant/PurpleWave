@@ -9,9 +9,9 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountUpTo
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Minutes

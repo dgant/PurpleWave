@@ -1,7 +1,7 @@
 package Macro.Scheduling
 
 import Lifecycle.With
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

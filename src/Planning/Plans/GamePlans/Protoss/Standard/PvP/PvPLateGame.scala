@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
 import Utilities._

@@ -3,7 +3,7 @@ package Information.Fingerprinting.ZergStrategies
 import Information.Fingerprinting.Generic.{FingerprintCompleteBy, FingerprintOr}
 import Information.Fingerprinting.Strategies.ZergTimings
 import Lifecycle.With
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import Utilities.Time.Seconds
 
 class Fingerprint10Hatch extends FingerprintOr(

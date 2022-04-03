@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Minutes}

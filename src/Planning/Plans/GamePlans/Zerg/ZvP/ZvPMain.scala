@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, MatchWarriors}
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvPHydraBust, ZvPMutaliskBust, ZvPReactiveBust, ZvPZerglingBust}

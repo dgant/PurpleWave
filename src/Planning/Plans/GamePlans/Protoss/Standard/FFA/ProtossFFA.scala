@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Always
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UpgradeComplete, UpgradeStarted}
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.Protoss
 
 class ProtossFFA extends GameplanTemplate {

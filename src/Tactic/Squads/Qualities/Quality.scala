@@ -1,6 +1,6 @@
 package Tactic.Squads.Qualities
 
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 
 trait Quality extends UnitMatcher {
   val counteredBy: Array[Quality] = Array.empty

@@ -4,7 +4,7 @@ import Information.Battles.Types.GroupCentroid
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Planning.UnitMatchers.{MatchGroundWarriors, UnitMatcher}
+import Utilities.UnitMatchers.{MatchGroundWarriors, UnitMatcher}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 

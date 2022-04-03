@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
 import Utilities.Time.Minutes
 
 object BaseUpdater {

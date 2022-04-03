@@ -5,7 +5,7 @@ import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Predicates.Compound.And
 import Planning.Predicates.Milestones.{MiningBasesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeToMoveOut
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 
 class MaintainMiningBasesAt(bases: Int) extends Parallel(
   new Trigger(

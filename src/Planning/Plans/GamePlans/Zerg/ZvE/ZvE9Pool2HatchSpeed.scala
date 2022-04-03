@@ -15,7 +15,7 @@ import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{EnemyIsZerg, EnemyStrategy}
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {

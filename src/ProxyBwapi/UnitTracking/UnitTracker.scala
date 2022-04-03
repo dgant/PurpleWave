@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.TotalUnitCounter
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 import ProxyBwapi.UnitInfo._
 
 import scala.collection.JavaConverters._

@@ -3,9 +3,9 @@ package Planning.ResourceLocks
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Prioritized
-import Planning.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
-import Planning.UnitMatchers.{MatchAnything, UnitMatcher}
-import Planning.UnitPreferences.{PreferAnything, UnitPreference}
+import Utilities.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
+import Utilities.UnitMatchers.{MatchAnything, UnitMatcher}
+import Utilities.UnitPreferences.{PreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable

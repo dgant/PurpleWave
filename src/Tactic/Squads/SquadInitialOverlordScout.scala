@@ -3,8 +3,8 @@ package Tactic.Squads
 import Lifecycle.With
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.UnitMatchers.{MatchAnd, MatchComplete}
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class SquadInitialOverlordScout extends Squad {

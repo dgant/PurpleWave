@@ -8,7 +8,7 @@ import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.JavaConverters._

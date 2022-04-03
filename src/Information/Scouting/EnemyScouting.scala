@@ -2,7 +2,7 @@ package Information.Scouting
 
 import Lifecycle.With
 import Performance.Cache
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.Zerg
 
 trait EnemyScouting {

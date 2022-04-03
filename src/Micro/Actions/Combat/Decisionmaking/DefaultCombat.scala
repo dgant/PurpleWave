@@ -14,7 +14,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
-import Planning.UnitMatchers.MatchWorker
+import Utilities.UnitMatchers.MatchWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -189,7 +189,7 @@ object DefaultCombat extends Action {
     lazy val purring            = unit.unitClass.isTerran && unit.unitClass.isMechanical && unit.alliesSquadThenBattle.flatten.exists(a => a.repairing && a.orderTarget.contains(unit))
     lazy val canAbuseTarget     = target.exists(t => ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
     lazy val pixelToPokeTarget  = target.map(unit.pixelToFireAt)
-    lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToTurnShootTurnAccelerate + With.reaction.agencyMax + With.latency.latencyFrames)
+    lazy val framesToPokeTarget = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
     lazy val hasSpacetimeToPoke = framesToPokeTarget.exists(framesToPoke => unit.matchups.threats.forall(threat =>
       framesToPoke < Math.min(threat.framesToGetInRange(unit), threat.framesToGetInRange(unit, pixelToPokeTarget.get))
       && ! threat.inRangeToAttack(unit, pixelToPokeTarget.get.project(threat.pixel, 16))))
@@ -203,7 +203,7 @@ object DefaultCombat extends Action {
       unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
       || (
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
-        && unit.matchups.threatsInFrames(unit.unitClass.framesToTurnShootTurnAccelerate + 12).forall(_.topSpeed > unit.topSpeed))))
+        && unit.matchups.threatsInFrames(unit.unitClass.framesToPotshot + 9).forall(_.topSpeed > unit.topSpeed))))
     transition(Dance, () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
 
     if (unit.unready) return

@@ -3,9 +3,9 @@ package Tactic.Missions
 import Lifecycle.With
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountExactly
-import Planning.UnitMatchers.MatchAnd
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountExactly
+import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.Seconds

@@ -3,8 +3,8 @@ package Tactic.Tactics
 import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountEverything
-import Planning.UnitMatchers.{MatchAnd, MatchMobileFlying, MatchNot, MatchOr}
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitMatchers.{MatchAnd, MatchMobileFlying, MatchNot, MatchOr}
 
 class DoFloatBuildings extends Tactic {
 

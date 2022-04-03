@@ -8,7 +8,7 @@ import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuous
 import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Or}
 import Planning.Predicates.Milestones.{EnemiesAtMost, EnemyHasShown, FrameAtMost, UpgradeComplete}
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.GameTime
 

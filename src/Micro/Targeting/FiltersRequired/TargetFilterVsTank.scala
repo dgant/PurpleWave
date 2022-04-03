@@ -2,7 +2,7 @@ package Micro.Targeting.FiltersRequired
 
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
-import Planning.UnitMatchers.MatchTank
+import Utilities.UnitMatchers.MatchTank
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 

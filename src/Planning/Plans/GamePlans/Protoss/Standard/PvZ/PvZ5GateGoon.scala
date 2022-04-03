@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Planning.UnitMatchers.MatchWarriors
+import Utilities.UnitMatchers.MatchWarriors
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver}
 

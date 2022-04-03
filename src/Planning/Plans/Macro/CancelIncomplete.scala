@@ -3,7 +3,7 @@ package Planning.Plans.Macro
 import Lifecycle.With
 import Micro.Agency.Commander
 import Planning.Plan
-import Planning.UnitMatchers._
+import Utilities.UnitMatchers._
 
 class CancelIncomplete(matchers: UnitMatcher*) extends Plan {
   override def onUpdate(): Unit = {

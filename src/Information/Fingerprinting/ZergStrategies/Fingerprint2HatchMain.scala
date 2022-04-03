@@ -2,7 +2,7 @@ package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.MatchHatchlike
+import Utilities.UnitMatchers.MatchHatchlike
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Fingerprint2HatchMain extends Fingerprint {

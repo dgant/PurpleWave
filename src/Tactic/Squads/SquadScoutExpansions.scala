@@ -3,9 +3,9 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers._
-import Planning.UnitPreferences.PreferClose
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers._
+import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{GameTime, Seconds}
 

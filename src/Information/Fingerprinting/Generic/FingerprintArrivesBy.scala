@@ -2,7 +2,7 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.UnitMatchers.UnitMatcher
+import Utilities.UnitMatchers.UnitMatcher
 import Utilities.Time.FrameCount
 
 class FingerprintArrivesBy(

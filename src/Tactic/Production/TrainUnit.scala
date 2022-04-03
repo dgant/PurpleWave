@@ -4,8 +4,8 @@ import Macro.Requests.RequestProduction
 import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Planning.UnitCounters.CountOne
-import Planning.UnitPreferences.PreferTrainerFor
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferTrainerFor
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

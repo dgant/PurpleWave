@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.UnitMatchers.{MatchOr, MatchWarriors}
+import Utilities.UnitMatchers.{MatchOr, MatchWarriors}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy

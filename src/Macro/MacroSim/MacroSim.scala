@@ -173,7 +173,7 @@ final class MacroSim {
     cant ||= request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)
     cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
     cant ||= step.state.producers(request.producerRequired) < request.producersRequired
-    cant ||= request.unitsRequired.exists(step.state.unitsComplete(_) == 0)
+    cant ||= request.unitsRequired.exists(_.withMacroSubstitutes.map(step.state.unitsComplete).sum == 0)
     cant ||= ! canInsertBefore(request, i + 1)
     // TODO: Treat addons as producers
     if (cant) {

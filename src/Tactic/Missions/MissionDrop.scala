@@ -16,8 +16,8 @@ import Micro.Actions.{Action, Idle}
 import Micro.Agency.{Commander, Intention}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.ResourceLocks.LockUnits
-import Planning.UnitCounters.CountOne
-import Planning.UnitMatchers.{MatchTransport, MatchWorker}
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitMatchers.{MatchTransport, MatchWorker}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.{Minutes, Seconds}

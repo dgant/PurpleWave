@@ -2,7 +2,7 @@ package Information.Battles.Types
 
 import Information.Geography.Types.Base
 import ProxyBwapi.UnitInfo.UnitInfo
-import Tactics.Squads.UnitGroup
+import Tactic.Squads.UnitGroup
 
 /*
   A Division is a clustering of enemies, associated with the map features relevant to them.

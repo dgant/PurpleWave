@@ -2,13 +2,14 @@ package Lifecycle
 
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
+import Information.Accounting
 import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
 import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
-import Information.{UnitsShown, _}
+import Information.Scouting.{Scouting, UnitsShown}
 import Macro.Allocation._
 import Macro.Architecture.Architecture
 import Macro.Gathering
@@ -28,8 +29,8 @@ import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.UnitTracking.UnitTracker
 import Strategery.History.History
 import Strategery.Strategist
-import Tactics.Squads.Squads
-import Tactics.Tactics
+import Tactic.Squads.Squads
+import Tactic.Tactician
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
 import bwapi.Flag
 import bwta.BWTA
@@ -90,7 +91,7 @@ object With {
   var preplacement      : Preplacement        = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
-  var priorities       : Priorities         = _
+  var priorities        : Priorities         = _
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
   var scheduler         : Scheduler           = _
@@ -99,7 +100,7 @@ object With {
   var strategy          : Strategist          = _
   var storyteller       : Storyteller         = _
   var squads            : Squads              = _
-  var tactics           : Tactics             = _
+  var tactics           : Tactician             = _
   var tasks             : TaskQueueParallel   = _
   var units             : UnitTracker         = _
   var unitsShown        : UnitsShown          = _
@@ -204,7 +205,7 @@ object With {
     strategy          = new Strategist
     storyteller       = new Storyteller
     squads            = new Squads
-    tactics           = new Tactics
+    tactics           = new Tactician
     units             = new UnitTracker
     unitsShown        = new UnitsShown
     viewport          = new Viewport

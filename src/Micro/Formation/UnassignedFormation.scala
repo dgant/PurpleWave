@@ -4,7 +4,7 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Tactics.Squads.FriendlyUnitGroup
+import Tactic.Squads.FriendlyUnitGroup
 
 import scala.collection.mutable.ListBuffer
 

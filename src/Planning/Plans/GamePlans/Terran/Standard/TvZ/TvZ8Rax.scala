@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{Get, RequestProduction}
 import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -15,11 +15,11 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Tactics.DefendFightersAgainstRush
 import Planning.UnitCounters.{CountExcept, CountUpTo}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
+import Tactic.Tactics.DefendFightersAgainstRush
 import Utilities.Time.GameTime
 
 class TvZ8Rax extends GameplanTemplate {

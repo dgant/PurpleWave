@@ -16,10 +16,10 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy._
-import Tactics.DefendFightersAgainstRush
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRDT
+import Tactic.Tactics.DefendFightersAgainstRush
 
 class PvRDT extends GameplanTemplate {
   override val activationCriteria: Predicate = new Employing(PvRDT)

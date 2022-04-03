@@ -12,7 +12,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Tactics.Squads.FriendlyUnitGroup
+import Tactic.Squads.FriendlyUnitGroup
 import Utilities.LightYear
 import Utilities.Time.Minutes
 

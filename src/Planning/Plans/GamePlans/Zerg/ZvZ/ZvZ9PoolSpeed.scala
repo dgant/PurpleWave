@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{Get, RequestProduction}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -15,11 +15,11 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Tactics.DefendFightersAgainstRush
 import Planning.UnitMatchers.MatchHatchlike
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
+import Tactic.Tactics.DefendFightersAgainstRush
 
 class ZvZ9PoolSpeed extends GameplanTemplate {
 

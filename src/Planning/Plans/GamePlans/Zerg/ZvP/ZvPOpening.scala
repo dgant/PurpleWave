@@ -14,11 +14,11 @@ import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Tactics.DefendAgainstProxy
 import Planning.UnitMatchers.MatchGroundWarriors
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvP12Hatch, ZvP9Pool, ZvPOverpool}
+import Tactic.Tactics.DefendAgainstProxy
 
 class ZvPOpening extends GameplanTemplate {
 

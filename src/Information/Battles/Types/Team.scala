@@ -6,7 +6,7 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.UnitInfo.UnitInfo
-import Tactics.Squads.UnitGroup
+import Tactic.Squads.UnitGroup
 
 class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with SkimulationTeam {
 

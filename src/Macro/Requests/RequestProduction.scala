@@ -4,7 +4,7 @@ import ProxyBwapi.BuildableType
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.Upgrades.Upgrade
-import Tactics.Production._
+import Tactic.Production._
 import bwapi.Race
 
 abstract class RequestProduction(val buildableType: BuildableType, val quantity: Int = 0) extends {

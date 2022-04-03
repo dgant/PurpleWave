@@ -1,7 +1,7 @@
 package Micro.Formation
 
 import Mathematics.Points.Pixel
-import Tactics.Squads.FriendlyUnitGroup
+import Tactic.Squads.FriendlyUnitGroup
 
 object FormationGeneric {
   def march(group: FriendlyUnitGroup, destination: Pixel) : Formation = {

@@ -7,7 +7,7 @@ import Performance.Cache
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import Tactics.Squads.Squad
+import Tactic.Squads.Squad
 import Utilities.Time.Forever
 
 import scala.collection.JavaConverters._

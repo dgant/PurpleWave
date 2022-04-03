@@ -5,9 +5,7 @@ case class PreferAll(preferences: UnitPreference*) extends UnitPreference {
   override def apply(unit: FriendlyUnitInfo): Double = {
     preferences
       .zipWithIndex
-      .map(pair =>
-        pair._1.apply(unit)
-        * Math.pow(10, -pair._2))
+      .map(pair => pair._1.apply(unit) * Math.pow(10, -pair._2))
       .sum
   }
 }

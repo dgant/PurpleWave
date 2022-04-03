@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{Get, RequestProduction}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -15,10 +15,10 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones.MiningBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Tactics.DefendFightersAgainstRush
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ1RaxFE
+import Tactic.Tactics.DefendFightersAgainstRush
 
 class TvZ1RaxFE extends GameplanTemplate {
 

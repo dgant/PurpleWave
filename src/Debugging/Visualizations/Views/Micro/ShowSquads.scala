@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Mathematics.Maff
-import Tactics.Squads.Squad
+import Tactic.Squads.Squad
 import ProxyBwapi.UnitInfo.UnitInfo
 
 object ShowSquads extends View {

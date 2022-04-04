@@ -11,10 +11,11 @@ import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.TileFilters.{TileAny, TileFilter}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferClose
 
-class BuildBuilding(buildableBuilding: RequestProduction) extends Production {
+class BuildBuilding(buildableBuilding: RequestProduction, tileFilter: TileFilter = TileAny) extends Production {
 
   setBuildable(buildableBuilding)
   val buildingClass   : UnitClass       = buildable.unit.get

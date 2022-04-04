@@ -5,9 +5,10 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.TileFilters.TileFilter
 import bwapi.TilePosition
 
-final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
+final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) with TileFilter {
   
   def this(i: Int) = this(i % With.mapTileWidth, i / With.mapTileWidth )
   def this(tilePosition: TilePosition) = this(tilePosition.getX, tilePosition.getY)
@@ -270,4 +271,8 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def creepUnchecked: Boolean = {
     With.game.hasCreep(x, y) // TODO: Replace with actually unchecked variant
   }
+
+  override def apply(tile: Tile): Boolean = this == tile
+  override def isSubsetOf(other: TileFilter): Boolean = other(this)
+  override def generate: Iterable[Tile] = Iterable(this)
 }

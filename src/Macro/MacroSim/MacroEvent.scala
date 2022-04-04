@@ -1,31 +1,33 @@
 package Macro.MacroSim
 
+import Mathematics.Points.Tile
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Utilities.Time.Frames
 
 final class MacroEvent(val state: MacroState) {
-  var dFrames           : Int       = 0
-  var dMinerals         : Int       = 0
-  var dGas              : Int       = 0
-  var dSupplyAvailable  : Int       = 0
-  var dSupplyUsed       : Int       = 0
-  var dMineralPatches   : Int       = 0
-  var dGeysers          : Int       = 0
-  var dTech             : Tech      = Techs.None
-  var dUpgrade          : Upgrade   = Upgrades.None
-  var dUpgradeLevel     : Int       = 0
-  var dUnitExtant1      : UnitClass = UnitClasses.None
-  var dUnitExtant1N     : Int       = 0
-  var dUnitExtant2      : UnitClass = UnitClasses.None
-  var dUnitExtant2N     : Int       = 0
-  var dUnitComplete     : UnitClass = UnitClasses.None
-  var dUnitCompleteN    : Int       = 0
-  var dProducer1        : UnitClass = UnitClasses.None
-  var dProducer1N       : Int       = 0
-  var dProducer2        : UnitClass = UnitClasses.None
-  var dProducer2N       : Int       = 0
+  var dFrames           : Int           = 0
+  var dMinerals         : Int           = 0
+  var dGas              : Int           = 0
+  var dSupplyAvailable  : Int           = 0
+  var dSupplyUsed       : Int           = 0
+  var dMineralPatches   : Int           = 0
+  var dGeysers          : Int           = 0
+  var dTech             : Tech          = Techs.None
+  var dUpgrade          : Upgrade       = Upgrades.None
+  var dUpgradeLevel     : Int           = 0
+  var dUnitExtant1      : UnitClass     = UnitClasses.None
+  var dUnitExtant1N     : Int           = 0
+  var dUnitExtant2      : UnitClass     = UnitClasses.None
+  var dUnitExtant2N     : Int           = 0
+  var dUnitComplete     : UnitClass     = UnitClasses.None
+  var dUnitCompleteN    : Int           = 0
+  var dProducer1        : UnitClass     = UnitClasses.None
+  var dProducer1N       : Int           = 0
+  var dProducer2        : UnitClass     = UnitClasses.None
+  var dProducer2N       : Int           = 0
+  var tile              : Option[Tile]  = None
 
   private def sign(value: Int): String = {
     if (value >= 0) f"+$value" else f"$value"
@@ -35,6 +37,9 @@ final class MacroEvent(val state: MacroState) {
   }
   private def freeOrDone(unitClass: UnitClass): String = {
     if (dUnitComplete == unitClass) f"Done $unitClass" else f"Free $unitClass"
+  }
+  private def tileString: String = {
+    tile.map(t => f" $t").mkString("")
   }
   override def toString: String = {
     var output = f"${Frames(dFrames)} "
@@ -50,6 +55,7 @@ final class MacroEvent(val state: MacroState) {
     if (dSupplyAvailable  != 0)                 output += f"${sign(dSupplyAvailable)}s "
     if (dMineralPatches   != 0)                 output += f"${sign(dMineralPatches)} patches "
     if (dGeysers          != 0)                 output += f"${sign(dMineralPatches)} geysers "
+    output += tile
     output
   }
 }

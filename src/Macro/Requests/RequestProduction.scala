@@ -5,9 +5,10 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.Upgrades.Upgrade
 import Tactic.Production._
+import Utilities.TileFilters.{TileAny, TileFilter}
 import bwapi.Race
 
-abstract class RequestProduction(val buildableType: BuildableType, val quantity: Int = 0) extends {
+abstract class RequestProduction(val buildableType: BuildableType, val quantity: Int = 0, val tileFilter: TileFilter = TileAny) extends {
   def tech      : Option[Tech]      = buildableType match { case c: Tech      => Some(c) case _ => None }
   def upgrade   : Option[Upgrade]   = buildableType match { case c: Upgrade   => Some(c) case _ => None }
   def unit      : Option[UnitClass] = buildableType match { case c: UnitClass => Some(c) case _ => None }
@@ -32,8 +33,8 @@ abstract class RequestProduction(val buildableType: BuildableType, val quantity:
     else {
       val unitClass = unit.get
       if (unitClass.isAddon)                                                  new BuildAddon(this)
-      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new BuildBuilding(this)
-      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new MorphUnit(this)
+      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new BuildBuilding(this, tileFilter)
+      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new MorphUnit(this, tileFilter)
       else                                                                    new TrainUnit(this)
     }
   }
@@ -46,6 +47,7 @@ abstract class RequestProduction(val buildableType: BuildableType, val quantity:
     if (upgrade != requirement.upgrade) return false
     if (unit != requirement.unit) return false
     if (upgrade.isDefined && quantity < requirement.quantity) return false
+    if ( ! requirement.tileFilter.isSupersetOf(tileFilter)) return false
     true
   }
 

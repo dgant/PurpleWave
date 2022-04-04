@@ -9,11 +9,12 @@ import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.TileFilters.{TileAny, TileFilter}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsAny
 import Utilities.UnitPreferences._
 
-class MorphUnit(val buildableUnit: RequestProduction) extends Production {
+class MorphUnit(val buildableUnit: RequestProduction, tileFilter: TileFilter = TileAny) extends Production {
 
   setBuildable(buildableUnit)
   val classOutput   : UnitClass     = buildable.unit.get

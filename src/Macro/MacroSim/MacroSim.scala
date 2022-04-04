@@ -8,16 +8,17 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
+import Utilities.TileFilters.TileAny
 import Utilities.Time.Forever
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 final class MacroSim {
-  val redundant   = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
-  val denied      = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
-  val steps       = new mutable.ArrayBuffer[MacroStep]()
-  val minInsert  = new mutable.OpenHashMap[RequestProduction, Int]()
+  val redundant = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
+  val denied    = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
+  val steps     = new mutable.ArrayBuffer[MacroStep]()
+  val minInsert = new mutable.OpenHashMap[RequestProduction, Int]()
 
   def queue: Seq[RequestProduction] = steps.view.filter(_.request.isDefined).map(_.request.get)
 
@@ -54,7 +55,7 @@ final class MacroSim {
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
-        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass)))
+        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), u.tileTopLeft))
         event.dUnitComplete = u.unitClass
         event.dUnitCompleteN = 1
         if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
@@ -93,13 +94,22 @@ final class MacroSim {
       }
     })
 
-    // For each request, associate it with an existing event or attempt to insert a new event
+    // For each request, check if we've satisfied it by the end, and if not, insert it
     requests.foreach(request => {
-      // By the end of our simulation, have we not yet met the request?
       // TODO: Don't occupy Probes
       // TODO: Don't return producers which morph
       // TODO: Reduce diff for zergling/scourge
-      val unitDiff    = request.unit.map(u => request.quantity - steps.last.state.unitsComplete(u)).getOrElse(0)
+
+      // By the end of our simulation, have we not yet met the request?
+      //
+      // Units:
+      // - (Default) If there is no tile filter, use our state count
+      // - (Special) If there is a tile filter,  count our complete units which the tile filter accepts
+      val unitDiff = request.unit.map(requestedUnit => request.quantity -
+        (if (request.tileFilter.isSupersetOf(TileAny))
+           request.quantity - steps.last.state.unitsComplete(requestedUnit)
+        else
+          With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.tileFilter))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
       val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
       val diff        = Seq(unitDiff, upgradeDiff, techDiff).max

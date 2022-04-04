@@ -24,7 +24,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities.Time.{Forever, Frames, Seconds}
 import bwapi._
 
-abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with UnitFilter {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -416,4 +416,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     else if (alive)               player.colorMidnight
     else                          Colors.MidnightGray
   @inline final val unitColor: Color = Colors.hsv(hashCode % 256, 255, 128 + (hashCode / 256) % 128)
+
+  override def apply(other: UnitInfo): Boolean = other == this
 }

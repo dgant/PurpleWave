@@ -4,7 +4,7 @@ import Macro.Requests.RequestProduction
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitFilters.IsAll
 import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -15,7 +15,7 @@ class BuildAddon(buildableAddon: RequestProduction) extends Production {
   def addonClass    : UnitClass     = buildable.unit.get
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass, 1)
   val builderLock   : LockUnits     = new LockUnits(this)
-  builderLock.matcher     = MatchAnd(addonClass.whatBuilds._1, _.addon.filter(addonClass).forall(_.producer.contains(this)))
+  builderLock.matcher     = IsAll(addonClass.whatBuilds._1, _.addon.filter(addonClass).forall(_.producer.contains(this)))
   builderLock.counter     = CountOne
   builderLock.preference  = PreferIdle
 

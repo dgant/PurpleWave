@@ -4,7 +4,7 @@ import Information.Battles.Types.GroupCentroid
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Utilities.UnitMatchers.{MatchGroundWarriors, UnitMatcher}
+import Utilities.UnitFilters.{IsGroundWarrior, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -44,8 +44,8 @@ trait UnitGroup {
   def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
   def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
 
-  private val _count = new mutable.HashMap[UnitMatcher, Int]()
-  def count(matcher: UnitMatcher): Int = {
+  private val _count = new mutable.HashMap[UnitFilter, Int]()
+  def count(matcher: UnitFilter): Int = {
     _count(matcher) = _count.getOrElse(matcher, groupUnits.count(matcher))
     _count(matcher)
   }
@@ -64,7 +64,7 @@ trait UnitGroup {
   private val _hasGround                = new Cache(() => groupOrderable.exists( ! _.flying))
   private val _engagingOn               = new Cache(() => groupOrderable.exists(u =>                         u.matchups.targetsInRange.nonEmpty))
   private val _engagedUpon              = new Cache(() => groupOrderable.exists(u => u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty))
-  private val _widthPixels              = new Cache(() => groupOrderable.view.filter(MatchGroundWarriors).filter(_.canMove).map(_.unitClass.dimensionMax).sum)
+  private val _widthPixels              = new Cache(() => groupOrderable.view.filter(IsGroundWarrior).filter(_.canMove).map(_.unitClass.dimensionMax).sum)
   private val _centroidAir              = new Cache(() => GroupCentroid.air(centroidUnits(groupOrderable)))
   private val _centroidGround           = new Cache(() => GroupCentroid.ground(centroidUnits(groupOrderable)))
   private val _centroidKey              = new Cache(() => if (_hasGround()) centroidGround else centroidAir)

@@ -1,7 +1,7 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-case class MatchOr(matches: UnitMatcher*) extends UnitMatcher {
+case class IsAny(matches: UnitFilter*) extends UnitFilter {
   @inline final override def apply(unit: UnitInfo): Boolean = matches.exists(_(unit))
 }

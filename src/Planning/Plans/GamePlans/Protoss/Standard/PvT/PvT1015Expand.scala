@@ -13,9 +13,9 @@ import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitMatchers.{MatchAnd, MatchInNatural, MatchTank}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvT1015Expand
+import Utilities.UnitFilters.{IsAll, IsTank}
 
 class PvT1015Expand extends GameplanTemplate {
 
@@ -58,8 +58,8 @@ class PvT1015Expand extends GameplanTemplate {
       new Or(
         new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE),
         new And(
-          new EnemiesAtLeast(1, MatchAnd(Terran.Bunker, MatchInNatural)),
-          new EnemiesAtMost(0, MatchTank))),
+          new EnemiesAtLeast(1, IsAll(Terran.Bunker, _.base.exists(With.scouting.enemyNatural.contains))),
+          new EnemiesAtMost(0, IsTank))),
       new Pump(Protoss.Dragoon)),
 
     new Pump(Protoss.Dragoon, 6),

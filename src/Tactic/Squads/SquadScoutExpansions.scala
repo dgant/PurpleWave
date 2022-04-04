@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{GameTime, Seconds}
@@ -27,7 +27,7 @@ class SquadScoutExpansions extends Squad {
     }
   }
 
-  val matchAll = MatchOr(
+  val matchAll = IsAny(
     Terran.Marine,
     Terran.Firebat,
     Terran.Vulture,
@@ -41,7 +41,7 @@ class SquadScoutExpansions extends Squad {
     Zerg.Hydralisk,
     Zerg.Overlord,
     Zerg.Scourge)
-  val matchFlying = MatchOr(
+  val matchFlying = IsAny(
     Terran.Wraith,
     Protoss.Observer,
     Zerg.Overlord,

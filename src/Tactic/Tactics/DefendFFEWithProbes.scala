@@ -10,7 +10,7 @@ import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchWorker}
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWorker}
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -21,13 +21,13 @@ import scala.collection.mutable.ArrayBuffer
 class DefendFFEWithProbes extends Tactic {
   
   val defenders = new LockUnits(this)
-  defenders.matcher = MatchWorker
+  defenders.matcher = IsWorker
   
   protected def probeCount: Int = {
     val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEverEnemy(Zerg.Zergling)).max
-    val cannonsComplete     = With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete))
+    val cannonsComplete     = With.units.countOurs(IsAll(Protoss.PhotonCannon, IsComplete))
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
-    val workerCount         = With.units.countOurs(MatchWorker)
+    val workerCount         = With.units.countOurs(IsWorker)
     val workersToMine       = if (cannonsComplete < 2) 4 else 4 + 2 * cannonsComplete
     val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine - With.units.ours.count(_.agent.isScout), zerglings * 4 - cannonsComplete * 3)
     workersDesired
@@ -40,7 +40,7 @@ class DefendFFEWithProbes extends Tactic {
     if (With.enemies.size > 1) return
     haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
     if (With.units.countOurs(Protoss.PhotonCannon) == 0) return
-    if (With.units.countOurs(MatchAnd(Protoss.PhotonCannon, MatchComplete)) > 3) return
+    if (With.units.countOurs(IsAll(Protoss.PhotonCannon, IsComplete)) > 3) return
     if ( ! haveMinedEnoughForTwoCannons) return
     if ( ! With.enemies.exists(_.isUnknownOrZerg)) return
     if (With.fingerprints.twelveHatch()) return

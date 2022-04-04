@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.FFA
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Predicates.Compound.{And, Check}
-import Utilities.UnitMatchers.{MatchTank, MatchWarriors}
+import Utilities.UnitFilters.{IsTank, IsWarrior}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.{Do, NoPlan}
@@ -55,7 +55,7 @@ class TerranFFAMech extends GameplanTemplate {
   })
   
   override def attackPlan: Plan = new If(
-    new UnitsAtLeast(20, MatchWarriors),
+    new UnitsAtLeast(20, IsWarrior),
     super.attackPlan)
   
   override lazy val buildOrder = Vector(
@@ -89,7 +89,7 @@ class TerranFFAMech extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Vector(
     new If(
       new And(
-        new UnitsAtLeast(20, MatchWarriors),
+        new UnitsAtLeast(20, IsWarrior),
         new GasAtLeast(1000)),
       new Parallel(
         new Build(Get(1, Terran.Factory)),
@@ -97,12 +97,12 @@ class TerranFFAMech extends GameplanTemplate {
         new Build(Get(1, Terran.CovertOps)),
         new Pump(Terran.Ghost))
     ),
-    new If(new UnitsAtLeast(1,  MatchTank),    new Build(Get(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(12, MatchWarriors),     new RequireMiningBasesFFA(2)),
-    new If(new UnitsAtLeast(30, MatchWarriors),     new RequireMiningBasesFFA(3)),
-    new If(new UnitsAtLeast(40, MatchWarriors),     new RequireMiningBasesFFA(4)),
-    new If(new UnitsAtLeast(50, MatchWarriors),     new RequireMiningBasesFFA(5)),
-    new If(new UnitsAtLeast(30, MatchWarriors),     new Pump(Terran.Dropship, 2)),
+    new If(new UnitsAtLeast(1,  IsTank),    new Build(Get(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(12, IsWarrior),     new RequireMiningBasesFFA(2)),
+    new If(new UnitsAtLeast(30, IsWarrior),     new RequireMiningBasesFFA(3)),
+    new If(new UnitsAtLeast(40, IsWarrior),     new RequireMiningBasesFFA(4)),
+    new If(new UnitsAtLeast(50, IsWarrior),     new RequireMiningBasesFFA(5)),
+    new If(new UnitsAtLeast(30, IsWarrior),     new Pump(Terran.Dropship, 2)),
     new Pump(Terran.Comsat, 2),
     new Pump(Terran.Battlecruiser),
     new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Get(Terran.GhostCloak))),
@@ -113,7 +113,7 @@ class TerranFFAMech extends GameplanTemplate {
     new If(new UnitsAtLeast(3, Terran.Battlecruiser),   new Build(Get(Terran.Yamato))),
     new If(new UnitsAtLeast(6, Terran.Battlecruiser),   new Build(Get(Terran.BattlecruiserEnergy))),
     new If(new UnitsAtLeast(5, Terran.Battlecruiser),   new UpgradeAir),
-    new If(new UnitsAtLeast(3, MatchTank),     new UpgradeMech),
+    new If(new UnitsAtLeast(3, IsTank),     new UpgradeMech),
     new Pump(Terran.ScienceVessel, 2, 1),
     new Pump(Terran.SiegeTankUnsieged, 30),
     new Pump(Terran.Ghost, 5, 2),

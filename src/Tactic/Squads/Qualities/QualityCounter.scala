@@ -1,7 +1,7 @@
 package Tactic.Squads.Qualities
 
 import Mathematics.Maff
-import Utilities.UnitMatchers.UnitMatcher
+import Utilities.UnitFilters.UnitFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.CountMap
 
@@ -9,7 +9,7 @@ class QualityCounter {
 
   private val qualitiesEnemy = new CountMap[Quality]
   private val qualitiesFriendly = new CountMap[Quality]
-  private val unitsPossessed = new CountMap[UnitMatcher]
+  private val unitsPossessed = new CountMap[UnitFilter]
 
   def clear(): Unit = {
     qualitiesEnemy.clear()
@@ -29,7 +29,7 @@ class QualityCounter {
     if (unit.is(quality)) unit.subjectiveValue.toInt else 0
   }
 
-  private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitMatcher): Unit = {
+  private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitFilter): Unit = {
     unitsPossessed(matcher) += Maff.fromBoolean(unit.is(matcher))
   }
 

@@ -4,7 +4,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Utilities.UnitMatchers.MatchProxied
+import Utilities.UnitFilters.IsProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 
@@ -13,7 +13,7 @@ object SabotageProxy extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
     && unit.unitClass.isWorker
-    && unit.matchups.targets.exists(MatchProxied)
+    && unit.matchups.targets.exists(IsProxied)
     && ! ZvE4Pool())
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

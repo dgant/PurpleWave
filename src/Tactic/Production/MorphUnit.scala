@@ -6,21 +6,21 @@ import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{MatchMorphingInto, MatchOr, MatchSpecific}
-import Utilities.UnitPreferences._
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.IsAny
+import Utilities.UnitPreferences._
 
 class MorphUnit(val buildableUnit: RequestProduction) extends Production {
 
   setBuildable(buildableUnit)
-  val classOutput  : UnitClass      = buildable.unit.get
+  val classOutput   : UnitClass     = buildable.unit.get
   val classInput    : UnitClass     = classOutput.whatBuilds._1
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, classOutput, 1)
   val morpherLock   : LockUnits     = new LockUnits(this)
-  morpherLock.matcher = MatchOr(classInput, MatchMorphingInto(classOutput))
+  morpherLock.matcher = IsAny(classInput, _.friendly.exists(_.buildType == classOutput))
   morpherLock.counter = CountOne
   morpherLock.preference = PreferTrainerFor(classOutput)
 
@@ -43,7 +43,7 @@ class MorphUnit(val buildableUnit: RequestProduction) extends Production {
 
     // Shared somewhat with TrainUnit
     if (hasSpent || currencyLock.acquire()) {
-      morpherLock.matcher = morpher.map(m => new MatchSpecific(Set(m))).getOrElse(classInput)
+      morpherLock.matcher = if (morpher.isDefined) _ == morpher else classInput
       morpherLock.acquire()
       morpher = morpherLock.units.headOption
       morpher.foreach(_.intend(this, new Intention {

@@ -9,7 +9,7 @@ import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
-import Utilities.UnitMatchers.UnitMatcher
+import Utilities.UnitFilters.UnitFilter
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
@@ -20,7 +20,7 @@ trait MacroActions {
   def attack(): Unit = With.blackboard.wantToAttack.set(true)
   def harass(): Unit = With.blackboard.wantToHarass.set(true)
   def allIn(): Unit = { With.blackboard.yoloing.set(true); attack() }
-  def scoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1): Unit = {
+  def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Unit = {
     new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
   }
   def scoutAt(minimumSupply: Int, maxScouts: Int = 1): Unit = {
@@ -82,10 +82,10 @@ trait MacroActions {
   def extractorTrick(): Unit = {
     new ExtractorTrick().update()
   }
-  def cancelIncomplete(matchers: UnitMatcher*): Unit = {
+  def cancelIncomplete(matchers: UnitFilter*): Unit = {
     new CancelIncomplete(matchers: _*).update()
   }
-  def cancelOrders(matchers: UnitMatcher*): Unit = {
+  def cancelOrders(matchers: UnitFilter*): Unit = {
     new CancelOrders(matchers: _*).update()
   }
   def buildGasPumps(quantity: Int = Int.MaxValue): Unit = {

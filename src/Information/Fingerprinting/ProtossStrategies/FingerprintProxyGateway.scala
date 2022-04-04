@@ -3,7 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Fingerprint
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
-import Utilities.UnitMatchers.{MatchAnd, MatchProxied}
+import Utilities.UnitFilters.{IsAll, IsProxied}
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
 
@@ -13,7 +13,7 @@ class FingerprintProxyGateway extends FingerprintAnd(
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(2, 50)),
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 15), 2),
     new FingerprintArrivesBy(Protoss.Zealot, GameTime(3, 40), 4),
-    new FingerprintCompleteBy(MatchAnd(Protoss.Gateway, MatchProxied), GameTime(5,  0)),
+    new FingerprintCompleteBy(IsAll(Protoss.Gateway, IsProxied), GameTime(5,  0)),
     new Fingerprint {
       override protected def investigate: Boolean = (
         With.frame > GameTime(1, 30)()

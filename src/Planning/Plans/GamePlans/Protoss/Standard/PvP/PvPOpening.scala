@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import Planning.Plans.Placement.BuildCannonsAtNatural
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchWarriors}
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
@@ -250,7 +250,7 @@ class PvPOpening extends GameplanImperative {
         || (PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0))
       shouldExpand &&= ! PvPTechBeforeRange()
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
-      shouldExpand ||= unitsComplete(MatchWarriors) >= 20 && safeToMoveOut
+      shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
       // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
       // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
@@ -273,11 +273,11 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
         getCannons ||= With.fingerprints.dtRush()
       }
-      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(MatchWarriors) >= 20)
+      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20)
     } else if (PvP3GateGoon()) {
-      shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
+      shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
     } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(MatchWarriors) >= (if (safeToMoveOut) 20 else 28)
+      shouldExpand = unitsComplete(IsWarrior) >= (if (safeToMoveOut) 20 else 28)
     }
     shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
@@ -306,7 +306,7 @@ class PvPOpening extends GameplanImperative {
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend
-    if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(MatchAnd(Protoss.Dragoon, MatchComplete)) == 0) {
+    if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
       aggression(0.6)
     }
 
@@ -406,7 +406,7 @@ class PvPOpening extends GameplanImperative {
     // React against proxy //
     /////////////////////////
 
-    if (With.fingerprints.proxyGateway() && With.frame < Minutes(5)() && unitsComplete(MatchWarriors) < 7) {
+    if (With.fingerprints.proxyGateway() && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
       pumpSupply()
       pumpWorkers()
       if (units(Protoss.Gateway) < 2) {

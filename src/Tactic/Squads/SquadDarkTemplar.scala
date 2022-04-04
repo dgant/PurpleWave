@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitMatchers.MatchMobileDetector
+import Utilities.UnitFilters.IsMobileDetector
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Seconds
 
@@ -22,7 +22,7 @@ class SquadDarkTemplar extends Squad {
   private val bases = new Cache(() =>
     With.geography.bases
       .filterNot(_.owner.isUs)
-      .filterNot(_.metro.units.exists(u => u.isEnemy && MatchMobileDetector(u)))
+      .filterNot(_.metro.units.exists(u => u.isEnemy && IsMobileDetector(u)))
       .filterNot(_.units.exists(u =>
         u.isEnemy
         && u.complete

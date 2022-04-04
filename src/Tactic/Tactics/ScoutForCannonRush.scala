@@ -4,15 +4,15 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchNotHoldingResources, MatchWorker}
-import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.{IsAll, IsComplete}
+import Utilities.UnitPreferences.PreferClose
 
 class ScoutForCannonRush extends Tactic {
   val scouts = new LockUnits(this)
-  scouts.matcher = MatchAnd(MatchWorker, MatchNotHoldingResources)
+  scouts.matcher = u => u.unitClass.isWorker && ! u.carrying
   scouts.counter = CountOne
   scouts.interruptable = false
 
@@ -38,7 +38,7 @@ class ScoutForCannonRush extends Tactic {
     var shouldScout = (
       previouslyCannonRushed
         && With.enemies.exists(_.isUnknownOrProtoss)
-        && ! With.units.existsEnemy(MatchAnd(Protoss.PhotonCannon, MatchComplete))
+        && ! With.units.existsEnemy(IsAll(Protoss.PhotonCannon, IsComplete))
         && ! With.fingerprints.gatewayFirst()
         && With.frame > GameTime(1, 30)()
         && With.frame < GameTime(6, 0)())

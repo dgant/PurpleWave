@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.Time.Minutes
 
 object BaseUpdater {
@@ -19,11 +19,11 @@ object BaseUpdater {
     base.townHall         = Maff.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying && u.tileTopLeft.tileDistanceFast(base.townHallTile) < 12))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals         = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
     base.gas              = base.units.filter(_.unitClass.isGas)
-    base.workerCount      = base.units.count(u => u.player == base.owner && u.is(MatchWorker))
+    base.workerCount      = base.units.count(u => u.player == base.owner && u.is(IsWorker))
     base.mineralsLeft     = base.minerals.view.map(_.mineralsLeft).sum
     base.gasLeft          = base.gas.view.map(_.gasLeft).sum
     base.lastPlannedExpo  = if (base.plannedExpo()) With.frame else base.lastPlannedExpo
-    base.enemyCombatValue = base.units.view.filter(_.isEnemy).filter(MatchWarriors).map(_.subjectiveValue).sum
+    base.enemyCombatValue = base.units.view.filter(_.isEnemy).filter(IsWarrior).map(_.subjectiveValue).sum
 
     updateOwner(base)
   }

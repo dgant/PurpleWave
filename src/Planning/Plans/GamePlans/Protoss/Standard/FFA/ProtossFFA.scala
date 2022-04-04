@@ -11,7 +11,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Always
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UpgradeComplete, UpgradeStarted}
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 
 class ProtossFFA extends GameplanTemplate {
@@ -32,9 +32,9 @@ class ProtossFFA extends GameplanTemplate {
   def doExpand: Predicate = new Always
   def expansionPlan = new Parallel(
     new If(UnitsAtLeast(4,  Protoss.Carrier,  complete = true), new RequireMiningBases(3)),
-    new If(UnitsAtLeast(12, MatchWarriors,    complete = true), new RequireMiningBases(3)),
+    new If(UnitsAtLeast(12, IsWarrior,    complete = true), new RequireMiningBases(3)),
     new If(UnitsAtLeast(6,  Protoss.Carrier,  complete = true), new RequireMiningBases(4)),
-    new If(UnitsAtLeast(20, MatchWarriors,    complete = true), new RequireMiningBases(4)))
+    new If(UnitsAtLeast(20, IsWarrior,    complete = true), new RequireMiningBases(4)))
   
   override def buildPlans: Seq[Plan] = Vector(
     new RequireMiningBases(2),

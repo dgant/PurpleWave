@@ -13,7 +13,7 @@ import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, _}
 import Planning.Predicates.Reactive.{EnemyMutalisksLikely, SafeAtHome, SafeToMoveOut}
 import Planning.Predicates.Strategy._
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
 
@@ -36,11 +36,11 @@ object PvZIdeas {
     new Or(
       new And(
         new SafeToMoveOut,
-        new UnitsAtLeast(6, MatchWarriors, complete = true)),
+        new UnitsAtLeast(6, IsWarrior, complete = true)),
       new And(
         new SafeAtHome,
-        new UnitsAtLeast(10, MatchWarriors, complete = true)),
-      new UnitsAtLeast(14, MatchWarriors, complete = true)),
+        new UnitsAtLeast(10, IsWarrior, complete = true)),
+      new UnitsAtLeast(14, IsWarrior, complete = true)),
     new RequireMiningBases(2))
 
   class PvZRequireMiningBases(bases: Int) extends Parallel(
@@ -85,7 +85,7 @@ object PvZIdeas {
     new And(
       new UnitsAtLeast(1, Protoss.Forge),
       new UnitsAtMost(3, Protoss.Gateway, complete = true),
-      new UnitsAtMost(8, MatchWarriors)),
+      new UnitsAtMost(8, IsWarrior)),
     new Parallel(
       new PlacementForgeFastExpand,
       new If(
@@ -186,7 +186,7 @@ object PvZIdeas {
       new Or(
         new Employing(PvZLateGameTemplar),
         new TechStarted(Protoss.PsionicStorm)),
-      new PumpRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(MatchWarriors, 0.3)))),
+      new PumpRatio(Protoss.HighTemplar, 1, 20, Seq(Friendly(IsWarrior, 0.3)))),
     new PumpRatio(Protoss.Dragoon, 1, 100, Seq(
       Enemy(Zerg.Lurker, 1.0),
       Enemy(Zerg.Mutalisk, 1.0),

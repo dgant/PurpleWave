@@ -1,7 +1,7 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchWorker extends UnitMatcher {
+object IsWorker extends UnitFilter {
   override def apply(unit: UnitInfo): Boolean = unit.unitClass.isWorker
 }

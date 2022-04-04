@@ -3,7 +3,6 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import Utilities.UnitMatchers.MatchBuilding
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.{Minutes, Seconds}
@@ -20,7 +19,7 @@ object Cancel extends Action {
     lazy val framesToFinish   = Seq(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames).max
     lazy val doomed           = unit.battle.isDefined && unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
     lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish
-    lazy val canCancel        = unit.isAny(MatchBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
+    lazy val canCancel        = unit.isAny(_.unitClass.isBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
     lazy val producing        = unit.training || unit.upgrading || unit.teching
     lazy val beingBorn        = unit.remainingCompletionFrames > 0
     lazy val isDecoy          = With.frame < Minutes(4)() && (unit.unitClass.canAttack || unit.is(Zerg.CreepColony)) && unit.matchups.allies.exists(_.isBeingViolent) // The 4-pool use case, essentially

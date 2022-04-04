@@ -19,7 +19,7 @@ import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Utilities.UnitMatchers.{MatchOr, MatchTank, MatchWarriors, MatchWorker}
+import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior, IsWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.GameTime
@@ -246,7 +246,7 @@ class PvTBasic extends GameplanTemplate {
       new RequireBases(4)))
 
   class GoObs     extends Parallel(new WriteStatus("GoObs"),      new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer)))
-  class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, MatchOr(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, MatchTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
+  class GoReaver  extends Parallel(new WriteStatus("GoReaver"),   new BuildOrder(Get(Protoss.RoboticsFacility), Get(Protoss.Shuttle), Get(Protoss.RoboticsSupportBay), Get(Protoss.Reaver)), new If(new And(new MiningBasesAtLeast(3), new EnemiesAtLeast(30, IsAny(Terran.Marine, Terran.Medic, Terran.Firebat, Terran.Ghost))), new If(new EnemiesAtMost(0, IsTank), new Build(Get(3, Protoss.RoboticsFacility)), new Build(Get(2, Protoss.RoboticsFacility)))))
   class GoDT      extends Parallel(new WriteStatus("GoDT"),       new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(2, Protoss.DarkTemplar)))
   class GoStorm   extends Parallel(new WriteStatus("GoStorm"),    new BuildOrder(Get(Protoss.CitadelOfAdun), Get(Protoss.TemplarArchives), Get(Protoss.PsionicStorm), Get(2, Protoss.HighTemplar)))
   class GoCarrier extends Parallel(new WriteStatus("GoCarrier"),  new BuildOrder(Get(Protoss.Stargate), Get(2, Protoss.Stargate), Get(Protoss.FleetBeacon), Get(2, Protoss.Carrier), Get(Protoss.AirDamage), Get(4, Protoss.Gateway), Get(Protoss.CitadelOfAdun), Get(Protoss.CarrierCapacity)))
@@ -293,11 +293,11 @@ class PvTBasic extends GameplanTemplate {
                 new UnitsAtMost(4, Protoss.Gateway)),
               new CapGasAt(250)),
             new If(
-              new UnitsAtMost(45, MatchWorker),
+              new UnitsAtMost(45, IsWorker),
               new CapGasAt(400))))),
 
     // Pylon block
-    new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, MatchWorker)), new PylonBlock),
+    new If(new And(new BasesAtLeast(3), new MiningBasesAtLeast(2), new UnitsAtLeast(45, IsWorker)), new PylonBlock),
 
     /////////////////////////
     // Actual build order //
@@ -312,7 +312,7 @@ class PvTBasic extends GameplanTemplate {
       new And(new SafeAtHome, new UnitsAtLeast(5, Protoss.Gateway)),
       new Parallel(
         new If(new And(new EmployingCarriers, new UnitsAtLeast(1, Protoss.Stargate)),       new GoCarrier),
-        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun),   new Employing(PvEStormYes), new UnitsAtLeast(12, MatchWarriors)), new GoStorm),
+        new If(new And(new EmployingGateway,  new UnitsAtLeast(1, Protoss.CitadelOfAdun),   new Employing(PvEStormYes), new UnitsAtLeast(12, IsWarrior)), new GoStorm),
         new If(new And(new EmployingArbiters, new UnitsAtLeast(1, Protoss.CitadelOfAdun)),  new GoArbiter))),
 
     new HighPriorityTech,
@@ -360,8 +360,8 @@ class PvTBasic extends GameplanTemplate {
 
     // Gas pump timing
     new PumpRatio(Protoss.Assimilator, 1, 2, Seq(Friendly(Protoss.Gateway, 0.2), Friendly(Protoss.RoboticsSupportBay, 0.4), Friendly(Protoss.TemplarArchives, 0.2), Friendly(Protoss.Stargate, 2.0))),
-    new If(new And(new UnitsAtLeast(30, MatchWorker), new EmployingTwoBase), new BuildGasPumps),
-    new If(new UnitsAtLeast(45, MatchWorker), new BuildGasPumps),
+    new If(new And(new UnitsAtLeast(30, IsWorker), new EmployingTwoBase), new BuildGasPumps),
+    new If(new UnitsAtLeast(45, IsWorker), new BuildGasPumps),
 
     ////////////////////////////
     // Reactions from 2 base //

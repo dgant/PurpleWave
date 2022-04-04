@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
@@ -16,7 +16,7 @@ class MissionStormDrop extends MissionDrop {
   override protected def shouldStopRaiding: Boolean = shouldGoHome
   override protected def shouldGoHome: Boolean = passengers.forall(_.energy < 75)
 
-  object MatchStormDroppable extends MatchAnd(MatchComplete, Protoss.HighTemplar, _.energy >= 75, recruitablePassenger)
+  object MatchStormDroppable extends IsAll(IsComplete, Protoss.HighTemplar, _.energy >= 75, recruitablePassenger)
 
   val stormLock = new LockUnits(this)
   stormLock.matcher = MatchStormDroppable

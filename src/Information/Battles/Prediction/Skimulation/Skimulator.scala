@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.LightYear
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 
 object Skimulator {
 
@@ -30,10 +30,10 @@ object Skimulator {
       battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimDistanceToEngage = Maff.clamp(u.skimDistanceToEngage - u.topSpeed * With.framesSince(u.lastSeen), u.skimDistanceToEngage, enemyMeanVisibleDistance))
     }
 
-    battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(MatchWarriors).map(_.skimDistanceToEngage)).getOrElse(LightYear()))
+    battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(IsWarrior).map(_.skimDistanceToEngage)).getOrElse(LightYear()))
     battle.teams.foreach(team => team.units.foreach(unit => {
       // Calculate speed, accounting reasonably for immobile units
-      val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (MatchTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed / 4)
+      val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed / 4)
       val delayFrames           = Math.max(unit.cooldownLeft, Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / speed / (if (unit.isFriendly) battle.speedMultiplier else 1.0)))
       val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
       val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
@@ -85,7 +85,7 @@ object Skimulator {
       if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
       if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size / 8.0
-      if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(MatchGroundWarriors) / 12, 1.0, 2.5)
+      if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(IsGroundWarrior) / 12, 1.0, 2.5)
       if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.count(Protoss.Shuttle) / team.count(Protoss.Reaver), 1.0, if (Protoss.ShuttleSpeed(unit.player)) 2.0 else 1.5)
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Dragoon(unit) && Protoss.DragoonRange(player))          unit.skimStrength *= 1.5
@@ -102,13 +102,13 @@ object Skimulator {
       unit.skimMagic = 0
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.ScienceVessel(unit))                                  * casts100  * 1.5)
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Battlecruiser(unit))                                  * casts150  * 2.5)
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Ghost(unit)         && Terran.Lockdown(player))       * casts100  * Maff.clamp(team.opponent.count(MatchMechWarriors)   / 1,  1.0, 1.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.HighTemplar(unit)  && Protoss.PsionicStorm(player))  * casts75   * Maff.clamp(team.opponent.count(MatchWarriors)       / 8,  1.0, 2.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.DarkArchon(unit)   && Protoss.Maelstrom(player))     * casts100  * Maff.clamp(team.opponent.count(MatchBioWarriors)    / 4,  1.0, 4.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(MatchWarriors)       / 4,  1.0, 4.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Corsair(unit)      && Protoss.DisruptionWeb(player)) * casts125  * Maff.clamp(team.opponent.count(MatchGroundWarriors) / 4,  1.0, 3.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Queen(unit)           && Zerg.Ensnare(player))          * casts100  * Maff.clamp(team.opponent.count(MatchWarriors)       / 12, 1.0, 2.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * Maff.clamp(team.opponent.count(MatchWarriors)       / 4,  1.0, 4.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Ghost(unit)         && Terran.Lockdown(player))       * casts100  * Maff.clamp(team.opponent.count(IsMechWarrior)   / 1,  1.0, 1.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.HighTemplar(unit)  && Protoss.PsionicStorm(player))  * casts75   * Maff.clamp(team.opponent.count(IsWarrior)       / 8,  1.0, 2.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.DarkArchon(unit)   && Protoss.Maelstrom(player))     * casts100  * Maff.clamp(team.opponent.count(IsBioWarrior)    / 4,  1.0, 4.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 4.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Corsair(unit)      && Protoss.DisruptionWeb(player)) * casts125  * Maff.clamp(team.opponent.count(IsGroundWarrior) / 4,  1.0, 3.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Queen(unit)           && Zerg.Ensnare(player))          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 12, 1.0, 2.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 4.0))
       unit.skimStrength += unit.skimMagic
 
       // Count presence

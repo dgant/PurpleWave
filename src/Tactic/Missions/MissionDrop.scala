@@ -17,7 +17,7 @@ import Micro.Agency.{Commander, Intention}
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{MatchTransport, MatchWorker}
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.{Minutes, Seconds}
@@ -42,7 +42,7 @@ abstract class MissionDrop extends Mission {
   protected def recruitable(unit: UnitInfo): Boolean = unit.complete && unit.matchups.threatsInRange.isEmpty
   protected def recruitablePassenger(unit: UnitInfo): Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
   protected val transportLock = new LockUnits(this)
-  transportLock.matcher = unit => MatchTransport(unit) && recruitable(unit)
+  transportLock.matcher = unit => unit.isTransport && recruitable(unit)
   transportLock.counter = CountOne
 
   val itinerary = new mutable.Queue[Base]
@@ -74,7 +74,7 @@ abstract class MissionDrop extends Mission {
   private def ignore(base: Base): Boolean = {
     if (base.owner.isFriendly) return true
     if (base.heart.tileDistanceFast(SpecificPoints.tileMiddle) < 32 && ! base.zone.island) return true
-    if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! MatchWorker(u))) return true
+    if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     if ( ! additionalItineraryConditions(base)) return true
     With.framesSince(base.lastScoutedFrame) < Seconds(90)() && ! base.owner.isEnemy

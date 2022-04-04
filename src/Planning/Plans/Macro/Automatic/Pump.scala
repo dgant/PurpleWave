@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plan
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -22,7 +22,7 @@ class Pump(
     if ( ! canBuild) return
     val unitsComplete       = With.macroCounts.oursComplete(unitClass)
     val unitsExtant         = With.macroCounts.oursExtant(unitClass)
-    val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(MatchAnd(MatchHatchlike, MatchComplete)) else 0
+    val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(IsAll(IsHatchlike, IsComplete)) else 0
     val builders            = getBuildersExisting.size + larvaSpawning
     val unitsToAdd          = Seq(maximumConcurrently, 3 * builders * unitClass.copiesProduced).min
     val unitsToRequest      = Seq(maximumTotal, maxDesirable, unitsExtant + unitsToAdd).min

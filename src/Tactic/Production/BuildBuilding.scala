@@ -8,12 +8,11 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{Match, MatchAnd, MatchSpecific}
-import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferClose
 
 class BuildBuilding(buildableBuilding: RequestProduction) extends Production {
 
@@ -80,9 +79,10 @@ class BuildBuilding(buildableBuilding: RequestProduction) extends Production {
     // Find an appropriate builder (or make sure we use the current builder)
     val desiredZone = desiredTile.map(_.zone)
     if (building.exists(_.buildUnit.isDefined)) {
-      builderLock.matcher = new MatchSpecific(Set(building.get.buildUnit.get))
+      builderLock.matcher = building.get.buildUnit.contains
     } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      builderLock.matcher = MatchAnd(Match(_.zone == desiredZone.get), builderMatcher)
+      // Performance optimization: Only consider workers in the same zone when we have a lot available
+      builderLock.matcher = unit => desiredZone.contains(unit.zone) && builderMatcher(unit)
     } else {
       builderLock.matcher = builderMatcher
     }

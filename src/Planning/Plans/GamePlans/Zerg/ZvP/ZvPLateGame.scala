@@ -15,7 +15,7 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Compound.{Check, Not, Or}
 import Planning.Predicates.Economy.GasAtMost
 import Planning.Predicates.Milestones.{EnemyHasShown, UnitsAtLeast}
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Zerg}
 
 class ZvPLateGame extends GameplanTemplate {
@@ -27,7 +27,7 @@ class ZvPLateGame extends GameplanTemplate {
     archon: Double,
     reaver: Double,
     corsair: Double) {
-    def weigh: Double = if (With.units.countEnemy(MatchWarriors) < minimumArmySize) 0 else (
+    def weigh: Double = if (With.units.countEnemy(IsWarrior) < minimumArmySize) 0 else (
       zealot * With.units.countEnemy(Protoss.Zealot)
       + dragoon * With.units.countEnemy(Protoss.Dragoon)
       + archon * With.units.countEnemy(Protoss.Archon)
@@ -93,7 +93,7 @@ class ZvPLateGame extends GameplanTemplate {
         new WriteStatus("Ling-Defiler"),
         // new Pump(Zerg.Defiler, 3),
         new PumpRatio(Zerg.Extractor, 0, 99, Seq(Friendly(Zerg.Drone, 0.1))),
-        new PumpRatio(Zerg.Zergling, 24, 60, Seq(Enemy(MatchWarriors, 7.0))),
+        new PumpRatio(Zerg.Zergling, 24, 60, Seq(Enemy(IsWarrior, 7.0))),
         new Build(
           Get(Zerg.QueensNest),
           Get(Zerg.EvolutionChamber),
@@ -115,7 +115,7 @@ class ZvPLateGame extends GameplanTemplate {
         new WriteStatus("Ling-Muta"),
         new Pump(Zerg.Mutalisk),
         new PumpRatio(Zerg.Extractor, 0, 99, Seq(Friendly(Zerg.Drone, 0.1))),
-        new PumpRatio(Zerg.Zergling, 18, 30, Seq(Enemy(MatchWarriors, 6.0))),
+        new PumpRatio(Zerg.Zergling, 18, 30, Seq(Enemy(IsWarrior, 6.0))),
         new UpgradeContinuously(Zerg.AirDamage),
         new Build(
           Get(Zerg.QueensNest),
@@ -136,7 +136,7 @@ class ZvPLateGame extends GameplanTemplate {
         new Build(Get(Zerg.HydraliskDen)),
         new UpgradeHydraSpeedThenRange,
         new Build(Get(Zerg.LurkerMorph)),
-        new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(MatchWarriors, 2.0))),
+        new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(IsWarrior, 2.0))),
         new If(
           new UnitsAtLeast(50, Zerg.Drone),
           new Build(Get(2, Zerg.EvolutionChamber))),
@@ -151,7 +151,7 @@ class ZvPLateGame extends GameplanTemplate {
         new CapGasAt(250),
         new Build(Get(Zerg.HydraliskDen)),
         new UpgradeHydraSpeedThenRange,
-        new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(MatchWarriors, 2.5))),
+        new PumpRatio(Zerg.Hydralisk, 18, 60, Seq(Enemy(IsWarrior, 2.5))),
         new Build(
           Get(6, Zerg.Hatchery),
           Get(2, Zerg.EvolutionChamber)),

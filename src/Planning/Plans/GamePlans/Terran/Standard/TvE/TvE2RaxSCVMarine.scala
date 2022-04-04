@@ -15,12 +15,12 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitCounters.CountExcept
-import Utilities.UnitMatchers.{MatchMobile, MatchWorker}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
 import Utilities.Time.Seconds
+import Utilities.UnitCounters.CountExcept
+import Utilities.UnitFilters.{IsRecruitableForCombat, IsWorker}
 
 class TvE2RaxSCVMarine extends GameplanTemplate {
 
@@ -31,7 +31,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ScoutAt(10))
 
   class ReadyToAttack extends Latch(new Or(
-    new UnitsAtLeast(26, MatchMobile),
+    new UnitsAtLeast(26, IsRecruitableForCombat),
     new And(
       new UnitsAtLeast(2, Terran.Marine),
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.nexusFirst, With.fingerprints.twelveHatch))))
@@ -52,7 +52,7 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     new ReadyToAttack,
     new Parallel(
       new Delay(Seconds(7)(), new AttackAndHarass),
-      new AttackWithWorkers(new CountExcept(4, MatchWorker))))
+      new AttackWithWorkers(new CountExcept(4, IsWorker))))
 
   override def supplyPlan: Plan = NoPlan()
 

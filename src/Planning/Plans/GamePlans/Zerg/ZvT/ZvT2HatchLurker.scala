@@ -18,7 +18,7 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
@@ -91,8 +91,8 @@ class ZvT2HatchLurker extends GameplanTemplate {
 
     new CapGasAtRatioToMinerals(1.0, 100),
     new Write(With.blackboard.preferCloseExpansion, true),
-    new CancelOrders(MatchTeching(Zerg.LurkerMorph)),
-    new CancelOrders(MatchUpgrading(Zerg.ZerglingSpeed)),
+    new CancelOrders(_.techProducing.contains(Zerg.LurkerMorph)),
+    new CancelOrders(_.upgradeProducing.contains(Zerg.ZerglingSpeed)),
 
     new Pump(Zerg.SunkenColony),
     new BuildSunkensAtNatural(1),
@@ -152,7 +152,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
     new BuildOrder(
       Get(Zerg.ZerglingSpeed),
       Get(Zerg.HydraliskDen)),
-    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(MatchHatchlike, 10.0))),
+    new PumpRatio(Zerg.Drone, 20, 40, Seq(Friendly(IsHatchlike, 10.0))),
     new Build(Get(Zerg.LurkerMorph)),
     new BuildGasPumps,
     new If(

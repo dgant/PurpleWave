@@ -5,10 +5,10 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Plans.Scouting.ScoutCleared
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{MatchAnd, MatchScoutCatcher}
-import Utilities.UnitPreferences.PreferClose
+import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferClose
 
 class SquadEjectScout extends Squad {
   override def toString: String = "Eject"
@@ -25,7 +25,11 @@ class SquadEjectScout extends Squad {
     if (scoutCleared.apply) return
     if (targetScout().isEmpty) return
 
-    lock.matcher = MatchAnd(MatchScoutCatcher, (unit) => With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)
+    lock.matcher = unit => (
+      unit.canMove
+      && unit.unitClass.attacksGround
+      && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
+      && With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)
     lock.counter = CountOne
     lock.preference = PreferClose(targetScout().get.pixel)
     lock.acquire()

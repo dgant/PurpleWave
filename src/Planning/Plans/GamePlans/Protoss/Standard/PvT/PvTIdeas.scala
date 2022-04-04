@@ -14,7 +14,7 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeToMoveOut}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.{GameTime, Minutes}
@@ -34,7 +34,7 @@ object PvTIdeas {
     new AttackAndHarass,
     new If(
       new Or(
-        new Latch(new UnitsAtLeast(8, MatchWarriors)),
+        new Latch(new UnitsAtLeast(8, IsWarrior)),
         new Not(new EnemyBarracksCheese)),
       new If(
         new And(
@@ -54,10 +54,10 @@ object PvTIdeas {
               // Don't get sieged in
               new EnemyHasTech(Terran.SiegeMode),
               // Vs 3-fac: Turtle hard
-              new Latch(new UnitsAtLeast(24, MatchWarriors)),
+              new Latch(new UnitsAtLeast(24, IsWarrior)),
               // Vs 2-fac: Turtle medium
               new And(
-                new Latch(new UnitsAtLeast(12, MatchWarriors)),
+                new Latch(new UnitsAtLeast(12, IsWarrior)),
                 new Not(new EnemyStrategy(With.fingerprints.threeFac))),
               new Not(new EnemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac))))),
           new AttackAndHarass)))
@@ -71,14 +71,14 @@ object PvTIdeas {
   class ReactToWorkerRush extends If(
     new And(
       new EnemyStrategy(With.fingerprints.workerRush),
-      new EnemiesAtMost(0, MatchWarriors),
+      new EnemiesAtMost(0, IsWarrior),
       new BasesAtMost(2),
       new FrameAtMost(GameTime(8, 0)())),
     new Parallel(
       new WriteStatus("ReactToWorkerRush"),
       new Pump(Protoss.Probe, 9),
       new If(
-        new UnitsAtMost(3, MatchWarriors),
+        new UnitsAtMost(3, IsWarrior),
         new CancelIncomplete(Protoss.Nexus)),
       new CapGasAt(50),
       new If(
@@ -104,7 +104,7 @@ object PvTIdeas {
       new EnemyStrategy(With.fingerprints.bunkerRush),
       new FrameAtMost(Minutes(7)()),
       new Or(
-        new EnemiesAtLeast(1, MatchAnd(Terran.Bunker, MatchProxied)),
+        new EnemiesAtLeast(1, IsAll(Terran.Bunker, IsProxied)),
         new EnemiesAtLeast(1, Terran.Marine))),
     new Parallel(
       new WriteStatus("ReactToBunkerRush"),
@@ -134,7 +134,7 @@ object PvTIdeas {
           new If(UnitsAtMost(1, Protoss.Gateway),
             new Parallel(
               new CapGasWorkersAt(0),
-              new CancelIncomplete(MatchOr(Protoss.Assimilator, Protoss.CyberneticsCore)))))),
+              new CancelIncomplete(IsAny(Protoss.Assimilator, Protoss.CyberneticsCore)))))),
       new Pump(Protoss.Reaver),
       new Pump(Protoss.Zealot, 3),
       new PumpWorkers,
@@ -167,11 +167,11 @@ object PvTIdeas {
     new Pump(Protoss.DarkTemplar, 2))
 
   private class TrainObservers extends If(
-    Or(UnitsAtLeast(24, MatchWarriors),
+    Or(UnitsAtLeast(24, IsWarrior),
       new EnemyHasShownWraithCloak),
     new Pump(Protoss.Observer, 4),
     new If(
-      UnitsAtLeast(18, MatchWarriors),
+      UnitsAtLeast(18, IsWarrior),
       new Pump(Protoss.Observer, 3),
       new Pump(Protoss.Observer, 2)))
 
@@ -201,13 +201,13 @@ object PvTIdeas {
     new TrainObservers,
     new PvTPumpReaverShuttle(6),
     new If(
-      And(UnitsAtLeast(12, MatchWarriors), Employing(PvEStormYes)),
+      And(UnitsAtLeast(12, IsWarrior), Employing(PvEStormYes)),
       new Pump(Protoss.HighTemplar, 2)),
     new If(
       UnitsAtLeast(1, Protoss.FleetBeacon),
       new PumpRatio(Protoss.Corsair, 0, 8, Seq(Enemy(Terran.Wraith, 2.0)))),
     new Pump(Protoss.Carrier, 8),
-    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(MatchTank, 0.5))),
+    new PumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(IsTank, 0.5))),
     new TrainScouts,
     new If(
       Or(Employing(PvEStormYes), EnemyStrategy(With.fingerprints.bio), GasAtLeast(800)),

@@ -8,7 +8,7 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
@@ -37,7 +37,7 @@ object Gather extends Action {
         lazy val basePaired = baseOpposite.orElse(baseRemote)
 
         def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
-          ! threat.isAny(MatchWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+          ! threat.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
             && threat.pixelsToGetInRange(unit, atResource.pixel) < defenseRadiusPixels)
 
         if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
@@ -49,7 +49,7 @@ object Gather extends Action {
       // Burrow from threats
       if (unit.canBurrow
         && unit.matchups.enemies.exists(enemy =>
-          ! enemy.isAny(MatchWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+          ! enemy.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
           && ! unit.tile.enemyDetected) {
         Commander.burrow(unit)
@@ -97,7 +97,7 @@ object Gather extends Action {
       lazy val zoneTo         = resource.zone
       lazy val mainAndNatural = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
       lazy val transferring   = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
-      lazy val threatened     = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && ! unit.matchups.threats.forall(MatchWorker)
+      lazy val threatened     = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && ! unit.matchups.threats.forall(IsWorker)
       lazy val threatCloser   = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixel) < unit.pixelDistanceCenter(resource.pixel))
       if (transferring
         && threatened

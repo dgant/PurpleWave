@@ -2,13 +2,13 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.UnitMatchers.UnitMatcher
+import Utilities.UnitFilters.UnitFilter
 import Utilities.Time.FrameCount
 
 class FingerprintArrivesBy(
-  unitMatcher : UnitMatcher,
-  gameTime    : FrameCount,
-  quantity    : Int = 1)
+                            unitMatcher : UnitFilter,
+                            gameTime    : FrameCount,
+                            quantity    : Int = 1)
     extends Fingerprint {
   
   override val sticky = true

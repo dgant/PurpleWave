@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
 import Utilities._
@@ -38,7 +38,7 @@ class PvPLateGame extends GameplanImperative {
   val buildCannonsAtNatural = new BuildCannonsAtNatural(1)
   val buildCannonsAtExpansions = new BuildCannonsAtExpansions(1)
   override def executeBuild(): Unit = {
-    fearDeath   = ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(MatchWarriors) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
+    fearDeath   = ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
     fearContain = With.scouting.enemyProgress > 0.6
@@ -53,7 +53,7 @@ class PvPLateGame extends GameplanImperative {
       fearContain = false
     }
 
-    expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(MatchWarriors) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+    expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldDetect = enemyDarkTemplarLikely
     shouldDetect ||= enemyHasShown(Protoss.ArbiterTribunal, Protoss.Arbiter)
     shouldExpand = fearMacro || ! fearDeath
@@ -63,7 +63,7 @@ class PvPLateGame extends GameplanImperative {
       miningBases < 2
       || enemyBases > miningBases
       || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
-      || Math.min(unitsComplete(MatchWarriors) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
+      || Math.min(unitsComplete(IsWarrior) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
     shouldExpand ||= miningBases < 1
     shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
     shouldAttack = PvPIdeas.shouldAttack
@@ -173,7 +173,7 @@ class PvPLateGame extends GameplanImperative {
 
     if (techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ZealotSpeed)) {
       pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
-      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(MatchWarriors, 1.0 / 4.0)))
+      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(IsWarrior, 1.0 / 4.0)))
       if (shouldHarass) {
         pump(Protoss.Shuttle, 1)
       }
@@ -254,8 +254,8 @@ class PvPLateGame extends GameplanImperative {
       unitsComplete(Protoss.Nexus) > 1
       && unitsComplete(Protoss.Gateway) >= 5
       && unitsComplete(Protoss.Assimilator) > 1
-      && unitsComplete(MatchWarriors) >= 12
-      && (unitsComplete(MatchWarriors) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush) || techStarted(Protoss.PsionicStorm)))
+      && unitsComplete(IsWarrior) >= 12
+      && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush) || techStarted(Protoss.PsionicStorm)))
     if (shouldDetect) { get(Protoss.Forge) }
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)

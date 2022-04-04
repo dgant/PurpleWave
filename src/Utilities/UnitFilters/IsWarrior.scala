@@ -1,15 +1,13 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 
-import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchWarriors extends UnitMatcher {
-
+object IsWarrior extends UnitFilter {
   override def apply(unit: UnitInfo): Boolean = (
     unit.aliveAndComplete
     && unit.unitClass.orderable
     && unit.unitClass.attacksOrCasts
     && ! unit.unitClass.isWorker
-    && (unit.unitClass.canMove || Terran.SiegeTankSieged(unit))
+    && (unit.unitClass.canMove || unit.unitClass.isTank)
   )
 }

@@ -14,7 +14,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -154,7 +154,7 @@ object DefaultCombat extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     lazy val target = Target.choose(unit)
-    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(MatchWorker) || unit.matchups.targets.nonEmpty
+    unit.agent.shouldEngage &&= target.nonEmpty || unit.matchups.threats.forall(IsWorker) || unit.matchups.targets.nonEmpty
 
     //////////////////////////
     // Set traffic priority //
@@ -175,7 +175,7 @@ object DefaultCombat extends Action {
 
     var technique: Technique =
       if ( ! unit.canMove) Fight
-      else if (unit.agent.withinSafetyMargin || unit.agent.shouldEngage || unit.matchups.threatsInFrames(48).forall(MatchWorker))
+      else if (unit.agent.withinSafetyMargin || unit.agent.shouldEngage || unit.matchups.threatsInFrames(48).forall(IsWorker))
         Fight else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
@@ -244,7 +244,7 @@ object DefaultCombat extends Action {
         || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
         // Break if we're just pillaging
         || unit.confidence11 > confidenceChaseThreshold
-        || unit.matchups.threats.forall(MatchWorker)
+        || unit.matchups.threats.forall(IsWorker)
         // Break if the fight has already begun and the formation isn't helping us
         || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {

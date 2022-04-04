@@ -10,7 +10,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Strategery.StarCraftMap
 import Strategery.Strategies.Strategy
 import Utilities.Time.FrameCount
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import bwapi.Race
 
 /**
@@ -29,7 +29,7 @@ trait MacroCounting {
   def supplyUsed200: Int = (supplyUsed400 + 1) / 2
   def supplyTotal200: Int = supplyTotal400 / 2
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
-  def saturated: Boolean = units(MatchWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
+  def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
   def bases: Int = With.geography.ourBases.size
   def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
@@ -59,16 +59,16 @@ trait MacroCounting {
         && unit.remainingUpgradeFrames <= withinFrames))
   }
 
-  def units(matchers: UnitMatcher*): Int = (
-    With.units.countOurs(MatchOr(matchers: _*)) +
+  def units(matchers: UnitFilter*): Int = (
+    With.units.countOurs(IsAny(matchers: _*)) +
       (if (With.self.isZerg) With.units.ours.map(u => if (matchers.contains(u.buildType)) u.buildType.copiesProduced else 0).sum else 0)
   )
 
-  def unitsComplete(matchers: UnitMatcher*): Int = {
-    With.units.countOurs(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
+  def unitsComplete(matchers: UnitFilter*): Int = {
+    With.units.countOurs(IsAll(IsComplete, IsAny(matchers: _*)))
   }
 
-  def unitsEver(matchers: UnitMatcher*): Int = {
+  def unitsEver(matchers: UnitFilter*): Int = {
     With.units.countEverOurs(_.isAny(matchers: _*))
   }
 
@@ -122,9 +122,9 @@ trait MacroCounting {
 
   def starts: Int = With.geography.startLocations.size
 
-  def enemies(matchers: UnitMatcher*): Int =  With.units.countEnemy(MatchOr(matchers: _*))
+  def enemies(matchers: UnitFilter*): Int =  With.units.countEnemy(IsAny(matchers: _*))
 
-  def enemiesComplete(matchers: UnitMatcher*): Int = With.units.countEnemy(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
+  def enemiesComplete(matchers: UnitFilter*): Int = With.units.countEnemy(IsAll(IsComplete, IsAny(matchers: _*)))
 
   def enemiesShown(unitClasses: UnitClass*): Int = unitClasses.view.map(With.unitsShown.allEnemies(_)).sum
 

@@ -2,7 +2,7 @@ package Information.Battles
 
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.UnitMatchers.MatchProxied
+import Utilities.UnitFilters.IsProxied
 
 object BattleFilters {
   def local(unit: UnitInfo): Boolean = any(unit) && unit.likelyStillThere
@@ -16,7 +16,7 @@ object BattleFilters {
   )
 
   def home(unit: UnitInfo): Boolean = {
-    unit.isFriendly || ! unit.unitClass.isBuilding || MatchProxied(unit)
+    unit.isFriendly || ! unit.unitClass.isBuilding || IsProxied(unit)
   }
 
   def away(unit: UnitInfo): Boolean = {

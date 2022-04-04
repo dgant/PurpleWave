@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.Terran
 
 class Scan extends Tactic {
@@ -36,7 +36,7 @@ class Scan extends Tactic {
     val contentiousTanks = With.units.enemy.view.filter(u =>
       ! u.visible
       && u.likelyStillThere
-      && u.is(MatchTank)
+      && u.is(IsTank)
       &&u.matchups.enemies.exists(e =>
         e.is(Terran.SiegeTankSieged)
         && e.cooldownLeft == 0

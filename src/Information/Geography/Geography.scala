@@ -8,7 +8,7 @@ import Mathematics.Points.{SpecificPoints, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Performance.Tasks.TimedTask
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.JavaConverters._
@@ -126,7 +126,7 @@ class Geography extends TimedTask {
     ++ Vector(With.geography.ourNatural).filter(x =>
         With.strategy.isInverted
         && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
-        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(MatchTank)))
+        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(IsTank)))
         && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.globalHome.judgement.exists(_.shouldFight)))
     ++ With.units.ours
       .view

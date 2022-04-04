@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Utilities.UnitCounters.CountExactly
-import Utilities.UnitMatchers.{MatchAnd, MatchAntiGround, MatchWarriors}
+import Utilities.UnitFilters.{IsAll, IsAntiGround, IsWarrior}
 import Utilities.UnitPreferences.PreferClose
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.Minutes
@@ -24,7 +24,7 @@ class MissionKillExpansion extends Mission {
     && With.recruiter.available.count(lock.matcher) >= 20)
 
   var lastFrameInBase = 0
-  lock.matcher = MatchAnd(MatchWarriors, MatchAntiGround)
+  lock.matcher = IsAll(IsWarrior, IsAntiGround)
 
   override def recruit(): Unit = {
     val targetBase = best
@@ -40,7 +40,7 @@ class MissionKillExpansion extends Mission {
   private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(b => b.metro != base.metro && ! b.natural.contains(base))
   private def baseCloserToOurArmy(base: Base): Boolean = base.heart.groundPixels(With.scouting.ourMuscleOrigin) + 320 < base.heart.groundPixels(With.scouting.threatOrigin)
   private def baseIsEnemy(base: Base): Boolean = base.owner.isEnemy
-  private def enoughKillers: Boolean = vicinity.base.forall(unitsRequired(_) > Maff.orElse(units, With.units.ours.filter(MatchWarriors)).size)
+  private def enoughKillers: Boolean = vicinity.base.forall(unitsRequired(_) > Maff.orElse(units, With.units.ours.filter(IsWarrior)).size)
 
   override def run(): Unit = {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {

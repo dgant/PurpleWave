@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
-import Utilities.UnitMatchers.{MatchTank, MatchWorker}
+import Utilities.UnitFilters.{IsTank, IsWorker}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 import bwapi.Color
@@ -57,7 +57,7 @@ object JudgmentModifiers {
         g.base.exists(_.owner.isUs) // Don't assist distance miners
         && g.pixelDistanceEdge(ally) <= Gather.defenseRadiusPixels
         && ally.matchups.threats.exists(t => t.pixelDistanceEdge(g) - t.pixelRangeAgainst(ally) <= Gather.defenseRadiusPixels))))
-    val workersTotal = With.units.countOurs(MatchWorker)
+    val workersTotal = With.units.countOurs(IsWorker)
     val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
     if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio / 2.0)) else None
   }
@@ -70,7 +70,7 @@ object JudgmentModifiers {
   //     and thus systematically bleed units
   def hiddenTanks(battleLocal: Battle): Option[JudgmentModifier] = {
     if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
-    val tanks           = battleLocal.enemy.units.count(u => MatchTank(u) && u.base.exists(_.owner.isEnemy) && ! u.visible)
+    val tanks           = battleLocal.enemy.units.count(u => IsTank(u) && u.base.exists(_.owner.isEnemy) && ! u.visible)
     if (tanks == 0) return None
     def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
     val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum

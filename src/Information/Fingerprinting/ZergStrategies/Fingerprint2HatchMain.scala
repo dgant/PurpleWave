@@ -2,7 +2,7 @@ package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.UnitMatchers.MatchHatchlike
+import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class Fingerprint2HatchMain extends Fingerprint {
@@ -14,5 +14,5 @@ class Fingerprint2HatchMain extends Fingerprint {
 
   override val sticky = true
 
-  protected def hatcheries: Iterable[UnitInfo] = With.units.enemy.filter(MatchHatchlike)
+  protected def hatcheries: Iterable[UnitInfo] = With.units.enemy.filter(IsHatchlike)
 }

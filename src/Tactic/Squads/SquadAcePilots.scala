@@ -6,17 +6,17 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitMatchers.{MatchFlyingWarriors, MatchOr}
+import Utilities.UnitFilters.{IsFlyingWarrior, IsAny}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Tactic.Missions.MissionDrop
 import Utilities.Time.Seconds
 
 class SquadAcePilots extends Squad {
   val acePilots = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
-  val acePilotMatcher = MatchOr(acePilots: _*)
+  val acePilotMatcher = IsAny(acePilots: _*)
 
   val splashPilots = Seq(Terran.Valkyrie, Protoss.Corsair)
-  val splashPilotMatcher = MatchOr(splashPilots: _*)
+  val splashPilotMatcher = IsAny(splashPilots: _*)
 
   lock.matcher = acePilotMatcher
   lock.counter = CountEverything
@@ -30,11 +30,11 @@ class SquadAcePilots extends Squad {
   override def run(): Unit = {
     // Help other squads with anti-air
     val otherSquads = With.squads.all.view.filterNot(==)
-    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(MatchFlyingWarriors))).toVector
+    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
     if (squadsToCover.nonEmpty) {
       val squad = squadsToCover
         .sortBy(_.isInstanceOf[SquadDefendBase])
-        .maxBy(_.targets.get.count(MatchFlyingWarriors))
+        .maxBy(_.targets.get.count(IsFlyingWarrior))
       activity = "AceHelpSquad"
       followSquad(squad)
       return
@@ -58,8 +58,8 @@ class SquadAcePilots extends Squad {
     val aceDivision =
       Maff.minBy(With.battles.divisions
         .view
-        .filter(_.enemies.exists(MatchFlyingWarriors))
-        .filter(d => hasFleet || units.size > d.enemies.count(MatchFlyingWarriors)))(_.centroidAir.pixelDistanceSquared(centroidAir))
+        .filter(_.enemies.exists(IsFlyingWarrior))
+        .filter(d => hasFleet || units.size > d.enemies.count(IsFlyingWarrior)))(_.centroidAir.pixelDistanceSquared(centroidAir))
     if (aceDivision.isDefined) {
       activity = "AceAir2Air"
       vicinity = aceDivision.get.centroidAir

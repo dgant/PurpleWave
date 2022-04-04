@@ -15,7 +15,7 @@ import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtLeast
 import Planning.Predicates.Strategy.{EnemyIsZerg, EnemyStrategy}
-import Utilities.UnitMatchers.MatchHatchlike
+import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.Races.Zerg
 
 class ZvE9Pool2HatchSpeed extends GameplanTemplate {
@@ -75,7 +75,7 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
         new If(new UnitsAtLeast(2, Zerg.Hatchery), new Build(Get(Zerg.Extractor))),
         new If(
           new Or(
-            new UnitsAtLeast(2, MatchHatchlike),
+            new UnitsAtLeast(2, IsHatchlike),
             new MineralsAtLeast(350)),
           new If(
             new GasForUpgrade(Zerg.ZerglingSpeed),

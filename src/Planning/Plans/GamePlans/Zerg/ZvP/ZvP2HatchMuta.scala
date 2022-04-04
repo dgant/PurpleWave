@@ -17,7 +17,7 @@ import Planning.Predicates.MacroFacts
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete, MatchOr}
+import Utilities.UnitFilters.{IsAll, IsComplete, IsAny}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
@@ -108,7 +108,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
           Get(3, Zerg.Hatchery),
           Get(22, Zerg.Drone)))))
     
-  lazy val ZealotOrDragoon = MatchOr(Protoss.Zealot, Protoss.Dragoon)
+  lazy val ZealotOrDragoon = IsAny(Protoss.Zealot, Protoss.Dragoon)
   
   class ReactiveSunkensVsZealots extends If(
     And(
@@ -139,7 +139,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   class ReactiveZerglings extends If(
     UnitsAtMost(0, Zerg.Spire, complete = true),
     new PumpRatio(Zerg.Zergling, 0, 10, Seq(
-      Friendly(MatchAnd(Zerg.SunkenColony, MatchComplete), -6.0),
+      Friendly(IsAll(Zerg.SunkenColony, IsComplete), -6.0),
       Enemy(Terran.Marine, 1.5),
       Enemy(Terran.Firebat, 3.0),
       Enemy(Terran.Vulture, 2.0),
@@ -154,7 +154,7 @@ class ZvP2HatchMuta extends GameplanTemplate {
   
   override def emergencyPlans: Seq[Plan] = Vector(
     new Pump(Zerg.SunkenColony),
-    new PumpRatio(Zerg.Drone, 0, 18, Seq(Flat(9), Friendly(MatchAnd(Zerg.SunkenColony, MatchComplete), 3))),
+    new PumpRatio(Zerg.Drone, 0, 18, Seq(Flat(9), Friendly(IsAll(Zerg.SunkenColony, IsComplete), 3))),
     new ReactiveSunkensVsZealots,
     new ZergReactionVsWorkerRush
   )
@@ -184,8 +184,8 @@ class ZvP2HatchMuta extends GameplanTemplate {
       new Pump(Zerg.Scourge, 2)),
     new PumpRatio(Zerg.Scourge, 0, 10,
       Seq(
-        Enemy(MatchOr(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
-        Enemy(MatchOr(Zerg.Scourge), 1.0))),
+        Enemy(IsAny(Terran.Valkyrie, Terran.Wraith, Protoss.Corsair, Protoss.Stargate, Zerg.Mutalisk), 2.0),
+        Enemy(IsAny(Zerg.Scourge), 1.0))),
     new If(
       new And(
         new MiningBasesAtLeast(3),

@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -15,15 +15,15 @@ object Poke extends Action {
     With.scouting.enemyMain.isDefined
     && unit.canAttack
     && unit.totalHealth > 39
-    && unit.matchups.targets.exists(MatchWorker)
-    && unit.matchups.threats.forall(MatchWorker)
+    && unit.matchups.targets.exists(IsWorker)
+    && unit.matchups.threats.forall(IsWorker)
     && ( // Save our strength for blocking Hatcheries
       ! With.enemy.isZerg
       || unit.matchups.threats.size <= 5
       || unit.totalHealth > 25))
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    val targets = unit.matchups.targets.filter(MatchWorker)
+    val targets = unit.matchups.targets.filter(IsWorker)
     if (targets.isEmpty) return
 
     val targetHeart = unit.base.map(_.heart.center).getOrElse(unit.zone.centroid)

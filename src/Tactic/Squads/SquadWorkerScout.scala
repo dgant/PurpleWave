@@ -7,7 +7,7 @@ import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferScout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -21,7 +21,7 @@ class SquadWorkerScout extends Squad {
   var abandonScouting: Boolean = false
   val scoutLock: LockUnits = new LockUnits(this)
   scoutLock.interruptable = false
-  scoutLock.matcher = MatchWorker
+  scoutLock.matcher = IsWorker
 
   protected final def scoutBasesTowardsTownHall(unit: FriendlyUnitInfo, bases: Seq[Base]): Unit = {
     scoutTo(unit, bases, bases.maxBy(base => unit.pixelDistanceTravelling(base.townHallArea.center)).townHallArea.center)
@@ -33,7 +33,7 @@ class SquadWorkerScout extends Squad {
       && ! zone.bases.exists(_.harvestingArea.contains(tile)))) // Don't walk into worker line
 
     unit.intend(this, new Intention {
-      toScoutTiles  = if (MatchWarriors(unit)) Seq.empty else tiles
+      toScoutTiles  = if (IsWarrior(unit)) Seq.empty else tiles
       toTravel      = Some(destination)
     })
     bases.foreach(With.scouting.registerScout)
@@ -52,7 +52,7 @@ class SquadWorkerScout extends Squad {
     // Abandon scouting when we have a closer unit approaching
     abandonScouting ||= With.blackboard.wantToAttack() && scouts.nonEmpty && With.units.ours.exists(u =>
       u.complete
-      && ! MatchWorker(u)
+      && ! IsWorker(u)
       && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)())))
 
     // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
@@ -74,7 +74,7 @@ class SquadWorkerScout extends Squad {
     val scoutCount = Math.min(
       Math.min(
         With.blackboard.maximumScouts(),
-        With.units.countOurs(MatchWorker) - 3),
+        With.units.countOurs(IsWorker) - 3),
         basesToScout.size)
     if (scoutCount < 1) return
 
@@ -84,7 +84,7 @@ class SquadWorkerScout extends Squad {
     scouts = scoutLock.acquire().toVector // The copy is important since the source is mutable
     if (scouts.isEmpty) return
 
-    val enemyHasCombatUnits = With.units.enemy.exists(u  => u.canAttack && ! MatchWorker(u))
+    val enemyHasCombatUnits = With.units.enemy.exists(u  => u.canAttack && ! IsWorker(u))
     val orderedScouts = scouts.toVector.sortBy(s => basesToScout.view.map(_.townHallTile).map(s.pixelDistanceTravelling).min)
     val basesToScoutQueue = new UnorderedBuffer[Base](basesToScout)
     orderedScouts.indices.foreach(i => {

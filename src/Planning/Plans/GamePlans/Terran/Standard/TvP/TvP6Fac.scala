@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{Not, Or}
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLeast}
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Utilities.UnitMatchers.{MatchOr, MatchTank}
+import Utilities.UnitFilters.{IsAny, IsTank}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP6Fac
@@ -29,7 +29,7 @@ class TvP6Fac extends GameplanTemplate {
     new If(
       new Or(
         new UnitsAtLeast(6, Terran.Factory, complete = true),
-        new UnitsAtLeast(8, MatchTank, complete = true)),
+        new UnitsAtLeast(8, IsTank, complete = true)),
     new AttackAndHarass))
 
   override def workerPlan: Plan = new Parallel(
@@ -43,7 +43,7 @@ class TvP6Fac extends GameplanTemplate {
     new TvPIdeas.PumpScienceVessels,
     new TvPIdeas.PumpGoliaths,
     new If(
-      new EnemiesAtLeast(1, MatchOr(Protoss.Carrier, Protoss.FleetBeacon)),
+      new EnemiesAtLeast(1, IsAny(Protoss.Carrier, Protoss.FleetBeacon)),
       new UpgradeContinuously(Terran.GoliathAirRange)),
     new Pump(Terran.SiegeTankUnsieged, maximumTotal = 6, maximumConcurrently = 2),
     new ReactiveDetection,

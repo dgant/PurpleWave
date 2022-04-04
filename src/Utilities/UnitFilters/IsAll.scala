@@ -1,7 +1,7 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 import ProxyBwapi.UnitInfo.UnitInfo
 
-case class MatchAnd(matchers: UnitMatcher*) extends UnitMatcher {
+case class IsAll(matchers: UnitFilter*) extends UnitFilter {
   
   override def apply(unit: UnitInfo): Boolean = {
     matchers.forall(_.apply(unit))

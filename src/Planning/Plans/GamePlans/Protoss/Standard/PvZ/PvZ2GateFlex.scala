@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Minutes}
@@ -23,7 +23,7 @@ class PvZ2GateFlex extends GameplanImperative {
       Get(Protoss.Pylon),
       Get(10, Protoss.Probe),
       Get(Protoss.Gateway))
-    if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(MatchWarriors) < 5) {
+    if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(IsWarrior) < 5) {
       pumpSupply()
       pumpWorkers()
       pump(Protoss.Zealot)
@@ -101,7 +101,7 @@ class PvZ2GateFlex extends GameplanImperative {
     var safeOutside = safeToMoveOut
     safeOutside &&= ! goSpeedlots || upgradeComplete(Protoss.GroundDamage, 10) || unitsComplete(Protoss.Zealot) >= 11
     var safeToExpand = safeOutside
-    safeToExpand &&= unitsComplete(MatchWarriors) + 2 * unitsComplete(Protoss.Archon) >= 9
+    safeToExpand &&= unitsComplete(IsWarrior) + 2 * unitsComplete(Protoss.Archon) >= 9
     safeToExpand ||= unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Corsair) > 0 && enemies(Zerg.Hydralisk) == 0 && enemies(Zerg.Mutalisk) == 0
     var shouldExpand = frame > mutaFrame
     shouldExpand ||= enemiesComplete(Zerg.SunkenColony) > 1
@@ -199,7 +199,7 @@ class PvZ2GateFlex extends GameplanImperative {
     }
     upgrades()
     trainCorsairs()
-    if (safeAtHome && unitsComplete(MatchWarriors) >= 10) {
+    if (safeAtHome && unitsComplete(IsWarrior) >= 10) {
       tech2Base()
     }
     if (enemyLurkersLikely || after(Minutes(9))) {
@@ -224,8 +224,8 @@ class PvZ2GateFlex extends GameplanImperative {
       if (upgradeComplete(Protoss.AirDamage)) {
         get(Protoss.AirArmor)
       }
-    } else if (safeAtHome || unitsComplete(MatchWarriors) >= 8) {
-      pumpRatio(Protoss.Corsair, 1, 4, Seq(Friendly(MatchWarriors, 0.1)))
+    } else if (safeAtHome || unitsComplete(IsWarrior) >= 8) {
+      pumpRatio(Protoss.Corsair, 1, 4, Seq(Friendly(IsWarrior, 0.1)))
     }
   }
 
@@ -239,14 +239,14 @@ class PvZ2GateFlex extends GameplanImperative {
       get(Protoss.DragoonRange)
     }
     if (unitsComplete(Protoss.Corsair) > 5 || (enemies(Zerg.Scourge, Zerg.Mutalisk) == 0 && ! enemyHasUpgrade(Zerg.OverlordSpeed))) {
-      pumpRatio(Protoss.DarkTemplar, 1, 3, Seq(Friendly(MatchWarriors, 0.1)))
+      pumpRatio(Protoss.DarkTemplar, 1, 3, Seq(Friendly(IsWarrior, 0.1)))
     }
     if (minerals > 500 && gas < 50) {
       pump(Protoss.Zealot)
     }
     pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Corsair, -1.5), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
     pumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(-12), Friendly(Protoss.Zealot, 2.0)))
-    pumpRatio(Protoss.HighTemplar, 4, 12, Seq(Friendly(MatchWarriors, 0.15)))
+    pumpRatio(Protoss.HighTemplar, 4, 12, Seq(Friendly(IsWarrior, 0.15)))
     if (upgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)) {
       pump(Protoss.Shuttle, 1)
     }
@@ -297,7 +297,7 @@ class PvZ2GateFlex extends GameplanImperative {
       requireMiningBases(
         Math.min(
           miningBases + 1,
-          2 + Math.min(unitsComplete(MatchWarriors) / 20, 2)))
+          2 + Math.min(unitsComplete(IsWarrior) / 20, 2)))
     }
   }
 }

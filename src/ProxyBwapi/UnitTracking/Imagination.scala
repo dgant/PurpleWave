@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, PixelRay}
 import Mathematics.Shapes.Circle
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import Utilities.Time.{Forever, Minutes, Seconds}
@@ -47,7 +47,7 @@ object Imagination {
         unit.removalFrames - With.framesSince(unit.lastSeen)
       else if (unit.unitClass.isOrganic && unit.irradiated)
         unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
-      else if (MatchWarriors(unit))
+      else if (IsWarrior(unit))
         if (With.strategy.isFfa)
           Minutes(4)()
         else

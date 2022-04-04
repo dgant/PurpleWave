@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkersLikely, EnemyMutalisksLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
-import Utilities.UnitMatchers.{MatchOr, MatchTank, MatchWarriors}
+import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior}
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran._
@@ -26,11 +26,11 @@ class TvZSK extends GameplanTemplate {
   class CanAttack extends And(
     new Or(
       new Employing(TvZ2RaxAcademy),
-      new Latch(new UnitsAtLeast(20, MatchWarriors))),
+      new Latch(new UnitsAtLeast(20, IsWarrior))),
     new Or(
       new SafeToMoveOut,
       new BasesAtLeast(3),
-      new UnitsAtLeast(3, MatchTank),
+      new UnitsAtLeast(3, IsTank),
       new UnitsAtLeast(1, Terran.NuclearMissile)))
 
   class LurkerLikely extends Or(
@@ -45,7 +45,7 @@ class TvZSK extends GameplanTemplate {
       new EnemyHasTech(Zerg.LurkerMorph),
       new EnemyHasShown(Zerg.Lurker),
       new EnemyHasShown(Zerg.LurkerEgg),
-      new EnemiesAtLeast(4, MatchOr(Zerg.SunkenColony, Zerg.CreepColony))))
+      new EnemiesAtLeast(4, IsAny(Zerg.SunkenColony, Zerg.CreepColony))))
 
   override def scoutPlan: Plan = NoPlan()
   override def attackPlan: Plan = new If(new CanAttack, new AttackAndHarass)
@@ -61,7 +61,7 @@ class TvZSK extends GameplanTemplate {
   override def aggressionPlan: Plan = new Trigger(
     new Or(
       new UnitsAtLeast(5, Terran.Barracks, complete = true),
-      new UnitsAtLeast(3, MatchTank),
+      new UnitsAtLeast(3, IsTank),
       new UnitsAtLeast(1, Terran.NuclearMissile),
       new Employing(TvZ2RaxAcademy, TvZRaxCCRax)),
     new Aggression(1.2),
@@ -77,7 +77,7 @@ class TvZSK extends GameplanTemplate {
     new If(
       new And(
         new Latch(new UnitsAtLeast(4, Terran.ScienceVessel, complete = true)),
-        new UnitsAtLeast(30, MatchWarriors)),
+        new UnitsAtLeast(30, IsWarrior)),
       new RequireMiningBases(3)),
 
     new TechContinuously(Terran.Stim),

@@ -5,14 +5,14 @@ import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import Utilities.UnitPreferences.PreferClose
 
 class RemoveMineralBlocks extends Plan {
   
   val miners = new LockUnits(this)
   miners.interruptable = false
-  miners.matcher = MatchWorker
+  miners.matcher = IsWorker
   miners.counter = CountOne
   
   override def onUpdate() {

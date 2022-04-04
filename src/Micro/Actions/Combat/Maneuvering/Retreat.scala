@@ -8,7 +8,7 @@ import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Minutes
@@ -32,7 +32,7 @@ object Retreat extends Action {
     lazy val timeOriginUs         = unit.framesToTravelTo(unit.agent.safety)
     lazy val timeOriginEnemy      = Maff.takePercentile(0.1, unit.matchups.threats)(Ordering.by(timeOriginOfThreat)).map(timeOriginOfThreat).headOption.getOrElse(Double.PositiveInfinity)
     lazy val enemySooner          = timeOriginUs + 96 >= timeOriginEnemy
-    lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(MatchTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
+    lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(IsTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
     lazy val safetyIsSafe         = unit.agent.safety.tile.enemyRangeAgainst(unit) < unit.tile.enemyRangeAgainst(unit)
     lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && (unit.zone == unit.agent.safety.zone && unit.pixelDistanceCenter(unit.agent.safety) >= 32 * unit.agent.safety.tile.enemyRangeAgainst(unit) && PixelRay(unit.pixel, unit.agent.safety).forall(_.enemyRangeAgainst(unit) <= unit.tile.enemyRangeAgainst(unit)))

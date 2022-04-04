@@ -3,12 +3,12 @@ package Tactic.Tactics
 import Debugging.ToString
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 
 class Gather extends Tactic {
 
   val workerLock: LockUnits = new LockUnits(this)
-  workerLock.matcher = MatchWorker
+  workerLock.matcher = IsWorker
 
   def launch() {
     workerLock.acquire()

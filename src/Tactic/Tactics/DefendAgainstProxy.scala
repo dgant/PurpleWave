@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.{CountEverything, CountUpTo}
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadRazeProxies
@@ -30,12 +30,12 @@ class DefendAgainstProxy extends Tactic {
     if (proxies.isEmpty) return
 
     // Set up collections of available and assigned defenders
-    var additionalWorkersAllowed  = With.units.countOurs(MatchWorker) - 6
+    var additionalWorkersAllowed  = With.units.countOurs(IsWorker) - 6
     val defendersAssigned         = new mutable.HashMap[FriendlyUnitInfo, UnitInfo]
     val defendersAvailable        = new mutable.HashSet[FriendlyUnitInfo]
     defenders.release()
     defenders.counter = CountEverything
-    defenders.matcher = MatchOr(MatchWorker, MatchWarriors)
+    defenders.matcher = IsAny(IsWorker, IsWarrior)
     defenders.inquire().foreach(defendersAvailable++=)
 
     val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony))
@@ -86,7 +86,7 @@ class DefendAgainstProxy extends Tactic {
     }
 
     defenders.counter = CountUpTo(defendersAssigned.size)
-    defenders.matcher = Match(_.friendly.exists(defendersAssigned.contains))
+    defenders.matcher = _.friendly.exists(defendersAssigned.contains)
     defenders.acquire()
     if (defenders.units.isEmpty) return
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
@@ -99,7 +99,7 @@ class DefendAgainstProxy extends Tactic {
       ! e.flying
       && e.likelyStillThere
       && e.isAny(scaryTypes: _*)
-      && MatchProxied(e))
+      && IsProxied(e))
   }
   
   lazy val scaryTypes = Vector(

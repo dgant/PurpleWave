@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Planning.Prioritized
 import Utilities.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
-import Utilities.UnitMatchers.{MatchAnything, UnitMatcher}
+import Utilities.UnitFilters.{IsAnything, UnitFilter}
 import Utilities.UnitPreferences.{PreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class LockUnits(val owner: Prioritized) {
   var interruptable : Boolean         = true
-  var matcher       : UnitMatcher     = MatchAnything
+  var matcher       : UnitFilter     = IsAnything
   var preference    : UnitPreference  = PreferAnything
   var counter       : UnitCounter     = CountEverything
 
@@ -53,7 +53,7 @@ class LockUnits(val owner: Prioritized) {
   private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
     // Here's a bunch of special-case performance shortcuts
     if (counter == CountEverything) {
-      if (matcher == MatchAnything) {
+      if (matcher == IsAnything) {
         candidates.toSeq
       } else {
         candidates.filter(matcher).toSeq

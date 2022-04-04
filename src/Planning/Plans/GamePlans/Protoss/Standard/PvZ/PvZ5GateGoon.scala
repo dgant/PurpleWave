@@ -14,7 +14,7 @@ import Planning.Predicates.Compound.{And, Latch, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.{PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver}
 
@@ -63,7 +63,7 @@ class PvZ5GateGoon extends GameplanTemplate {
           new Or(
             new And(
               new Employing(PvZMidgame5GateGoon),
-              new UnitsAtLeast(18, MatchWarriors)),
+              new UnitsAtLeast(18, IsWarrior)),
             new And(
               new Employing(PvZMidgame5GateGoonReaver),
               new UnitsAtLeast(4, Protoss.Reaver))),

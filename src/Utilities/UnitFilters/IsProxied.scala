@@ -1,4 +1,4 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -6,7 +6,9 @@ import Mathematics.Maff
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 
-abstract class MatchAnyProxy extends UnitMatcher {
+object IsProxied extends UnitFilter {
+
+  private val distanceRatio = 1.25
 
   private def mainBases(player: PlayerInfo): Iterable[Base] = {
     if (player.isUs) return Seq(With.geography.ourMain)
@@ -37,18 +39,4 @@ abstract class MatchAnyProxy extends UnitMatcher {
 
     distanceFriendly < distanceEnemy * 1.4
   }
-
-  val distanceRatio: Double
-}
-
-object MatchProxied extends MatchAnyProxy {
-
-  override val distanceRatio = 1.25
-
-}
-
-object MatchProxiedInOurBase extends MatchAnyProxy {
-  
-  override val distanceRatio = 0.7
-  
 }

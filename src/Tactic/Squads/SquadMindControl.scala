@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
@@ -22,7 +22,7 @@ class SquadMindControl extends Squad {
 
   def stealables: Iterable[ForeignUnitInfo] = With.units.enemy.filter(_.isAny(
     Terran.Battlecruiser,
-    MatchTank,
+    IsTank,
     Protoss.Carrier,
     Protoss.Shuttle,
     Protoss.Reaver,

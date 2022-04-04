@@ -5,12 +5,12 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitMatchers.{MatchWarriors, MatchWorker}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
 class DefendAgainstWorkerRush extends Tactic {
   
   val defenders = new LockUnits(this)
-  defenders.matcher = MatchWorker
+  defenders.matcher = IsWorker
   
   def launch() {
     val attackingWorkers = With.geography.ourBases
@@ -23,8 +23,8 @@ class DefendAgainstWorkerRush extends Tactic {
       .distinct
   
     lazy val attackingCentroid = Maff.centroid(attackingWorkers.map(_.pixel))
-    lazy val ourWorkers = With.units.countOurs(MatchWorker)
-    lazy val ourCombatUnits = With.units.countOurs(MatchWarriors)
+    lazy val ourWorkers = With.units.countOurs(IsWorker)
+    lazy val ourCombatUnits = With.units.countOurs(IsWarrior)
     
     if (attackingWorkers.size < 3 || ourCombatUnits >= 3) return
       

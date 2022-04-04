@@ -2,14 +2,14 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.UnitMatchers.{MatchAnd, MatchWarriors, MatchWorker}
+import Utilities.UnitFilters.{IsAll, IsWarrior, IsWorker}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Utilities.Time.GameTime
 
 class FingerprintWorkerRush extends Fingerprint {
 
-  protected object MatchAttackingWorker extends MatchAnd(
-      MatchWorker,
+  protected object MatchAttackingWorker extends IsAll(
+      IsWorker,
       (unit: UnitInfo) => {
         val distanceOurBase = unit.pixelDistanceTravelling(With.geography.ourMain.heart.center)
         With.geography.startBases.forall(base =>
@@ -20,7 +20,7 @@ class FingerprintWorkerRush extends Fingerprint {
 
   override protected def investigate: Boolean = {
     val attackingWorkerCount = attackingWorkers.size
-    if (With.units.existsEnemy(MatchWarriors)) return false
+    if (With.units.existsEnemy(IsWarrior)) return false
     if (With.frame < GameTime(4, 0)() && attackingWorkerCount > 2) return true
     if (With.frame < GameTime(6, 0)() && attackingWorkerCount > 4) return true
     false

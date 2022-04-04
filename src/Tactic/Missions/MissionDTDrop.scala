@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitFilters.IsAll
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
@@ -12,7 +12,7 @@ import Tactic.Squads.SquadAutomation
 class MissionDTDrop extends MissionDrop {
   override protected def additionalFormationConditions: Boolean = With.recruiter.available.exists(MatchDroppableDT)
 
-  object MatchDroppableDT extends MatchAnd(Protoss.DarkTemplar, recruitablePassenger)
+  object MatchDroppableDT extends IsAll(Protoss.DarkTemplar, recruitablePassenger)
   val dtLock = new LockUnits(this)
   dtLock.matcher = Protoss.DarkTemplar
   dtLock.counter = CountUpTo(2)

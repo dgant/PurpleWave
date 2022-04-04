@@ -1,8 +1,8 @@
-package Utilities.UnitMatchers
+package Utilities.UnitFilters
 
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object MatchAntiAir extends UnitMatcher {
+object IsAntiAir extends UnitFilter {
   
   override def apply(unit: UnitInfo): Boolean = unit.damageOnHitAir > 0
 }

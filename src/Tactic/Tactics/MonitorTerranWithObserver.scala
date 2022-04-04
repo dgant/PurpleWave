@@ -5,7 +5,7 @@ import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.MatchMobileDetector
+import Utilities.UnitFilters.IsMobileDetector
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran}
 
@@ -18,7 +18,7 @@ class MonitorTerranWithObserver extends Tactic {
   override def launch(): Unit = {
     val bases = With.geography.enemyBases.filter(_.owner.isTerran)
     if (bases.isEmpty) return
-    if (With.units.existsEnemy(MatchMobileDetector)) return
+    if (With.units.existsEnemy(IsMobileDetector)) return
     if (With.units.countEnemy(Terran.Factory) > 7) return
     if (With.enemies.exists(_.hasTech(Terran.WraithCloak))) return
     if (With.units.countOurs(Protoss.Observer) < 3 && MacroFacts.enemyHasShown(Terran.SpiderMine)) return

@@ -5,7 +5,7 @@ import Micro.Actions.Action
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Targeting.FiltersSituational.TargetFilterVisibleInRange
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
@@ -29,11 +29,11 @@ object Root extends Action {
     private def framesToRoot = 18 + With.reaction.agencyAverage
     
     private lazy val weAreALurker           = Zerg.Lurker.apply(unit)
-    private lazy val weAreATank             = MatchTank.apply(unit)
+    private lazy val weAreATank             = IsTank.apply(unit)
     private lazy val weAreRooted            = (weAreALurker && unit.burrowed) || unit.is(Terran.SiegeTankSieged)
     private lazy val maxRange               = if (unit.is(Terran.SiegeTankUnsieged)) Terran.SiegeTankSieged.pixelRangeGround else unit.pixelRangeGround
     private lazy val ourDistanceToGoal      = distanceToGoal(unit)
-    private lazy val rootersInPush          = unit.alliesSquad.filter(s => unit != s && Zerg.Lurker.apply(s) || MatchTank.apply(s))
+    private lazy val rootersInPush          = unit.alliesSquad.filter(s => unit != s && Zerg.Lurker.apply(s) || IsTank.apply(s))
     private lazy val rootersInPushCloser    = rootersInPush.count(u => distanceToGoal(u) < ourDistanceToGoal + pushSpacing)
 
     def notHiddenUphill(target: UnitInfo): Boolean = target.visible || target.altitude <=  unit.altitude
@@ -128,7 +128,7 @@ object Root extends Action {
     }
   }
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isAny(MatchTank,  Zerg.Lurker)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isAny(IsTank,  Zerg.Lurker)
   
   override def perform(unit: FriendlyUnitInfo) {
     val rootAction = new RootAction(unit)

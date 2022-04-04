@@ -10,7 +10,7 @@ import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStr
 import Lifecycle.{JBWAPIClient, Main, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
-import Utilities.UnitMatchers.MatchHatchlike
+import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -72,11 +72,11 @@ class Storyteller {
     new Story                           ("Our Factories",       () => With.units.countOurs(Terran.Factory)),
     new Story                           ("Our Barracks",        () => With.units.countOurs(Terran.Barracks)),
     new Story                           ("Our Gateways",        () => With.units.countOurs(Protoss.Gateway)),
-    new Story                           ("Our Hatcheries",      () => With.units.countOurs(MatchHatchlike)),
+    new Story                           ("Our Hatcheries",      () => With.units.countOurs(_.unitClass.isHatchlike)),
     new Story                           ("Enemy Factories",     () => With.units.countEnemy(Terran.Factory)),
     new Story                           ("Enemy Barracks",      () => With.units.countEnemy(Terran.Barracks)),
     new Story                           ("Enemy Gateways",      () => With.units.countEnemy(Protoss.Gateway)),
-    new Story                           ("Enemy Hatcheries",    () => With.units.countEnemy(MatchHatchlike)),
+    new Story                           ("Enemy Hatcheries",    () => With.units.countEnemy(_.unitClass.isHatchlike)),
     new Story                           ("Safe at home",        () => MacroFacts.safeAtHome),
     new Story                           ("Safe to move out",    () => MacroFacts.safeToMoveOut),
     new Story                           ("Should attack",       () => With.blackboard.wantToAttack.get),

@@ -10,7 +10,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
 import Micro.Targeting.Target
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -62,7 +62,7 @@ object Build extends Action {
         Target.choose(unit)
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Commander.attack(unit)
-      } else if (unit.matchups.threats.exists( ! _.is(MatchWorker))) {
+      } else if (unit.matchups.threats.exists( ! _.is(IsWorker))) {
         FightOrFlee.consider(unit)
         Fight.consider(unit)
       }

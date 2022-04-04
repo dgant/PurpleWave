@@ -14,7 +14,7 @@ import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Utilities.UnitMatchers.MatchOr
+import Utilities.UnitFilters.IsAny
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT7Pool
@@ -53,7 +53,7 @@ class ZvT7Pool extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
     new Write(With.blackboard.pushKiters, true),
-    new AllInIf(new EnemiesAtLeast(1, MatchOr(Terran.Vulture, Terran.Factory), complete = true)),
+    new AllInIf(new EnemiesAtLeast(1, IsAny(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),
       new CapGasWorkersAt(0),

@@ -2,7 +2,7 @@ package Information.Fingerprinting.TerranStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.UnitMatchers.MatchTank
+import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.Terran
 import Utilities.Time.GameTime
 
@@ -20,7 +20,7 @@ class FingerprintBio extends Fingerprint {
     }
 
     val enemyMech = (
-        2 * With.units.countEnemy(MatchTank)
+        2 * With.units.countEnemy(IsTank)
       + 3 * With.units.countEnemy(Terran.Battlecruiser)
       + With.units.countEnemy(Terran.Vulture)
       + With.units.countEnemy(Terran.Goliath)

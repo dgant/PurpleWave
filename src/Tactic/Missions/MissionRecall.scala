@@ -3,16 +3,16 @@ package Tactic.Missions
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountBetween
-import Utilities.UnitMatchers.{MatchAnd, MatchOr}
+import Utilities.UnitFilters.{IsAll, IsAny}
 import ProxyBwapi.Races.Protoss
 
 class MissionRecall extends Mission {
   override def shouldForm: Boolean = Protoss.Recall(With.self) && arbiterLock.inquire().exists(_.nonEmpty)
 
   val arbiterLock = new LockUnits(this)
-  arbiterLock.matcher = MatchAnd(Protoss.Arbiter, _.energy >= Protoss.Recall.energyCost || state == StateFighting)
+  arbiterLock.matcher = IsAll(Protoss.Arbiter, _.energy >= Protoss.Recall.energyCost || state == StateFighting)
   val armyLock = new LockUnits(this)
-  armyLock.matcher = MatchOr(Protoss.Zealot, Protoss.Dragoon, Protoss.HighTemplar, Protoss.Archon, Protoss.Reaver, Protoss.Carrier)
+  armyLock.matcher = IsAny(Protoss.Zealot, Protoss.Dragoon, Protoss.HighTemplar, Protoss.Archon, Protoss.Reaver, Protoss.Carrier)
   armyLock.counter = CountBetween(10, 20)
 
   override protected def recruit(): Unit = {

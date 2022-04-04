@@ -3,7 +3,7 @@ package Planning
 import Lifecycle.With
 import Performance.Tasks.TimedTask
 import Planning.Plans.GamePlans.MacroActions
-import Utilities.UnitMatchers.MatchWorker
+import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Minutes
 
@@ -18,8 +18,8 @@ class Yolo extends TimedTask with MacroActions {
 
   override protected def onRun(budgetMs: Long): Unit = {
     // Trigger desparation
-    val weCanNeverMineAgain = ! With.units.existsOurs(MatchWorker) || With.geography.ourBases.forall(_.mineralsLeft == 0)
-    val enemyIsMining = With.units.existsEnemy(MatchWorker) && With.geography.enemyBases.exists(_.mineralsLeft >= 400)
+    val weCanNeverMineAgain = ! With.units.existsOurs(IsWorker) || With.geography.ourBases.forall(_.mineralsLeft == 0)
+    val enemyIsMining = With.units.existsEnemy(IsWorker) && With.geography.enemyBases.exists(_.mineralsLeft >= 400)
     desperationTriggered = weCanNeverMineAgain && enemyIsMining
 
     // Trigger mineout

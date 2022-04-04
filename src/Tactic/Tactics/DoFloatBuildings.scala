@@ -4,7 +4,6 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitMatchers.{MatchAnd, MatchMobileFlying, MatchNot, MatchOr}
 
 class DoFloatBuildings extends Tactic {
 
@@ -12,9 +11,7 @@ class DoFloatBuildings extends Tactic {
   floaties.counter = CountEverything
 
   def launch() {
-    floaties.matcher = MatchAnd(
-      MatchNot(MatchMobileFlying),
-      MatchOr(With.blackboard.floatableBuildings(): _*))
+    floaties.matcher = u => ! u.flying && With.blackboard.floatableBuildings().exists(_(u))
     floaties.acquire()
     floaties.units.foreach(_.intend(this, new Intention { shouldLiftoff = true }))
   }

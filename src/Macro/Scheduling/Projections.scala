@@ -3,7 +3,7 @@ package Macro.Scheduling
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitFilters.{IsAll, IsComplete}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -46,7 +46,7 @@ class Projections {
     unitsInCycle: Array[UnitClass] = null): Int = {
 
     // Do we have it already?
-    if (With.units.existsOurs(MatchAnd(unitClass, MatchComplete))) return 0
+    if (With.units.existsOurs(IsAll(unitClass, IsComplete))) return 0
 
     // Are we building what we need already?
     val soonestUnit = Maff.minBy(With.units.ours.view.filter(_.isPrerequisite(unitClass)))(_.remainingCompletionFrames)

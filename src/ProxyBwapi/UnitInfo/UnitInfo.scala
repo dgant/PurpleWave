@@ -15,7 +15,7 @@ import Micro.Matchups.MatchupAnalysis
 import Micro.Targeting.Target
 import Performance.{Cache, KeyedCache}
 import Planning.Prioritized
-import Utilities.UnitMatchers.{MatchHatchlike, UnitMatcher}
+import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -32,15 +32,15 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final override val hashCode: Int = id + With.frame * 10000
   @inline final override def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass${if (selected) "*" else ""} ${if (complete) "" else Frames(With.frame + remainingCompletionFrames)} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $pixel"
 
-  @inline final def is(unitMatcher: UnitMatcher): Boolean = unitMatcher.apply(this)
-  @inline final def isPrerequisite(unitMatcher: UnitMatcher): Boolean = (
+  @inline final def is(unitMatcher: UnitFilter): Boolean = unitMatcher.apply(this)
+  @inline final def isPrerequisite(unitMatcher: UnitFilter): Boolean = (
     unitMatcher(this)
       || unitMatcher == Zerg.Hatchery && isAny(Zerg.Lair, Zerg.Hive)
       || unitMatcher == Zerg.Lair && is(Zerg.Hatchery)
       || unitMatcher == Zerg.Spire && is(Zerg.GreaterSpire))
-  @inline final def isNone(unitMatchers: UnitMatcher*): Boolean = ! unitMatchers.exists(_(this))
-  @inline final def isAny(unitMatchers: UnitMatcher*): Boolean = unitMatchers.exists(_(this))
-  @inline final def isAll(unitMatchers: UnitMatcher*): Boolean = unitMatchers.forall(_(this))
+  @inline final def isNone(unitMatchers: UnitFilter*): Boolean = ! unitMatchers.exists(_(this))
+  @inline final def isAny(unitMatchers: UnitFilter*): Boolean = unitMatchers.exists(_(this))
+  @inline final def isAll(unitMatchers: UnitFilter*): Boolean = unitMatchers.forall(_(this))
 
   val frameDiscovered             : Int = With.frame
   val initialHitPoints            : Int = bwapiUnit.getHitPoints
@@ -77,7 +77,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lastShieldPoints  = shieldPoints
     lastMatrixPoints  = matrixPoints
     lastCooldown      = cooldownLeft
-    hasEverBeenCompleteHatch ||= complete && is(MatchHatchlike)
+    hasEverBeenCompleteHatch ||= complete && is(IsHatchlike)
     previousPixels(With.frame % previousPixels.length) = pixel
   }
 
@@ -132,7 +132,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && unitClass.topSpeed > 0
     && canDoAnything
     && ! burrowed
-    && ! is(Terran.SiegeTankSieged))
+    && ! Terran.SiegeTankSieged(this))
   @inline final def velocity: Force = Force(velocityX, velocityY)
   @inline final def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
   @inline final def topSpeedPossible: Double = topSpeedPossibleCache()
@@ -154,7 +154,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tile, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixel, pixels)
 
-  @inline final def isTransport: Boolean = if (is(Zerg.Overlord)) player.hasUpgrade(Zerg.OverlordDrops) else unitClass.isTransport
+  @inline final def isTransport: Boolean = flying && (if (Zerg.Overlord(this)) player.hasUpgrade(Zerg.OverlordDrops) else unitClass.isTransport)
 
   @inline final def detectionRangePixels: Int = if (unitClass.isDetector) (if (unitClass.isBuilding) 32 * 7 else sightPixels) else 0
   @inline final def sightPixels: Int = sightRangePixelsCache()

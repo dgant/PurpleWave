@@ -15,7 +15,7 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitMatchers.MatchHatchlike
+import Utilities.UnitFilters.IsHatchlike
 import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
@@ -80,7 +80,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
         new UnitsAtLeast(1, Zerg.Lair),
         new Or(
           new EnemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool),
-          new EnemiesAtLeast(2, MatchHatchlike, complete = true))),
+          new EnemiesAtLeast(2, IsHatchlike, complete = true))),
         new Parallel(
           // Finish our initial Zergling pressure.
           // The tenth Zergling arrives as 12 Hatch's first Zerglings pop

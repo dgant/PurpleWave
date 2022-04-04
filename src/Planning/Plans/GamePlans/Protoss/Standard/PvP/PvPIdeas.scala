@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvP
 
 import Lifecycle.With
 import Planning.Predicates.MacroCounting
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Utilities.Time.Minutes
@@ -23,14 +23,14 @@ object PvPIdeas extends MacroCounting {
   def shouldAttack: Boolean = {
     // Attack subject to global safety
     var output = enemyLowUnitStrategy
-    output ||= unitsComplete(MatchWarriors) > 0 && enemiesComplete(MatchWarriors, Protoss.PhotonCannon) == 0 && (attackFirstZealot || With.frame > Minutes(4)() || unitsComplete(MatchWarriors) > 2)
+    output ||= unitsComplete(IsWarrior) > 0 && enemiesComplete(IsWarrior, Protoss.PhotonCannon) == 0 && (attackFirstZealot || With.frame > Minutes(4)() || unitsComplete(IsWarrior) > 2)
     output ||= employing(PvP1012) && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
     output ||= employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon) && bases < 2
-    output ||= employing(PvP3GateGoon) && unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(MatchWarriors) >= 6
-    output ||= employing(PvP4GateGoon) && unitsComplete(Protoss.Gateway) >= 4 && unitsComplete(MatchWarriors) >= 6
+    output ||= employing(PvP3GateGoon) && unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
+    output ||= employing(PvP4GateGoon) && unitsComplete(Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 6
     output ||= enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 1
     output ||= enemyStrategy(With.fingerprints.dtRush) && enemies(Protoss.DarkTemplar) == 0
-    output ||= unitsComplete(Protoss.Shuttle) > 0 && unitsComplete(Protoss.Reaver) > 0 && unitsComplete(MatchWarriors) >= 6
+    output ||= unitsComplete(Protoss.Shuttle) > 0 && unitsComplete(Protoss.Reaver) > 0 && unitsComplete(IsWarrior) >= 6
     output ||= upgradeComplete(Protoss.ZealotSpeed)
     output ||= enemyMiningBases > miningBases
     output ||= bases > 2

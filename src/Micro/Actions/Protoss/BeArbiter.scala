@@ -5,7 +5,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
-import Utilities.UnitMatchers.MatchBuilding
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -19,10 +18,9 @@ object BeArbiter extends Action {
       Protoss.Arbiter,
       Protoss.DarkTemplar,
       Protoss.Interceptor,
-      Protoss.Observer,
-      MatchBuilding)
+      Protoss.Observer)
 
-  val cloakRadiusPixels = 32 * 7
+  val cloakRadiusPixels: Int = 32 * 7
   override protected def perform(arbiter: FriendlyUnitInfo): Unit = {
     if (arbiter.matchups.pixelsOfEntanglement > -16) {
       Retreat.delegate(arbiter)

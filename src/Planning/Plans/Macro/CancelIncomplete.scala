@@ -3,9 +3,9 @@ package Planning.Plans.Macro
 import Lifecycle.With
 import Micro.Agency.Commander
 import Planning.Plan
-import Utilities.UnitMatchers._
+import Utilities.UnitFilters._
 
-class CancelIncomplete(matchers: UnitMatcher*) extends Plan {
+class CancelIncomplete(matchers: UnitFilter*) extends Plan {
   override def onUpdate(): Unit = {
     val incompletes = With.units.ours.view.filter(u => ! u.complete && u.isAny(matchers: _*))
 

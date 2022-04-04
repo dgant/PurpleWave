@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Utilities.UnitMatchers.{MatchProxied, MatchWarriors}
+import Utilities.UnitFilters.{IsProxied, IsWarrior}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 
@@ -19,7 +19,7 @@ class SquadAttack extends Squad {
   }
 
   protected def getVicinity: Pixel = {
-    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => MatchWarriors(u) && u.likelyStillThere && ! Terran.Vulture(u) && u.detected)
+    lazy val enemyNonTrollyThreats = With.units.enemy.count(u => IsWarrior(u) && u.likelyStillThere && ! Terran.Vulture(u) && u.detected)
     lazy val airValue = units.view.filter(_.flying).map(_.subjectiveValue).sum
     lazy val totalValue = units.view.map(_.subjectiveValue).sum
     lazy val baseScores = With.geography.enemyBases.map(b => {
@@ -38,7 +38,7 @@ class SquadAttack extends Squad {
     Maff.orElse(
       Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center)),
       // Remote proxies
-      if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(MatchProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)),
+      if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(IsProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)),
       // Highest scoring enemy base
       Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.units.view.filter(_.isEnemy).filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center)),
       // Threat option, if there's an army to pursue

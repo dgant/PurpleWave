@@ -1,6 +1,6 @@
 package ProxyBwapi.Races
 
-import Utilities.UnitMatchers.MatchOr
+import Utilities.UnitFilters.IsAny
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.Upgrades.Upgrades
@@ -43,9 +43,9 @@ object Zerg {
   lazy val NydusCanal             = UnitClasses.get(UnitType.Zerg_Nydus_Canal)
   lazy val InfestedCommandCenter  = UnitClasses.get(UnitType.Zerg_Infested_Command_Center)
   lazy val SpelLDarkSwarm         = UnitClasses.get(UnitType.Spell_Dark_Swarm)
-  lazy val SpireOrGreaterSpire    = MatchOr(Spire, GreaterSpire)
-  lazy val HatcheryLairOrHive     = MatchOr(Hatchery, Lair, Hive)
-  lazy val LairOrHive             = MatchOr(Lair, Hive)
+  lazy val SpireOrGreaterSpire    = IsAny(Spire, GreaterSpire)
+  lazy val HatcheryLairOrHive     = IsAny(Hatchery, Lair, Hive)
+  lazy val LairOrHive             = IsAny(Lair, Hive)
   lazy val ZerglingAttackSpeed    = Upgrades.get(UpgradeType.Adrenal_Glands)
   lazy val UltraliskSpeed         = Upgrades.get(UpgradeType.Anabolic_Synthesis)
   lazy val OverlordVisionRange    = Upgrades.get(UpgradeType.Antennae)

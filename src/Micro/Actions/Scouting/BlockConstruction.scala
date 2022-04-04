@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 
 object BlockConstruction extends Action {
@@ -12,7 +12,7 @@ object BlockConstruction extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     blockableBuilders(unit).nonEmpty
       && ! unit.flying
-      && ! unit.matchups.threats.exists(MatchWarriors)
+      && ! unit.matchups.threats.exists(IsWarrior)
       && With.geography.enemyBases.nonEmpty
       && (unit.hitPoints > 10 || ! unit.base.exists(_.owner.isEnemy))
   )

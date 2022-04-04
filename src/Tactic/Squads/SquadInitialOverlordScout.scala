@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Micro.Agency.Intention
 import Performance.Cache
-import Utilities.UnitMatchers.{MatchAnd, MatchComplete}
+import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
@@ -48,13 +48,13 @@ class SquadInitialOverlordScout extends Squad {
     if ( ! With.self.isZerg) return
 
     endScouting ||= With.units.existsEnemy(Terran.Marine, Terran.Goliath, Terran.Wraith)
-    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Terran.Barracks))
-    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Terran.Starport))
+    endScouting ||= With.units.existsEnemy(IsAll(IsComplete, Terran.Barracks))
+    endScouting ||= With.units.existsEnemy(IsAll(IsComplete, Terran.Starport))
     endScouting ||= With.units.existsEnemy(Protoss.Dragoon, Protoss.Corsair)
-    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Protoss.Stargate))
-    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Protoss.CyberneticsCore))
+    endScouting ||= With.units.existsEnemy(IsAll(IsComplete, Protoss.Stargate))
+    endScouting ||= With.units.existsEnemy(IsAll(IsComplete, Protoss.CyberneticsCore))
     endScouting ||= With.units.existsEnemy(Zerg.Mutalisk, Zerg.Hydralisk, Zerg.Scourge)
-    endScouting ||= With.units.existsEnemy(MatchAnd(MatchComplete, Zerg.HydraliskDen))
+    endScouting ||= With.units.existsEnemy(IsAll(IsComplete, Zerg.HydraliskDen))
     endScouting ||= With.units.existsEnemy(Zerg.Spire)
     if (endScouting) {
       lock.release()

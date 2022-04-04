@@ -4,7 +4,7 @@ import Lifecycle.With
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountExactly
-import Utilities.UnitMatchers.MatchAnd
+import Utilities.UnitFilters.IsAll
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
@@ -16,7 +16,7 @@ class MissionSpeedlotDrop extends MissionDrop {
     && MacroFacts.upgradeComplete(Protoss.ZealotSpeed, 1, Seconds(15)())
     && With.recruiter.available.count(MatchDroppableSpeedlot) >= 4)
 
-  object MatchDroppableSpeedlot extends MatchAnd(Protoss.Zealot, recruitablePassenger)
+  object MatchDroppableSpeedlot extends IsAll(Protoss.Zealot, recruitablePassenger)
   val zealotLock = new LockUnits(this)
   zealotLock.matcher = MatchDroppableSpeedlot
   zealotLock.counter = CountExactly(4)

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitMatchers.{MatchMobileDetector, MatchOr}
+import Utilities.UnitFilters.{IsMobileDetector, IsAny}
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
@@ -14,11 +14,11 @@ import scala.util.Random
 class SquadClearExpansionBlockers extends Squad {
   
   val detectorLock = new LockUnits(this)
-  detectorLock.matcher = MatchMobileDetector
+  detectorLock.matcher = IsMobileDetector
   detectorLock.counter = CountOne
 
   val sweeperLock = new LockUnits(this)
-  sweeperLock.matcher = MatchOr(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
+  sweeperLock.matcher = IsAny(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
   sweeperLock.counter = CountOne
 
   def launch(): Unit = {

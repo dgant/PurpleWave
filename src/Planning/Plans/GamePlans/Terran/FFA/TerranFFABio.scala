@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Terran.FFA
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Predicates.Compound.Check
-import Utilities.UnitMatchers.{MatchTank, MatchWarriors}
+import Utilities.UnitFilters.{IsTank, IsWarrior}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
@@ -34,7 +34,7 @@ class TerranFFABio extends GameplanTemplate {
       Get(1, Terran.ScienceFacility)))
   
   override def attackPlan: Plan = new If(
-    new UnitsAtLeast(20, MatchWarriors),
+    new UnitsAtLeast(20, IsWarrior),
     super.attackPlan)
   
   override lazy val buildOrder = Vector(
@@ -66,11 +66,11 @@ class TerranFFABio extends GameplanTemplate {
   )
   
   override def buildPlans: Seq[Plan] = Vector(
-    new If(new UnitsAtLeast(1,  MatchTank),    new Build(Get(Terran.SiegeMode))),
-    new If(new UnitsAtLeast(12, MatchWarriors),     new RequireMiningBasesFFA(2)),
-    new If(new UnitsAtLeast(60, MatchWarriors),     new RequireMiningBasesFFA(3)),
-    new If(new UnitsAtLeast(90, MatchWarriors),     new RequireMiningBasesFFA(4)),
-    new If(new UnitsAtLeast(50, MatchWarriors),     new Pump(Terran.Dropship, 2)),
+    new If(new UnitsAtLeast(1,  IsTank),    new Build(Get(Terran.SiegeMode))),
+    new If(new UnitsAtLeast(12, IsWarrior),     new RequireMiningBasesFFA(2)),
+    new If(new UnitsAtLeast(60, IsWarrior),     new RequireMiningBasesFFA(3)),
+    new If(new UnitsAtLeast(90, IsWarrior),     new RequireMiningBasesFFA(4)),
+    new If(new UnitsAtLeast(50, IsWarrior),     new Pump(Terran.Dropship, 2)),
     new Pump(Terran.CovertOps, 1),
     new Pump(Terran.Comsat, 2),
     new Pump(Terran.MachineShop),
@@ -78,7 +78,7 @@ class TerranFFABio extends GameplanTemplate {
     new If(new UnitsAtLeast(1, Terran.NuclearMissile),  new Build(Get(Terran.GhostVisionRange))),
     new If(new UnitsAtLeast(3, Terran.Ghost),           new Build(Get(Terran.Lockdown))),
     new If(new UnitsAtLeast(8, Terran.Ghost),           new Build(Get(Terran.GhostEnergy))),
-    new If(new UnitsAtLeast(3, MatchTank),     new UpgradeMech),
+    new If(new UnitsAtLeast(3, IsTank),     new UpgradeMech),
     new Pump(Terran.NuclearMissile),
     new Pump(Terran.NuclearSilo),
     new Pump(Terran.ScienceVessel, 2),

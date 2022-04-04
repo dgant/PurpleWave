@@ -3,12 +3,12 @@ package Planning.Plans.Macro
 import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitMatchers.{MatchOr, UnitMatcher}
+import Utilities.UnitFilters.{IsAny, UnitFilter}
 
-class CancelOrders(matchers: UnitMatcher*) extends Plan {
+class CancelOrders(matchers: UnitFilter*) extends Plan {
 
   val lock = new LockUnits(this)
-  lock.matcher = MatchOr(matchers: _*)
+  lock.matcher = IsAny(matchers: _*)
 
   override def onUpdate(): Unit = {
     lock.acquire()

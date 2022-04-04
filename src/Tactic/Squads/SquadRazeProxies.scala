@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
-import Utilities.UnitMatchers.MatchWarriors
+import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
@@ -16,7 +16,7 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
   override def run() {
     units.foreach(unit => {
       val assignee = assignments.get(unit)
-      val attackTarget = if (With.units.existsEnemy(MatchWarriors)) None else assignee
+      val attackTarget = if (With.units.existsEnemy(IsWarrior)) None else assignee
       unit.intend(this, new Intention {
         toTravel  = Some(assignee.map(_.pixel).getOrElse(centroidUnit))
         toAttack  = attackTarget

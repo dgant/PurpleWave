@@ -2,14 +2,14 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Utilities.UnitMatchers.{MatchHatchlike, UnitMatcher}
+import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.FrameCount
 
 class FingerprintCompleteBy(
-   unitMatcher : UnitMatcher,
-   gameTime    : FrameCount,
-   quantity    : Int = 1) extends Fingerprint {
+                             unitMatcher : UnitFilter,
+                             gameTime    : FrameCount,
+                             quantity    : Int = 1) extends Fingerprint {
 
   private val endFrame = gameTime()
   override def investigate: Boolean = {
@@ -27,7 +27,7 @@ class FingerprintCompleteBy(
 
   private def observed: Int = {
     var output = With.units.countEverEnemyP(u => unitMatcher(u) && u.completionFrame <= endFrame)
-    if (unitMatcher == MatchHatchlike) {
+    if (unitMatcher == IsHatchlike) {
       output += With.geography.enemyBases.count(_.townHall.exists(u => u.isEnemy && u.isAny(Zerg.Lair, Zerg.Hive)))
     }
     output

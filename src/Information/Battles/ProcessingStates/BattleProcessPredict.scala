@@ -9,16 +9,13 @@ class BattleProcessPredict extends BattleProcessState {
   var battles: Seq[Battle] = _
 
   override def step(): Unit = {
-    val battles = With.battles.nextBattlesLocal
-
-    val unpredicted = battles.find( ! _.predictionComplete)
+    val unpredicted = With.battles.nextBattles.find( ! _.predictionComplete)
     if (unpredicted.isDefined) {
-      unpredicted.get.skimulated = With.configuration.skimulate
       if (unpredicted.get.skimulated) {
         Skimulator.predict(unpredicted.get)
         unpredicted.get.predictionComplete = true
       } else {
-        if (With.simulation.prediction != unpredicted.get) {
+        if (With.simulation.battle != unpredicted.get) {
           With.simulation.reset(unpredicted.get)
         }
         With.simulation.step()

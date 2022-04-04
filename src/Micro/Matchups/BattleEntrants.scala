@@ -1,7 +1,7 @@
 package Micro.Matchups
 
-import Information.Battles.BattleClassificationFilters
-import Information.Battles.Types.BattleLocal
+import Information.Battles.BattleFilters
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 class BattleEntrants extends TimedTask {
 
-  val entrants = new mutable.HashMap[BattleLocal, mutable.ArrayBuffer[UnitInfo]]
+  val entrants = new mutable.HashMap[Battle, mutable.ArrayBuffer[UnitInfo]]
   
   override protected def onRun(budgetMs: Long): Unit = {
     assignEntrants()
@@ -26,7 +26,7 @@ class BattleEntrants extends TimedTask {
       if (entrant.alive
         && entrant.battle.isEmpty
         && With.framesSince(entrant.frameDiscovered) < 72
-        && BattleClassificationFilters.isEligibleLocal(entrant)) {
+        && BattleFilters.local(entrant)) {
           val battle = Maff.minBy(With.units.all.view.filter(_.battle.isDefined))(_.pixelDistanceSquared(entrant)).flatMap(_.battle)
           if (battle.isDefined) {
             if ( ! entrants.contains(battle.get)) {

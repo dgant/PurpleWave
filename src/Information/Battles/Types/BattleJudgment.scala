@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
-class BattleJudgment(battle: BattleLocal) {
+class BattleJudgment(battle: Battle) {
   val scoreTotal          : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthTotal,   battle.enemy.skimStrengthTotal)     else calculateSimulationScore
   val scoreAir            : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthAir,     battle.enemy.skimStrengthVsAir)     else scoreTotal
   val scoreGround         : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthGround,  battle.enemy.skimStrengthVsGround)  else scoreTotal

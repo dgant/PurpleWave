@@ -17,25 +17,29 @@ abstract class PlayerProxy(base: Player) {
   lazy val name           : String    = base.getName
   lazy val raceInitial    : Race      = base.getRace
   lazy val isUs           : Boolean   = this == With.self
-  lazy val isNeutral      : Boolean   = base.isNeutral
-  lazy val isAlly         : Boolean   = base.isAlly(With.game.self) && ! isUs
-  lazy val isEnemy        : Boolean   = base.isEnemy(With.game.self)
   lazy val startTile      : Tile      = new Tile(base.getStartLocation)
-  lazy val townHallClass  : UnitClass = UnitClasses.get(raceInitial.getCenter)
+  lazy val townHallClass  : UnitClass = UnitClasses.get(raceInitial.getResourceDepot)
   lazy val gasClass       : UnitClass = UnitClasses.get(raceInitial.getRefinery)
   lazy val supplyClass    : UnitClass = UnitClasses.get(raceInitial.getSupplyProvider)
   lazy val transportClass : UnitClass = UnitClasses.get(raceInitial.getTransport)
   lazy val workerClass    : UnitClass = UnitClasses.get(raceInitial.getWorker)
-  
-  def gas               : Int = gasCache()
-  def minerals          : Int = mineralsCache()
-  def gatheredGas       : Int = gatheredGasCache()
-  def gatheredMinerals  : Int = gatheredMineralsCache()
-  def supplyUsed        : Int = supplyUsedCache()
-  def supplyTotal       : Int = supplyTotalCache()
+
+  def isNeutral   : Boolean   = base.isNeutral
+  def isAlly      : Boolean   = base.isAlly(With.game.self) && ! isUs
+  def isEnemy     : Boolean   = base.isEnemy(With.game.self)
+  def isDefeated  : Boolean   = base.isDefeated || base.leftGame
+
+  def gas               : Int = base.gas
+  def minerals          : Int = base.minerals
+  def gatheredGas       : Int = base.gatheredGas
+  def gatheredMinerals  : Int = base.gatheredMinerals
+  def supplyUsed400     : Int = supplyUsedCache()
+  def supplyTotal400    : Int = supplyTotalCache()
   
   def rawUnits: Vector[Unit] = unitsCache()
-  
+  private val unitsCache = new Cache(() => base.getUnits.asScala.toVector)
+
+  private val upgradeLevelCaches = new mutable.HashMap[Upgrade, Cache[Int]]
   private lazy val maxUpgradeLevels = new mutable.HashMap[Upgrade, Int] ++ Upgrades.all.map(upgrade => (upgrade, 0))
   def getUpgradeLevel(upgrade: Upgrade): Int = {
     if ( ! upgradeLevelCaches.contains(upgrade)) {
@@ -52,22 +56,15 @@ abstract class PlayerProxy(base: Player) {
     maxUpgradeLevels(upgrade) = currentLevel
     currentLevel
   }
-  
+
+  private val techsResearchedCaches = new mutable.HashMap[Tech, Cache[Boolean]]
   def hasTech(tech: Tech):Boolean = {
-    //Further optimization: Stop expiring when researched
+    // Further optimization: Stop expiring when researched
     if ( ! techsResearchedCaches.contains(tech)) {
       techsResearchedCaches.put(tech, new Cache(() => base.hasResearched(tech.bwapiTech)))
     }
     techsResearchedCaches(tech)()
   }
-  
-  private val gasCache                = new Cache(() => base.gas)
-  private val mineralsCache           = new Cache(() => base.minerals)
-  private val gatheredGasCache        = new Cache(() => base.gatheredGas)
-  private val gatheredMineralsCache   = new Cache(() => base.gatheredMinerals)
-  private val unitsCache              = new Cache(() => base.getUnits.asScala.toVector)
-  private val upgradeLevelCaches      = new mutable.HashMap[Upgrade, Cache[Int]]
-  private val techsResearchedCaches   = new mutable.HashMap[Tech, Cache[Boolean]]
 
   private val supplyUsedCache = new Cache(() => if (!isUs) 0 else
     With.units.ours
@@ -84,6 +81,4 @@ abstract class PlayerProxy(base: Player) {
         .withFilter(u => u.complete && u.unitClass.race == raceInitial)
         .map(_.unitClass.supplyProvided)
         .sum))
-
-  override val hashCode: Int = id
 }

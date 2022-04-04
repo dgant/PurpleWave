@@ -21,15 +21,13 @@ class Blackboard {
   var aggressionRatio       : Property[Double]            = add(new Property(1.0))
   var wantToAttack          : Property[Boolean]           = add(new Property(false))
   var wantToHarass          : Property[Boolean]           = add(new Property(false))
-  var safeToMoveOut         : Property[Boolean]           = add(new Property(false))
   var maximumScouts         : Property[Int]               = add(new Property(0))
   var gasWorkerFloor        : Property[Int]               = add(new Property(0))      // Require at least this many gas workers
   var gasWorkerCeiling      : Property[Int]               = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)
   var gasLimitFloor         : Property[Int]               = add(new Property(0))      // Max gas mining until at least this much gas
   var gasLimitCeiling       : Property[Int]               = add(new Property(100000)) // Stop gas mining after this much gas
   var gasWorkerRatio        : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
-  var allIn                 : Property[Boolean]           = add(new Property(false))
-  var yoloing               : Property[Boolean]           = add(new Property(true))
+  var yoloing               : Property[Boolean]           = add(new Property(false))
   var allowIslandBases      : Property[Boolean]           = add(new Property(false))
   var makeDarkArchons       : Property[Boolean]           = add(new Property(false))
   var pushKiters            : Property[Boolean]           = add(new Property(false))

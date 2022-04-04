@@ -1,6 +1,7 @@
 package Information.Battles.Prediction.Simulation
 
-import Information.Battles.Prediction.{PredictionLocal, SimulationCheckpoint}
+import Information.Battles.Prediction.SimulationCheckpoint
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -9,17 +10,18 @@ import scala.collection.mutable.ArrayBuffer
 
 final class Simulation {
   val resolution: Int = With.configuration.simulationResolution
-  var prediction: PredictionLocal = _
+  var battle: Battle = _
   val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
   val realUnitsOurs: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val grid: SimulationGrid = new SimulationGrid
-  def reset(newPrediction: PredictionLocal): Unit = {
-    prediction = newPrediction
+
+  def reset(newBattle: Battle): Unit = {
+    battle = newBattle
     realUnits.clear()
     realUnitsOurs.clear()
     realUnitsEnemy.clear()
-    realUnits ++= prediction.battle.units.filter(simulatable).sortBy(_.pixelDistanceSquared(prediction.battle.focus))
+    realUnits ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
     realUnitsOurs ++= realUnits.view.filter(_.isOurs)
     realUnitsEnemy ++= realUnits.view.filter(_.isEnemy)
     simulacra.foreach(_.reset(this))
@@ -28,14 +30,14 @@ final class Simulation {
   @inline def step(): Unit = {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
-    prediction.simulationFrames += 1
-    prediction.predictionComplete ||= prediction.simulationFrames >= With.configuration.simulationFrames
-    prediction.predictionComplete ||= ! simulacraOurs.exists(_.alive)
-    prediction.predictionComplete ||= ! simulacraEnemy.exists(_.alive)
-    prediction.predictionComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
-    if (prediction.predictionComplete) {
+   battle.simulationFrames += 1
+   battle.predictionComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
+   battle.predictionComplete ||= ! simulacraOurs.exists(_.alive)
+   battle.predictionComplete ||= ! simulacraEnemy.exists(_.alive)
+   battle.predictionComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    if (battle.predictionComplete) {
       cleanup()
-    } else if (prediction.simulationFrames - prediction.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
+    } else if (battle.simulationFrames - battle.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
       checkpoint()
     }
   }
@@ -46,15 +48,16 @@ final class Simulation {
     && ! unit.isAny(Protoss.Interceptor, Protoss.Scarab))
 
   private def cleanup(): Unit = {
-    prediction.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
-    if (prediction.logSimulation) {
-      prediction.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, prediction)))
-      prediction.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
+   battle.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
+    if (battle.logSimulation) {
+     battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
+     battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
     }
     checkpoint()
   }
+
   private def checkpoint(): Unit = {
-    prediction.simulationCheckpoints += new SimulationCheckpoint(this, prediction.simulationCheckpoints.lastOption)
+   battle.simulationCheckpoints += new SimulationCheckpoint(this, battle.simulationCheckpoints.lastOption)
   }
 
   def simulacra       : Seq[Simulacrum] = realUnits.view.map(_.simulacrum)

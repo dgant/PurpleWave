@@ -1,6 +1,6 @@
 package Micro.Matchups
 
-import Information.Battles.BattleClassificationFilters
+import Information.Battles.BattleFilters
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.{Cache, KeyedCache}
@@ -11,7 +11,7 @@ import Tactic.Squads.{GenericUnitGroup, UnitGroup}
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
-  private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleClassificationFilters.isEligibleLocal(u)) else Seq.empty.view
+  private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleFilters.local(u)) else Seq.empty.view
 
   def groupUs: UnitGroup = _groupUs()
   def groupEnemy: UnitGroup = _groupEnemy()

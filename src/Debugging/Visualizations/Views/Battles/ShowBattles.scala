@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.View
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -24,7 +24,7 @@ object ShowBattles extends View {
     localBattle.foreach(renderBattleMap)
   }
 
-  def localBattle: Option[BattleLocal] = {
+  def localBattle: Option[Battle] = {
     val battlesSelected = With.units.ours.filter(_.selected).flatMap(_.battle)
     val battlesToShow = if (battlesSelected.isEmpty) With.battles.local else battlesSelected
     Maff.minBy(battlesToShow)(_.focus.pixelDistanceSquared(With.viewport.center))
@@ -36,7 +36,7 @@ object ShowBattles extends View {
     units.groupBy(_.unitClass).toVector.sortBy( - _._2.size).map(p => f"${p._2.size} ${p._1.toString.take(4)}").mkString(", ")
   }
 
-  def renderSkimulationScreen(battle: BattleLocal): Unit = {
+  def renderSkimulationScreen(battle: Battle): Unit = {
     val x = 5
     val us = battle.us
     val enemy = battle.enemy
@@ -51,7 +51,7 @@ object ShowBattles extends View {
     ))
   }
 
-  def renderBattleScreen(battle: BattleLocal) {
+  def renderBattleScreen(battle: Battle) {
     if (With.configuration.skimulate) {
       renderSkimulationScreen(battle)
       return
@@ -87,11 +87,11 @@ object ShowBattles extends View {
       height = graphWidth)
   }
 
-  def renderSkimulationMap(battle: BattleLocal): Unit = {
+  def renderSkimulationMap(battle: Battle): Unit = {
     battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrength), u.pixel, u.player.colorDark))
   }
 
-  def renderBattleMap(battle: BattleLocal) {
+  def renderBattleMap(battle: Battle) {
     if (With.configuration.skimulate) {
       renderSkimulationMap(battle)
       return

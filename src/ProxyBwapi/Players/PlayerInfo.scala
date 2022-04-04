@@ -25,7 +25,8 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   def isUnknownOrTerran   : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Terran
   def isUnknownOrProtoss  : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Protoss
   def isUnknownOrZerg     : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Zerg
-  lazy val isFriendly : Boolean = isUs || isAlly
+
+  def isFriendly : Boolean = isUs || isAlly
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
 
@@ -33,13 +34,13 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
     super.hasTech(tech) || With.scouting.techsOwned.get(this).exists(_.contains(tech))
   }
 
-  lazy val colorMidnight: bwapi.Color   =
+  lazy val colorMidnight: bwapi.Color =
     if      (isUs)      Colors.MidnightViolet
     else if (isNeutral) Colors.MidnightTeal
     else if (isAlly)    Colors.MidnightBlue
     else                Colors.MidnightRed
   
-  lazy val colorDeep: bwapi.Color  =
+  lazy val colorDeep: bwapi.Color =
     if      (isUs)      Colors.DeepViolet
     else if (isNeutral) Colors.DeepTeal
     else if (isAlly)    Colors.DeepBlue
@@ -57,13 +58,13 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
     else if (isAlly)    Colors.MediumBlue
     else                Colors.MediumRed
   
-  lazy val colorBright: bwapi.Color   =
+  lazy val colorBright: bwapi.Color =
     if      (isUs)      Colors.BrightViolet
     else if (isNeutral) Colors.BrightTeal
     else if (isAlly)    Colors.BrightBlue
     else                Colors.BrightRed
   
-  lazy val colorNeon: bwapi.Color   =
+  lazy val colorNeon: bwapi.Color =
     if      (isUs)      Colors.NeonViolet
     else if (isNeutral) Colors.NeonTeal
     else if (isAlly)    Colors.NeonBlue

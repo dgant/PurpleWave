@@ -52,7 +52,7 @@ class RequireSufficientSupply extends Plan {
     val depotCompletionFrames     = supplyProvider.buildFrames + (if (supplyProvider.isBuilding) 24 * 4 else 0) //Add a few seconds to account for builder transit time (and finishing time)
     val supplyPerProvider         = supplyProvider.supplyProvided
     val currentSupplyOfTownHalls  = With.units.ours.view.filter(unit => unit.remainingCompletionFrames < depotCompletionFrames && ! unit.is(supplyProvider)).map(_.unitClass.supplyProvided).sum
-    val currentSupplyUsed         = With.self.supplyUsed
+    val currentSupplyUsed         = With.self.supplyUsed400
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2.0 // Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
     val incomePerFrame            = With.accounting.ourIncomePerFrameMinerals + With.accounting.ourIncomePerFrameGas

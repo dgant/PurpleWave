@@ -5,6 +5,8 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
+import Planning.Predicates.MacroFacts
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.UnitGroup
 
@@ -15,6 +17,8 @@ class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with 
   lazy val us         : Boolean       = this == battle.us
   lazy val enemy      : Boolean       = this == battle.enemy
   lazy val opponent   : Team          = if (us) battle.enemy else battle.us
+
+  val hasDetection: Boolean = detectors.nonEmpty || (enemy && MacroFacts.enemyHasShown(Terran.SpiderMine, Terran.Comsat, Terran.SpellScannerSweep))
 
   val vanguardAll = new Cache(() =>
     Maff.minBy(

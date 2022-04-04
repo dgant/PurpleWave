@@ -3,9 +3,9 @@ package Information.Battles.Prediction.Skimulation
 import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
-import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.LightYear
+import Utilities.UnitMatchers._
 
 object Skimulator {
 
@@ -15,7 +15,7 @@ object Skimulator {
 
     // Calculate unit distance
     battle.teams.foreach(team => team.units.foreach(unit => {
-      unit.skimDistanceToEngage = Math.max(0d,
+      unit.skimDistanceToEngage = if (battle.isGlobal) 32 * 13 else Math.max(0d,
         Maff.min(
           team.opponent.units.map(e =>
             (if (unit.isEnemy || unit.inRangeToAttack(e)) unit.pixelDistanceEdge(e) else Math.max(0, unit.pixelDistanceTravelling(e.pixel) - unit.pixelRangeAgainst(e)))
@@ -60,7 +60,7 @@ object Skimulator {
         unit.skimStrength *= unit.damageOnHitGround / unit.unitClass.effectiveGroundDamage
 
       // Consider high ground advantage
-      if (unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
+      if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
         if (unit.presumptiveTarget.exists(_.altitude > unit.altitude)) {
           unit.skimStrength *= 0.5
         } else if (unit.presumptiveTarget.exists(t => t.altitude < unit.pixelToFireAt(t).altitude)) {
@@ -69,13 +69,11 @@ object Skimulator {
       }
 
       // Consider detection
-      if ( ! team.opponent.detectors.exists(d => d.canMove || d.isEnemy)) {
+      if ( ! team.opponent.hasDetection) {
         if (Terran.Wraith(unit) && Terran.WraithCloak(player)) unit.skimStrength *= 5
         if (Protoss.DarkTemplar(unit)) unit.skimStrength *= 15
         if (Zerg.Lurker(unit)) unit.skimStrength *= 5
       }
-
-      lazy val enemySize = team.opponent.attackersCastersCount
 
       // Count other unit properties
       if (unit.canStim)                                                   unit.skimStrength *= 1.2

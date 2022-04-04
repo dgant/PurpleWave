@@ -1,7 +1,7 @@
 package Information.Battles
 
 import Information.Battles.ProcessingStates.{BattleProcessInitial, BattleProcessState}
-import Information.Battles.Types.{BattleGlobal, BattleLocal, Division}
+import Information.Battles.Types.{Battle, Division}
 import Lifecycle.With
 import Performance.TaskQueue.TaskQueueGlobalWeights
 import Performance.Tasks.{StateTasks, TimedTask}
@@ -16,19 +16,22 @@ class Battles extends TimedTask {
   withSkipsMax(3)
   withWeight(TaskQueueGlobalWeights.Battles)
 
-  var global    : BattleGlobal                = new BattleGlobal(Vector.empty, Vector.empty)
-  var byUnit    : Map[UnitInfo, BattleLocal]  = Map.empty
-  var local     : Vector[BattleLocal]         = Vector.empty
-  var divisions : Vector[Division]            = Vector.empty
+  var globalHome  : Battle                = new Battle(isGlobal = true)
+  var globalAway  : Battle                = new Battle(isGlobal = true)
+  var byUnit      : Map[UnitInfo, Battle] = Map.empty
+  var local       : Vector[Battle]        = Vector.empty
+  var divisions   : Vector[Division]      = Vector.empty
+
+  var nextBattleGlobalHome  : Battle            = new Battle(isGlobal = true)
+  var nextBattleGlobalAway  : Battle            = new Battle(isGlobal = true)
+  var nextBattlesLocal      : Vector[Battle]    = Vector.empty
+  var nextDivisions         : Vector[Division]  = Vector.empty
+  def nextBattles: Seq[Battle] = nextBattlesLocal.view :+ nextBattleGlobalHome :+ nextBattleGlobalAway
+
+  val clustering = new BattleClustering
 
   var lastEstimationCompletion = 0
   val estimationRuntimes = new mutable.Queue[Int]
-
-  var nextBattleGlobal  : Option[BattleGlobal]  = None
-  var nextBattlesLocal  : Vector[BattleLocal]   = Vector.empty
-  var nextDivisions     : Vector[Division]      = Vector.empty
-
-  val clustering = new BattleClustering
 
   private var _processingState: BattleProcessState = new BattleProcessInitial
   def setProcessingState(newState: BattleProcessState): Unit = {

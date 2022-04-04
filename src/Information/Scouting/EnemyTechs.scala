@@ -23,7 +23,7 @@ trait EnemyTechs {
       def addIf(tech: Tech, boolean: Boolean, checkOurs: Boolean = false): Unit = {
         if (checkOurs && With.self.hasTech(tech)) {
           return
-        } else  if (boolean && tech.race == enemy.raceCurrent) {
+        } else if (boolean && tech.race == enemy.raceCurrent) {
           techsOwned(enemy) += tech
         }
       }

@@ -34,7 +34,7 @@ class Bank {
   private def recountResources() {
     mineralsLeft  = With.self.minerals  + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameMinerals).toInt
     gasLeft       = With.self.gas       + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameGas).toInt
-    supplyLeft    = With.self.supplyTotal - With.self.supplyUsed
+    supplyLeft    = With.self.supplyTotal400 - With.self.supplyUsed400
     requests.foreach(queueBuyer)
   }
   

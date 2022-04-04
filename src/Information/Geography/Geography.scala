@@ -127,7 +127,7 @@ class Geography extends TimedTask {
         With.strategy.isInverted
         && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
         && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(MatchTank)))
-        && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.global.globalSafeToAttack))
+        && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.globalHome.judgement.exists(_.shouldFight)))
     ++ With.units.ours
       .view
       .filter(_.intent.toBuild.exists(_.isTownHall))

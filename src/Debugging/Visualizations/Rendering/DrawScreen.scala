@@ -1,8 +1,6 @@
 package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
-import Information.Battles.Prediction.PredictionLocal
-import Information.Battles.Types.BattleLocal
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -97,30 +95,5 @@ object DrawScreen {
         i += 1
       }
     })
-  }
-
-  private def drawBattleMap(battle: BattleLocal, estimation: PredictionLocal) {
-    val weWin               = battle.judgement.exists(_.shouldFight)
-    val ourColorDark        = With.self.colorMidnight
-    val enemyColorDark      = With.enemy.colorMidnight
-    val ourColorNeon        = With.self.colorNeon
-    val enemyColorNeon      = With.enemy.colorNeon
-    val neutralColor        = Colors.BrightGray
-    val winnerStrengthColor = if (weWin) ourColorDark else enemyColorDark
-
-    battle.teams.foreach(team => {
-      val isUs = team == battle.us
-      val centroid = team.centroidAir
-      val radius = Maff.max(team.units.map(u => u.unitClass.radialHypotenuse + u.pixelDistanceCenter(centroid))).getOrElse(0.0).toInt
-      val thickness = if (weWin == isUs) 2 else 5
-      (0 until thickness).foreach(t => DrawMap.circle(centroid, radius + t, if (isUs) ourColorNeon else enemyColorNeon))
-    })
-    DrawMap.circle  (battle.focus,                8,                          neutralColor)
-    DrawMap.circle  (battle.us.vanguardAll(),     8,                          ourColorDark)
-    DrawMap.circle  (battle.enemy.vanguardAll(),  8,                          enemyColorDark)
-    DrawMap.line    (battle.focus,                battle.us.vanguardAll(),    ourColorDark)
-    DrawMap.line    (battle.focus,                battle.enemy.vanguardAll(), enemyColorDark)
-    With.game.drawCircleMap(battle.focus.bwapi, (battle.us.units ++ battle.enemy.units).map(_.pixelDistanceCenter(battle.focus)).max.toInt, neutralColor)
-
   }
 }

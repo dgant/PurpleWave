@@ -146,7 +146,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {
-    if (simulation.prediction.logSimulation) {
+    if (simulation.battle.logSimulation) {
       addEvent(SimulationEventBehavior(this, behavior, newBehavior))
     }
     behavior = newBehavior
@@ -154,14 +154,14 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def setTarget(targetNew: Option[Simulacrum]): Unit = {
-    if (simulation.prediction.logSimulation && target != targetNew) {
+    if (simulation.battle.logSimulation && target != targetNew) {
       addEvent(SimulationEventSwitchTarget(this, target, targetNew))
     }
     target = targetNew
   }
 
   @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
-    if (simulation.prediction.logSimulation) {
+    if (simulation.battle.logSimulation) {
       addEvent(SimulationEventTween(this, to, frames, reason))
     }
     cooldownMoving = Maff.clamp(frames, 1, With.configuration.simulationResolution)
@@ -179,7 +179,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
-    if (simulation.prediction.logSimulation) {
+    if (simulation.battle.logSimulation) {
       addEvent(SimulationEventSleep(this, frames, reason))
     }
     cooldownLeft = Math.max(cooldownLeft, frames)
@@ -208,7 +208,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       valueDealt += valueKill
       victim.valueReceived += valueKill
     }
-    if (simulation.prediction.logSimulation) {
+    if (simulation.battle.logSimulation) {
       addEvent(SimulationEventAttack(
         this,
         victim,

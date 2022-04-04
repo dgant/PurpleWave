@@ -7,7 +7,7 @@ import Planning.{Plan, Predicate}
 class AllInIf(predicate: Predicate = new Always) extends Plan {
   
   override def onUpdate() {
-    With.blackboard.allIn.set(With.blackboard.allIn() || predicate.apply)
+    if (predicate.apply) With.blackboard.yoloing.set(true)
     With.yolo.updateBlackboard()
   }
 }

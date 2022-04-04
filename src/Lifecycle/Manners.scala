@@ -10,7 +10,7 @@ class Manners extends TimedTask {
   
   override def onRun(budgetMs: Long) {
     if (With.configuration.enableSurrenders
-      && With.self.supplyUsed == 0
+      && With.self.supplyUsed400 == 0
       && With.self.minerals < 50
       && With.units.existsEnemy(MatchWorker)
       && With.units.existsEnemy(_.unitClass.isResourceDepot)) {

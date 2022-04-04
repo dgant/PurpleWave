@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Views.View
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 
@@ -11,7 +11,7 @@ object ShowJudgment extends View {
     ShowBattles.localBattle.foreach(render)
   }
 
-  private def render(battle: BattleLocal): Unit = {
+  private def render(battle: Battle): Unit = {
     val x = 540
     val y = 40
     val mx = 2

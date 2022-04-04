@@ -1,6 +1,6 @@
 package Information.Battles
 
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -38,7 +38,7 @@ class BattleClustering {
     // Step 1: Do a super-fast approximate clustering
     // This clustering doesn't guarantee full merging of clusters but in practice comes very close
     val fastClusters = new UnorderedBuffer[UnitInfo]()
-    fastClusters.addAll(With.units.playerOwned.view.filter(BattleClassificationFilters.isEligibleLocal))
+    fastClusters.addAll(With.units.playerOwned.view.filter(BattleFilters.local))
     fastClusters.foreach(_.nextInCluster = None)
     var i = 0
     while(i < fastClusters.length) {
@@ -86,9 +86,10 @@ class BattleClustering {
     With.battles.nextBattlesLocal = clusters
       .view
       .map(cluster =>
-        new BattleLocal(
+        new Battle(
           cluster.units.view.filter(_.isOurs),
-          cluster.units.view.filter(_.isEnemy)))
+          cluster.units.view.filter(_.isEnemy),
+          isGlobal = false))
       .filter(_.teams.forall(_.units.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports)))
       .toVector
 

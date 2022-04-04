@@ -27,7 +27,7 @@ class ZvE4Pool extends GameplanTemplate {
   override def aggressionPlan: Plan = new If(
     new Latch(
       new And(
-        new Check(() => With.self.supplyUsed >= 18),
+        new Check(() => With.self.supplyUsed400 >= 18),
         new UnitsAtLeast(3, Zerg.Larva)),
       Seconds(10)()),
     new Aggression(99),

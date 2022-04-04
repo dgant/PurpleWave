@@ -15,7 +15,7 @@ object ShowResources extends View {
 
     var minerals = With.self.minerals
     var gas = With.self.gas
-    var supply = With.self.supplyTotal - With.self.supplyUsed
+    var supply = With.self.supplyTotal400 - With.self.supplyUsed400
     val rawText = With.bank.requests
       .toVector
       .sortBy(_.expectedFrames)

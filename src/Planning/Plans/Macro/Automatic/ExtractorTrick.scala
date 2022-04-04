@@ -12,8 +12,8 @@ class ExtractorTrick extends Plan {
     
     lazy val extractors = With.units.ours.filter(e => e.is(Zerg.Extractor) && ! e.complete)
     val shouldBuildExtractor = (
-      With.self.supplyTotal == 18
-      && Vector(17, 18).contains(With.self.supplyUsed)
+      With.self.supplyTotal400 == 18
+      && Vector(17, 18).contains(With.self.supplyUsed400)
       && With.self.minerals >= 84
       && With.units.existsOurs(Zerg.Larva)
       && extractors.isEmpty)
@@ -23,7 +23,7 @@ class ExtractorTrick extends Plan {
       extractors.exists(e => With.framesSince(e.frameDiscovered) > 24)
       && (
         extractors.exists(_.remainingCompletionFrames < 3 * 24)
-        || (With.self.supplyTotal == 18 && With.self.supplyUsed >= 18))
+        || (With.self.supplyTotal400 == 18 && With.self.supplyUsed400 >= 18))
       )
     
     if (shouldBuildExtractor) {

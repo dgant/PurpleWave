@@ -1,7 +1,7 @@
 package Information.Battles.ProcessingStates
 
-import Information.Battles.{BattleClassificationFilters, GlobalSafeToMoveOut}
-import Information.Battles.Types.{BattleGlobal, Team}
+import Information.Battles.BattleFilters
+import Information.Battles.Types.Battle
 import Lifecycle.With
 
 class BattleProcessSwap extends BattleProcessState {
@@ -13,10 +13,16 @@ class BattleProcessSwap extends BattleProcessState {
     With.battles.divisions = With.battles.nextDivisions
 
     // Replace global
-    With.battles.nextBattleGlobal.foreach(With.battles.global = _)
-    With.battles.global = new BattleGlobal(
-      With.units.ours  .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector,
-      With.units.enemy .view.filter(BattleClassificationFilters.isEligibleGlobal).toVector)
+    With.battles.globalHome = With.battles.nextBattleGlobalHome
+    With.battles.globalAway = With.battles.nextBattleGlobalAway
+    With.battles.nextBattleGlobalHome = new Battle(
+      With.units.ours  .view.filter(BattleFilters.global).filter(BattleFilters.home).toVector,
+      With.units.enemy .view.filter(BattleFilters.global).filter(BattleFilters.home).toVector,
+      isGlobal = true)
+    With.battles.nextBattleGlobalAway = new Battle(
+      With.units.ours  .view.filter(BattleFilters.global).filter(BattleFilters.away).toVector,
+      With.units.enemy .view.filter(BattleFilters.global).filter(BattleFilters.away).toVector,
+      isGlobal = true)
 
     transitionTo(new BattleProcessMatchupAnalysis)
   }

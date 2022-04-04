@@ -19,7 +19,7 @@ trait MacroActions {
 
   def attack(): Unit = With.blackboard.wantToAttack.set(true)
   def harass(): Unit = With.blackboard.wantToHarass.set(true)
-  def allIn(): Unit = { With.blackboard.allIn.set(true); attack() }
+  def allIn(): Unit = { With.blackboard.yoloing.set(true); attack() }
   def scoutOn(unitMatcher: UnitMatcher, scoutCount: Int = 1, quantity: Int = 1): Unit = {
     new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
   }

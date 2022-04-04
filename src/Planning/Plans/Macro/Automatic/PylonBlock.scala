@@ -65,7 +65,7 @@ class PylonBlock extends Plan {
           toTravel = Some(tileToBlock.center)
           canFight = false
         }
-        if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed + 24 >= With.self.supplyTotal) {
+        if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed400 + 24 >= With.self.supplyTotal400) {
           currencyLock.acquire()
           intent = new Intention {
             toBuild = Some(Protoss.Pylon)

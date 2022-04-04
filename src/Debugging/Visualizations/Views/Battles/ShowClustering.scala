@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.View
-import Information.Battles.Types.BattleLocal
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -34,7 +34,7 @@ object ShowClustering extends View {
     ))
   }
   
-  private def renderMapBattle(battle: BattleLocal, color: Color) {
+  private def renderMapBattle(battle: Battle, color: Color) {
     battle.teams.foreach(team =>
       team.units.foreach(unit =>
         DrawMap.line(unit.pixel, team.centroidAir, color)))

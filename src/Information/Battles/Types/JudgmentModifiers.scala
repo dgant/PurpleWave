@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object JudgmentModifiers {
 
-  def apply(battle: BattleLocal): Seq[JudgmentModifier] = {
+  def apply(battle: Battle): Seq[JudgmentModifier] = {
     val output = new ArrayBuffer[JudgmentModifier]
     def add(name: String, color: Color, modifier: Option[JudgmentModifier]) {
       modifier.foreach(m => {
@@ -32,7 +32,7 @@ object JudgmentModifiers {
   //  especially if pushed into our main/natural
   //    because we will run out of room to retreat
   //    and because workers or buildings will be endangered if we don't
-  def proximity(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+  def proximity(battleLocal: Battle): Option[JudgmentModifier] = {
     val deltaMin        = -0.2 * Maff.clamp(With.frame / Minutes(10)(), 1, 2)
     val deltaMax        = 0.05
     val centroid        = battleLocal.enemy.centroidGround
@@ -49,7 +49,7 @@ object JudgmentModifiers {
   //   when our gatherers are endangered
   //    because they are very fragile
   //    and if they die we will probably lose the game
-  def gatherers(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+  def gatherers(battleLocal: Battle): Option[JudgmentModifier] = {
     val workersImperiled = battleLocal.us.units.count(ally =>
       ally.unitClass.isWorker
       && ally.visibleToOpponents
@@ -68,7 +68,7 @@ object JudgmentModifiers {
   //     because their existence is highly probable
   //     and if we attacked in error once, we will likely keep doing it
   //     and thus systematically bleed units
-  def hiddenTanks(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+  def hiddenTanks(battleLocal: Battle): Option[JudgmentModifier] = {
     if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
     val tanks           = battleLocal.enemy.units.count(u => MatchTank(u) && u.base.exists(_.owner.isEnemy) && ! u.visible)
     if (tanks == 0) return None
@@ -91,7 +91,7 @@ object JudgmentModifiers {
   //   until conditions look advantageous
   //     because surprise is on the enemy's side
   //     and because patience will tend to let us gather more force to fight
-  def commitment(battleLocal: BattleLocal): Option[JudgmentModifier] = {
+  def commitment(battleLocal: Battle): Option[JudgmentModifier] = {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
     val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))

@@ -3,7 +3,6 @@ package Planning.Predicates
 import Information.Fingerprinting.Fingerprint
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Utilities.UnitMatchers._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -11,6 +10,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Strategery.StarCraftMap
 import Strategery.Strategies.Strategy
 import Utilities.Time.FrameCount
+import Utilities.UnitMatchers._
 import bwapi.Race
 
 /**
@@ -19,17 +19,19 @@ import bwapi.Race
 trait MacroCounting {
 
   def frame: Int = With.frame
-  def gas: Int = With.self.gas
-  def minerals: Int = With.self.minerals
-  def supplyUsed200: Int = (With.self.supplyUsed + 1) / 2
-  def supplyTotal200: Int = With.self.supplyTotal / 2
-  def supplyBlocked: Boolean = With.self.supplyUsed >= With.self.supplyTotal
-  def saturated: Boolean = units(MatchWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
-
-  def bases: Int = With.geography.ourBases.size
   def after(gameTime: FrameCount): Boolean = frame > gameTime()
   def before(gameTime: FrameCount): Boolean = frame < gameTime()
 
+  def gas: Int = With.self.gas
+  def minerals: Int = With.self.minerals
+  def supplyUsed400: Int = With.self.supplyUsed400
+  def supplyTotal400: Int = With.self.supplyTotal400
+  def supplyUsed200: Int = (supplyUsed400 + 1) / 2
+  def supplyTotal200: Int = supplyTotal400 / 2
+  def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
+  def saturated: Boolean = units(MatchWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
+
+  def bases: Int = With.geography.ourBases.size
   def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
   def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)
   def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
@@ -40,8 +42,7 @@ trait MacroCounting {
   }
 
   def techComplete(tech: Tech, withinFrames: Int = 0): Boolean = {
-    With.self.hasTech(tech) || (withinFrames >= 0 && With.units.ours.exists(unit =>
-      unit.teching && unit.techingType == tech && unit.remainingTechFrames <= withinFrames))
+    tech() || (withinFrames >= 0 && With.units.ours.exists(u => u.teching && u.techingType == tech && u.remainingTechFrames <= withinFrames))
   }
 
   def upgradeStarted(upgrade: Upgrade, level: Int = 1): Boolean = {
@@ -49,8 +50,8 @@ trait MacroCounting {
   }
 
   def upgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0): Boolean = {
-    With.self.getUpgradeLevel(upgrade) >= level  || (
-      With.self.getUpgradeLevel(upgrade) == level - 1
+    upgrade(level) || (
+      upgrade(level - 1)
       && withinFrames > 0
       && With.units.ours.exists(unit =>
         unit.upgrading
@@ -100,11 +101,11 @@ trait MacroCounting {
   }
 
   def safeAtHome: Boolean = {
-    safeToMoveOut || With.battles.global.globalSafeToDefend
+    With.battles.globalHome.judgement.exists(_.shouldFight)
   }
 
   def safeToMoveOut: Boolean = {
-    With.blackboard.safeToMoveOut()
+    With.battles.globalAway.judgement.exists(_.shouldFight)
   }
 
   def gasCapsUntouched: Boolean = (
@@ -115,37 +116,23 @@ trait MacroCounting {
     && ! With.blackboard.gasWorkerRatio.isSet
   )
 
-  def employing(strategies: Strategy*): Boolean = {
-    strategies.exists(_())
-  }
+  def employing(strategies: Strategy*): Boolean = strategies.exists(_())
 
   def onMap(map: StarCraftMap*): Boolean = map.exists(_())
 
   def starts: Int = With.geography.startLocations.size
 
-  def enemies(matchers: UnitMatcher*): Int = {
-    With.units.countEnemy(MatchOr(matchers: _*))
-  }
+  def enemies(matchers: UnitMatcher*): Int =  With.units.countEnemy(MatchOr(matchers: _*))
 
-  def enemiesComplete(matchers: UnitMatcher*): Int = {
-    With.units.countEnemy(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
-  }
+  def enemiesComplete(matchers: UnitMatcher*): Int = With.units.countEnemy(MatchAnd(MatchComplete, MatchOr(matchers: _*)))
 
-  def enemiesShown(unitClasses: UnitClass*): Int = {
-    unitClasses.view.map(With.unitsShown.allEnemies(_)).sum
-  }
+  def enemiesShown(unitClasses: UnitClass*): Int = unitClasses.view.map(With.unitsShown.allEnemies(_)).sum
 
-  def enemyHasShown(unitClasses: UnitClass*): Boolean = {
-    unitClasses.exists(enemiesShown(_) > 0)
-  }
+  def enemyHasShown(unitClasses: UnitClass*): Boolean = unitClasses.exists(enemiesShown(_) > 0)
 
-  def enemyHasTech(techs: Tech*): Boolean = {
-    techs.exists(t => With.enemies.exists(_.hasTech(t)))
-  }
+  def enemyHasTech(techs: Tech*): Boolean = techs.exists(t => With.enemies.exists(_.hasTech(t)))
 
-  def enemyHasUpgrade(upgrade: Upgrade, level: Int = 1): Boolean = {
-    With.enemies.exists(_.getUpgradeLevel(upgrade) >= level)
-  }
+  def enemyHasUpgrade(upgrade: Upgrade, level: Int = 1): Boolean = With.enemies.exists(_.getUpgradeLevel(upgrade) >= level)
 
   def enemyShownCloakedThreat: Boolean = (
     With.enemy.hasTech(Terran.WraithCloak) || enemyHasShown(

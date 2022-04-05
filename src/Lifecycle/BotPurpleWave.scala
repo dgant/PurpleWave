@@ -1,13 +1,20 @@
 package Lifecycle
 
 import Debugging._
+import Lifecycle.With.game
 import bwapi.DefaultBWListener
+import bwta.BWTA
+import jbweb.{Blocks, JBWEB, Stations, Walls}
 
 class BotPurpleWave extends DefaultBWListener {
 
   override def onStart() {
     tryCatch(() => {
       With.onStart()
+      JBWEB.onStart(game, BWTA.getBWEM)
+      Walls.createFFE()
+      Stations.findStations()
+      Blocks.findBlocks()
       With.history.onStart()
     })
   }
@@ -31,12 +38,19 @@ class BotPurpleWave extends DefaultBWListener {
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
+    JBWEB.onUnitDestroy(unit)
     tryCatch(() => With.units.onUnitDestroy(unit))
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {}
-  override def onUnitDiscover(unit: bwapi.Unit) {}
+  override def onUnitDiscover(unit: bwapi.Unit): Unit = {
+    JBWEB.onUnitDiscover(unit)
+  }
   override def onUnitHide(unit: bwapi.Unit) {}
+
+  override def onUnitMorph(unit: bwapi.Unit): Unit = {
+    JBWEB.onUnitMorph(unit)
+  }
 
   override def onUnitRenegade(unit: bwapi.Unit): Unit = {
     tryCatch(() => With.units.onUnitRenegade(unit))

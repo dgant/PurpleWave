@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
@@ -40,7 +40,7 @@ class ZvT7Pool extends GameplanTemplate {
     new ZergReactionVsWorkerRush
   )
 
-  override def buildOrder: Seq[RequestProduction] = Seq(
+  override def buildOrder: Seq[RequestBuildable] = Seq(
     Get(7, Zerg.Drone),
     Get(Zerg.SpawningPool),
     Get(8, Zerg.Drone),

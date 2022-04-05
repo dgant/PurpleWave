@@ -1,7 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Micro.Agency.Intention
 import Planning.ResourceLocks._
 import Utilities.UnitCounters.CountOne
@@ -9,11 +9,10 @@ import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
-class ResearchUpgrade(buildableUpgrade: RequestProduction) extends Production {
-
-  setBuildable(buildableUpgrade)
-  val upgrade       : Upgrade       = buildable.upgrade.get
-  val level         : Int           = buildable.quantity
+class ResearchUpgrade(requestArg: RequestBuildable) extends Production {
+  setRequest(requestArg)
+  val upgrade       : Upgrade       = request.upgrade.get
+  val level         : Int           = request.quantity
   val upgraderClass : UnitClass     = upgrade.whatUpgrades
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, upgrade, level)
   val upgraders     : LockUnits     = new LockUnits(this)
@@ -25,7 +24,6 @@ class ResearchUpgrade(buildableUpgrade: RequestProduction) extends Production {
   override def hasSpent: Boolean = upgraders.units.exists(_.upgradeProducing.contains(upgrade))
 
   override def onUpdate() {
-    if (isComplete) return
     if (hasSpent || currencyLock.acquire()) {
       upgraders.acquire()
       if ( ! hasSpent) {

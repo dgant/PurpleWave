@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
@@ -19,7 +19,7 @@ class ZvT7PoolLurker extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvT1HatchLurker)
 
-  override def buildOrder: Seq[RequestProduction] = Vector(
+  override def buildOrder: Seq[RequestBuildable] = Vector(
     Get(9, Zerg.Drone),
     Get(Zerg.SpawningPool),
     Get(10, Zerg.Drone),

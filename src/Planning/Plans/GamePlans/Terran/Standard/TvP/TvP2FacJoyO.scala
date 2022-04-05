@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvP
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -40,7 +40,7 @@ class TvP2FacJoyO extends GameplanTemplate {
   override def workerPlan: Plan = new PumpWorkers
 
   // https://liquipedia.net/starcraft/JoyO_Rush
-  override def buildOrder: Seq[RequestProduction] = Vector(
+  override def buildOrder: Seq[RequestBuildable] = Vector(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),
     Get(11, Terran.SCV),

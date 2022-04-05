@@ -1,7 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention
@@ -9,15 +9,13 @@ import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.TileFilters.{TileAny, TileFilter}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsAny
 import Utilities.UnitPreferences._
 
-class MorphUnit(val buildableUnit: RequestProduction, tileFilter: TileFilter = TileAny) extends Production {
-
-  setBuildable(buildableUnit)
-  val classOutput   : UnitClass     = buildable.unit.get
+class MorphUnit(requestArg: RequestBuildable) extends Production {
+  setRequest(requestArg)
+  val classOutput   : UnitClass     = request.unit.get
   val classInput    : UnitClass     = classOutput.whatBuilds._1
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, classOutput, 1)
   val morpherLock   : LockUnits     = new LockUnits(this)
@@ -31,7 +29,6 @@ class MorphUnit(val buildableUnit: RequestProduction, tileFilter: TileFilter = T
   def hasSpent: Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
   def onUpdate() {
-
     // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production
     // Shared somewhat with BuildBuilding
     lazy val alreadyMorphing = With.units.ours.filter(u =>

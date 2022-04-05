@@ -1,7 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import ProxyBwapi.BuildableType
+import ProxyBwapi.Buildable
 import Tactic.Tactics.Tactic
 import Utilities.CountMap
 
@@ -19,8 +19,8 @@ class Produce extends Tactic {
     _queueLast = _queueNext
     _queueNext = ListBuffer.empty
     val requests      = With.macroSim.queue
-    val typesCounted  = new CountMap[BuildableType]
-    val typesNeeded   = new CountMap[BuildableType]
+    val typesCounted  = new CountMap[Buildable]
+    val typesNeeded   = new CountMap[Buildable]
     val matched       = new mutable.HashSet[Production]
 
     // Requeue any paid-for production, in the same order
@@ -28,12 +28,14 @@ class Produce extends Tactic {
 
     // Retain required production or add new production
     requests.foreach(request => {
-      val       existingNext = _queueNext.view                        .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
-      lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(p => p.buildable.satisfies(request) && ! matched.contains(p))
+      val       existingNext = _queueNext.view                        .find(production => production.satisfies(request) && ! matched.contains(production))
+      lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(production => production.satisfies(request) && ! matched.contains(production))
       existingNext.foreach(matched+=)
-      if (existingNext.isEmpty) {
+      existingNext.foreach(_.setRequest(request)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
+      if (existingNext.isEmpty && request.specificUnit.isEmpty) {
         existingLast.foreach(_queueNext+=)
         existingLast.foreach(matched+=)
+        existingLast.foreach(_.setRequest(request)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
         if (existingLast.isEmpty) {
           val newProduction = request.makeProduction
           _queueNext += newProduction

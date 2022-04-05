@@ -15,7 +15,6 @@ object ShowUnitsFriendly extends View {
   var showClient      : Boolean = false
   var showAction      : Boolean = true
   var showOrder       : Boolean = true
-  var showTargets     : Boolean = false
   def showPaths       : Boolean = ShowUnitPaths.inUse
   var showDesire      : Boolean = true
   var showDistance    : Boolean = false
@@ -26,29 +25,6 @@ object ShowUnitsFriendly extends View {
   
   override def renderMap() { With.units.ours.foreach(renderUnitState) }
 
-  def renderTargets(unit: UnitInfo): Unit = {
-    val targetUnit = unit.presumptiveTarget
-    val targetPosition = unit.presumptiveDestination
-    if (targetUnit.exists(_.unitClass.isResource)) {
-      targetUnit.map(_.pixel).foreach(DrawMap.line(unit.pixel, _, Colors.MediumTeal))
-    } else if (targetUnit.isDefined) {
-      targetUnit.map(_.pixel).foreach(DrawMap.line(unit.pixel, _, Colors.MediumYellow))
-    }
-    if (targetPosition != unit.pixel && unit.orderTarget.isEmpty) {
-      DrawMap.line(unit.pixel, targetPosition, Colors.MediumGray)
-      renderUnitBoxAt(unit, targetPosition, Colors.MediumGray)
-      unit.friendly.map(_.agent).foreach(agent => {
-        agent.toReturn.foreach(toReturn => {
-          val returnColor = Colors.MediumViolet
-          if (targetPosition != toReturn) {
-            DrawMap.line(targetPosition, toReturn, returnColor)
-            renderUnitBoxAt(unit, agent.toReturn.get, returnColor)
-          }
-        })
-      })
-    }
-  }
-
   def renderUnitBoxAt(unit: UnitInfo, at: Pixel, color: Color): Unit = {
     DrawMap.box(
       at.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
@@ -58,25 +34,35 @@ object ShowUnitsFriendly extends View {
   
   def renderUnitState(unit: FriendlyUnitInfo) {
     val agent = unit.agent
-    if (selectedOnly && ! unit.selected) return
-    if ( ! unit.aliveAndComplete && ! unit.unitClass.isBuilding) return
-    if ( ! With.viewport.contains(unit.pixel)) return
-    if ( ! unit.unitClass.orderable) return
-    if (unit.transport.isDefined) return
+
+    var marker: Option[String] = None
+    var origin = unit.pixel
+    unit.transport.foreach(transport => {
+      marker = Some(f"Loaded ${unit.unitClass}")
+      val index = transport.loadedUnits.zipWithIndex.find(p => p._1 == unit).map(_._2).getOrElse(0)
+      origin = unit.pixel.subtract(0, 32 * (1 + index))
+    })
+    if ( ! unit.complete && ! unit.morphing && ! unit.unitClass.isBuilding) {
+      marker = Some(f"Training ${unit.unitClass}")
+      origin.add(0, 16)
+    }
     
+    if (selectedOnly && ! unit.selected && ! unit.transport.exists(_.selected)) return
+    if ( ! With.viewport.contains(origin)) return
+    if ( ! unit.unitClass.orderable) return
+
     var labelY = -28
+    
     def drawNextLabel(value: String): Unit = {
-      DrawMap.label(value, unit.pixel.add(0, labelY), drawBackground = false)
+      DrawMap.label(value, origin.add(0, labelY), drawBackground = false)
       labelY += 7
     }
 
-    if (showTargets) {
-      renderTargets(unit)
-    }
+    marker.foreach(drawNextLabel)
 
     if (showLeaders) {
       if (agent.leader().contains(unit)) {
-        val start = unit.pixel.add(0, unit.unitClass.dimensionDown + 8)
+        val start = origin.add(0, unit.unitClass.dimensionDown + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
         DrawMap.star(start, 4, Colors.NeonYellow)
       }
@@ -84,7 +70,7 @@ object ShowUnitsFriendly extends View {
 
     if (showDesire && unit.battle.isDefined && (unit.canMove || unit.canAttack)) {
       val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
-      val pixel = unit.pixel.subtract(0, 6 + unit.unitClass.height / 2)
+      val pixel = origin.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.box(pixel.subtract(4, 4), pixel.add(4, 4), Color.Black, solid = true)
       DrawMap.box(pixel.subtract(3, 3), pixel.add(3, 3), color,       solid = true)
     }
@@ -93,13 +79,13 @@ object ShowUnitsFriendly extends View {
       if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
         val degrees = System.currentTimeMillis() % 360
         val radians = degrees * Math.PI / 360
-        DrawMap.circle(unit.pixel.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
-        DrawMap.circle(unit.pixel.radiateRadians(radians, -10), 2, Colors.NeonYellow, solid = true)
+        DrawMap.circle(origin.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
+        DrawMap.circle(origin.radiateRadians(radians, -10), 2, Colors.NeonYellow, solid = true)
       }
     }
 
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected.isEmpty)) {
-      unit.agent.lastPath.foreach(_.renderMap(unit.unitColor, Some(unit.pixel)))
+      unit.agent.lastPath.foreach(_.renderMap(unit.unitColor, Some(origin)))
     }
 
     if (showForces) {
@@ -107,16 +93,16 @@ object ShowUnitsFriendly extends View {
       val forceRadiusMin = 4
       val maxForce = Maff.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
-        DrawMap.circle(unit.pixel, forceRadiusMin, Color.White)
+        DrawMap.circle(origin, forceRadiusMin, Color.White)
         (agent.forces.view ++ Seq((Forces.sum, agent.forces.sum)))
           .filter(_._2.lengthSquared > 0)
           .foreach(pair => {
             val force           = pair._2
             val forceNormalized = force.normalize(Math.max(24, forceLengthMax * force.lengthSlow / maxForce))
-            val to = unit.pixel.add(
+            val to = origin.add(
               forceNormalized.x.toInt,
               forceNormalized.y.toInt)
-            DrawMap.arrow(unit.pixel.project(to, 8), to, pair._1.color)
+            DrawMap.arrow(origin.project(to, 8), to, pair._1.color)
           })
         }
     }
@@ -127,10 +113,10 @@ object ShowUnitsFriendly extends View {
     if (showOrder)        drawNextLabel(unit.order.toString)
 
     if (showDistance) {
-      DrawMap.arrow(unit.pixel, agent.destination, Color.Black)
+      DrawMap.arrow(origin, agent.destination, Color.Black)
       DrawMap.label(
         unit.pixelDistanceTravelling(unit.agent.destination).toInt.toString,
-        agent.unit.pixel.add(0, 21),
+        unit.pixel.add(0, 21),
         drawBackground = true,
         Color.Black)
     }

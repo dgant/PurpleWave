@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvZ
 
 import Lifecycle.With
-import Macro.Requests.{Get, RequestProduction}
+import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -53,7 +53,7 @@ class TvZ8Rax extends GameplanTemplate {
       new ScoutAt(10, maxScouts = 2),
       new ScoutAt(10)))
 
-  override def buildOrder: Seq[RequestProduction] = Seq(
+  override def buildOrder: Seq[RequestBuildable] = Seq(
     Get(8, Terran.SCV),
     Get(Terran.Barracks),
     Get(9, Terran.SCV),

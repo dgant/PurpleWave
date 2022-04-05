@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvZ
 
 import Lifecycle.With
-import Macro.Requests.{Get, RequestProduction}
+import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
@@ -43,7 +43,7 @@ class ZvZ9PoolSpeed extends GameplanTemplate {
     new ZergReactionVsWorkerRush
   )
 
-  override def buildOrder: Seq[RequestProduction] = Vector(
+  override def buildOrder: Seq[RequestBuildable] = Vector(
     Get(9, Zerg.Drone),
     Get(Zerg.SpawningPool),
     Get(10, Zerg.Drone),

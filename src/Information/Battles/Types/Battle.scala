@@ -10,11 +10,11 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import scala.collection.mutable
 
 class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = Vector.empty, val isGlobal: Boolean) {
-  val frameCreated: Int = With.frame
-  val us = new Team(this, unitsUs)
-  val enemy = new Team(this, unitsEnemy)
-  val teams: Vector[Team] = Vector(us, enemy)
-  val focus: Pixel = Maff.centroid(teams.map(_.vanguardAll()))
+  lazy val frameCreated: Int = With.frame
+  lazy val us = new Team(this, unitsUs)
+  lazy val enemy = new Team(this, unitsEnemy)
+  lazy val teams: Vector[Team] = Vector(us, enemy)
+  lazy val focus: Pixel = Maff.centroid(teams.map(_.vanguardAll()))
 
   var predictionComplete: Boolean = false
 
@@ -24,10 +24,11 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   // Prediction arguments //
   //////////////////////////
 
-  val skimulated: Boolean = isGlobal || With.configuration.skimulate
-  val logSimulation: Boolean = With.configuration.debugging
-  val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
-  val speedMultiplier: Double = if (isGlobal) 1.0 else judgmentModifiers.map(_.speedMultiplier).product
+  lazy val skimulated       : Boolean               = isGlobal || With.configuration.skimulate
+  lazy val logSimulation    : Boolean               = With.configuration.debugging
+  lazy val speedMultiplier  : Double                = if (isGlobal) 1.0 else judgmentModifiers.map(_.speedMultiplier).product
+  lazy val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
+
 
   ////////////////////////
   // Simulation results //

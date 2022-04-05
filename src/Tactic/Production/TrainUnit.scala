@@ -1,6 +1,6 @@
 package Tactic.Production
 
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
@@ -9,9 +9,9 @@ import Utilities.UnitPreferences.PreferTrainerFor
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class TrainUnit(val buildableUnit: RequestProduction) extends Production {
-  setBuildable(buildableUnit)
-  val traineeClass    : UnitClass         = buildable.unit.get
+class TrainUnit(requestArg: RequestBuildable) extends Production {
+  setRequest(requestArg)
+  val traineeClass    : UnitClass         = request.unit.get
   val trainerClass    : UnitClass         = traineeClass.whatBuilds._1
   val addonClass      : Option[UnitClass] = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
   val currencyLock    : LockCurrency      = new LockCurrencyFor(this, traineeClass, 1)
@@ -23,17 +23,16 @@ class TrainUnit(val buildableUnit: RequestProduction) extends Production {
   var finalTrainer: Option[FriendlyUnitInfo] = None
   var finalTrainee: Option[FriendlyUnitInfo] = None
   def trainer: Option[FriendlyUnitInfo] = finalTrainer.orElse(trainerLock.units.headOption)
-  def trainee: Option[FriendlyUnitInfo] = finalTrainee.orElse(trainer.flatMap(_.trainee.filter(traineeClass).filter(_.producer.forall(==))))
+  override def trainee: Option[FriendlyUnitInfo] = finalTrainee.orElse(trainer.flatMap(_.trainee.filter(traineeClass).filter(_.producer.forall(==))))
   override def hasSpent: Boolean = trainee.isDefined
   override def isComplete: Boolean = trainee.exists(MacroCounter.countComplete(_)(traineeClass) > 0)
-  override def expectUnit(unit: FriendlyUnitInfo): Boolean = {
+  override def expectTrainee(unit: FriendlyUnitInfo): Boolean = {
     if (trainer.exists(t => traineeClass(unit) && t.pixel == unit.pixel)) {
       finalTrainee = Some(unit)
       true
     } else false
   }
   override def onUpdate() {
-    if (isComplete) return
     // As we approach completion, lock in our trainer/trainee for our records and let another task acquire it
     if (trainee.exists(t => t.alive && t.remainingCompletionFrames < 96)) {
       finalTrainer = trainer

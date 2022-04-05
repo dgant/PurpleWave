@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
@@ -51,7 +51,7 @@ class TvEProxyBBS extends GameplanTemplate {
     new MineralsAtLeast(200),
     super.supplyPlan)
   
-  override def buildOrder: Seq[RequestProduction] = Vector(
+  override def buildOrder: Seq[RequestBuildable] = Vector(
     Get(Terran.CommandCenter),
     Get(8, Terran.SCV),
     Get(2, Terran.Barracks),
@@ -60,7 +60,7 @@ class TvEProxyBBS extends GameplanTemplate {
     Get(Terran.Marine))
   
   override def buildPlans: Seq[Plan] = Vector(
-    new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
+    new Do(() => With.blackboard.maxBuilderTravelFrames = Int.MaxValue),
     new Pump(Terran.SCV, 3),
     new Pump(Terran.Marine),
     new PumpWorkers,

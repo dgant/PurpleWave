@@ -50,7 +50,7 @@ object ShowProduction extends View {
     .toVector ++ With.tactics.produce.queue.view
       .filterNot(_.hasSpent)
       .map(production => {
-        val duration = production.buildable.buildFrames
+        val duration = production.request.buildFrames
         Producible(
           production.toString.replaceAll("Produce ", ""),
           duration,

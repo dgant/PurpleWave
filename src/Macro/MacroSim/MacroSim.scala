@@ -1,7 +1,7 @@
 package Macro.MacroSim
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, RequestTech, RequestUnit, RequestUpgrade}
+import Macro.Requests.{RequestBuildable, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
@@ -15,16 +15,17 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 final class MacroSim {
-  val redundant = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
-  val denied    = new ArrayBuffer[RequestProduction]() // We don't need this for bot operation; it's just here for debugging
+  val redundant = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
+  val denied    = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
   val steps     = new mutable.ArrayBuffer[MacroStep]()
-  val minInsert = new mutable.OpenHashMap[RequestProduction, Int]()
+  val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
 
-  def queue: Seq[RequestProduction] = steps.view.filter(_.request.isDefined).map(_.request.get)
+  private def requests: Seq[RequestBuildable] = steps.view.filter(_.request.isDefined).map(_.request.get)
+  def queue: Seq[RequestBuildable] = requests.filter(_.specificUnit.isDefined) ++ requests.filter(_.specificUnit.isEmpty)
 
   private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
-    val requests = new ArrayBuffer[RequestProduction]
+    val requests = new ArrayBuffer[RequestBuildable]
     redundant.clear()
     denied.clear()
     steps.clear()
@@ -55,7 +56,7 @@ final class MacroSim {
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
-        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), u.tileTopLeft))
+        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificUnitArg = Some(u)))
         event.dUnitComplete = u.unitClass
         event.dUnitCompleteN = 1
         if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
@@ -104,10 +105,10 @@ final class MacroSim {
       //
       // Units:
       // - (Default) If there is no tile filter, use our state count
-      // - (Special) If there is a tile filter,  count our complete units which the tile filter accepts
+      // - (Special) If there is a  tile filter, count our complete units which the tile filter accepts
       val unitDiff = request.unit.map(requestedUnit => request.quantity -
-        (if (request.tileFilter.isSupersetOf(TileAny))
-           request.quantity - steps.last.state.unitsComplete(requestedUnit)
+        (if (request.tileFilter == TileAny)
+          steps.last.state.unitsComplete(requestedUnit)
         else
           With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.tileFilter))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
@@ -170,7 +171,7 @@ final class MacroSim {
     })
   }
 
-  private def canInsertAfter(request: RequestProduction, i: Int): Boolean = {
+  private def canInsertAfter(request: RequestBuildable, i: Int): Boolean = {
     // Find a state where we can fulfill the request
     val step = steps(i)
     var cant = false
@@ -192,7 +193,7 @@ final class MacroSim {
     ! cant
   }
 
-  private def canInsertBefore(request: RequestProduction, i: Int): Boolean = {
+  private def canInsertBefore(request: RequestBuildable, i: Int): Boolean = {
     // Ensure no future states would be rendered impossible by inserting the request
     var j = i
     var cant = false
@@ -207,7 +208,7 @@ final class MacroSim {
     ! cant
   }
 
-  private def exceedsMinInsert(request: RequestProduction, i: Int): Boolean = {
+  private def exceedsMinInsert(request: RequestBuildable, i: Int): Boolean = {
     minInsert.get(request).exists(_ >= i)
   }
 

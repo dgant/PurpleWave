@@ -1,13 +1,13 @@
 package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
-import Macro.Requests.{RequestProduction, RequestUnit}
+import Macro.Requests.{RequestBuildable, RequestUnit}
 import Planning.Plan
 
 /**
   * Requests buildables without replacing non-tech units
   */
-class BuildOrder(requests: RequestProduction*) extends Plan {
+class BuildOrder(requests: RequestBuildable*) extends Plan {
   override def onUpdate() {
     val modifiedRequests = requests.flatMap(request =>
       if (request.unit.forall(_.isBuilding) || request.quantity <= 0) Some(request) else {

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.Standard.PvR
 import Lifecycle.With
 import Macro.Architecture.Blueprint
 import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Requests.{RequestProduction, Get}
+import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
@@ -45,7 +45,7 @@ class PvRForgeDT extends GameplanTemplateVsRandom {
         new PumpWorkers,
         new Build(Get(6, Protoss.PhotonCannon)))))
 
-  override def buildOrder: Seq[RequestProduction] = Vector(
+  override def buildOrder: Seq[RequestBuildable] = Vector(
     Get(8, Protoss.Probe),
     Get(Protoss.Pylon),
     Get(9, Protoss.Probe),

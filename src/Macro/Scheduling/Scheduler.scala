@@ -1,29 +1,29 @@
 package Macro.Scheduling
 
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Planning.Prioritized
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Scheduler {
-  private val _requests = new mutable.HashMap[Prioritized, mutable.ArrayBuffer[RequestProduction]]
+  private val _requests = new mutable.HashMap[Prioritized, mutable.ArrayBuffer[RequestBuildable]]
 
   def reset() {
     _requests.clear()
   }
 
-  def request(requester: Prioritized, theRequest: RequestProduction) {
+  def request(requester: Prioritized, theRequest: RequestBuildable) {
     requestAll(requester, Seq(theRequest))
   }
 
-  def requestAll(requester: Prioritized, buildables: Iterable[RequestProduction]): Unit = {
+  def requestAll(requester: Prioritized, buildables: Iterable[RequestBuildable]): Unit = {
     requester.prioritize()
     _requests(requester) = _requests.getOrElse(requester, ArrayBuffer.empty)
     _requests(requester) ++= buildables
   }
 
-  def requests: Vector[(Prioritized, Iterable[RequestProduction])] = {
+  def requests: Vector[(Prioritized, Iterable[RequestBuildable])] = {
     _requests.toVector.sortBy(_._1.priorityUntouched)
   }
 }

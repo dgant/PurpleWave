@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import Micro.Heuristics.MicroValue
-import ProxyBwapi.BuildableType
+import ProxyBwapi.Buildable
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -14,7 +14,7 @@ import bwapi.{Race, UnitType}
 
 import scala.collection.mutable.ListBuffer
 
-final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitFilter with BuildableType {
+final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with UnitFilter with Buildable {
 
   //////////////
   // Geometry //

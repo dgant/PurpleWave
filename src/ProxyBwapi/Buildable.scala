@@ -2,7 +2,7 @@ package ProxyBwapi
 
 import bwapi.Race
 
-trait BuildableType {
+trait Buildable {
   def race: Race
   def productionFrames(quantity: Int): Int
   def mineralCost(quantity: Int): Int

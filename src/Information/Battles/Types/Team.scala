@@ -18,9 +18,9 @@ class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with 
   lazy val enemy      : Boolean       = this == battle.enemy
   lazy val opponent   : Team          = if (us) battle.enemy else battle.us
 
-  val hasDetection: Boolean = detectors.nonEmpty || (enemy && MacroFacts.enemyHasShown(Terran.SpiderMine, Terran.Comsat, Terran.SpellScannerSweep))
+  lazy val hasDetection: Boolean = detectors.nonEmpty || (enemy && MacroFacts.enemyHasShown(Terran.SpiderMine, Terran.Comsat, Terran.SpellScannerSweep))
 
-  val vanguardAll = new Cache(() =>
+  lazy val vanguardAll = new Cache(() =>
     Maff.minBy(
       Maff.orElse(
         attackers,
@@ -28,7 +28,7 @@ class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with 
     .map(_.pixel)
     .getOrElse(With.scouting.threatOrigin.center))
 
-  val vanguardAir = new Cache(() =>
+  lazy val vanguardAir = new Cache(() =>
     Maff.minBy(
       Maff.orElse(
         attackers.view.filter(_.flying),
@@ -36,7 +36,7 @@ class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with 
     .map(_.pixel)
     .getOrElse(vanguardAll()))
 
-  val vanguardGround = new Cache(() =>
+  lazy val vanguardGround = new Cache(() =>
     Maff.minBy(
       Maff.orElse(
         attackers.view.filterNot(_.flying),

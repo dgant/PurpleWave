@@ -1,12 +1,12 @@
 package ProxyBwapi.Upgrades
 
 import Lifecycle.With
-import ProxyBwapi.BuildableType
+import ProxyBwapi.Buildable
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import bwapi.{Race, UpgradeType}
 
-case class Upgrade(bwapiType: UpgradeType) extends BuildableType {
+case class Upgrade(bwapiType: UpgradeType) extends Buildable {
   val id                  : Int                 = bwapiType.id
   val levels              : Vector[Int]         = (1 to bwapiType.maxRepeats).toVector
   val race                : Race                = bwapiType.getRace

@@ -1,12 +1,12 @@
 package ProxyBwapi.Techs
 
 import Lifecycle.With
-import ProxyBwapi.BuildableType
+import ProxyBwapi.Buildable
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import bwapi.{Order, Race, TechType, WeaponType}
 
-case class Tech(bwapiTech: TechType) extends BuildableType{
+case class Tech(bwapiTech: TechType) extends Buildable{
   val id                  : Int         = bwapiTech.id
   val energyCost          : Int         = bwapiTech.energyCost
   val getOrder            : Order       = bwapiTech.getOrder

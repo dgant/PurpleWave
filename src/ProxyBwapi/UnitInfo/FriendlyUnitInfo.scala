@@ -23,7 +23,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _framesFailingToAttack  : Int     = 0
   override def update() {
     if (frameDiscovered < With.frame) readProxy()
-    if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectUnit(this)).foreach(setProducer)
+    if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     super.update()
     _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))

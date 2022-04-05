@@ -1,7 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Utilities.UnitCounters.CountOne
@@ -9,10 +9,9 @@ import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 
-class ResearchTech(buildableTech: RequestProduction) extends Production {
-
-  setBuildable(buildableTech)
-  val tech          : Tech          = buildable.tech.get
+class ResearchTech(requestArg: RequestBuildable) extends Production {
+  setRequest(requestArg)
+  val tech          : Tech          = request.tech.get
   val techerClass   : UnitClass     = tech.whatResearches
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, tech, 1)
   val techers       : LockUnits     = new LockUnits(this)
@@ -24,7 +23,6 @@ class ResearchTech(buildableTech: RequestProduction) extends Production {
   override def hasSpent: Boolean = techers.units.exists(_.techProducing.contains(tech))
 
   override def onUpdate() {
-    if (isComplete) return
     if (hasSpent || currencyLock.acquire()) {
       techers.acquire()
       techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))

@@ -56,7 +56,7 @@ class TvTProxy5Rax extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Vector(
     new Write(With.blackboard.pushKiters, true),
-    new Do(() => With.blackboard.maxFramesToSendAdvanceBuilder = Int.MaxValue),
+    new Do(() => With.blackboard.maxBuilderTravelFrames = Int.MaxValue),
     new Pump(Terran.Marine),
   )
 }

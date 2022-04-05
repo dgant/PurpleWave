@@ -5,7 +5,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 
 class Blackboard {
   
-  var maxFramesToSendAdvanceBuilder: Int = With.configuration.maxFramesToSendAdvanceBuilder
+  var maxBuilderTravelFrames: Int = With.configuration.maxFramesToSendAdvanceBuilder
   
   protected var resets: Vector[() => Unit] = Vector.empty
   protected def add[T](property  : Property[T])  : Property[T] = {

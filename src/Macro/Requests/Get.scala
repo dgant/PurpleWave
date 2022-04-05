@@ -1,6 +1,6 @@
 package Macro.Requests
 
-import ProxyBwapi.BuildableType
+import ProxyBwapi.Buildable
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
@@ -11,7 +11,7 @@ import ProxyBwapi.Upgrades.Upgrade
   */
 object Get {
 
-  def apply(quantity: Int, buildableType: BuildableType): RequestProduction = {
+  def apply(quantity: Int, buildableType: Buildable): RequestBuildable = {
     buildableType match {
       case v: UnitClass  => RequestUnit(v, quantity)
       case v: Tech       => RequestTech(v)
@@ -19,5 +19,5 @@ object Get {
     }
   }
 
-  def apply(buildableType: BuildableType, quantity: Int = 1): RequestProduction = apply(quantity, buildableType)
+  def apply(buildableType: Buildable, quantity: Int = 1): RequestBuildable = apply(quantity, buildableType)
 }

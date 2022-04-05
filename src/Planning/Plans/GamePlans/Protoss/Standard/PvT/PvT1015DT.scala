@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
-import Macro.Requests.RequestProduction
+import Macro.Requests.RequestBuildable
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.Trigger
@@ -23,7 +23,7 @@ class PvT1015DT extends GameplanTemplate {
 
   override def workerPlan: Plan = new PumpWorkers(oversaturate = true)
 
-  override val buildOrder: Vector[RequestProduction] = ProtossBuilds.PvT1015GateGoonDT
+  override val buildOrder: Vector[RequestBuildable] = ProtossBuilds.PvT1015GateGoonDT
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvTIdeas.ReactToFiveRaxAs2GateCore,

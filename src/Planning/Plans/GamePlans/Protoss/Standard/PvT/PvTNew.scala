@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.Standard.PvT
 
 import Lifecycle.With
-import Macro.Requests.Get
 import Planning.Plans.GamePlans.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.DoQueue
@@ -22,32 +21,59 @@ class PvTNew extends GameplanImperative {
   }
 
   def openNexusFirst(): Unit = {
-
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Nexus)
+    // TODO: I think one gate core if cross-spawn, two if close. Also might depend on gas/no gas
   }
 
   def open1ZealotExpand(): Unit = {
     // Reference: https://youtu.be/jYRHZVAjhX8?t=4932
-    buildOrder(Get(8, Protoss.Probe))
-    get(Protoss.Pylon)
-    buildOrder(Get(10, Protoss.Probe))
-    get(Protoss.Gateway)
-    buildOrder(Get(13, Protoss.Probe))
-    buildOrder(Get(Protoss.Zealot))
-    buildOrder(Get(14, Protoss.Probe))
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(14, Protoss.Probe)
     doEmergencyReactions()
-    get(2, Protoss.Nexus)
+    once(2, Protoss.Nexus)
     scoutOn(Protoss.Nexus, quantity = 2)
-    get(Protoss.Assimilator)
-    get(Protoss.CyberneticsCore)
-    buildOrder(Get(15, Protoss.Probe))
-    buildOrder(Get(2, Protoss.Zealot))
-    buildOrder(Get(17, Protoss.Probe))
-    get(2, Protoss.Pylon)
-    buildOrder(Get(Protoss.Dragoon))
+    once(Protoss.Assimilator)
+    once(Protoss.CyberneticsCore)
+    once(15, Protoss.Probe)
+    once(2, Protoss.Zealot)
+    once(17, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    once(Protoss.Dragoon)
   }
 
   def openZZCoreZ(): Unit = {
-
+    // Reference: https://www.youtube.com/watch?v=MXYRhJOmOkc
+    once(8,  Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(14, Protoss.Probe)
+    once(Protoss.Assimilator)
+    once(15, Protoss.Probe)
+    once(2, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(17, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(3, Protoss.Pylon)
+    once(20, Protoss.Probe)
+    once(Protoss.DragoonRange)
+    once(Protoss.Dragoon)
+    once(21, Protoss.Probe)
+    once(2, Protoss.Nexus)
   }
 
   def open24Nexus(): Unit = {
@@ -72,6 +98,7 @@ class PvTNew extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     // TODO: Expansion is informative
+    // TODO: Cross-spawn informs Nexus-first choices
     // TODO: 10-12 is informative
     // TODO: 14 CC is informative
     // TODO: 1 Rax FE is informative
@@ -188,7 +215,7 @@ class PvTNew extends GameplanImperative {
 
   def doShuttles(): Unit = {
     get(Protoss.RoboticsFacility)
-    buildOrder(Get(Protoss.Shuttle))
+    once(Protoss.Shuttle)
     get(Protoss.RoboticsSupportBay)
     get(Protoss.ShuttleSpeed)
   }
@@ -251,7 +278,7 @@ class PvTNew extends GameplanImperative {
   def doCarriers(): Unit = {
     get(2, Protoss.Stargate)
     get(Protoss.FleetBeacon)
-    buildOrder(Get(2, Protoss.Carrier))
+    once(2, Protoss.Carrier)
     if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
     get(Protoss.CarrierCapacity)
     if (upgradeComplete(Protoss.AirArmor, 3))  upgradeContinuously(Protoss.AirDamage)

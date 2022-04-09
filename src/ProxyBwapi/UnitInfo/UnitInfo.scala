@@ -214,7 +214,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
         cooldownAir,
         cooldownGround))
     + friendly
-      .filter(u => u.is(Protoss.Reaver) && u.scarabs == 0)
+      .filter(u => Protoss.Reaver(u) && u.scarabs == 0)
       .map(_.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
       .getOrElse(0)))
 

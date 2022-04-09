@@ -39,6 +39,11 @@ trait MacroActions {
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))
+  def once(unit: UnitClass): Unit = buildOrder(Get(1, unit))
+  def once(upgrade: Upgrade): Unit = get(upgrade)
+  def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
+  def once(tech: Tech): Unit = get(tech)
+  def once(quantity: Int, unit: UnitClass): Unit = buildOrder(Get(quantity, unit))
   def get(item: RequestBuildable): Unit = {
     With.scheduler.request(_requesterPlan, item)
   }

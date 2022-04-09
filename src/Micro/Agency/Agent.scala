@@ -148,7 +148,6 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   private var _ride: Option[FriendlyUnitInfo] = None
   private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
-  //private var _wantsPickup: Boolean = false
   private var _rideGoal: Option[Pixel] = None
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct

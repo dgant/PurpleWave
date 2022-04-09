@@ -195,7 +195,7 @@ object With {
     paths             = new Paths
     placement         = new PlacementCycle
     preplacement      = new Preplacement
-    priorities       = new Priorities
+    priorities        = new Priorities
     projections       = new Projections
     reaction          = new ReactionTimes
     recruiter         = new Recruiter

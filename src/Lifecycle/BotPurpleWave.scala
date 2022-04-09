@@ -1,20 +1,17 @@
 package Lifecycle
 
 import Debugging._
-import Lifecycle.With.game
+import Information.Geography.JBWEBWrapper
 import bwapi.DefaultBWListener
-import bwta.BWTA
-import jbweb.{Blocks, JBWEB, Stations, Walls}
+import jbweb.{JBWEB, Walls}
 
 class BotPurpleWave extends DefaultBWListener {
 
   override def onStart() {
     tryCatch(() => {
       With.onStart()
-      JBWEB.onStart(game, BWTA.getBWEM)
-      Walls.createFFE()
-      Stations.findStations()
-      Blocks.findBlocks()
+      Walls.logInfo = With.configuration.logstd
+      JBWEBWrapper.onStart()
       With.history.onStart()
     })
   }

@@ -2,23 +2,21 @@ package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Predicates.Compound.Check
-import Utilities.UnitFilters.{IsTank, IsWarrior}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
+import Planning.Predicates.Compound.Check
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
+import Utilities.UnitFilters.{IsTank, IsWarrior}
 
 class TerranFFABio extends GameplanTemplate {
-  
-  override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
+
   override val scoutPlan     : Plan  = NoPlan()
   override def aggressionPlan: Plan = new Aggression(0.8)
   

@@ -1,9 +1,9 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
-import Planning.Plans.Basic.{Do, Write}
+import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraRangeThenSpeed
@@ -96,8 +96,8 @@ class ZvT3HatchLing extends GameplanTemplate {
 
   override def buildPlans: Seq[Plan] = Seq(
 
-    new Do(() => With.blackboard.maxBuilderTravelFrames = GameTime(1, 0)()),
-    new Write(With.blackboard.preferCloseExpansion, true),
+    new Write(With.blackboard.maxBuilderTravelFrames, () => GameTime(1, 0)()),
+    new Write(With.blackboard.preferCloseExpansion, () => true),
 
     new If(
       new And(

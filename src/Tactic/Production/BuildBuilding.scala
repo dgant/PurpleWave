@@ -150,7 +150,7 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
 
   def needBuilder: Boolean = {
     lazy val proposedBuilder = builderLock.inquire().flatMap(_.headOption)
-    lazy val maxBuilderTravelFrames = With.blackboard.maxBuilderTravelFrames * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs) && proposedBuilder.isDefined))
+    lazy val maxBuilderTravelFrames = With.blackboard.maxBuilderTravelFrames() * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs) && proposedBuilder.isDefined))
     if (trainee.isDefined)                                    return buildingClass.isTerran
     if (desiredTile.isEmpty)                                  return false
     if (currencyLock.expectedFrames > maxBuilderTravelFrames) return false

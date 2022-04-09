@@ -59,7 +59,7 @@ class ZvT1HatchHydra extends GameplanTemplate {
   override def buildOrder: Seq[RequestBuildable] = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
 
   override def buildPlans = Seq(
-    new Write(With.blackboard.pushKiters, true),
+    new Write(With.blackboard.pushKiters, () => true),
     new FloorGasWorkersAt(1),
     new AllInIf(new EnemiesAtLeast(1, Terran.Bunker)),
     new If(

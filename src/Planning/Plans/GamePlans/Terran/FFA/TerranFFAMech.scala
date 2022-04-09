@@ -2,25 +2,23 @@ package Planning.Plans.GamePlans.Terran.FFA
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Predicates.Compound.{And, Check}
-import Utilities.UnitFilters.{IsTank, IsWarrior}
 import Planning.Plan
 import Planning.Plans.Army.Aggression
-import Planning.Plans.Basic.{Do, NoPlan}
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
-import Planning.Plans.GamePlans.Terran.Situational.PlaceBunkersAtNatural
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}
-import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
+import Planning.Predicates.Compound.{And, Check}
 import Planning.Predicates.Economy.GasAtLeast
+import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast}
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.UnitFilters.{IsTank, IsWarrior}
 
 class TerranFFAMech extends GameplanTemplate {
-  
-  override def placementPlan : Plan  = new PlaceBunkersAtNatural(2)
+
   override val scoutPlan     : Plan  = NoPlan()
   override def aggressionPlan: Plan = new Aggression(0.8)
   
@@ -45,14 +43,16 @@ class TerranFFAMech extends GameplanTemplate {
     new UpgradeContinuously(Terran.AirArmor),
     new Build(Get(1, Terran.ScienceFacility)))
   
-  private class BuildScienceFacilityForAddon(addon: UnitClass) extends Do(() => {
-    val numberOfCovertOps         = With.units.countOurs(Terran.CovertOps)
-    val numberOfPhysicsLab        = With.units.countOurs(Terran.PhysicsLab)
-    val numberOfThisAddon         = if (addon == Terran.CovertOps) numberOfCovertOps else numberOfPhysicsLab
-    val numberOfOtherAddon        = numberOfCovertOps + numberOfPhysicsLab - numberOfThisAddon
-    val numberOfScienceFacilities = if (numberOfThisAddon > 0) 0 else 1 + numberOfOtherAddon
-    With.scheduler.request(this, Get(numberOfScienceFacilities, Terran.ScienceFacility))
-  })
+  private class BuildScienceFacilityForAddon(addon: UnitClass) extends Plan {
+    override def onUpdate(): Unit = {
+      val numberOfCovertOps         = With.units.countOurs(Terran.CovertOps)
+      val numberOfPhysicsLab        = With.units.countOurs(Terran.PhysicsLab)
+      val numberOfThisAddon         = if (addon == Terran.CovertOps) numberOfCovertOps else numberOfPhysicsLab
+      val numberOfOtherAddon        = numberOfCovertOps + numberOfPhysicsLab - numberOfThisAddon
+      val numberOfScienceFacilities = if (numberOfThisAddon > 0) 0 else 1 + numberOfOtherAddon
+      With.scheduler.request(this, Get(numberOfScienceFacilities, Terran.ScienceFacility))
+    }
+  }
   
   override def attackPlan: Plan = new If(
     new UnitsAtLeast(20, IsWarrior),

@@ -18,7 +18,6 @@ class Configuration {
   // Mode settings //
   ///////////////////
 
-
   var logstd            = false
   var humanMode         = false
   var visualizeFun      = false
@@ -44,8 +43,6 @@ class Configuration {
   /////////////
 
   var skimulate                     = true
-  var avatarBattleDistancePixels    = 32.0 * 6.0
-  var battleHysteresisFrames        = Seconds(6)()
   var simulationFrames              = Seconds(15)()
   var simulationResolution          = 8
   var simulationBonusTankRange      = 64.0
@@ -56,7 +53,6 @@ class Configuration {
   ///////////
   
   var minimumMineralsBeforeMinedOut   = 150 * 8
-  var maxFramesToSendAdvanceBuilder   = Seconds(50)()
   var blockerMineralThreshold         = 250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   var enableTightBuildingPlacement    = false
   
@@ -67,10 +63,6 @@ class Configuration {
   var enablePerformancePauses             = true
   var maximumGamesHistoryPerOpponent      = 500
   var logTaskDuration                     = false
-  
-  var buildingPlacementRefreshPeriod      = Seconds(3)()
-  var buildingPlacementMaxTilesToEvaluate = 300
-  var buildingPlacementMaximumQueue       = 12
   
   ///////////////////
   // Visualization //

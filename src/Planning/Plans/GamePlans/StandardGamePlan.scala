@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans
 
 import Planning.Plans.Compound.SwitchOurRace
 import Planning.Plans.GamePlans.Protoss.ProtossStandardGamePlan
-import Planning.Plans.GamePlans.Terran.Standard.TvE.TerranStandardGamePlan
+import Planning.Plans.GamePlans.Terran.TvE.TerranStandardGamePlan
 import Planning.Plans.GamePlans.Zerg.ZergStandardGamePlan
 
 class StandardGamePlan extends SwitchOurRace(

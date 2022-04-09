@@ -52,7 +52,7 @@ class ZvT7Pool extends GameplanTemplate {
     Get(Zerg.Extractor))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new Write(With.blackboard.pushKiters, true),
+    new Write(With.blackboard.pushKiters, () => true),
     new AllInIf(new EnemiesAtLeast(1, IsAny(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),

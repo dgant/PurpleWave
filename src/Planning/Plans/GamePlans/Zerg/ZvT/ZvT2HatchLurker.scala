@@ -90,7 +90,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
   class HydraMuta extends Parallel(
 
     new CapGasAtRatioToMinerals(1.0, 100),
-    new Write(With.blackboard.preferCloseExpansion, true),
+    new Write(With.blackboard.preferCloseExpansion, () => true),
     new CancelOrders(_.techProducing.contains(Zerg.LurkerMorph)),
     new CancelOrders(_.upgradeProducing.contains(Zerg.ZerglingSpeed)),
 

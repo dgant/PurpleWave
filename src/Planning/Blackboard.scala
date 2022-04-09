@@ -2,10 +2,10 @@ package Planning
 
 import Lifecycle.With
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.Time.Seconds
 
 class Blackboard {
-  
-  var maxBuilderTravelFrames: Int = With.configuration.maxFramesToSendAdvanceBuilder
+
   
   protected var resets: Vector[() => Unit] = Vector.empty
   protected def add[T](property  : Property[T])  : Property[T] = {
@@ -26,6 +26,7 @@ class Blackboard {
   var gasWorkerCeiling      : Property[Int]               = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)
   var gasLimitFloor         : Property[Int]               = add(new Property(0))      // Max gas mining until at least this much gas
   var gasLimitCeiling       : Property[Int]               = add(new Property(100000)) // Stop gas mining after this much gas
+  var maxBuilderTravelFrames: Property[Int]               = add(new Property(Seconds(50)()))
   var gasWorkerRatio        : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
   var yoloing               : Property[Boolean]           = add(new Property(false))
   var allowIslandBases      : Property[Boolean]           = add(new Property(false))

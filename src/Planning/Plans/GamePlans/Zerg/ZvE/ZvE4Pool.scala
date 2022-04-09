@@ -49,7 +49,7 @@ class ZvE4Pool extends GameplanTemplate {
   
   override def buildPlans: Seq[Plan] = Vector(
     new CapGasAt(0, 0),
-    new Write(With.blackboard.pushKiters, true),
+    new Write(With.blackboard.pushKiters, () => true),
     new AllInIf(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
   
     new Pump(Zerg.Drone, 3),

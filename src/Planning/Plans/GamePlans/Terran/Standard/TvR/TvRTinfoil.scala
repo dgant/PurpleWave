@@ -1,7 +1,5 @@
 package Planning.Plans.GamePlans.Terran.Standard.TvR
 
-import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Trigger}
@@ -21,13 +19,6 @@ import Strategery.Strategies.Terran.TvR.TvRTinfoil
 class TvRTinfoil extends GameplanTemplateVsRandom {
   
   override val activationCriteria: Predicate = new Employing(TvRTinfoil)
-  
-  override lazy val blueprints = Vector(
-    new Blueprint(Terran.Bunker,       placement = Some(PlacementProfiles.hugTownHall), marginPixels = Some(32)),
-    new Blueprint(Terran.Barracks,     placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Terran.SupplyDepot,  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Terran.SupplyDepot,  placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Terran.Factory,      placement = Some(PlacementProfiles.hugTownHall)))
   
   override def attackPlan: Plan = new If(
     new UpgradeComplete(Terran.MarineRange),

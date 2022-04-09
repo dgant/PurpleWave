@@ -3,24 +3,23 @@ package Planning.Plans.GamePlans.Terran.Standard.TvE
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan}
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
-import Planning.Plans.Placement.{BuildBunkersAtEnemy, ProposePlacement}
+import Planning.Plans.Placement.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
-import Utilities.UnitCounters.CountExcept
-import Utilities.UnitFilters.IsWorker
 import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS
+import Utilities.UnitCounters.CountExcept
+import Utilities.UnitFilters.IsWorker
 
 class TvEProxyBBS extends GameplanTemplate {
   
@@ -34,11 +33,9 @@ class TvEProxyBBS extends GameplanTemplate {
     new Not(new FoundEnemyBase),
     new ScoutOn(Terran.Marine))
 
-  override def placementPlan: Plan = new ProposePlacement {
-    override lazy val blueprints = Vector(
-      new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)),
-      new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false), placement = Some(PlacementProfiles.proxyBuilding)))
-  }
+  override lazy val blueprints = Vector(
+    new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false)),
+    new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false)))
   
   override def attackPlan: Plan = new Parallel(
     new AttackAndHarass,

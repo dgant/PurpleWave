@@ -3,8 +3,6 @@ package Macro.Architecture
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.ArchitecturalAssessment.ArchitecturalAssessment
-import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
-import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -20,7 +18,6 @@ class Blueprint(
   var requireTownHallTile : Option[Boolean]           = None,
   var requireGasTile      : Option[Boolean]           = None,
   var requireResourceGap  : Option[Boolean]           = None,
-  var placement           : Option[PlacementProfile]  = None,
   var marginPixels        : Option[Double]            = None,
   val requireCandidates   : Option[Seq[Tile]]         = None,
   var preferZone          : Option[Zone]              = None,
@@ -39,7 +36,6 @@ class Blueprint(
   requireGasTile              = requireGasTile              .orElse(Some(building.isRefinery))
   requireResourceGap          = requireResourceGap          .orElse(Some(building.isTownHall))
   preferZone                  = preferZone                  .orElse(requireZone)
-  placement                   = placement                   .orElse(Some(PlacementProfiles.default(this)))
   respectHarvesting           = respectHarvesting           .orElse(Some( ! requireTownHallTile.get))
   marginPixels = marginPixels
     .orElse(Some(building).filter(_.canAttack).map(_.effectiveRangePixels.toDouble))
@@ -58,12 +54,12 @@ class Blueprint(
     }
     true
   }
-  def accepts(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+  def accepts(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
     val reason = assess(tile, request)
     reason == ArchitecturalAssessment.Accepted
   }
   
-  def assess(tile: Tile, request: Option[PlacementRequest] = None): ArchitecturalAssessment = {
+  def assess(tile: Tile, request: Option[PlacedBlueprint] = None): ArchitecturalAssessment = {
     if ( ! tile.valid) {
       return ArchitecturalAssessment.Invalid
     }
@@ -71,10 +67,11 @@ class Blueprint(
       return ArchitecturalAssessment.DoesntMatch
     }
     if (requirePower.get) {
-      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && With.architecture.powered3Height.get(tile) > request.map(_.requiredFrame).getOrElse(With.frame)) {
+      // We can allow use of forthcoming Pylon power by using a value higher than With.frame
+      if (heightTiles.get == 3 && ! With.grids.psi3Height.isSet(tile) && With.architecture.powered3Height.get(tile) > With.frame) {
         return ArchitecturalAssessment.Unpowered
       }
-      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && With.architecture.powered2Height.get(tile) > request.map(_.requiredFrame).getOrElse(With.frame)) {
+      if (heightTiles.get == 2 && ! With.grids.psi2Height.isSet(tile) && With.architecture.powered2Height.get(tile) > With.frame) {
         return ArchitecturalAssessment.Unpowered
       }
     }
@@ -126,7 +123,7 @@ class Blueprint(
         if ( ! requireTownHallTile.get && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
           return ArchitecturalAssessment.BlockedByUnit
         }
-        if (With.groundskeeper.isReserved(tile, request.flatMap(_.plan))) {
+        if ( ! With.groundskeeper.isFree(tile)) {
           return ArchitecturalAssessment.Reserved
         }
         y += 1
@@ -140,7 +137,6 @@ class Blueprint(
     (
       id.map(_.toString).getOrElse("x") + " " +
       building.toString + " " +
-      placement.toString + " " +
       widthTiles + "x" + heightTiles + " " +
       (if (powers.get)              "(Powers) "     else "") +
       (if (requirePower.get)        "(Powered) "    else "") +

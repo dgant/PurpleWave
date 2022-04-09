@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class LockUnits(val owner: Prioritized) {
   var interruptable : Boolean         = true
-  var matcher       : UnitFilter     = IsAnything
+  var matcher       : UnitFilter      = IsAnything
   var preference    : UnitPreference  = PreferAnything
   var counter       : UnitCounter     = CountEverything
 

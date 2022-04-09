@@ -45,7 +45,6 @@ class TaskQueueGlobal extends TaskQueueParallel(
     With.groundskeeper)
     .withSkipsMax(6)
     .withWeight(TaskQueueGlobalWeights.Planning),
-  With.placement,
   new TaskQueueSerial(
     "Micro",
     With.matchups,

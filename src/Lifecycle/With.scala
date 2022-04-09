@@ -87,11 +87,10 @@ object With {
   var matchups          : MatchupGraph        = _
   var paths             : Paths               = _
   var performance       : PerformanceMonitor  = _
-  var placement         : PlacementCycle      = _
   var preplacement      : Preplacement        = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
-  var priorities        : Priorities         = _
+  var priorities        : Priorities          = _
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
   var scheduler         : Scheduler           = _
@@ -100,7 +99,7 @@ object With {
   var strategy          : Strategist          = _
   var storyteller       : Storyteller         = _
   var squads            : Squads              = _
-  var tactics           : Tactician             = _
+  var tactics           : Tactician           = _
   var tasks             : TaskQueueParallel   = _
   var units             : UnitTracker         = _
   var unitsShown        : UnitsShown          = _
@@ -193,7 +192,6 @@ object With {
     manners           = new Manners
     matchups          = new MatchupGraph
     paths             = new Paths
-    placement         = new PlacementCycle
     preplacement      = new Preplacement
     priorities        = new Priorities
     projections       = new Projections

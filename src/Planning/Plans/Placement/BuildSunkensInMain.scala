@@ -2,16 +2,10 @@ package Planning.Plans.Placement
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
+import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import ProxyBwapi.Races.Zerg
 
-class BuildSunkensInMain(
-  towersRequired: Int,
-  placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon)
-  extends BuildZergStaticDefenseAtBases(
-      Zerg.SunkenColony,
-      towersRequired,
-      placement) {
+class BuildSunkensInMain(initialCount: Int) extends BuildZergStaticDefenseAtBases(initialCount, Zerg.SunkenColony) {
     
     override def eligibleBases: Iterable[Base] = Vector(With.geography.ourMain)
   }

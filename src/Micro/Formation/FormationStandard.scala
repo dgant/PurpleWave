@@ -109,7 +109,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     parameterize()
     With.grids.formationSlots.reset()
     With.geography.ourBases.foreach(_.resourcePathTiles.foreach(With.grids.formationSlots.block))
-    With.groundskeeper.reserved.view.map(_.target).foreach(With.grids.formationSlots.block)
+    With.groundskeeper.reserved.foreach(With.grids.formationSlots.block)
     With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(With.grids.formationSlots.block))
     if (style == FormationStyleGuard && groundUnits.exists(Protoss.Reaver)) {
       PixelRay(target, centroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs

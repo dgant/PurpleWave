@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.Standard.PvZ.PvZ2GateFlex
+import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2GateFlex
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race

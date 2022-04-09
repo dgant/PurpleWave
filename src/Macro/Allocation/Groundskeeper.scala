@@ -1,146 +1,59 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Macro.Architecture.Blueprint
-import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.Tile
 import Performance.Tasks.TimedTask
 import Planning.Plans.Basic.NoPlan
 import Planning.Prioritized
-import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Planning.ResourceLocks.LockTiles
 import Utilities.Time.Forever
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class TileReservation(plan: Prioritized, target: Tile, update: Int) {
-  def active: Boolean = update >= With.groundskeeper.updates - 1
-}
+final class Groundskeeper extends TimedTask {
+  class TileReservation(val tile: Tile, var owner: Prioritized, var update: Int) {
+    def renewed: Boolean = update >= With.groundskeeper.updates
+    def recent: Boolean = update >= With.groundskeeper.updates - 1
+  }
 
-case class RequestReservation(plan: Prioritized, update: Int) {
-  def active: Boolean = update >= With.groundskeeper.updates - 1
-}
+  lazy val tileReservations: Array[TileReservation] =
+    (0 until With.mapTileWidth).flatMap(x =>
+      (0 until With.mapTileHeight).map(y =>
+        new TileReservation(Tile(x, y), NoPlan(), -Forever()))).toArray
 
-class Groundskeeper extends TimedTask {
+  lazy val reservations = new ArrayBuffer[(LockTiles, Seq[TileReservation])]()
+
   var updates: Int = 0
-  val reserved: Array[TileReservation] = Array.fill(With.mapTileWidth * With.mapTileHeight)(TileReservation(NoPlan(), Tile(0, 0), -Forever()))
-
-  var suggestionsBefore   : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
-  var suggestionsNow      : mutable.Buffer[PlacementRequest] = ArrayBuffer.empty
-  var blueprintConsumers  : mutable.Map[Blueprint, FriendlyUnitInfo] = mutable.HashMap.empty
-  var requestHolders      : mutable.Map[PlacementRequest, RequestReservation] = mutable.HashMap.empty
 
   override protected def onRun(budgetMs: Long): Unit = {
     updates += 1
-    suggestionsBefore   = suggestionsNow
-    suggestionsNow      = ArrayBuffer.empty
-    blueprintConsumers.view.filterNot(_._2.alive).toSeq.foreach(p => blueprintConsumers.remove(p._1))
-    requestHolders.view.filterNot(_._2.active).toSeq.foreach(r => requestHolders.remove(r._1))
+    var inactive: Option[LockTiles] = None
+    do {
+      inactive = reservations.find(_._2.forall( ! _.recent)).map(_._1)
+      inactive.foreach(release)
+    } while (inactive.isDefined)
   }
 
-  def getRequestHolder(request: PlacementRequest): Option[Prioritized] = {
-    requestHolders.get(request).map(_.plan)
-  }
+  def isFree(tile: Tile): Boolean = tile.valid && ! tileReservations(tile.i).renewed
 
-  private def setRequestHolder(request: PlacementRequest, holder: Prioritized): Unit = {
-    requestHolders(request) = RequestReservation(holder, updates)
-  }
+  def reserved: Seq[Tile] = reservations.view.flatMap(_._2.view).map(_.tile)
 
-  private def suggestionsWithDuplicates: Seq[PlacementRequest] = (suggestionsNow.view ++ suggestionsBefore.view)
-    .filterNot(request => blueprintConsumers.contains(request.blueprint))
-
-  def suggestions: Seq[PlacementRequest] = suggestionsWithDuplicates.distinct
-
-  // I am a placer plan. I want to suggest a specific place to put a Gateway.
-  def suggest(unitClass: UnitClass, tile: Tile): Unit = {
-    val existing = matchSuggestion(unitClass, tile)
-    existing.foreach(refresh)
-    if (existing.isEmpty) {
-      suggestionsNow += new PlacementRequest(new Blueprint(unitClass), tile = Some(tile))
+  def satisfy(lock: LockTiles): Boolean = {
+    release(lock)
+    lazy val lockReservations = lock.tiles.view.map(_.i).map(tileReservations)
+    lock.satisfied = lock.tiles.forall(_.valid) && lockReservations.forall(res => res.owner == lock.owner || ! res.renewed)
+    if (lock.satisfied) {
+      lockReservations.foreach(_.owner = lock.owner)
+      lockReservations.foreach(_.update = updates)
+      reservations += ((lock, lockReservations))
     }
+    lock.satisfied
   }
 
-  // I am a placer plan. I want to suggest a specific request for placing an FFE
-  def suggest(request: PlacementRequest): Unit = {
-    if ( ! suggestionsNow.contains(request)) {
-      suggestionsNow += request
-    }
-  }
-
-  // I am a placer plan. I want to suggest a blueprint for placing a Gateway.
-  def suggest(blueprint: Blueprint): Unit = {
-   val existing = matchSuggestion(blueprint)
-    existing.foreach(refresh)
-    if (existing.isEmpty) {
-      suggestionsNow += new PlacementRequest(blueprint)
-    }
-  }
-
-  // I am a building plan. I want to indicate that I will need placement for a Gateway.
-  def request(requestingPlan: Prioritized, unitClass: UnitClass): PlacementRequest = {
-    val matched = matchSuggestion(requestingPlan, unitClass)
-    matched.foreach(refresh)
-    val output =
-      if (matched.isEmpty) {
-        val newRequest = new PlacementRequest(new Blueprint(unitClass))
-        suggestionsNow += newRequest
-        newRequest
-      } else {
-        matched.get
-      }
-    setRequestHolder(output, requestingPlan)
-    output
-  }
-
-  // I am a building plan. I want to indicate that I have used this blueprint to build something
-  def consume(blueprint: Blueprint, unit: FriendlyUnitInfo): Unit = {
-    blueprintConsumers(blueprint) = unit
-  }
-
-  private def refresh(request: PlacementRequest): Unit = {
-    suggestionsBefore -= request
-    if (! suggestionsNow.contains(request)) {
-      suggestionsNow += request
-    }
-  }
-
-  private def matchSuggestion(blueprint: Blueprint): Option[PlacementRequest] = {
-    suggestionsWithDuplicates.find(_.blueprint == blueprint)
-  }
-
-  private def matchSuggestion(unitClass: UnitClass, tile: Tile): Option[PlacementRequest] = {
-    // Put the blueprint consumer check at the end because it's the slowest
-    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.tile.contains(tile))
-  }
-
-  private def matchSuggestion(plan: Prioritized, unitClass: UnitClass): Option[PlacementRequest] = {
-    // Put the blueprint consumer check at the end because it's the slowest
-    suggestionsWithDuplicates.find(s => s.unitClass == unitClass && s.plan.forall(plan==))
-  }
-
-  def isReserved(tile: Tile, plan: Option[Prioritized] = None): Boolean = {
-    if ( ! tile.valid) return true
-    val reservation = reserved(tile.i)
-    if ( ! reservation.active) return false
-    if ( ! plan.contains(reservation.plan)) return true
-    false
-  }
-
-  def reserve(plan: Prioritized, target: Tile, unitClass: UnitClass): Boolean = {
-    reserve(plan, unitClass.tileArea.add(target).tiles)
-  }
-
-  def reserve(plan: Prioritized, tiles: Seq[Tile]): Boolean = {
-    val canReserve = tiles.forall(tile => ! isReserved(tile, plan = Some(plan)))
-    if (canReserve) {
-      tiles.foreach(tile => reserved(tile.i) = TileReservation(plan, tile, updates))
-    } else {
-      // Where I've seen this, it's been:
-      // 1. A plan calls reserve()
-      // 2. But it calls it on a tile reserved by a plan with a highier priority
-      With.logger.warn(f"Attempting to reserve unreservable tiles ${tiles.toVector} for $plan")
-    }
-    canReserve
+  def release(lock: LockTiles): Unit = {
+    val current = reservations.view.filter(_._1.owner == lock.owner).toVector
+    current.view.flatMap(_._2).filter(_.owner == lock.owner).foreach(_.update = -Forever())
+    reservations --= current
+    lock.satisfied = false
   }
 }

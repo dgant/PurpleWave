@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
 import Lifecycle.With
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
@@ -61,8 +60,6 @@ class ZvP2HatchMuta extends GameplanTemplate {
     new If(
       MineralsAtLeast(400),
       new RequireMiningBases(4)))
-  
-  private def sunkenProfile = PlacementProfiles.defensive
 
   override def attackPlan: Plan = new If(
     new Or(
@@ -116,25 +113,25 @@ class ZvP2HatchMuta extends GameplanTemplate {
       UnitsAtMost(0, Zerg.Spire, complete = true)),
     new If(
       EnemiesAtLeast(17, ZealotOrDragoon),
-      new BuildSunkensAtNatural(7, sunkenProfile),
+      new BuildSunkensAtNatural(7),
       new If(
         EnemiesAtLeast(13, ZealotOrDragoon),
-        new BuildSunkensAtNatural(6, sunkenProfile),
+        new BuildSunkensAtNatural(6),
         new If(
           EnemiesAtLeast(10, ZealotOrDragoon),
-          new BuildSunkensAtNatural(5, sunkenProfile),
+          new BuildSunkensAtNatural(5),
           new If(
             EnemiesAtLeast(7, ZealotOrDragoon),
-            new BuildSunkensAtNatural(4, sunkenProfile),
+            new BuildSunkensAtNatural(4),
             new If(
               EnemiesAtLeast(5, ZealotOrDragoon),
-              new BuildSunkensAtNatural(3, sunkenProfile),
+              new BuildSunkensAtNatural(3),
               new If(
                 EnemiesAtLeast(3, ZealotOrDragoon),
-                new BuildSunkensAtNatural(2, sunkenProfile),
+                new BuildSunkensAtNatural(2),
                 new If(
                   EnemyStrategy(With.fingerprints.twoGate),
-                  new BuildSunkensAtNatural(2, sunkenProfile)))))))))
+                  new BuildSunkensAtNatural(2)))))))))
   
   class ReactiveZerglings extends If(
     UnitsAtMost(0, Zerg.Spire, complete = true),

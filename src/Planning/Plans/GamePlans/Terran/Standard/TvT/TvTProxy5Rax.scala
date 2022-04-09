@@ -2,35 +2,27 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{Do, NoPlan, Write}
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
-import Planning.Plans.Placement.ProposePlacement
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Utilities.UnitCounters.CountExcept
-import Utilities.UnitFilters.IsWorker
 import Planning.{Plan, Predicate, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax
+import Utilities.UnitCounters.CountExcept
+import Utilities.UnitFilters.IsWorker
 
 class TvTProxy5Rax extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvTProxy5Rax)
 
-  override def placementPlan: Plan = new ProposePlacement{
-    override lazy val blueprints = Vector(
-      new Blueprint(
-        Terran.Barracks,
-        preferZone = ProxyPlanner.proxyMiddle,
-        placement = Some(PlacementProfiles.proxyBuilding)))
-  }
+  override lazy val blueprints = Vector(new Blueprint(Terran.Barracks, preferZone = ProxyPlanner.proxyMiddle))
 
   override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),

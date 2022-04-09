@@ -103,7 +103,7 @@ object FormationZone {
             // Don't stand in a choke
             && ! zone.edges.exists(e => e.radiusPixels < 96 && e.pixelCenter.pixelDistance(tile.center) < e.radiusPixels + 32)
             // Stand in an unoccupied tile
-            && (flyer || (tile.walkableUnchecked && ! occupied.get(tile) && ! With.groundskeeper.isReserved(tile)))
+            && (flyer || (tile.walkableUnchecked && ! occupied.get(tile) && With.groundskeeper.isFree(tile)))
         )
         val bestTile = Maff.minBy(candidates)(tile => {
           val exitDistanceTiles = tile.center.pixelDistance(Maff.projectedPointOnSegment(tile.center, edge.sidePixels.head, edge.sidePixels.last)).toInt / 32

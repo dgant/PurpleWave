@@ -3,19 +3,13 @@ package Planning.Plans.Macro.Protoss
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Pump
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 
-class BuildTowersAtBases(
-  towersRequired  : Int,
-  placementPylon  : PlacementProfile = PlacementProfiles.hugWorkersWithPylon,
-  placementTower  : PlacementProfile = PlacementProfiles.hugWorkersWithCannon,
-  towerClass      : UnitClass = Protoss.PhotonCannon)
-    extends Plan {
+class BuildTowersAtBases(towersRequired: Int, towerClass: UnitClass = Protoss.PhotonCannon) extends Plan {
 
   override def onUpdate() {
     val bases = eligibleBases
@@ -37,8 +31,7 @@ class BuildTowersAtBases(
       new Blueprint(
         Protoss.Pylon,
         requireZone       = Some(zone),
-        requireCandidates = Some(zone.tilesSeq),
-        placement         = Some(placementPylon))))
+        requireCandidates = Some(zone.tilesSeq))))
     .toMap
 
   private val towerBlueprintsByZone = With.geography.zones
@@ -48,8 +41,7 @@ class BuildTowersAtBases(
         new Blueprint(
           towerClass,
           requireZone       = Some(zone),
-          requireCandidates = Some(zone.tilesSeq),
-          placement         = Some(placementTower)))))
+          requireCandidates = Some(zone.tilesSeq)))))
     .toMap
 
   protected def eligibleBases: Iterable[Base] = {
@@ -64,13 +56,11 @@ class BuildTowersAtBases(
     val needPylons = towerClass.requiresPsi
     
     if (needPylons && pylonsInZone.isEmpty) {
-      With.groundskeeper.suggest(pylonBlueprintByZone(zone))
       new Pump(Protoss.Pylon, maximumConcurrently = 1)
     }
 
     if ( ! needPylons || pylonsInZone.exists(_.aliveAndComplete)) {
       val newBlueprints = towerBlueprintsByZone(zone).take(towersToAdd)
-      newBlueprints.foreach(With.groundskeeper.suggest)
       new Pump(towerClass, maximumConcurrently = towersToAdd).update()
     }
   }

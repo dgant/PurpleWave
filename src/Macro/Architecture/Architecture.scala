@@ -3,7 +3,6 @@ package Macro.Architecture
 import Information.Geography.Types.Zone
 import Information.Grids.Versioned.GridVersionedInt
 import Lifecycle.With
-import Macro.Architecture.PlacementRequests.PlacementRequest
 import Mathematics.Points.{Tile, TileRectangle}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -39,25 +38,25 @@ class Architecture {
     recalculateBuilderAccess()
   }
   
-  def buildable(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+  def buildable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
     With.grids.buildable.get(tile) && ! unbuildable.excludes(tile, request)
   }
   
-  def walkable(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+  def walkable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
     With.grids.walkable.get(tile) &&
       ! unwalkable.excludes(tile, request) &&
       ! tile.zone.bases.exists(_.townHallArea.contains(tile))
   }
   
-  def gassable(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+  def gassable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
     ! ungassable.excludes(tile, request)
   }
 
-  def townhallable(tile: Tile, request: Option[PlacementRequest] = None): Boolean = {
+  def townhallable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
     ! untownhallable.excludes(tile, request)
   }
   
-  def diffPlacement(tile: Tile, request: PlacementRequest): ArchitectureDiff = {
+  def diffPlacement(tile: Tile, request: PlacedBlueprint): ArchitectureDiff = {
     
     val output = new ArchitectureDiffSeries
   

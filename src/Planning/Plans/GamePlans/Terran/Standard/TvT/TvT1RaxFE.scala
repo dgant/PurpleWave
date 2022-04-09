@@ -3,7 +3,6 @@ package Planning.Plans.GamePlans.Terran.Standard.TvT
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
@@ -33,12 +32,6 @@ class TvT1RaxFE extends GameplanTemplate {
   override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass)
 
   val naturalZone: Zone = With.geography.ourNatural.zone
-  override lazy val blueprints: Seq[Blueprint] = Seq(
-    new Blueprint(Terran.Bunker,       preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(96)),
-    new Blueprint(Terran.Barracks,     preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0)),
-    new Blueprint(Terran.SupplyDepot,  preferZone = Some(naturalZone), placement = Some(PlacementProfiles.defensive), marginPixels = Some(0))
-  )
 
   override def buildOrder: Seq[RequestBuildable] = Seq(
     Get(9, Terran.SCV),

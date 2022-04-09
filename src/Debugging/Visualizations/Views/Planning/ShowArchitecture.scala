@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
+import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.View
 import Lifecycle.With
 import Macro.Architecture.GridExclusion
@@ -9,29 +9,13 @@ import bwapi.Color
 
 object ShowArchitecture extends View {
 
-  override def renderScreen(): Unit = {
-    renderGroundskeeperScreen()
-  }
-
   override def renderMap(): Unit = {
-    renderGroundskeeperMap()
-    renderArchitectureMap()
-  }
-
-  def renderGroundskeeperScreen(): Unit = {
-    DrawScreen.column(5, 40,
-      With.groundskeeper.suggestions
-        .filter(_.tile.isEmpty)
-        .map(s =>s.blueprint.toString + s.plan.map(_.toString).getOrElse("")))
-  }
-
-  def renderGroundskeeperMap(): Unit = {
     With.viewport.rectangleTight().tiles.foreach(tile => {
       if (tile.valid) {
-        val reservation = With.groundskeeper.reserved(tile.i)
-        if (reservation.active) {
+        val reservation = With.groundskeeper.tileReservations(tile.i)
+        if (reservation.renewed) {
           DrawMap.tile(tile, color = Colors.NeonYellow)
-          DrawMap.label(reservation.plan.toString, tile.center)
+          DrawMap.label(reservation.owner.toString, tile.center)
         }
         if (With.architecture.unbuildable.get(tile).isDefined) {
           DrawMap.tile(tile, 12, Colors.DarkRed)
@@ -52,11 +36,6 @@ object ShowArchitecture extends View {
           DrawMap.circle(tile.center, 4, Colors.BrightTeal)
         }
       }
-    })
-    With.groundskeeper.suggestions.filter(_.tile.isDefined).foreach(suggestion => {
-      val tile = suggestion.tile.get
-      DrawMap.tileRectangle(suggestion.blueprint.relativeBuildArea.add(tile), Colors.MediumBlue)
-      DrawMap.label(suggestion.plan.map(_.toString).getOrElse("X"), tile.center)
     })
   }
 

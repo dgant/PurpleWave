@@ -1,8 +1,5 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
-import Lifecycle.With
-import Macro.Architecture.Blueprint
-import Macro.Architecture.Heuristics.PlacementProfiles
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
@@ -20,7 +17,7 @@ import Strategery.Strategies.Zerg.ZvT13PoolMuta
 
 class ZvT13PoolMuta extends GameplanTemplate {
 
-  override val activationCriteria: Predicate = new Employing(ZvT13PoolMuta)
+  override val activationCriteria: Predicate = Employing(ZvT13PoolMuta)
   override def aggressionPlan: Plan = new Aggression(0.7)
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,
@@ -49,11 +46,6 @@ class ZvT13PoolMuta extends GameplanTemplate {
       initialBefore = new Build(Get(1, Zerg.CreepColony))),
     new BuildOrder(
       Get(3, Zerg.Overlord)))
-  
-  override def blueprints: Seq[Blueprint] = Vector(
-    new Blueprint(Zerg.CreepColony, requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Zerg.CreepColony, requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)),
-    new Blueprint(Zerg.CreepColony, requireZone = Some(With.geography.ourNatural.zone), placement = Some(PlacementProfiles.hugTownHall)))
 
   override def buildPlans: Seq[Plan] = Vector(
     new Pump(Zerg.Mutalisk),

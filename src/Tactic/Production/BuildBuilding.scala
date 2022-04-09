@@ -1,7 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import Macro.Architecture.PlacementRequests.PlacementRequest
+import Macro.Architecture.PlacedBlueprint
 import Macro.Requests.RequestBuildable
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
@@ -25,11 +25,11 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   builderLock.interruptable = false
 
   private var orderedTile : Option[Tile]                = None
-  private var placement   : Option[PlacementRequest]    = None
+  private var placement   : Option[PlacedBlueprint]     = None
   private var waitForBuilderToRecallUntil: Option[Int]  = None
 
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
-  def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(placement.flatMap(_.tile))
+  def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft) //TODO: .orElse(placement.flatMap(_.tile))
 
   private var _trainee: Option[FriendlyUnitInfo] = None
   override def trainee: Option[FriendlyUnitInfo] = _trainee
@@ -43,7 +43,8 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   }
 
   override def onCompletion(): Unit = {
-    placement.map(_.blueprint).foreach(With.groundskeeper.consume(_, trainee.get))
+    // TODO: Probably not required anymore. Which means we can likely kill this hook entirely
+    // placement.map(_.blueprint).foreach(With.groundskeeper.consume(_, trainee.get))
   }
 
   override def onUpdate() {
@@ -77,7 +78,9 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     trainee.foreach(_.friendly.foreach(_.setProducer(this)))
     orderedTile = trainee.map(_.tileTopLeft).orElse(orderedTile)
 
-    if (trainee.isEmpty) { placement = Some(With.groundskeeper.request(this, buildingClass)).filter(_.tile.isDefined) }
+    // TODO: Replace or delete
+    // if (trainee.isEmpty) { placement = Some(With.groundskeeper.request(this, buildingClass)).filter(_.tile.isDefined) }
+
     if (desiredTile.isEmpty) return
     if ( ! hasSpent) { currencyLock.acquire() }
     if ( ! needBuilder) {
@@ -134,7 +137,8 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
             canFight    = false
           })
         }
-        desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
+        // TODO: Use locks instead
+        //desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
       } else if (buildingClass.isTerran) {
         builder.get.intend(this, new Intention {
           toFinishConstruction = trainee

@@ -1,10 +1,6 @@
 package Planning.Plans.Placement
 
-import Macro.Architecture.Heuristics.{PlacementProfile, PlacementProfiles}
 import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import ProxyBwapi.Races.Terran
 
-class BuildBunkersAtBases(
-  initialCount: Int,
-  placement: PlacementProfile = PlacementProfiles.hugWorkersWithCannon)
-    extends BuildTowersAtBases(initialCount, placement, placement, Terran.Bunker)
+class BuildBunkersAtBases(initialCount: Int) extends BuildTowersAtBases(initialCount, Terran.Bunker)

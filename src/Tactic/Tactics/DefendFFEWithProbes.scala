@@ -83,7 +83,7 @@ class DefendFFEWithProbes extends Tactic {
     }
 
     def occupied(pixel: Pixel): Boolean = (
-      pixel.tile.adjacent9.exists(With.groundskeeper.isReserved(_))
+      ! pixel.tile.adjacent9.forall(With.groundskeeper.isFree)
     )
     workersByCannon.foreach(pair => {
       val cannon = pair._1

@@ -11,7 +11,7 @@ import Planning.Plans.GamePlans.Terran.Situational.RepairBunker
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Terran.PopulateBunkers
-import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural, ProposePlacement}
+import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
@@ -35,11 +35,9 @@ class TvP1RaxFE extends GameplanTemplate {
     new UnitsAtLeast(1, Terran.EngineeringBay)
   ))
 
-   override def placementPlan: Plan = new ProposePlacement {
-     override lazy val blueprints: Seq[Blueprint] = Vector(
-       new Blueprint(Terran.Barracks,     preferZone = Some(With.geography.ourNatural.zone)),
-       new Blueprint(Terran.SupplyDepot,  preferZone = Some(With.geography.ourNatural.zone)))
-   }
+   override lazy val blueprints: Seq[Blueprint] = Vector(
+    new Blueprint(Terran.Barracks,     preferZone = Some(With.geography.ourNatural.zone)),
+    new Blueprint(Terran.SupplyDepot,  preferZone = Some(With.geography.ourNatural.zone)))
 
   override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot)
 

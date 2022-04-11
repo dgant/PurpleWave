@@ -32,7 +32,7 @@ class Template {
   def width   : Int         = right() - left()
   def height  : Int         = bottom() - top()
 
-  def add(point: Point, requirement: TemplatePointRequirement): Template = {
+   def add(point: Point, requirement: TemplatePointRequirement): Template = {
     points += TemplatePoint(point, requirement)
     left.invalidate()
     right.invalidate()

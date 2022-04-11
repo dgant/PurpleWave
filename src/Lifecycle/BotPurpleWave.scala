@@ -3,7 +3,7 @@ package Lifecycle
 import Debugging._
 import Information.Geography.JBWEBWrapper
 import bwapi.DefaultBWListener
-import jbweb.{JBWEB, Walls}
+import jbweb.Walls
 
 class BotPurpleWave extends DefaultBWListener {
 
@@ -35,18 +35,18 @@ class BotPurpleWave extends DefaultBWListener {
   }
 
   override def onUnitDestroy(unit: bwapi.Unit) {
-    JBWEB.onUnitDestroy(unit)
+    JBWEBWrapper.onUnitDestroy(unit)
     tryCatch(() => With.units.onUnitDestroy(unit))
   }
 
   override def onUnitComplete(unit: bwapi.Unit) {}
   override def onUnitDiscover(unit: bwapi.Unit): Unit = {
-    JBWEB.onUnitDiscover(unit)
+    JBWEBWrapper.onUnitDiscover(unit)
   }
   override def onUnitHide(unit: bwapi.Unit) {}
 
   override def onUnitMorph(unit: bwapi.Unit): Unit = {
-    JBWEB.onUnitMorph(unit)
+    JBWEBWrapper.onUnitMorph(unit)
   }
 
   override def onUnitRenegade(unit: bwapi.Unit): Unit = {

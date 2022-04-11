@@ -32,9 +32,8 @@ trait Fits {
   }
 
   def place(fit: Fit): Unit = {
-    fit.template.points.view.map(Foundation(fit.origin, _)).foreach(place)
+    fit.template.points.view.map(p => Foundation(fit.origin.add(p.point), p)).foreach(place)
   }
-
   def place(foundation: Foundation): Unit = {
     val point = foundation.point
     val requirement = point.requirement

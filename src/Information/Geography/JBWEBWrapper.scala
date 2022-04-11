@@ -30,4 +30,8 @@ object JBWEBWrapper {
     JBWEB.onUnitMorph(unit)
   }
 
+  def draw(): Unit = {
+    if ( ! enabled) return
+    JBWEB.draw()
+  }
 }

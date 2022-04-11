@@ -4,10 +4,9 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, SpecificPoints}
 import Performance.Tasks.TimedTask
-import Placement.Generation.{TerranWall, Templates}
-import Placement.Templating.{Fit, Fitter}
+import Placement.Generation.{Fit, Fitter, Templates, TerranWall}
 
-class Preplacement extends TimedTask with Fitter {
+class Placement extends TimedTask with Fitter {
 
   private var initialized: Boolean = false
 
@@ -17,9 +16,9 @@ class Preplacement extends TimedTask with Fitter {
     With.units.neutral
       .filter(_.unitClass.isBuilding)
       .filterNot(u => u.base.exists(_.townHallArea.intersects(u.tileArea)))
-      .foreach(_.tileArea.tiles.map(Fit(_, Templates.walkway)).foreach(place))
-    With.geography.bases.foreach(b => place(Fit(b.townHallTile, Templates.townhall)))
-    With.geography.bases.foreach(_.resourcePathTiles.foreach(t => place(Fit(t, Templates.walkway))))
+      .foreach(_.tileArea.tiles.map(Fit(_, Templates.walkway)).foreach(index))
+    With.geography.bases.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
+    With.geography.bases.foreach(_.resourcePathTiles.foreach(t => index(Fit(t, Templates.walkway))))
     With.geography.zones.foreach(preplaceWalls)
     With.geography.zones.foreach(preplaceZone)
   }
@@ -35,21 +34,19 @@ class Preplacement extends TimedTask with Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    addFits(fitAndPlace     (exitTile,    bounds, directionToBack,  Templates.batterycannon))
-    addFits(fitAndPlaceAll  (cornerFront, bounds, directionToBack,  Templates.initialLayouts))
-    addFits(fitAndPlaceAll  (cornerFront, bounds, directionToBack,  Templates.gateways))
-    addFits(fitAndPlaceAll  (cornerBack,  bounds, directionToFront, Templates.tech))
-    addFits(fitAndPlaceAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 2))
-    addFits(fitAndPlaceAll  (cornerBack,  bounds, directionToFront, Templates.tech))
-    addFits(fitAndPlaceAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 5))
+    fitAndIndex     (exitTile,    bounds, directionToBack,  Templates.batterycannon)
+    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.initialLayouts)
+    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways)
+    fitAndIndexAll  (cornerBack,  bounds, directionToFront, Templates.tech)
+    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 2)
+    fitAndIndexAll  (cornerBack,  bounds, directionToFront, Templates.tech)
+    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 5)
   }
 
   private def preplaceWalls(zone: Zone): Unit = {
     // DISABLED. Terran walls are too slow to use as-is
     if (With.self.isTerran && false) {
-      val terranWall = TerranWall(zone)
-      terranWall.foreach(addFit)
-      terranWall.foreach(place)
+      TerranWall(zone).foreach(index)
     }
   }
 }

@@ -5,7 +5,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
-import Placement.Templating.{Fit, Template}
+import Placement.Templating.Template
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 

@@ -1,8 +1,9 @@
-package Placement.Templating
+package Placement.Generation
 
 import Lifecycle.With
 import Mathematics.Points._
 import Placement.Access.Fits
+import Placement.Templating.Template
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -11,14 +12,14 @@ trait Fitter extends Fits {
   /**
     * Attempts to fit a single template.
     */
-  def fitAndPlace(from: Tile, bounds: TileRectangle, direction: Direction, template: Template, maxFits: Int = 1): Seq[Fit] = {
-    fitAndPlaceAll(from, bounds, direction, Seq(template), maxFits)
+  def fitAndIndex(from: Tile, bounds: TileRectangle, direction: Direction, template: Template, maxFits: Int = 1): Seq[Fit] = {
+    fitAndIndexAll(from, bounds, direction, Seq(template), maxFits)
   }
 
   /**
     * Attempts to fit each of a sequence of templates.
     */
-  def fitAndPlaceAll(from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[Template], maxFits: Int = 1): Seq[Fit] = {
+  def fitAndIndexAll(from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[Template], maxFits: Int = 1): Seq[Fit] = {
     val output = new ArrayBuffer[Fit]
 
     var templateIndex = 0
@@ -29,7 +30,7 @@ trait Fitter extends Fits {
         val tile = generator.next()
         if (fitsAt(template, tile)) {
           val newFit = Fit(tile, template)
-          place(newFit)
+          index(newFit)
           output += newFit
           if (output.length >= maxFits) {
             return output
@@ -59,7 +60,7 @@ trait Fitter extends Fits {
           } else if ( ! tile.add(slot.width - 1, slot.height - 1).valid) {
             violated = true
           } else {
-            val previous = requirementAt(tile)
+            val previous = at(tile)
             if (slot.walkableBefore) {
               if ( ! With.grids.walkable.get(tile)) {
                 violated = true

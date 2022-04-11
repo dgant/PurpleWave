@@ -1,4 +1,4 @@
-package Placement.Templating
+package Placement.Access
 
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 

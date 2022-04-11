@@ -21,7 +21,7 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import NeoGeo.{MapIdentifier, NeoGeo}
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
-import Placement.Preplacement
+import Placement.Placement
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -87,7 +87,7 @@ object With {
   var matchups          : MatchupGraph        = _
   var paths             : Paths               = _
   var performance       : PerformanceMonitor  = _
-  var preplacement      : Preplacement        = _
+  var placement         : Placement        = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
   var priorities        : Priorities          = _
@@ -192,7 +192,7 @@ object With {
     manners           = new Manners
     matchups          = new MatchupGraph
     paths             = new Paths
-    preplacement      = new Preplacement
+    placement         = new Placement
     priorities        = new Priorities
     projections       = new Projections
     reaction          = new ReactionTimes

@@ -1,7 +1,8 @@
-package Placement.Templating
+package Placement.Generation
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.{Tile, TileRectangle}
+import Placement.Templating.Template
 import bwapi.Color
 
 case class Fit(origin: Tile, template: Template) {

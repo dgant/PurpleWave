@@ -9,7 +9,7 @@ import Mathematics.Points.{Direction, Pixel, SpecificPoints, TileGenerator}
 object ShowPreplacement extends View {
 
   override def renderMap(): Unit = {
-    With.preplacement.fits.foreach(_.drawMap())
+    With.preplacement.allFits.foreach(_.drawMap())
   }
 
   def showGenerator() {

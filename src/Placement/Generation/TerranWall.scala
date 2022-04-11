@@ -1,15 +1,15 @@
-package Placement
+package Placement.Generation
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
+import Placement.Templating.{Fit, Template}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 
-
-object PreplaceTerranWall {
+object TerranWall {
 
   def apply(zone: Zone): Option[Fit] = {
     if (zone.exit.isEmpty) return None
@@ -28,8 +28,7 @@ object PreplaceTerranWall {
     if (tileOut.isEmpty) return None
     val altitudes = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct
     val unitsToPlace = Seq(Seq(Terran.Barracks), Seq(Terran.Barracks, Terran.SupplyDepot), Seq(Terran.Barracks, Terran.SupplyDepot, Terran.SupplyDepot))
-    //val unitToBlock = Seq(Zerg.Zergling, Protoss.Zealot, Protoss.Dragoon)
-    val unitToBlock = Seq(Zerg.Zergling)
+    val unitToBlock = Seq(Zerg.Zergling, Protoss.Zealot, Protoss.Dragoon)
     val trials = altitudes.flatMap(a => unitsToPlace.view.flatMap(up => unitToBlock.map((a, up, _))))
     trials.map(t => placeAll(t._1, tileIn.get, tileOut.get, searchArea, t._2, Seq.empty, t._3)).find(_.isDefined).flatten
   }
@@ -42,7 +41,7 @@ object PreplaceTerranWall {
             Tile(
               Maff.min(placed.view.map(_._1.x)).getOrElse(0),
               Maff.min(placed.view.map(_._1.y)).getOrElse(0)),
-            new PreplacementTemplate(placed)))
+            new Template(placed)))
         else None
     }
     area.tiles.filter(_.altitude == altitude).map(t => placeAll(altitude, tileIn, tileOut, area, unplaced.drop(1), placed :+ (t, unplaced.head), shouldBlock)).find(_.isDefined).flatten

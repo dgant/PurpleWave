@@ -2,6 +2,4 @@ package Utilities.UnitPreferences
 
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-trait UnitPreference {
-  def apply(unit: FriendlyUnitInfo): Double
-}
+trait UnitPreference extends Function[FriendlyUnitInfo, Double]

@@ -44,12 +44,5 @@ abstract class RequestBuildable(
     }
   }
 
-  override def hashCode(): Int = buildable.hashCode() ^ quantity
-  override def equals(anyOther: scala.Any): Boolean = {
-    if ( ! anyOther.isInstanceOf[RequestBuildable]) return false
-    val other = anyOther.asInstanceOf[RequestBuildable]
-    buildable == other.buildable && quantity == other.quantity
-  }
-
   override def toString: String = f"Buildable ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}${if (upgrade.isDefined) f" lvl $quantity" else ""}"
 }

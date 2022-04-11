@@ -1,4 +1,4 @@
-package Placement
+package Placement.Templating
 
 import Mathematics.Maff
 import Mathematics.Points._
@@ -8,7 +8,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
 
-class PreplacementTemplate {
+class Template {
 
   def this(units: Seq[(Tile, UnitClass)]) {
     this()
@@ -18,11 +18,10 @@ class PreplacementTemplate {
       Point(
         tileUnit._1.x - xMin,
         tileUnit._1.y - yMin),
-      new PreplacementRequirement(tileUnit._2)))
+      new TemplatePointRequirement(tileUnit._2)))
   }
 
-  val points: ArrayBuffer[PreplacementSlot] = new ArrayBuffer[PreplacementSlot]()
-
+  val points  : ArrayBuffer[TemplatePoint] = new ArrayBuffer
   val left    : Cache[Int]  = new CacheForever(() => Maff.min(points.view.map(_.point.x)).getOrElse(0))
   val right   : Cache[Int]  = new CacheForever(() => Maff.max(points.view.map(p => p.point.x + p.requirement.width)).getOrElse(0))
   val top     : Cache[Int]  = new CacheForever(() => Maff.min(points.view.map(_.point.y)).getOrElse(0))
@@ -33,8 +32,8 @@ class PreplacementTemplate {
   def width   : Int         = right() - left()
   def height  : Int         = bottom() - top()
 
-  def add(point: Point, requirement: PreplacementRequirement): PreplacementTemplate = {
-    points += PreplacementSlot(point, requirement)
+  def add(point: Point, requirement: TemplatePointRequirement): Template = {
+    points += TemplatePoint(point, requirement)
     left.invalidate()
     right.invalidate()
     top.invalidate()
@@ -45,7 +44,7 @@ class PreplacementTemplate {
     this
   }
 
-  def add(string: String): PreplacementTemplate = {
+  def add(string: String): Template = {
     var x: Int = 0
     var y: Int = 0
     var onWhitespace: Boolean = true
@@ -59,23 +58,24 @@ class PreplacementTemplate {
         }
       } else {
         onWhitespace = false
-        val pt: PreplacementRequirement = char.toLower match {
-          case '-' => ReservedWalkable
-          case 't' => new PreplacementRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery)
-          case 'h' => new PreplacementRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern) // 3x2 tech
-          case 'p' => new PreplacementRequirement(Protoss.Pylon)
-          case 'g' => new PreplacementRequirement(Terran.Barracks, Protoss.Gateway, Protoss.Stargate) // 4x3 production
-          case 'r' => new PreplacementRequirement(Protoss.RoboticsFacility) // 3x2 production
-          case 'f' => new PreplacementRequirement(Protoss.Forge)
-          case 'y' => new PreplacementRequirement(Protoss.CyberneticsCore)
-          case 'c' => new PreplacementRequirement(Protoss.PhotonCannon)
-          case 'b' => new PreplacementRequirement(Protoss.ShieldBattery)
-          case '4' => new PreplacementRequirement(4, 3)
-          case '3' => new PreplacementRequirement(3, 2)
-          case '2' => new PreplacementRequirement(2, 2)
-          case default => Unreserved
+        val pt: TemplatePointRequirement = char.toLower match {
+          case '-' => RequireWalkable
+          case 't' => new TemplatePointRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery)
+          case 'h' => new TemplatePointRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern) // 3x2 tech
+          case 'p' => new TemplatePointRequirement(Protoss.Pylon)
+          case 'g' => new TemplatePointRequirement(Terran.Barracks, Protoss.Gateway, Protoss.Stargate) // 4x3 production
+          case 'r' => new TemplatePointRequirement(Protoss.RoboticsFacility) // 3x2 production
+          case 'f' => new TemplatePointRequirement(Protoss.Forge)
+          case 'y' => new TemplatePointRequirement(Protoss.CyberneticsCore)
+          case 'c' => new TemplatePointRequirement(Protoss.PhotonCannon)
+          case 'b' => new TemplatePointRequirement(Protoss.ShieldBattery)
+          case '6' => new TemplatePointRequirement(6, 3)
+          case '4' => new TemplatePointRequirement(4, 3)
+          case '3' => new TemplatePointRequirement(3, 2)
+          case '2' => new TemplatePointRequirement(2, 2)
+          case default => RequireAnything
         }
-        if (pt != Unreserved) {
+        if (pt != RequireAnything) {
           add(point(), pt)
         }
         x += 1
@@ -84,5 +84,5 @@ class PreplacementTemplate {
     this
   }
 
-  override def toString: String = "PreplacementTemplate " + width + "x" + height + " "
+  override def toString: String = f"PreplacementTemplate $width x $height"
 }

@@ -1,11 +1,10 @@
-package Placement
+package Placement.Templating
 
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.{Tile, TileRectangle}
 import bwapi.Color
 
-case class Fit(origin: Tile, template: PreplacementTemplate) {
-
+case class Fit(origin: Tile, template: Template) {
   def drawMap(): Unit = {
     if (template.points.isEmpty) return
     val startX = template.points.map(_.point.x).min

@@ -1,16 +1,18 @@
-package Placement
+package Placement.Generation
 
-object PreplacementTemplates {
+import Placement.Templating.Template
 
-  val walkway = new PreplacementTemplate().add("-")
+object Templates {
 
-  val townhall = new PreplacementTemplate().add(
+  val walkway: Template = new Template().add("-")
+
+  val townhall: Template = new Template().add(
     "Txxx " +
     "xxxx " +
     "xxxx " )
 
   val initialLayouts = Seq(
-    new PreplacementTemplate().add(
+    new Template().add(
       "---------- " +
       "-4xxx4xxx- " +
       "-xxxxxxxx- " +
@@ -18,7 +20,7 @@ object PreplacementTemplates {
       "-HxxPxRxx- " +
       "xxxxxxxxx- " +
       "xxxxx----- "),
-    new PreplacementTemplate().add(
+    new Template().add(
       "---------- " +
       "-4xxx4xxx- " +
       "-xxxxxxxx- " +
@@ -29,7 +31,7 @@ object PreplacementTemplates {
   )
 
   val gateways = Seq(
-    new PreplacementTemplate().add(
+    new Template().add(
       "xxx-------- " +
       "Px4xxx4xxx- " +
       "xxxxxxxxxx- " +
@@ -38,7 +40,7 @@ object PreplacementTemplates {
       "Pxxxxxxxxx- " +
       "xxxxxxxxxx- " +
       "xxx-------- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "xxx---- " +
       "Px4xxx- " +
       "xxxxxx- " +
@@ -47,19 +49,19 @@ object PreplacementTemplates {
       "Pxxxxx- " +
       "xxxxxx- " +
       "xxx---- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "---------- " +
       "-4xxx4xxx- " +
       "-xxxxxxxx- " +
       "-xxxxxxxx- " +
       "--xPxPxx-- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "xx--------- " +
       "Px4xxx4xxx- " +
       "xxxxxxxxxx- " +
       "Pxxxxxxxxx- " +
       "xx--------- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "-------- " +
       "-4xxxPx- " +
       "-xxxxxx- " +
@@ -68,20 +70,20 @@ object PreplacementTemplates {
       "-xxxxPxx " +
       "-xxxxxxx " +
       "------xx " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "xxx---- " +
       "Px4xxx- " +
       "xxxxxx- " +
       "xxxxxx- " +
       "xxx---- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "PxPx- " +
       "xxxx- " +
       "4xxx- " +
       "xxxx- " +
       "xxxx- " +
       "----- " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "-PxPx " +
       "-xxxx " +
       "-4xxx " +
@@ -91,10 +93,10 @@ object PreplacementTemplates {
   )
 
   val tech = Seq(
-    new PreplacementTemplate().add(
+    new Template().add(
       "3xxPx3xx " +
       "xxxxxxxx " ),
-    new PreplacementTemplate().add(
+    new Template().add(
       "3xx " +
       "xxx " +
       "3xx " +
@@ -102,7 +104,7 @@ object PreplacementTemplates {
       "Pxx " +
       "xxx " ))
 
-  val batterycannon = new PreplacementTemplate().add(
+  val batterycannon: Template = new Template().add(
     "--------- " +
     "-BxxPxCx- " +
     "-xxxxxxx- " +

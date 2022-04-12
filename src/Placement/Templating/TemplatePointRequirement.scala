@@ -1,9 +1,13 @@
 package Placement.Templating
 
 import Mathematics.Maff
+import Placement.Access.PlaceLabels.PlaceLabel
 import ProxyBwapi.UnitClasses.UnitClass
 
+import scala.collection.mutable.ArrayBuffer
+
 class TemplatePointRequirement(val buildings: UnitClass*) {
+  val labels = new ArrayBuffer[PlaceLabel]
   val buildableBefore : Boolean = true
   val walkableBefore  : Boolean = true
   val buildableAfter  : Boolean = false
@@ -18,10 +22,6 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
   }
 
   def dimensions: (Int, Int) = (width, height)
-
-  def allows(building: UnitClass): Boolean = {
-    width >= building.width && height >= building.height && (buildings.isEmpty || buildings.contains(building))
-  }
 
   override def toString: String = (
     if (buildableAfter) "Unused"

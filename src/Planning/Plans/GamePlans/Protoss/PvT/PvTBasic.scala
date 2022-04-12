@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.PvT
 
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
@@ -12,19 +11,19 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural, ProposePlacement}
+import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Planning.Plans.Scouting.{ScoutCleared, ScoutNow, ScoutOn}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
 import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
-import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior, IsWorker}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.GameTime
+import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior, IsWorker}
 
-//noinspection RedundantNewCaseClass,RedundantNewCaseClass
+//noinspection RedundantNewCaseClass
 class PvTBasic extends GameplanTemplate {
 
   override def archonPlan: Plan = new If(
@@ -34,17 +33,6 @@ class PvTBasic extends GameplanTemplate {
       new EnemyStrategy(With.fingerprints.bio),
       new MeldArchons(49) { override def maximumTemplar: Int = 6 },
       new MeldArchons(25) { override def maximumTemplar: Int = 6 }))
-
-  override def placementPlan: Plan = new If(
-    new And(
-      new FrameAtMost(GameTime(5, 0)()),
-      new Employing(PvTZZCoreZ),
-      new Not(new EnemyRecentStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.workerRush))),
-    new ProposePlacement(
-      new Blueprint(Protoss.Pylon,           preferZone = Some(With.geography.ourNatural.zone)),
-      new Blueprint(Protoss.Gateway,         preferZone = Some(With.geography.ourNatural.zone)),
-      new Blueprint(Protoss.Pylon,           requireZone = Some(With.geography.ourMain.zone)),
-      new Blueprint(Protoss.CyberneticsCore, requireZone = Some(With.geography.ourMain.zone))))
 
   override def scoutPlan: Plan = new Parallel(
     new If(new EnemyIsRandom,                   new ScoutOn(Protoss.Pylon)), // Continue scouting from a PvR opening

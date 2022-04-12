@@ -3,14 +3,15 @@ package Placement.Access
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
+import Utilities.TileFilters.TileFilter
 
 import scala.collection.mutable
 
-class PlacementQuery {
+class PlacementQuery extends TileFilter{
   var requirements  = new PlacementQueryOptions
   var preferences   = new PlacementQueryOptions
 
-  def accept(tile: Tile): Boolean = {
+  def apply(tile: Tile): Boolean = {
     if ( ! tile.valid) return false
     accept(Foundation(tile, With.placement.at(tile)))
   }
@@ -23,7 +24,9 @@ class PlacementQuery {
     preferences.score(foundation)
   }
 
-  def query: Traversable[Foundation] = {
+  def tiles: Traversable[Tile] = foundations.view.map(_.tile)
+
+  def foundations: Traversable[Foundation] = {
     // Start with the smallest matching collection
     val foundationsRequired = Maff.minBy(requirements.label.map(With.placement.get)
       ++ requirements.zone.map(With.placement.get)
@@ -36,13 +39,11 @@ class PlacementQuery {
       .map(tile => Foundation(tile, With.placement.at(tile)))
       .filter(p => p.point.requirement.buildableBefore
               && ! p.point.requirement.buildableAfter))
-    val filteredOnce = Maff.orElse(foundationsRequired, foundationsByTile, Seq(With.placement.foundations))
-    val filteredOnceSmallest = filteredOnce.minBy(_.length)
-    val filteredCompletely = filteredOnceSmallest.view.filter(accept)
+    val filteredOnce          = Maff.orElse(foundationsRequired, foundationsByTile, Seq(With.placement.foundations))
+    val filteredOnceSmallest  = filteredOnce.minBy(_.length)
+    val filteredCompletely    = filteredOnceSmallest.view.filter(accept)
     val output = new mutable.PriorityQueue[Foundation]()(Ordering.by(preferences.score))
     output ++= filteredCompletely
     output
   }
-
-  def apply: Traversable[Tile] = query.view.map(_.tile)
 }

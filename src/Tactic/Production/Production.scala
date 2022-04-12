@@ -8,7 +8,6 @@ trait Production extends Prioritized {
   def isComplete: Boolean
   def hasSpent: Boolean
   def onUpdate(): Unit
-  def onCompletion(): Unit = {}
   def expectTrainee(unit: FriendlyUnitInfo): Boolean = false
   def trainee: Option[FriendlyUnitInfo] = None
   final def update(): Unit = {

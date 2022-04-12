@@ -22,8 +22,6 @@ class ZvZ10HatchLing extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(ZvZ10HatchLing)
 
-  override def aggressionPlan = new Aggression(1.2)
-
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvZIdeas.ReactToFourPool,
     new ZergReactionVsWorkerRush

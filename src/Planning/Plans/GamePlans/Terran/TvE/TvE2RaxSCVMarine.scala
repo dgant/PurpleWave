@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.{If, _}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -35,18 +35,6 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
       new UnitsAtLeast(2, Terran.Marine),
       new EnemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.nexusFirst, With.fingerprints.twelveHatch))))
 
-  override def aggressionPlan: Plan = new If(
-    new ReadyToAttack,
-    new If(
-      new Or(
-        new MineralsAtLeast(400),
-        new EnemiesAtLeast(1, Terran.Bunker),
-        new EnemiesAtLeast(1, Protoss.PhotonCannon),
-        new EnemiesAtLeast(1, Zerg.SunkenColony)),
-      new AllInIf,
-      new Aggression(2.0)),
-    super.aggressionPlan)
-
   override def attackPlan: Plan = new If(
     new ReadyToAttack,
     new Parallel(
@@ -74,6 +62,16 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
     Get(2, Terran.SupplyDepot))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new ReadyToAttack,
+      new If(
+        new Or(
+          new MineralsAtLeast(400),
+          new EnemiesAtLeast(1, Terran.Bunker),
+          new EnemiesAtLeast(1, Protoss.PhotonCannon),
+          new EnemiesAtLeast(1, Zerg.SunkenColony)),
+        new AllInIf,
+        new Aggression(2.0))),
     new Write(With.blackboard.pushKiters, () => true),
     new Pump(Terran.Marine),
     new BuildOrder(Get(20, Terran.SCV)),

@@ -57,17 +57,17 @@ class TvZSK extends GameplanTemplate {
         new UnitsAtLeast(1, Terran.Factory)),
       new Pump(Terran.Comsat)),
     new PumpWorkers(oversaturate = false))
-
-  override def aggressionPlan: Plan = new Trigger(
-    new Or(
-      new UnitsAtLeast(5, Terran.Barracks, complete = true),
-      new UnitsAtLeast(3, IsTank),
-      new UnitsAtLeast(1, Terran.NuclearMissile),
-      new Employing(TvZ2RaxAcademy, TvZRaxCCRax)),
-    new Aggression(1.2),
-    new Aggression(1.0))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new Trigger(
+      new Or(
+        new UnitsAtLeast(5, Terran.Barracks, complete = true),
+        new UnitsAtLeast(3, IsTank),
+        new UnitsAtLeast(1, Terran.NuclearMissile),
+        new Employing(TvZ2RaxAcademy, TvZRaxCCRax)),
+      new Aggression(1.2),
+      new Aggression(1.0)),
+
     new RepairBunker,
 
     new If(new BasesAtMost(1), new Pump(Terran.Marine, 24, maximumConcurrently = 3)),

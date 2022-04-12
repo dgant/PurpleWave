@@ -9,14 +9,14 @@ import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.Time.{Forever, Seconds}
 
 class Architecture {
-  val unbuildable       : GridExclusion = new GridExclusion
-  val unwalkable        : GridExclusion = new GridExclusion
-  val ungassable        : GridExclusion = new GridExclusion
-  val untownhallable    : GridExclusion = new GridExclusion
-  val creep             : GridExclusion = new GridExclusion
-  val powered2Height    : GridVersionedInt = new GridVersionedInt { override val defaultValue: Int = Forever() }
-  val powered3Height    : GridVersionedInt = new GridVersionedInt { override val defaultValue: Int = Forever() }
-  var accessibleZones   : Vector[Zone] = Vector.empty
+  val unbuildable       : GridExclusion     = new GridExclusion
+  val unwalkable        : GridExclusion     = new GridExclusion
+  val ungassable        : GridExclusion     = new GridExclusion
+  val untownhallable    : GridExclusion     = new GridExclusion
+  val creep             : GridExclusion     = new GridExclusion
+  val powered2Height    : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
+  val powered3Height    : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
+  var accessibleZones   : Vector[Zone]      = Vector.empty
     
   def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
     if (With.configuration.enableTightBuildingPlacement) {
@@ -60,15 +60,13 @@ class Architecture {
     
     val output = new ArchitectureDiffSeries
   
-    val area = TileRectangle(
-      tile.add(request.blueprint.relativeBuildStart),
-      tile.add(request.blueprint.relativeBuildEnd))
+    val area = TileRectangle(tile, tile.add(request.blueprint.width, request.blueprint.height))
     val exclusion = Exclusion(request.blueprint.toString, area, Some(request))
 
     output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
 
     // If we have no Pylons, place in advance of our first completing
-    if (request.blueprint.powers.get && ! With.units.existsOurs(Protoss.Pylon)) {
+    if (request.blueprint.building == Protoss.Pylon && ! With.units.existsOurs(Protoss.Pylon)) {
       output.stack += new ArchitectureDiffPower(tile)
     }
     
@@ -84,11 +82,11 @@ class Architecture {
     // Reserve addon space in bases
     if (With.self.isTerran) {
       With.geography.bases.foreach(base => {
-      val start = base.townHallTile.add(4, 1)
-      val addonArea = TileRectangle(start, start.add(2, 2))
-        val exclusion = Some(Exclusion("Addon for " + base, addonArea))
-        addonArea.tiles.foreach(unbuildable.set(_, exclusion))
-    })
+        val start = base.townHallTile.add(4, 1)
+        val addonArea = TileRectangle(start, start.add(2, 2))
+          val exclusion = Some(Exclusion("Addon for " + base, addonArea))
+          addonArea.tiles.foreach(unbuildable.set(_, exclusion))
+      })
     }
 
     With.units.ours.foreach(unit => {

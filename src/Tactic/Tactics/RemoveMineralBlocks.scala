@@ -1,21 +1,20 @@
-package Planning.Plans.Macro.Expanding
+package Tactic.Tactics
 
 import Lifecycle.With
 import Micro.Agency.Intention
-import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsWorker
 import Utilities.UnitPreferences.PreferClose
 
-class RemoveMineralBlocks extends Plan {
+class RemoveMineralBlocks extends Tactic {
   
   val miners = new LockUnits(this)
   miners.interruptable = false
   miners.matcher = IsWorker
   miners.counter = CountOne
-  
-  override def onUpdate() {
+
+  override def launch(): Unit = {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral.view
       .filter(unit => unit.unitClass.isMinerals && unit.mineralsLeft <= With.configuration.blockerMineralThreshold)

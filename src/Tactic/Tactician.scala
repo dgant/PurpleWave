@@ -67,10 +67,11 @@ class Tactician extends TimedTask {
   // Background squads //
   ///////////////////////
 
-  private val gather                     = addBackgroundTactic(new Gather)
-  private val chillOverlords             = addBackgroundTactic(new ChillOverlords)
-  private val doFloatBuildings           = addBackgroundTactic(new DoFloatBuildings)
-  private val scan                       = addBackgroundTactic(new Scan)
+  private val removeMineralBlocks       = addBackgroundTactic(new RemoveMineralBlocks)
+  private val gather                    = addBackgroundTactic(new Gather)
+  private val chillOverlords            = addBackgroundTactic(new ChillOverlords)
+  private val doFloatBuildings          = addBackgroundTactic(new DoFloatBuildings)
+  private val scan                      = addBackgroundTactic(new Scan)
 
   override protected def onRun(budgetMs: Long): Unit = {
     missions.foreach(_.launch())

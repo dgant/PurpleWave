@@ -27,17 +27,9 @@ class PvT1015Expand extends GameplanTemplate {
     new UnitsAtLeast(3, Protoss.Nexus),
     new And(new UnitsAtLeast(2, Protoss.Nexus), new Not(new ShouldDoubleExpand)))
 
-  override val removeMineralBlocksAt: Int = 20
   override def scoutPlan = new If(new UpgradeStarted(Protoss.DragoonRange), new ScoutNow)
   override val attackPlan = new AttackAndHarass
   override val buildOrder: Vector[RequestBuildable] = ProtossBuilds.PvT1015GateGoon
-
-  override def aggressionPlan: Plan = new If(
-    new And(
-      new UpgradeComplete(Protoss.DragoonRange),
-      new Not(new EnemyHasShown(Terran.SiegeTankSieged)),
-      new Not(new EnemyStrategy(With.fingerprints.twoFac))),
-    new Aggression(1.25))
 
   override def emergencyPlans: Seq[Plan] = Seq(
     new PvTIdeas.ReactToFiveRaxAs2GateCore,

@@ -1,12 +1,12 @@
 package Tactic.Production
 
 import Lifecycle.With
-import Macro.Architecture.PlacedBlueprint
 import Macro.Requests.RequestBuildable
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
+import Placement.Access.{Foundation, PlacementQuery}
 import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
@@ -23,13 +23,21 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
   builderLock.interruptable = false
+  val placementQuery  : PlacementQuery  = Maff.??(requestArg.tileFilter.asInstanceOf[PlacementQuery], new PlacementQuery)
+  placementQuery.requirements.width   = Some(buildingClass.tileWidth)
+  placementQuery.requirements.height  = Some(buildingClass.tileHeight)
+  placementQuery.preferences.width    = placementQuery.preferences.width
+  placementQuery.preferences.height   = placementQuery.preferences.height
+  placementQuery.preferences.building = Some(buildingClass)
+  placementQuery.preferences.zone     = With.geography.ourZones
+  placementQuery.preferences.base     = With.geography.ourBases
 
   private var orderedTile : Option[Tile]                = None
-  private var placement   : Option[PlacedBlueprint]     = None
+  private var foundation   : Option[Foundation]         = None
   private var waitForBuilderToRecallUntil: Option[Int]  = None
 
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
-  def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft) //TODO: .orElse(placement.flatMap(_.tile))
+  def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
 
   private var _trainee: Option[FriendlyUnitInfo] = None
   override def trainee: Option[FriendlyUnitInfo] = _trainee
@@ -42,44 +50,37 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     output
   }
 
-  override def onCompletion(): Unit = {
-    // TODO: Probably not required anymore. Which means we can likely kill this hook entirely
-    // placement.map(_.blueprint).foreach(With.groundskeeper.consume(_, trainee.get))
-  }
-
   override def onUpdate() {
     // Populate the trainee manually.
     // This step may rarely be necessary because the expectTrainee() process can theoretically fail when:
     // 1. We command a builder to build at X
     // 2. We command a builder to build at Y
     // 3. While the second command hasn't been executed due to latency, the builder constructs a building at X
-    lazy val builderProvenUnit = builder
+    lazy val underConstructionByBuilder = builder
       .flatMap(_.buildUnit)
       .flatMap(_.friendly)
       .filter(buildingClass)
       .filter(_.producer.contains(this))
     lazy val candidates = builder.map(knownBuilder => With.units.ours
-        .filter(buildingClass)
-        .filterNot(_.complete)
-        .filter(_.producer.forall(==))
-        .filter(_.pixelDistanceEdge(knownBuilder) < 32 * 4)
-        .filter(candidate => request.tileFilter(candidate.tileTopLeft))
-        .filter(MacroCounter.countComplete(_)(buildingClass) == 0)).getOrElse(Seq.empty)
+      .filter(buildingClass)
+      .filterNot(_.complete)
+      .filter(_.producer.forall(==))
+      .filter(_.pixelDistanceEdge(knownBuilder) < 32 * 4)
+      .filter(candidate => request.tileFilter(candidate.tileTopLeft))
+      .filter(MacroCounter.countComplete(_)(buildingClass) == 0)).getOrElse(Seq.empty)
     _trainee = _trainee
-      // Remove dead buildings
       .filter(_.alive)
       .filterNot(Neutral.Geyser)
-      // Take buildings definitely under construction by our builder
-      .orElse(builderProvenUnit)
-      // Take any matching incomplete building; preferably being produced by existing builder, and preferably on the targeted square
+      .orElse(underConstructionByBuilder)
       .orElse(candidates.find(candidate => orderedTile.contains(candidate.tileTopLeft)))
       .orElse(candidates.find(candidate => desiredTile.contains(candidate.tileTopLeft)))
       .orElse(Maff.minBy(candidates)(_.frameDiscovered))
     trainee.foreach(_.friendly.foreach(_.setProducer(this)))
     orderedTile = trainee.map(_.tileTopLeft).orElse(orderedTile)
 
-    // TODO: Replace or delete
-    // if (trainee.isEmpty) { placement = Some(With.groundskeeper.request(this, buildingClass)).filter(_.tile.isDefined) }
+    if (trainee.isEmpty) {
+      //With.architecture.buildable()
+    }
 
     if (desiredTile.isEmpty) return
     if ( ! hasSpent) { currencyLock.acquire() }

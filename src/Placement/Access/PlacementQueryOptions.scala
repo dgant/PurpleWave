@@ -20,15 +20,15 @@ class PlacementQueryOptions {
 
   protected def scoreWidth(foundation: Foundation): Double = {
     if (width.isEmpty) return 1.0
-    if (foundation.point.requirement.width == width.get) return 1.0
-    if (foundation.point.requirement.width >  width.get) return 0.75
+    if (foundation.point.requirement.width == width.get) return 1.25
+    if (foundation.point.requirement.width >  width.get) return 1.0
     0.0
   }
 
   protected def scoreHeight(foundation: Foundation): Double = {
     if (height.isEmpty) return 1.0
-    if (foundation.point.requirement.height == height.get) return 1.0
-    if (foundation.point.requirement.height >  height.get) return 0.75
+    if (foundation.point.requirement.height == height.get) return 1.25
+    if (foundation.point.requirement.height >  height.get) return 1.0
     0.0
   }
 

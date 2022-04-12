@@ -20,7 +20,6 @@ import Utilities.UnitFilters.{IsTank, IsWarrior}
 class TerranFFAMech extends GameplanTemplate {
 
   override val scoutPlan     : Plan  = NoPlan()
-  override def aggressionPlan: Plan = new Aggression(0.8)
   
   private class UpgradeMech extends Parallel(
     new BuildGasPumps,

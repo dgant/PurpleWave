@@ -27,10 +27,6 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
     new ZergReactionVsWorkerRush
   )
 
-  override def aggressionPlan: Plan = new If(
-    new UpgradeComplete(Zerg.ZerglingSpeed),
-    new Aggression(1.5))
-
   override def attackPlan: Plan = new If(
     new EnemyIsZerg,
     super.attackPlan,
@@ -45,6 +41,9 @@ class ZvE9Pool2HatchSpeed extends GameplanTemplate {
     Get(6, Zerg.Zergling))
 
   override def buildPlans: Seq[Plan] = Seq(
+    new If(
+      new UpgradeComplete(Zerg.ZerglingSpeed),
+      new Aggression(1.5)),
     new Pump(Zerg.Drone, 6),
     new If(
       new EnemyStrategy(With.fingerprints.fourPool),

@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.PvR
 
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.Get
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan

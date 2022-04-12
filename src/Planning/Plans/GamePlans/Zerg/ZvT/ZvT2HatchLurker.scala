@@ -61,11 +61,6 @@ class ZvT2HatchLurker extends GameplanTemplate {
 
   class EnoughLurkersToAttack extends UnitsAtLeast(4, Zerg.Lurker, complete = true)
 
-  override def aggressionPlan: Plan = new Trigger(
-    new EnoughLurkersToAttack,
-    new Aggression(6.0),
-    new Aggression(1.0))
-
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,
     new ZergReactionVsWorkerRush

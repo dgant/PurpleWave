@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Terran.TvT
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}

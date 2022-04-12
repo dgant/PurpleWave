@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Macro.Requests.Get
-import Planning.Plans.Army.{Aggression, AttackAndHarass}
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
@@ -18,7 +18,6 @@ import Strategery.Strategies.Zerg.ZvT13PoolMuta
 class ZvT13PoolMuta extends GameplanTemplate {
 
   override val activationCriteria: Predicate = Employing(ZvT13PoolMuta)
-  override def aggressionPlan: Plan = new Aggression(0.7)
   override def emergencyPlans: Seq[Plan] = Seq(
     new ZvTIdeas.ReactToBarracksCheese,
     new ZergReactionVsWorkerRush)

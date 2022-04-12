@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.{NoPlan, Write}
-import Planning.Plans.Compound._
+import Planning.Plans.Compound.If
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -15,23 +15,14 @@ import Planning.Predicates.Compound.{And, Check, Latch, Not}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Utilities.UnitFilters.IsAny
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.ZvE4Pool
 import Utilities.Time.Seconds
+import Utilities.UnitFilters.IsAny
 
 class ZvE4Pool extends GameplanTemplate {
   
   override val activationCriteria = new Employing(ZvE4Pool)
-  
-  override def aggressionPlan: Plan = new If(
-    new Latch(
-      new And(
-        new Check(() => With.self.supplyUsed400 >= 18),
-        new UnitsAtLeast(3, Zerg.Larva)),
-      Seconds(10)()),
-    new Aggression(99),
-    new Aggression(1.5))
   
   override def scoutPlan: Plan = new If(
     new And(
@@ -48,6 +39,15 @@ class ZvE4Pool extends GameplanTemplate {
   override def attackPlan: Plan = new AttackAndHarass
   
   override def buildPlans: Seq[Plan] = Vector(
+    new If(
+      new Latch(
+        new And(
+          new Check(() => With.self.supplyUsed400 >= 18),
+          new UnitsAtLeast(3, Zerg.Larva)),
+        Seconds(10)()),
+      new Aggression(99),
+      new Aggression(1.5)),
+
     new CapGasAt(0, 0),
     new Write(With.blackboard.pushKiters, () => true),
     new AllInIf(new EnemiesAtLeast(1, Protoss.PhotonCannon)),

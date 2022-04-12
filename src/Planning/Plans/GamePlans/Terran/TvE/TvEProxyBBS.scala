@@ -1,9 +1,8 @@
 package Planning.Plans.GamePlans.Terran.TvE
 
-import Information.Geography.Types.Zone
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.{Get, RequestBuildable}
+import Planning.Plan
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
@@ -15,7 +14,6 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, ProxyPlanner}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvE.TvEProxyBBS
 import Utilities.UnitCounters.CountExcept
@@ -24,18 +22,10 @@ import Utilities.UnitFilters.IsWorker
 class TvEProxyBBS extends GameplanTemplate {
   
   override val activationCriteria = new Employing(TvEProxyBBS)
-
-  override def aggressionPlan: Plan = new Aggression(1.5)
-  
-  lazy val proxyZone: Option[Zone] = ProxyPlanner.proxyMiddle
   
   override def scoutPlan: Plan = new If(
     new Not(new FoundEnemyBase),
     new ScoutOn(Terran.Marine))
-
-  override lazy val blueprints = Vector(
-    new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false)),
-    new Blueprint(Terran.Barracks, preferZone = proxyZone, respectHarvesting = Some(false)))
   
   override def attackPlan: Plan = new Parallel(
     new AttackAndHarass,
@@ -57,6 +47,7 @@ class TvEProxyBBS extends GameplanTemplate {
     Get(Terran.Marine))
   
   override def buildPlans: Seq[Plan] = Vector(
+    new Aggression(1.5),
     new Write(With.blackboard.maxBuilderTravelFrames, () => Int.MaxValue),
     new Pump(Terran.SCV, 3),
     new Pump(Terran.Marine),

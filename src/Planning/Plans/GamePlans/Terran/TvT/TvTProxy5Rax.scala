@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Terran.TvT
 
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{NoPlan, Write}
@@ -12,7 +11,7 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Planning.{Plan, Predicate, ProxyPlanner}
+import Planning.{Plan, Predicate}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax
 import Utilities.UnitCounters.CountExcept
@@ -21,8 +20,6 @@ import Utilities.UnitFilters.IsWorker
 class TvTProxy5Rax extends GameplanTemplate {
 
   override val activationCriteria: Predicate = new Employing(TvTProxy5Rax)
-
-  override lazy val blueprints = Vector(new Blueprint(Terran.Barracks, preferZone = ProxyPlanner.proxyMiddle))
 
   override def scoutPlan: Plan = new If(
     new StartPositionsAtLeast(3),
@@ -33,7 +30,6 @@ class TvTProxy5Rax extends GameplanTemplate {
         new ScoutAt(10, 2),
         new ScoutAt(10))))
 
-  override def aggressionPlan = new Aggression(1.5)
   override def workerPlan: Plan = NoPlan()
   override def supplyPlan: Plan = NoPlan()
   override def attackPlan: Plan = new Parallel(new AttackAndHarass, new AttackWithWorkers(new CountExcept(3, IsWorker)))
@@ -47,6 +43,7 @@ class TvTProxy5Rax extends GameplanTemplate {
   )
 
   override def buildPlans: Seq[Plan] = Vector(
+    new Aggression(1.5),
     new Write(With.blackboard.pushKiters, () => true),
     new Write(With.blackboard.maxBuilderTravelFrames, () => Int.MaxValue),
     new Pump(Terran.Marine),

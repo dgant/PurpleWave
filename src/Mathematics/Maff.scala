@@ -423,6 +423,9 @@ object Maff {
   @inline final def toSign(value: Boolean): Int = if (value) 1 else -1
 
   @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.find(_.nonEmpty).getOrElse(x.head)
+
+  @inline final def ??[T >: Null](x: T*): T = x.find(_ != null).orNull
+
   @inline final def itinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
     val indexFrom = rotation.indexOf(from)
     val indexTo = rotation.indexOf(to)

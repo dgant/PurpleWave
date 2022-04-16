@@ -3,10 +3,14 @@ package Macro.Architecture
 import Information.Geography.Types.Zone
 import Information.Grids.Versioned.GridVersionedInt
 import Lifecycle.With
+import Macro.Architecture.ArchitecturalAssessment.ArchitecturalAssessment
 import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.Shapes.Pylons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.Time.{Forever, Seconds}
+import Strategery.Plasma
+import Utilities.LightYear
+import Utilities.Time.Forever
 
 class Architecture {
   val unbuildable       : GridExclusion     = new GridExclusion
@@ -14,65 +18,56 @@ class Architecture {
   val ungassable        : GridExclusion     = new GridExclusion
   val untownhallable    : GridExclusion     = new GridExclusion
   val creep             : GridExclusion     = new GridExclusion
-  val powered2Height    : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
-  val powered3Height    : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
+  val powerFrame2Height : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
+  val powerFrame3Height : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
   var accessibleZones   : Vector[Zone]      = Vector.empty
-    
-  def usuallyNeedsMargin(unitClass: UnitClass): Boolean = {
-    if (With.configuration.enableTightBuildingPlacement) {
-      unitClass.isBuilding &&
-      unitClass.trainsGroundUnits &&
-      ! unitClass.isTownHall // Nexus margins bork FFEs. Down the road Hatcheries may need margins.
-    } else true
-  }
-  
-  def reboot() {
-    unbuildable     .update()
-    unwalkable      .update()
-    ungassable      .update()
-    untownhallable  .update()
-    powered2Height  .update()
-    powered3Height  .update()
+
+  def update() {
+    unbuildable       .update()
+    unwalkable        .update()
+    ungassable        .update()
+    untownhallable    .update()
+    powerFrame2Height .update()
+    powerFrame3Height .update()
     recalculateExclusions()
     recalculatePower()
     recalculateBuilderAccess()
   }
-  
-  def buildable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
+
+  def buildable(tile: Tile, request: Option[BuildingPlacement] = None): Boolean = {
     With.grids.buildable.get(tile) && ! unbuildable.excludes(tile, request)
   }
-  
-  def walkable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
+
+  def walkable(tile: Tile, request: Option[BuildingPlacement] = None): Boolean = {
     With.grids.walkable.get(tile) &&
       ! unwalkable.excludes(tile, request) &&
       ! tile.zone.bases.exists(_.townHallArea.contains(tile))
   }
-  
-  def gassable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
+
+  def gassable(tile: Tile, request: Option[BuildingPlacement] = None): Boolean = {
     ! ungassable.excludes(tile, request)
   }
 
-  def townhallable(tile: Tile, request: Option[PlacedBlueprint] = None): Boolean = {
+  def townhallable(tile: Tile, request: Option[BuildingPlacement] = None): Boolean = {
     ! untownhallable.excludes(tile, request)
   }
-  
-  def diffPlacement(tile: Tile, request: PlacedBlueprint): ArchitectureDiff = {
-    
+
+  def diffPlacement(tile: Tile, request: BuildingPlacement): ArchitectureDiff = {
     val output = new ArchitectureDiffSeries
-  
-    val area = TileRectangle(tile, tile.add(request.blueprint.width, request.blueprint.height))
-    val exclusion = Exclusion(request.blueprint.toString, area, Some(request))
+
+    val area = TileRectangle(tile, tile.add(request.unit.tileWidth, request.unit.tileHeight))
+    val exclusion = Exclusion(request.unit.toString, area, Some(request))
 
     output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
 
-    // If we have no Pylons, place in advance of our first completing
-    if (request.blueprint.building == Protoss.Pylon && ! With.units.existsOurs(Protoss.Pylon)) {
-      output.stack += new ArchitectureDiffPower(tile)
+    if (request.unit == Protoss.Pylon) {
+      // If we have no Pylons, place in advance of our first completing
+      output.stack += new ArchitectureDiffPower(tile, With.frame + (if (With.units.existsOurs(Protoss.Pylon)) Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion else 0))
     }
-    
+
     output
   }
-  
+
   /////////////
   // Margins //
   /////////////
@@ -84,7 +79,7 @@ class Architecture {
       With.geography.bases.foreach(base => {
         val start = base.townHallTile.add(4, 1)
         val addonArea = TileRectangle(start, start.add(2, 2))
-          val exclusion = Some(Exclusion("Addon for " + base, addonArea))
+          val exclusion = Some(Exclusion("Addon (CC)", addonArea))
           addonArea.tiles.foreach(unbuildable.set(_, exclusion))
       })
     }
@@ -92,13 +87,13 @@ class Architecture {
     With.units.ours.foreach(unit => {
       // Reserve unit's addon space
       if (unit.unitClass.canBuildAddon) {
-        val exclusion = Some(Exclusion("Addon for " + unit, unit.addonArea))
+        val exclusion = Some(Exclusion("Addon", unit.addonArea))
         unit.addonArea.tiles.foreach(unbuildable.set(_, exclusion))
       }
 
-      // Reserve margins for buildings which produce ground units
-      if ( ! unit.flying && (unit.isAny(Zerg.Egg, Zerg.LurkerEgg) || (unit.unitClass.isBuilding && usuallyNeedsMargin(unit.unitClass)))) {
-        val exclusion = Some(Exclusion("Margin for " + unit, unit.tileArea.expand(1, 1)))
+      // Don't get stuck trying to build on top of eggs
+      if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg)) {
+        val exclusion = Some(Exclusion(unit.unitClass.toString, unit.tileArea.expand(1, 1)))
         val w = 1 + unit.unitClass.tileWidth
         val h = 1 + unit.unitClass.tileHeight
         var x = 0
@@ -119,28 +114,114 @@ class Architecture {
     // Flag places where we can't build gas
     With.geography.bases.foreach(_.gas.foreach(gas =>
       if (gas.alive && ! gas.player.isNeutral) {
-        val exclusion = Some(Exclusion("Geyser occupied by" + gas, gas.tileArea.expand(1, 1)))
+        val exclusion = Some(Exclusion("Geyser occupied", gas.tileArea))
         ungassable.set(gas.tileTopLeft, exclusion)
       }
     ))
   }
-  
+
   ///////////
   // Power //
   ///////////
-  
+
   private def recalculatePower() {
-    With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + Seconds(3)()))
+    With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + unit.unitClass.framesToFinishCompletion))
   }
-  
+
   private def addPower(tile: Tile, frame: Int) {
-    With.grids.psi2Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered2Height.set(neighbor, frame))
-    With.grids.psi3Height.psiPoints.map(tile.add).foreach(neighbor => if (neighbor.valid) powered3Height.set(neighbor, frame))
+    Pylons.points2.map(tile.add).foreach(neighbor => if (neighbor.valid) powerFrame2Height.set(neighbor, frame))
+    Pylons.points3.map(tile.add).foreach(neighbor => if (neighbor.valid) powerFrame3Height.set(neighbor, frame))
   }
 
   private def recalculateBuilderAccess() {
     val hasBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
-    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distancePixels(z) < Int.MaxValue))
+    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distancePixels(z) < LightYear()))
     accessibleZones = (hasBuilder ++ accessible).distinct
+  }
+
+  ///////////////
+  // Legality! //
+  ///////////////
+
+  def assess(topLeft: Tile, building: UnitClass): ArchitecturalAssessment = {
+    val width: Int = building.tileWidth + (if (building.canBuildAddon && ! building.isTownHall) 2 else 0)
+    val height: Int = building.tileHeight
+
+    if ( ! topLeft.valid) {
+      return ArchitecturalAssessment.Invalid
+    }
+    if (building.requiresPsi) {
+      // We can allow use of forthcoming Pylon power by using a value higher than With.frame
+      if (height == 3 && ! With.grids.psi3Height.isSet(topLeft) && powerFrame3Height.get(topLeft) > With.frame) {
+        return ArchitecturalAssessment.Unpowered
+      }
+      if (height == 2 && ! With.grids.psi2Height.isSet(topLeft) && powerFrame2Height.get(topLeft) > With.frame) {
+        return ArchitecturalAssessment.Unpowered
+      }
+    }
+
+    val zone = topLeft.zone
+    if (zone.island
+      && ! Plasma()
+      && ( ! With.blackboard.allowIslandBases() || ! zone.bases.exists(_.minerals.exists(_.visible)))
+      && ! accessibleZones.contains(zone)) {
+      return ArchitecturalAssessment.InaccessibleIsland
+    }
+
+    val request = BuildingPlacement(topLeft, building)
+
+    if (building.isGas) {
+      if ( ! zone.bases.exists(_.gas.exists(_.tileTopLeft == topLeft))) {
+        return ArchitecturalAssessment.IsntGas
+      }
+      if ( ! gassable(topLeft, Some(request))) {
+        return ArchitecturalAssessment.BlockedGas
+      }
+      return ArchitecturalAssessment.Accepted
+    }
+
+    if (building.isTownHall) {
+      if ( ! zone.bases.exists(_.townHallTile == topLeft)) {
+        return ArchitecturalAssessment.IsntBasePosition
+      }
+      if ( ! townhallable(topLeft, Some(request))) {
+        return ArchitecturalAssessment.IsntLegalForTownHall
+      }
+    }
+
+    val buildArea = TileRectangle(topLeft, topLeft.add(width, height))
+    var x = buildArea.startInclusive.x
+    val xMax = buildArea.endExclusive.x
+    val yMax = buildArea.endExclusive.y
+    while (x < xMax) {
+      var y = buildArea.startInclusive.y
+      while (y < yMax) {
+        val nextTile = Tile(x, y)
+        if ( ! buildable(nextTile, Some(request))) {
+          return ArchitecturalAssessment.IsntBuildable
+        }
+        if (nextTile.zone.perimeter.contains(nextTile)) {
+          return ArchitecturalAssessment.ViolatesPerimeter
+        }
+        if (building.requiresCreep != nextTile.creep) {
+          return ArchitecturalAssessment.CreepMismatch
+        }
+        if ( ! building.isTownHall && ! building.isAddon && zone.bases.exists(_.harvestingArea.contains(nextTile))) {
+          return ArchitecturalAssessment.ViolatesHarvesting
+        }
+        if (building.isTownHall && ! With.grids.buildableTownHall.get(nextTile)) {
+          return ArchitecturalAssessment.ViolatesResourceGap
+        }
+        if ( ! building.isTownHall && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
+          return ArchitecturalAssessment.BlockedByUnit
+        }
+        if ( ! With.groundskeeper.isFree(topLeft)) {
+          return ArchitecturalAssessment.Reserved
+        }
+        y += 1
+      }
+      x += 1
+    }
+    ArchitecturalAssessment.Accepted
   }
 }

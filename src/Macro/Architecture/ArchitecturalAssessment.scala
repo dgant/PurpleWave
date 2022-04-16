@@ -5,7 +5,6 @@ object ArchitecturalAssessment extends Enumeration {
   val
     Accepted,
     Invalid,
-    DoesntMatch,
     Unpowered,
     IsntBuildableTerrain,
     InaccessibleIsland,

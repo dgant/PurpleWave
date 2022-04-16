@@ -28,7 +28,7 @@ class PvTNew extends GameplanImperative {
     // TODO: I think one gate core if cross-spawn, two if close. Also might depend on gas/no gas
   }
 
-  def open1ZealotExpand(): Unit = {
+  def openGateNexus(): Unit = {
     // Reference: https://youtu.be/jYRHZVAjhX8?t=4932
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
@@ -139,7 +139,7 @@ class PvTNew extends GameplanImperative {
     if (false) {
       openNexusFirst()
     } else if (false) {
-      open1ZealotExpand()
+      openGateNexus()
     } else if (false) {
       openZZCoreZ()
     } else if (false) {
@@ -175,6 +175,10 @@ class PvTNew extends GameplanImperative {
     get(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     get(2, Protoss.Nexus)
+    // Against one-base Siege push, 3-Gate goon: https://youtu.be/djZt3n1Po6s?t=6681
+
+    // TODO: Go Reaver if siege tech and no Vulture tech or minimal Vultures (suggesting bio)
+    // TODO: Lock into doing one of these two things first, then getting the other
     if (enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.bio, With.fingerprints.oneRaxFE, With.fingerprints.fourteenCC)) {
       reavers()
     } else {

@@ -14,7 +14,7 @@ abstract class AbstractGridPsi extends AbstractGridFramestamp {
 
   private val wrapThreshold = 18
   override def update(): Unit = {
-    val newPylons = With.units.ours.view.filter(unit => unit.aliveAndComplete && unit.is(Protoss.Pylon)).toVector
+    val newPylons = With.units.ours.view.filter(_.complete).filter(Protoss.Pylon).toVector
     if (newPylons != lastPylons) {
       updateVersion()
       newPylons.foreach(pylon => {

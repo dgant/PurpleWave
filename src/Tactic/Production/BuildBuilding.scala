@@ -7,7 +7,7 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Placement.Access.{Foundation, PlacementQuery}
-import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
+import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -18,6 +18,7 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   setRequest(requestArg)
   val buildingClass   : UnitClass       = request.unit.get
   val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
+  val tileLock        : LockTiles       = new LockTiles(this)
   val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
   val builderLock     : LockUnits       = new LockUnits(this)
   builderLock.matcher = builderMatcher
@@ -32,13 +33,12 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   placementQuery.preferences.zone     = With.geography.ourZones
   placementQuery.preferences.base     = With.geography.ourBases
 
-  private var orderedTile : Option[Tile]                = None
-  private var foundation   : Option[Foundation]         = None
-  private var waitForBuilderToRecallUntil: Option[Int]  = None
-
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
 
+  private var orderedTile : Option[Tile]        = None
+  private var foundation  : Option[Foundation]  = None
+  private var intendAfter : Option[Int]         = None
   private var _trainee: Option[FriendlyUnitInfo] = None
   override def trainee: Option[FriendlyUnitInfo] = _trainee
   override def hasSpent: Boolean = trainee.isDefined
@@ -79,7 +79,17 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     orderedTile = trainee.map(_.tileTopLeft).orElse(orderedTile)
 
     if (trainee.isEmpty) {
-      //With.architecture.buildable()
+      // Is our ordered/desired tile legal?
+      // If not, get the first legal tile. TODO: Check future power availability
+      // Legality check must include whether the groundskeeper will give us the required tiles
+
+      placementQuery.foundations
+      // If we have a tile, lock it
+      /*
+      tileLock.tiles =  new TileRectangle(t, 6, 4, )else new TileRectangle(t, ,
+        if (buildingClass.canBuildAddon) 6 else buildingClass.tileWidth,
+        buildingClass.tileHeight)
+        */
     }
 
     if (desiredTile.isEmpty) return
@@ -107,10 +117,10 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     builderLock.preference = PreferClose(desiredTile.get.center)
     builderLock.acquire()
     
-    if (waitForBuilderToRecallUntil.isDefined) {
-      if (With.frame < waitForBuilderToRecallUntil.get) return
+    if (intendAfter.isDefined) {
+      if (With.frame < intendAfter.get) return
       orderedTile = None
-      waitForBuilderToRecallUntil = None
+      intendAfter = None
     }
     
     if (builderLock.satisfied) {
@@ -124,7 +134,7 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
           // Steps:
           // 1. Recall the builder
           // 2. Wait for the order to take effect
-          waitForBuilderToRecallUntil = Some(With.frame + 24)
+          intendAfter = Some(With.frame + 24)
           builder.get.intend(this, new Intention {
             toTravel    = desiredTile.map(_.center)
             toBuildTile = desiredTile

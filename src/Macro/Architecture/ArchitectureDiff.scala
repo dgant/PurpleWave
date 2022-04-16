@@ -2,6 +2,7 @@ package Macro.Architecture
 
 import Lifecycle.With
 import Mathematics.Points.Tile
+import Mathematics.Shapes.Pylons
 
 import scala.collection.mutable
 
@@ -43,26 +44,26 @@ class ArchitectureDiffExclude(tile: Tile, exclusion: Exclusion) extends Architec
   }
 }
 
-class ArchitectureDiffPower(tile: Tile) extends ArchitectureDiff {
-  val psi2Tiles: Array[Tile] = With.grids.psi2Height.psiPoints.map(tile.add).filter(_.valid)
-  val psi3Tiles: Array[Tile] = With.grids.psi3Height.psiPoints.map(tile.add).filter(_.valid)
-  val power2Before: Array[Int] = psi2Tiles.map(With.architecture.powered2Height.get)
-  val power3Before: Array[Int] = psi3Tiles.map(With.architecture.powered3Height.get)
+class ArchitectureDiffPower(tile: Tile, frame: Int) extends ArchitectureDiff {
+  val psi2Tiles: Array[Tile] = Pylons.points2.map(tile.add).filter(_.valid)
+  val psi3Tiles: Array[Tile] = Pylons.points3.map(tile.add).filter(_.valid)
+  val power2Before: Array[Int] = psi2Tiles.map(With.architecture.powerFrame2Height.get)
+  val power3Before: Array[Int] = psi3Tiles.map(With.architecture.powerFrame3Height.get)
 
   override def doo(): Unit = {
-    psi2Tiles.foreach(With.architecture.powered2Height.set(_, With.frame))
-    psi3Tiles.foreach(With.architecture.powered3Height.set(_, With.frame))
+    psi2Tiles.foreach(With.architecture.powerFrame2Height.set(_, frame))
+    psi3Tiles.foreach(With.architecture.powerFrame3Height.set(_, frame))
   }
 
   override def undo(): Unit = {
     var i = 0
     while (i < psi2Tiles.length) {
-      With.architecture.powered2Height.set(psi2Tiles(i), power2Before(i))
+      With.architecture.powerFrame2Height.set(psi2Tiles(i), power2Before(i))
       i += 1
     }
     i = 0
     while (i < psi3Tiles.length) {
-      With.architecture.powered2Height.set(psi3Tiles(i), power3Before(i))
+      With.architecture.powerFrame2Height.set(psi3Tiles(i), power3Before(i))
       i += 1
     }
   }

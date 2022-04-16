@@ -29,10 +29,10 @@ object ShowArchitecture extends View {
         if (With.architecture.ungassable.get(tile).isDefined) {
           DrawMap.tile(tile, 4, Colors.DarkIndigo)
         }
-        if (With.architecture.powered2Height.get(tile) <= With.frame) {
+        if (With.architecture.powerFrame2Height.get(tile) <= With.frame) {
           //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
         }
-        if (With.architecture.powered3Height.get(tile) <= With.frame) {
+        if (With.architecture.powerFrame3Height.get(tile) <= With.frame) {
           DrawMap.circle(tile.center, 4, Colors.BrightTeal)
         }
       }

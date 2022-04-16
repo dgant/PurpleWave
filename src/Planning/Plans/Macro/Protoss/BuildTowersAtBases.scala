@@ -2,7 +2,6 @@ package Planning.Plans.Macro.Protoss
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
-import Macro.Architecture.Blueprint
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Pump
@@ -25,25 +24,6 @@ class BuildTowersAtBases(towersRequired: Int, towerClass: UnitClass = Protoss.Ph
     }
   }
 
-  private val pylonBlueprintByZone = With.geography.zones
-    .map(zone =>(
-      zone,
-      new Blueprint(
-        Protoss.Pylon,
-        requireZone       = Some(zone),
-        requireCandidates = Some(zone.tilesSeq))))
-    .toMap
-
-  private val towerBlueprintsByZone = With.geography.zones
-    .map(zone => (
-      zone,
-      (1 to towersRequired).map(i =>
-        new Blueprint(
-          towerClass,
-          requireZone       = Some(zone),
-          requireCandidates = Some(zone.tilesSeq)))))
-    .toMap
-
   protected def eligibleBases: Iterable[Base] = {
     With.geography.ourBasesAndSettlements
   }
@@ -60,7 +40,6 @@ class BuildTowersAtBases(towersRequired: Int, towerClass: UnitClass = Protoss.Ph
     }
 
     if ( ! needPylons || pylonsInZone.exists(_.aliveAndComplete)) {
-      val newBlueprints = towerBlueprintsByZone(zone).take(towersToAdd)
       new Pump(towerClass, maximumConcurrently = towersToAdd).update()
     }
   }

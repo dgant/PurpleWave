@@ -19,22 +19,13 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   setRequest(requestArg)
   val buildingClass   : UnitClass       = request.unit.get
   val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
-  val tileWidth       : Int             = buildingClass.tileWidth + (if (buildingClass.canBuildAddon) 2 else 0)
-  val tileHeight      : Int             = buildingClass.tileHeight
   val tileLock        : LockTiles       = new LockTiles(this)
   val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
   val builderLock     : LockUnits       = new LockUnits(this)
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
   builderLock.interruptable = false
-  val placementQuery  : PlacementQuery  = requestArg.tileFilter match { case query: PlacementQuery => query case _ => new PlacementQuery }
-  placementQuery.requirements.width   = Some(tileWidth)
-  placementQuery.requirements.height  = Some(tileHeight)
-  placementQuery.preferences.width    = Some(tileWidth)
-  placementQuery.preferences.height   = Some(tileHeight)
-  placementQuery.preferences.building = Some(buildingClass)
-  placementQuery.preferences.zone     = With.geography.ourZones
-  placementQuery.preferences.base     = With.geography.ourBases
+  val placementQuery  : PlacementQuery  = requestArg.tileFilter match { case query: PlacementQuery => query case _ => new PlacementQuery(buildingClass) }
 
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
@@ -86,13 +77,17 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
       // If not, get the first legal tile.
       // Legality check must include whether the groundskeeper will give us the required tiles
 
+      // TODO: Update zone/base preference if not specified by the original request
       // TODO: Check future power availability
-      foundation = (foundation.view ++ placementQuery.foundations)
+      // TODO: Apply the architecture diff... if that has any remaining relevance. Probably we can just delete that code.
+      val newFoundation, assessment = (foundation.view ++ placementQuery.foundations)
         .map(f => (f, With.architecture.assess(f.tile, buildingClass)))
-        .find(fa => fa._2 == ArchitecturalAssessment.Accepted && With.groundskeeper.isFree(fa._1.tile, tileWidth, tileHeight))
+        .find(fa => fa._2 == ArchitecturalAssessment.Accepted && With.groundskeeper.isFree(fa._1.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight))
         .map(_._1)
+      foundation = newFoundation
       if (foundation.isEmpty) return
-      if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, tileWidth, tileHeight).tiles)) {
+      With.architecture.diffPlacement(foundation.get.tile, buildingClass).doo()
+      if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight).tiles)) {
         With.logger.warn(f"Failed to acquire tiles for $this at ${foundation.get.tile}")
         return
       }

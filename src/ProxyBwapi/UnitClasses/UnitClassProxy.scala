@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 abstract class UnitClassProxy(val bwapiType: UnitType) {
   val id                       = bwapiType.id
   lazy val abilities           = bwapiType.abilities.asScala.map(Techs.get)
-  val acceleration256             = bwapiType.acceleration
+  val acceleration256          = bwapiType.acceleration
   val armor                    = bwapiType.armor
   val buildScore               = bwapiType.buildScore
   val buildFrames              = bwapiType.buildTime

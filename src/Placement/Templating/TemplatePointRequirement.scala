@@ -26,6 +26,7 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
   override def toString: String = (
     if (buildableAfter) "Unused"
     else if (walkableAfter) "Hallway"
+    else if (buildings.forall(_.isGas)) "Gas"
     else if (buildings.nonEmpty) buildings.mkString(", ")
     else "Building") + f" $width x $height"
 }

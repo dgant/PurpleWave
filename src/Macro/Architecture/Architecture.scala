@@ -52,15 +52,15 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
 
-  def diffPlacement(tile: Tile, request: BuildingPlacement): ArchitectureDiff = {
+  def diffPlacement(tile: Tile, unit: UnitClass): ArchitectureDiff = {
     val output = new ArchitectureDiffSeries
 
-    val area = TileRectangle(tile, tile.add(request.unit.tileWidth, request.unit.tileHeight))
-    val exclusion = Exclusion(request.unit.toString, area, Some(request))
+    val area = TileRectangle(tile, tile.add(unit.tileWidth, unit.tileHeight))
+    val exclusion = Exclusion(unit.toString, area, Some(BuildingPlacement(tile, unit)))
 
     output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
 
-    if (request.unit == Protoss.Pylon) {
+    if (unit == Protoss.Pylon) {
       // If we have no Pylons, place in advance of our first completing
       output.stack += new ArchitectureDiffPower(tile, With.frame + (if (With.units.existsOurs(Protoss.Pylon)) Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion else 0))
     }

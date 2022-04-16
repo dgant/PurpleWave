@@ -33,8 +33,8 @@ class PlacementQueryOptions {
   }
 
   protected def scoreBuilding(foundation: Foundation): Double = {
-    if (building.isEmpty) return 1.0
     if (building.exists(foundation.point.requirement.buildings.contains)) return 1.0
+    if (building.isEmpty) return 1.0
     val widthMatches = foundation.point.requirement.width == building.get.tileWidth
     val heightMatches = foundation.point.requirement.height == building.get.tileHeight
     if (widthMatches && heightMatches) return 0.75
@@ -93,4 +93,15 @@ class PlacementQueryOptions {
     && acceptBase(foundation)
     && acceptBuilding(foundation)
     && acceptTile(foundation))
+
+  def audit(foundation: Foundation): (Foundation, Double, Double, Double, Double, Double, Double, Double, Double) = (
+    foundation,
+    score(foundation),
+    scoreWidth(foundation),
+    scoreHeight(foundation),
+    scoreLabel(foundation),
+    scoreZone(foundation),
+    scoreBase(foundation),
+    scoreBuilding(foundation),
+    scoreTile(foundation))
 }

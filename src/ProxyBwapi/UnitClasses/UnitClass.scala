@@ -153,6 +153,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Queen)            32.0 * 9.0
     else pixelRangeMax
 
+  lazy val tileWidthPlusAddon: Int = tileWidth + 2 * Maff.fromBoolean(canBuildAddon)
   lazy val tileArea: TileRectangle = TileRectangle(Tile(0, 0), tileSize)
   lazy val orderable: Boolean = ! isSpell && ! Vector(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
   lazy val isMinerals: Boolean = isMineralField

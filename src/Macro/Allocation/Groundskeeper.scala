@@ -1,7 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Mathematics.Points.Tile
+import Mathematics.Points.{Tile, TileRectangle}
 import Performance.Tasks.TimedTask
 import Planning.Plans.Basic.NoPlan
 import Planning.Prioritized
@@ -35,6 +35,10 @@ final class Groundskeeper extends TimedTask {
   }
 
   def isFree(tile: Tile): Boolean = tile.valid && ! tileReservations(tile.i).renewed
+
+  def isFree(from: Tile, width: Int, height: Int): Boolean = isFree(from, from.add(width, height))
+
+  def isFree(from: Tile, to: Tile): Boolean = TileRectangle(from, to).tiles.forall(isFree)
 
   def reserved: Seq[Tile] = reservations.view.flatMap(_._2.view).map(_.tile)
 

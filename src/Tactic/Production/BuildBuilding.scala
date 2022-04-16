@@ -1,10 +1,11 @@
 package Tactic.Production
 
 import Lifecycle.With
+import Macro.Architecture.ArchitecturalAssessment
 import Macro.Requests.RequestBuildable
 import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
-import Mathematics.Points.Tile
+import Mathematics.Points.{Tile, TileRectangle}
 import Micro.Agency.Intention
 import Placement.Access.{Foundation, PlacementQuery}
 import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
@@ -18,17 +19,19 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
   setRequest(requestArg)
   val buildingClass   : UnitClass       = request.unit.get
   val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
+  val tileWidth       : Int             = buildingClass.tileWidth + (if (buildingClass.canBuildAddon) 2 else 0)
+  val tileHeight      : Int             = buildingClass.tileHeight
   val tileLock        : LockTiles       = new LockTiles(this)
   val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
   val builderLock     : LockUnits       = new LockUnits(this)
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
   builderLock.interruptable = false
-  val placementQuery  : PlacementQuery  = Maff.??(requestArg.tileFilter.asInstanceOf[PlacementQuery], new PlacementQuery)
-  placementQuery.requirements.width   = Some(buildingClass.tileWidth)
-  placementQuery.requirements.height  = Some(buildingClass.tileHeight)
-  placementQuery.preferences.width    = placementQuery.preferences.width
-  placementQuery.preferences.height   = placementQuery.preferences.height
+  val placementQuery  : PlacementQuery  = requestArg.tileFilter match { case query: PlacementQuery => query case _ => new PlacementQuery }
+  placementQuery.requirements.width   = Some(tileWidth)
+  placementQuery.requirements.height  = Some(tileHeight)
+  placementQuery.preferences.width    = Some(tileWidth)
+  placementQuery.preferences.height   = Some(tileHeight)
   placementQuery.preferences.building = Some(buildingClass)
   placementQuery.preferences.zone     = With.geography.ourZones
   placementQuery.preferences.base     = With.geography.ourBases
@@ -80,16 +83,19 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
 
     if (trainee.isEmpty) {
       // Is our ordered/desired tile legal?
-      // If not, get the first legal tile. TODO: Check future power availability
+      // If not, get the first legal tile.
       // Legality check must include whether the groundskeeper will give us the required tiles
 
-      placementQuery.foundations
-      // If we have a tile, lock it
-      /*
-      tileLock.tiles =  new TileRectangle(t, 6, 4, )else new TileRectangle(t, ,
-        if (buildingClass.canBuildAddon) 6 else buildingClass.tileWidth,
-        buildingClass.tileHeight)
-        */
+      // TODO: Check future power availability
+      foundation = (foundation.view ++ placementQuery.foundations)
+        .map(f => (f, With.architecture.assess(f.tile, buildingClass)))
+        .find(fa => fa._2 == ArchitecturalAssessment.Accepted && With.groundskeeper.isFree(fa._1.tile, tileWidth, tileHeight))
+        .map(_._1)
+      if (foundation.isEmpty) return
+      if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, tileWidth, tileHeight).tiles)) {
+        With.logger.warn(f"Failed to acquire tiles for $this at ${foundation.get.tile}")
+        return
+      }
     }
 
     if (desiredTile.isEmpty) return

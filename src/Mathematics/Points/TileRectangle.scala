@@ -14,8 +14,12 @@ final case class TileRectangle(
     this(new Tile(0), new Tile(0))
   }
 
+  def this(tile: Tile, width: Int, height: Int) {
+    this(tile, tile.add(width, height))
+  }
+
   def this(tile: Tile) {
-    this(tile, tile.add(1, 1))
+    this(tile, 1, 1)
   }
 
   def this(included: Iterable[Tile]) {

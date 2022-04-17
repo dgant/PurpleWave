@@ -435,4 +435,24 @@ object Maff {
       rotation.view.drop(indexFrom) ++ rotation.view.take(indexTo + 1)
     }
   }
+
+  /**
+    * Applies a stable, in-place sort to a mutable array-like collection
+    */
+  @inline final def sortStablyInPlaceBy[T, O: Ordering](a: mutable.IndexedSeq[T])(feature: T => O): Unit = {
+    // Insertion sort
+    val ordering = Ordering.by(feature)
+    val length = a.length
+    var i = 0
+    while (i < length) {
+      var j = i
+      while (j > 0 && ordering.gt(a(j-1), a(j))) {
+        val swap = a(j)
+        a(j) = a(j-1)
+        a(j-1) = swap
+        j = j - 1
+      }
+      i = i + 1
+    }
+  }
 }

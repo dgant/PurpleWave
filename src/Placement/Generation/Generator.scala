@@ -19,6 +19,7 @@ trait Generator extends Fitter {
     With.geography.bases.foreach(_.resourcePathTiles.foreach(t => index(Fit(t, Templates.walkway))))
     With.geography.zones.foreach(preplaceWalls)
     With.geography.zones.foreach(preplaceZone)
+    sort()
   }
 
   private def preplaceZone(zone: Zone): Unit = {

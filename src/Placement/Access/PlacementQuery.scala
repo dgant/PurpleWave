@@ -97,18 +97,18 @@ class PlacementQuery extends TileFilter{
   }
 
   def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    With.placement.foundations.map(requirements.audit).sortBy(_._2)
+    With.placement.foundations.map(requirements.audit).sortBy(-_._2)
   }
 
   def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    With.placement.foundations.map(preferences.audit).sortBy(_._2)
+    With.placement.foundations.map(preferences.audit).sortBy(-_._2)
   }
 
   def auditGasRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    gasFoundations.map(requirements.audit).toVector.sortBy(_._2)
+    gasFoundations.map(requirements.audit).toVector.sortBy(-_._2)
   }
 
   def auditGasPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    gasFoundations.map(preferences.audit).toVector.sortBy(_._2)
+    gasFoundations.map(preferences.audit).toVector.sortBy(-_._2)
   }
 }

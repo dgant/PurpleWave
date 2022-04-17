@@ -28,7 +28,7 @@ class MorphUnit(requestArg: RequestBuildable) extends Production {
   def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classOutput) > 0)
   def hasSpent: Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
-  def onUpdate() {
+  def onUpdate(): Unit = {
     // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production
     // Shared somewhat with BuildBuilding
     lazy val alreadyMorphing = With.units.ours.filter(u =>
@@ -41,7 +41,7 @@ class MorphUnit(requestArg: RequestBuildable) extends Production {
 
     // Shared somewhat with TrainUnit
     if (hasSpent || currencyLock.acquire()) {
-      morpherLock.matcher = if (morpher.isDefined) _ == morpher else classInput
+      morpherLock.matcher = if (morpher.isDefined) morpher.contains else classInput
       morpherLock.acquire()
       morpher = morpherLock.units.headOption
       morpher.foreach(_.intend(this, new Intention {

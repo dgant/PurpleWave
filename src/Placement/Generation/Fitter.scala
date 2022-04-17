@@ -29,7 +29,7 @@ trait Fitter extends Fits {
       while (generator.hasNext) {
         val tile = generator.next()
         if (fitsAt(template, tile)) {
-          val newFit = Fit(tile, template)
+          val newFit = Fit(tile, template, order)
           index(newFit)
           output += newFit
           if (output.length >= maxFits) {

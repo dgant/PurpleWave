@@ -2,6 +2,7 @@ package Placement.Access
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Generation.Fit
@@ -60,11 +61,14 @@ trait Fits {
     map.put(key, map.getOrElse(key, new ArrayBuffer)).foreach(_ += value)
   }
 
-  private def sort(): Unit = {
-    /*
+  protected def sort(): Unit = {
+    Maff.sortStablyInPlaceBy(_fits)(_.order)
     _fits.sortBy(_.order)
-    _foundations.sortBy(_.order)
-    byDimensions.foreach(_.)
-    */
+    Maff.sortStablyInPlaceBy(_foundations)(_.order)
+    byDimensions  .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byZone        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byBase        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byBuilding    .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byLabel       .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
   }
 }

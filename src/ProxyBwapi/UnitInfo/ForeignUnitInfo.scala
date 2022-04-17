@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
-import ProxyBwapi.UnitTracking.Imagination
+import ProxyBwapi.UnitTracking.{GhostUnit, Imagination}
 import bwapi.UnitType
 
 final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(bwapiUnit, id) {
@@ -10,6 +10,10 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
   override val foreign: Option[ForeignUnitInfo] = Some(this)
 
   override def update(): Unit = {
+    if (GhostUnit(this)) {
+      With.units.onUnitDestroy(bwapiUnit)
+      return
+    }
     if (frameDiscovered < With.frame) {
       readProxy()
     }

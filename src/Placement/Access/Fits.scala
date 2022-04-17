@@ -32,7 +32,7 @@ trait Fits {
 
   def index(fit: Fit): Unit = {
     _fits += fit
-    fit.template.points.view.map(p => Foundation(fit.origin.add(p.point), p)).foreach(index)
+    fit.template.points.view.map(p => Foundation(fit.origin.add(p.point), p, fit.order)).foreach(index)
   }
   protected def index(foundation: Foundation): Unit = {
     val point = foundation.point
@@ -58,5 +58,13 @@ trait Fits {
 
   private def put[T, U](map: mutable.Map[T, ArrayBuffer[U]], key: T, value: U): Unit = {
     map.put(key, map.getOrElse(key, new ArrayBuffer)).foreach(_ += value)
+  }
+
+  private def sort(): Unit = {
+    /*
+    _fits.sortBy(_.order)
+    _foundations.sortBy(_.order)
+    byDimensions.foreach(_.)
+    */
   }
 }

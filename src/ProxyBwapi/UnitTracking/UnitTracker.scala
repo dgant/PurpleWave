@@ -59,9 +59,9 @@ final class UnitTracker {
   // Access //
   ////////////
 
-  @inline def ours        : Iterable[FriendlyUnitInfo]  = With.units.bufferFriendly.all
-  @inline def enemy       : Iterable[ForeignUnitInfo]   = With.units.bufferEnemy.all
-  @inline def neutral     : Iterable[ForeignUnitInfo]   = With.units.bufferNeutral.all
+  @inline def ours        : Iterable[FriendlyUnitInfo]  = With.units.bufferFriendly.all.filterNot(GhostUnit(_))
+  @inline def enemy       : Iterable[ForeignUnitInfo]   = With.units.bufferEnemy.all.filterNot(GhostUnit(_))
+  @inline def neutral     : Iterable[ForeignUnitInfo]   = With.units.bufferNeutral.all.filterNot(GhostUnit(_))
   @inline def playerOwned : Iterable[UnitInfo]          = ours ++ enemy
   @inline def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
   @inline def all         : Iterable[UnitInfo]          = playerOwned ++ neutral

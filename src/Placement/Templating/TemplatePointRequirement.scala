@@ -21,12 +21,17 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
     height = argHeight
   }
 
+  def withLabels(newLabels: PlaceLabel*): TemplatePointRequirement = {
+    labels ++= newLabels
+    this
+  }
+
   def dimensions: (Int, Int) = (width, height)
 
   override def toString: String = (
     if (buildableAfter) "Unused"
     else if (walkableAfter) "Hallway"
-    else if (buildings.forall(_.isGas)) "Gas"
+    else if (buildings.exists(_.isGas)) "Gas"
     else if (buildings.nonEmpty) buildings.mkString(", ")
     else "Building") + f" $width x $height"
 }

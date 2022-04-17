@@ -68,22 +68,22 @@ class PlacementQueryOptions {
     Maff.clamp(0.25 * Maff.nanToOne(With.mapTileWidth.toDouble / tile.map(_.groundTiles(foundation.tile)).min), 0.0, 0.25)
   }
 
-  protected def acceptWidth(foundation: Foundation): Boolean = scoreWidth(foundation) > acceptOver
-  protected def acceptHeight(foundation: Foundation): Boolean = scoreHeight(foundation) > acceptOver
-  protected def acceptBuilding(foundation: Foundation): Boolean = scoreBuilding(foundation) > acceptOver
-  protected def acceptLabel(foundation: Foundation): Boolean = scoreLabel(foundation) > acceptOver
-  protected def acceptZone(foundation: Foundation): Boolean = scoreZone(foundation) > acceptOver
-  protected def acceptBase(foundation: Foundation): Boolean = scoreBase(foundation) > acceptOver
-  protected def acceptTile(foundation: Foundation): Boolean = scoreTile(foundation) > acceptOver
+  protected def acceptWidth     (foundation: Foundation): Boolean = scoreWidth(foundation)    > acceptOver
+  protected def acceptHeight    (foundation: Foundation): Boolean = scoreHeight(foundation)   > acceptOver
+  protected def acceptBuilding  (foundation: Foundation): Boolean = scoreBuilding(foundation) > acceptOver
+  protected def acceptLabel     (foundation: Foundation): Boolean = scoreLabel(foundation)    > acceptOver
+  protected def acceptZone      (foundation: Foundation): Boolean = scoreZone(foundation)     > acceptOver
+  protected def acceptBase      (foundation: Foundation): Boolean = scoreBase(foundation)     > acceptOver
+  protected def acceptTile      (foundation: Foundation): Boolean = scoreTile(foundation)     > acceptOver
 
   def score(foundation: Foundation): Double = Seq(
-    scoreWidth(foundation),
-    scoreHeight(foundation),
-    scoreLabel(foundation),
-    scoreZone(foundation),
-    scoreBase(foundation),
-    scoreBuilding(foundation),
-    scoreTile(foundation)).sum
+    1 * scoreWidth(foundation),
+    1 * scoreHeight(foundation),
+    1 * scoreLabel(foundation),
+    2 * scoreZone(foundation),
+    3 * scoreBase(foundation),
+    1 * scoreBuilding(foundation),
+    1 * scoreTile(foundation)).sum
 
   def accept(foundation: Foundation): Boolean = (
     acceptWidth(foundation)

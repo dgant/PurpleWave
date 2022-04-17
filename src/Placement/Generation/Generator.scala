@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, SpecificPoints}
 
-trait Generator extends Fitter{
+trait Generator extends Fitter {
 
   private var _initialized: Boolean = false
 
@@ -32,13 +32,12 @@ trait Generator extends Fitter{
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    fitAndIndex     (exitTile,    bounds, directionToBack,  Templates.batterycannon)
-    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.initialLayouts)
-    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways)
-    fitAndIndexAll  (cornerBack,  bounds, directionToFront, Templates.tech)
-    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 2)
-    fitAndIndexAll  (cornerBack,  bounds, directionToFront, Templates.tech)
-    fitAndIndexAll  (cornerFront, bounds, directionToBack,  Templates.gateways, 5)
+    fitAndIndex     (1, exitTile,    bounds, directionToBack,  Templates.batterycannon)
+    fitAndIndexAll  (0, cornerFront, bounds, directionToBack,  Templates.initialLayouts)
+    fitAndIndexAll  (3, cornerFront, bounds, directionToBack,  Templates.gateways, 2)
+    fitAndIndexAll  (2, cornerBack,  bounds, directionToFront, Templates.tech)
+    fitAndIndexAll  (4, cornerBack,  bounds, directionToFront, Templates.tech)
+    fitAndIndexAll  (4, cornerFront, bounds, directionToBack,  Templates.gateways, 5)
   }
 
   private def preplaceWalls(zone: Zone): Unit = {

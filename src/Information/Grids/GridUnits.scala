@@ -35,12 +35,17 @@ final class GridUnits extends AbstractTypedGrid[Traversable[UnitInfo]] {
 
   private def addUnit(unit: UnitInfo): Unit = {
     val tile = unit.tile
-    values(tile.i).add(unit)
+    // There's an offchance of invalid tiles if invoked on a ghost unit
+    if (tile.valid) {
+      values(tile.i).add(unit)
+    }
     units(unit) = tile
   }
 
   private def removeUnit(unit: UnitInfo, tile: Tile): Unit = {
-    values(tile.i).remove(unit)
+    if (tile.valid) {
+      values(tile.i).remove(unit)
+    }
     units.remove(unit)
   }
 }

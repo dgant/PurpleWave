@@ -8,10 +8,11 @@ object Listener extends BWEventListener {
 
   var lastException: Option[Exception] = None
   var lastStackTrace: Option[String] = None
-  var doesThisCodeEvenGetExecuted: Int = 0
+  var gameCount: Int = 0
 
   override def onStart(): Unit = {
     try {
+      gameCount += 1
       bot = Some(new BotPurpleWave)
       bot.get.onStart()
     }

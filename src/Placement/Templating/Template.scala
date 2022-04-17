@@ -3,6 +3,7 @@ package Placement.Templating
 import Mathematics.Maff
 import Mathematics.Points._
 import Performance.{Cache, CacheForever}
+import Placement.Access.PlaceLabels._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 
@@ -60,15 +61,15 @@ class Template {
         onWhitespace = false
         val pt: TemplatePointRequirement = char.toLower match {
           case '-' => RequireWalkable
-          case 't' => new TemplatePointRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery)
-          case 'h' => new TemplatePointRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern) // 3x2 tech
-          case 'p' => new TemplatePointRequirement(Protoss.Pylon)
-          case 'g' => new TemplatePointRequirement(Terran.Barracks, Protoss.Gateway, Protoss.Stargate) // 4x3 production
-          case 'r' => new TemplatePointRequirement(Protoss.RoboticsFacility) // 3x2 production
-          case 'f' => new TemplatePointRequirement(Protoss.Forge)
-          case 'y' => new TemplatePointRequirement(Protoss.CyberneticsCore)
-          case 'c' => new TemplatePointRequirement(Protoss.PhotonCannon)
-          case 'b' => new TemplatePointRequirement(Protoss.ShieldBattery)
+          case 't' => new TemplatePointRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery).withLabels(TownHall)
+          case 'h' => new TemplatePointRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern).withLabels(Tech) // 3x2 tech
+          case 'p' => new TemplatePointRequirement(Protoss.Pylon).withLabels(PriorityPower, Supply)
+          case 'g' => new TemplatePointRequirement(Terran.Barracks, Protoss.Gateway).withLabels(GroundProduction) // 4x3 production
+          case 'r' => new TemplatePointRequirement(Protoss.RoboticsFacility).withLabels(GroundProduction) // 3x2 production
+          case 'f' => new TemplatePointRequirement(Protoss.Forge).withLabels(Tech)
+          case 'y' => new TemplatePointRequirement(Protoss.CyberneticsCore).withLabels(Tech)
+          case 'c' => new TemplatePointRequirement(Protoss.PhotonCannon).withLabels(Defensive)
+          case 'b' => new TemplatePointRequirement(Protoss.ShieldBattery).withLabels(Defensive)
           case '6' => new TemplatePointRequirement(6, 3)
           case '4' => new TemplatePointRequirement(4, 3)
           case '3' => new TemplatePointRequirement(3, 2)

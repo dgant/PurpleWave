@@ -122,7 +122,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def base: Option[Base] = tile.base
   @inline final def metro: Option[Metro] = tile.metro
 
-
   @inline final def canTraverse(pixel: Pixel): Boolean = pixel.traversableBy(this)
   @inline final def canTraverse(tile: Tile): Boolean = tile.traversableBy(this)
 

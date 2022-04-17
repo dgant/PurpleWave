@@ -12,14 +12,14 @@ trait Fitter extends Fits {
   /**
     * Attempts to fit a single template.
     */
-  def fitAndIndex(from: Tile, bounds: TileRectangle, direction: Direction, template: Template, maxFits: Int = 1): Seq[Fit] = {
-    fitAndIndexAll(from, bounds, direction, Seq(template), maxFits)
+  def fitAndIndex(order: Int, from: Tile, bounds: TileRectangle, direction: Direction, template: Template, maxFits: Int = 1): Seq[Fit] = {
+    fitAndIndexAll(order, from, bounds, direction, Seq(template), maxFits)
   }
 
   /**
     * Attempts to fit each of a sequence of templates.
     */
-  def fitAndIndexAll(from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[Template], maxFits: Int = 1): Seq[Fit] = {
+  def fitAndIndexAll(order: Int, from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[Template], maxFits: Int = 1): Seq[Fit] = {
     val output = new ArrayBuffer[Fit]
 
     var templateIndex = 0

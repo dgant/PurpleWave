@@ -2,7 +2,8 @@ package Debugging.Visualizations.Rendering
 
 import Debugging.Visualizations.Colors
 import Lifecycle.With
-import Mathematics.Points.{Pixel, PixelRectangle, Tile, TileRectangle}
+import Mathematics.Maff
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import bwapi.Color
 
 object DrawMap {
@@ -207,6 +208,10 @@ object DrawMap {
   }
   
   def irrelevant(points: Pixel*): Boolean = {
-    With.configuration.visualizationCullViewport && ! new PixelRectangle(points).expand(64, 64).intersects(With.viewport.area)
+    (With.configuration.visualizationCullViewport
+      && ! points.exists(With.viewport.contains(_, 0))
+      && ! With.viewport.contains(Maff.centroid(points)))
+    // This is more accurate but is slower due to allocating a PixelRectangle
+    // ! new PixelRectangle(points).expand(64, 64).intersects(With.viewport.area)
   }
 }

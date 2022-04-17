@@ -33,20 +33,20 @@ object Templates {
   val gateways = Seq(
     new Template().add(
       "xxx-------- " +
-      "Px4xxx4xxx- " +
+      "2x4xxx4xxx- " +
       "xxxxxxxxxx- " +
       "Pxxxxxxxxx- " +
       "xx4xxx4xxx- " +
-      "Pxxxxxxxxx- " +
+      "2xxxxxxxxx- " +
       "xxxxxxxxxx- " +
       "xxx-------- " ),
     new Template().add(
       "xxx---- " +
-      "Px4xxx- " +
+      "2x4xxx- " +
       "xxxxxx- " +
       "Pxxxxx- " +
       "xx4xxx- " +
-      "Pxxxxx- " +
+      "2xxxxx- " +
       "xxxxxx- " +
       "xxx---- " ),
     new Template().add(
@@ -54,10 +54,10 @@ object Templates {
       "-4xxx4xxx- " +
       "-xxxxxxxx- " +
       "-xxxxxxxx- " +
-      "--xPxPxx-- " ),
+      "--xPx2xx-- " ),
     new Template().add(
       "xx--------- " +
-      "Px4xxx4xxx- " +
+      "2x4xxx4xxx- " +
       "xxxxxxxxxx- " +
       "Pxxxxxxxxx- " +
       "xx--------- " ),
@@ -65,7 +65,7 @@ object Templates {
       "-------- " +
       "-4xxxPx- " +
       "-xxxxxx- " +
-      "-xxxxPx- " +
+      "-xxxx2x- " +
       "-4xxxxxx " +
       "-xxxxPxx " +
       "-xxxxxxx " +
@@ -77,14 +77,14 @@ object Templates {
       "xxxxxx- " +
       "xxx---- " ),
     new Template().add(
-      "PxPx- " +
+      "Px2x- " +
       "xxxx- " +
       "4xxx- " +
       "xxxx- " +
       "xxxx- " +
       "----- " ),
     new Template().add(
-      "-PxPx " +
+      "-Px2x " +
       "-xxxx " +
       "-4xxx " +
       "-xxxx " +

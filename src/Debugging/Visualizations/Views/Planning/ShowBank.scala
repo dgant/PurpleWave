@@ -1,17 +1,17 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Utilities.UnitFilters.IsWorker
 
 import scala.collection.mutable.ArrayBuffer
 
-object ShowResources extends View {
+object ShowBank extends DebugView {
 
   val dropColumns = 4
 
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
 
     var minerals = With.self.minerals
     var gas = With.self.gas

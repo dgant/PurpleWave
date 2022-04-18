@@ -13,8 +13,8 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsAny
 import Utilities.UnitPreferences._
 
-class MorphUnit(requestArg: RequestBuildable) extends Production {
-  setRequest(requestArg)
+class MorphUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+  setRequest(requestArg, expectedFramesArg)
   val classOutput   : UnitClass     = request.unit.get
   val classInput    : UnitClass     = classOutput.whatBuilds._1
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, classOutput, 1)

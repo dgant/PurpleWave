@@ -2,11 +2,11 @@ package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import bwapi.Color
 
-object ShowSaturation extends View {
+object ShowSaturation extends DebugView {
   override def renderMap(): Unit = {
     val gathererCounts = With.units.ours.view
       .filter(_.agent.toGather.isDefined)

@@ -15,25 +15,25 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferClose
 
-class BuildBuilding(requestArg: RequestBuildable) extends Production {
-  setRequest(requestArg)
+class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+  setRequest(requestArg, expectedFramesArg)
   val buildingClass   : UnitClass       = request.unit.get
   val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
+  val placementQuery  : PlacementQuery  = requestArg.placement.getOrElse(new PlacementQuery(buildingClass))
   val tileLock        : LockTiles       = new LockTiles(this)
   val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
   val builderLock     : LockUnits       = new LockUnits(this)
   builderLock.matcher = builderMatcher
   builderLock.counter = CountOne
   builderLock.interruptable = false
-  val placementQuery  : PlacementQuery  = requestArg.tileFilter match { case query: PlacementQuery => query case _ => new PlacementQuery(buildingClass) }
+
+  var orderedTile : Option[Tile]        = None
+  var foundation  : Option[Foundation]  = None
+  var intendAfter : Option[Int]         = None
+  private var _trainee: Option[FriendlyUnitInfo] = None
 
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
-
-  private var orderedTile : Option[Tile]        = None
-  private var foundation  : Option[Foundation]  = None
-  private var intendAfter : Option[Int]         = None
-  private var _trainee: Option[FriendlyUnitInfo] = None
   override def trainee: Option[FriendlyUnitInfo] = _trainee
   override def hasSpent: Boolean = trainee.isDefined
   override def isComplete: Boolean = trainee.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
@@ -44,7 +44,7 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     output
   }
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     // Populate the trainee manually.
     // This step may rarely be necessary because the expectTrainee() process can theoretically fail when:
     // 1. We command a builder to build at X
@@ -60,7 +60,7 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
       .filterNot(_.complete)
       .filter(_.producer.forall(==))
       .filter(_.pixelDistanceEdge(knownBuilder) < 32 * 4)
-      .filter(candidate => request.tileFilter(candidate.tileTopLeft))
+      .filter(u => placementQuery.acceptExisting(u.tileTopLeft))
       .filter(MacroCounter.countComplete(_)(buildingClass) == 0)).getOrElse(Seq.empty)
     _trainee = _trainee
       .filter(_.alive)
@@ -73,20 +73,23 @@ class BuildBuilding(requestArg: RequestBuildable) extends Production {
     orderedTile = trainee.map(_.tileTopLeft).orElse(orderedTile)
 
     if (trainee.isEmpty) {
-      // Is our ordered/desired tile legal?
-      // If not, get the first legal tile.
-      // Legality check must include whether the groundskeeper will give us the required tiles
-
-      // TODO: Update zone/base preference if not specified by the original request
-      // TODO: Check future power availability
-      // TODO: Apply the architecture diff... if that has any remaining relevance. Probably we can just delete that code.
-      val newFoundation, assessment = (foundation.view ++ placementQuery.foundations)
-        .map(f => (f, With.architecture.assess(f.tile, buildingClass)))
-        .find(fa => fa._2 == ArchitecturalAssessment.Accepted && With.groundskeeper.isFree(fa._1.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight))
-        .map(_._1)
-      foundation = newFoundation
+      if (expectedFrames > With.blackboard.maxBuilderTravelFrames()) return
+      if (request.placement.isEmpty) {
+        placementQuery.resetDefaults(buildingClass) // Reset placement preferences, in case eg. we no longer control some base
+      }
+      lazy val candidateFoundations = placementQuery.foundations
+      var candidateIndex = 0
+      do {
+        if (foundation.isEmpty && candidateFoundations.nonEmpty) {
+          foundation = Some(candidateFoundations(candidateIndex))
+          candidateIndex += 1
+        }
+        foundation = foundation.filter(f => With.architecture.assess(f.tile, buildingClass) == ArchitecturalAssessment.Accepted)
+        foundation = foundation.filter(f => With.groundskeeper.isFree(f.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight))
+        foundation = foundation.filter(placementQuery.accept)
+      } while (foundation.isEmpty && candidateIndex < candidateFoundations.length)
       if (foundation.isEmpty) return
-      With.architecture.diffPlacement(foundation.get.tile, buildingClass).doo()
+      With.architecture.diffPlacement(foundation.get.tile, buildingClass, expectedFrames).doo() // Mainly needed so we know what will be powered in the future
       if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight).tiles)) {
         With.logger.warn(f"Failed to acquire tiles for $this at ${foundation.get.tile}")
         return

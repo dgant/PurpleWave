@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowTextOnlyUnits extends View {
+object ShowTextOnlyUnits extends DebugView {
   
   override def renderMap() {
     

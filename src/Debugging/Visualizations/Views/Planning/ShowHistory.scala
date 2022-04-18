@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowHistory extends View {
+object ShowHistory extends DebugView {
   
   override def renderScreen(): Unit = {
     DrawScreen.column(5,

@@ -1,15 +1,15 @@
 package Macro.Requests
 
+import Placement.Access.PlacementQuery
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.TileFilters.{TileAny, TileFilter}
 
 case class RequestUnit(
-  unitClass       : UnitClass,
-  quantityArg     : Int                       = 1,
-  tileFilterArg   : TileFilter                = TileAny,
-  specificUnitArg : Option[FriendlyUnitInfo]  = None) extends RequestBuildable(
+  unitClass         : UnitClass,
+  quantityArg       : Int                       = 1,
+  placementQueryArg : Option[PlacementQuery]    = None,
+  specificUnitArg   : Option[FriendlyUnitInfo]  = None) extends RequestBuildable(
     unitClass,
     quantityArg,
-    tileFilterArg,
+    placementQueryArg,
     specificUnitArg)

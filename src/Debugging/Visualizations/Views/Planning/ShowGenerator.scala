@@ -2,17 +2,13 @@ package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.{Direction, Pixel, SpecificPoints, TileGenerator}
 
-object ShowPreplacement extends View {
+object ShowGenerator extends DebugView {
 
   override def renderMap(): Unit = {
-    With.placement.fits.foreach(_.drawMap())
-  }
-
-  def showGenerator() {
     With.geography.zones.foreach(zone => {
       if (zone.boundary.contains(new Pixel(With.game.getMousePosition).add(With.viewport.start).tile)) {
         val bounds        = zone.boundary

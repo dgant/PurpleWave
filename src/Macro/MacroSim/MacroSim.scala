@@ -8,7 +8,6 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
-import Utilities.TileFilters.TileAny
 import Utilities.Time.Forever
 
 import scala.collection.mutable
@@ -20,8 +19,8 @@ final class MacroSim {
   val steps     = new mutable.ArrayBuffer[MacroStep]()
   val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
 
-  private def requests: Seq[RequestBuildable] = steps.view.filter(_.request.isDefined).map(_.request.get)
-  def queue: Seq[RequestBuildable] = requests.filter(_.specificUnit.isDefined) ++ requests.filter(_.specificUnit.isEmpty)
+  private def requests: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
+  def queue: Seq[(RequestBuildable, Int)] = requests.filter(_._1.specificUnit.isDefined) ++ requests.filter(_._1.specificUnit.isEmpty)
 
   private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
@@ -104,13 +103,13 @@ final class MacroSim {
       // By the end of our simulation, have we not yet met the request?
       //
       // Units:
-      // - (Default) If there is no tile filter, use our state count
-      // - (Special) If there is a  tile filter, count our complete units which the tile filter accepts
+      // - (Default) If there is no placement query, use our state count
+      // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
       val unitDiff = request.unit.map(requestedUnit => request.quantity -
-        (if (request.tileFilter == TileAny)
+        (if (request.placement.isEmpty)
           steps.last.state.unitsComplete(requestedUnit)
         else
-          With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.tileFilter))).getOrElse(0)
+          With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
       val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
       val diff        = Seq(unitDiff, upgradeDiff, techDiff).max

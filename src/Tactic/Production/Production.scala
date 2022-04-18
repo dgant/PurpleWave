@@ -16,10 +16,12 @@ trait Production extends Prioritized {
   }
 
   private var _request: RequestBuildable = _
+  private var _expectedFrames: Int = _
   final def request: RequestBuildable = _request
-  final def setRequest(requestArg: RequestBuildable): RequestBuildable = {
+  final def expectedFrames: Int = _expectedFrames
+  final def setRequest(requestArg: RequestBuildable, expectedFramesArg: Int): Unit = {
     _request = requestArg
-    _request
+    _expectedFrames = expectedFramesArg
   }
 
   /**
@@ -31,7 +33,7 @@ trait Production extends Prioritized {
     if (request.unit    != requirement.unit)    return false
     if (request.upgrade.isDefined && request.quantity < requirement.quantity) return false
     if ( ! request.specificUnit.forall(trainee.contains)) return false
-    if (request.tileFilter != request.tileFilter) return false
+    if (request.placement != requirement.placement) return false
     true
   }
 

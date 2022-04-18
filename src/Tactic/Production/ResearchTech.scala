@@ -9,8 +9,8 @@ import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 
-class ResearchTech(requestArg: RequestBuildable) extends Production {
-  setRequest(requestArg)
+class ResearchTech(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+  setRequest(requestArg, expectedFramesArg)
   val tech          : Tech          = request.tech.get
   val techerClass   : UnitClass     = tech.whatResearches
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, tech, 1)
@@ -22,7 +22,7 @@ class ResearchTech(requestArg: RequestBuildable) extends Production {
   override def isComplete: Boolean = tech(With.self)
   override def hasSpent: Boolean = techers.units.exists(_.techProducing.contains(tech))
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     if (hasSpent || currencyLock.acquire()) {
       techers.acquire()
       techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))

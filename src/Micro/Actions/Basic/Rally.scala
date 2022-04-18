@@ -17,7 +17,7 @@ object Rally extends Action {
     && unit.canDoAnything
   )
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     var shouldRallyToMinerals = false
     
     if (unit.unitClass.isTownHall) {

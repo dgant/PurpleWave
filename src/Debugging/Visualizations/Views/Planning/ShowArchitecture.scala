@@ -2,12 +2,12 @@ package Debugging.Visualizations.Views.Planning
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Macro.Architecture.GridExclusion
 import bwapi.Color
 
-object ShowArchitecture extends View {
+object ShowArchitecture extends DebugView {
 
   override def renderMap(): Unit = {
     With.viewport.rectangleTight().tiles.foreach(tile => {

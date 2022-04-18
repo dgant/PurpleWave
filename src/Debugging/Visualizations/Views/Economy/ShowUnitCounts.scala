@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowUnitCounts extends View {
+object ShowUnitCounts extends DebugView {
 
   override def renderScreen(): Unit = {
     val unitCounts = With.units.ours

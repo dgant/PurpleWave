@@ -2,13 +2,13 @@ package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowHappyUnits extends View {
+object ShowHappyUnits extends DebugView {
   
   override def renderMap() {
     

@@ -2,14 +2,14 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.Micro.ShowSquads
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowClustering extends View {
+object ShowClustering extends DebugView {
   
   override def renderScreen() {
     val y = 7 * With.visualization.lineHeightSmall

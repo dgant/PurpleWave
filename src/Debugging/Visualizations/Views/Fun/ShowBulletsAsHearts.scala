@@ -1,14 +1,14 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Players.Players
 
 import scala.collection.JavaConverters._
 
-object ShowBulletsAsHearts extends View {
+object ShowBulletsAsHearts extends DebugView {
   
   override def renderMap() {
     With.game.getBullets.asScala

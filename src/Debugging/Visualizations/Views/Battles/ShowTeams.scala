@@ -2,9 +2,9 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 
-object ShowTeams extends View {
+object ShowTeams extends DebugView {
 
   override def renderMap(): Unit = {
     ShowBattles.localBattle.foreach(battle => {

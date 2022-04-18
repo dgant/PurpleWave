@@ -3,14 +3,11 @@ package Debugging
 import java.lang.management.{ManagementFactory, MemoryType}
 import java.text.DecimalFormat
 import java.util.Calendar
-
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformanceDetails
-import Debugging.Visualizations.Views.Planning.{ShowStrategyEvaluations, ShowStrategyInterest}
 import Lifecycle.{JBWAPIClient, Main, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
-import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -240,7 +237,14 @@ class Storyteller {
   }
 
   private def logStrategyEvaluation(): Unit = {
-    val columns = ShowStrategyEvaluations.columns
+    val evaluations = With.strategy.evaluations.values.filter(e => e.strategy.legality.isLegal || e.gamesUs.nonEmpty).toVector.sortBy( - _.probabilityWin)
+    val columns = Vector(
+      Vector("Strategy") ++ evaluations.map(_.strategy.toString),
+      Vector("#Games")   ++ evaluations.map(e => formatGames(e.gamesUs.size)),
+      Vector("#Wtd")     ++ evaluations.map(e => formatGames(e.gamesUs.map(_.weight).sum)),
+      Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.filter(_.won).map(_.weight).sum)),
+      Vector("WinPct")   ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
+      Vector("WinEst")   ++ evaluations.map(e => formatPercentage(e.probabilityWin)))
     if (columns.isEmpty) return
       var rows = new ArrayBuffer[String]()
       (0 until columns.map(_.length).max).foreach(rowIndex => {
@@ -250,11 +254,17 @@ class Storyteller {
      })
     columns.map(_.mkString("\t")).foreach(tell)
   }
-
   private def logStrategyInterest(): Unit = {
     tell("Strategy interest")
-    ShowStrategyInterest.evaluations.map(p => p._1 + " " + p._2).foreach(tell)
+    With.strategy.winProbabilityByBranchLegal
+      .toVector
+      .sortBy( - _._2)
+      .map(pair => (formatPercentage(pair._2), pair._1.toSeq.map(_.toString).sorted.mkString(" + ")))
+      .map(p => p._1 + " " + p._2)
+      .foreach(tell)
   }
+  private def formatGames(games: Double): String = "%1.1f".format(games)
+  private def formatPercentage(value: Double): String = (value * 100.0).toInt + """%%"""
 
   class Tale(val tale: String) { val frame: Int = With.frame }
 

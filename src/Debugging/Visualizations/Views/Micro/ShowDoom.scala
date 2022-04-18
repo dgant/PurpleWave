@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object ShowDoom extends View {
+object ShowDoom extends DebugView {
   override def renderMap(): Unit = {
     With.units.all.foreach(renderUnit)
   }

@@ -6,9 +6,9 @@ import Debugging.Visualizations.Views.Economy._
 import Debugging.Visualizations.Views.Fun._
 import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
-import Debugging.Visualizations.Views.Performance.{ShowPerformanceDetails, ShowPerformanceSummary, ShowReactionTime}
-import Debugging.Visualizations.Views.Planning.{ShowStatus, _}
-import Debugging.Visualizations.Views.{ShowClock, ShowStoryteller, View}
+import Debugging.Visualizations.Views.Performance._
+import Debugging.Visualizations.Views.Planning._
+import Debugging.Visualizations.Views.{ShowHeader, ShowStoryteller, DebugView}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Performance.Tasks.TimedTask
@@ -27,27 +27,24 @@ class Visualization extends TimedTask {
   // Settings //
   //////////////
   
-  var views: ArrayBuffer[View] = mutable.ArrayBuffer[View](
+  var views: ArrayBuffer[DebugView] = mutable.ArrayBuffer[DebugView](
     // Evergreen views
-    ShowClock,
-    ShowStrategyName,
+    ShowHeader,
     ShowGrids,
     ShowUtilization,
     ShowHealthAndCooldown,
     ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    ShowStatus,
-    ShowPerformanceSummary,
     ShowStoryteller,
 
     // Temporary views
     ShowFormations,
     ShowBWEB,
-    ShowPreplacement
+    ShowFoundations
   )
 
-  lazy val knownViews: Vector[View] = Vector[View](
+  lazy val knownViews: Vector[DebugView] = Vector[DebugView](
     ShowAccelerants,
     ShowArchitecture,
     ShowBases,
@@ -61,6 +58,7 @@ class Visualization extends TimedTask {
     ShowAccounting,
     ShowFingerprints,
     ShowFormations,
+    ShowFoundations,
     ShowGas,
     ShowGradients,
     ShowGrids,
@@ -76,20 +74,14 @@ class Visualization extends TimedTask {
     ShowUnitsFriendly,
     ShowUtilization,
     ShowPerformanceDetails,
-    ShowPerformanceSummary,
     ShowProduction,
-    ShowPreplacement,
+    ShowPlacement,
     ShowPushes,
     ShowReactionTime,
-    ShowResources,
+    ShowBank,
     ShowRushDistances,
     ShowSaturation,
-    ShowScheduler,
     ShowSquads,
-    ShowStatus,
-    ShowStrategyInterest,
-    ShowStrategyName,
-    ShowStrategyEvaluations,
     ShowStoryteller,
     ShowTeams,
     ShowTextOnly,
@@ -99,7 +91,7 @@ class Visualization extends TimedTask {
     ShowUnitPaths,
     ShowZoneBorders,
     ShowZoneLabels,
-    ShowZonePathDemo,
+    ShowZonePaths,
     ShowZones
   )
   
@@ -113,7 +105,7 @@ class Visualization extends TimedTask {
   
   val lineHeightSmall = 9
   
-  def toggle(view: View) {
+  def toggle(view: DebugView) {
     if (views.contains(view)) {
       views -= view
     } else {

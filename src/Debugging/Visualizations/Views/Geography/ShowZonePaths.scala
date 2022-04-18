@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowZonePathDemo extends View {
+object ShowZonePaths extends DebugView {
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.geography.startLocations.foreach(start1 =>
       With.geography.startLocations.foreach(start2 =>
         if (start1 != start2) {

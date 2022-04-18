@@ -1,9 +1,9 @@
 package Debugging.Visualizations.Views.Planning
 
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowFingerprints extends View {
+object ShowFingerprints extends DebugView {
 
   override def renderScreen() {
     With.game.drawTextScreen(

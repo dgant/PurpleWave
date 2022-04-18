@@ -1,5 +1,5 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 
-object ShowUnitPaths extends View
+object ShowUnitPaths extends DebugView

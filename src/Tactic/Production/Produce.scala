@@ -15,7 +15,7 @@ class Produce extends Tactic {
 
   def queue: Seq[Production] = _queueNext
 
-  def launch() {
+  def launch(): Unit = {
     _queueLast = _queueNext
     _queueNext = ListBuffer.empty
     val requests      = With.macroSim.queue
@@ -27,17 +27,18 @@ class Produce extends Tactic {
     _queueNext ++= _queueLast.view.filter(_.hasSpent)
 
     // Retain required production or add new production
-    requests.foreach(request => {
+    requests.foreach(upcomingRequest => {
+      val (request, expectedFrames) = upcomingRequest
       val       existingNext = _queueNext.view                        .find(production => production.satisfies(request) && ! matched.contains(production))
       lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(production => production.satisfies(request) && ! matched.contains(production))
       existingNext.foreach(matched+=)
-      existingNext.foreach(_.setRequest(request)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
+      existingNext.foreach(_.setRequest(request, expectedFrames)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
       if (existingNext.isEmpty && request.specificUnit.isEmpty) {
         existingLast.foreach(_queueNext+=)
         existingLast.foreach(matched+=)
-        existingLast.foreach(_.setRequest(request)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
+        existingLast.foreach(_.setRequest(request, expectedFrames)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
         if (existingLast.isEmpty) {
-          val newProduction = request.makeProduction
+          val newProduction = request.makeProduction(expectedFrames)
           _queueNext += newProduction
           matched += newProduction
         }

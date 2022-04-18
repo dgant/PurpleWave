@@ -1,14 +1,14 @@
 package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Coordination.Pushing.Push
 
 import scala.collection.mutable
 
-object ShowPushes extends View {
+object ShowPushes extends DebugView {
   override def renderMap(): Unit = {
     val activePushes = new mutable.HashSet[Push]
     With.units.ours.view.filter(_.canMove).foreach(u => With.coordinator.pushes.get(u).foreach(push => {

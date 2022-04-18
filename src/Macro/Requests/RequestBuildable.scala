@@ -1,18 +1,18 @@
 package Macro.Requests
 
+import Placement.Access.PlacementQuery
 import ProxyBwapi.Buildable
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import Tactic.Production._
-import Utilities.TileFilters.{TileAny, TileFilter}
 import bwapi.Race
 
 abstract class RequestBuildable(
   val buildable     : Buildable,
   val quantity      : Int = 0,
-  val tileFilter    : TileFilter = TileAny,
+  val placement     : Option[PlacementQuery] = None,
   val specificUnit  : Option[FriendlyUnitInfo] = None) {
   def tech      : Option[Tech]      = buildable match { case c: Tech      => Some(c) case _ => None }
   def upgrade   : Option[Upgrade]   = buildable match { case c: Upgrade   => Some(c) case _ => None }
@@ -32,15 +32,15 @@ abstract class RequestBuildable(
   def producerRequired  : UnitClass               = unit.map(_.whatBuilds._1).orElse(upgrade.map(_.whatUpgrades)).orElse(tech.map(_.whatResearches)).getOrElse(UnitClasses.None)
   def producersRequired : Int                     = unit.map(_.whatBuilds._2).getOrElse(1)
 
-  final def makeProduction: Production = {
-    if (tech.isDefined) new ResearchTech(this)
-    else if (upgrade.isDefined) new ResearchUpgrade(this)
+  final def makeProduction(expectedFrames: Int): Production = {
+    if (tech.isDefined) new ResearchTech(this, expectedFrames)
+    else if (upgrade.isDefined) new ResearchUpgrade(this, expectedFrames)
     else {
       val unitClass = unit.get
-      if (unitClass.isAddon)                                                  new BuildAddon(this)
-      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new BuildBuilding(this)
-      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new MorphUnit(this)
-      else                                                                    new TrainUnit(this)
+      if (unitClass.isAddon)                                                  new BuildAddon(this, expectedFrames)
+      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new BuildBuilding(this, expectedFrames)
+      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new MorphUnit(this, expectedFrames)
+      else                                                                    new TrainUnit(this, expectedFrames)
     }
   }
 

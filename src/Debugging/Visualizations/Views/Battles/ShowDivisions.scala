@@ -2,13 +2,13 @@ package Debugging.Visualizations.Views.Battles
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.Micro.ShowSquads
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowDivisions extends View {
+object ShowDivisions extends DebugView {
   
   override def renderScreen() {
     val y = 17 * With.visualization.lineHeightSmall

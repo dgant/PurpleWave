@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Performance
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowReactionTime extends View {
+object ShowReactionTime extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     DrawScreen.table(
       5, 5 * With.visualization.lineHeightSmall,
       Vector(

@@ -1,11 +1,11 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import bwapi.Color
 
-object ShowUtilization extends View {
+object ShowUtilization extends DebugView {
   val max: Double = Math.log(24 * 60)
   override def renderMap(): Unit = {
     With.units.ours

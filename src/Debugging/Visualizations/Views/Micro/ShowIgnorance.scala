@@ -1,13 +1,13 @@
 package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Information.Battles.BattleFilters
 import Lifecycle.With
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowIgnorance extends View {
+object ShowIgnorance extends DebugView {
 
   override def renderMap() { With.units.all.foreach(renderUnit) }
 

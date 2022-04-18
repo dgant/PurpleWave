@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views.Battles
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawScreen.GraphCurve
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
@@ -11,7 +11,7 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
 
-object ShowBattles extends View {
+object ShowBattles extends DebugView {
   
   override def renderScreen() {
     localBattle.foreach(renderBattleScreen)

@@ -9,8 +9,8 @@ import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 
-class ResearchUpgrade(requestArg: RequestBuildable) extends Production {
-  setRequest(requestArg)
+class ResearchUpgrade(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+  setRequest(requestArg, expectedFramesArg)
   val upgrade       : Upgrade       = request.upgrade.get
   val level         : Int           = request.quantity
   val upgraderClass : UnitClass     = upgrade.whatUpgrades

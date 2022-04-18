@@ -1,11 +1,11 @@
 package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 
-object ShowRushDistances extends View {
+object ShowRushDistances extends DebugView {
   
   /****************
   Known ramp widths
@@ -67,7 +67,7 @@ object ShowRushDistances extends View {
   Ride of the Valkyries: ???
   Tau Cross: 5318 - 5538 - 5731
   *****************************/
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val x = 5
     val y = 1 * With.visualization.lineHeightSmall
     val distances = With.geography.rushDistances

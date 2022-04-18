@@ -2,13 +2,13 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 import Tactic.Squads.Squad
 import ProxyBwapi.UnitInfo.UnitInfo
 
-object ShowSquads extends View {
+object ShowSquads extends DebugView {
   
   override def renderMap() {
     With.squads.all.filter(_.units.nonEmpty).foreach(renderSquadMap)

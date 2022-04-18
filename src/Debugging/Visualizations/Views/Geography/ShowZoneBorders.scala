@@ -2,10 +2,10 @@ package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowZoneBorders extends View {
+object ShowZoneBorders extends DebugView {
   
   override def renderMap() {
     With.geography.zones.foreach(zone => {

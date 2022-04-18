@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Battles
 
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 
 
-object ShowJudgment extends View {
+object ShowJudgment extends DebugView {
   override def renderScreen(): Unit = {
     ShowBattles.localBattle.foreach(render)
   }

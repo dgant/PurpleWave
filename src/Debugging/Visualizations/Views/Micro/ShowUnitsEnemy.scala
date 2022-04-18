@@ -2,14 +2,14 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Utilities.Time.Frames
 
-object ShowUnitsEnemy extends View {
+object ShowUnitsEnemy extends DebugView {
   
   var showSiegeRadius = false
   var showFogged      = true

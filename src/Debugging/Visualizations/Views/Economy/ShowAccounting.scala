@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowAccounting extends View {
+object ShowAccounting extends DebugView {
   
   override def renderScreen() {
     val labels = Vector(

@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
 import bwapi.Color
 
-object ShowProduction extends View {
+object ShowProduction extends DebugView {
 
   case class Producible(
     name: String,

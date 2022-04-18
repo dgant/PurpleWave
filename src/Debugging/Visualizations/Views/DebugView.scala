@@ -3,7 +3,7 @@ package Debugging.Visualizations.Views
 import Debugging.ToString
 import Lifecycle.With
 
-abstract class View {
+abstract class DebugView {
   
   lazy val name: String = ToString(this).replace("Show", "")
   

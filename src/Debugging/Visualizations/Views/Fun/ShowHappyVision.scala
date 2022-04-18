@@ -1,9 +1,9 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Views.Geography.ShowZones
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 
-object ShowHappyVision extends View {
+object ShowHappyVision extends DebugView {
   
   def render() {
     ShowBlackScreen.renderScreen()

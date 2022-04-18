@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Utilities.Time.Seconds
 import bwapi.Color
 
-object ShowMacroSim extends View {
+object ShowMacroSim extends DebugView {
   val y0 = 300
   val pixelsPerFrame          : Double = 638.0 / Seconds(90)()
   val pixelsPerResource       : Double = y0 / 1000.0

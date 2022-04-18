@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Debugging.Visualizations.{Colors, Forces}
 import Lifecycle.With
 import Mathematics.Maff
@@ -9,7 +9,7 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import bwapi.Color
 
-object ShowUnitsFriendly extends View {
+object ShowUnitsFriendly extends DebugView {
   
   var selectedOnly    : Boolean = false
   var showClient      : Boolean = false

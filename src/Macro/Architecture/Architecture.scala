@@ -52,7 +52,7 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
 
-  def diffPlacement(tile: Tile, unit: UnitClass): ArchitectureDiff = {
+  def diffPlacement(tile: Tile, unit: UnitClass, futureFrames: Int = 0): ArchitectureDiff = {
     val output = new ArchitectureDiffSeries
 
     val area = TileRectangle(tile, tile.add(unit.tileWidth, unit.tileHeight))
@@ -61,8 +61,7 @@ class Architecture {
     output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
 
     if (unit == Protoss.Pylon) {
-      // If we have no Pylons, place in advance of our first completing
-      output.stack += new ArchitectureDiffPower(tile, With.frame + (if (With.units.existsOurs(Protoss.Pylon)) Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion else 0))
+      output.stack += new ArchitectureDiffPower(tile, With.frame + futureFrames + Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion)
     }
 
     output
@@ -72,7 +71,7 @@ class Architecture {
   // Margins //
   /////////////
 
-  private def recalculateExclusions() {
+  private def recalculateExclusions(): Unit = {
 
     // Reserve addon space in bases
     if (With.self.isTerran) {
@@ -124,16 +123,16 @@ class Architecture {
   // Power //
   ///////////
 
-  private def recalculatePower() {
+  private def recalculatePower(): Unit = {
     With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + unit.unitClass.framesToFinishCompletion))
   }
 
-  private def addPower(tile: Tile, frame: Int) {
+  private def addPower(tile: Tile, frame: Int): Unit = {
     Pylons.points2.map(tile.add).foreach(neighbor => if (neighbor.valid) powerFrame2Height.set(neighbor, frame))
     Pylons.points3.map(tile.add).foreach(neighbor => if (neighbor.valid) powerFrame3Height.set(neighbor, frame))
   }
 
-  private def recalculateBuilderAccess() {
+  private def recalculateBuilderAccess(): Unit = {
     val hasBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
     val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distancePixels(z) < LightYear()))
     accessibleZones = (hasBuilder ++ accessible).distinct
@@ -143,7 +142,7 @@ class Architecture {
   // Legality! //
   ///////////////
 
-  def assess(topLeft: Tile, building: UnitClass): ArchitecturalAssessment = {
+  def assess(topLeft: Tile, building: UnitClass, futureFrames: Int = 0): ArchitecturalAssessment = {
     val width: Int = building.tileWidth + (if (building.canBuildAddon && ! building.isTownHall) 2 else 0)
     val height: Int = building.tileHeight
 
@@ -152,10 +151,10 @@ class Architecture {
     }
     if (building.requiresPsi) {
       // We can allow use of forthcoming Pylon power by using a value higher than With.frame
-      if (height == 3 && ! With.grids.psi3Height.isSet(topLeft) && powerFrame3Height.get(topLeft) > With.frame) {
+      if (height == 3 && ! With.grids.psi3Height.isSet(topLeft) && powerFrame3Height.get(topLeft) > With.frame + futureFrames) {
         return ArchitecturalAssessment.Unpowered
       }
-      if (height == 2 && ! With.grids.psi2Height.isSet(topLeft) && powerFrame2Height.get(topLeft) > With.frame) {
+      if (height == 2 && ! With.grids.psi2Height.isSet(topLeft) && powerFrame2Height.get(topLeft) > With.frame + futureFrames) {
         return ArchitecturalAssessment.Unpowered
       }
     }

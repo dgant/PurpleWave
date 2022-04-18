@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 import Utilities.Time.Seconds
 
-object ShowStoryteller extends View {
+object ShowStoryteller extends DebugView {
   val duration = Seconds(10)()
 
   override def renderScreen(): Unit = {

@@ -46,15 +46,11 @@ trait Fits {
     if ( ! requirement.buildableBefore) return
     if (requirement.buildableAfter) return
     _foundations += foundation
-    put(byDimensions, foundation.point.requirement.dimensions, foundation)
-    put(byZone, foundation.tile.zone, foundation)
-    foundation.tile.base.foreach(base => put(byBase, base, foundation))
-    requirement.buildings.foreach(b => put(byBuilding, b, foundation))
-    requirement.labels.foreach(l => put(byLabel, l, foundation))
-
-    if (requirement.buildings.isEmpty) {
-      byDimensions.put(requirement.dimensions, byDimensions.getOrElse(requirement.dimensions, new ArrayBuffer)).foreach(_ += foundation)
-    }
+    put(byDimensions, foundation.point.requirement.dimensions,  foundation)
+    put(byZone,       foundation.tile.zone,                     foundation)
+    foundation.tile.base  .foreach(base     => put(byBase,      base,     foundation))
+    requirement.buildings .foreach(building => put(byBuilding,  building, foundation))
+    requirement.labels    .foreach(label    => put(byLabel,     label,    foundation))
   }
 
   private def put[T, U](map: mutable.Map[T, ArrayBuffer[U]], key: T, value: U): Unit = {

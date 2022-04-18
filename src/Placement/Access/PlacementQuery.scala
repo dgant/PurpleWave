@@ -5,19 +5,26 @@ import Mathematics.Points.Tile
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.TileFilters.TileFilter
 
-import scala.collection.mutable
-
-class PlacementQuery extends TileFilter{
-  var requirements  = new PlacementQueryOptions
-  var preferences   = new PlacementQueryOptions
+class PlacementQuery {
+  var requirements  = new PlacementQueryParameters
+  var preferences   = new PlacementQueryParameters
+  // Required for Produce to match requests against existing production
+  override def equals(other: Any): Boolean = {
+    if ( ! other.isInstanceOf[PlacementQuery]) return false
+    val otherQuery = other.asInstanceOf[PlacementQuery]
+    requirements == otherQuery.requirements && preferences == otherQuery.preferences
+  }
 
   /**
     * Recommended default arguments for a building type
     */
   def this(building: UnitClass) {
     this()
+    resetDefaults(building)
+  }
+
+  def resetDefaults(building: UnitClass): Unit = {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
     requirements.building = Some(building).filter(b => b.isTownHall || b.isGas)
@@ -46,9 +53,12 @@ class PlacementQuery extends TileFilter{
     }
   }
 
-  def apply(tile: Tile): Boolean = {
+  def acceptExisting(tile: Tile): Boolean = {
     if ( ! tile.valid) return false
-    accept(Foundation(tile, With.placement.at(tile)))
+    if (requirements.zone.nonEmpty && ! requirements.zone.contains(tile.zone)) return false
+    if (requirements.base.nonEmpty && ! requirements.base.exists(tile.base.contains)) return false
+    if (requirements.tile.nonEmpty && ! requirements.tile.contains(tile)) return false
+    true
   }
 
   def accept(foundation: Foundation): Boolean = {
@@ -61,28 +71,23 @@ class PlacementQuery extends TileFilter{
 
   def tiles: Traversable[Tile] = foundations.view.map(_.tile)
 
-  def foundations: Traversable[Foundation] = {
+  def foundations: Seq[Foundation] = {
     // As a performance optimization, start filtering from the smallest matching collection
-    lazy val foundationSources = Seq(
-      requirements.label.flatMap(With.placement.get(_).view),
-      requirements.zone.flatMap(With.placement.get(_).view),
-      requirements.base.flatMap(With.placement.get(_).view),
-      requirements.building.map(With.placement.get(_).view).getOrElse(Seq.empty),
-      requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h).view)).getOrElse(Seq.empty),
-      With.placement.foundations.view)
+    lazy val foundationSources = IndexedSeq(
+      requirements.label.flatMap(With.placement.get),
+      requirements.zone.flatMap(With.placement.get),
+      requirements.base.flatMap(With.placement.get),
+      requirements.building.map(With.placement.get).getOrElse(IndexedSeq.empty),
+      requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
+      With.placement.foundations)
     lazy val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
-
-    val output = new mutable.PriorityQueue[Foundation]()(Ordering.by(preferences.score))
-    if (requirements.building.exists(_.isGas)) {
-      // We don't preplace gas foundations
-      output ++= gasFoundations.filter(accept)
-    } else {
-      output ++= foundationSourceSmallest.filter(accept)
-    }
-    output
+    (if (requirements.building.exists(_.isGas)) gasFoundations else foundationSourceSmallest).filter(accept)sortBy(- score(_))
+    // If this sorting is too slow we can use a PriorityQueue,
+    // but would need to account for the existing ordering in the score
+    // because PriorityQueue is not a stable sort
   }
 
-  def gasFoundations: Traversable[Foundation] = {
+  def gasFoundations: Seq[Foundation] = {
     val bases = (if (requirements.base.isEmpty && requirements.zone.isEmpty) {
       With.geography.ourBases.view
     } else if (requirements.zone.isEmpty) {
@@ -90,10 +95,7 @@ class PlacementQuery extends TileFilter{
     } else {
       requirements.zone.view.flatMap(_.bases).filter(requirements.base.contains)
     })
-    val gasses = bases.flatMap(_.gas).filter(_.isNeutral)
-    val output = new mutable.PriorityQueue[Foundation]()(Ordering.by(preferences.score))
-    output ++= gasses.map(_.tileTopLeft).map(Foundation(_, PointGas))
-    output
+    bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, PointGas))
   }
 
   def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
@@ -101,14 +103,10 @@ class PlacementQuery extends TileFilter{
   }
 
   def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+    foundations.map(preferences.audit).sortBy(-_._2)
+  }
+
+  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(preferences.audit).sortBy(-_._2)
-  }
-
-  def auditGasRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    gasFoundations.map(requirements.audit).toVector.sortBy(-_._2)
-  }
-
-  def auditGasPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    gasFoundations.map(preferences.audit).toVector.sortBy(-_._2)
   }
 }

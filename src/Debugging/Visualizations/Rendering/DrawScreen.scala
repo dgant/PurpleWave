@@ -7,10 +7,6 @@ import Mathematics.Points.Pixel
 import bwapi.Color
 
 object DrawScreen {
-  
-  def header(x: Int, text: String) {
-    column(x, With.visualization.lineHeightSmall, text)
-  }
 
   def column(x: Int, y: Int, text: Iterable[String]) {
     column(x, y, text.mkString("\n"))
@@ -19,6 +15,7 @@ object DrawScreen {
   def column(x: Int, y: Int, text: String) {
     With.game.drawTextScreen(x, y, text)
   }
+
   def text(pixel: Pixel, text: String): Unit = {
     With.game.drawTextScreen(pixel.x, pixel.y, text)
   }

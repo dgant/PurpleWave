@@ -2,13 +2,12 @@ package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Points.Pixel
-import bwapi.MouseButton
 
-object ShowTileInfo extends View {
+object ShowTileInfo extends DebugView {
   
   override def renderScreen(): Unit = {
     val mousePixelScreen  = new Pixel(With.game.getMousePosition)
@@ -17,15 +16,13 @@ object ShowTileInfo extends View {
     val walkableTile      = mousePixelMap.walkableTile
     val zone              = With.geography.zoneByTile(mouseTile)
 
-    if (true || With.game.getMouseState(MouseButton.M_LEFT)) {
-      val pathfindProfile = new PathfindProfile(With.geography.home.walkableTile)
-      pathfindProfile.end = Some(walkableTile)
-      val path = pathfindProfile.find
-      if (path.pathExists) {
-        path.tiles.foreach(tiles => {
-          tiles.toVector.indices.dropRight(1).foreach(i => DrawMap.arrow(tiles(i).center, tiles(i+1).center, Colors.BrightBlue))
-        })
-      }
+    val pathfindProfile = new PathfindProfile(With.geography.home.walkableTile)
+    pathfindProfile.end = Some(walkableTile)
+    val path = pathfindProfile.find
+    if (path.pathExists) {
+      path.tiles.foreach(tiles => {
+        tiles.toVector.indices.dropRight(1).foreach(i => DrawMap.arrow(tiles(i).center, tiles(i+1).center, Colors.BrightBlue))
+      })
     }
 
     DrawMap.line(mouseTile.center, walkableTile.center, Colors.BrightYellow)

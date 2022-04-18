@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowKills extends View {
+object ShowKills extends DebugView {
 
   override def renderScreen(): Unit = {
     val kills = With.units.ours

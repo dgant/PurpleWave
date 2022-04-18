@@ -1,14 +1,14 @@
 package Debugging.Visualizations.Views.Performance
 
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
 
-object ShowPerformanceDetails extends View {
+object ShowPerformanceDetails extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     DrawScreen.table(5, With.visualization.lineHeightSmall * 6, statusTable(sortTasks(With.performance.tasks)).take(20))
   }
 

@@ -91,6 +91,7 @@ final case class TileRectangle(
   @inline def endPixel        : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
   @inline def topRightPixel   : Pixel = Pixel(endPixel.x, startPixel.y)
   @inline def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
+  @inline def midPixel        : Pixel = startPixel.midpoint(endPixel)
   
   @inline def cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))

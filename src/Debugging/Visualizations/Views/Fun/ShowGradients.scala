@@ -2,11 +2,11 @@ package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Mathematics.Points.Pixel
 import bwapi.Color
 
-object ShowGradients extends View {
+object ShowGradients extends DebugView {
 
   def drawGradient(row: Int, column: Int, color: (Int, Int) => Color): Unit = {
     val origin = Pixel(264 * row, 264 * column)

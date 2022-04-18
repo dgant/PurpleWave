@@ -9,8 +9,8 @@ import Utilities.UnitPreferences.PreferTrainerFor
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class TrainUnit(requestArg: RequestBuildable) extends Production {
-  setRequest(requestArg)
+class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+  setRequest(requestArg, expectedFramesArg)
   val traineeClass    : UnitClass         = request.unit.get
   val trainerClass    : UnitClass         = traineeClass.whatBuilds._1
   val addonClass      : Option[UnitClass] = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)

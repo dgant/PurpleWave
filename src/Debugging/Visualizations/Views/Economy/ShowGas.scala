@@ -1,10 +1,10 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
-object ShowGas extends View {
+object ShowGas extends DebugView {
 
   override def renderScreen() {
     val workersMin  = With.blackboard.gasWorkerFloor()

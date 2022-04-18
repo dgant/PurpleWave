@@ -2,11 +2,11 @@ package Debugging.Visualizations.Views.Micro
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.View
+import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import bwapi.Color
 
-object ShowAccelerants extends View {
+object ShowAccelerants extends DebugView {
 
   override def renderMap(): Unit = {
     val radius = With.gathering.zipperRadius

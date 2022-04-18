@@ -7,7 +7,7 @@ import Mathematics.Points.Tile
 import Placement.Access.PlaceLabels.PlaceLabel
 import ProxyBwapi.UnitClasses.UnitClass
 
-class PlacementQueryOptions {
+class PlacementQueryParameters {
   var width     : Option[Int]       = None
   var height    : Option[Int]       = None
   var building  : Option[UnitClass] = None
@@ -15,6 +15,24 @@ class PlacementQueryOptions {
   var zone      : Seq[Zone]         = Seq.empty
   var base      : Seq[Base]         = Seq.empty
   var tile      : Seq[Tile]         = Seq.empty
+  // Required for Produce to match requests against existing production
+  override def equals(other: Any): Boolean = {
+    if ( ! other.isInstanceOf[PlacementQueryParameters]) return false
+    val otherParameters = other.asInstanceOf[PlacementQueryParameters]
+    if (width     != otherParameters.width)     return false
+    if (height    != otherParameters.height)    return false
+    if (building  != otherParameters.building)  return false
+    if ( ! label.forall(otherParameters.label.contains))  return false
+    if ( ! otherParameters.label.forall(label.contains))  return false
+    if ( ! zone.forall(otherParameters.zone.contains))    return false
+    if ( ! otherParameters.zone.forall(zone.contains))    return false
+    if ( ! base.forall(otherParameters.base.contains))    return false
+    if ( ! otherParameters.base.forall(base.contains))    return false
+    if ( ! tile.forall(otherParameters.tile.contains))    return false
+    if ( ! otherParameters.tile.forall(tile.contains))    return false
+    true
+  }
+
 
   private val acceptOver: Double = 0.99
 
@@ -80,8 +98,8 @@ class PlacementQueryOptions {
     1 * scoreWidth(foundation),
     1 * scoreHeight(foundation),
     1 * scoreLabel(foundation),
-    2 * scoreZone(foundation),
-    3 * scoreBase(foundation),
+    5 * scoreZone(foundation),
+    9 * scoreBase(foundation),
     1 * scoreBuilding(foundation),
     1 * scoreTile(foundation)).sum
 

@@ -12,7 +12,8 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvZFFE, PvZGatewayFE}
 import Utilities.Time.GameTime

@@ -1,7 +1,7 @@
 package Planning.Predicates.Reactive
 
 import Lifecycle.With
-import Planning.Predicate
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 
 case class EnemyCarriers() extends Predicate {

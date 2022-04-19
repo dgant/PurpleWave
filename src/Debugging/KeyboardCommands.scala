@@ -1,14 +1,11 @@
 package Debugging
 
-import Lifecycle.{JBWAPIClient, With}
+import Lifecycle.{PurpleBWClient, With}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
-  def quitVsHuman(): Unit = {
-    if (With.configuration.humanMode) With.lambdas.add(() => With.game.leaveGame())
-  }
 
-  def onSendText(text: String) {
+  def onSendText(text: String): Unit = {
     text match {
       case "q"          => breakpoint()
       case "c"          => With.configuration.camera      = ! With.configuration.camera
@@ -22,11 +19,9 @@ object KeyboardCommands {
       case "2"          => With.game.setLocalSpeed(24 * 8)  ; With.configuration.camera = false
       case "3"          => With.game.setLocalSpeed(24)      ; With.configuration.camera = false
       case "4"          => With.game.setLocalSpeed(0)       ; With.configuration.camera = false
-      case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
-      case "map"        => With.logger.debug("The current map is " + With.game.mapName + ": " + With.game.mapFileName)
-      case "pm"         => With.logger.debug(JBWAPIClient.getPerformanceMetrics.toString)
-      case "task"       => With.configuration.logTaskDuration = ! With.configuration.logTaskDuration
+      case "pm"         => With.logger.debug(PurpleBWClient.getPerformanceMetrics.toString)
       case "track"      => With.configuration.trackUnit = ! With.configuration.trackUnit
+      case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
 
       case "get out"    => quitVsHuman()
       case "quit"       => quitVsHuman()
@@ -37,17 +32,19 @@ object KeyboardCommands {
     With.game.sendText(text)
   }
 
-  var breakpointFodder = 1
-  def breakpoint() {
+
+  def quitVsHuman(): Unit = {
+    if (With.configuration.humanMode && With.self.name != "Anonymous AI") {
+      With.lambdas.add(() => With.game.leaveGame())
+    }
+  }
+
+  private var breakpointFodder = 1
+  def breakpoint(): Unit = {
      breakpointFodder = -breakpointFodder
   }
 
-  def slow(): Unit = {
-    With.game.setLocalSpeed(1000)
-  }
-
-
-  def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
+  private def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
 }
 
 

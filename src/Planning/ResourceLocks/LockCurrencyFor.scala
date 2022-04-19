@@ -1,6 +1,6 @@
 package Planning.ResourceLocks
 
-import Planning.Prioritized
+import Macro.Allocation.Prioritized
 import ProxyBwapi.Buildable
 
 class LockCurrencyFor(prioritized: Prioritized, buildableType: Buildable, upgradeLevel: Int) extends LockCurrency(prioritized) {

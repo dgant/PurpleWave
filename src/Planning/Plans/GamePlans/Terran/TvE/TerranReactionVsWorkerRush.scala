@@ -13,7 +13,8 @@ import Planning.Plans.Placement.BuildBunkersAtMain
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.EnemyStrategy
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 
 class TerranReactionVsWorkerRush extends GameplanTemplate {

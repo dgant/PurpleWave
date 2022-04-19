@@ -16,7 +16,8 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ12Pool
 

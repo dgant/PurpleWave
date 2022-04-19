@@ -19,7 +19,8 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Utilities.UnitFilters._
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
 import Utilities.Time.Seconds
@@ -85,7 +86,6 @@ class ZvT2HatchLurker extends GameplanTemplate {
   class HydraMuta extends Parallel(
 
     new CapGasAtRatioToMinerals(1.0, 100),
-    new Write(With.blackboard.preferCloseExpansion, () => true),
     new CancelOrders(_.techProducing.contains(Zerg.LurkerMorph)),
     new CancelOrders(_.upgradeProducing.contains(Zerg.ZerglingSpeed)),
 

@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitTracking
 
-import Lifecycle.{Listener, With}
+import Lifecycle.{PurpleEventListener, With}
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Position, UnitType}
 
@@ -9,7 +9,7 @@ import bwapi.{Position, UnitType}
   */
 object GhostUnit {
   def fromBwapi(unit: bwapi.Unit): Boolean = {
-    (Listener.gameCount > 1
+    (PurpleEventListener.gameCount > 1
       && unit.getType.id == UnitType.Unknown.id
       && unit.getInitialType.id == UnitType.Unknown.id
       && unit.getPosition == Position.Unknown
@@ -17,7 +17,7 @@ object GhostUnit {
   }
 
   def apply(unit: UnitInfo): Boolean = {
-    Listener.gameCount > 1 && (
+    PurpleEventListener.gameCount > 1 && (
       fromBwapi(unit.bwapiUnit)
       || unit.frameDiscovered > With.frame
       || unit.lastSeen > With.frame)

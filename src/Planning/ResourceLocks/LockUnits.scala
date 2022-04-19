@@ -1,8 +1,8 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
+import Macro.Allocation.Prioritized
 import Mathematics.Maff
-import Planning.Prioritized
 import Utilities.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
 import Utilities.UnitFilters.{IsAnything, UnitFilter}
 import Utilities.UnitPreferences.{PreferAnything, UnitPreference}

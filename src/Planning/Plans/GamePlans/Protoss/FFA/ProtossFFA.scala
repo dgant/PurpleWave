@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.FFA
 
 import Macro.Requests.Get
-import Planning.{Plan, Predicate}
+import Planning.Plan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, TechContinuously, UpgradeContinuously}
@@ -9,7 +9,7 @@ import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting.ScoutOn
-import Planning.Predicates.Always
+import Planning.Predicates.{Always, Predicate}
 import Planning.Predicates.Milestones.{EnemyHasShownCloakedThreat, UnitsAtLeast, UpgradeComplete, UpgradeStarted}
 import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss

@@ -16,7 +16,8 @@ import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyHasShown, UnitsAtLea
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.{IsAny, IsTank}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP6Fac
 

@@ -2,7 +2,8 @@ package Planning.Plans.Compound
 
 import Lifecycle.With
 import Planning.Plans.Basic.NoPlan
-import Planning.{Plan, Property}
+import Planning.Plan
+import Utilities.Property
 import bwapi.Race
 
 class SwitchOurRace(

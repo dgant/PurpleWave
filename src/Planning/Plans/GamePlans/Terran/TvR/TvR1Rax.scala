@@ -10,7 +10,8 @@ import Planning.Predicates.Compound.{Not, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 import Utilities.UnitFilters.IsWarrior

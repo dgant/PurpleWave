@@ -15,7 +15,8 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy._
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvRDT
 import Tactic.Tactics.DefendFightersAgainstRush

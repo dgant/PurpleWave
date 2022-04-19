@@ -14,7 +14,8 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ10HatchLing
 

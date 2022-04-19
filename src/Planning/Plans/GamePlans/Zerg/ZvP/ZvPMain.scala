@@ -15,7 +15,8 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAll, IsComplete, IsAny, IsWarrior}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvPHydraBust, ZvPMutaliskBust, ZvPReactiveBust, ZvPZerglingBust}
 

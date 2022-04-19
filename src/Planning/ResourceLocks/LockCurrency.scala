@@ -1,7 +1,7 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
-import Planning.Prioritized
+import Macro.Allocation.Prioritized
 
 class LockCurrency(prioritized: Prioritized) {
 

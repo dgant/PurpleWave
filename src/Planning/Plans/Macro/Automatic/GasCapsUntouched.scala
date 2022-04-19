@@ -1,7 +1,6 @@
 package Planning.Plans.Macro.Automatic
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 
 class GasCapsUntouched extends Predicate {
   override def apply: Boolean = MacroFacts.gasCapsUntouched

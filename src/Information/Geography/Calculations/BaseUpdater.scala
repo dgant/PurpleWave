@@ -80,9 +80,5 @@ object BaseUpdater {
         }
       }
     }
-
-    if (originalOwner != base.owner) {
-      base.lastOwnerChangeFrame = With.frame
-    }
   }
 }

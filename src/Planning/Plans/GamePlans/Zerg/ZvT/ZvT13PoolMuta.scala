@@ -11,7 +11,8 @@ import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvT13PoolMuta
 

@@ -1,7 +1,6 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 
 case class EnemyWalledIn() extends Predicate {
   override def apply: Boolean = MacroFacts.enemyWalledIn

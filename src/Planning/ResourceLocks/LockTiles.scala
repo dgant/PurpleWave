@@ -1,8 +1,8 @@
 package Planning.ResourceLocks
 
 import Lifecycle.With
+import Macro.Allocation.Prioritized
 import Mathematics.Points.Tile
-import Planning.Prioritized
 
 class LockTiles(val owner: Prioritized) {
 

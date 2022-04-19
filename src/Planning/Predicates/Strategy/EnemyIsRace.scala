@@ -1,7 +1,7 @@
 package Planning.Predicates.Strategy
 
 import Lifecycle.With
-import Planning.Predicate
+import Planning.Predicates.Predicate
 import bwapi.Race
 
 class EnemyIsRace(val race: Race) extends Predicate {

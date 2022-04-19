@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.TileFilters.TileFilter
 import bwapi.TilePosition
 
 final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {

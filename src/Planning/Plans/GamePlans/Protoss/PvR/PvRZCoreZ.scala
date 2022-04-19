@@ -11,7 +11,8 @@ import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
 import Utilities.UnitFilters.IsWarrior
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpenZCoreZ
 

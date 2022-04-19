@@ -16,7 +16,8 @@ import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsHatchlike
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed
 import Tactic.Tactics.DefendFightersAgainstRush

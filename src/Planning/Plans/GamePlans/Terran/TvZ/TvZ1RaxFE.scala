@@ -15,7 +15,8 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones.MiningBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ1RaxFE
 import Tactic.Tactics.DefendFightersAgainstRush

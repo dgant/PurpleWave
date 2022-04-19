@@ -30,20 +30,19 @@ class Base(val townHallTile: Tile)
   var gas                   : Vector[UnitInfo]  = Vector.empty
   var minerals              : Vector[UnitInfo]  = Vector.empty
   var owner                 : PlayerInfo        = With.neutral
-  var lastOwnerChangeFrame  : Int               = 0
   var name                  : String            = "Nowhere"
   var enemyCombatValue      : Double            = _
   var workerCount           : Int               = _
   val saturation            : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
 
-  private val _initialResources = With.units.all.filter(u => u.mineralsLeft > With.configuration.blockerMineralThreshold || u.gasLeft > 0).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+  private val _initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
   val harvestingArea = new TileRectangle(_initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
   val heart: Tile = {
     val centroid = if (_initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(_initialResources.view.map(_.pixel))
     val direction = centroid.subtract(townHallArea.center)
     val xDominant = Math.abs(direction.x) > Math.abs(direction.y)
     if (xDominant)
-          if (direction.x < 0) townHallTile.add(-2, 1) else townHallTile.add(5, 1)
+         if (direction.x < 0) townHallTile.add(-2, 1) else townHallTile.add(5, 1)
     else if (direction.y < 0) townHallTile.add(1, -2) else townHallTile.add(1, 4)
   }
 

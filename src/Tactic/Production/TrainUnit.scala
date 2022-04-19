@@ -1,7 +1,7 @@
 package Tactic.Production
 
+import Information.Counting.MacroCounter
 import Macro.Requests.RequestBuildable
-import Macro.Scheduling.MacroCounter
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Utilities.UnitCounters.CountOne

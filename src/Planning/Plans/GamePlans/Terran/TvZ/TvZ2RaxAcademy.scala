@@ -16,7 +16,8 @@ import Planning.Predicates.Milestones.{EnemyHasShown, MiningBasesAtLeast, UnitsA
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Utilities.UnitFilters.{IsAny, IsWarrior}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy
 

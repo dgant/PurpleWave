@@ -15,7 +15,8 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Milestones.{BasesAtLeast, GasForUpgrade, UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsGroundWarrior
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvP12Hatch, ZvP9Pool, ZvPOverpool}
 import Tactic.Tactics.DefendAgainstProxy

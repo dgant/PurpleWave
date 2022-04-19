@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 import java.util.Calendar
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformance
-import Lifecycle.{JBWAPIClient, Main, With}
+import Lifecycle.{PurpleBWClient, Main, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
@@ -154,7 +154,7 @@ class Storyteller {
       "The bot believes its performance"
       + (if (Main.jbwapiConfiguration.getAsync) ", if it were running synchronously, would have been " else " was ")
       + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
-    tell(JBWAPIClient.getPerformanceMetrics.toString)
+    tell(PurpleBWClient.getPerformanceMetrics.toString)
     tell(
       DrawScreen.tableToString(
         DrawScreen.padTable(

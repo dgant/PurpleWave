@@ -11,7 +11,8 @@ import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax
 import Utilities.UnitCounters.CountExcept

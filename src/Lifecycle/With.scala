@@ -2,26 +2,26 @@ package Lifecycle
 
 import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
-import Information.Accounting
 import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
+import Information.Counting.{Accounting, MacroCounts, ProductionHistory, Projections}
 import Information.Fingerprinting.Fingerprints
 import Information.Geography.Geography
+import Information.Geography.NeoGeo.{MapIdentifier, NeoGeo}
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
+import Lifecycle.Configure.{BwapiData, Configuration, ConfigurationLoader}
 import Macro.Allocation._
-import Macro.Architecture.Architecture
-import Macro.Gathering
-import Macro.MacroSim.MacroSim
-import Macro.Scheduling.{MacroCounts, ProductionHistory, Projections, Scheduler}
+import Macro.Gathering.Gathering
+import Macro.Scheduling.{MacroSim, Scheduler}
 import Mathematics.Points.Tile
 import Micro.Agency.Agency
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
-import NeoGeo.{MapIdentifier, NeoGeo}
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
+import _root_.Placement.Architecture.Architecture
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -87,7 +87,7 @@ object With {
   var matchups          : MatchupGraph        = _
   var paths             : Paths               = _
   var performance       : PerformanceMonitor  = _
-  var placement         : Placement        = _
+  var placement         : Placement           = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
   var priorities        : Priorities          = _
@@ -111,13 +111,13 @@ object With {
   def framesSince(previousFrame: Int): Int = Math.max(0, frame - previousFrame)
   def framesUntil(futureFrame: Int): Int = Math.max(0, futureFrame - frame)
 
-  def onFrame() {
+  def onFrame(): Unit = {
     frame = With.game.getFrameCount
   }
 
-  def onStart() {
+  def onStart(): Unit = {
     startNanoTime = System.nanoTime()
-    game = JBWAPIClient.getGame
+    game = PurpleBWClient.getGame
     game.enableFlag(Flag.UserInput)
     game.setLatCom(false)
     game.setLocalSpeed(0)
@@ -215,7 +215,7 @@ object With {
     tasks             = new TaskQueueGlobal
   }
   
-  private def analyzeTerrain() {
+  private def analyzeTerrain(): Unit = {
     With.logger.debug(f"Loading fake BWTA for ${game.mapName} at ${game.mapFileName()}")
     try {
       BWTA.readMap(game)

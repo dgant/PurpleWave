@@ -14,7 +14,8 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{BasesAtLeast, EnemiesAtLeast, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsTank
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvPFDStrong
 

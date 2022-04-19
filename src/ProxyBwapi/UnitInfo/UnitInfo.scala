@@ -6,6 +6,7 @@ import Information.Battles.Prediction.Skimulation.SkimulationUnit
 import Information.Battles.Types.{Battle, Team}
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
+import Macro.Allocation.Prioritized
 import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points._
@@ -14,7 +15,6 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Micro.Targeting.Target
 import Performance.{Cache, KeyedCache}
-import Planning.Prioritized
 import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -86,7 +86,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0
 
-  lazy val isBlocker: Boolean = (unitClass.isMinerals || unitClass.isGas) && gasLeft + mineralsLeft < With.configuration.blockerMineralThreshold
+  lazy val isBlocker: Boolean = (unitClass.isMinerals || unitClass.isGas) && gasLeft + mineralsLeft <  250 // Setting this goofily high as an AIIDE hack to account for the 249-mineral patches on Fortress
   lazy val inefficientGasPosition: Boolean = unitClass.isGas && base.map(_.townHallTile).exists(t => t.y + 3 < tileTopLeft.y || t.x + 4 < tileTopLeft.x)
   lazy val gasMinersRequired: Int = if (unitClass.isGas) (if (inefficientGasPosition) 4 else 3) else 0
 

@@ -1,8 +1,8 @@
 package Tactic.Production
 
+import Information.Counting.MacroCounter
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
-import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}

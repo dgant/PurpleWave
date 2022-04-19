@@ -1,9 +1,8 @@
 package Micro.Agency
 
-import Debugging.KeyboardCommands
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Mathematics.Maff
+import Mathematics.Points.{Pixel, SpecificPoints, Tile}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -39,7 +38,7 @@ object Commander {
     unit.agent.setRideGoal(unit.pixel)
     leadFollower(unit, hold)
     if (unit.unready) return
-    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     if (unit.velocity.lengthSquared > 0 && unit.order != Orders.HoldPosition) {
       unit.bwapiUnit.holdPosition()
     }
@@ -110,23 +109,7 @@ object Commander {
         || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
 
       if (shouldOrder) {
-        // Hold position attacks currently don't work reliably.
-        // A unit get commanded to hold position next to a target but just stands there and doesn't attack it
-        // My hypothesis is that a hold position unit refuses to *turn* to face a target,
-        // so if the solo hold-position target is behind a unit that can't attack backwards, the holder won't attack.
-        // This could of course be tested manually in-game.
-        val allowHoldingPosition = false
-        if (allowHoldingPosition
-          && ! unit.flying
-          && ! unit.unitClass.floats
-          && unit.matchups.targetsInRange.size == 1
-          && unit.matchups.targetsInRange.head == target
-          // Because Reavers use BW's internal ground distance we can't be sure the target is in range
-          && ! unit.is(Protoss.Reaver)) {
-          unit.bwapiUnit.holdPosition()
-        } else {
-          unit.bwapiUnit.attack(target.bwapiUnit)
-        }
+        unit.bwapiUnit.attack(target.bwapiUnit)
         target.addFutureAttack(unit)
       }
       sleepAttack(unit)
@@ -200,7 +183,7 @@ object Commander {
   }
 
   def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(attackMove(unit, _))
-  private def attackMove(unit: FriendlyUnitInfo, destination: Pixel) {
+  private def attackMove(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
     unit.agent.setRideGoal(destination)
     leadFollower(unit, attackMove(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
@@ -215,7 +198,7 @@ object Commander {
   }
 
   def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(patrol(unit, _))
-  private def patrol(unit: FriendlyUnitInfo, destination: Pixel) {
+  private def patrol(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
     unit.agent.setRideGoal(destination)
     leadFollower(unit, patrol(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
@@ -227,7 +210,7 @@ object Commander {
   }
 
   def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
-  private def move(unit: FriendlyUnitInfo, destination: Pixel) {
+  private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
     unit.agent.setRideGoal(destination)
     leadFollower(unit, move(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
@@ -256,18 +239,18 @@ object Commander {
     sleep(unit)
   }
   
-  def rightClick(unit: FriendlyUnitInfo, target: UnitInfo) {
+  def rightClick(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, rightClick(_, target))
     if ( ! unit.agent.ride.contains(target)) {
       unit.agent.setRideGoal(target.pixel)
     }
     if (unit.unready) return
-    if ( ! unit.is(Zerg.Lurker)) autoUnburrow(unit)
+    if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     unit.bwapiUnit.rightClick(target.bwapiUnit)
     sleepAttack(unit)
   }
   
-  def useTech(unit: FriendlyUnitInfo, tech: Tech) {
+  def useTech(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     if (tech == Terran.Stim) {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
@@ -279,7 +262,7 @@ object Commander {
     sleep(unit)
   }
   
-  def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo) {
+  def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -292,7 +275,7 @@ object Commander {
     }
   }
   
-  def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel) {
+  def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel): Unit = {
     unit.agent.setRideGoal(target)
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -305,7 +288,7 @@ object Commander {
     }
   }
   
-  def repair(unit: FriendlyUnitInfo, target: UnitInfo) {
+  def repair(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -325,7 +308,7 @@ object Commander {
   }
 
   def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
-  private def gather(unit: FriendlyUnitInfo, resource: UnitInfo) {
+  private def gather(unit: FriendlyUnitInfo, resource: UnitInfo): Unit = {
     unit.agent.setRideGoal(resource.pixel)
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -337,7 +320,7 @@ object Commander {
       }
     } else {
       if (resource.visible) {
-        def doGather() {
+        def doGather(): Unit = {
           unit.bwapiUnit.rightClick(resource.bwapiUnit)
         }
         if (resource.unitClass.isGas) {
@@ -354,7 +337,7 @@ object Commander {
           lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)
           lazy val onTargetMineral      = unit.orderTarget.contains(resource)
           lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)
-          def doGatherFromAccelerant() { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
+          def doGatherFromAccelerant(): Unit = { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
           if (unit.order == Orders.MiningMinerals) {
             // Leave well alone!
           } else if (onAccelerantPixel) {
@@ -387,7 +370,7 @@ object Commander {
     sleep(unit, 1)
   }
 
-  def build(unit: FriendlyUnitInfo, unitClass: UnitClass) {
+  def build(unit: FriendlyUnitInfo, unitClass: UnitClass): Unit = {
     if (unit.unready) return
     if (autoUnburrow(unit)) return
     // Don't auto-unload! We have a separate process for building Scarabs in loaded Reavers
@@ -395,7 +378,7 @@ object Commander {
     sleepBuild(unit)
   }
   
-  def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile) {
+  def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile): Unit = {
     unit.agent.setRideGoal(tile.center)
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -407,20 +390,20 @@ object Commander {
     unit.bwapiUnit.build(unitClass.bwapiType, tile.bwapi)
     sleepBuild(unit)
   }
-  
-  def tech(unit: FriendlyUnitInfo, tech: Tech) {
+
+  def tech(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.research(tech.bwapiTech)
     sleep(unit)
   }
   
-  def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade) {
+  def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.upgrade(upgrade.bwapiType)
     sleep(unit)
   }
   
-  def cancel(unit: FriendlyUnitInfo) {
+  def cancel(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     if (unit.teching) {
       unit.bwapiUnit.cancelResearch()
@@ -434,45 +417,37 @@ object Commander {
     sleep(unit)
   }
   
-  def rally(unit: FriendlyUnitInfo, pixel: Pixel) {
+  def rally(unit: FriendlyUnitInfo, pixel: Pixel): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.setRallyPoint(pixel.bwapi)
     unit.lastSetRally = With.frame
     sleep(unit)
   }
   
-  def rally(unit: FriendlyUnitInfo, targetUnit: UnitInfo) {
-    if (unit.unready) return
-    unit.bwapiUnit.setRallyPoint(unit.bwapiUnit)
-    unit.lastSetRally = With.frame
-    sleep(unit)
-  }
-  
-  
-  def unload(transport: FriendlyUnitInfo, passenger: UnitInfo) {
+  def unload(transport: FriendlyUnitInfo, passenger: UnitInfo): Unit = {
     // No sleeping required
     transport.bwapiUnit.unload(passenger.bwapiUnit)
   }
   
-  def addon(unit: FriendlyUnitInfo, unitClass: UnitClass) {
+  def addon(unit: FriendlyUnitInfo, unitClass: UnitClass): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.buildAddon(unitClass.bwapiType)
     sleep(unit)
   }
   
-  def buildScarab(unit: FriendlyUnitInfo) {
+  def buildScarab(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.build(Protoss.Scarab.bwapiType)
     sleep(unit)
   }
   
-  def buildInterceptor(unit: FriendlyUnitInfo) {
+  def buildInterceptor(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.build(Protoss.Interceptor.bwapiType)
     sleep(unit)
   }
   
-  def cloak(unit: FriendlyUnitInfo, tech: Tech) {
+  def cloak(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     leadFollower(unit, cloak(_, tech))
     if (unit.unready) return
     unit.agent.lastCloak = With.frame
@@ -480,26 +455,26 @@ object Commander {
     sleep(unit)
   }
   
-  def decloak(unit: FriendlyUnitInfo, tech: Tech) {
+  def decloak(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     leadFollower(unit, decloak(_, tech))
     if (unit.unready) return
     unit.bwapiUnit.decloak()
     sleep(unit)
   }
   
-  def burrow(unit: FriendlyUnitInfo) {
+  def burrow(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.burrow()
     sleep(unit)
   }
   
-  def unburrow(unit: FriendlyUnitInfo) {
+  def unburrow(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.unburrow()
     sleep(unit)
   }
   
-  def lift(unit: FriendlyUnitInfo) {
+  def lift(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.lift()
     sleep(unit)
@@ -523,17 +498,17 @@ object Commander {
     if ( ! Zerg.Lurker(unit) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) autoUnburrow(unit)
   }
   
-  private def sleepAttack(unit: FriendlyUnitInfo) {
+  private def sleepAttack(unit: FriendlyUnitInfo): Unit = {
     sleep(unit, AttackDelay.framesToWaitAfterIssuingAttackOrder(unit))
   }
   
-  private def sleepBuild(unit: FriendlyUnitInfo) {
+  private def sleepBuild(unit: FriendlyUnitInfo): Unit = {
     // Adapted from https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1497
     // In practice (1 + 2 * With.latency.latencyFrames) was too low
     sleep(unit, 3 + 2 * With.latency.latencyFrames)
   }
   
-  private def sleepReturnCargo(unit:FriendlyUnitInfo) {
+  private def sleepReturnCargo(unit:FriendlyUnitInfo): Unit = {
     // Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1442
     sleep(unit, 8)
   }
@@ -543,9 +518,11 @@ object Commander {
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0)).max
-    unit.sleepUntil(sleepUntil)
+
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
-      KeyboardCommands.breakpointFodder = - KeyboardCommands.breakpointFodder
+      unit.sleepUntil(sleepUntil)
+    } else {
+      unit.sleepUntil(sleepUntil)
     }
   }
 

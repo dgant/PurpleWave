@@ -1,7 +1,6 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 import ProxyBwapi.Techs.Tech
 
 case class TechComplete(tech: Tech, withinFrames: Int = 0) extends Predicate {

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plans.Army._
 import Planning.Plans.Basic.{NoPlan, Write}
-import Planning.Plans.Compound.{If, _}
+import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -15,7 +15,8 @@ import Planning.Predicates.Compound.{And, Latch, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones.{EnemiesAtLeast, FoundEnemyBase, UnitsAtLeast}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Terran.TvE.TvE2RaxSCVMarine
 import Utilities.UnitCounters.CountExcept

@@ -9,8 +9,8 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting._
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Strategy.WeAreZerg
-import Planning.Predicates.{Always, Never}
-import Planning.{Plan, Predicate}
+import Planning.Predicates.{Always, Never, Predicate}
+import Planning.Plan
 
 abstract class GameplanTemplate extends Plan with Modal {
   val activationCriteria    : Predicate       = new Always

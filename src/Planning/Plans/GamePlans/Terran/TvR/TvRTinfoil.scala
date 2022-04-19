@@ -12,7 +12,8 @@ import Planning.Plans.Macro.Terran.PopulateBunkers
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.IsWarrior
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil
 

@@ -1,7 +1,6 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 import Utilities.UnitFilters.{IsAnything, UnitFilter}
 
 case class EnemiesAtMost(quantity: Int = 0, matcher: UnitFilter = IsAnything, complete: Boolean = false) extends Predicate {

@@ -4,7 +4,6 @@ import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Performance.Tasks.TimedTask
 import Planning.Plans.Basic.NoPlan
-import Planning.Prioritized
 import Planning.ResourceLocks.LockTiles
 import Utilities.Time.Forever
 

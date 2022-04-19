@@ -13,7 +13,8 @@ import Planning.Predicates.Compound.{Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAny, IsTank}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2FacJoyO
 

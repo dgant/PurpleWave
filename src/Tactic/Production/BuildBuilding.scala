@@ -1,13 +1,13 @@
 package Tactic.Production
 
+import Information.Counting.MacroCounter
 import Lifecycle.With
-import Macro.Architecture.ArchitecturalAssessment
 import Macro.Requests.RequestBuildable
-import Macro.Scheduling.MacroCounter
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
 import Micro.Agency.Intention
 import Placement.Access.{Foundation, PlacementQuery}
+import Placement.Architecture.ArchitecturalAssessment
 import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass

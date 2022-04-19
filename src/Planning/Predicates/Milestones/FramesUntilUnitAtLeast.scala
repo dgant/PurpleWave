@@ -1,7 +1,6 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 import ProxyBwapi.UnitClasses.UnitClass
 
 case class FramesUntilUnitAtLeast(unitClass: UnitClass, frames: () => Int) extends Predicate {

@@ -1,7 +1,6 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 import Utilities.UnitFilters._
 
 case class UnitsAtLeast(quantity: Int, matcher: UnitFilter, complete: Boolean = false) extends Predicate {

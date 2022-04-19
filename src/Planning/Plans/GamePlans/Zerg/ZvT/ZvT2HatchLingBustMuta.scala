@@ -12,7 +12,8 @@ import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.{EnemiesAtLeast, EnemyWalledIn, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLingBustMuta
 import Utilities.Time.Seconds

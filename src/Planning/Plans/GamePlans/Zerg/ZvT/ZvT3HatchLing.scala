@@ -16,7 +16,8 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT3HatchLing
 import Utilities.Time.GameTime
@@ -97,7 +98,6 @@ class ZvT3HatchLing extends GameplanTemplate {
   override def buildPlans: Seq[Plan] = Seq(
 
     new Write(With.blackboard.maxBuilderTravelFrames, () => GameTime(1, 0)()),
-    new Write(With.blackboard.preferCloseExpansion, () => true),
 
     new If(
       new And(

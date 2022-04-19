@@ -35,7 +35,7 @@ trait EnemyTechs {
       // we could proc them on ourselves
       // or fail to proc on an enemy who missed while casting
       addIf(Terran.GhostCloak,      enemies.exists(u => Terran.Ghost(u) && u.cloaked))
-      addIf(Terran.Irradiate,       any.exists(_.irradiated),    checkOurs = true)
+      addIf(Terran.Irradiate,       any.exists(_.irradiated),     checkOurs = true)
       addIf(Terran.Lockdown,        ours.exists(_.lockedDown))
       addIf(Terran.OpticalFlare,    ours.exists(_.blind))
       addIf(Terran.SiegeMode,       enemies.exists(Terran.SiegeTankSieged))

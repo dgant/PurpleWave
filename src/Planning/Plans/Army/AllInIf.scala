@@ -1,8 +1,8 @@
 package Planning.Plans.Army
 
 import Lifecycle.With
-import Planning.Predicates.Always
-import Planning.{Plan, Predicate}
+import Planning.Predicates.{Always, Predicate}
+import Planning.Plan
 
 class AllInIf(predicate: Predicate = new Always) extends Plan {
   

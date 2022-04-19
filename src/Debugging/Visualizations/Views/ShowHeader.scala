@@ -1,6 +1,6 @@
 package Debugging.Visualizations.Views
 
-import Lifecycle.{JBWAPIClient, With}
+import Lifecycle.{PurpleBWClient, With}
 
 object ShowHeader extends DebugView {
   
@@ -15,7 +15,7 @@ object ShowHeader extends DebugView {
     With.game.drawTextScreen(80,  1 * h, f"$With.latency.turnSize} frames/turn")
     With.game.drawTextScreen(155, 1 * h, f"${With.performance.frameMeanMs}ms avg")
     With.game.drawTextScreen(230, 1 * h, f"${With.performance.frameMaxMs}ms max")
-    With.game.drawTextScreen(305, 1 * h, f"${JBWAPIClient.framesBehind} frames back")
+    With.game.drawTextScreen(305, 1 * h, f"${PurpleBWClient.framesBehind} frames back")
     With.game.drawTextScreen(375, 1 * h, clock)
     With.game.drawTextScreen(405, 1 * h, f"${With.frame}")
     With.game.drawTextScreen(5,   2 * h, f"+${With.configuration.frameLimitMs}ms: ${With.performance.framesOverShort}/320")

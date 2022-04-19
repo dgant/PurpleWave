@@ -15,7 +15,8 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyLurkersLikely, EnemyMutalisksLikely, SafeToMoveOut}
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran._
 

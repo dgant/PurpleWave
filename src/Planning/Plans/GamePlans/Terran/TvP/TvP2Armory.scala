@@ -14,7 +14,8 @@ import Planning.Plans.Placement.{BuildBunkersAtNatural, BuildMissileTurretsAtBas
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2Armory
 

@@ -14,7 +14,8 @@ import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT14CC
 

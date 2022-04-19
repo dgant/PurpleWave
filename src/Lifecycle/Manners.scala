@@ -8,7 +8,7 @@ class Manners extends TimedTask {
   
   def enabled: Boolean = With.configuration.enableChat
   
-  override def onRun(budgetMs: Long) {
+  override def onRun(budgetMs: Long): Unit = {
     if (With.configuration.enableSurrenders
       && With.self.supplyUsed400 == 0
       && With.self.minerals < 50
@@ -19,14 +19,13 @@ class Manners extends TimedTask {
     if (With.frame == Seconds(5)()) {
       if (With.configuration.humanMode) {
         chat("Good luck, " + With.enemy.name + ", and have fun!")
-      }
-      else {
+      } else {
         With.history.message.foreach(chat)
       }
     }
   }
   
-  private def surrender() {
+  private def surrender(): Unit = {
     chat("Well played.")
     With.game.leaveGame()
   }
@@ -37,17 +36,16 @@ class Manners extends TimedTask {
     }
   }
   
-  def chat(text: String) {
+  def chat(text: String): Unit = {
     if (enabled) {
       With.game.sendText(text)
-      //With.game.printf(text)
     }
   }
   
-  def onEnd(isWinner: Boolean) {
+  def onEnd(isWinner: Boolean): Unit = {
     chat(
       if (With.configuration.humanMode)
-        "Good game, " + With.enemy.name
+        f"Good game, ${With.enemy.name}!"
       else if (isWinner)
         "Good game! I still think you're beautiful."
       else

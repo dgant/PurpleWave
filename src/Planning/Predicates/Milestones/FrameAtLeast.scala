@@ -1,7 +1,7 @@
 package Planning.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Predicate
+import Planning.Predicates.Predicate
 
 case class FrameAtLeast(frame: () => Int) extends Predicate {
 

@@ -1,6 +1,6 @@
 package Performance
 
-import Lifecycle.{JBWAPIClient, With}
+import Lifecycle.{PurpleBWClient, With}
 import Performance.Tasks.TimedTask
 import Utilities.Time.Forever
 
@@ -55,7 +55,7 @@ class PerformanceMonitor {
   def continueRunning: Boolean = (
     With.frame == 0
     || ! With.configuration.enablePerformancePauses
-    || (msBeforeTarget > 0 && JBWAPIClient.framesBehind() < 1))
+    || (msBeforeTarget > 0 && PurpleBWClient.framesBehind() < 1))
 
   def violatedTarget  : Boolean = With.frame > 0 && msBeforeTarget < 0
   def violatedLimit   : Boolean = With.frame > 0 && frameMs >= With.configuration.frameLimitMs

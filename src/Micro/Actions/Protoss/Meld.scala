@@ -13,7 +13,7 @@ object Meld extends Action {
     && ( ! unit.visibleToOpponents || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isUs))
   )
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val besties = unit
       .metro.map(_.units)
       .getOrElse(unit.zone.units)

@@ -17,7 +17,7 @@ class RemoveMineralBlocks extends Tactic {
   override def launch(): Unit = {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral.view
-      .filter(unit => unit.unitClass.isMinerals && unit.mineralsLeft <= With.configuration.blockerMineralThreshold)
+      .filter(unit => unit.unitClass.isMinerals && unit.isBlocker)
       .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixel) || edge.pixelCenter.pixelDistanceSquared(unit.pixel) < Math.pow(32.0 * 3, 2)))
       .toVector
     

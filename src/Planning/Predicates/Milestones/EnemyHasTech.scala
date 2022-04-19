@@ -1,7 +1,7 @@
 package Planning.Predicates.Milestones
 
 import Lifecycle.With
-import Planning.Predicate
+import Planning.Predicates.Predicate
 import ProxyBwapi.Techs.Tech
 
 case class EnemyHasTech(tech: Tech) extends Predicate {

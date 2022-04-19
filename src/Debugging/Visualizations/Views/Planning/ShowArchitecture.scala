@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
-import Macro.Architecture.GridExclusion
+import Placement.Architecture.GridExclusion
 import bwapi.Color
 
 object ShowArchitecture extends DebugView {

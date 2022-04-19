@@ -1,8 +1,9 @@
 package Planning.Plans.Compound
 
 import Planning.Plans.Basic.NoPlan
-import Planning.Predicates.Never
-import Planning.{Plan, Predicate, Property}
+import Planning.Predicates.{Never, Predicate}
+import Planning.Plan
+import Utilities.Property
 
 class FlipIf(
   initialPredicate  : Predicate = new Never,

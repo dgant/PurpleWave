@@ -9,7 +9,8 @@ import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UpgradeComplete
 import Planning.Predicates.Strategy.Employing
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvR2Gate4Gate
 

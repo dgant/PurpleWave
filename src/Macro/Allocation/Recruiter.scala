@@ -1,7 +1,6 @@
 package Macro.Allocation
 
 import Lifecycle.With
-import Planning.Prioritized
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

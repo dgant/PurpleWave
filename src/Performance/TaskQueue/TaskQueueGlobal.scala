@@ -27,9 +27,9 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.bank.update()
       With.recruiter.update()
       With.priorities.update()
-      With.scheduler.reset() // Must be synchronous with gameplan; Flickers ShowProduction otherwise
-      With.blackboard.reset() // Must be synchronous with gameplan; Flickers flags otherwise
-      With.yolo.updateBlackboard()
+      With.scheduler.reset()
+      With.blackboard.reset()
+      With.yolo.updateBlackboard() // YOLO affects gameplan
       With.strategy.update()
       With.strategy.gameplan.update()
       With.macroSim.simulate()

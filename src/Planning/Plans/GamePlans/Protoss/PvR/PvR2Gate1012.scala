@@ -1,13 +1,14 @@
 package Planning.Plans.GamePlans.Protoss.PvR
 
 import Macro.Requests.Get
-import Planning.{Plan, Predicate}
+import Planning.Plan
 import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.ScoutOn
+import Planning.Predicates.Predicate
 import Planning.Predicates.Strategy.Employing
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpen2Gate1012

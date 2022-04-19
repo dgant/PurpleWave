@@ -1,6 +1,6 @@
 package Planning.Predicates.Compound
 
-import Planning.Predicate
+import Planning.Predicates.Predicate
 
 case class Or(children: Predicate*) extends Predicate{
   

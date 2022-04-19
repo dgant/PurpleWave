@@ -13,7 +13,8 @@ import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.EnemyStrategy
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 
 class ZvTMidgame extends GameplanTemplate {

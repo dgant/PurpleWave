@@ -12,7 +12,8 @@ import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeStarted}
 import Planning.Predicates.Strategy.EnemyStrategy
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 
 class ZergReactionVsWorkerRush extends GameplanTemplate {

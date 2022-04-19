@@ -1,7 +1,7 @@
 package Tactic.Production
 
+import Macro.Allocation.Prioritized
 import Macro.Requests.RequestBuildable
-import Planning.Prioritized
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait Production extends Prioritized {

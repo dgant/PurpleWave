@@ -1,7 +1,7 @@
 package Macro.Scheduling
 
+import Macro.Allocation.Prioritized
 import Macro.Requests.RequestBuildable
-import Planning.Prioritized
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -9,11 +9,11 @@ import scala.collection.mutable.ArrayBuffer
 class Scheduler {
   private val _requests = new mutable.HashMap[Prioritized, mutable.ArrayBuffer[RequestBuildable]]
 
-  def reset() {
+  def reset(): Unit = {
     _requests.clear()
   }
 
-  def request(requester: Prioritized, theRequest: RequestBuildable) {
+  def request(requester: Prioritized, theRequest: RequestBuildable): Unit = {
     requestAll(requester, Seq(theRequest))
   }
 

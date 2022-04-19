@@ -1,8 +1,8 @@
 package Strategery
 
 import Debugging.ToString
+import Information.Geography.NeoGeo.MapIdentifier
 import Lifecycle.With
-import NeoGeo.MapIdentifier
 abstract class StarCraftMap {
   val name: String = ToString(this)
   val nameStub: String = MapIdentifier.apply(name)

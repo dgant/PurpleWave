@@ -3,7 +3,8 @@ package Planning.Plans.Compound
 import Lifecycle.With
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.GamePlans.Modal
-import Planning.{Plan, Property}
+import Planning.Plan
+import Utilities.Property
 import bwapi.Race
 
 class SwitchEnemyRace(

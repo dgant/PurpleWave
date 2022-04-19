@@ -105,9 +105,6 @@ abstract class TimedTask {
     }
     lastRunFrame = With.frame
     _runsTotal += 1
-    if (With.configuration.logTaskDuration) {
-      With.logger.debug(f"$toString duration: ${runMsLast}ms")
-    }
   }
 
   override def toString: String = name

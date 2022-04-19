@@ -14,7 +14,8 @@ import Planning.Predicates.Compound.{Latch, Not, Or}
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsWarrior
-import Planning.{Plan, Predicate}
+import Planning.Plan
+import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss.PvZ1BaseForgeTech
 

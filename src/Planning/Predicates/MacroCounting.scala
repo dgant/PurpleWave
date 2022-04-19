@@ -31,10 +31,11 @@ trait MacroCounting {
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
   def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
+  private val minedOutThreshold = 150 * 8
   def bases: Int = With.geography.ourBases.size
-  def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut
+  def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > minedOutThreshold
   def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)
-  def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > With.configuration.minimumMineralsBeforeMinedOut)
+  def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > minedOutThreshold)
   def gasPumps: Int = With.geography.ourBases.map(_.gas.view.filter(_.isOurs).count(_.gasLeft > 300)).sum
 
   def techStarted(tech: Tech): Boolean = {

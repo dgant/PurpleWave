@@ -1,7 +1,6 @@
 package Planning.Predicates.Reactive
 
-import Planning.Predicate
-import Planning.Predicates.MacroFacts
+import Planning.Predicates.{MacroFacts, Predicate}
 
 case class EnemyLurkersLikely() extends Predicate {
   override def apply: Boolean = MacroFacts.enemyLurkersLikely

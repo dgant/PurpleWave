@@ -1,6 +1,7 @@
 package Planning
 
 import Debugging.SimpleString
+import Macro.Allocation.Prioritized
 
 class Plan extends Prioritized with SimpleString {
   

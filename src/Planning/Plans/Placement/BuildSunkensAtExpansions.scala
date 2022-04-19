@@ -2,7 +2,6 @@ package Planning.Plans.Placement
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Planning.Plans.Macro.Protoss.BuildTowersAtBases
 import ProxyBwapi.Races.Zerg
 
 class BuildSunkensAtExpansions(initialCount: Int) extends BuildTowersAtBases(initialCount, Zerg.SunkenColony) {

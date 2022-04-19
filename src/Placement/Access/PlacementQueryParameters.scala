@@ -33,7 +33,6 @@ class PlacementQueryParameters {
     true
   }
 
-
   private val acceptOver: Double = 0.99
 
   protected def scoreWidth(foundation: Foundation): Double = {

@@ -4,7 +4,7 @@ import Debugging.ToString
 import Debugging.Visualizations.Colors
 import bwapi.Color
 
-class FormationStyle(val color: Color, val offset: Int) {
+abstract class FormationStyle(val color: Color, val offset: Int) {
   val name: String = ToString(this).replace("FormationStyle", "")
 }
 

@@ -15,7 +15,7 @@ class PopulateBunkers extends Plan {
   
   val bunkerLocks = new mutable.HashMap[FriendlyUnitInfo, LockUnits]
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     val bunkers = With.units.ours.filter(Terran.Bunker).toSet
     
     bunkerLocks.keySet.diff(bunkers).foreach(bunkerLocks.remove)
@@ -32,7 +32,7 @@ class PopulateBunkers extends Plan {
     output
   }
   
-  private def updateBunker(bunker: FriendlyUnitInfo) {
+  private def updateBunker(bunker: FriendlyUnitInfo): Unit = {
     val lock = bunkerLocks(bunker)
     lock.acquire()
     lock.units.foreach(unit => {

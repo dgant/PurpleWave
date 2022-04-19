@@ -10,9 +10,9 @@ import bwapi.Color
 
 object ShowHealthAndCooldown extends DebugView {
   
-  override def renderMap() { With.units.all.foreach(renderUnit) }
+  override def renderMap(): Unit = { With.units.all.foreach(renderUnit) }
   
-  def renderUnit(unit: UnitInfo) {
+  def renderUnit(unit: UnitInfo): Unit = {
     if ( ! With.viewport.contains(unit.pixel)) return
     if ( ! unit.alive) return
     if ( ! unit.likelyStillThere) return

@@ -9,9 +9,7 @@ import scala.collection.mutable
 object BorderFinder {
   
   def claimedZones(player: PlayerInfo): Set[Zone] = {
-    
     // The goal: Find the set of Zones that a player's bases enclose
-    
     val output = new mutable.HashSet[Zone]
     
     // Start with our bases
@@ -22,10 +20,7 @@ object BorderFinder {
     val travelZones =
       playerZones.flatten(zone1 =>
         playerZones.flatten(zone2 =>
-          if (zone1 == zone2)
-            None
-          else
-            With.paths.zonePath(zone1, zone2)
+          if (zone1 == zone2) None else With.paths.zonePath(zone1, zone2)
         ))
         .flatMap(_.steps.map(_.from))
     output ++= travelZones

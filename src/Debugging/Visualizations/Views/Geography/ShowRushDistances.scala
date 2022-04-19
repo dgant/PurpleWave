@@ -71,9 +71,7 @@ object ShowRushDistances extends DebugView {
     val x = 5
     val y = 1 * With.visualization.lineHeightSmall
     val distances = With.geography.rushDistances
-    DrawScreen.table(
-      x,
-      y,
+    DrawScreen.table(x, y,
       Vector(
         Vector(
           With.mapFileName,
@@ -82,14 +80,11 @@ object ShowRushDistances extends DebugView {
           Maff.mean(distances).toInt.toString,
           distances.max.toInt.toString
         )))
-    DrawScreen.table(
-      x,
-      y + With.visualization.lineHeightSmall,
+    DrawScreen.table(x, y + With.visualization.lineHeightSmall,
       Vector(
         Vector(
           "Ramp width",
           "")
         ++ With.geography.ourMain.zone.edges.map(_.radiusPixels.toInt.toString)))
   }
-  
 }

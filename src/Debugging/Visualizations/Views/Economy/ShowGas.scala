@@ -6,7 +6,7 @@ import Lifecycle.With
 
 object ShowGas extends DebugView {
 
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val workersMin  = With.blackboard.gasWorkerFloor()
     val workersNow  = With.units.countOurs(_.friendly.exists(_.agent.toGather.exists(_.unitClass.isGas)))
     val workersMax  = With.blackboard.gasWorkerCeiling()

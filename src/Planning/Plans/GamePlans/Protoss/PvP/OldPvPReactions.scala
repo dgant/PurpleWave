@@ -7,7 +7,7 @@ import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.Protoss.BuildTowersAtBases
+import Planning.Plans.Placement.BuildTowersAtBases
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._

@@ -22,7 +22,7 @@ class Architecture {
   val powerFrame3Height : GridVersionedInt  = new GridVersionedInt { override val defaultValue: Int = Forever() }
   var accessibleZones   : Vector[Zone]      = Vector.empty
 
-  def update() {
+  def update(): Unit = {
     unbuildable       .update()
     unwalkable        .update()
     ungassable        .update()
@@ -52,19 +52,22 @@ class Architecture {
     ! untownhallable.excludes(tile, request)
   }
 
-  def diffPlacement(tile: Tile, unit: UnitClass, futureFrames: Int = 0): ArchitectureDiff = {
-    val output = new ArchitectureDiffSeries
-
+  def assumePlacement(tile: Tile, unit: UnitClass, futureFrames: Int = 0): Unit = {
     val area = TileRectangle(tile, tile.add(unit.tileWidth, unit.tileHeight))
     val exclusion = Exclusion(unit.toString, area, Some(BuildingPlacement(tile, unit)))
 
-    output.stack ++= area.tiles.filter(_.valid).map(new ArchitectureDiffExclude(_, exclusion))
+    area.tiles.filter(_.valid).foreach(t => {
+      With.architecture.unbuildable.set(tile, Some(exclusion))
+      With.architecture.unwalkable.set(tile, Some(exclusion))
+      With.architecture.untownhallable.set(tile, Some(exclusion))
+      With.architecture.ungassable.set(tile, Some(exclusion))
+    })
 
     if (unit == Protoss.Pylon) {
-      output.stack += new ArchitectureDiffPower(tile, With.frame + futureFrames + Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion)
+      val powerFrame = With.frame + futureFrames + Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion
+      Pylons.points2.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame2Height.set(_, powerFrame))
+      Pylons.points3.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame3Height.set(_, powerFrame))
     }
-
-    output
   }
 
   /////////////

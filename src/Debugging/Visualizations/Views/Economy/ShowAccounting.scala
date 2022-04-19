@@ -6,7 +6,7 @@ import Lifecycle.With
 
 object ShowAccounting extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val labels = Vector(
       "Active miners:",
       "Active drillers:",

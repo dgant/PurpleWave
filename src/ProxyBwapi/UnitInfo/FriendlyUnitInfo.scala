@@ -21,7 +21,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _lastFrameOccupied      : Int     = - Forever()
   private var _framesFailingToMove    : Int     = 0
   private var _framesFailingToAttack  : Int     = 0
-  override def update() {
+  override def update(): Unit = {
     if (frameDiscovered < With.frame) readProxy()
     if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     super.update()
@@ -32,6 +32,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
       _framesFailingToMove = 0 else _framesFailingToMove += 1
     if (cooldownLeft > 0 || ! tryingToAttackHere) _framesFailingToAttack = 0 else _framesFailingToAttack += 1
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
+    if (order == Orders.HarvestGas || order == Orders.MiningMinerals) orderTarget.foreach(_.lastFrameHarvested = With.frame)
   }
 
   def knownToEnemy  : Boolean = _knownToEnemy
@@ -51,11 +52,10 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _intent: Intention = new Intention
   def client: Any = _client
   def intent: Intention = _intent
-  def intend(client: Any, intent: Intention) {
+  def intend(client: Any, intent: Intention): Unit = {
     _client = Some(client)
     _intent = intent
   }
-
 
   private var _squad: Option[Squad] = None
   private var _lastSquadChange: Int = 0

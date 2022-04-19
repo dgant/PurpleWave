@@ -23,7 +23,7 @@ object ShowUnitsFriendly extends DebugView {
   var showLeaders     : Boolean = true
   var showCharge      : Boolean = true
   
-  override def renderMap() { With.units.ours.foreach(renderUnitState) }
+  override def renderMap(): Unit = { With.units.ours.foreach(renderUnitState) }
 
   def renderUnitBoxAt(unit: UnitInfo, at: Pixel, color: Color): Unit = {
     DrawMap.box(
@@ -32,7 +32,7 @@ object ShowUnitsFriendly extends DebugView {
       color)
   }
   
-  def renderUnitState(unit: FriendlyUnitInfo) {
+  def renderUnitState(unit: FriendlyUnitInfo): Unit = {
     val agent = unit.agent
 
     var marker: Option[String] = None

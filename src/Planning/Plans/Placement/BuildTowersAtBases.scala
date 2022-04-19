@@ -5,18 +5,25 @@ import Lifecycle.With
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plan
 import Planning.Plans.GamePlans.MacroActions
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 
-class BuildZergStaticDefenseAtBases(towersRequired: Int, towerClass: UnitClass) extends Plan with MacroActions {
-  
+class BuildTowersAtBases(towersRequired: Int, towerClass: UnitClass = Protoss.PhotonCannon) extends Plan with MacroActions {
+
   override def onUpdate(): Unit = {
     val bases = eligibleBases
+
     if (bases.nonEmpty) {
-      bases.foreach(buildInBase)
+      if (towerClass == Protoss.PhotonCannon) {
+        get(Protoss.Forge)
+      } else if (towerClass == Terran.MissileTurret) {
+        get(Terran.EngineeringBay)
+      }
     }
+
+    bases.foreach(towerBase)
   }
-  
+
   protected def eligibleBases: Iterable[Base] = With.geography.ourBasesAndSettlements
 
   protected def makePlacement(unitClass: UnitClass, base: Base): PlacementQuery = {
@@ -25,10 +32,11 @@ class BuildZergStaticDefenseAtBases(towersRequired: Int, towerClass: UnitClass) 
     output.preferences.label = Vector(PlaceLabels.Defensive)
     output
   }
-  
-  private def buildInBase(base: Base): Unit = {
-    val placement = makePlacement(Zerg.CreepColony, base)
-    val sunkensInZone = With.units.ours.filter(Zerg.SunkenColony).count(u => placement.acceptExisting(u.tileTopLeft))
-    get(towersRequired - sunkensInZone, Zerg.CreepColony, placement)
+
+  private def towerBase(base: Base): Unit = {
+    if (towerClass.requiresPsi) {
+      get(1, Protoss.Pylon, makePlacement(Protoss.Pylon, base))
+    }
+    get(towersRequired, towerClass, makePlacement(towerClass, base))
   }
 }

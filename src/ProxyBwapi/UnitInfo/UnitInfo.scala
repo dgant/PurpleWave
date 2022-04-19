@@ -51,8 +51,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastMatrixPoints            : Int = _
   var lastCooldown                : Int = _
   var lastFrameTakingDamage       : Int = - Forever()
-  var lastFrameTryingToAttack     : Int = - Forever()
   var lastFrameStartingAttack     : Int = - Forever()
+  var lastFrameHarvested          : Int = - Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   private var lastUnitClass       : UnitClass = _
   private val previousPixels      : Array[Pixel] = Array.fill(48)(new Pixel(bwapiUnit.getPosition))

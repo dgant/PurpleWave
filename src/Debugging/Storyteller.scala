@@ -4,7 +4,7 @@ import java.lang.management.{ManagementFactory, MemoryType}
 import java.text.DecimalFormat
 import java.util.Calendar
 import Debugging.Visualizations.Rendering.DrawScreen
-import Debugging.Visualizations.Views.Performance.ShowPerformanceDetails
+import Debugging.Visualizations.Views.Performance.ShowPerformance
 import Lifecycle.{JBWAPIClient, Main, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
@@ -158,8 +158,8 @@ class Storyteller {
     tell(
       DrawScreen.tableToString(
         DrawScreen.padTable(
-          ShowPerformanceDetails.statusTable(
-            ShowPerformanceDetails.sortTasks(
+          ShowPerformance.statusTable(
+            ShowPerformance.sortTasks(
               With.performance.tasks)))))
 
     val formatterMs = new DecimalFormat("#.###")

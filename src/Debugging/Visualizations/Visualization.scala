@@ -47,7 +47,6 @@ class Visualization extends TimedTask {
   lazy val knownViews: Vector[DebugView] = Vector[DebugView](
     ShowAccelerants,
     ShowArchitecture,
-    ShowBases,
     ShowBattles,
     ShowBlackScreen,
     ShowBulletsAsHearts,
@@ -73,24 +72,19 @@ class Visualization extends TimedTask {
     ShowUnitsEnemy,
     ShowUnitsFriendly,
     ShowUtilization,
-    ShowPerformanceDetails,
+    ShowPerformance,
     ShowProduction,
     ShowPlacement,
     ShowPushes,
     ShowReactionTime,
     ShowBank,
     ShowRushDistances,
-    ShowSaturation,
     ShowSquads,
     ShowStoryteller,
     ShowTeams,
     ShowTextOnly,
-    ShowTextOnlyUnits,
     ShowTileInfo,
-    ShowUnitCounts,
     ShowUnitPaths,
-    ShowZoneBorders,
-    ShowZoneLabels,
     ShowZonePaths,
     ShowZones
   )
@@ -105,7 +99,7 @@ class Visualization extends TimedTask {
   
   val lineHeightSmall = 9
   
-  def toggle(view: DebugView) {
+  def toggle(view: DebugView): Unit = {
     if (views.contains(view)) {
       views -= view
     } else {
@@ -122,8 +116,8 @@ class Visualization extends TimedTask {
     matched
   }
   
-  override def onRun(budgetMs: Long) {
-    requireInitialization()
+  override def onRun(budgetMs: Long): Unit = {
+    initialize()
     if ( ! enabled) return
     if (With.tasks.tasks.exists(_.runsTotal == 0)) return
     With.game.setTextSize(Text.Size.Small)
@@ -152,7 +146,7 @@ class Visualization extends TimedTask {
   }
   
   private var initialized = false
-  private def requireInitialization() {
+  private def initialize(): Unit = {
     if (initialized) return
     initialized = true
     enabled = With.configuration.visualizeDebug

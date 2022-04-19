@@ -5,7 +5,7 @@ import Lifecycle.With
 
 object ShowFormations extends DebugView {
 
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.squads.all.foreach(_.formations.foreach(_.renderMap()))
   }
 }

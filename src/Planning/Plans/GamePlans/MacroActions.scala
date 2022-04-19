@@ -1,18 +1,19 @@
 package Planning.Plans.GamePlans
 
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable, RequestUnit}
+import Placement.Access.PlacementQuery
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
-import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
-import Utilities.UnitFilters.UnitFilter
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.UnitFilters.UnitFilter
 
 trait MacroActions {
   def status(text: String): Unit = With.blackboard.status.set(With.blackboard.status() :+ text)
@@ -34,8 +35,9 @@ trait MacroActions {
   def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
   def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  def get(unit: UnitClass): Unit = get(Get(unit))
-  def get(quantity: Int, unit: UnitClass): Unit = get(Get(quantity, unit))
+  def get(unit: UnitClass): Unit = get(1, unit)
+  def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
+  def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, Some(placementQuery)))
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))

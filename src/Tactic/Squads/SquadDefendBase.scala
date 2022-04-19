@@ -63,7 +63,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private var formationReturn: Formation = FormationEmpty
 
-  override def run() {
+  override def run(): Unit = {
     if (units.isEmpty) return
 
     val canWander         = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
@@ -71,7 +71,10 @@ class SquadDefendBase(base: Base) extends Squad {
     val breached          = scourables.exists(isBreaching)
     val canScour          = scourables.nonEmpty && (canWander || breached)
     val travelGoal        = if (canScour) vicinity else guardChoke.map(_.pixelCenter).getOrElse(bastion())
-    val withdrawingUnits  = units.count(u => ! u.metro.contains(base.metro) && travelGoal.travelPixelsFor(heart, u) < 192 + u.pixelDistanceTravelling(heart))
+    val withdrawingUnits  = units.count(u =>
+      ! u.metro.contains(base.metro)
+      && u.pixelDistanceTravelling(heart) + 32 * 15 > travelGoal.travelPixelsFor(heart, u)
+      && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
 
     lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(travelGoal))
     lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))

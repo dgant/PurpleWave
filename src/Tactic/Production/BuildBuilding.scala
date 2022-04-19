@@ -12,6 +12,7 @@ import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.Time.{Forever, Seconds}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferClose
 
@@ -27,6 +28,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
   builderLock.counter = CountOne
   builderLock.interruptable = false
 
+  var lastSearch  : Int                 = -Forever()
   var orderedTile : Option[Tile]        = None
   var foundation  : Option[Foundation]  = None
   var intendAfter : Option[Int]         = None
@@ -80,16 +82,17 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
       lazy val candidateFoundations = placementQuery.foundations
       var candidateIndex = 0
       do {
-        if (foundation.isEmpty && candidateFoundations.nonEmpty) {
+        if ((foundation.isEmpty && candidateFoundations.nonEmpty) || With.framesSince(lastSearch) > Seconds(if (builder.isDefined) 60 else 15)()) {
           foundation = Some(candidateFoundations(candidateIndex))
+          lastSearch = With.frame
           candidateIndex += 1
         }
-        foundation = foundation.filter(f => With.architecture.assess(f.tile, buildingClass) == ArchitecturalAssessment.Accepted)
+        foundation = foundation.filter(f => With.architecture.assess(f.tile, buildingClass, expectedFrames) == ArchitecturalAssessment.Accepted)
         foundation = foundation.filter(f => With.groundskeeper.isFree(f.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight))
         foundation = foundation.filter(placementQuery.accept)
       } while (foundation.isEmpty && candidateIndex < candidateFoundations.length)
       if (foundation.isEmpty) return
-      With.architecture.diffPlacement(foundation.get.tile, buildingClass, expectedFrames).doo() // Mainly needed so we know what will be powered in the future
+      With.architecture.assumePlacement(foundation.get.tile, buildingClass, expectedFrames) // Mainly needed so we know what will be powered in the future
       if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight).tiles)) {
         With.logger.warn(f"Failed to acquire tiles for $this at ${foundation.get.tile}")
         return

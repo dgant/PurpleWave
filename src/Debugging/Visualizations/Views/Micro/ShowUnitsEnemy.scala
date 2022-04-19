@@ -15,11 +15,11 @@ object ShowUnitsEnemy extends DebugView {
   var showFogged      = true
   var showCountdown   = true
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.units.enemy.foreach(renderUnit)
   }
   
-  private def renderUnit(unit: ForeignUnitInfo) {
+  private def renderUnit(unit: ForeignUnitInfo): Unit = {
     
     val color = unit.teamColor
       

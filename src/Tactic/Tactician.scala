@@ -102,11 +102,11 @@ class Tactician extends TimedTask {
     }
   }
 
-  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.owner.isUs || b.plannedExpoRecently).getOrElse(base)
+  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
   private def runCoreTactics(): Unit = {
 
     // Sort defense divisions by descending importance
-    var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.owner.isUs || b.plannedExpoRecently))
+    var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.isOurs || b.plannedExpoRecently))
     divisionsDefending = divisionsDefending
       .filterNot(d =>
         // TODO: Old checks which we should probably generalize better
@@ -169,7 +169,7 @@ class Tactician extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else Maff.maxBy(With.geography.bases.filter(b => b.owner.isUs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
+        else Maff.maxBy(With.geography.bases.filter(b => b.isOurs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
   }

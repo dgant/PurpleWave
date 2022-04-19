@@ -51,7 +51,7 @@ class PylonBlock extends Plan {
     val basesEligible = basesDistant.filter(base =>
       With.grids.scoutingPathsStartLocations.get(base.townHallTile.add(1, 1)) > 15
       && baseIsEligible(base)
-      && base.isNaturalOf.forall(main =>
+      && base.naturalOf.forall(main =>
         baseIsEligible(main)
         && basesDistant.contains(main)))
 

@@ -1,7 +1,7 @@
 package Lifecycle
 
 import Debugging._
-import Information.Geography.JBWEBWrapper
+import Placement.JBWEBWrapper
 import bwapi.DefaultBWListener
 import jbweb.Walls
 

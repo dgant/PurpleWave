@@ -41,7 +41,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     // 3-player: Scout one base with one probe while keeping the others in the middle.
     // 4-player: Scout two bases with one probe while keeping the others in the middle.
     
-    val possibleStarts = With.geography.startBases.filter(base => base.lastScoutedFrame <= 0 && ! base.owner.isUs)
+    val possibleStarts = With.geography.startBases.filter(base => base.lastFrameScoutedByUs <= 0 && ! base.owner.isUs)
     
     if (possibleStarts.isEmpty) {
       // Defensive handling of situation that makes no sense
@@ -74,7 +74,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
         .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
         .sortBy(_.heart.tileDistanceFast(With.geography.home))
         .sortBy( ! _.isStartLocation)
-        .sortBy(_.lastScoutedFrame)
+        .sortBy(_.lastFrameScoutedByUs)
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
     while(unassignedScouts.nonEmpty) {

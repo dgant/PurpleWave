@@ -77,7 +77,7 @@ abstract class MissionDrop extends Mission {
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     if ( ! additionalItineraryConditions(base)) return true
-    With.framesSince(base.lastScoutedFrame) < Seconds(90)() && ! base.owner.isEnemy
+    With.framesSince(base.lastFrameScoutedByUs) < Seconds(90)() && ! base.owner.isEnemy
   }
 
   final private def skipBase(base: Base): Boolean = {
@@ -96,7 +96,7 @@ abstract class MissionDrop extends Mission {
     if (bases.isEmpty) return
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) Maff.nanToOne(
-        With.framesSince(b.lastScoutedFrame).toDouble
+        With.framesSince(b.lastFrameScoutedByUs).toDouble
         * Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin),      10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))
         / Math.min(b.heart.groundTiles(With.scouting.mostBaselikeEnemyTile),  10 * b.heart.tileDistanceFast(With.scouting.mostBaselikeEnemyTile)))
       else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProgress + 1)

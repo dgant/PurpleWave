@@ -7,7 +7,7 @@ import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
 
 trait BaseInference {
   def firstEnemyMain: Option[Base] = _firstEnemyMain
-  def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scouted || base.owner.isEnemy)
+  def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scoutedByUs || base.owner.isEnemy)
   def enemyNatural: Option[Base] = enemyMain.flatMap(_.natural)
   def firstExpansionFrameEnemy: Int = _firstExpansionFrameEnemy
   def firstExpansionFrameUs: Int = _firstExpansionFrameUs
@@ -21,9 +21,9 @@ trait BaseInference {
 
   protected def updateBaseInference(): Unit = {
     _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.find(_.owner.isEnemy))
-    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.view.filter(_.owner.isNeutral).find(_.isNaturalOf.exists(_.owner.isEnemy)))
+    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.view.filter(_.owner.isNeutral).find(_.naturalOf.exists(_.owner.isEnemy)))
     if (_firstEnemyMain.isEmpty) {
-      val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scouted)
+      val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scoutedByUs)
       // Infer possible mains from process of elimination
       if (possibleMains.size == 1) {
         _firstEnemyMain = possibleMains.headOption

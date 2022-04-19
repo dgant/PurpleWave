@@ -118,7 +118,7 @@ class SquadAcePilots extends Squad {
   }
 
   private def getStaleBase(bases: Seq[Base]): Seq[Base] = {
-    bases.filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
+    bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
   }
 
   private def chill(): Unit = {

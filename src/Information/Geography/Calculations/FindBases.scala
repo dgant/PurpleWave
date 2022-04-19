@@ -11,12 +11,12 @@ import Strategery.Hunters
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-object BaseFinder {
+object FindBases {
   
-  val baseRadiusPixels        = 32.0 * 15.0
-  val baseMergingRadiusPixels = 32.0 * 12.0
+  val baseRadiusPixels        : Double = 32.0 * 15.0
+  val baseMergingRadiusPixels : Double = 32.0 * 12.0
   
-  def calculate: Iterable[Tile] = {
+  def apply: Iterable[Tile] = {
     
     // Start locations are free base placements.
     val startTiles    = With.game.getStartLocations.asScala.map(new Tile(_)).toArray

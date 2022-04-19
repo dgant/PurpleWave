@@ -71,8 +71,8 @@ class SquadScoutExpansions extends Squad {
     lock.matcher = if (With.blackboard.wantToAttack() && With.scouting.ourProgress > 0.5) matchAll else matchFlying
 
     val toScoutBases = Maff.orElse(
-      scoutableBases().filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(90)()),
-      scoutableBases().filter(b => With.framesSince(b.lastScoutedFrame) > Seconds(30)()),
+      scoutableBases().filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(90)()),
+      scoutableBases().filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(30)()),
       scoutableBases())
     val toScoutBaseSorted = toScoutBases.toVector.sortBy(b =>
       Maff.maxBy(units)(_.squadAge).map(_.framesToTravelTo(b.heart))

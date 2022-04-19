@@ -11,11 +11,11 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.Random
 
-object ZoneBuilder {
+object BuildZones {
   
   def zones: Iterable[Zone] = {
     With.grids.walkableTerrain.initialize()
-    val names   = Random.shuffle(PlaceNames.countries)
+    val names   = Random.shuffle(Labels.countries)
     val nameQ   = new mutable.Queue[String] ++ names
     var repeats = 1
     val zones = BWTA.getRegions.asScala.map(region => {
@@ -31,8 +31,8 @@ object ZoneBuilder {
   
   def edges: Iterable[Edge] = BWTA.getChokepoints.asScala.map(new Edge(_))
   def bases: Iterable[Base] = {
-    val bases   = BaseFinder.calculate.map(new Base(_))
-    val names   = Random.shuffle(PlaceNames.cities)
+    val bases   = FindBases.apply.map(new Base(_))
+    val names   = Random.shuffle(Labels.cities)
     val nameQ   = new mutable.Queue[String] ++ names
     var repeats = 1
     bases.foreach(base => {

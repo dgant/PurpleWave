@@ -4,14 +4,13 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.SpecificPoints
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 
-object ZoneUpdater {
+object UpdateZones {
   
-  def update() {
+  def apply(): Unit = {
     // Precalculate these
     With.geography.zones.foreach(_.distanceGrid)
     With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
@@ -19,8 +18,7 @@ object ZoneUpdater {
     With.units.all.filter(_.likelyStillThere).foreach(unit => unit.zone.unitBuffer += unit)
     With.geography.zones.foreach(updateZone)
   
-    if ( ! With.geography.naturalsSearched) {
-      With.geography.naturalsSearched = true
+    if (With.frame == 0) {
       With.geography.bases
         .filter(_.isStartLocation)
         .foreach(startLocationBase =>
@@ -28,13 +26,16 @@ object ZoneUpdater {
             .filter(otherBase => otherBase != startLocationBase && otherBase.gas.nonEmpty)
             .sortBy(_.zone.distancePixels(startLocationBase.zone))
             .headOption
-            .foreach(_.isNaturalOf = Some(startLocationBase)))
+            .foreach(natural => {
+              natural.naturalOf = Some(startLocationBase)
+              startLocationBase.natural = Some(natural)
+            }))
     }
   
     With.geography.zones.foreach(zone => { zone.owner = With.neutral; zone.contested = false })
     val playerBorders = Players.all
       .filterNot(_.isNeutral)
-      .map(player => (player, BorderFinder.claimedZones(player)))
+      .map(player => (player, FindBorder.apply(player)))
       .toMap
     playerBorders.foreach(pair => pair._2.foreach(zone => {
       if ( ! zone.owner.isNeutral || zone.contested) {
@@ -48,15 +49,15 @@ object ZoneUpdater {
     With.geography.home = Maff
       .minBy(With.geography.ourBases)(_.townHallTile.walkableTile.groundTiles(With.geography.home.walkableTile))
       .map(_.townHallTile)
-      .getOrElse(SpecificPoints.tileMiddle)
+      .getOrElse(With.geography.home)
   }
 
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
-  private def updateZone(zone: Zone) {
+  private def updateZone(zone: Zone): Unit = {
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
     zone.exitDistanceGrid.initialize()
-    zone.bases.foreach(BaseUpdater.updateBase)
+    zone.bases.foreach(UpdateBase(_))
     zone.exitNow = zone.calculateExit
   
     val exitBuildings = zone.exit.map(exit =>
@@ -74,6 +75,4 @@ object ZoneUpdater {
           canaryTileOutside.exists(tileOutside =>
             ! new PathfindProfile(tileInside, end = Some(tileOutside), lengthMaximum = Some(100)).find.pathExists)))
   }
-  
-  
 }

@@ -26,7 +26,7 @@ trait Intrigue {
   private val cacheBaseIntrigueInitial = new Cache(() =>
     Maff
       .orElse(
-        With.geography.bases.filter(b => ! b.owner.isUs),
+        With.geography.bases.filter(b => ! b.isOurs),
         With.geography.bases)
       .map(base => (base, getBaseIntrigueInitial(base)))
       .toMap)
@@ -37,8 +37,8 @@ trait Intrigue {
     val heartNatural        = base.natural.getOrElse(base).heart.center
     val hearts              = Vector(heartMain, heartNatural)
     val distanceFromEnemy   = 32.0 * 32.0 + Maff.min(enemyHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
-    val informationAge      = 1.0 + With.framesSince(base.lastScoutedFrame)
-    val startPositionBonus  = if (base.isStartLocation && base.lastScoutedFrame <= 0) 100.0 else 1.0
+    val informationAge      = 1.0 + With.framesSince(base.lastFrameScoutedByUs)
+    val startPositionBonus  = if (base.isStartLocation && base.lastFrameScoutedByUs <= 0) 100.0 else 1.0
     val output              = startPositionBonus * informationAge / distanceFromEnemy
     output
   }

@@ -32,7 +32,7 @@ object Gather extends Action {
       // Move between bases if resource isn't safe to mine and we hope help will arrive
       if (With.reaction.sluggishness < 2) {
         val baseOriginal = resource.base
-        lazy val baseOpposite = baseOriginal.flatMap(b => b.isNaturalOf.orElse(b.natural))
+        lazy val baseOpposite = baseOriginal.flatMap(b => b.naturalOf.orElse(b.natural))
         lazy val baseRemote = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
         lazy val basePaired = baseOpposite.orElse(baseRemote)
 

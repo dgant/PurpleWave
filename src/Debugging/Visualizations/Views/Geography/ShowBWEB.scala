@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Geography
 
 import Debugging.Visualizations.Views.DebugView
-import Information.Geography.JBWEBWrapper
+import Placement.JBWEBWrapper
 
 object ShowBWEB extends DebugView {
 

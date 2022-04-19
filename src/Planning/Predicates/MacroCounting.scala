@@ -184,7 +184,7 @@ trait MacroCounting {
   def enemyBases: Int = With.geography.enemyBases.size
   def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
   def foundEnemyBase: Boolean = enemyBases > 0
-  def enemyNaturalConfirmed: Boolean = With.geography.enemyBases.exists(b => b.isNaturalOf.isDefined && b.townHall.isDefined)
+  def enemyNaturalConfirmed: Boolean = With.geography.enemyBases.exists(b => b.naturalOf.isDefined && b.townHall.isDefined)
 
   def enemyIs(race: Race): Boolean = With.enemies.exists(_.raceCurrent == race)
   def enemyIsTerran: Boolean = enemyIs(Race.Terran)

@@ -54,7 +54,7 @@ object BlockConstruction extends Action {
         && targetPixel.base.exists(base =>
           base.townHall.isEmpty
           && (base.owner.isEnemy
-            || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.isNaturalOf.exists(_.owner.isEnemy))))))
+            || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.naturalOf.exists(_.owner.isEnemy))))))
       val output                    = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
       output
     })

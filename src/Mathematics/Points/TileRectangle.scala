@@ -42,6 +42,10 @@ final case class TileRectangle(
         Maff.min(included.view.map(_.endExclusive.y)).getOrElse(0)))
   }
 
+  def this(xStartInclusive: Int, yStartInclusive: Int, xEndExclusive: Int, yEndExclusive: Int) {
+    this(Tile(xStartInclusive, yStartInclusive), Tile(xEndExclusive, yEndExclusive))
+  }
+
   if (endExclusive.x < startInclusive.x) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }

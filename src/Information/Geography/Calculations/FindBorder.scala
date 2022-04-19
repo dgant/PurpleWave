@@ -6,9 +6,9 @@ import ProxyBwapi.Players.PlayerInfo
 
 import scala.collection.mutable
 
-object BorderFinder {
+object FindBorder {
   
-  def claimedZones(player: PlayerInfo): Set[Zone] = {
+  def apply(player: PlayerInfo): Set[Zone] = {
     // The goal: Find the set of Zones that a player's bases enclose
     val output = new mutable.HashSet[Zone]
     
@@ -34,5 +34,4 @@ object BorderFinder {
     
     output.toSet
   }
-  
 }

@@ -62,12 +62,12 @@ class Agent(val unit: FriendlyUnitInfo) {
     Maff.minBy(
       With.geography.ourBases.filter(base =>
         base.scoutedByEnemy
-        || base.isNaturalOf.exists(_.scoutedByEnemy)
+        || base.naturalOf.exists(_.scoutedByEnemy)
         || base == With.geography.ourNatural
         || base == With.geography.ourMain))(base =>
       unit.pixelDistanceTravelling(base.heart)
       // Retreat into main
-      + (if (base.isNaturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base))) 32 * 40 else 0))
+      + (if (base.naturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base))) 32 * 40 else 0))
     .map(_.heart.center)
     .getOrElse(With.geography.home.center))
 

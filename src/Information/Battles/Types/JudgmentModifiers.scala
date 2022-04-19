@@ -36,7 +36,7 @@ object JudgmentModifiers {
     val deltaMin        = -0.2 * Maff.clamp(With.frame / Minutes(10)(), 1, 2)
     val deltaMax        = 0.05
     val centroid        = battleLocal.enemy.centroidGround
-    val keyBases        = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isNaturalOf.exists(_.isOurMain))
+    val keyBases        = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.naturalOf.exists(_.isOurMain))
     val distanceMax     = With.mapPixelWidth
     val distanceHome    = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.walkableTile)).map(centroid.groundPixels).min
     val distanceRatio   = Maff.clamp(distanceHome.toDouble / distanceMax, 0, 1)

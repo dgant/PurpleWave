@@ -41,9 +41,9 @@ object ShowZones extends DebugView {
         Vector(
           base.description,
           "Resources: " + base.mineralsLeft + "m + " + base.gasLeft + "g",
-          if (With.framesSince(base.lastScoutedFrame) < 24 * 5) ""
-          else if (base.lastScoutedFrame <= 0) "Unscouted"
-          else "Last scouted " + With.framesSince(base.lastScoutedFrame) + " frames ago"
+          if (With.framesSince(base.lastFrameScoutedByUs) < 24 * 5) ""
+          else if (base.lastFrameScoutedByUs <= 0) "Unscouted"
+          else "Last scouted " + With.framesSince(base.lastFrameScoutedByUs) + " frames ago"
         ),
         base.townHallArea.center,
         drawBackground = true,

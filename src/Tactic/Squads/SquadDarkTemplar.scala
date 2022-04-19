@@ -34,7 +34,7 @@ class SquadDarkTemplar extends Squad {
     if (bases().isEmpty) { lock.release(); return }
     val basesSorted = bases()
       .sortBy(_.heart.center.groundPixels(centroidGround))
-      .sortBy(b => With.framesSince(b.lastScoutedFrame) < Seconds(30)())
+      .sortBy(b => With.framesSince(b.lastFrameScoutedByUs) < Seconds(30)())
       .sortBy( ! _.owner.isEnemy)
     val base = basesSorted.head
     vicinity = base.heart.center

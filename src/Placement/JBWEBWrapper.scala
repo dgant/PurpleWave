@@ -1,4 +1,4 @@
-package Information.Geography
+package Placement
 
 import Lifecycle.With.game
 import bwta.BWTA

@@ -14,7 +14,7 @@ object IsProxied extends UnitFilter {
     if (player.isUs) return Seq(With.geography.ourMain)
     val bases = Maff.orElse(
       With.geography.startBases.filter(_.owner == player),
-      With.geography.startBases.filter(base => base.owner.isNeutral && base.lastScoutedFrame == 0),
+      With.geography.startBases.filter(base => base.owner.isNeutral && base.lastFrameScoutedByUs == 0),
       With.geography.startBases.filter(base => base.owner.isNeutral),
       With.geography.bases.filter( ! _.owner.isUs),
       With.geography.bases)
@@ -32,7 +32,7 @@ object IsProxied extends UnitFilter {
     if ( ! unit.unitClass.isBuilding) return false
     if (unit.flying) return false
     if (unit.base.exists(b => b.isStartLocation && ! b.isOurMain)) return false // Hack fix to detecting normal buildings as proxied
-    if (unit.base.exists(b => b.isNaturalOf.exists( ! _.isOurMain))) return false // Hack fix to detecting normal buildings as proxied
+    if (unit.base.exists(b => b.naturalOf.exists( ! _.isOurMain))) return false // Hack fix to detecting normal buildings as proxied
 
     val distanceEnemy     = baseDistance(unit, unit.player)
     val distanceFriendly  = baseDistance(unit, With.self)

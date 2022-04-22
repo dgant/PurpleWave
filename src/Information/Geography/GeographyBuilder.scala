@@ -65,7 +65,7 @@ trait GeographyBuilder {
     //
     val baseTiles = FindBases()
     val baseTilesByZone = baseTiles.groupBy(zoneByValidTile)
-    val baseTileSets = baseTilesByZone.flatMap(p => p._2.map(base => (base, p._1.tiles.filter(tile => p._2.filterNot(base==).exists(_.tileDistanceSquared(tile) < base.tileDistanceSquared(tile))))))
+    val baseTileSets = baseTilesByZone.flatMap(p => p._2.map(base => (base, p._1.tiles.filter(tile => p._2.filterNot(base==).forall(_.tileDistanceSquared(tile) > base.tileDistanceSquared(tile))))))
     _bases = baseTileSets.map(p => new Base(baseNames.next(), p._1, p._2)).toVector
     _baseByTile = allTiles.map(t => _bases.find(_.tiles.contains(t))).toVector
 

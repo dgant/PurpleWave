@@ -520,14 +520,15 @@ object Commander {
       unit.nextOrderFrame.getOrElse(0)).max
 
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
+      With.configuration.trackUnit = false
       unit.sleepUntil(sleepUntil)
     } else {
       unit.sleepUntil(sleepUntil)
     }
   }
 
-  private def untrack(): Unit = {
-    With.configuration.trackUnit = false
+  private def retrack(): Unit = {
+    With.configuration.trackUnit = true
   }
 
   private def leadFollower(unit: FriendlyUnitInfo, todo: (FriendlyUnitInfo) => Unit): Unit = {

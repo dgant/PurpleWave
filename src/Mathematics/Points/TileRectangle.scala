@@ -10,19 +10,19 @@ final case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
 
-  def this() {
+  @inline def this() {
     this(new Tile(0), new Tile(0))
   }
 
-  def this(tile: Tile, width: Int, height: Int) {
+  @inline def this(tile: Tile, width: Int, height: Int) {
     this(tile, tile.add(width, height))
   }
 
-  def this(tile: Tile) {
+  @inline def this(tile: Tile) {
     this(tile, 1, 1)
   }
 
-  def this(included: Iterable[Tile]) {
+  @inline def this(included: Iterable[Tile]) {
     this(
       Tile(
         Maff.min(included.view.map(_.x)).getOrElse(0),
@@ -32,7 +32,7 @@ final case class TileRectangle(
         Maff.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
-  def this(included: Traversable[TileRectangle]) {
+  @inline def this(included: Traversable[TileRectangle]) {
     this(
       Tile(
         Maff.min(included.view.map(_.startInclusive.x)).getOrElse(0),
@@ -42,7 +42,7 @@ final case class TileRectangle(
         Maff.min(included.view.map(_.endExclusive.y)).getOrElse(0)))
   }
 
-  def this(xStartInclusive: Int, yStartInclusive: Int, xEndExclusive: Int, yEndExclusive: Int) {
+  @inline def this(xStartInclusive: Int, yStartInclusive: Int, xEndExclusive: Int, yEndExclusive: Int) {
     this(Tile(xStartInclusive, yStartInclusive), Tile(xEndExclusive, yEndExclusive))
   }
 
@@ -101,8 +101,8 @@ final case class TileRectangle(
   @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
   @inline def tiles: SeqView[Tile, Seq[_]] =
-    (0 until endExclusive.x - startInclusive.x).view.flatMap(x =>
-      (0 until endExclusive.y - startInclusive.y).view.map(y =>
+    (0 until endExclusive.y - startInclusive.y).view.flatMap(y =>
+      (0 until endExclusive.x - startInclusive.x).view.map(x =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
   
   @inline def tilesSurrounding: Iterable[Tile] = expand(1, 1).tiles.filterNot(contains)

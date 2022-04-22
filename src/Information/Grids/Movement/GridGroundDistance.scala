@@ -18,7 +18,7 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
   override def onInitialization(): Unit = {
     var seeds = origins.filter(walkable)
     if (seeds.isEmpty) {
-      seeds = seeds.flatMap(seed => Spiral.points(20).map(seed.add).find(walkable))
+      seeds = seeds.flatMap(seed => Spiral(20).map(seed.add).find(walkable))
     }
 
     var distance = 0

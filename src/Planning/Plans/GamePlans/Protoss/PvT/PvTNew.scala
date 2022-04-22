@@ -16,6 +16,7 @@ class PvTNew extends GameplanImperative {
     // Vs. BBS: Zealots into 3-Gate Goon
     // Vs. 10-12: Zealots into 3-Gate Goon
     // Vs. Worker rush: Zealots into 3-Gate Goon
+    // Vs. 2-Fac, or possibly any scout-blocking wall-in: Gate-Core-Gate before expand
 
     Vector(new PvTIdeas.ReactToRaxCheese, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush).foreach(_.update())
   }

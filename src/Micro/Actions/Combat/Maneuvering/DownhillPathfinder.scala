@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
   */
 object DownhillPathfinder {
   def decend(from: Tile, to: Tile): Option[Iterable[Tile]] = {
-    val directions = Ring.points(1)
+    val directions = Ring(1)
     var firstDirection = 0 // Rotate the first direction we try to discover diagonals
 
     // Pre-allocating is hopefully a performance improvement

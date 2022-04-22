@@ -95,7 +95,7 @@ object FormationZone {
         }
       } else {
         // Apply arc positioning to find the best spot for this unit
-        val candidates = Spiral.points(11).view.map(formationCenter.tile.add).filter(tile =>
+        val candidates = Spiral(11).view.map(formationCenter.tile.add).filter(tile =>
           tile.valid
             && tile.zone == zone
             // Stand uphill if possible

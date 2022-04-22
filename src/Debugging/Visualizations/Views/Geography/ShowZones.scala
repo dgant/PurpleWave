@@ -53,7 +53,7 @@ object ShowZones extends DebugView {
 
     // Draw labels
     With.geography.zones.foreach(zone => {
-      zone.exit.foreach(exit => DrawMap.arrow(zone.centroid.center, zone.centroid.center.project(exit.pixelCenter, 128.0), zone.owner.colorDark))
+      zone.exitOriginal.foreach(exit => DrawMap.arrow(zone.centroid.center, zone.centroid.center.project(exit.pixelCenter, 128.0), zone.owner.colorDark))
       DrawMap.label(zone.toString, zone.centroid.center, drawBackground = true, backgroundColor = zone.owner.colorDark)
       zone.edges.foreach(edge =>
         edge.zones.foreach(edgeZone => {

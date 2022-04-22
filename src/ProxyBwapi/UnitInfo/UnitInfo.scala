@@ -307,7 +307,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       val offset = pixel.offsetFromTileCenter
       val ringPixels =
         Ring
-          .points(range.toInt / 32)
+          .apply(range.toInt / 32)
           .map(enemy.tile.add(_).center.add(offset))
           .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
       val ringSpot = Maff.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))

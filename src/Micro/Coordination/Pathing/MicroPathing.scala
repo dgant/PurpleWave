@@ -59,7 +59,7 @@ object MicroPathing {
   val waypointDistancePixels: Int = 32 * waypointDistanceTiles
   private val ringDistance = waypointDistanceTiles * waypointDistanceTiles * 32 * 32
   def getCircleTowards(from: Pixel, to: Pixel): SeqView[Pixel, Seq[_]] = {
-    Circle.points(5).view.map(p => from.add(p.x * 32, p.y * 32)).filter(_.valid)
+    Circle(5).view.map(p => from.add(p.x * 32, p.y * 32)).filter(_.valid)
   }
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {

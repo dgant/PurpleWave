@@ -16,7 +16,7 @@ object FindBases {
   val baseRadiusPixels        : Double = 32.0 * 15.0
   val baseMergingRadiusPixels : Double = 32.0 * 12.0
   
-  def apply: Iterable[Tile] = {
+  def apply(): Iterable[Tile] = {
     
     // Start locations are free base placements.
     val startTiles    = With.game.getStartLocations.asScala.map(new Tile(_)).toArray
@@ -58,7 +58,7 @@ object FindBases {
       resources,
       baseRadiusPixels,
       limitRegion = shouldLimitRegion,
-      (unit) => unit.pixel).values
+      _.pixel).values
   }
   
   private def measureExclusions(expansionResources: Iterable[ForeignUnitInfo]): Set[Tile] = {
@@ -75,7 +75,7 @@ object FindBases {
     val searchRadius  = 10
     val candidates =
       Circle
-        .points(searchRadius)
+        .apply(searchRadius)
         .map(centroid.add)
         .filter(tile => isLegalTownHallTile(tile, exclusions, altitude))
     

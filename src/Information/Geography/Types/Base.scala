@@ -11,34 +11,44 @@ import Utilities.Time.{Forever, Minutes}
 
 import scala.collection.mutable
 
-class Base(val townHallTile: Tile)
-{
-  val townHallArea          : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
-  lazy val zone             : Zone              = With.geography.zoneByTile(townHallTile)
-  lazy val metro            : Metro             = With.geography.metros.find(_.bases.contains(this)).get
-  lazy val isStartLocation  : Boolean           = With.geography.startLocations.contains(townHallTile)
-  lazy val isOurMain        : Boolean           = With.geography.ourMain == this
-  lazy val radians          : Double            = SpecificPoints.middle.radiansTo(townHallArea.center)
-  lazy val tiles            : Set[Tile]         = zone.tiles.view.filter(_.tileDistanceSlow(heart) < 50).filter(t => ! zone.bases.view.filter(_.heart != heart).exists(_.heart.groundPixels(t) < heart.groundPixels(t))).toSet
-  lazy val economicValue    : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
-  lazy val plannedExpo      : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
+final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
+        val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
+        val townHallArea      : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
+        val radians           : Double            = SpecificPoints.middle.radiansTo(townHallArea.center)
+        val zone              : Zone              = With.geography.zoneByTile(townHallTile)
+  lazy  val metro             : Metro             = With.geography.metros.find(_.bases.contains(this)).get
+  lazy  val economicValue     : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
+  lazy  val plannedExpo       : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
     With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))
     || units.exists(u => u.isOurs && u.unitClass.isBuilding && ! townHallArea.contains(u.tileTopLeft))))
-  var natural               : Option[Base]      = None
-  var naturalOf             : Option[Base]      = None
-  var townHall              : Option[UnitInfo]  = None
-  var units                 : Vector[UnitInfo]  = Vector.empty
-  var gas                   : Vector[UnitInfo]  = Vector.empty
-  var minerals              : Vector[UnitInfo]  = Vector.empty
-  var owner                 : PlayerInfo        = With.neutral
-  var name                  : String            = "Nowhere"
-  var enemyCombatValue      : Double            = _
-  var workerCount           : Int               = _
-  val saturation            : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
-
-  private val _initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
-  val harvestingArea = new TileRectangle(_initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
-  val heart: Tile = {
+  var natural                 : Option[Base]      = None
+  var naturalOf               : Option[Base]      = None
+  var townHall                : Option[UnitInfo]  = None
+  var units                   : Vector[UnitInfo]  = Vector.empty
+  var gas                     : Vector[UnitInfo]  = Vector.empty
+  var minerals                : Vector[UnitInfo]  = Vector.empty
+  var owner                   : PlayerInfo        = With.neutral
+  var enemyCombatValue        : Double            = _
+  var workerCount             : Int               = _
+  val saturation              : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
+  var mineralsLeft            : Int               = 0
+  var gasLeft                 : Int               = 0
+  var lastPlannedExpo         : Int               = - Forever()
+  var lastFrameScoutedByUs    : Int               = 0
+  var lastFrameScoutedByEnemy : Int               = 0
+  def isOurs                  : Boolean           = owner.isUs
+  def isAlly                  : Boolean           = owner.isAlly
+  def isEnemy                 : Boolean           = owner.isEnemy
+  def isNeutral               : Boolean           = owner.isNeutral
+  def isOurMain               : Boolean           = With.geography.ourMain == this
+  def isOurNatural            : Boolean           = With.geography.ourNatural == this
+  def scoutedByUs             : Boolean           = lastFrameScoutedByUs > 0
+  def scoutedByEnemy          : Boolean           = lastFrameScoutedByEnemy > 0
+  def plannedExpoRecently     : Boolean           = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
+  def resources               : Seq[UnitInfo]     = minerals.view ++ gas
+  private lazy val _initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+  lazy val harvestingArea = new TileRectangle(_initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+  lazy val heart: Tile = {
     val centroid = if (_initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(_initialResources.view.map(_.pixel))
     val direction = centroid.subtract(townHallArea.center)
     if (Math.abs(direction.x) > Math.abs(direction.y))
@@ -70,28 +80,12 @@ class Base(val townHallTile: Tile)
     output.filter(_.valid).toSet
   }
 
-  var mineralsLeft            = 0
-  var gasLeft                 = 0
-  var lastPlannedExpo         = - Forever()
-  var lastFrameScoutedByUs    = 0
-  var lastFrameScoutedByEnemy = 0
-
-  def isOurs          : Boolean = owner.isUs
-  def isAlly          : Boolean = owner.isAlly
-  def isEnemy         : Boolean = owner.isEnemy
-  def isNeutral       : Boolean = owner.isNeutral
-  def scoutedByUs     : Boolean = lastFrameScoutedByUs > 0
-  def scoutedByEnemy  : Boolean = lastFrameScoutedByEnemy > 0
-  def plannedExpoRecently: Boolean = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
-  def resources: Seq[UnitInfo] = minerals.view ++ gas
-
   override def toString: String = f"$description $name, ${zone.name} $heart"
 
   def description: String = (
     if (this == With.geography.ourMain) "Our main"
     else if (this == With.geography.ourNatural) "Our natural"
-    else (
-      (if (isEnemy) "Enemy" else if (isOurs) "Our" else if (isAlly) "Ally" else "Neutral")
-      + " "
-      + (if (isStartLocation && ! isOurs) "main" else if (naturalOf.isDefined && ! isOurs) "natural" else "base")))
+    else
+      ((if (isEnemy) "Enemy" else if (isOurs) "Our" else if (isAlly) "Ally" else "Neutral")
+      + (if (isStartLocation && ! isOurs) " main" else if (naturalOf.isDefined && ! isOurs) " natural" else " base")))
 }

@@ -8,11 +8,11 @@ import Strategery.MapGroups
 
 class GridWalkableTerrain extends AbstractGridArrayBoolean {
 
-  override def onInitialization() {
+  override def onInitialization(): Unit = {
     val walkableGoal = if (MapGroups.narrowRamp.exists(_())) 12 else 16
     indices.foreach(i => set(
       i,
-      Square.pointsDownAndRight(4)
+      Square(4)
         .map(new Tile(i).topLeftWalkPixel.add)
         .count(walkTile => With.game.isWalkable(walkTile.bwapi)) >= walkableGoal))
   }

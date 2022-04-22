@@ -66,7 +66,7 @@ abstract class TargetedSpell extends Action {
     if (caster.flying || caster.transport.exists(_.flying)) {
       caster.agent.toTravel = Some(target)
     } else {
-      caster.agent.toTravel = Maff.minBy(Ring.points(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling)
+      caster.agent.toTravel = Maff.minBy(Ring(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling)
     }
     Commander.move(caster)
   }

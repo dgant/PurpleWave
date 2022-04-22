@@ -19,7 +19,7 @@ class ScoutForCannonRush extends Tactic {
   lazy val previouslyCannonRushed: Boolean = With.strategy.enemyFingerprints(5).contains(With.fingerprints.cannonRush.toString)
 
   private val maxScoutDistance: Int = 32 * 25
-  lazy val tilesToScout: Array[Tile] = With.geography.allTiles.filter(tile => {
+  lazy val tilesToScout: Vector[Tile] = With.geography.allTiles.filter(tile => {
     val i = tile.i
     (
       With.grids.buildableTerrain.getUnchecked(tile.i)

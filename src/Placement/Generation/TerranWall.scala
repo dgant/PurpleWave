@@ -12,20 +12,20 @@ import ProxyBwapi.UnitClasses.UnitClass
 object TerranWall {
 
   def apply(zone: Zone): Option[Fit] = {
-    if (zone.exit.isEmpty) return None
-    if (zone.exit.get.radiusPixels > 9 * 32 / 2) return None
+    if (zone.exitOriginal.isEmpty) return None
+    if (zone.exitOriginal.get.radiusPixels > 9 * 32 / 2) return None
     //TODO: Restore this
     if ( ! zone.bases.exists(_.isStartLocation) && ! zone.bases.exists(_.naturalOf.exists(_.isStartLocation))) return None
-    if (zone.edges.exists(e => e != zone.exit.get && e.otherSideof(zone) != With.geography.ourMain.zone && e.otherSideof(zone) != With.geography.ourNatural.zone)) return None
+    if (zone.edges.exists(e => e != zone.exitOriginal.get && e.otherSideof(zone) != With.geography.ourMain.zone && e.otherSideof(zone) != With.geography.ourNatural.zone)) return None
     val searchRadius = 10
-    val searchStart = zone.exit.get.pixelCenter.tile.subtract(searchRadius, searchRadius)
+    val searchStart = zone.exitOriginal.get.pixelCenter.tile.subtract(searchRadius, searchRadius)
     val searchEnd = searchStart.add(2 * searchRadius - 2, 2 * searchRadius - 1)
     val searchArea = TileRectangle(searchStart, searchEnd)
-    val zoneOut = zone.exit.get.otherSideof(zone)
+    val zoneOut = zone.exitOriginal.get.otherSideof(zone)
     val tilesBuildableIn = zone.tiles.view.filter(_.buildable)
     val tilesBuildableOut = zoneOut.tiles.view.filter(_.buildable)
-    val tileIn = Maff.minBy(tilesBuildableIn.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
-    val tileOut = Maff.minBy(tilesBuildableOut.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exit.get.pixelCenter))
+    val tileIn = Maff.minBy(tilesBuildableIn.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exitOriginal.get.pixelCenter))
+    val tileOut = Maff.minBy(tilesBuildableOut.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exitOriginal.get.pixelCenter))
     if (tileIn.isEmpty) return None
     if (tileOut.isEmpty) return None
     val altitudes = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct

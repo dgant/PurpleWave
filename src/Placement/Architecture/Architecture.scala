@@ -137,7 +137,7 @@ class Architecture {
 
   private def recalculateBuilderAccess(): Unit = {
     val hasBuilder = With.geography.zones.filter(_.units.exists(u => u.isOurs && u.unitClass.isWorker))
-    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.distancePixels(z) < LightYear()))
+    val accessible = With.geography.zones.filter(z => hasBuilder.exists(_.heart.groundPixels(z.heart) < LightYear()))
     accessibleZones = (hasBuilder ++ accessible).distinct
   }
 

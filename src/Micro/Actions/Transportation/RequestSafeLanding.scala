@@ -13,8 +13,7 @@ object RequestSafeLanding {
       val goal = destination.getOrElse(if (unit.agent.shouldEngage) unit.agent.destination else unit.agent.safety)
       val distanceToGoal = unit.pixelDistanceCenter(goal)
       val searchOriginTile = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile
-      val landingOption = Spiral
-        .points(6)
+      val landingOption = Spiral(6)
         .map(searchOriginTile.add)
         .find(tile => tile.walkable && With.grids.enemyRangeGround.get(tile) <= 0)
       landingOption.foreach(landing => {

@@ -41,8 +41,14 @@ final class UnitTracker {
     })
     units(id) = None
   }
-  def onFrame() {
+  private def birthAll(): Unit = {
     With.game.getAllUnits.asScala.foreach(u => if (units(u.getID).isEmpty) { birth(u) })
+  }
+  def onStart(): Unit = {
+    birthAll()
+  }
+  def onFrame(): Unit = {
+    birthAll()
     all.foreach(_.update())
     foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
   }
@@ -50,7 +56,7 @@ final class UnitTracker {
     kill(bwapiUnit.getID)
     birth(bwapiUnit)
   }
-  def onUnitDestroy(bwapiUnit: bwapi.Unit) {
+  def onUnitDestroy(bwapiUnit: bwapi.Unit): Unit = {
     get(bwapiUnit).foreach(_.asInstanceOf[BWAPICachedUnitProxy].changeVisibility(Visibility.Dead))
     kill(bwapiUnit.getID)
   }
@@ -74,7 +80,7 @@ final class UnitTracker {
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)
   def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = inTiles(
     Circle
-      .points(tiles)
+      .apply(tiles)
       .view
       .map(tile.add))
   def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {

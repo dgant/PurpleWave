@@ -10,7 +10,7 @@ object FormationGeneric {
 
   def guard(group: FriendlyUnitGroup, toGuard: Option[Pixel]): Formation = {
     val guardZone = toGuard.getOrElse(group.homeConsensus).zone
-    guardZone.exit
+    guardZone.exitOriginal
       .map(exit => FormationZone(group, guardZone, exit))
       .getOrElse(new FormationStandard(group, FormationStyleGuard, group.homeConsensus))
   }

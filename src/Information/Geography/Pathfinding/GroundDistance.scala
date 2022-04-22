@@ -3,7 +3,6 @@ package Information.Geography.Pathfinding
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
 
-
 trait GroundDistance {
 
   val impossiblyLargeDistanceTiles: Int = 256 * 256

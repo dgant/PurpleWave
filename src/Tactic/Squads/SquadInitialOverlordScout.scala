@@ -33,7 +33,7 @@ class SquadInitialOverlordScout extends Squad {
       val candidateBases = With.geography.startBases.filterNot(_.owner.isUs).filterNot(_.scoutedByUs)
       candidateBases.sortBy(main => {
         val base = main.natural.filter(!_.scoutedByUs && With.enemy.isProtoss).getOrElse(main)
-        base.zone.exit
+        base.zone.exitOriginal
           .map(_.pixelCenter)
           .getOrElse(base.townHallArea.center)
           .pixelDistance(

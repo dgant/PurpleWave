@@ -38,19 +38,19 @@ class Logger {
     error(formatException(exception))
   }
   
-  def onException(exception: Exception) {
+  def onException(exception: Exception): Unit = {
     quietlyOnException(exception)
   }
   
-  def debug(message: String) {
+  def debug(message: String): Unit = {
     log(f"DEBUG | $message", chat = false)
   }
   
-  def warn(message: String) {
+  def warn(message: String): Unit = {
     log(f"WARN  | $message", chat = false)
   }
   
-  def error(message: String) {
+  def error(message: String): Unit = {
     errorOcurred = true
     log(f"ERROR | $message")
   }

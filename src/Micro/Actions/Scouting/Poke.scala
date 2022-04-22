@@ -31,7 +31,7 @@ object Poke extends Action {
       target.pixelDistanceEdge(unit)
       - Maff.min(unit.matchups.threats.filter(_ != target).map(_.pixelDistanceEdge(target))).getOrElse(0.0))
 
-    val exit          = unit.zone.exit.map(_.pixelCenter).getOrElse(With.geography.home.center)
+    val exit          = unit.zone.exitOriginal.map(_.pixelCenter).getOrElse(With.geography.home.center)
     val otherThreats  = targets.filter(t => t != target && t.pixelDistanceCenter(exit) <= unit.pixelDistanceCenter(exit))
     val framesAway    = targets.map(unit.framesToGetInRange).min
     val framesToWait  = unit.framesToBeReadyForAttackOrder
@@ -44,7 +44,7 @@ object Poke extends Action {
     }
     
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
-    lazy val targetPosition = target.pixel.project(target.zone.exit.map(_.pixelCenter).getOrElse(unit.pixel), targetDistance)
+    lazy val targetPosition = target.pixel.project(target.zone.exitOriginal.map(_.pixelCenter).getOrElse(unit.pixel), targetDistance)
     unit.agent.toAttack = Some(target)
     unit.agent.toTravel = Some(targetPosition)
     if ( ! unit.is(Terran.SCV) && framesToWait > 0) {

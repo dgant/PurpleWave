@@ -93,6 +93,6 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
 
   @inline private final def flood(floody: FloodyUnit): Seq[(Tile, Int)] = {
     val max = floody.radius + margin
-    (0 to max).flatMap(d => Ring.points(d).map(p => (floody.tile.add(p), max - d))).filter(_._1.valid)
+    (0 to max).flatMap(d => Ring(d).map(p => (floody.tile.add(p), max - d))).filter(_._1.valid)
   }
 }

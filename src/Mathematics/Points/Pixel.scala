@@ -129,10 +129,9 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
 
   @inline private def nwtTest(tile: Tile): Option[Tile] = if (tile.walkable) Some(tile) else None
-  @inline private def nwtFlip(xFirst: Boolean, t0: Tile, t1: Tile): Option[Tile] = if (xFirst)
-    nwtTest(t0).orElse(nwtTest(t1))
-  else
-    nwtTest(t1).orElse(nwtTest(t0))
+  @inline private def nwtFlip(xFirst: Boolean, t0: Tile, t1: Tile): Option[Tile] =
+    if (xFirst) nwtTest(t0).orElse(nwtTest(t1))
+    else        nwtTest(t1).orElse(nwtTest(t0))
   @inline def walkableTile: Tile = {
     val ti = tile
     if (ti.walkable) return ti
@@ -146,7 +145,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(nwtTest(        Tile(tx + dx, ty + dy)))
       .orElse(nwtFlip(xFirst, Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(nwtTest(        Tile(tx - dx, ty - dy)))
-      .orElse(Spiral.points(16).view.map(ti.add).find(_.walkable))
+      .orElse(Spiral(16).view.map(ti.add).find(_.walkable))
       .getOrElse(tile)
     output
   }

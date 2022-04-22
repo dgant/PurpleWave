@@ -13,6 +13,8 @@ class PurpleWave extends DefaultBWListener {
       Walls.logInfo = With.configuration.logstd
       JBWEBWrapper.onStart()
       With.history.onStart()
+      With.units.onStart()
+      With.geography.onStart()
     })
   }
 

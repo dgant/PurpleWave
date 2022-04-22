@@ -36,7 +36,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   }
 
   lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.startBases.filterNot(_.owner.isUs).map(_.heart.groundPixels(tile)).sum)
-  def findStartLocation() {
+  def findStartLocation(): Unit = {
     // 2-Player: We know where they are. Go SMOrc.
     // 3-player: Scout one base with one probe while keeping the others in the middle.
     // 4-player: Scout two bases with one probe while keeping the others in the middle.
@@ -55,7 +55,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
       val unscoutedBases    = new mutable.ArrayBuffer[Base] ++ possibleStarts
       val unassignedScouts  = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units
       while(unassignedScouts.nonEmpty && unscoutedBases.size > 1) {
-        val nextBase = unscoutedBases.minBy(_.zone.distancePixels(With.geography.ourMain.zone))
+        val nextBase = unscoutedBases.minBy(_.zone.heart.groundPixels(With.geography.home))
         val scout = unassignedScouts.minBy(_.framesToTravelTo(nextBase.heart.center))
         unassignedScouts  -= scout
         unscoutedBases    -= nextBase
@@ -66,7 +66,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     }
   }
   
-  def findBases() {
+  def findBases(): Unit = {
     // Distribute scouts among unscouted bases, preferring to send more to the closest bases
     val unscoutedBases =
       With.geography.bases
@@ -88,17 +88,17 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     }
   }
   
-  def tickle(unit: FriendlyUnitInfo, base: Base) {
+  def tickle(unit: FriendlyUnitInfo, base: Base): Unit = {
     tickle(unit, base.heart.center)
   }
   
-  def tickle() {
+  def tickle(): Unit = {
     val base = With.geography.enemyBases.toList.sortBy(_.workerCount).lastOption
     val target = base.map(_.heart.center).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
     fighters.units.foreach(tickle(_, target))
   }
   
-  def tickle(unit: FriendlyUnitInfo, target: Pixel) {
+  def tickle(unit: FriendlyUnitInfo, target: Pixel): Unit = {
     unit.intend(this, new Intention {
       toTravel = Some(target)
       canTickle = true

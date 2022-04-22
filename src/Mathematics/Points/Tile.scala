@@ -90,15 +90,8 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def tileDistanceManhattan(tile: Tile): Int = {
     Math.abs(x-tile.x) + Math.abs(y-tile.y)
   }
-  @inline def tileDistanceSlow(tile: Tile): Double = {
-    Math.sqrt(tileDistanceSquared(tile))
-  }
   @inline def tileDistanceFast(tile: Tile): Double = {
-    // Octagonal distance
-    // https://en.wikibooks.org/wiki/Algorithms/Distance_approximations#Octagonal
-    val dx = Math.abs(x - tile.x)
-    val dy = Math.abs(y - tile.y)
-    0.941256 * Math.max(dx, dy) + Maff.sqrt2m1d * Math.min(dx, dy)
+    Maff.broodWarDistance(x, y, tile.x, tile.y)
   }
   @inline def tileDistanceSquared(tile: Tile): Int = {
     val dx = x - tile.x
@@ -193,13 +186,19 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (unit.flying) this else center.traversiblePixel(unit).tile
   }
   @inline def walkableTile: Tile = {
-    if (walkable) this else Spiral.points(16).view.map(add).find(_.walkable).getOrElse(this)
+    if (walkable) this else Spiral(16).view.map(add).find(_.walkable).getOrElse(this)
   }
   @inline def buildable: Boolean = {
     valid && buildableUnchecked
   }
   @inline def buildableUnchecked: Boolean = {
     With.grids.buildable.getUnchecked(i)
+  }
+  @inline def buildableTerrain: Boolean = {
+    With.game.isBuildable(x, y)
+  }
+  @inline def buildableTerrainUnchecked: Boolean = {
+    With.grids.buildableTerrain.getUnchecked(this)
   }
   @inline def explored: Boolean = {
     With.game.isExplored(x, y)

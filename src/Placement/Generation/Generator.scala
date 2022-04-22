@@ -25,8 +25,8 @@ trait Generator extends Fitter {
   private def preplaceZone(zone: Zone): Unit = {
     val bounds = zone.boundary
     if (bounds.cornerTilesInclusive.distinct.length < 4) return // Alchemist has a degenerate 1xN zone
-    val exitDirection     = zone.exit.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
-    val exitTile          = zone.exit.map(_.pixelCenter.tile).getOrElse(zone.centroid)
+    val exitDirection     = zone.exitOriginal.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
+    val exitTile          = zone.exitOriginal.map(_.pixelCenter.tile).getOrElse(zone.centroid)
     val tilesFront        = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)
     val tilesBack         = bounds.cornerTilesInclusive.filterNot(tilesFront.contains)
     val cornerFront       = tilesFront.maxBy(_.tileDistanceSquared(SpecificPoints.tileMiddle))

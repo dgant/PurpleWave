@@ -31,8 +31,10 @@ trait Expansions {
     val opposingTiles   = Maff.orElse(With.geography.bases.filter(b => opposingPlayers.exists(_ == b.owner)).map(_.heart), Seq(tileEnemy))
     val opposingRaces   = opposingPlayers.map(_.raceCurrent).filterNot(Race.Unknown==)
 
-    val weightTowards   = weightsTowards.get(player.raceCurrent).map(x => Maff.min(opposingRaces.flatMap(x.get))).getOrElse(-0.75)
-    val gasBasesNeeded  = gasNeeds.get(player.raceCurrent).map(x => Maff.max(opposingRaces.flatMap(x.get))).getOrElse(3)
+    val raceWeights     = weightsTowards  .getOrElse(player.raceCurrent, Map.empty)
+    val raceGasBases    = gasNeeds        .getOrElse(player.raceCurrent, Map.empty)
+    val weightTowards   = Maff.min(opposingRaces.flatMap(raceWeights.get)).getOrElse(-0.75)
+    val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get)).getOrElse(3)
 
     def scoreBase(base: Base): Double = {
       val distanceHome  = Maff.mean(friendlyTiles.map(base.heart.groundPixels)) / 32

@@ -22,7 +22,7 @@ class BuildZergStaticDefenseAtBases(towersRequired: Int, towerClass: UnitClass) 
   protected def makePlacement(unitClass: UnitClass, base: Base): PlacementQuery = {
     val output = new PlacementQuery(unitClass)
     output.requirements.base = Vector(base)
-    output.preferences.label = Vector(PlaceLabels.Defensive)
+    output.preferences.labelYes = Vector(PlaceLabels.Defensive)
     output
   }
   

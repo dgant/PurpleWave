@@ -11,10 +11,12 @@ class PlacementQueryParameters {
   var width     : Option[Int]       = None
   var height    : Option[Int]       = None
   var building  : Option[UnitClass] = None
-  var label     : Seq[PlaceLabel]   = Seq.empty
+  var labelYes     : Seq[PlaceLabel]   = Seq.empty
+  var labelNo  : Seq[PlaceLabel]   = Seq.empty
   var zone      : Seq[Zone]         = Seq.empty
   var base      : Seq[Base]         = Seq.empty
   var tile      : Seq[Tile]         = Seq.empty
+
   // Required for Produce to match requests against existing production
   override def equals(other: Any): Boolean = {
     if ( ! other.isInstanceOf[PlacementQueryParameters]) return false
@@ -22,8 +24,8 @@ class PlacementQueryParameters {
     if (width     != otherParameters.width)     return false
     if (height    != otherParameters.height)    return false
     if (building  != otherParameters.building)  return false
-    if ( ! label.forall(otherParameters.label.contains))  return false
-    if ( ! otherParameters.label.forall(label.contains))  return false
+    if ( ! labelYes.forall(otherParameters.labelYes.contains))  return false
+    if ( ! otherParameters.labelYes.forall(labelYes.contains))  return false
     if ( ! zone.forall(otherParameters.zone.contains))    return false
     if ( ! otherParameters.zone.forall(zone.contains))    return false
     if ( ! base.forall(otherParameters.base.contains))    return false
@@ -58,10 +60,16 @@ class PlacementQueryParameters {
     0.0
   }
 
-  protected def scoreLabel(foundation: Foundation): Double = {
-    if (label.isEmpty) return 1.0
-    if (label.forall(foundation.point.requirement.labels.contains)) return 1.0
-    label.count(foundation.point.requirement.labels.contains) / (2.0 * label.size)
+  protected def scoreLabelYes(foundation: Foundation): Double = {
+    if (labelYes.isEmpty) return 1.0
+    if (labelYes.forall(foundation.point.requirement.labels.contains)) return 1.0
+    labelYes.count(foundation.point.requirement.labels.contains) / (2.0 * labelYes.size)
+  }
+
+  protected def scoreLabelNo(foundation: Foundation): Double = {
+    if (labelNo.isEmpty) return 1.0
+    if ( ! labelNo.exists(foundation.point.requirement.labels.contains)) return 1.0
+    labelNo.count( ! foundation.point.requirement.labels.contains(_)) / (2.0 * labelNo.size)
   }
 
   protected def scoreZone(foundation: Foundation): Double = {
@@ -88,7 +96,8 @@ class PlacementQueryParameters {
   protected def acceptWidth     (foundation: Foundation): Boolean = scoreWidth(foundation)    > acceptOver
   protected def acceptHeight    (foundation: Foundation): Boolean = scoreHeight(foundation)   > acceptOver
   protected def acceptBuilding  (foundation: Foundation): Boolean = scoreBuilding(foundation) > acceptOver
-  protected def acceptLabel     (foundation: Foundation): Boolean = scoreLabel(foundation)    > acceptOver
+  protected def acceptLabelYes  (foundation: Foundation): Boolean = scoreLabelYes(foundation) > acceptOver
+  protected def acceptLabelNo   (foundation: Foundation): Boolean = scoreLabelNo(foundation)  > acceptOver
   protected def acceptZone      (foundation: Foundation): Boolean = scoreZone(foundation)     > acceptOver
   protected def acceptBase      (foundation: Foundation): Boolean = scoreBase(foundation)     > acceptOver
   protected def acceptTile      (foundation: Foundation): Boolean = scoreTile(foundation)     > acceptOver
@@ -96,7 +105,8 @@ class PlacementQueryParameters {
   def score(foundation: Foundation): Double = Seq(
     1 * scoreWidth(foundation),
     1 * scoreHeight(foundation),
-    1 * scoreLabel(foundation),
+    1 * scoreLabelYes(foundation),
+    1 * scoreLabelNo(foundation),
     5 * scoreZone(foundation),
     9 * scoreBase(foundation),
     1 * scoreBuilding(foundation),
@@ -105,18 +115,20 @@ class PlacementQueryParameters {
   def accept(foundation: Foundation): Boolean = (
     acceptWidth(foundation)
     && acceptHeight(foundation)
-    && acceptLabel(foundation)
+    && acceptLabelYes(foundation)
+    && acceptLabelNo(foundation)
     && acceptZone(foundation)
     && acceptBase(foundation)
     && acceptBuilding(foundation)
     && acceptTile(foundation))
 
-  def audit(foundation: Foundation): (Foundation, Double, Double, Double, Double, Double, Double, Double, Double) = (
+  def audit(foundation: Foundation): (Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double) = (
     foundation,
     score(foundation),
     scoreWidth(foundation),
     scoreHeight(foundation),
-    scoreLabel(foundation),
+    scoreLabelYes(foundation),
+    scoreLabelNo(foundation),
     scoreZone(foundation),
     scoreBase(foundation),
     scoreBuilding(foundation),

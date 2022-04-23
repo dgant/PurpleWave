@@ -28,36 +28,40 @@ class PlacementQuery {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
     requirements.building = Some(building).filter(b => b.isTownHall || b.isGas)
+    requirements.labelYes = if (building.isTownHall) Seq(PlaceLabels.TownHall)  else Seq.empty
+    requirements.labelNo  = if (building.isTownHall) Seq.empty                  else Seq(PlaceLabels.TownHall)
     preferences.width     = requirements.width
     preferences.height    = requirements.height
     preferences.building  = Some(building)
     preferences.zone      = With.geography.ourZones
     preferences.base      = With.geography.ourBases
     if (Seq(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.RoboticsFacility).contains(building)) {
-      preferences.label = preferences.label :+ PlaceLabels.GroundProduction
+      preferences.labelYes = preferences.labelYes :+ PlaceLabels.GroundProduction
     }
     if (Seq(
       Terran.EngineeringBay, Terran.Academy, Terran.Armory, Terran.Starport, Terran.ScienceFacility,
       Protoss.Forge, Protoss.CyberneticsCore, Protoss.Observatory, Protoss.RoboticsSupportBay, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.FleetBeacon, Protoss.ArbiterTribunal,
       Zerg.SpawningPool, Zerg.EvolutionChamber, Zerg.HydraliskDen, Zerg.Spire, Zerg.QueensNest, Zerg.DefilerMound, Zerg.UltraliskCavern).contains(building)) {
-      preferences.label = preferences.label :+ PlaceLabels.Tech
+      preferences.labelYes = preferences.labelYes :+ PlaceLabels.Tech
     }
     if (Seq(Terran.MissileTurret, Terran.Bunker, Protoss.PhotonCannon, Protoss.ShieldBattery, Zerg.CreepColony).contains(building)) {
-      preferences.label = preferences.label :+ PlaceLabels.Defensive
+      preferences.labelYes = preferences.labelYes :+ PlaceLabels.Defensive
     }
     if (Seq(Terran.SupplyDepot, Protoss.Pylon).contains(building)) {
-      preferences.label = preferences.label :+ PlaceLabels.Supply
+      preferences.labelYes = preferences.labelYes :+ PlaceLabels.Supply
     }
     if (Protoss.Pylon == building) {
-      preferences.label = preferences.label :+ PlaceLabels.PriorityPower
+      preferences.labelYes = preferences.labelYes :+ PlaceLabels.PriorityPower
     }
   }
 
   def acceptExisting(tile: Tile): Boolean = {
     if ( ! tile.valid) return false
-    if (requirements.zone.nonEmpty && ! requirements.zone.contains(tile.zone)) return false
-    if (requirements.base.nonEmpty && ! requirements.base.exists(tile.base.contains)) return false
-    if (requirements.tile.nonEmpty && ! requirements.tile.contains(tile)) return false
+    if (requirements.zone.nonEmpty    && ! requirements.zone.contains(tile.zone)) return false
+    if (requirements.base.nonEmpty    && ! requirements.base.exists(tile.base.contains)) return false
+    if (requirements.tile.nonEmpty    && ! requirements.tile.contains(tile)) return false
+    if ( ! requirements.labelYes.forall(With.placement.at(tile).requirement.labels.contains)) return false
+    if (    requirements.labelNo.exists(With.placement.at(tile).requirement.labels.contains)) return false
     true
   }
 
@@ -74,7 +78,7 @@ class PlacementQuery {
   def foundations: Seq[Foundation] = {
     // As a performance optimization, start filtering from the smallest matching collection
     lazy val foundationSources = IndexedSeq(
-      requirements.label.flatMap(With.placement.get),
+      requirements.labelYes.flatMap(With.placement.get),
       requirements.zone.flatMap(With.placement.get),
       requirements.base.flatMap(With.placement.get),
       requirements.building.map(With.placement.get).getOrElse(IndexedSeq.empty),
@@ -98,15 +102,15 @@ class PlacementQuery {
     bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, PointGas))
   }
 
-  def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(requirements.audit).sortBy(-_._2)
   }
 
-  def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     foundations.map(preferences.audit).sortBy(-_._2)
   }
 
-  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(preferences.audit).sortBy(-_._2)
   }
 }

@@ -15,10 +15,13 @@ trait Generator extends Fitter {
       .filter(_.unitClass.isBuilding)
       .filterNot(u => u.base.exists(_.townHallArea.intersects(u.tileArea)))
       .foreach(_.tileArea.tiles.map(Fit(_, Templates.walkway)).foreach(index))
-    With.geography.bases.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
-    With.geography.bases.foreach(_.resourcePathTiles.foreach(t => index(Fit(t, Templates.walkway))))
-    With.geography.zones.foreach(preplaceWalls)
-    With.geography.zones.foreach(preplaceZone)
+    // Fit closer zones first, so in case of tiebreaks we prefer closer zones
+    val basesSorted = With.geography.bases.sortBy(_.heart.groundTiles(With.geography.home))
+    val zonesSorted = With.geography.zones.sortBy(_.heart.groundTiles(With.geography.home))
+    basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
+    basesSorted.foreach(_.resourcePathTiles.foreach(t => index(Fit(t, Templates.walkway))))
+    zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
+    zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
   }
 

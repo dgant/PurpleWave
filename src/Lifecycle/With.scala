@@ -6,14 +6,13 @@ import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
 import Information.Counting.{Accounting, MacroCounts, ProductionHistory, Projections}
 import Information.Fingerprinting.Fingerprints
-import Information.Geography.Geography
+import Information.Geography.{Expansions, Geography}
 import Information.Geography.NeoGeo.{MapIdentifier, NeoGeo}
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
 import Lifecycle.Configure.{BwapiData, Configuration, ConfigurationLoader}
 import Macro.Allocation._
-import Macro.Expansions
 import Macro.Gathering.Gathering
 import Macro.Scheduling.{MacroSim, Scheduler}
 import Mathematics.Points.Tile

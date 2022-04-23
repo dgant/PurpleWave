@@ -13,7 +13,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 trait Fits {
-  protected lazy val points: Array[TemplatePoint] = Array.fill(With.mapTileArea)(PointAnything)
+  protected lazy val points: Array[TemplatePoint]       = Array.fill(With.mapTileArea)(PointAnything)
+  protected lazy val byTile: Array[Option[Foundation]]  = Array.fill(With.mapTileArea)(None)
   private val _fits         = new ArrayBuffer[Fit] // We only keep these for debugging
   private val _foundations  = new ArrayBuffer[Foundation]
   private val byDimensions  = new mutable.HashMap[(Int, Int), ArrayBuffer[Foundation]]
@@ -22,20 +23,22 @@ trait Fits {
   private val byBuilding    = new mutable.HashMap[UnitClass,  ArrayBuffer[Foundation]]
   private val byLabel       = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
 
-  def at(tile: Tile)                : TemplatePoint   = if (tile.valid) points(tile.i) else PointNothing
-  def get(width: Int, height: Int)  : Seq[Foundation] = byDimensions.getOrElse((width, height), Seq.empty)
-  def get(zone: Zone)               : Seq[Foundation] = byZone.getOrElse(zone, Seq.empty)
-  def get(base: Base)               : Seq[Foundation] = byBase.getOrElse(base, Seq.empty)
-  def get(building: UnitClass)      : Seq[Foundation] = byBuilding.getOrElse(building, Seq.empty)
-  def get(label: PlaceLabel)        : Seq[Foundation] = byLabel.getOrElse(label, Seq.empty)
-  def foundations                   : Seq[Foundation] = _foundations
-  def fits                          : Seq[Fit]        = _fits
+  def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else PointNothing
+  def get(tile: Tile)               : Option[Foundation]  = if (tile.valid) byTile(tile.i) else None
+  def get(width: Int, height: Int)  : Seq[Foundation]     = byDimensions.getOrElse((width, height), Seq.empty)
+  def get(zone: Zone)               : Seq[Foundation]     = byZone.getOrElse(zone, Seq.empty)
+  def get(base: Base)               : Seq[Foundation]     = byBase.getOrElse(base, Seq.empty)
+  def get(building: UnitClass)      : Seq[Foundation]     = byBuilding.getOrElse(building, Seq.empty)
+  def get(label: PlaceLabel)        : Seq[Foundation]     = byLabel.getOrElse(label, Seq.empty)
+  def foundations                   : Seq[Foundation]     = _foundations
+  def fits                          : Seq[Fit]            = _fits
 
   def index(fit: Fit): Unit = {
     _fits += fit
     fit.template.points.view.map(p => Foundation(fit.origin.add(p.point), p, fit.order)).foreach(index)
   }
   protected def index(foundation: Foundation): Unit = {
+    if ( ! foundation.tile.valid) return
     val point = foundation.point
     val requirement = point.requirement
     (0 until requirement.width).flatMap(dx =>
@@ -43,6 +46,7 @@ trait Fits {
           .filter(_.valid)
           .map(_.i)
           .foreach(points(_) = point)
+    byTile(foundation.tile.i) = Some(foundation)
     if ( ! requirement.buildableBefore) return
     if (requirement.buildableAfter) return
     _foundations += foundation

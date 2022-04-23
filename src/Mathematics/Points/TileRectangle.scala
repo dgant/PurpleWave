@@ -90,12 +90,16 @@ final case class TileRectangle(
     contains(otherRectangle.startInclusive.x, otherRectangle.endExclusive.y - 1)  ||
     contains(otherRectangle.endExclusive.x - 1, otherRectangle.startInclusive.y)
   }
-  
-  @inline def startPixel      : Pixel = startInclusive.topLeftPixel
-  @inline def endPixel        : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
-  @inline def topRightPixel   : Pixel = Pixel(endPixel.x, startPixel.y)
-  @inline def bottomleftPixel : Pixel = Pixel(startPixel.x, endPixel.y)
-  @inline def midPixel        : Pixel = startPixel.midpoint(endPixel)
+
+  @inline def startPixel        : Pixel = startInclusive.topLeftPixel
+  @inline def endPixel          : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
+  @inline def topRightPixel     : Pixel = Pixel(endPixel.x, startPixel.y)
+  @inline def bottomleftPixel   : Pixel = Pixel(startPixel.x, endPixel.y)
+  @inline def midPixel          : Pixel = startPixel.midpoint(endPixel)
+  @inline def leftMiddlePixel   : Pixel = Pixel(startPixel.x, midPixel.y)
+  @inline def rightMiddlePixel  : Pixel = Pixel(endPixel.x, midPixel.y)
+  @inline def topCenterPixel    : Pixel = Pixel(midPixel.x, endPixel.y)
+  @inline def bottomCenterPixel : Pixel = Pixel(midPixel.x, startPixel.y)
   
   @inline def cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))

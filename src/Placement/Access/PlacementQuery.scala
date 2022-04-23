@@ -1,7 +1,9 @@
 package Placement.Access
 
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Points.Tile
+import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -55,6 +57,23 @@ class PlacementQuery {
     }
   }
 
+  def requireWidth        (value: Int)          : PlacementQuery = { requirements.width     = Some(value);  this }
+  def requireHeight       (value: Int)          : PlacementQuery = { requirements.height    = Some(value);  this }
+  def requireBuilding     (value: UnitClass)    : PlacementQuery = { requirements.building  = Some(value);  this }
+  def requireLabelYes     (value: PlaceLabel*)  : PlacementQuery = { requirements.labelYes  = value;        this }
+  def requireLabelNo      (value: PlaceLabel*)  : PlacementQuery = { requirements.labelNo   = value;        this }
+  def requireZone         (value: Zone*)        : PlacementQuery = { requirements.zone      = value;        this }
+  def requireBase         (value: Base*)        : PlacementQuery = { requirements.base      = value;        this }
+  def requireTile         (value: Tile*)        : PlacementQuery = { requirements.tile      = value;        this }
+  def preferWidth         (value: Int)          : PlacementQuery = { preferences.width      = Some(value);  this }
+  def preferHeight        (value: Int)          : PlacementQuery = { preferences.height     = Some(value);  this }
+  def preferBuilding      (value: UnitClass)    : PlacementQuery = { preferences.building   = Some(value);  this }
+  def preferLabelYes      (value: PlaceLabel*)  : PlacementQuery = { preferences.labelYes   = value;        this }
+  def preferLabelNo       (value: PlaceLabel*)  : PlacementQuery = { preferences.labelNo    = value;        this }
+  def preferZone          (value: Zone*)        : PlacementQuery = { preferences.zone       = value;        this }
+  def preferBase          (value: Base*)        : PlacementQuery = { preferences.base       = value;        this }
+  def preferTile          (value: Tile*)        : PlacementQuery = { preferences.tile       = value;        this }
+
   def acceptExisting(tile: Tile): Boolean = {
     if ( ! tile.valid) return false
     if (requirements.zone.nonEmpty    && ! requirements.zone.contains(tile.zone)) return false
@@ -85,11 +104,12 @@ class PlacementQuery {
       requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
       With.placement.foundations)
     lazy val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
-    (if (requirements.building.exists(_.isGas)) gasFoundations else foundationSourceSmallest).filter(accept)sortBy(- score(_))
-    // If this sorting is too slow we can use a PriorityQueue,
-    // but would need to account for the existing ordering in the score
-    // because PriorityQueue is not a stable sort
+    if (requirements.building.exists(_.isGas)) gasFoundations
+    else if (requirements.labelYes.contains(PlaceLabels.TownHall)) townHallFoundations
+    else foundationSourceSmallest.filter(accept)sortBy(- score(_))
   }
+
+  def townHallFoundations: Seq[Foundation] = With.geography.preferredExpansionsOurs.map(_.townHallTile).map(With.placement.get).flatten
 
   def gasFoundations: Seq[Foundation] = {
     val bases = (if (requirements.base.isEmpty && requirements.zone.isEmpty) {

@@ -3,7 +3,6 @@ package Information.Geography
 import Information.Geography.Calculations.UpdateZones
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
-import Macro.Expansions
 import Mathematics.Maff
 import Mathematics.Points.{SpecificPoints, Tile}
 import Performance.Tasks.TimedTask

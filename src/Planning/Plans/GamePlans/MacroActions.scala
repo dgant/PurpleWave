@@ -1,5 +1,6 @@
 package Planning.Plans.GamePlans
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable, RequestUnit}
 import Placement.Access.PlacementQuery
@@ -36,8 +37,11 @@ trait MacroActions {
   def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
   def get(unit: UnitClass): Unit = get(1, unit)
+  def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
+  def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
   def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
   def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, Some(placementQuery)))
+  def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(With.geography.ourNatural))
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))

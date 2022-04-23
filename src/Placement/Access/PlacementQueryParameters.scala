@@ -11,8 +11,8 @@ class PlacementQueryParameters {
   var width     : Option[Int]       = None
   var height    : Option[Int]       = None
   var building  : Option[UnitClass] = None
-  var labelYes     : Seq[PlaceLabel]   = Seq.empty
-  var labelNo  : Seq[PlaceLabel]   = Seq.empty
+  var labelYes  : Seq[PlaceLabel]   = Seq.empty
+  var labelNo   : Seq[PlaceLabel]   = Seq.empty
   var zone      : Seq[Zone]         = Seq.empty
   var base      : Seq[Base]         = Seq.empty
   var tile      : Seq[Tile]         = Seq.empty
@@ -75,16 +75,13 @@ class PlacementQueryParameters {
   protected def scoreZone(foundation: Foundation): Double = {
     if (zone.isEmpty) return 1.0
     if (zone.contains(foundation.tile.zone)) return 1.0
-    if (foundation.tile.metro.exists(_.zones.exists(zone.contains))) return 0.25
-    0.0
+    0.25 * Maff.clamp(1 - Maff.nanToOne(zone.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
   }
 
   protected def scoreBase(foundation: Foundation): Double = {
     if (base.isEmpty) return 1.0
     if (base.exists(foundation.tile.base.contains)) return 1.0
-    if (base.exists(_.zone == foundation.tile.zone)) return 0.5
-    if (foundation.tile.metro.exists(_.bases.exists(base.contains))) return 0.25
-    0.0
+    0.25 * Maff.clamp(1 - Maff.nanToOne(base.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
   }
 
   protected def scoreTile(foundation: Foundation): Double = {

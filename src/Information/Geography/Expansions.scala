@@ -1,4 +1,4 @@
-package Macro
+package Information.Geography
 
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -43,7 +43,7 @@ trait Expansions {
       val enemyFactor   = Maff.clamp(1.0 - distanceEnemy  / 256.0,  0.1, 1.0)
       val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
       val gasFactor     = if (adequateGas(base) || gasBases > gasBasesNeeded) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
-      val output        =homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards
+      val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards
       output
     }
 

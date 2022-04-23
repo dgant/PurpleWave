@@ -73,7 +73,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val basesBefore = bases
     bases = With.geography.bases.filter(_.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 240))) // Geography.ourBases isn't valid frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
-      val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
+      val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
       workers.foreach(_.intend(this, new Intention { toTravel = Some(goal) }))
       return
     }
@@ -181,7 +181,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private def issueCommands(): Unit = {
     unassigned.foreach(i => i.intend(this, new Intention {
       toGather = Maff.minBy(With.units.ours.filter(_.unitClass.isGas))(u => i.pixelDistanceTravelling(u.pixel.walkableTile))
-      toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.threatOrigin)).tiles).center)
+      toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.enemyThreatOrigin)).tiles).center)
       canFight = false }))
     assignments.foreach(a => a._1.intend(this, new Intention { toGather = Some(a._2.resource) }))
   }

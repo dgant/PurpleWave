@@ -94,7 +94,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   
   def tickle(): Unit = {
     val base = With.geography.enemyBases.toList.sortBy(_.workerCount).lastOption
-    val target = base.map(_.heart.center).getOrElse(With.scouting.mostBaselikeEnemyTile.center)
+    val target = base.map(_.heart.center).getOrElse(With.scouting.enemyHome.center)
     fighters.units.foreach(tickle(_, target))
   }
   

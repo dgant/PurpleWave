@@ -68,7 +68,7 @@ class Grids extends TimedTask {
     } else if (code == "gn") {
       _selected = Some(With.geography.ourNatural.zone.distanceGrid)
     } else if (code == "ge") {
-      _selected = Some(With.scouting.mostBaselikeEnemyTile.zone.distanceGrid)
+      _selected = Some(With.scouting.enemyHome.zone.distanceGrid)
     } else if (code == "g") {
       _selected = None
     }

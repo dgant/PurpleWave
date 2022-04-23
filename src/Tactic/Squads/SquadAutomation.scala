@@ -85,7 +85,7 @@ object SquadAutomation {
       output += FormationGeneric.march(squad, to)
     }
     // Always include a disengagey formation for units that want to retreat/kite
-    if (squad.centroidKey.zone == squad.homeConsensus.zone && With.scouting.threatOrigin.zone != squad.homeConsensus.zone) {
+    if (squad.centroidKey.zone == squad.homeConsensus.zone && With.scouting.enemyThreatOrigin.zone != squad.homeConsensus.zone) {
       output += FormationGeneric.guard(squad, Some(squad.homeConsensus))
     } else {
       output += FormationGeneric.disengage(squad)

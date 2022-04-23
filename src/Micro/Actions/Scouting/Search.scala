@@ -35,7 +35,7 @@ abstract class AbstractSearch extends Action {
       With.geography.neutralBases
         .filterNot(_.zone.island)
         .sortBy(b =>
-          b.townHallTile.groundPixels(With.scouting.mostBaselikeEnemyTile)
+          b.townHallTile.groundPixels(With.scouting.enemyHome)
           - b.townHallTile.groundPixels(With.geography.home))
         .take(count)
     }

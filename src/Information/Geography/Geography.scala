@@ -3,13 +3,14 @@ package Information.Geography
 import Information.Geography.Calculations.UpdateZones
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
+import Macro.Expansions
 import Mathematics.Maff
 import Mathematics.Points.{SpecificPoints, Tile}
 import Performance.Tasks.TimedTask
 
 import scala.collection.JavaConverters._
 
-final class Geography extends TimedTask with GeographyCache {
+final class Geography extends TimedTask with GeographyCache with Expansions {
   lazy val startBases         : Vector[Base]    = bases.filter(_.isStartLocation)
   lazy val startLocations     : Vector[Tile]    = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
   lazy val ourMain            : Base            = With.geography.ourBases.find(_.isStartLocation).getOrElse(With.geography.bases.minBy(_.heart.tileDistanceFast(With.self.startTile)))
@@ -33,5 +34,6 @@ final class Geography extends TimedTask with GeographyCache {
 
   override def onRun(budgetMs: Long): Unit = {
     UpdateZones.apply()
+    updateExpansions()
   }
 }

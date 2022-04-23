@@ -26,7 +26,7 @@ class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGroup with 
         attackers,
         units))(_.pixelDistanceSquared(opponent.centroidKey))
     .map(_.pixel)
-    .getOrElse(With.scouting.threatOrigin.center))
+    .getOrElse(With.scouting.enemyThreatOrigin.center))
 
   lazy val vanguardAir = new Cache(() =>
     Maff.minBy(

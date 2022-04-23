@@ -15,7 +15,7 @@ class BattleProcessDivisions extends BattleProcessState {
 
     var zones = (With.geography.enemyBases ++ With.geography.ourBasesAndSettlements).map(_.zone).distinct
     if (zones.isEmpty) {
-      zones = Vector(With.geography.home.zone, With.scouting.mostBaselikeEnemyTile.zone).distinct
+      zones = Vector(With.geography.home.zone, With.scouting.enemyHome.zone).distinct
     }
 
     val salientBaseGroups = Seq(

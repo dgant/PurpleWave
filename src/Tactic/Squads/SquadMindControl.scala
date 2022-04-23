@@ -49,7 +49,7 @@ class SquadMindControl extends Squad {
       i += 1
     })
 
-    lazy val safety = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.threatOrigin)).map(_.heart).getOrElse(With.geography.home).center
+    lazy val safety = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.enemyThreatOrigin)).map(_.heart).getOrElse(With.geography.home).center
     unready.foreach(_.intend(this, new Intention { toTravel = Some(safety) }))
   }
 }

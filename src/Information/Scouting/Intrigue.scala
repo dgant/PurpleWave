@@ -11,7 +11,7 @@ trait Intrigue {
   def baseScouts(base: Base): Int = baseScoutMap(base)
   def baseIntrigue: Map[Base, Double] = baseIntrigueRaw.map(p => (p._1, p._2 / Math.pow(100.0, baseScouts(p._1))))
   def baseIntrigueRaw: Map[Base, Double] = cacheBaseIntrigueInitial()
-  def mostBaselikeEnemyTile: Tile = mostBaselikeEnemyTileCache()
+  def enemyHome: Tile = mostBaselikeEnemyTileCache()
 
   def registerScout(base: Base): Unit = {
     baseScoutMap(base) += 1

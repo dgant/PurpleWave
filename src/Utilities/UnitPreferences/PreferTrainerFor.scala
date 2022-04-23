@@ -27,7 +27,7 @@ case class PreferTrainerFor(traineeClass: UnitClass) extends UnitPreference {
     val workers   = if (traineeClass.isWorker) Maff.clamp(trainer.base.map(_.saturation()).getOrElse(0.0), 0.0, 1.0) else 0.0
     val defend    = if (traineeClass.attacksGround && ! traineeClass.isWorker) Maff.clamp(trainer.base.map(_.enemyCombatValue).getOrElse(0d) / Terran.Vulture.subjectiveValue, 0d, 1d) else 0d
     val health    = trainer.totalHealth / trainer.unitClass.maxTotalHealth.toDouble
-    val distance  = 1.0 - Maff.clamp(trainer.tile.groundTiles(With.scouting.mostBaselikeEnemyTile) / (With.mapTileWidth + With.mapTileHeight), 0.0, 1.0)
+    val distance  = 1.0 - Maff.clamp(trainer.tile.groundTiles(With.scouting.enemyHome) / (With.mapTileWidth + With.mapTileHeight), 0.0, 1.0)
     val score = (
       + 100000.0  * noAddon
       + 10000.0   * readiness

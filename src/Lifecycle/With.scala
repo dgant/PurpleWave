@@ -13,6 +13,7 @@ import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
 import Lifecycle.Configure.{BwapiData, Configuration, ConfigurationLoader}
 import Macro.Allocation._
+import Macro.Expansions
 import Macro.Gathering.Gathering
 import Macro.Scheduling.{MacroSim, Scheduler}
 import Mathematics.Points.Tile
@@ -58,6 +59,7 @@ object With {
   var mapWalkArea       : Int                 = 0
 
   var game              : bwapi.Game          = _
+  var accounting        : Accounting          = _
   var agents            : Agency              = _
   var animations        : Animations          = _
   var architecture      : Architecture        = _
@@ -70,7 +72,7 @@ object With {
   var camera            : Camera              = _
   var coordinator       : Coordinator         = _
   var configuration     : Configuration       = _
-  var accounting        : Accounting          = _
+  var expansions        : Expansions          = _
   var fingerprints      : Fingerprints        = _
   var gathering         : Gathering           = _
   var geo               : NeoGeo              = _

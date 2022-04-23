@@ -23,7 +23,7 @@ class SquadAttack extends Squad {
     lazy val airValue = units.view.filter(_.flying).map(_.subjectiveValue).sum
     lazy val totalValue = units.view.map(_.subjectiveValue).sum
     lazy val baseScores = With.geography.enemyBases.map(b => {
-      val distanceThreat = With.scouting.threatOrigin.walkableTile.groundPixels(b.heart.center)
+      val distanceThreat = With.scouting.enemyThreatOrigin.walkableTile.groundPixels(b.heart.center)
       val distanceArmy = keyDistanceTo(b.heart.center)
       val accessibility = if (b.zone.island) Math.pow(Maff.nanToZero(airValue / totalValue), 2) else 1.0
       (b, accessibility * (2 * distanceThreat - distanceArmy))
@@ -32,7 +32,7 @@ class SquadAttack extends Squad {
       && With.enemy.bases.size < 3
       && With.scouting.enemyProgress > 0.4
       && enemyNonTrollyThreats > 6) {
-      return With.scouting.threatOrigin.center
+      return With.scouting.enemyThreatOrigin.center
     }
     // Horror proxies/Gas steals
     Maff.orElse(
@@ -42,7 +42,7 @@ class SquadAttack extends Squad {
       // Highest scoring enemy base
       Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.units.view.filter(_.isEnemy).filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center)),
       // Threat option, if there's an army to pursue
-      Some(With.scouting.threatOrigin.center).filter(unused => enemyNonTrollyThreats > 0)).headOption
-      .getOrElse(With.scouting.mostBaselikeEnemyTile.center)
+      Some(With.scouting.enemyThreatOrigin.center).filter(unused => enemyNonTrollyThreats > 0)).headOption
+      .getOrElse(With.scouting.enemyHome.center)
   }
 }

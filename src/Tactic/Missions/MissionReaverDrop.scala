@@ -41,7 +41,7 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def recruit(): Unit = {
     populateItinerary()
-    vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.mostBaselikeEnemyTile).center
+    vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
     transportLock.preference = PreferClose(vicinity)
     transportLock.acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }

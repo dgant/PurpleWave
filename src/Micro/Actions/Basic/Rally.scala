@@ -38,6 +38,6 @@ object Rally extends Action {
       return
     }
 
-    Commander.rally(unit, With.scouting.mostBaselikeEnemyTile.center)
+    Commander.rally(unit, With.scouting.enemyHome.center)
   }
 }

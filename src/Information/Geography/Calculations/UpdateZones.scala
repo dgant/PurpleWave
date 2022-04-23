@@ -48,7 +48,7 @@ object UpdateZones {
       .getOrElse(With.geography.home)
   }
 
-  def calculateExit(zone: Zone): Option[Edge] = Maff.minBy(zone.edges)(edge => Maff.orElse(With.geography.enemyBases.map(_.heart), Seq(With.scouting.threatOrigin)).map(edge.distanceGrid.get).min)
+  def calculateExit(zone: Zone): Option[Edge] = Maff.minBy(zone.edges)(edge => Maff.orElse(With.geography.enemyBases.map(_.heart), Seq(With.scouting.enemyThreatOrigin)).map(edge.distanceGrid.get).min)
 
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
   private def updateZone(zone: Zone): Unit = {

@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
   private val centroidPixel = Maff.centroid(proxyPixels)
-  private val centroidUnit  = Maff.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.threatOrigin.center)
+  private val centroidUnit  = Maff.minBy(proxyPixels)(_.pixelDistance(centroidPixel)).getOrElse(With.scouting.enemyThreatOrigin.center)
 
   override def launch(): Unit = {}
 

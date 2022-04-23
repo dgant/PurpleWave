@@ -27,7 +27,7 @@ class SquadCatchDTRunby extends Squad {
     val dts = With.units.enemy.view.filter(Protoss.DarkTemplar)
     Maff.minBy(With.geography.ourBases.map(_.heart.center))(heart =>
       Maff.min(dts.map(_.pixelDistanceCenter(heart)))
-        .getOrElse(heart.pixelDistance(With.scouting.mostBaselikeEnemyTile.center)))
+        .getOrElse(heart.pixelDistance(With.scouting.enemyHome.center)))
       .getOrElse(With.geography.home.center)
     })
 }

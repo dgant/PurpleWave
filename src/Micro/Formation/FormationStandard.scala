@@ -36,7 +36,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val targetNear        : Option[UnitInfo]      = Maff.minBy(targetsNear)(_.pixelDistanceTravelling(group.centroidGround))
   val targetTowards     : Option[UnitInfo]      = Maff.minBy(targetsTowards)(_.pixelDistanceTravelling(group.centroidGround))
   val target            : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(goal)
-  val vanguardTarget    : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(With.scouting.threatOrigin.center)
+  val vanguardTarget    : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(With.scouting.enemyThreatOrigin.center)
   val vanguardOrigin    : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) vanguardTarget else goal
   val vanguardUnits     : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
   val centroid          : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel

@@ -12,11 +12,9 @@ object ArchitecturalAssessment extends Enumeration {
     BlockedGas,
     IsntBasePosition,
     IsntLegalForTownHall,
-    ViolatesPerimeter,
     IsntBuildable,
     CreepMismatch,
-    ViolatesHarvesting,
     ViolatesResourceGap,
-    BlockedByUnit,
-    Reserved = Value
+    BlockedByUnit
+    = Value
 }

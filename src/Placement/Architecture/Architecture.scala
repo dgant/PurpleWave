@@ -202,23 +202,14 @@ class Architecture {
         if ( ! buildable(nextTile, Some(request))) {
           return ArchitecturalAssessment.IsntBuildable
         }
-        if (nextTile.zone.perimeter.contains(nextTile)) {
-          return ArchitecturalAssessment.ViolatesPerimeter
-        }
         if (building.requiresCreep != nextTile.creep) {
           return ArchitecturalAssessment.CreepMismatch
-        }
-        if ( ! building.isTownHall && ! building.isAddon && zone.bases.exists(_.harvestingArea.contains(nextTile))) {
-          return ArchitecturalAssessment.ViolatesHarvesting
         }
         if (building.isTownHall && ! With.grids.buildableTownHall.get(nextTile)) {
           return ArchitecturalAssessment.ViolatesResourceGap
         }
         if ( ! building.isTownHall && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
           return ArchitecturalAssessment.BlockedByUnit
-        }
-        if ( ! With.groundskeeper.isFree(topLeft)) {
-          return ArchitecturalAssessment.Reserved
         }
         y += 1
       }

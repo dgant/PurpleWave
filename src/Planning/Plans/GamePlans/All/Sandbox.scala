@@ -29,7 +29,7 @@ class Sandbox extends GameplanImperative {
     get(Protoss.RoboticsFacility)
     buildGasPumps()
     get(Protoss.Observatory)
-    new BuildCannonsAtExpansions(6)
+    new BuildCannonsAtExpansions(6).update()
     get(4, Protoss.Nexus)
     get(16, Protoss.Gateway)
   }

@@ -12,7 +12,7 @@ object ShowHeader extends DebugView {
 
     val h = With.visualization.lineHeightSmall
     With.game.drawTextScreen(5,   1 * h, f"${With.game.getLatencyFrames} latency frames")
-    With.game.drawTextScreen(80,  1 * h, f"$With.latency.turnSize} frames/turn")
+    With.game.drawTextScreen(80,  1 * h, f"${With.latency.turnSize} frames/turn")
     With.game.drawTextScreen(155, 1 * h, f"${With.performance.frameMeanMs}ms avg")
     With.game.drawTextScreen(230, 1 * h, f"${With.performance.frameMaxMs}ms max")
     With.game.drawTextScreen(305, 1 * h, f"${PurpleBWClient.framesBehind} frames back")

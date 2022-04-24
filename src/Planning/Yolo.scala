@@ -31,7 +31,7 @@ class Yolo extends TimedTask with MacroActions {
       maxoutFramesCharged -= 2 * frameDelta
     }
 
-    val maxoutFrameTarget = Minutes(2)() * With.enemies.size * (if (With.self.isTerran) 5 else if (With.enemies.exists(_.isTerran)) 1 else 3)
+    val maxoutFrameTarget = Minutes(1)() + Minutes(1)() * With.enemies.size * (if (With.self.isTerran) 5 else if (With.enemies.exists(_.isTerran)) 1 else 3)
     if (maxoutFramesCharged <= 0) {
       maxoutFramesCharged = 0
       maxoutTriggered = false

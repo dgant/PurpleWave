@@ -10,7 +10,7 @@ object Potshot extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.canFight && unit.readyForAttackOrder
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     Target.choose(unit, TargetFilterPotshot)
     Commander.attack(unit)
   }

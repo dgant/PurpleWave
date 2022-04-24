@@ -6,7 +6,6 @@ import Micro.Targeting.FiltersSituational.TargetFilterWhitelist
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 
-
 object Target extends {
   def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
     attacker.agent.toAttack = best(attacker, required: _*)

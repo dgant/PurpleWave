@@ -29,7 +29,7 @@ class PlacementQuery {
   def resetDefaults(building: UnitClass): Unit = {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
-    requirements.building = Some(building).filter(b => b.isTownHall || b.isGas)
+    requirements.building = Some(building).filter(_.isGas)
     requirements.labelYes = if (building.isTownHall) Seq(PlaceLabels.TownHall)  else Seq.empty
     requirements.labelNo  = if (building.isTownHall) Seq.empty                  else Seq(PlaceLabels.TownHall)
     preferences.width     = requirements.width

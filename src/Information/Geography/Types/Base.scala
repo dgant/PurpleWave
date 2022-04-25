@@ -9,8 +9,6 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.{Forever, Minutes}
 
-import scala.collection.immutable.HashSet
-
 final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
         val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
         val townHallArea      : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
@@ -70,7 +68,8 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     route
   })).toMap
   lazy val resourcePathTiles: Set[Tile] = {
-    var output: Set[Tile] = HashSet(resourcePaths.values.flatten)
+    var output: Set[Tile] = Set.empty
+    output ++= resourcePaths.values.flatten
     // Avoid blocking the path where workers are likely to pop out of gas
     // by blocking tiles adjacent to the Nexus that could be along the critical path
     output ++= gas.flatMap(_.tileArea.tilesSurrounding.map(t => townHallArea.expand(1, 1).tiles.minBy(_.tileDistanceSquared(t))))

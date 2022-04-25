@@ -45,31 +45,23 @@ class Template {
     this
   }
 
-  def add(string: String): Template = {
+  def add(strings: String*): Template = {
     var x: Int = 0
     var y: Int = 0
-    var onWhitespace: Boolean = true
-    def point(): Point = Point(x, y)
-    string.foreach(char => {
-      if (char.isWhitespace) {
-        if ( ! onWhitespace) {
-          onWhitespace = true
-          x = 0
-          y += 1
-        }
-      } else {
-        onWhitespace = false
-        val pt: TemplatePointRequirement = char.toLower match {
+    while (y < strings.length) {
+      val string = strings(y)
+      x = 0
+      while (x < string.length) {
+        val char = string(x)
+        val pt: TemplatePointRequirement = char.toUpper match {
           case '-' => RequireWalkable
-          case 't' => new TemplatePointRequirement(Terran.CommandCenter, Protoss.Nexus, Zerg.Hatchery).withLabels(TownHall)
-          case 'h' => new TemplatePointRequirement(Terran.Armory, Terran.Academy, Protoss.Forge, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsSupportBay, Protoss.Observatory, Protoss.ArbiterTribunal, Protoss.FleetBeacon, Zerg.EvolutionChamber, Zerg.SpawningPool, Zerg.HydraliskDen, Zerg.QueensNest, Zerg.UltraliskCavern).withLabels(Tech) // 3x2 tech
-          case 'p' => new TemplatePointRequirement(Protoss.Pylon).withLabels(PriorityPower, Supply)
-          case 'g' => new TemplatePointRequirement(Terran.Barracks, Protoss.Gateway).withLabels(GroundProduction) // 4x3 production
-          case 'r' => new TemplatePointRequirement(Protoss.RoboticsFacility).withLabels(GroundProduction) // 3x2 production
-          case 'f' => new TemplatePointRequirement(Protoss.Forge).withLabels(Tech)
-          case 'y' => new TemplatePointRequirement(Protoss.CyberneticsCore).withLabels(Tech)
-          case 'c' => new TemplatePointRequirement(Protoss.PhotonCannon).withLabels(Defensive)
-          case 'b' => new TemplatePointRequirement(Protoss.ShieldBattery).withLabels(Defensive)
+          case 'H' => new TemplatePointRequirement(4, 3).withLabels(TownHall)
+          case 'G' => new TemplatePointRequirement(4, 3).withLabels(GroundProduction) // 4x3 ground production, eg. Gateway
+          case 'R' => new TemplatePointRequirement(3, 2).withLabels(GroundProduction) // 3x2 ground production, eg. Robotics
+          case 'T' => new TemplatePointRequirement(3, 2).withLabels(Tech) // 3x2 tech
+          case 'P' => new TemplatePointRequirement(Protoss.Pylon).withLabels(PriorityPower, Supply)
+          case 'C' => new TemplatePointRequirement(Terran.MissileTurret, Protoss.PhotonCannon, Zerg.CreepColony).withLabels(Defensive)
+          case 'B' => new TemplatePointRequirement(Terran.Bunker, Protoss.ShieldBattery).withLabels(Defensive)
           case '6' => new TemplatePointRequirement(6, 3)
           case '4' => new TemplatePointRequirement(4, 3)
           case '3' => new TemplatePointRequirement(3, 2)
@@ -77,11 +69,18 @@ class Template {
           case default => RequireAnything
         }
         if (pt != RequireAnything) {
-          add(point(), pt)
+          add(Point(x, y), pt)
+          // TODO: Add postfix modifiers here
+          // -Optional fits
+          // -Must-fill (no undersize occupants)
+          // Maybe: high-pri
+          // Maybe: banned contents
+          // Maybe: 2 types of "One of these must be unwalkable"
         }
         x += 1
       }
-    })
+      y += 1
+    }
     this
   }
 

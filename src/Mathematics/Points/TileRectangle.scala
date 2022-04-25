@@ -1,7 +1,5 @@
 package Mathematics.Points
 
-
-
 import Mathematics.Maff
 
 import scala.collection.SeqView

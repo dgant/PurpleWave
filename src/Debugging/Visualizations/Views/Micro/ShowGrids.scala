@@ -8,7 +8,7 @@ import Mathematics.Points.TileRectangle
 
 object ShowGrids extends DebugView {
 
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.grids.selected.foreach(renderGrid)
   }
   
@@ -17,7 +17,7 @@ object ShowGrids extends DebugView {
     viewportTiles.tiles
       .foreach(tile => {
         val repr = grid.reprAt(tile.i)
-        if (repr != "0" && repr != "") {
+        if (repr != "0" && repr != "" && repr != "false") {
           DrawMap.text(tile.topLeftPixel.add(14, 12), repr)
         }
       })

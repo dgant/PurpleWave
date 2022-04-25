@@ -92,7 +92,7 @@ class Grids extends TimedTask {
     _disposableDouble
   }
 
-  private var _updateQueue = new mutable.Queue[Grid]()
+  private val _updateQueue = new mutable.Queue[Grid]()
 
   override protected def onRun(budgetMs: Long): Unit = {
     val timer = new Timer(budgetMs)

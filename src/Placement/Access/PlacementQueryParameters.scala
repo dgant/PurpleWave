@@ -63,13 +63,13 @@ class PlacementQueryParameters {
   protected def scoreLabelYes(foundation: Foundation): Double = {
     if (labelYes.isEmpty) return 1.0
     if (labelYes.forall(foundation.point.requirement.labels.contains)) return 1.0
-    labelYes.count(foundation.point.requirement.labels.contains) / (2.0 * labelYes.size)
+    0.25 * labelYes.count(foundation.point.requirement.labels.contains) / labelYes.size
   }
 
   protected def scoreLabelNo(foundation: Foundation): Double = {
     if (labelNo.isEmpty) return 1.0
     if ( ! labelNo.exists(foundation.point.requirement.labels.contains)) return 1.0
-    labelNo.count( ! foundation.point.requirement.labels.contains(_)) / (2.0 * labelNo.size)
+    0.25 * labelNo.count( ! foundation.point.requirement.labels.contains(_)) / labelNo.size
   }
 
   protected def scoreZone(foundation: Foundation): Double = {

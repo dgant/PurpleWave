@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.{Forever, Minutes}
 
-import scala.collection.mutable
+import scala.collection.immutable.HashSet
 
 final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
         val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
@@ -70,14 +70,14 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     route
   })).toMap
   lazy val resourcePathTiles: Set[Tile] = {
-    val output = new mutable.ArrayBuffer[Tile]
-    output ++= resourcePaths.values.flatten
-    // Avoid blocking the path where workers are likely to pop out of gas by blocking tiles adjacent to the Nexus that could be along the critical path
-    gas.foreach(_.tileArea.tilesSurrounding.foreach(gasTile => output += townHallArea.expand(1, 1).tiles.minBy(_.tileDistanceSquared(gasTile))))
+    var output: Set[Tile] = HashSet(resourcePaths.values.flatten)
+    // Avoid blocking the path where workers are likely to pop out of gas
+    // by blocking tiles adjacent to the Nexus that could be along the critical path
+    output ++= gas.flatMap(_.tileArea.tilesSurrounding.map(t => townHallArea.expand(1, 1).tiles.minBy(_.tileDistanceSquared(t))))
     // Avoid trapping workers into the mining area by banning tiles which are adjacent to the resource
     output ++= minerals.flatMap(_.tileArea.tilesSurrounding)
     output --= townHallArea.tiles
-    output.filter(_.valid).toSet
+    output.filter(_.valid)
   }
 
   override def toString: String = f"$description $name, ${zone.name} $heart"

@@ -2,29 +2,25 @@ package Macro.Allocation
 
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
-import Performance.Tasks.TimedTask
 import Planning.Plans.Basic.NoPlan
 import Planning.ResourceLocks.LockTiles
 import Utilities.Time.Forever
 
 import scala.collection.mutable.ArrayBuffer
 
-final class Groundskeeper extends TimedTask {
+final class Groundskeeper {
   class TileReservation(val tile: Tile, var owner: Prioritized, var update: Int) {
     def renewed: Boolean = update >= With.groundskeeper.updates
     def recent: Boolean = update >= With.groundskeeper.updates - 1
   }
 
-  lazy val tileReservations: Array[TileReservation] =
-    (0 until With.mapTileWidth).flatMap(x =>
-      (0 until With.mapTileHeight).map(y =>
-        new TileReservation(Tile(x, y), NoPlan(), -Forever()))).toArray
+  lazy val tileReservations: Array[TileReservation] = With.geography.allTiles.map(t => new TileReservation(t, NoPlan(), -Forever())).toArray
 
   lazy val reservations = new ArrayBuffer[(LockTiles, Seq[TileReservation])]()
 
   var updates: Int = 0
 
-  override protected def onRun(budgetMs: Long): Unit = {
+  def update(): Unit = {
     updates += 1
     var inactive: Option[LockTiles] = None
     do {
@@ -35,9 +31,9 @@ final class Groundskeeper extends TimedTask {
 
   def isFree(tile: Tile): Boolean = tile.valid && ! tileReservations(tile.i).renewed
 
-  def isFree(from: Tile, width: Int, height: Int): Boolean = isFree(from, from.add(width, height))
+  def isFree(start: Tile, width: Int, height: Int): Boolean = isFree(start, start.add(width, height))
 
-  def isFree(from: Tile, to: Tile): Boolean = TileRectangle(from, to).tiles.forall(isFree)
+  def isFree(startInclusive: Tile, endExclusive: Tile): Boolean = TileRectangle(startInclusive, endExclusive).tiles.forall(isFree)
 
   def reserved: Seq[Tile] = reservations.view.flatMap(_._2.view).map(_.tile)
 

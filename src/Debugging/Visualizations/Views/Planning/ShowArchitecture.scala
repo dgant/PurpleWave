@@ -30,7 +30,7 @@ object ShowArchitecture extends DebugView {
           DrawMap.tile(tile, 4, Colors.DarkIndigo)
         }
         if (With.architecture.powerFrame2Height.get(tile) <= With.frame) {
-          //DrawMap.circle(tile.pixelCenter, 4, Colors.BrightYellow)
+          DrawMap.circle(tile.center, 2, Colors.BrightYellow)
         }
         if (With.architecture.powerFrame3Height.get(tile) <= With.frame) {
           DrawMap.circle(tile.center, 4, Colors.BrightTeal)

@@ -24,8 +24,10 @@ class TaskQueueGlobal extends TaskQueueParallel(
     With.unitsShown,
     With.productionHistory,
     new SimpleTask("Gameplan", () => {
+      With.architecture.update()
       With.bank.update()
       With.recruiter.update()
+      With.groundskeeper.update()
       With.priorities.update()
       With.scheduler.reset()
       With.blackboard.reset()
@@ -41,8 +43,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
     // Squads are relatively expensive to run so we should revert this state of affairs.
     // We should also seek to ensure that squads are a run-to-completion batch, eg. we run every squad before proceeding, and not necessarily on the same frame
     // With.squads,
-    With.gathering,
-    With.groundskeeper)
+    With.gathering)
     .withSkipsMax(6)
     .withWeight(TaskQueueGlobalWeights.Planning),
   new TaskQueueSerial(

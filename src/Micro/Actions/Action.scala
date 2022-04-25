@@ -11,7 +11,7 @@ abstract class Action {
   protected def requiresReadiness: Boolean = true
   
   def allowed(unit: FriendlyUnitInfo): Boolean = true
-  protected def perform(unit: FriendlyUnitInfo)
+  protected def perform(unit: FriendlyUnitInfo): Unit
   
   final def consider(unit: FriendlyUnitInfo): Boolean = {
     act(unit, giveCredit = true)

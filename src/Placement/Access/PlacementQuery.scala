@@ -133,4 +133,6 @@ class PlacementQuery {
   def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(preferences.audit).sortBy(-_._2)
   }
+
+  override def toString: String = f"PlacementQuery Req$requirements) Pref$preferences)"
 }

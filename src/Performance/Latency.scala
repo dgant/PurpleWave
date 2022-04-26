@@ -8,7 +8,7 @@ class Latency {
   var latencyFrames: Int = With.game.getLatencyFrames
   var minRemainingLatencyFrames: Int = latencyFrames
   
-  def onFrame() {
+  def onFrame(): Unit = {
     minRemainingLatencyFrames = Math.min(minRemainingLatencyFrames, With.game.getRemainingLatencyFrames)
   }
   
@@ -16,13 +16,9 @@ class Latency {
   private val remainingFramesCache = new Cache(() => With.game.getRemainingLatencyFrames)
   
   def turnSize: Int = {
-    if (lastRunFrame > 0) {
-      if (latencyFrames <= 3)
-        return 1
-      else if (latencyFrames == 6)
-        return 2
-    }
-    //This doesn't accurately track changes to latency settings during the game.
+    if (latencyFrames <= 3) return 1
+    if (latencyFrames == 6) return 2
+    // This doesn't accurately track changes to latency settings during the game.
     1 + Math.max(0, With.game.getLatencyFrames - minRemainingLatencyFrames)
   }
   

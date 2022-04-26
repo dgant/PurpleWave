@@ -3,7 +3,7 @@ package Information.Geography.Types
 import Information.Geography.Calculations.UpdateZones
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Direction, Pixel, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwta.Region
@@ -20,6 +20,7 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   lazy  val exitOriginal      : Option[Edge]        = UpdateZones.calculateExit(this)
   lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
   lazy  val exitDistanceGrid  : GridGroundDistance  = exitOriginal.map(_.distanceGrid).getOrElse(distanceGrid)
+  lazy  val exitDirection     : Option[Direction]   = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
   
   var units           : Vector[UnitInfo]  = Vector.empty
   var owner           : PlayerInfo        = if (tiles.contains(new Tile(With.game.self.getStartLocation))) With.self else With.neutral

@@ -1,7 +1,9 @@
 package Placement.Access
 
+import Debugging.SimpleString
+
 object PlaceLabels {
-  trait PlaceLabel
+  trait PlaceLabel extends SimpleString
   object TownHall         extends PlaceLabel
   object Gas              extends PlaceLabel
   object GroundProduction extends PlaceLabel

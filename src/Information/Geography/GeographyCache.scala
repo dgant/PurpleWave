@@ -3,12 +3,8 @@ package Information.Geography
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Tile
-import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Utilities.UnitFilters.IsTank
-
-import scala.collection.mutable
 
 trait GeographyCache extends GeographyBuilder {
   private def geo: Geography = With.geography
@@ -17,7 +13,14 @@ trait GeographyCache extends GeographyBuilder {
   protected val ourZonesCache       : Cache[Vector[Zone]]     = new Cache(() => geo.zones.filter(_.isOurs))
   protected val ourBasesCache       : Cache[Vector[Base]]     = new Cache(() => geo.bases.filter(_.isOurs))
   protected val ourSettlementsCache : Cache[Vector[Base]]     = new Cache(() => getSettlements)
-  protected val ourNaturalCache     : Cache[Base]             = new Cache(() =>
+
+  protected val ourMainCache: Cache[Base] = new Cache(() =>
+    Maff.orElse(
+      geo.ourBases.filter(_.isStartLocation),
+      geo.ourBases,
+      geo.startBases).minBy(b => b.heart.groundTiles(With.self.startTile) + b.heart.tileDistanceFast(With.self.startTile) / 1000.0))
+
+  protected val ourNaturalCache: Cache[Base] = new Cache(() =>
     geo.ourMain.natural.filter(_.naturalOf.exists(_.isOurs))
     .orElse(geo.bases.find(_.naturalOf.exists(_.isOurs)))
     .getOrElse(geo.bases.filterNot(geo.ourMain==).minBy(_.townHallTile.groundPixels(geo.ourMain.townHallTile))))

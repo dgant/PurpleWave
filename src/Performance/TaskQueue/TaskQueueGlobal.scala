@@ -13,7 +13,6 @@ object TaskQueueGlobalWeights {
 class TaskQueueGlobal extends TaskQueueParallel(
   With.geography,
   With.grids,
-  With.placement,
   With.scouting,
   new TaskQueueSerial("Fingerprinting", With.fingerprints.relevant.map(f => new SimpleTask(f.toString, f.update)): _*),
   With.yolo,
@@ -32,6 +31,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.scheduler.reset()
       With.blackboard.reset()
       With.yolo.updateBlackboard() // YOLO affects gameplan
+      With.placement.initialize() // It's not relevant at time of writing, but strategy selection may depend on what placements are available
       With.strategy.update()
       With.strategy.gameplan.update()
       With.macroSim.simulate()

@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable, RequestUnit}
+import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.PlacementQuery
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
@@ -42,6 +43,7 @@ trait MacroActions {
   def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
   def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, Some(placementQuery)))
   def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(With.geography.ourNatural))
+  def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(With.geography.ourNatural).requireLabelYes(labels: _*))
   def get(upgrade: Upgrade): Unit = get(Get(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
   def get(tech: Tech): Unit = get(Get(tech))

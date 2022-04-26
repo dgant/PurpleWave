@@ -2,7 +2,7 @@ package Information.Geography.Types
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{PixelRay, SpecificPoints, Tile, TileRectangle}
+import Mathematics.Points.{Direction, PixelRay, SpecificPoints, Tile, TileRectangle}
 import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
@@ -44,15 +44,21 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def scoutedByEnemy          : Boolean           = lastFrameScoutedByEnemy > 0
   def plannedExpoRecently     : Boolean           = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
   def resources               : Seq[UnitInfo]     = minerals.view ++ gas
-  private lazy val _initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
-  lazy val harvestingArea = new TileRectangle(_initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+
+  private lazy val initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+
+  lazy val harvestingArea = new TileRectangle(initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+
   lazy val heart: Tile = {
-    val centroid = if (_initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(_initialResources.view.map(_.pixel))
+    val centroid = if (initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(initialResources.view.map(_.pixel))
     val direction = centroid.subtract(townHallArea.center)
     if (Math.abs(direction.x) > Math.abs(direction.y))
          if (direction.x < 0) townHallTile.add(-2, 1) else townHallTile.add(5, 1)
     else if (direction.y < 0) townHallTile.add(1, -2) else townHallTile.add(1, 4)
   }
+
+  lazy val gasDirection     : Direction = Maff.centroid(gas.map(_.pixel)).subtract(townHallArea.midPixel).direction
+  lazy val mineralDirection : Direction = Maff.centroid(minerals.map(_.pixel)).subtract(townHallArea.midPixel).direction
 
   lazy val resourcePaths: Map[UnitInfo, Iterable[Tile]] = resources.map(resource => (resource, {
     // Draw a shortest-path line from each resource to the town hall.
@@ -67,6 +73,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     val route           = PixelRay(from.center, to.center)
     route
   })).toMap
+
   lazy val resourcePathTiles: Set[Tile] = {
     var output: Set[Tile] = Set.empty
     output ++= resourcePaths.values.flatten
@@ -79,12 +86,12 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     output.filter(_.valid)
   }
 
-  override def toString: String = f"$description $name, ${zone.name} $heart"
-
   def description: String = (
     if (this == With.geography.ourMain) "Our main"
     else if (this == With.geography.ourNatural) "Our natural"
     else
       ((if (isEnemy) "Enemy" else if (isOurs) "Our" else if (isAlly) "Ally" else "Neutral")
       + (if (isStartLocation && ! isOurs) " main" else if (naturalOf.isDefined && ! isOurs) " natural" else " base")))
+
+  override def toString: String = f"$description $name, ${zone.name} $heart"
 }

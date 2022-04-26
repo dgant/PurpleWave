@@ -3,7 +3,7 @@ package Placement.Generation
 import Lifecycle.With
 import Mathematics.Points._
 import Placement.Access.Fits
-import Placement.Templating.Template
+import Placement.Templating.{Template, TemplatePoint, TemplatePointRequirement}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -47,52 +47,68 @@ trait Fitter extends Fits {
     * Considers conflicts with existing fits.
     */
   def fitsAt(template: Template, origin: Tile): Boolean = {
-    val violation = template.points.find(templatePoint => {
-      val slot = templatePoint.requirement
-      val slotOrigin = origin.add(templatePoint.point)
-      var violated = false
-      for (dx <- 0 until slot.width) {
-        for (dy <- 0 until slot.height) {
+    if ( ! template.accept(origin)) {
+      return false
+    }
+    val violation = template.points.find( ! accept(_, origin))
+    violation.isEmpty
+  }
+
+  private def accept(templatePoint: TemplatePoint, origin: Tile): Boolean = {
+    val requirement = templatePoint.requirement
+    val pointTile = origin.add(templatePoint.point)
+    if (requirement.isTownHall) {
+      return pointTile.base.exists(_.townHallTile == pointTile)
+    } else if (requirement.isGas) {
+      return pointTile.base.exists(_.gas.exists(_.tileTopLeft == pointTile))
+    } else {
+      for (dx <- 0 until requirement.width) {
+        for (dy <- 0 until requirement.height) {
           val relative = Point(dx, dy)
-          val tile = slotOrigin.add(relative)
-          if ( ! tile.valid) {
-            violated = true
-          } else if ( ! tile.add(slot.width - 1, slot.height - 1).valid) {
-            violated = true
-          } else {
-            val previous = at(tile)
-            if (slot.walkableBefore) {
-              if ( ! With.grids.walkable.get(tile)) {
-                violated = true
-              } else if ( ! previous.requirement.walkableAfter) {
-                violated = true
-              }
-            }
-            if (slot.buildableBefore) {
-              if ( ! With.grids.buildable.get(tile)) {
-                violated = true
-              }
-              if ( ! previous.requirement.buildableAfter) {
-                if (previous.point != relative) {
-                  violated = true
-                }
-                if (previous.requirement.width != slot.width) {
-                  violated = true
-                }
-                if (previous.requirement.height != slot.height) {
-                  violated = true
-                }
-                if (slot.buildings.nonEmpty && ! previous.requirement.buildings.forall(slot.buildings.contains)) {
-                  violated = true
-                }
-              }
-            }
+          val tile = pointTile.add(relative)
+          if ( ! accept(requirement, relative, tile)) {
+            return false
           }
         }
       }
-      violated
-    })
+    }
+    true
+  }
 
-    violation.isEmpty
+  private def accept(requirement: TemplatePointRequirement, relative: Point, tile: Tile): Boolean = {
+    if ( ! tile.valid) {
+      return false
+    } else if ( ! tile.add(requirement.width - 1, requirement.height - 1).valid) {
+      return false
+    } else {
+      val previous = at(tile)
+      if (requirement.walkableBefore) {
+        if ( ! tile.walkableUnchecked) {
+          return false
+        } else if ( ! previous.requirement.walkableAfter) {
+          return false
+        }
+      }
+      if (requirement.buildableBefore) {
+        if ( ! With.grids.buildable.get(tile)) {
+          return false
+        }
+        if ( ! previous.requirement.buildableAfter) {
+          if (previous.point != relative) {
+            return false
+          }
+          if (previous.requirement.width != requirement.width) {
+            return false
+          }
+          if (previous.requirement.height != requirement.height) {
+            return false
+          }
+          if (requirement.buildings.nonEmpty && ! previous.requirement.buildings.forall(requirement.buildings.contains)) {
+            return false
+          }
+        }
+      }
+    }
+    true
   }
 }

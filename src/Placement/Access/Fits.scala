@@ -21,7 +21,7 @@ trait Fits {
   private val byZone        = new mutable.HashMap[Zone,       ArrayBuffer[Foundation]]
   private val byBase        = new mutable.HashMap[Base,       ArrayBuffer[Foundation]]
   private val byBuilding    = new mutable.HashMap[UnitClass,  ArrayBuffer[Foundation]]
-  private val byLabel       = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
+  private val byLabelYes       = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
 
   def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else PointNothing
   def get(tile: Tile)               : Option[Foundation]  = if (tile.valid) byTile(tile.i) else None
@@ -29,7 +29,7 @@ trait Fits {
   def get(zone: Zone)               : Seq[Foundation]     = byZone.getOrElse(zone, Seq.empty)
   def get(base: Base)               : Seq[Foundation]     = byBase.getOrElse(base, Seq.empty)
   def get(building: UnitClass)      : Seq[Foundation]     = byBuilding.getOrElse(building, Seq.empty)
-  def get(label: PlaceLabel)        : Seq[Foundation]     = byLabel.getOrElse(label, Seq.empty)
+  def get(label: PlaceLabel)        : Seq[Foundation]     = byLabelYes.getOrElse(label, Seq.empty)
   def foundations                   : Seq[Foundation]     = _foundations
   def fits                          : Seq[Fit]            = _fits
 
@@ -54,7 +54,7 @@ trait Fits {
     put(byZone,       foundation.tile.zone,                     foundation)
     foundation.tile.base  .foreach(base     => put(byBase,      base,     foundation))
     requirement.buildings .foreach(building => put(byBuilding,  building, foundation))
-    requirement.labels    .foreach(label    => put(byLabel,     label,    foundation))
+    requirement.labels    .foreach(label    => put(byLabelYes,  label,    foundation))
   }
 
   private def put[T, U](map: mutable.Map[T, ArrayBuffer[U]], key: T, value: U): Unit = {
@@ -69,6 +69,6 @@ trait Fits {
     byZone        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
     byBase        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
     byBuilding    .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
-    byLabel       .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byLabelYes       .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
   }
 }

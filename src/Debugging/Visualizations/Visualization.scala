@@ -41,6 +41,7 @@ class Visualization extends TimedTask {
     // Temporary views
     ShowFormations,
     ShowBWEB,
+    ShowPlacement,
     ShowFoundations,
     ShowExpansions
   )

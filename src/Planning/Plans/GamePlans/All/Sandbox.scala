@@ -21,6 +21,7 @@ class Sandbox extends GameplanImperative {
     get(Protoss.CyberneticsCore)
   }
   override def executeMain(): Unit = {
+    scoutOn(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     pump(Protoss.Observer, 2)
     pump(Protoss.Dragoon)

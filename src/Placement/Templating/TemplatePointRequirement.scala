@@ -1,7 +1,7 @@
 package Placement.Templating
 
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.PlaceLabel
+import Placement.Access.PlaceLabels.{Gas, PlaceLabel, TownHall}
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
@@ -28,10 +28,14 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
 
   def dimensions: (Int, Int) = (width, height)
 
+  def isTownHall = labels.contains(TownHall)
+  def isGas = labels.contains(Gas)
+
   override def toString: String = (
     if (buildableAfter) "Unused"
     else if (walkableAfter) "Hallway"
     else if (buildings.exists(_.isGas)) "Gas"
-    else if (buildings.nonEmpty) buildings.mkString(", ")
-    else "Building") + f" $width x $height"
+    else if (buildings.nonEmpty) buildings.take(3).map(_.toString.take(4)).mkString(", ") + (if (buildings.size > 3) "..." else "")
+    else if (labels.nonEmpty) (if (buildings.nonEmpty) "\n" else "") + labels.take(3).mkString(", ") + (if (labels.size > 3) "..." else "")
+    else f"$width x $height")
 }

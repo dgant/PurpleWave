@@ -2,9 +2,9 @@ package Mathematics.Points
 
 import Mathematics.Maff
 
-class Direction(x: Int, y: Int) extends AbstractPoint (
-  if (x*x < y*y) 0 else Maff.signum(x),
-  if (x*x >= y*y) 0 else Maff.signum(y)) {
+class Direction(_x: Int, _y: Int) extends AbstractPoint (
+  if (_x*_x < _y*_y) 0 else Maff.signum(_x),
+  if (_x*_x >= _y*_y) 0 else Maff.signum(_y)) {
 
   def this(start: AbstractPoint, end: AbstractPoint) {
     this(end.x - start.x, end.y - start.y)
@@ -14,10 +14,14 @@ class Direction(x: Int, y: Int) extends AbstractPoint (
     this(source.x, source.y)
   }
 
-  def isVertical: Boolean = x == 0
-  def isHorizontal: Boolean = y == 0
-  def isUp: Boolean = y < 0
-  def isDown: Boolean = y > 0
-  def isLeft: Boolean = x < 0
-  def isRight: Boolean = x > 0
+  @inline final def isVertical: Boolean = x == 0
+  @inline final def isHorizontal: Boolean = y == 0
+  @inline final def isUp: Boolean = y < 0
+  @inline final def isDown: Boolean = y > 0
+  @inline final def isLeft: Boolean = x < 0
+  @inline final def isRight: Boolean = x > 0
+
+  @inline final override def equals(other: Any): Boolean = {
+    other.isInstanceOf[Direction] && other.asInstanceOf[Direction].x == x && other.asInstanceOf[Direction].y == y
+  }
 }

@@ -1,8 +1,9 @@
-package Mathematics.Points
+package Placement.Generation
 
 import Mathematics.Maff
+import Mathematics.Points.{Direction, Tile}
 
-class TileGenerator(suggestedOrigin: Tile, val boundA: Tile, val boundB: Tile, val direction: Direction) {
+class TileGeneratorRectangularSweep(suggestedOrigin: Tile, val boundA: Tile, val boundB: Tile, val direction: Direction) extends TileGenerator {
   private val xMin = Math.min(boundA.x, boundB.x)
   private val xMax = Math.max(boundA.x, boundB.x)
   private val yMin = Math.min(boundA.y, boundB.y)

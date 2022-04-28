@@ -7,8 +7,6 @@ abstract class AbstractPoint(val x: Int, val y: Int) {
 
   def direction: Direction = new Direction(this)
 
-  @inline final def maxDimensionLength: Int = Math.max(Math.abs(x), Math.abs(y))
-
   protected final val radiansOverDegrees = 2.0 * Math.PI / 256.0
 
   @inline final def asPixel: Pixel = Pixel(x, y)

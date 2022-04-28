@@ -4,7 +4,8 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
-import Mathematics.Points.{Direction, Pixel, SpecificPoints, TileGenerator}
+import Mathematics.Points.{Direction, Pixel, SpecificPoints}
+import Placement.Generation.TileGeneratorRectangularSweep
 
 object ShowGenerator extends DebugView {
 
@@ -23,7 +24,7 @@ object ShowGenerator extends DebugView {
         val directionToFront  = new Direction(cornerBack, cornerFront)
 
         DrawMap.box(bounds.startPixel, bounds.endPixel, Colors.NeonYellow)
-        val generator = new TileGenerator(exitTile, zone.boundary.startInclusive, zone.boundary.endExclusive, directionToBack)
+        val generator = new TileGeneratorRectangularSweep(exitTile, zone.boundary.startInclusive, zone.boundary.endExclusive, directionToBack)
         var previous = exitTile
         var next = previous
         var i = 0

@@ -21,7 +21,7 @@ class Placement extends Fitter {
     val zonesSorted = With.geography.zones.sortBy(_.heart.groundTiles(With.geography.home))
     basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
-    basesSorted.foreach(base => fitAndIndexAll(5, base.tiles.minBy(_.i), new TileRectangle(base.tiles), Directions.Down, if (base.isStartLocation) Templates.mainBases else Templates.bases))
+    basesSorted.foreach(base => fitAndIndexConstrained(5, 1, if (base.isStartLocation) Templates.mainBases else Templates.bases, base))
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
@@ -37,17 +37,16 @@ class Placement extends Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    fitAndIndexAll  (1, exitTile,    bounds, directionToBack,  Templates.batterycannon)
-    fitAndIndexAll  (0, cornerFront, bounds, directionToBack,  Templates.initialLayouts)
-    fitAndIndexAll  (3, cornerFront, bounds, directionToBack,  Templates.gateways, 2)
-    fitAndIndexAll  (2, cornerBack,  bounds, directionToFront, Templates.tech)
-    fitAndIndexAll  (4, cornerBack,  bounds, directionToFront, Templates.tech)
-    fitAndIndexAll  (4, cornerFront, bounds, directionToBack,  Templates.gateways, 5)
+    fitAndIndexRectangle(1, 1, Templates.batterycannon,  exitTile,    bounds, directionToBack)
+    fitAndIndexRectangle(0, 1, Templates.initialLayouts, cornerFront, bounds, directionToBack)
+    fitAndIndexRectangle(2, 1, Templates.tech,           cornerBack,  bounds, directionToFront)
+    fitAndIndexRectangle(3, 1, Templates.gateways,       cornerFront, bounds, directionToBack)
+    fitAndIndexRectangle(4, 1, Templates.tech,           cornerBack,  bounds, directionToFront)
+    fitAndIndexRectangle(4, 5, Templates.gateways,       cornerFront, bounds, directionToBack)
   }
 
   private def preplaceWalls(zone: Zone): Unit = {
-    // DISABLED. Terran walls are too slow to use as-is
-    if (With.self.isTerran && false) {
+    if (With.self.isTerran && zone.metro.contains(With.geography.ourMain.metro)) {
       TerranWall(zone).foreach(index)
     }
   }

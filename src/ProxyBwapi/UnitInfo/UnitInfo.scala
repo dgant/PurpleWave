@@ -29,7 +29,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
 
-  @inline final override val hashCode: Int = id + With.frame * 10000
+  @inline final override val hashCode: Int = Math.abs(id + With.frame * 10000) // Abs in case of overflow, which can happen in very long games
   @inline final override def toString: String = f"${if (isFriendly) "Our" else if (isEnemy) "Foe" else "Neutral"} $unitClass${if (selected) "*" else ""} ${if (complete) "" else Frames(With.frame + remainingCompletionFrames)} #$id $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else ""} $pixel"
 
   @inline final def is(unitMatcher: UnitFilter): Boolean = unitMatcher.apply(this)

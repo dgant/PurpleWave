@@ -1,31 +1,36 @@
 package Placement.Generation
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points._
 import Placement.Access.Fits
 import Placement.Templating.{Template, TemplatePoint, TemplatePointRequirement}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 trait Fitter extends Fits {
 
   /**
-    * Attempts to fit a single template.
+    * Attempts to fit each of a sequence of templates.
     */
-  def fitAndIndex(order: Int, from: Tile, bounds: TileRectangle, direction: Direction, template: Template, maxFits: Int = 1): Seq[Fit] = {
-    fitAndIndexAll(order, from, bounds, direction, Seq(template), maxFits)
+  def fitAndIndexRectangle(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, bounds: TileRectangle, direction: Direction): mutable.Buffer[Fit] = {
+    fitAndIndex(order, maxFits, templates, x => new TileGeneratorRectangularSweep(from, bounds.startInclusive, bounds.endExclusive, direction))
   }
 
   /**
-    * Attempts to fit each of a sequence of templates.
+    * Attempts to fit a template constrained by town hall or resource position
     */
-  def fitAndIndexAll(order: Int, from: Tile, bounds: TileRectangle, direction: Direction, templates: Seq[Template], maxFits: Int = 1): Seq[Fit] = {
-    val output = new ArrayBuffer[Fit]
+  def fitAndIndexConstrained(order: Int, maxFits: Int, templates: Seq[Template], base: Base): mutable.Buffer[Fit] = {
+    fitAndIndex(order, maxFits, templates, new TileGeneratorConstrained(base, _))
+  }
 
+  def fitAndIndex(order: Int, maxFits: Int, templates: Seq[Template], generatorGenerator: Template => TileGenerator): mutable.Buffer[Fit] = {
+    val output = new ArrayBuffer[Fit]
     var templateIndex = 0
     while (templateIndex < templates.length) {
       val template = templates(templateIndex)
-      val generator = new TileGenerator(from, bounds.startInclusive, bounds.endExclusive, direction)
+      val generator = generatorGenerator(template)
       while (generator.hasNext) {
         val tile = generator.next()
         if (fitsAt(template, tile)) {

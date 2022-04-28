@@ -22,8 +22,8 @@ object ShowFoundations extends DebugView {
           foundation.tile.add(
             production.buildingClass.tileWidthPlusAddon,
             production.buildingClass.tileHeight))
-        DrawMap.box(box.startPixel, box.endPixel, Colors.MediumGreen)
-        DrawMap.label(f"#$i ${production.buildingClass}", box.midPixel)
+        DrawMap.box(box.startPixel.add(8, 8), box.endPixel.subtract(8, 8), Colors.MediumGreen)
+        DrawMap.label(f"#$i ${production.buildingClass}", box.bottomCenterPixel.subtract(0, With.visualization.lineHeightSmall / 2))
         if (lastCorners.nonEmpty) {
           val arrow = lastCorners.flatMap(b => box.cornerPixels.map(a => (a, b))).minBy(p => p._1.pixelDistance(p._2))
           DrawMap.arrow(arrow._1, arrow._2, Colors.DarkGreen)

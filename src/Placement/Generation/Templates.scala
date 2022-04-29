@@ -6,113 +6,205 @@ import bwapi.Race
 
 object Templates {
 
-  val walkway: Template = new Template().add("-")
+  val walkway: Template = new Template().from("-")
 
-  val townhall = new Template().add(
+  val townhall: Template = new Template().from(
     "Hxxx",
     "xxxx",
     "xxxx")
 
   // Generic defense for town hall areas
-  val bases = Seq(
-    new Template()
-      .withMineralDirection(Directions.Left) // Aim heavy defenses right
-      .add(
-        "xxxxxxCx",
+  val bases: Seq[Template] = Seq(
+    /////////////////////////
+    // Wide heavy defenses //
+    /////////////////////////
+    new Template() // Aim heavy defenses right
+      .forMineralDirection(Directions.Left)
+      .from(
+        "xxxxxxCN",
         "xxxxxxxx",
-        "xxxxxxCx",
-        "Cxxxxxxx",
-        "xx2x--Cx",
+        "xxxxxxCN",
+        "CMUxxxxx",
+        "xxPMNICN",
         "--xx--xx",
-        "CxHxxxCx",
+        "CMHxxxCN",
         "xxxxxxxx",
-        "--xxxxCx",
-        "Cx-Pxxxx",
-        "xx-xxxCx",
+        "--xxxxCN",
+        "CM-PNxxx",
+        "xx-xxxCN",
         "xx-xxxxx"),
     new Template() // Aim heavy defenses left
-      .withMineralDirection(Directions.Right)
-      .add(
-        "Cxxxxxxx",
+      .forMineralDirection(Directions.Right)
+      .from(
+        "CNxxxxxx",
         "xxxxxxxx",
-        "Cxxxxxxx",
-        "xxxxxxCx",
-        "CxPx--xx",
+        "CNxxxxxx",
+        "xxxxxxCM",
+        "CNPMNIxx",
         "xxxx----",
-        "CxHxxxCx",
+        "CNHxxxCMI",
         "xxxxxxxx",
-        "Cxxxxx--",
-        "xx-2xxCx",
-        "Cx-xxxxx",
-        "xx-xxxxx"),
+        "CNxxxx--",
+        "xx-PN-CMU",
+        "CN-xx-xx",
+        "xx-xx-xx"),
     new Template() // Aim heavy defenses up
-      .withMineralDirection(Directions.Down)
-      .add(
-        "CxCxCxCxCxCx",
+      .forMineralDirection(Directions.Down)
+      .from(
+        "CNCNCNCNCNCN",
         "xxxxxxxxxxxx",
-        "xxPxHxxx2xxx",
+        "xxPNHxxxPMNI",
         "xxxxxxxxxxxx",
         "x---xxxx---x",
-        "x-Cx-Cx-Cx-x",
+        "x-CM-CMICMUx",
         "x-xx-xx-xx-x"),
     new Template() // Aim heavy defenses Down
-      .withMineralDirection(Directions.Up)
-      .add(
-        "x-Cx-Cx-Cx-x",
+      .forMineralDirection(Directions.Up)
+      .from(
+        "x-CM-CMICM-x",
         "x-xx-xx-xx-x",
         "x---Hxxx---x",
-        "xxPxxxxx2xxx",
+        "xxPMNIxxPNxx",
         "xxxxxxxxxxxx",
-        "CxCxCxCxCxCx",
+        "CNCNCNCNCNCN",
         "xxxxxxxxxxxx"),
-    new Template() // Generic low-footprint template in case we have issues fitting the others
-      .add(
-        "Cx-2x-Cx",
+    ///////////////////////////
+    // Narrow heavy defenses //
+    ///////////////////////////
+    new Template() // Aim heavy defenses right
+      .forMineralDirection(Directions.Left)
+      .from(
+        "xxxxxxCN",
+        "CMxxxxxx",
+        "xxPMNICN",
+        "--xx--xx",
+        "CMHxxxCNI",
+        "xxxxxxxx",
+        "CMUxxxCN",
+        "xx----xx"),
+    new Template() // Aim heavy defenses left
+      .forMineralDirection(Directions.Right)
+      .from(
+        "CNxxxxxx",
+        "xxxxxxxx",
+        "CNPMNIxx",
+        "xxxx--CMI",
+        "CNHxxxxx",
+        "xxxxxx--",
+        "CNxxxxCM",
+        "xx----xx"),
+    new Template() // Aim heavy defenses up
+      .forMineralDirection(Directions.Down)
+      .from(
+        "CNCNCNCN",
+        "xxxxxxxx",
+        "PNHxxxPMNI",
+        "xxxxxxxx",
+        "--xxxx--",
+        "CM-CMICM",
+        "xx-xx-xx"),
+    new Template() // Aim heavy defenses Down
+      .forMineralDirection(Directions.Up)
+      .from(
+        "CM-CMICM",
         "xx-xx-xx",
         "--Hxxx--",
-        "2xxxxx2x",
+        "PMNIxxPN",
         "xxxxxxxx",
-        "Cx-Px-Cx",
+        "CNCNCNCN",
+        "xxxxxxxx"),
+  ////////////////////////
+  // Miniature defenses //
+  ////////////////////////
+    new Template() // Aim heavy defenses right
+      .forMineralDirection(Directions.Left)
+      .from(
+        "CMPMNICN",
+        "xxxx--xx",
+        "--HxxxCN",
+        "CMIxxxxx",
+        "xxxxxxCN",
+        "---xxxxx"),
+    new Template() // Aim defenses left
+      .forMineralDirection(Directions.Right)
+      .from(
+        "CNPMNICM",
+        "xxxx--xx",
+        "CNHxxx--",
+        "xxxxxxCMI",
+        "CNxxxxxx",
+        "xxx-----"),
+    new Template() // Aim defenses up
+      .forMineralDirection(Directions.Down)
+      .from(
+        "CNCNCN",
+        "xxxxxx",
+        "HxxxPMNI",
+        "xxxxxx",
+        "xxxx--",
+        "CMICM-",
+        "xx-xx-"),
+    new Template() // Aim defenses Down
+      .forMineralDirection(Directions.Up)
+      .from(
+        "CM-CM-",
+        "xx-xx-",
+        "HxxxPMNI",
+        "xxxxxx",
+        "xxxx--",
+        "CNCNCN",
+        "xxxxxx"),
+    ////////////////////////////////////
+    // Very generic miniature defense //
+    ////////////////////////////////////
+    new Template()
+      .from(
+        "CD-PD-CD",
+        "xx-xx-xx",
+        "--Hxxx--",
+        "CDxxxxCD",
+        "xxxxxxxx",
+        "CD-PD-CD",
         "xx-xx-xx"))
 
   // Default Protoss main base town hall layouts, though also good for Terran.
   // Most main bases have gas directly above the town hall position.
-  // Exceptions in BASIL map pool: Neo Moon Glaive @ 12, Tau Cross @ 5
+  // Exceptions in BASIL map pool: Neo Moon Glaive @ 12, Tau Cross @ 2, Tau Cross @ 5
   //
-  val mainBases = Seq(
+  val mainBases: Seq[Template] = Seq(
     // This one is adapted from ASL13 RO8 Rain vs. Soulkey game 3 @ 10:53 (1:02:04 on Tastosis VOD).
     new Template()
-      .withRaces(Race.Terran, Race.Protoss)
-      .withMineralDirection(Directions.Right)
-      .withGasDirection(Directions.Up)
-      .add(
-        "-3xxGxxxCx-",
-        "-xxxxxxxxx-",
-        "-3xxPx--Cx-",
-        "-xxxxx--xx-",
-        "-----------",
-        "4xxxHxxx---",
-        "xxxxxxxxCx-",
-        "xxxxxxxxCx-"),
+      .forRaces(Race.Protoss)
+      .forMineralDirection(Directions.Right)
+      .forGasDirection(Directions.Up)
+      .from(
+        "-TxxGxxxCMx",
+        "-xxxxxxxxxx",
+        "SIxxPM--CMU",
+        "xxxxxx--xx-",
+        "xxxx-------",
+        "SIxxHxxx---",
+        "xxxxxxxxCMI",
+        "xxxxxxxxxx-"),
     // This one is adapted from ASL13 RO8 Rain vs. Soulkey game 2 @ 7:47 (36:48 on Tastosis VOD).
     new Template()
-      .withRaces(Race.Terran, Race.Protoss)
-      .withMineralDirection(Directions.Left)
-      .withGasDirection(Directions.Up)
-      .add(
-        "x-Gxxxxxxx",
-        "x-xxxxxxxx",
-        "x---------",
-        "x-Cx--Txxx",
-        "x-xx--xxxx",
-        "--HxxxAxxx",
-        "Cxxxxxxxxx",
+      .forRaces(Race.Protoss)
+      .forMineralDirection(Directions.Left)
+      .forGasDirection(Directions.Up)
+      .from(
+        "CMIxxxSIxx",
         "xxxxxxxxxx",
-        "--CxPx3xxx",
+        "x-----xxxx",
+        "x-PM--SIxx",
+        "x-xx--xxxx",
+        "--Hxxxxxxx",
+        "CMxxxxTxxx",
+        "xxxxxxxxxx",
+        "--CM2UTxxx",
         "--xxxxxxxx")) ++ bases // Default to generic base layouts if needed
 
   val initialLayouts = Seq(
-    new Template().add(
+    new Template().from(
       "----------",
       "-4xxx4xxx-",
       "-xxxxxxxx-",
@@ -120,7 +212,7 @@ object Templates {
       "-TxxPxRxx-",
       "xxxxxxxxx-",
       "xxxxx-----"),
-    new Template().add(
+    new Template().from(
       "----------",
       "-4xxx4xxx-",
       "-xxxxxxxx-",
@@ -131,7 +223,7 @@ object Templates {
   )
 
   val gateways = Seq(
-    new Template().add(
+    new Template().from(
       "xxx--------",
       "2x4xxx4xxx-",
       "xxxxxxxxxx-",
@@ -140,7 +232,7 @@ object Templates {
       "2xxxxxxxxx-",
       "xxxxxxxxxx-",
       "xxx--------" ),
-    new Template().add(
+    new Template().from(
       "xxx----",
       "2x4xxx-",
       "xxxxxx-",
@@ -149,19 +241,19 @@ object Templates {
       "2xxxxx-",
       "xxxxxx-",
       "xxx---- " ),
-    new Template().add(
+    new Template().from(
       "----------",
       "-4xxx4xxx-",
       "-xxxxxxxx-",
       "-xxxxxxxx-",
       "--xPx2xx--" ),
-    new Template().add(
+    new Template().from(
       "xx---------",
       "2x4xxx4xxx-",
       "xxxxxxxxxx-",
       "Pxxxxxxxxx-",
       "xx---------" ),
-    new Template().add(
+    new Template().from(
       "--------",
       "-4xxxPx-",
       "-xxxxxx-",
@@ -170,20 +262,20 @@ object Templates {
       "-xxxxPxx",
       "-xxxxxxx",
       "------xx "),
-    new Template().add(
+    new Template().from(
       "xxx----",
       "Px4xxx-",
       "xxxxxx-",
       "xxxxxx-",
       "xxx---- "),
-    new Template().add(
+    new Template().from(
       "Px2x-",
       "xxxx-",
       "4xxx-",
       "xxxx-",
       "xxxx-",
       "----- "),
-    new Template().add(
+    new Template().from(
       "-Px2x",
       "-xxxx",
       "-4xxx",
@@ -193,10 +285,10 @@ object Templates {
   )
 
   val tech = Seq(
-    new Template().add(
+    new Template().from(
       "3xxPx3xx",
       "xxxxxxxx"),
-    new Template().add(
+    new Template().from(
       "3xx",
       "xxx",
       "3xx",
@@ -206,20 +298,20 @@ object Templates {
 
   val batterycannon = Seq(
     new Template()
-      .withExitDirection(Directions.Up)
-      .add(
+      .forExitDirection(Directions.Up)
+      .from(
       "--------",
       "-BxxPxCx",
       "-xxxxxxx"),
     new Template()
-      .withExitDirection(Directions.Down)
-      .add(
+      .forExitDirection(Directions.Down)
+      .from(
       "CxPxBxx-",
       "xxxxxxx-",
       "--------"),
     new Template()
-      .withExitDirection(Directions.Left)
-      .add(
+      .forExitDirection(Directions.Left)
+      .from(
       "----",
       "-Bxx",
       "-xxx",
@@ -228,8 +320,8 @@ object Templates {
       "-Cxx",
       "-xxx"),
     new Template()
-      .withExitDirection(Directions.Right)
-      .add(
+      .forExitDirection(Directions.Right)
+      .from(
         "----",
         "Bxx-",
         "xxx-",

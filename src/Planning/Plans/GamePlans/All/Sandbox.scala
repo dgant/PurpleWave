@@ -33,7 +33,7 @@ class Sandbox extends GameplanImperative {
     get(2, Protoss.Nexus)
     get(3, Protoss.Gateway)
     new BuildCannonsAtExpansions(6).update()
-    get(8, Protoss.Nexus)
+    get(15, Protoss.Nexus)
     get(Protoss.RoboticsSupportBay)
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)

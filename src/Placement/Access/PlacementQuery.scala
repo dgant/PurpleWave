@@ -52,9 +52,6 @@ class PlacementQuery {
     if (Seq(Terran.SupplyDepot, Protoss.Pylon).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.Supply
     }
-    if (Protoss.Pylon == building) {
-      preferences.labelYes = preferences.labelYes :+ PlaceLabels.PriorityPower
-    }
   }
 
   def requireWidth        (value: Int)          : PlacementQuery = { requirements.width     = Some(value);  this }
@@ -85,7 +82,7 @@ class PlacementQuery {
   }
 
   def accept(foundation: Foundation): Boolean = {
-    requirements.accept(foundation)
+    requirements.accept(foundation) && ! With.grids.units.get(foundation.tile).exists(u => u.unitClass.isBuilding && u.isFriendly)
   }
 
   def score(foundation: Foundation): Double = {
@@ -106,7 +103,14 @@ class PlacementQuery {
     lazy val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
     if (requirements.building.exists(_.isGas)) gasFoundations
     else if (requirements.labelYes.contains(PlaceLabels.TownHall)) townHallFoundations
-    else foundationSourceSmallest.filter(accept)sortBy(- score(_))
+    else foundationSourceSmallest
+      .view
+      .filter(accept)
+      .map(f => (f, score(f))) // Keep the score in the container so we don't need to keep recalculating it as we sort
+      .toVector
+      .sortBy(-_._2)
+      .view // Rather than construct a new container without the scores, return a view which hides them
+      .map(_._1)
   }
 
   def townHallFoundations: Seq[Foundation] = With.geography.preferredExpansionsOurs.map(_.townHallTile).map(With.placement.get).flatten
@@ -122,15 +126,15 @@ class PlacementQuery {
     bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, PointGas))
   }
 
-  def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(requirements.audit).sortBy(-_._2)
   }
 
-  def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     foundations.map(preferences.audit).sortBy(-_._2)
   }
 
-  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(preferences.audit).sortBy(-_._2)
   }
 

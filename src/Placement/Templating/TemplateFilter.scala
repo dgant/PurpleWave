@@ -11,11 +11,11 @@ trait TemplateFilter {
   private var races             : Iterable[Race]      = Iterable.empty
   private var enemyRaces        : Iterable[Race]      = Iterable.empty
 
-  def withMineralDirection  (values: Direction*): Template = { mineralDirection ++= values; this.asInstanceOf[Template] }
-  def withGasDirection      (values: Direction*): Template = { gasDirection     ++= values; this.asInstanceOf[Template] }
-  def withExitDirection     (values: Direction*): Template = { exitDirection    ++= values; this.asInstanceOf[Template] }
-  def withRaces             (values: Race*)     : Template = { races            ++= values; this.asInstanceOf[Template] }
-  def withEnemyRaces        (values: Race*)     : Template = { enemyRaces       ++= values; this.asInstanceOf[Template] }
+  def forMineralDirection (values: Direction*): Template = { mineralDirection ++= values; this.asInstanceOf[Template] }
+  def forGasDirection     (values: Direction*): Template = { gasDirection     ++= values; this.asInstanceOf[Template] }
+  def forExitDirection    (values: Direction*): Template = { exitDirection    ++= values; this.asInstanceOf[Template] }
+  def forRaces            (values: Race*)     : Template = { races            ++= values; this.asInstanceOf[Template] }
+  def forEnemyRaces       (values: Race*)     : Template = { enemyRaces       ++= values; this.asInstanceOf[Template] }
 
   def accept(tile: Tile): Boolean = {
     if (mineralDirection.nonEmpty && ! tile.base.map(_.mineralDirection)  .exists(d => mineralDirection .exists(d==))) return false

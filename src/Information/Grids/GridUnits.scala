@@ -34,7 +34,8 @@ final class GridUnits extends AbstractTypedGrid[Traversable[UnitInfo]] {
   }
 
   private def addUnit(unit: UnitInfo): Unit = {
-    val tile = unit.tile
+    // Stinky approach: Put buildings on their top-left tile so we know exactly when a placement has been occupied.
+    val tile = if (unit.unitClass.isBuilding) unit.tileTopLeft else unit.tile
     // There's an offchance of invalid tiles if invoked on a ghost unit
     if (tile.valid) {
       values(tile.i).add(unit)

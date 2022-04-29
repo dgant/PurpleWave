@@ -30,6 +30,10 @@ class Grids extends TimedTask {
   // Initialized once
   val buildableTerrain            = add("bt",   new GridBuildableTerrain)
   val buildableTownHall           = add("bh",   new GridBuildableTownHall)
+  val buildable63                 = add("b4",   new GridBuildableWH(6, 3))
+  val buildable43                 = add("b4",   new GridBuildableWH(4, 3))
+  val buildable32                 = add("b3",   new GridBuildableWH(3, 2))
+  val buildable22                 = add("b2",   new GridBuildableWH(2, 2))
   val walkableTerrain             = add("wt",   new GridWalkableTerrain)
   val mobilityTerrain             = add("mt",   new GridMobilityTerrain)
   val scoutingPathsBases          = add("spb",  new GridScoutingPathsBases)
@@ -90,6 +94,15 @@ class Grids extends TimedTask {
   def disposableDouble(): GridVersionedDouble = {
     _disposableDouble.update()
     _disposableDouble
+  }
+
+  def buildableW(w: Int): GridBuildableWH = {
+    w match {
+      case 6 => buildable63
+      case 4 => buildable43
+      case 3 => buildable32
+      case _ => buildable22
+    }
   }
 
   private val _updateQueue = new mutable.Queue[Grid]()

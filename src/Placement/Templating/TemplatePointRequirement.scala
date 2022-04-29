@@ -2,6 +2,7 @@ package Placement.Templating
 
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.{Gas, PlaceLabel, TownHall}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
@@ -28,14 +29,21 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
 
   def dimensions: (Int, Int) = (width, height)
 
-  def isTownHall = labels.contains(TownHall)
-  def isGas = labels.contains(Gas)
+  def isTownHall  : Boolean = labels.contains(TownHall)
+  def isGas       : Boolean = labels.contains(Gas)
+  def powers      : Boolean = buildings.contains(Protoss.Pylon)
 
-  override def toString: String = (
-    if (buildableAfter) "Unused"
-    else if (walkableAfter) "Hallway"
-    else if (buildings.exists(_.isGas)) "Gas"
-    else if (buildings.nonEmpty) buildings.take(3).map(_.toString.take(4)).mkString(", ") + (if (buildings.size > 3) "..." else "")
-    else if (labels.nonEmpty) (if (buildings.nonEmpty) "\n" else "") + labels.take(3).mkString(", ") + (if (labels.size > 3) "..." else "")
-    else f"$width x $height")
+  override def toString: String = {
+    if (buildableAfter) return "Unused"
+    if (walkableAfter)  return "Hallway"
+    if (isGas)          return "Gas"
+    if (isTownHall)     return "Town Hall"
+    if (buildings.isEmpty && labels.isEmpty) return f"$width x $height"
+    val buildingList        = buildings.take(3).map(_.toString.take(4)).mkString(", ")
+    val buildingTerminator  = if (buildings.size > 3) "..." else ""
+    val optionalNewline     = if (buildings.nonEmpty && labels.nonEmpty) "\n" else ""
+    val labelList           = labels.take(3).mkString(", ")
+    val labelTerminator     = if (labels.size > 3) "..." else ""
+    f"$buildingList$buildingTerminator$optionalNewline$labelList$labelTerminator"
+  }
 }

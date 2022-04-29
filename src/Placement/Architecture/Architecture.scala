@@ -195,6 +195,9 @@ class Architecture {
     var x = buildArea.startInclusive.x
     val xMax = buildArea.endExclusive.x
     val yMax = buildArea.endExclusive.y
+    if ( ! With.grids.buildableW(width).get(buildArea.startInclusive)) {
+      return ArchitecturalAssessment.IsntBuildable
+    }
     while (x < xMax) {
       var y = buildArea.startInclusive.y
       while (y < yMax) {

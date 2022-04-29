@@ -67,6 +67,9 @@ trait Fitter extends Fits {
     } else if (requirement.isGas) {
       return pointTile.base.exists(_.gas.exists(_.tileTopLeft == pointTile))
     } else {
+      if ( ! With.grids.buildableW(requirement.width).get(pointTile)) {
+        return false
+      }
       for (dx <- 0 until requirement.width) {
         for (dy <- 0 until requirement.height) {
           val relative = Point(dx, dy)

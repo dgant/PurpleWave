@@ -2,7 +2,7 @@ package Placement
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{Direction, Directions, SpecificPoints, TileRectangle}
+import Mathematics.Points.{Direction, SpecificPoints}
 import Placement.Generation.{Fit, Fitter, Templates, TerranWall}
 
 class Placement extends Fitter {

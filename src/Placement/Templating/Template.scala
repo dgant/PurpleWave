@@ -47,7 +47,7 @@ class Template extends TemplateFilter {
     this
   }
 
-  def add(strings: String*): Template = {
+  def from(strings: String*): Template = {
     ascii = Some(strings.mkString("\n"))
     var x: Int = 0
     var y: Int = 0
@@ -58,29 +58,29 @@ class Template extends TemplateFilter {
         val char = string(x)
         val pt: TemplatePointRequirement = char.toUpper match {
           case '-' => RequireWalkable
-          case 'A' => new TemplatePointRequirement(4, 3).withLabels(Tech)             // 4x3 air tech, eg. Stargate
+          case 'A' =>RequireWalkable
           case 'B' => new TemplatePointRequirement(Terran.Bunker, Protoss.ShieldBattery).withLabels(Defensive)
           case 'C' => new TemplatePointRequirement(Terran.MissileTurret, Protoss.PhotonCannon, Zerg.CreepColony).withLabels(Defensive)
-          case 'D' => new TemplatePointRequirement(4, 3).withLabels(GroundProduction) // 4x3 ground production, eg. Gateway
-          case 'E' => RequireAnything
+          case 'D' => last.labels ++= Seq(Defensive, DefendHall); RequireAnything
+          case 'E' => last.labels ++= Seq(Defensive, DefendEntrance); RequireAnything
           case 'F' => new TemplatePointRequirement(Terran.Factory).withLabels(GroundProduction)
           case 'G' => new TemplatePointRequirement(4, 2).withLabels(Gas)
           case 'H' => new TemplatePointRequirement(4, 3).withLabels(TownHall)
-          case 'I' => RequireAnything
+          case 'I' => last.labels += Important; RequireAnything
           case 'J' => RequireAnything
           case 'K' => RequireAnything
           case 'L' => RequireAnything
-          case 'M' => RequireAnything
-          case 'N' => RequireAnything
+          case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); RequireAnything
+          case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); RequireAnything
           case 'O' => RequireAnything
-          case 'P' => new TemplatePointRequirement(Protoss.Pylon).withLabels(PriorityPower, Supply)
+          case 'P' => new TemplatePointRequirement(Protoss.Pylon).withLabels(Important, Supply)
           case 'Q' => RequireAnything
           case 'R' => new TemplatePointRequirement(3, 2).withLabels(GroundProduction) // 3x2 ground production, eg. Robotics
-          case 'S' => RequireAnything
+          case 'S' => new TemplatePointRequirement(Protoss.Stargate).withLabels(Tech)
           case 'T' => new TemplatePointRequirement(3, 2).withLabels(Tech) // 3x2 tech
-          case 'U' => RequireAnything
+          case 'U' => last.labels += Unimportant; RequireAnything
           case 'V' => RequireAnything
-          case 'W' => RequireAnything
+          case 'W' => new TemplatePointRequirement(4, 3).withLabels(GroundProduction) // 4x3 ground production, eg. Gateway
           case 'X' => RequireAnything
           case 'Y' => RequireAnything
           case 'Z' => RequireAnything
@@ -111,6 +111,13 @@ class Template extends TemplateFilter {
     }
     this
   }
+
+  def addLabels(placeLabels: PlaceLabel*): Template = {
+    points.foreach(_.requirement.labels ++= placeLabels)
+    this
+  }
+
+  private def last = points.last.requirement
 
   override def toString: String = f"PreplacementTemplate $width x $height"
 }

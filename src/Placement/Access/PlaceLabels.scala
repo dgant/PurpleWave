@@ -10,10 +10,11 @@ object PlaceLabels {
   object Tech                 extends PlaceLabel
   object Supply               extends PlaceLabel
   object Defensive            extends PlaceLabel
-  object DefendChoke          extends PlaceLabel
+  object DefendEntrance       extends PlaceLabel
   object DefendHall           extends PlaceLabel
-  object DefendWorkersAir     extends PlaceLabel
-  object DefendWorkersGround  extends PlaceLabel
+  object DefendAir            extends PlaceLabel
+  object DefendGround         extends PlaceLabel
   object Wall                 extends PlaceLabel
-  object PriorityPower        extends PlaceLabel
+  object Important            extends PlaceLabel
+  object Unimportant          extends PlaceLabel
 }

@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import Placement.Access.PlaceLabels.PlaceLabel
+import Placement.Access.PlaceLabels.{Important, PlaceLabel, Unimportant}
 import ProxyBwapi.UnitClasses.UnitClass
 
 class PlacementQueryParameters {
@@ -40,6 +40,12 @@ class PlacementQueryParameters {
 
   private val acceptOver: Double = 0.99
 
+  protected def scoreImportance(foundation: Foundation): Double = {
+         if (foundation.point.requirement.labels.contains(Important))   1.2
+    else if (foundation.point.requirement.labels.contains(Unimportant)) 1.0
+    else                                                                1.1
+  }
+
   protected def scoreWidth(foundation: Foundation): Double = {
     if (width.isEmpty) return 1.0
     if (foundation.point.requirement.width == width.get) return 1.25
@@ -55,12 +61,13 @@ class PlacementQueryParameters {
   }
 
   protected def scoreBuilding(foundation: Foundation): Double = {
-    if (building.exists(foundation.point.requirement.buildings.contains)) return 1.0
-    if (building.isEmpty) return 1.0
+    val foundationBuildings = foundation.point.requirement.buildings
+    if (building.exists(foundationBuildings.contains)) return 1.0
+    if (building.isEmpty && foundationBuildings.isEmpty) return 1.0
+    if (building.isEmpty || foundationBuildings.isEmpty) return 0.5
     val widthMatches = foundation.point.requirement.width == building.get.tileWidth
     val heightMatches = foundation.point.requirement.height == building.get.tileHeight
-    if (widthMatches && heightMatches) return 0.75
-    0.0
+    0.125 * Maff.fromBoolean(widthMatches) + 0.125 * Maff.fromBoolean(heightMatches)
   }
 
   protected def scoreLabelYes(foundation: Foundation): Double = {
@@ -103,6 +110,7 @@ class PlacementQueryParameters {
   protected def acceptTile      (foundation: Foundation): Boolean = scoreTile(foundation)     > acceptOver
 
   def score(foundation: Foundation): Double = Seq(
+    1 * scoreImportance(foundation),
     1 * scoreWidth(foundation),
     1 * scoreHeight(foundation),
     1 * scoreLabelYes(foundation),
@@ -122,9 +130,10 @@ class PlacementQueryParameters {
     && acceptBuilding(foundation)
     && acceptTile(foundation))
 
-  def audit(foundation: Foundation): (Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double) = (
+  def audit(foundation: Foundation): (Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double) = (
     foundation,
     score(foundation),
+    scoreImportance(foundation),
     scoreWidth(foundation),
     scoreHeight(foundation),
     scoreLabelYes(foundation),

@@ -83,6 +83,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
       var candidateIndex = 0
       do {
         if ((foundation.isEmpty && candidateFoundations.nonEmpty) || With.framesSince(lastSearch) > Seconds(if (builder.isDefined) 60 else 15)()) {
+          if (candidateIndex > candidateFoundations.length) return
           foundation = Some(candidateFoundations(candidateIndex))
           lastSearch = With.frame
           candidateIndex += 1

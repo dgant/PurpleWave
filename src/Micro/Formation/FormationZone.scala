@@ -4,7 +4,7 @@ import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points._
-import Mathematics.Shapes.Spiral
+import Mathematics.Shapes.{Ray, Spiral}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Squads.FriendlyUnitGroup
@@ -42,7 +42,7 @@ object FormationZone {
 
     // Clear a line for Scarabs
     if (units.exists(Protoss.Reaver)) {
-      PixelRay(edge.pixelCenter, chokeEnd).foreach(occupied.set(_, true))
+      Ray(edge.pixelCenter, chokeEnd).foreach(occupied.set(_, true))
     }
     val expectedRange: Int = 32 * (
       if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6

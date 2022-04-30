@@ -123,7 +123,7 @@ class SquadAcePilots extends Squad {
 
   private def chill(): Unit = {
     activity = "AceChill"
-    val groundToAir = Maff.exemplarOption(With.units.ours.filter(u => u.canAttackAir && ! u.flying).map(_.pixel))
+    val groundToAir = Maff.exemplarOpt(With.units.ours.filter(u => u.canAttackAir && ! u.flying).map(_.pixel))
     vicinity = groundToAir.getOrElse(homeConsensus)
     SquadAutomation.target(this)
     units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity); toReturn = Some(vicinity)}))

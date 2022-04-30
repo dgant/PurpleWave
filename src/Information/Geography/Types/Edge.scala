@@ -2,8 +2,9 @@ package Information.Geography.Types
 
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.Maff
-import Mathematics.Points.{Direction, Pixel, PixelRay, Tile}
+import Mathematics.{Maff, Shapes}
+import Mathematics.Points.{Direction, Pixel, Tile}
+import Mathematics.Shapes.Ray
 import bwta.Chokepoint
 
 final class Edge(choke: Chokepoint) {
@@ -12,7 +13,7 @@ final class Edge(choke: Chokepoint) {
   def otherSideof(zone: Zone): Zone = zones.find(_ != zone).getOrElse(zones.head)
   lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double = choke.getWidth / 2
-  lazy val tiles        : Vector[Tile] = PixelRay(sidePixels.head, sidePixels.last).toVector
+  lazy val tiles        : Vector[Tile] = Shapes.Ray(sidePixels.head, sidePixels.last).toVector
   lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
   lazy val direction    : Direction = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)

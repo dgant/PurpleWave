@@ -4,7 +4,7 @@ import Information.Geography.Calculations.UpdateZones
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{SpecificPoints, Tile}
+import Mathematics.Points.{Points, Tile}
 import Performance.Tasks.TimedTask
 
 import scala.collection.JavaConverters._
@@ -13,7 +13,7 @@ final class Geography extends TimedTask with GeographyCache with Expansions {
   lazy val startBases         : Vector[Base]    = bases.filter(_.isStartLocation)
   lazy val startLocations     : Vector[Tile]    = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
   lazy val rushDistances      : Vector[Double]  = startLocations.flatMap(s1 => startLocations.filterNot(s1==).map(s2 => s1.groundPixels(s2))).sorted
-  lazy val clockwiseBases     : Vector[Base]    = With.geography.bases.sortBy(b => SpecificPoints.middle.radiansTo(b.townHallArea.center))
+  lazy val clockwiseBases     : Vector[Base]    = With.geography.bases.sortBy(b => Points.middle.radiansTo(b.townHallArea.center))
   lazy val counterwiseBases   : Vector[Base]    = clockwiseBases.reverse
 
   var home: Tile = new Tile(With.game.self.getStartLocation)

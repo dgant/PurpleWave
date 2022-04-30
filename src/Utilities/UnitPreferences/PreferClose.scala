@@ -1,10 +1,10 @@
 package Utilities.UnitPreferences
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-case class PreferClose(pixel: Pixel = SpecificPoints.middle) extends UnitPreference {
+case class PreferClose(pixel: Pixel = Points.middle) extends UnitPreference {
   override def apply(unit: FriendlyUnitInfo): Double = {
     val inMiningCycle = unit.unitClass.isWorker && unit.orderTarget.exists(t => t.unitClass.isGas || (t.unitClass.isMinerals && unit.pixelDistanceCenter(t) < 72))
     ((if (With.performance.danger) unit.pixelDistanceCenter(pixel) else unit.pixelDistanceTravelling(pixel))

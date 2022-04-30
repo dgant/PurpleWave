@@ -6,7 +6,7 @@ import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.SpecificPoints
+import Mathematics.Points.Points
 import Micro.Actions.Basic.{DoNothing, ReloadScarabs}
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
@@ -73,7 +73,7 @@ abstract class MissionDrop extends Mission {
 
   private def ignore(base: Base): Boolean = {
     if (base.owner.isFriendly) return true
-    if (base.heart.tileDistanceFast(SpecificPoints.tileMiddle) < 32 && ! base.zone.island) return true
+    if (base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     if ( ! additionalItineraryConditions(base)) return true
@@ -208,7 +208,7 @@ abstract class MissionDrop extends Mission {
     profile.canCrossUnwalkable  = Some(true)
     profile.canEndUnwalkable    = Some(true)
     profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
-    profile.repulsors           = Vector(PathfindRepulsor(SpecificPoints.middle, 1.0, 32 * mapEdgeMarginTiles))
+    profile.repulsors           = Vector(PathfindRepulsor(Points.middle, 1.0, 32 * mapEdgeMarginTiles))
     path = Some(profile.find)
     pathItineraryBase = itinerary.headOption.orNull
     if (path.get.pathExists) {

@@ -11,9 +11,9 @@ object Clustering {
     radius        : Double,
     limitRegion   : Boolean = false,
     extractPixel  : (T) => Pixel)
-      :mutable.HashMap[T, mutable.HashSet[T]] = {
+      : mutable.HashMap[T, mutable.HashSet[T]] = {
     
-    val neighborsByUnit = mapUnitsToNeighbors(things, radius, extractPixel)
+    val neighborsByUnit = mapToNeighbors(things, radius, extractPixel)
     val unitLeaders = new mutable.HashMap[T, T]
     val groupsByLeader = new mutable.HashMap[T, mutable.HashSet[T]] {
       override def default(key: T):mutable.HashSet[T] = {
@@ -37,7 +37,7 @@ object Clustering {
     groupsByLeader
   }
   
-  private def mapUnitsToNeighbors[T](
+  private def mapToNeighbors[T](
     things        : Iterable[T],
     radius        : Double,
     extractPixel  : (T) => Pixel)
@@ -45,13 +45,11 @@ object Clustering {
     
     val radiusSquared = radius * radius
     
-    //Yes, this includes the unit itself
-    things.map(thing =>
-      (
+    // Yes, this includes the unit itself
+    things.map(thing => (
         thing,
         things
-          .filter(otherThing =>
-            extractPixel(otherThing).pixelDistanceSquared(extractPixel(thing))
-            <= radiusSquared))).toMap
+          .filter(otherThing => extractPixel(otherThing).pixelDistanceSquared(extractPixel(thing)) <= radiusSquared)))
+          .toMap
   }
 }

@@ -2,7 +2,7 @@ package Micro.Agency
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, SpecificPoints, Tile}
+import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -128,8 +128,8 @@ object Commander {
     if (With.reaction.sluggishness == 0 && unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
       if (to == unit.pixel) {
-        val signX = Maff.forcedSignum(SpecificPoints.middle.x - to.x)
-        val signY = Maff.forcedSignum(SpecificPoints.middle.y - to.y)
+        val signX = Maff.forcedSignum(Points.middle.x - to.x)
+        val signY = Maff.forcedSignum(Points.middle.y - to.y)
         to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
       } else if (unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
         to = unit.pixel.project(to, overshootDistance)

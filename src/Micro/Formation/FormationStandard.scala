@@ -6,8 +6,9 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
-import Mathematics.Maff
-import Mathematics.Points.{Pixel, PixelRay, Point, Tile}
+import Mathematics.{Maff, Shapes}
+import Mathematics.Points.{Pixel, Point, Tile}
+import Mathematics.Shapes.Ray
 import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -112,7 +113,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     With.groundskeeper.reserved.foreach(With.grids.formationSlots.block)
     With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(With.grids.formationSlots.block))
     if (style == FormationStyleGuard && groundUnits.exists(Protoss.Reaver)) {
-      PixelRay(target, centroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
+      Shapes.Ray(target, centroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
     }
     val classCount = groundUnits
       .groupBy(_.unitClass)
@@ -120,7 +121,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       .toVector
       .sortBy(_.formationRangePixels)
     val arc = arcSlots(classCount, 32 + apex.pixelDistance(face))
-    val groundPlacementCentroid = Maff.exemplarOption(arc.values.view.flatten).getOrElse(apex)
+    val groundPlacementCentroid = Maff.exemplarOpt(arc.values.view.flatten).getOrElse(apex)
     val output = arc ++ airUnits
       .groupBy(_.unitClass)
       .map(u => (u._1, u._2.map(x => groundPlacementCentroid)))

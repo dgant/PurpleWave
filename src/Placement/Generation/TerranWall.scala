@@ -12,26 +12,28 @@ import ProxyBwapi.UnitClasses.UnitClass
 object TerranWall {
 
   def apply(zone: Zone): Option[Fit] = {
-    if (zone.exitOriginal.isEmpty) return None
-    if (zone.exitOriginal.get.radiusPixels > 9 * 32 / 2) return None
-    //TODO: Restore this
+    // TODO: Restore this as much as is appropriate
     if ( ! zone.bases.exists(_.isStartLocation) && ! zone.bases.exists(_.naturalOf.exists(_.isStartLocation))) return None
-    if (zone.edges.exists(e => e != zone.exitOriginal.get && e.otherSideof(zone) != With.geography.ourMain.zone && e.otherSideof(zone) != With.geography.ourNatural.zone)) return None
-    val searchRadius = 10
-    val searchStart = zone.exitOriginal.get.pixelCenter.tile.subtract(searchRadius, searchRadius)
-    val searchEnd = searchStart.add(2 * searchRadius - 2, 2 * searchRadius - 1)
-    val searchArea = TileRectangle(searchStart, searchEnd)
-    val zoneOut = zone.exitOriginal.get.otherSideof(zone)
-    val tilesBuildableIn = zone.tiles.view.filter(_.buildable)
+
+    val exit = zone.exitOriginal
+    if (exit.isEmpty) return None
+    if (exit.get.radiusPixels > 9 * 32 / 2) return None
+    if (zone.edges.exists(e => e != exit.get && e.otherSideof(zone) != With.geography.ourMain.zone && e.otherSideof(zone) != With.geography.ourNatural.zone)) return None
+    val searchRadius      = 10
+    val searchStart       = exit.get.pixelCenter.tile.subtract(searchRadius, searchRadius)
+    val searchEnd         = searchStart.add(2 * searchRadius - 2, 2 * searchRadius - 1)
+    val searchArea        = TileRectangle(searchStart, searchEnd)
+    val zoneOut           = exit.get.otherSideof(zone)
+    val tilesBuildableIn  = zone.tiles.view.filter(_.buildable)
     val tilesBuildableOut = zoneOut.tiles.view.filter(_.buildable)
-    val tileIn = Maff.minBy(tilesBuildableIn.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exitOriginal.get.pixelCenter))
-    val tileOut = Maff.minBy(tilesBuildableOut.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(zone.exitOriginal.get.pixelCenter))
-    if (tileIn.isEmpty) return None
-    if (tileOut.isEmpty) return None
-    val altitudes = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct
-    val unitsToPlace = Seq(Seq(Terran.Barracks), Seq(Terran.Barracks, Terran.SupplyDepot), Seq(Terran.Barracks, Terran.SupplyDepot, Terran.SupplyDepot))
-    val unitToBlock = Seq(Zerg.Zergling, Protoss.Zealot, Protoss.Dragoon)
-    val trials = altitudes.flatMap(a => unitsToPlace.view.flatMap(up => unitToBlock.map((a, up, _))))
+    val tileIn            = Maff.minBy(tilesBuildableIn.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(exit.get.pixelCenter))
+    val tileOut           = Maff.minBy(tilesBuildableOut.view.filterNot(searchArea.expand(1, 1).contains))(_.groundPixels(exit.get.pixelCenter))
+    if (tileIn.isEmpty)     return None
+    if (tileOut.isEmpty)    return None
+    val altitudes         = Seq(tileIn.get.altitude, tileOut.get.altitude).distinct
+    val unitsToPlace      = Seq(Seq(Terran.Barracks), Seq(Terran.Barracks, Terran.SupplyDepot), Seq(Terran.Barracks, Terran.SupplyDepot, Terran.SupplyDepot))
+    val unitToBlock       = Seq(Zerg.Zergling, Protoss.Zealot, Protoss.Dragoon)
+    val trials            = altitudes.flatMap(a => unitsToPlace.view.flatMap(up => unitToBlock.map((a, up, _))))
     trials.map(t => placeAll(t._1, tileIn.get, tileOut.get, searchArea, t._2, Seq.empty, t._3)).find(_.isDefined).flatten
   }
 
@@ -46,7 +48,10 @@ object TerranWall {
             new Template(placed)))
         else None
     }
-    area.tiles.filter(_.altitude == altitude).map(t => placeAll(altitude, tileIn, tileOut, area, unplaced.drop(1), placed :+ (t, unplaced.head), shouldBlock)).find(_.isDefined).flatten
+    area.tiles
+      .filter(_.altitude == altitude)
+      .map(t => placeAll(altitude, tileIn, tileOut, area, unplaced.drop(1), placed :+ (t, unplaced.head), shouldBlock))
+      .find(_.isDefined).flatten
   }
 
   def test(tileFrom: Tile, tileTo: Tile, placed: Seq[(Tile, UnitClass)], shouldBlock: UnitClass): Boolean = {

@@ -2,13 +2,11 @@ package Mathematics.Shapes
 
 import Mathematics.Points.Point
 
-import scala.collection.immutable
-
 object Spiral {
   
   // Via http://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
   //
-  def apply(radius: Int): immutable.IndexedSeq[Point] = {
+  def apply(radius: Int): IndexedSeq[Point] = {
     var dx = 1
     var dy = 0
     var segment_length = 1

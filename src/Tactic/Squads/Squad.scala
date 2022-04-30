@@ -2,7 +2,7 @@ package Tactic.Squads
 
 import Debugging.ToString
 import Lifecycle.With
-import Mathematics.Points.{Pixel, SpecificPoints}
+import Mathematics.Points.{Pixel, Points}
 import Micro.Formation.Formation
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
   var batchId: Int = Int.MinValue
-  var vicinity: Pixel = SpecificPoints.middle
+  var vicinity: Pixel = Points.middle
   var targets: Option[Seq[UnitInfo]] = None
   var formations: ArrayBuffer[Formation] = ArrayBuffer.empty
   val lock: LockUnits = new LockUnits(this)

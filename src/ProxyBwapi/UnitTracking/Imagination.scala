@@ -1,9 +1,9 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Mathematics.Maff
-import Mathematics.Points.{Pixel, PixelRay}
-import Mathematics.Shapes.Circle
+import Mathematics.{Maff, Shapes}
+import Mathematics.Points.Pixel
+import Mathematics.Shapes.{Circle, Ray}
 import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
@@ -133,7 +133,7 @@ object Imagination {
           && ! tile.visibleBwapi
           && tile.lastSeen < unit.lastSeen
           && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
-          && (unit.flying || PixelRay(unit.pixel, tile.center).forall(_.traversableBy(unit)))
+          && (unit.flying || Shapes.Ray(unit.pixel, tile.center).forall(_.traversableBy(unit)))
         ))(_.center.pixelDistanceSquared(unit.projectFrames(8))))
       .find(_.nonEmpty)
       .flatten

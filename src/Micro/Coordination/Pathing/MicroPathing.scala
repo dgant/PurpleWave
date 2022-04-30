@@ -5,9 +5,9 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
-import Mathematics.Points.{Pixel, PixelRay, Tile}
-import Mathematics.Maff
-import Mathematics.Shapes.Circle
+import Mathematics.Points.{Pixel, Tile}
+import Mathematics.{Maff, Shapes}
+import Mathematics.Shapes.{Circle, Ray}
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
@@ -64,7 +64,7 @@ object MicroPathing {
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
     if (unit.flying) return goal
-    val lineWaypoint      = if (PixelRay(unit.pixel, goal).forall(_.walkable)) Some(unit.pixel.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
+    val lineWaypoint      = if (Shapes.Ray(unit.pixel, goal).forall(_.walkable)) Some(unit.pixel.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tile, goal.tile)
     lazy val hillWaypoint = hillPath.map(path => path.last.center.add(unit.pixel.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
@@ -175,7 +175,7 @@ object MicroPathing {
   def castRay(from: Pixel, lengthPixels: Double, radians: Double, flying: Boolean): Pixel = {
     var output = from
     var proceed = true
-    PixelRay(from, lengthPixels = lengthPixels, radians = radians).foreach(tile =>
+    Shapes.Ray(from, lengthPixels = lengthPixels, radians = radians).foreach(tile =>
       if (proceed) {
         if (tile.valid && (flying || tile.walkableUnchecked)) {
           output = tile.center

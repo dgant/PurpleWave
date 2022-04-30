@@ -1,8 +1,9 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.Maff
-import Mathematics.Points.{Direction, PixelRay, SpecificPoints, Tile, TileRectangle}
+import Mathematics.{Maff, Shapes}
+import Mathematics.Points.{Direction, Points, Tile, TileRectangle}
+import Mathematics.Shapes.Ray
 import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
@@ -12,7 +13,7 @@ import Utilities.Time.{Forever, Minutes}
 final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
         val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
         val townHallArea      : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
-        val radians           : Double            = SpecificPoints.middle.radiansTo(townHallArea.center)
+        val radians           : Double            = Points.middle.radiansTo(townHallArea.center)
         val zone              : Zone              = With.geography.zoneByTile(townHallTile)
   lazy  val metro             : Metro             = With.geography.metros.find(_.bases.contains(this)).get
   lazy  val economicValue     : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
@@ -50,7 +51,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   lazy val harvestingArea = new TileRectangle(initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
 
   lazy val heart: Tile = {
-    val centroid = if (initialResources.isEmpty) townHallArea.center.subtract(SpecificPoints.middle) else Maff.centroid(initialResources.view.map(_.pixel))
+    val centroid = if (initialResources.isEmpty) townHallArea.center.subtract(Points.middle) else Maff.centroid(initialResources.view.map(_.pixel))
     val direction = centroid.subtract(townHallArea.center)
     if (Math.abs(direction.x) > Math.abs(direction.y))
          if (direction.x < 0) townHallTile.add(-2, 1) else townHallTile.add(5, 1)
@@ -70,7 +71,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     val bestDistance    = resourceTiles.map(hallDistanceSquared).min
     val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
     val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
-    val route           = PixelRay(from.center, to.center)
+    val route           = Shapes.Ray(from.center, to.center)
     route
   })).toMap
 

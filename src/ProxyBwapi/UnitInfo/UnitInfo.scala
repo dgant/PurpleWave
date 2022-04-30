@@ -10,7 +10,7 @@ import Macro.Allocation.Prioritized
 import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points._
-import Mathematics.Shapes.Ring
+import Mathematics.Shapes.{Ray, Ring}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Micro.Targeting.Target
@@ -316,7 +316,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     }
     // If the enemy isn't visible (likely uphill) we not only need to get in physical range, but altitude-adjusted sight range as well
     val sightPixel = enemy.pixel.projectUpTo(pixel, Math.min(sightPixels, range))
-    PixelRay(sightPixel, enemy.pixel)
+    Ray(sightPixel, enemy.pixel)
       .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
       .map(_.center)
       .getOrElse(enemy.pixel.traversiblePixel(this))

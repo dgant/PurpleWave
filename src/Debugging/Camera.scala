@@ -2,7 +2,7 @@ package Debugging
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, SpecificPoints, Tile, TileRectangle}
+import Mathematics.Points.{Pixel, Points, Tile, TileRectangle}
 import Performance.Tasks.TimedTask
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -14,7 +14,7 @@ class Camera extends TimedTask {
   withSkipsMax(0)
   withCosmetic(true)
   
-  private var tweenFrom   : Pixel     = SpecificPoints.middle
+  private var tweenFrom   : Pixel     = Points.middle
   private var focus       : Pixel     = With.self.startTile.center
   private var focusUnit   : UnitInfo  = _
   

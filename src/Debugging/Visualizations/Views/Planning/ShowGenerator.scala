@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
-import Mathematics.Points.{Direction, Pixel, SpecificPoints}
+import Mathematics.Points.{Direction, Pixel, Points}
 import Placement.Generation.TileGeneratorRectangularSweep
 
 object ShowGenerator extends DebugView {
@@ -13,11 +13,11 @@ object ShowGenerator extends DebugView {
     With.geography.zones.foreach(zone => {
       if (zone.boundary.contains(new Pixel(With.game.getMousePosition).add(With.viewport.start).tile)) {
         val bounds        = zone.boundary
-        val exitDirection = zone.exitOriginal.map(_.direction).getOrElse(zone.centroid.subtract(SpecificPoints.tileMiddle).direction)
+        val exitDirection = zone.exitOriginal.map(_.direction).getOrElse(zone.centroid.subtract(Points.tileMiddle).direction)
         val exitTile      = zone.exitOriginal.map(_.pixelCenter.tile).getOrElse(zone.centroid)
         val tilesFront    = bounds.cornerTilesInclusive.sortBy(t => Math.min(Math.abs(t.x - exitTile.x), Math.abs(t.y - exitTile.y))).take(2)
         val tilesBack     = bounds.cornerTilesInclusive.filterNot(tilesFront.contains)
-        val cornerFront   = tilesFront.maxBy(_.tileDistanceSquared(SpecificPoints.tileMiddle))
+        val cornerFront   = tilesFront.maxBy(_.tileDistanceSquared(Points.tileMiddle))
         val cornerBack    = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
 
         val directionToBack   = new Direction(cornerFront, cornerBack)

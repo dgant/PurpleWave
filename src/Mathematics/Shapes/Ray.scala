@@ -1,23 +1,24 @@
-package Mathematics.Points
+package Mathematics.Shapes
 
 import Mathematics.Maff
+import Mathematics.Points.{Pixel, Tile}
 
-object PixelRay {
+object Ray {
 
-  @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): Iterable[Tile] = {
+  @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): IndexedSeq[Tile] = {
     apply(from, from.radiateRadians(radians, lengthPixels))
   }
   
-  @inline final def apply(from: Pixel, to: Pixel): Iterable[Tile] = {
+  @inline final def apply(from: Pixel, to: Pixel): IndexedSeq[Tile] = {
     if (to.x == from.x) {
       val direction = Maff.signum(to.y - from.y)
       if (direction == 0) return Array(to.tile)
-      return (from.y / 32 to to.y / 32 by direction).view.map(tileY => Tile(to.x/32, tileY))
+      return (from.y / 32 to to.y / 32 by direction).map(tileY => Tile(to.x/32, tileY))
     }
     if (to.y == from.y) {
       val direction = Maff.signum(to.x - from.x)
       if (direction == 0) return Array(to.tile)
-      return (from.x / 32 to to.x / 32 by direction).view.map(tileX => Tile(tileX, to.y/32))
+      return (from.x / 32 to to.x / 32 by direction).map(tileX => Tile(tileX, to.y/32))
     }
     
     val gridSize    = 32

@@ -1,6 +1,7 @@
 package Placement.Walls
 
 import Information.Geography.Types.Zone
+import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall}
@@ -53,11 +54,37 @@ class WallCache {
     lazy val boundaryEndGas           = zone.bases.flatMap(_.gas.flatMap(_.tileArea.tilesAtEdge))
     val boundaryEnd                   = constraint.span match { case TerrainGas => boundaryEndGas; case TerrainHall => boundaryEndHall; case _ => boundaryEndTerrain }
 
-    def tryPlace(adjacentTo: Seq[Tile], buildings: Seq[UnitClass], gapsLeft: Int): Boolean = {
-      false
+    def tryPlace(tryBoundary: Seq[Tile], buildingsLeft: Seq[UnitClass], gapsLeft: Int): Boolean = {
+      // TODO: Respect constraint.blocksUnit
+      if (buildingsLeft.isEmpty) return tryBoundary.exists(a => boundaryEnd.exists(_.tileDistanceManhattan(a) < gapsLeft + 1))
+      val building = buildingsLeft.head
+      // For each tile in the boundary, try each way to place a building adjacent to it
+      tryBoundary.exists(tryBoundaryTile =>
+        // TODO: Try leaving a gap if we can afford it!
+        tryBoundaryTile.adjacent4.exists(tryOccupyingTile =>
+          building.tileArea.tilesAtEdge.exists(areaEdge => {
+            val buildingTile = tryOccupyingTile.subtract(areaEdge)
+            if ( ! With.grids.buildableW(building.tileWidthPlusAddon)(buildingTile)) {
+              false
+            } else if (wall.buildings.exists(existingBuilding => Maff.rectanglesIntersect(
+              buildingTile.x, buildingTile.y,
+              buildingTile.x + building.tileWidthPlusAddon, buildingTile.y + building.tileHeight,
+              existingBuilding._1.x, existingBuilding._1.y,
+              existingBuilding._1.x + existingBuilding._2.tileWidthPlusAddon, existingBuilding._1.y + existingBuilding._2.tileHeight))) {
+              false
+            } else {
+              wall.buildings += ((buildingTile, building))
+              val output = tryPlace(building.tileArea.tilesAtEdge.map(buildingTile.add), buildingsLeft.drop(1), gapsLeft)
+              if ( ! output) {
+                wall.buildings.remove(wall.buildings.length - 1)
+              }
+              output
+            }
+          })))
     }
 
-    val success = tryPlace(boundaryStart, constraint.buildings, constraint.gapTiles)
+    val permutations = constraint.buildings.permutations.toVector.distinct
+    val success = permutations.exists(permutation => tryPlace(boundaryStart, permutation.view, constraint.gapTiles))
 
     if (success) Some(wall) else None
   }

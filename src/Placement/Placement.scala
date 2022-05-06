@@ -3,9 +3,12 @@ package Placement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points}
-import Placement.Generation.{Fit, Fitter, Templates, TerranWall}
+import Placement.Generation.{Fit, Fitter, Templates}
+import Placement.Walls.{TerranWall, WallCache}
 
 class Placement extends Fitter {
+
+  val wall = new WallCache
 
   private var _initialized: Boolean = false
 

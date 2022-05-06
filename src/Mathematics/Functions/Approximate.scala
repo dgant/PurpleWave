@@ -4,9 +4,7 @@ import Mathematics.Maff
 import Mathematics.Maff.halfPI
 import Mathematics.Points.AbstractPoint
 
-trait Approximations {
-  @inline final def broodWarDistance(a: AbstractPoint, b: AbstractPoint): Double = broodWarDistance(a.x, a.y, b.x, b.y)
-  @inline final def broodWarDistance(a: (Int, Int), b: (Int, Int)): Double = broodWarDistance(a._1, a._2, b._1, b._2)
+trait Approximate {
   @inline final def broodWarDistance(x0: Int, y0: Int, x1: Int, y1: Int): Double = {
     val dx = Math.abs(x0 - x1)
     val dy = Math.abs(y0 - y1)

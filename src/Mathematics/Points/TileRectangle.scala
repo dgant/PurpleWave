@@ -1,8 +1,7 @@
 package Mathematics.Points
 
 import Mathematics.Maff
-
-import scala.collection.SeqView
+import Mathematics.Shapes.Box
 
 final case class TileRectangle(
   startInclusive : Tile,
@@ -47,6 +46,9 @@ final case class TileRectangle(
   if (endExclusive.x < startInclusive.x) {
     throw new Exception("Created an invalid (non-normalized) rectangle")
   }
+
+  @inline def width   : Int = endExclusive.x - startInclusive.x
+  @inline def height  : Int = endExclusive.y - startInclusive.y
   
   @inline def add(x: Int, y: Int): TileRectangle =
     TileRectangle(
@@ -91,9 +93,9 @@ final case class TileRectangle(
 
   @inline def startPixel        : Pixel = startInclusive.topLeftPixel
   @inline def endPixel          : Pixel = endExclusive.topLeftPixel.subtract(1, 1)
+  @inline def midPixel          : Pixel = startPixel.midpoint(endPixel)
   @inline def topRightPixel     : Pixel = Pixel(endPixel.x, startPixel.y)
   @inline def bottomleftPixel   : Pixel = Pixel(startPixel.x, endPixel.y)
-  @inline def midPixel          : Pixel = startPixel.midpoint(endPixel)
   @inline def leftMiddlePixel   : Pixel = Pixel(startPixel.x, midPixel.y)
   @inline def rightMiddlePixel  : Pixel = Pixel(endPixel.x, midPixel.y)
   @inline def topCenterPixel    : Pixel = Pixel(midPixel.x, endPixel.y)
@@ -102,10 +104,11 @@ final case class TileRectangle(
   @inline def cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
-  @inline def tiles: SeqView[Tile, Seq[_]] =
-    (0 until endExclusive.y - startInclusive.y).view.flatMap(y =>
-      (0 until endExclusive.x - startInclusive.x).view.map(x =>
+  @inline def tiles: IndexedSeq[Tile] =
+    (0 until endExclusive.y - startInclusive.y).flatMap(y =>
+      (0 until endExclusive.x - startInclusive.x).map(x =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
-  
-  @inline def tilesSurrounding: Iterable[Tile] = expand(1, 1).tiles.filterNot(contains)
+
+  @inline def tilesAtEdge: IndexedSeq[Tile] = Box(width, height).map(startInclusive.add)
+  @inline def tilesSurrounding: IndexedSeq[Tile] = Box(width + 2, height + 2).map(startInclusive.subtract(1, 1).add)
 }

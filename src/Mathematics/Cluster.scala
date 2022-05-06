@@ -4,9 +4,9 @@ import Mathematics.Points.Pixel
 
 import scala.collection.mutable
 
-object Clustering {
+object Cluster {
   
-  def group[T](
+  def apply[T](
     things        : Iterable[T],
     radius        : Double,
     limitRegion   : Boolean = false,

@@ -2,4 +2,4 @@ package Mathematics
 
 import Mathematics.Functions._
 
-object Maff extends Angles with Approximations with Conversions with Geometry with Normalizing with Reductions with Sampling with Sorting
+object Maff extends Angles with Approximate with Convert with Rectangles with Polygons with Normalize with Reduce with Sample with Sort

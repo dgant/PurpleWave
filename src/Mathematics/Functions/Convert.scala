@@ -1,6 +1,6 @@
 package Mathematics.Functions
 
-trait Conversions {
+trait Convert {
   @inline final def fromBoolean(value: Boolean): Int = if (value) 1 else 0
   @inline final def toBoolean(value: Int): Boolean = value != 0
   @inline final def toInt(value: Boolean): Int = if (value) 1 else 0

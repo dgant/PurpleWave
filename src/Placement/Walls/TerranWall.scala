@@ -1,10 +1,11 @@
-package Placement.Generation
+package Placement.Walls
 
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
+import Placement.Generation.Fit
 import Placement.Templating.Template
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

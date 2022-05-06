@@ -3,7 +3,7 @@ package Information.Geography.Calculations
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
 import Mathematics.Shapes.Circle
-import Mathematics.{Clustering, Maff}
+import Mathematics.{Cluster, Maff}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Strategery.Hunters
@@ -54,11 +54,7 @@ object FindBases {
   
   private def clusterResourcePatches(resources: Iterable[ForeignUnitInfo]): Iterable[Iterable[ForeignUnitInfo]] = {
     val shouldLimitRegion = ! Hunters() // Hack -- fix the top-right position on Hunters
-    Clustering.group[ForeignUnitInfo](
-      resources,
-      baseRadiusPixels,
-      limitRegion = shouldLimitRegion,
-      _.pixel).values
+    Cluster[ForeignUnitInfo](resources, baseRadiusPixels, limitRegion = shouldLimitRegion, _.pixel).values
   }
   
   private def measureExclusions(expansionResources: Iterable[ForeignUnitInfo]): Set[Tile] = {

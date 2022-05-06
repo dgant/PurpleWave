@@ -6,24 +6,19 @@ import Mathematics.Points.{AbstractPoint, Pixel}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-trait Geometry {
-  @inline final def distanceFromLineSegment(
-    point         : AbstractPoint,
-    segmentStart  : AbstractPoint,
-    segmentEnd    : AbstractPoint)
-  : Double = {
-    val x = point.x
-    val y = point.y
-    val x0 = segmentStart.x
-    val y0 = segmentStart.y
-    val x1 = segmentEnd.x
-    val y1 = segmentEnd.y
+trait Polygons {
 
-    val dx0 = x - x0
-    val dy0 = y - y0
-    val dx1 = x1 - x0
-    val dy1 = y1 - y0
-
+  @inline final def distanceFromLineSegment(point: AbstractPoint, start: AbstractPoint, end: AbstractPoint): Double = {
+    val x             = point.x
+    val y             = point.y
+    val x0            = start.x
+    val y0            = start.y
+    val x1            = end.x
+    val y1            = end.y
+    val dx0           = x - x0
+    val dy0           = y - y0
+    val dx1           = x1 - x0
+    val dy1           = y1 - y0
     val dotProduct    = dx0 * dx1 + dy0 * dy1
     val lengthSquared = dx1 * dx1 + dy1 * dy1
     val param         = if (lengthSquared != 0.0) dotProduct / lengthSquared else -1.0
@@ -40,10 +35,8 @@ trait Geometry {
       xx = x0 + param * dx1
       yy = y0 + param * dy1
     }
-
     val dx = x - xx
     val dy = y - yy
-
     Math.sqrt(dx * dx + dy * dy)
   }
 
@@ -56,8 +49,8 @@ trait Geometry {
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
-  def convexHull[T](points: Seq[T], extract: T => Pixel): Seq[T] = {
+  @inline final def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
+  final def convexHull[T](points: Seq[T], extract: T => Pixel): Seq[T] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
     if (points.size <= 2) return points
 
@@ -79,13 +72,12 @@ trait Geometry {
         i += 1
       }
     }
-    val stack = new mutable.Stack[T]
+    val output = new mutable.Stack[T]
     sortedPoints.foreach(point => {
-      while (stack.size > 1 && clockDirection(extract(point._1), extract(stack.head), extract(stack(1))) < 0)
-        stack.pop()
-      stack.push(point._1)
+      while (output.size > 1 && clockDirection(extract(point._1), extract(output.head), extract(output(1))) < 0) { output.pop() }
+      output.push(point._1)
     })
-    stack
+    output
   }
 
   @inline final def convexPolygonContains[T](points: Seq[AbstractPoint], point: AbstractPoint): Boolean = {
@@ -108,12 +100,12 @@ trait Geometry {
   }
 
   @inline final def projectedPointOnLine(p: Pixel, v1: Pixel, v2: Pixel): Pixel = {
-    val e1x = v2.x - v1.x.toDouble
-    val e1y = v2.y - v1.y.toDouble
-    val e2x = p.x - v1.x.toDouble
-    val e2y = p.y - v1.y.toDouble
-    val edot = e1x * e2x + e1y * e2y
-    val eLength2 = Math.max(1, e1x * e1x + e1y * e1y)
+    val e1x       = v2.x - v1.x.toDouble
+    val e1y       = v2.y - v1.y.toDouble
+    val e2x       = p.x - v1.x.toDouble
+    val e2y       = p.y - v1.y.toDouble
+    val edot      = e1x * e2x + e1y * e2y
+    val eLength2  = Math.max(1, e1x * e1x + e1y * e1y)
     Pixel(
       (v1.x + (e1x * edot) / eLength2).toInt,
       (v1.y + (e1y * edot) / eLength2).toInt)
@@ -126,13 +118,24 @@ trait Geometry {
     if (isOnSegment) on else Seq(v1, v2).minBy(_.pixelDistanceSquared(p))
   }
 
+  /**
+    * Given a looped sequence of items, returns the shortest subsequence starting with one element passing into another element, either forward or backward with respect to the sequence.
+    */
+  @inline final def shortestItinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
+    val indexFrom       = rotation.indexOf(from)
+    val indexTo         = rotation.indexOf(to)
+    val distance        = Math.abs(indexTo - indexFrom)
+    val forwardRotation = (indexTo > indexFrom) == (distance * 2 <= rotation.length)
+    val orderedRotation = if (forwardRotation) rotation.view else rotation.view.reverse
+    if (indexFrom < indexTo) orderedRotation.slice(indexFrom, indexTo + 1) else orderedRotation.drop(indexFrom) ++ orderedRotation.take(indexTo + 1)
+  }
+
+  /**
+    * Given a looped sequence of items, returns a subsequence starting with one element passing into another element in the same order as the sequence.
+    */
   @inline final def itinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
     val indexFrom = rotation.indexOf(from)
-    val indexTo = rotation.indexOf(to)
-    if (indexFrom < indexTo) {
-      rotation.view.slice(indexFrom, indexTo + 1)
-    } else {
-      rotation.view.drop(indexFrom) ++ rotation.view.take(indexTo + 1)
-    }
+    val indexTo   = rotation.indexOf(to)
+    if (indexFrom < indexTo) rotation.view.slice(indexFrom, indexTo + 1) else rotation.view.drop(indexFrom) ++ rotation.view.take(indexTo + 1)
   }
 }

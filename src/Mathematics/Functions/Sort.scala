@@ -2,7 +2,7 @@ package Mathematics.Functions
 
 import scala.collection.mutable
 
-trait Sorting {
+trait Sort {
   /**
     * Applies a stable, in-place insertion sort to a mutable array-like collection.
     *

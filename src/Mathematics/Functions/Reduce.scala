@@ -3,7 +3,7 @@ package Mathematics.Functions
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 
-trait Reductions {
+trait Reduce {
 
   @inline final def clamp(value: Int, bound1: Int, bound2: Int): Int = {
     val min = Math.min(bound1, bound2)

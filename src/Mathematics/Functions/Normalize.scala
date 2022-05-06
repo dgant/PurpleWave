@@ -1,5 +1,5 @@
 package Mathematics.Functions
 
-trait Normalizing {
+trait Normalize {
 
 }

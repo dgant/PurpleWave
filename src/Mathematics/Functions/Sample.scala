@@ -4,7 +4,7 @@ import Lifecycle.With
 
 import scala.util.Random
 
-trait Sampling {
+trait Sample {
 
   @inline final def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
     val sum = values.map(value => Math.pow(Math.E, extract(value))).sum

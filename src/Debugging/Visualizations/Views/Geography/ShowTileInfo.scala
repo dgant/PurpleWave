@@ -29,7 +29,6 @@ object ShowTileInfo extends DebugView {
     DrawMap.tileRectangle(mouseTile.toRectangle, Colors.BrightYellow)
     DrawMap.tileRectangle(walkableTile.toRectangle, Colors.hsv((System.currentTimeMillis() % 256L).toInt, 255, 192))
     DrawScreen.text(mousePixelScreen.add(4, -6), (walkableTile.groundPixels(With.geography.home).toInt / 32).toString)
-
-    zone.border.foreach(t => DrawMap.circle(t.center, 4, Colors.DarkBlue))
+    ShowZones.renderZoneMap(zone)
   }
 }

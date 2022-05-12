@@ -17,7 +17,7 @@ abstract class Fingerprint {
   //@inline final def matches: Boolean = matched
   @inline final def apply(): Boolean = matched
   @inline final def recently: Boolean = matched || With.strategy.enemyRecentFingerprints.contains(toString)
-  @inline final def update() {
+  @inline final def update(): Unit = {
     if (_lastUpdateFrame == With.frame) return
     _lastUpdateFrame = With.frame
     children.foreach(_.update())
@@ -25,7 +25,7 @@ abstract class Fingerprint {
     if (With.frame < lockAfter) {
       val matchedBefore = matched
       matched = investigate
-      if (matched != matchedBefore) {
+      if (matched != matchedBefore && With.frame > 0) {
         With.logger.debug(explanation)
       }
     }

@@ -1,12 +1,10 @@
 package Planning.Plans.GamePlans.All
 
-import Lifecycle.With
 import Planning.Plans.GamePlans.GameplanImperative
-import Planning.Plans.Placement.BuildCannonsAtExpansions
-import ProxyBwapi.Races.Protoss
 
 class Sandbox extends GameplanImperative {
   override def executeBuild(): Unit = {
+    /*
     get(8, Protoss.Probe)
     get(1, Protoss.Pylon, With.geography.ourNatural)
     get(11, Protoss.Probe)
@@ -19,8 +17,12 @@ class Sandbox extends GameplanImperative {
     get(17, Protoss.Probe)
     get(Protoss.Assimilator)
     get(Protoss.CyberneticsCore)
+    */
   }
   override def executeMain(): Unit = {
+    doBasics = false
+    doBuildOrder = false
+    /*
     scoutOn(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     pump(Protoss.Observer, 2)
@@ -42,5 +44,6 @@ class Sandbox extends GameplanImperative {
     get(Protoss.FleetBeacon)
     get(2, Protoss.Stargate)
     get(32, Protoss.Gateway)
+    */
   }
 }

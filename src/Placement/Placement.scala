@@ -4,7 +4,7 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points}
 import Placement.Generation.{Fit, Fitter, Templates}
-import Placement.Walls.{TerranWall, WallCache}
+import Placement.Walls.{WallCache, WallDesigner}
 
 class Placement extends Fitter {
 
@@ -54,7 +54,11 @@ class Placement extends Fitter {
 
   private def preplaceWalls(zone: Zone): Unit = {
     //if (With.self.isTerran) {
-      TerranWall(zone).foreach(index)
+    //TerranWall(zone).foreach(index)
     //}
+    //if ( ! zone.bases.exists(_.naturalOf.isDefined)) return
+    val wall = WallDesigner(zone)
+    val fit = wall.map(_.toFit)
+    fit.foreach(index)
   }
 }

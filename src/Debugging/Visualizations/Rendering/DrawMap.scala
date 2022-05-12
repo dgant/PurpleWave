@@ -10,7 +10,7 @@ object DrawMap {
   
   def text(
     origin  : Pixel,
-    text    : String) {
+    text    : String): Unit = {
     if (irrelevant(origin)) return
     With.game.drawTextMap(origin.bwapi, text)
   }
@@ -18,7 +18,7 @@ object DrawMap {
   def line(
     start : Pixel,
     end   : Pixel,
-    color : Color = Colors.DefaultGray) {
+    color : Color = Colors.DefaultGray): Unit = {
     if (irrelevant(start, end)) return
     With.game.drawLineMap(start.bwapi, end.bwapi, color)
   }
@@ -26,7 +26,7 @@ object DrawMap {
   def arrow(
     start : Pixel,
     end   : Pixel,
-    color : Color = Colors.DefaultGray) {
+    color : Color = Colors.DefaultGray): Unit = {
     if (irrelevant(start, end)) return
     
     line(start, end, color)
@@ -62,7 +62,7 @@ object DrawMap {
     start : Pixel,
     end   : Pixel,
     color : Color = Colors.DefaultGray,
-    solid : Boolean = false) {
+    solid : Boolean = false): Unit = {
     if (irrelevant(start, end)) return
 
     With.game.drawBoxMap(start.bwapi, end.bwapi, color, solid)
@@ -72,7 +72,7 @@ object DrawMap {
     center  : Pixel,
     radius  : Int,
     color   : Color = Colors.DefaultGray,
-    solid   : Boolean = false) {
+    solid   : Boolean = false): Unit = {
     if (radius <= 0) return
     if (irrelevant(
       center.add(-radius, -radius),
@@ -85,7 +85,7 @@ object DrawMap {
     position2 : Pixel,
     position3 : Pixel,
     color     : Color = Colors.DefaultGray,
-    solid: Boolean = false) {
+    solid: Boolean = false): Unit = {
     if (irrelevant(position1, position2, position3)) return
     With.game.drawTriangleMap(position1.bwapi, position2.bwapi, position3.bwapi, color, solid)
   }
@@ -96,7 +96,7 @@ object DrawMap {
     drawBackground  : Boolean = false,
     backgroundColor : Color = Colors.DefaultGray,
     drawBorder      : Boolean = false,
-    borderColor     : Color = Colors.DefaultGray) {
+    borderColor     : Color = Colors.DefaultGray): Unit = {
     if (irrelevant(position)) return
     labelBox(Vector(text), position, drawBackground, backgroundColor, drawBorder, borderColor)
   }
@@ -104,7 +104,7 @@ object DrawMap {
   def labelDot(
     text            : String,
     position        : Pixel,
-    backgroundColor : Color = Colors.DefaultGray) {
+    backgroundColor : Color = Colors.DefaultGray): Unit = {
     if (irrelevant(position)) return
     val width = 9 * text.length / 2
     val height = 11
@@ -119,7 +119,7 @@ object DrawMap {
     drawBackground  : Boolean = false,
     backgroundColor : Color = Colors.DefaultGray,
     drawBorder      : Boolean = false,
-    borderColor     : Color = Colors.DefaultGray) {
+    borderColor     : Color = Colors.DefaultGray): Unit = {
 
     if (irrelevant(position)) return
     
@@ -139,7 +139,7 @@ object DrawMap {
         boxX + boxWidth,
         boxY + boxHeight,
         backgroundColor,
-        true) //isSolid
+        true)
     }
     if (drawBorder) {
       With.game.drawBoxMap(
@@ -148,8 +148,7 @@ object DrawMap {
         boxX + boxWidth + 1,
         boxY + boxHeight + 1,
         borderColor,
-        false
-      )
+        false)
     }
     With.game.drawTextMap(
       textX,
@@ -157,12 +156,12 @@ object DrawMap {
       textLines.mkString("\n"))
   }
   
-  def tileRectangle(rectangle: TileRectangle, color: Color) {
+  def tileRectangle(rectangle: TileRectangle, color: Color, margin: Int = 0): Unit = {
     if (irrelevant(rectangle.startPixel, rectangle.endPixel)) return
-    With.game.drawBoxMap(rectangle.startPixel.bwapi, rectangle.endPixel.bwapi, color)
+    With.game.drawBoxMap(rectangle.startPixel.subtract(margin, margin).bwapi, rectangle.endPixel.add(margin, margin).bwapi, color)
   }
   
-  def polygon(pixels: Iterable[Pixel], color: Color = Colors.DefaultGray) {
+  def polygon(pixels: Iterable[Pixel], color: Color = Colors.DefaultGray): Unit = {
     if (pixels.size < 2) return
     pixels.reduce((p1, p2) => { line(p1, p2, color); p2 })
     line(pixels.head, pixels.last, color)

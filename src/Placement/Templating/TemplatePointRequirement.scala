@@ -41,9 +41,9 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
     if (buildings.isEmpty && labels.isEmpty) return f"$width x $height"
     val buildingList        = buildings.take(3).map(_.toString.take(4)).mkString(", ")
     val buildingTerminator  = if (buildings.size > 3) "..." else ""
-    val optionalNewline     = if (buildings.nonEmpty && labels.nonEmpty) "\n" else ""
-    val labelList           = labels.take(3).mkString(", ")
-    val labelTerminator     = if (labels.size > 3) "..." else ""
-    f"$buildingList$buildingTerminator$optionalNewline$labelList$labelTerminator"
+    val optionalSeparator   = if (buildings.nonEmpty && labels.nonEmpty) "\n---\n" else ""
+    val labelList           = labels.take(3).mkString("\n")
+    val labelTerminator     = if (labels.size > 5) "..." else ""
+    f"$buildingList$buildingTerminator$optionalSeparator$labelList$labelTerminator"
   }
 }

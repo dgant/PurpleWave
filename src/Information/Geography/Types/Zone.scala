@@ -12,7 +12,7 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
         val boundary          : TileRectangle       = new TileRectangle(tiles)
         val centroid          : Tile                = (if (tiles.isEmpty) new Pixel(bwemRegion.getCenter).tile else tiles.minBy(_.tileDistanceSquared(new Pixel(bwemRegion.getCenter).tile))).center.walkableTile
         val border            : Set[Tile]           = tiles.filter( ! _.adjacent8.forall(tiles.contains))
-        val perimeter         : Set[Tile]           = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(_.walkable))
+        val perimeter         : Set[Tile]           = tiles.filter(tile => tile.tileDistanceFromEdge <= 1 || ! tile.adjacent8.forall(_.walkableTerrain))
   lazy  val island            : Boolean             = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
   lazy  val bases             : Vector[Base]        = With.geography.bases.filter(_.townHallTile.zone == this)

@@ -2,6 +2,7 @@ package Information.Grids.Movement
 
 import Information.Grids.ArrayTypes.AbstractGridArray
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Spiral
 
@@ -12,15 +13,13 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
 
   def origins: Seq[Tile] = initialOrigins
 
-  @inline final def walkable(tile: Tile): Boolean = { tile.valid && (With.grids.walkable.get(tile) || (With.frame < 9 && With.units.ours.exists(_.tileArea.contains(tile)))) }
-  @inline final def walkable(iTile: Int): Boolean = { (With.grids.walkable.get(iTile) || (With.frame < 9 && With.units.ours.exists(_.tileArea.tiles.exists(iTile==)))) }
+  @inline final def walkable(tile: Tile): Boolean = walkable(tile.i)
+  @inline final def walkable(iTile: Int): Boolean = (
+    With.grids.walkable.get(iTile)
+    || (With.grids.walkableTerrain.get(iTile) && With.frame < 9 && With.units.ours.exists(_.tileArea.tiles.exists(_.i == iTile))))
 
   override def onInitialization(): Unit = {
-    var seeds = origins.filter(walkable)
-    if (seeds.isEmpty) {
-      seeds = seeds.flatMap(seed => Spiral(20).map(seed.add).find(walkable))
-    }
-
+    val seeds = Maff.orElse(origins.filter(walkable), origins.flatMap(seed => Spiral(20).map(seed.add).find(walkable)))
     var distance = 0
     var openSize = 0
     val tilesA = new Array[Int](tiles.size * 100)
@@ -57,7 +56,7 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
     while(openSize > 0) {
       val next = open
       val nextSize = openSize
-      open = if (open.equals(tilesA)) tilesB else tilesA
+      open = if (open.eq(tilesA)) tilesB else tilesA
       openSize = 0
       for (nextTile <- 0 until nextSize) explore(next(nextTile))
       distance += 1

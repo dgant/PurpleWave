@@ -25,7 +25,17 @@ object WallDesigner {
       //WallConstraint(1, Zerg.Zergling,  TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk, TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk, TerrainHall,    Protoss.Gateway, Protoss.Forge, Protoss.Pylon))
-    val wall = With.placement.wall.generate(zone, constraints)
+    val cache = new WallCache
+    val wall = cache.generate(zone, constraints)
+    With.logger.debug(f"${if (wall.isDefined) "CREATED WALL" else "FAILED to create wall"} for $zone")
+    With.logger.debug(f"Tiles considered:         ${cache.metricTilesConsidered}")
+    With.logger.debug(f"Unbuildable (Terrain):    ${cache.metricUnbuildableTerrain}")
+    With.logger.debug(f"Unbuildable (Granular):   ${cache.metricUnbuildableGranular}")
+    With.logger.debug(f"Intersection (Previous):  ${cache.metricIntersectsPrevious}")
+    With.logger.debug(f"Intersection (Hall):      ${cache.metricIntersectsHall}")
+    With.logger.debug(f"Gap too narrow:           ${cache.metricGapTooNarrow}")
+    With.logger.debug(f"Gap too wide:             ${cache.metricGapTooWide}")
+    With.logger.debug(f"Failed recursively:       ${cache.metricFailedRecursively}")
     wall
   }
 }

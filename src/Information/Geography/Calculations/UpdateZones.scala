@@ -49,7 +49,10 @@ object UpdateZones {
   }
 
   def calculateExit(zone: Zone): Option[Edge] = {
-    Maff.minBy(zone.edges)(edge => Maff.orElse(With.geography.enemyBases.map(_.heart), Seq(With.scouting.enemyThreatOrigin)).map(edge.distanceGrid.get).min)
+    Maff.minBy(zone.edges)(edge => Maff.orElse(
+      With.geography.enemyBases.map(_.heart),
+      Seq(With.scouting.enemyThreatOrigin)).map(edge.distanceGrid.get)
+      .min)
   }
   def calculateEntrance(zone: Zone): Option[Edge] = {
     Maff.minBy(zone.edges)(edge => With.geography.startLocations.map(edge.distanceGrid.get).min)

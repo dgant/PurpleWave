@@ -8,7 +8,7 @@ import Debugging.Visualizations.Views.Geography._
 import Debugging.Visualizations.Views.Micro._
 import Debugging.Visualizations.Views.Performance._
 import Debugging.Visualizations.Views.Planning._
-import Debugging.Visualizations.Views.{ShowHeader, ShowStoryteller, DebugView}
+import Debugging.Visualizations.Views.{DebugView, ShowStoryteller}
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Performance.Tasks.TimedTask
@@ -29,14 +29,14 @@ class Visualization extends TimedTask {
   
   var views: ArrayBuffer[DebugView] = mutable.ArrayBuffer[DebugView](
     // Evergreen views
-    ShowHeader,
+    //ShowHeader,
     ShowGrids,
     ShowUtilization,
     ShowHealthAndCooldown,
     ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    ShowStoryteller,
+    //ShowStoryteller,
 
     // Temporary views
     ShowZones,

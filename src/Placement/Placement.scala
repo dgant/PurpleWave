@@ -4,11 +4,9 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points}
 import Placement.Generation.{Fit, Fitter, Templates}
-import Placement.Walls.{WallCache, WallDesigner}
+import Placement.Walls.WallDesigner
 
 class Placement extends Fitter {
-
-  val wall = new WallCache
 
   private var _initialized: Boolean = false
 

@@ -49,7 +49,7 @@ trait Polygons {
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  @inline final def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
+  @inline final def convexHull[C <: Seq[Pixel]](points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
   final def convexHull[T](points: Seq[T], extract: T => Pixel): Seq[T] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
     if (points.size <= 2) return points
@@ -119,23 +119,35 @@ trait Polygons {
   }
 
   /**
-    * Given a looped sequence of items, returns the shortest subsequence starting with one element passing into another element, either forward or backward with respect to the sequence.
+    * Given a looped sequence of items, returns the shortest subsequence starting with one element ending with another element, either forward or backward with respect to the sequence.
     */
   @inline final def shortestItinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
-    val indexFrom       = rotation.indexOf(from)
-    val indexTo         = rotation.indexOf(to)
-    val distance        = Math.abs(indexTo - indexFrom)
-    val forwardRotation = (indexTo > indexFrom) == (distance * 2 <= rotation.length)
-    val orderedRotation = if (forwardRotation) rotation.view else rotation.view.reverse
-    if (indexFrom < indexTo) orderedRotation.slice(indexFrom, indexTo + 1) else orderedRotation.drop(indexFrom) ++ orderedRotation.take(indexTo + 1)
+    genericItinerary(from, to, rotation, preserveRotation = false, preferShort = true)
   }
 
   /**
-    * Given a looped sequence of items, returns a subsequence starting with one element passing into another element in the same order as the sequence.
+    * Given a looped sequence of items, returns the longest subsequence starting with one element ending with another element, either forward or backward with respect to the sequence.
+    */
+  @inline final def longestItinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
+    genericItinerary(from, to, rotation, preserveRotation = false, preferShort = false)
+  }
+
+  /**
+    * Given a looped sequence of items, returns a subsequence starting with one element passing into another element, in the same order as the original sequence.
     */
   @inline final def itinerary[T](from: T, to: T, rotation: Seq[T]): Seq[T] = {
-    val indexFrom = rotation.indexOf(from)
-    val indexTo   = rotation.indexOf(to)
-    if (indexFrom < indexTo) rotation.view.slice(indexFrom, indexTo + 1) else rotation.view.drop(indexFrom) ++ rotation.view.take(indexTo + 1)
+    genericItinerary(from, to, rotation, preserveRotation = true, preferShort = true)
+  }
+
+  @inline final private def genericItinerary[T](from: T, to: T, rotation: Seq[T], preserveRotation: Boolean, preferShort: Boolean): Seq[T] = {
+    val indexFrom       = rotation.indexOf(from)
+    val indexTo         = rotation.indexOf(to)
+    val indexMin        = Math.min(indexFrom, indexTo)
+    val indexMax        = Math.max(indexFrom, indexTo)
+    val directLength    = indexMax - indexMin
+    val directIsShorter = directLength * 2 <= rotation.length
+    val direct          = if (preserveRotation) (indexFrom > indexTo) else (directIsShorter == preferShort)
+    val subsequence     = if (direct) rotation.view.slice(indexMin, indexMax + 1) else rotation.view.drop(indexMax) ++ rotation.view.take(indexMin + 1)
+    if (subsequence.head == from) subsequence else subsequence.reverse
   }
 }

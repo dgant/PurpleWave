@@ -6,7 +6,7 @@ import scala.util.Random
 
 trait Sample {
 
-  @inline final def softmax[T](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
+  @inline final def softmax[T, C <: Seq[T]](values: Seq[T], extract: (T) => Double): Seq[(T, Double)] = {
     val sum = values.map(value => Math.pow(Math.E, extract(value))).sum
     values.map(value => (value, Math.pow(Math.E, extract(value)) / sum))
   }

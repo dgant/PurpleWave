@@ -13,7 +13,14 @@ object ShowZones extends DebugView {
   }
   def renderZoneMap(zone: Zone): Unit = {
     // Draw boundaries
-    zone.perimeter.foreach(tile => DrawMap.cross(tile.center, 4, Colors.MediumGray))
+    zone.wallPerimeter          .foreach(tile => DrawMap.box(tile.center.subtract(2, 2),    tile.center.add(2, 2), Colors.MediumGray))
+    zone.wallPerimeterHall      .foreach(tile => DrawMap.box(tile.center.subtract(4, 4),    tile.center.add(4, 4), Colors.NeonViolet))
+    zone.wallPerimeterGas       .foreach(tile => DrawMap.box(tile.center.subtract(6, 6),    tile.center.add(6, 6), Colors.NeonGreen))
+    zone.wallPerimeterExit      .foreach(tile => DrawMap.box(tile.center.subtract(8, 8),    tile.center.add(8, 8), Colors.NeonRed))
+    zone.wallPerimeterEntrance  .foreach(tile => DrawMap.box(tile.center.subtract(10, 10),  tile.center.add(10, 10), Colors.NeonGreen))
+    DrawMap.box(zone.wallPerimeterSplitStartA.center.subtract(12, 12), zone.wallPerimeterSplitStartA.center.add(12, 12), Colors.NeonOrange)
+    DrawMap.box(zone.wallPerimeterSplitStartB.center.subtract(14, 14), zone.wallPerimeterSplitStartB.center.add(14, 14), Colors.NeonBlue)
+
     zone.border.foreach(tile => {
       val color = zone.owner.colorMedium
       if ( ! tile.up.valid || tile.up.zone != zone) {

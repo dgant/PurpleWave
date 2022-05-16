@@ -114,7 +114,7 @@ object DrawMap {
   }
   
   def labelBox(
-    textLines       : Iterable[String],
+    textLines       : TraversableOnce[String],
     position        : Pixel,
     drawBackground  : Boolean = false,
     backgroundColor : Color = Colors.DefaultGray,

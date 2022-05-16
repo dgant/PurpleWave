@@ -101,6 +101,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def tileDistanceManhattan(tile: Tile): Int = {
     Math.abs(x-tile.x) + Math.abs(y-tile.y)
   }
+  @inline def tileDistanceChebyshev(tile: Tile): Int = {
+    Math.max(Math.abs(x-tile.x), Math.abs(y-tile.y))
+  }
   @inline def tileDistanceFast(tile: Tile): Double = {
     Maff.broodWarDistance(x, y, tile.x, tile.y)
   }

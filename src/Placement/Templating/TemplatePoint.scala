@@ -17,6 +17,8 @@ case class TemplatePoint(point: Point, requirement: TemplatePointRequirement) {
       else if (requirement.buildableBefore) Colors.NeonGreen
       else Colors.MediumViolet
     DrawMap.box(pixelStart, pixelEnd, color)
-    DrawMap.label(if (requirement.width > 1) requirement.toString else "", pixelStart.midpoint(pixelEnd))
+    DrawMap.labelBox(
+      if (requirement.width > 1) requirement.toString.lines else Seq(""),
+      pixelStart.midpoint(pixelEnd))
   }
 }

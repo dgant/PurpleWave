@@ -4,13 +4,14 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile}
-import Mathematics.Shapes.{Box, RoundedBox, Rectangle}
+import Mathematics.Shapes.{Rectangle, RoundedBox}
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall}
 import ProxyBwapi.UnitClasses.UnitClass
 
 class WallCache {
 
   // Logging metrics
+  var metricPermutations        = 0
   var metricTilesConsidered     = 0
   var metricUnbuildableTerrain  = 0
   var metricIntersectsPrevious  = 0
@@ -51,21 +52,20 @@ class WallCache {
     //    - Fill queue with buildings to place
     //    - For each place we could place the first building adjacent to the first tile: (LATER: Select cleverly to fill gaps)
     //      - Try placing each building adjacent to it or using our gap budget
-
-
     def boundaryEnd = constraint.span match {
       case TerrainGas => zone.wallPerimeterGas;
       case TerrainHall => zone.wallPerimeterHall;
-      case _ => zone.wallPerimeterExit.toVector }
+      case _ => zone.wallPerimeterExit }
 
     def tryPlace(horizon: Seq[Tile], buildingsLeft: Seq[UnitClass], gapsLeft: Int): Boolean = {
       // TODO: If gapsLeft is zero enforce constraint.blocksUnit
       if (buildingsLeft.isEmpty) {
-        if (horizon.forall(t => boundaryEnd.forall(_.tileDistanceManhattan(t) > gapsLeft))) {
+        if (horizon.forall(t => boundaryEnd.forall(_.tileDistanceManhattan(t) > 1 + gapsLeft))) {
           metricGapTooWide += 1
           return false
         }
-        if (horizon.exists(t => boundaryEnd.exists(_.tileDistanceManhattan(t) < gapsLeft))) {
+        // Use Chebyshev distance to check gap size because cater-corner diagonals are not acceptable
+        if (horizon.exists(t => boundaryEnd.exists(_.tileDistanceChebyshev(t) <= gapsLeft))) {
           metricGapTooNarrow += 1
           return false
         }
@@ -77,13 +77,19 @@ class WallCache {
       // For each tile in the boundary, try each way to place a building adjacent to it
       horizon.exists(horizonTile => {
         metricTilesConsidered += 1
-        (0 to gapsLeft).exists(gapsUsed => {
-          // Cater-corner adjacency isn't zero-gap so use CornerlessBox
-          val box: (Int, Int) => IndexedSeq[Point] = if (gapsUsed == gapsLeft) RoundedBox.apply else Box.apply
-          val margin = 2 + 2 * gapsUsed
-          box(margin + width, margin + height).exists(relative => {
+        // Cater-corner adjacency isn't zero-gap
+        val boxWidth = width + 2
+        val boxHeight = height + 2
+        RoundedBox(boxWidth, boxHeight).exists(relative => {
+          (0 to gapsLeft).exists(gapsUsed => {
             // TODO: If gapsUsed is zero enforce constraint.blocksUnit
-            val buildingTile = horizonTile.subtract(width, height).add(relative).subtract(gapsUsed, gapsUsed)
+            val buildingTile = horizonTile
+              .subtract(width, height)
+              .add(relative)
+              .add(   if (relative.x == 0)            Point(-gapsUsed, 0)
+                else  if (relative.y == 0)            Point(0,        -gapsUsed)
+                else  if (relative.x == boxWidth - 1) Point(gapsUsed, 0)
+                else                                  Point(0,        gapsUsed))
             val buildingEndX = buildingTile.x + width
             val buildingEndY = buildingTile.y + height
             if ( ! With.grids.buildableW(width)(buildingTile)) {
@@ -117,6 +123,7 @@ class WallCache {
     while (constraintAvailable) {
       nextConstraint()
       val permutations = constraint.buildings.permutations.toVector.distinct
+      metricPermutations += permutations.length
       if (permutations.exists(permutation => tryPlace(zone.wallPerimeterEntrance, permutation.view, constraint.gapTiles))) {
         return Some(wall)
       }

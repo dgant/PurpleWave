@@ -20,19 +20,24 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Geometry //
   //////////////
 
-  lazy val dimensionMin: Int = Math.min(width, height)
-  lazy val dimensionMax: Int = Math.max(width, height)
-  lazy val area: Int = dimensionMin * dimensionMax
-  lazy val sqrtArea: Int = Math.sqrt(area).toInt
-  lazy val perimeter: Int = 2 * width + 2 * height
-  lazy val occupancy: Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
+  lazy val dimensionMin : Int = Math.min(width, height)
+  lazy val dimensionMax : Int = Math.max(width, height)
+  lazy val area         : Int = dimensionMin * dimensionMax
+  lazy val sqrtArea     : Int = Math.sqrt(area).toInt
+  lazy val perimeter    : Int = 2 * width + 2 * height
+  lazy val occupancy    : Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
 
-  lazy val topLeft: Point = Point(-dimensionLeft, -dimensionUp)
-  lazy val topRight: Point = Point(dimensionRight, -dimensionUp)
-  lazy val bottomLeft: Point = Point(-dimensionLeft, dimensionDown)
-  lazy val bottomRight: Point = Point(dimensionRight, dimensionDown)
+  lazy val topLeft      : Point = Point(-dimensionLeft, -dimensionUp)
+  lazy val topRight     : Point = Point(dimensionRight, -dimensionUp)
+  lazy val bottomLeft   : Point = Point(-dimensionLeft, dimensionDown)
+  lazy val bottomRight  : Point = Point(dimensionRight, dimensionDown)
   lazy val corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+
+  lazy val marginUp     : Int = 16 * tileHeight - dimensionUp
+  lazy val marginDown   : Int = 16 * tileHeight - dimensionDown   - 1
+  lazy val marginLeft   : Int = 16 * tileWidth  - dimensionLeft
+  lazy val marginRight  : Int = 16 * tileWidth  - dimensionRight  - 1
 
   //////////////
   // Movement //
@@ -383,11 +388,11 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     output.toVector
   }
 
-  private def addBuildUnitIf(classes: ListBuffer[UnitClass], predicate: Boolean, thenAddThatClass: UnitClass) {
+  private def addBuildUnitIf(classes: ListBuffer[UnitClass], predicate: Boolean, thenAddThatClass: UnitClass): Unit = {
     if (predicate) classes.append(thenAddThatClass)
   }
 
-  private def addBuildUnitIf(classes: ListBuffer[UnitClass], ifThisClass: UnitClass, thenAddThatClass: UnitClass) {
+  private def addBuildUnitIf(classes: ListBuffer[UnitClass], ifThisClass: UnitClass, thenAddThatClass: UnitClass): Unit = {
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
 

@@ -4,12 +4,21 @@ import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels
 import Placement.Generation.Fit
 import Placement.Templating.{Template, TemplatePointRequirement}
+import Placement.Walls.WallSpans.TerrainTerrain
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
 
-class Wall() {
+class Wall {
   val buildings = new ArrayBuffer[(Tile, UnitClass)]
+  var constraint: WallConstraint = WallConstraint(0, Protoss.Dragoon, TerrainTerrain)
+
+  def this(other: Wall) {
+    this()
+    buildings ++= other.buildings
+    constraint = other.constraint
+  }
 
   def toFit: Fit = {
     if (buildings.isEmpty) return Fit(Tile(0, 0), new Template())

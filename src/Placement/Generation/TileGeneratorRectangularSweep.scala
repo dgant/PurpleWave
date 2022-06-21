@@ -4,22 +4,22 @@ import Mathematics.Maff
 import Mathematics.Points.{Direction, Tile}
 
 class TileGeneratorRectangularSweep(suggestedOrigin: Tile, val boundA: Tile, val boundB: Tile, val direction: Direction) extends TileGenerator {
-  private val xMin = Math.min(boundA.x, boundB.x)
-  private val xMax = Math.max(boundA.x, boundB.x)
-  private val yMin = Math.min(boundA.y, boundB.y)
-  private val yMax = Math.max(boundA.y, boundB.y)
-  private val origin = Tile(Maff.clamp(suggestedOrigin.x, xMin, xMax), Maff.clamp(suggestedOrigin.y, yMin, yMax))
-  private val dxMax = Math.max(suggestedOrigin.x - xMin, xMax - suggestedOrigin.x)
-  private val dyMax = Math.max(suggestedOrigin.y - yMin, yMax - suggestedOrigin.y)
-  private val breadthIsX = direction.y != 0
-  private val sideDepth = if (breadthIsX) direction.y else direction.x
+  private val xMin        = Math.min(boundA.x, boundB.x)
+  private val xMax        = Math.max(boundA.x, boundB.x)
+  private val yMin        = Math.min(boundA.y, boundB.y)
+  private val yMax        = Math.max(boundA.y, boundB.y)
+  private val origin      = Tile(Maff.clamp(suggestedOrigin.x, xMin, xMax), Maff.clamp(suggestedOrigin.y, yMin, yMax))
+  private val dxMax       = Math.max(suggestedOrigin.x - xMin, xMax - suggestedOrigin.x)
+  private val dyMax       = Math.max(suggestedOrigin.y - yMin, yMax - suggestedOrigin.y)
+  private val breadthIsX  = direction.y != 0
+  private val sideDepth   = if (breadthIsX) direction.y else direction.x
   private var sideBreadth = 1
-  private var dBreadth = 0
-  private var dDepth = 0
-  private val maxBreadth = if (breadthIsX) dxMax else dyMax
-  private val maxDepth = if (breadthIsX) dyMax else dxMax
-  private var nextOutput: Tile = origin
-  private var _hasNext: Boolean = true
+  private var dBreadth    = 0
+  private var dDepth      = 0
+  private val maxBreadth  = if (breadthIsX) dxMax else dyMax
+  private val maxDepth    = if (breadthIsX) dyMax else dxMax
+  private var nextOutput  = origin
+  private var _hasNext    = true
 
   def next(): Tile = {
     val output = nextOutput

@@ -14,6 +14,8 @@ object WallDesigner {
   def terran(zone: Zone): Option[Wall] = None
   def zerg(zone: Zone): Option[Wall] = None
   def protoss(zone: Zone): Option[Wall] = {
+    val exit = zone.exitOriginal
+    if (exit.isEmpty) return None
     val constraints = Vector(
       WallConstraint(1, Zerg.Zergling,    TerrainTerrain, Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainTerrain, Protoss.Gateway, Protoss.Forge),
@@ -25,10 +27,18 @@ object WallDesigner {
       WallConstraint(1, Zerg.Hydralisk,   TerrainGas,     Protoss.Gateway, Protoss.Forge, Protoss.Pylon),
       WallConstraint(1, Zerg.Zergling,    TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge),
-      WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge, Protoss.Pylon)
-      )
-    val cache = new WallCache
-    val wall = cache.generate(zone, constraints)
+      WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge, Protoss.Pylon))
+    val cache = new WallCache(zone, exit.get, constraints, Seq(
+      Protoss.Pylon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon,
+      Protoss.PhotonCannon))
+    val wall = cache.generate()
     With.logger.debug(f"$zone: ${if (wall.isDefined) "CREATED WALL" else "FAILED to create wall"}")
     if (wall.isDefined) {
       With.logger.debug(f"Constraints:              ${wall.get.constraint}" )

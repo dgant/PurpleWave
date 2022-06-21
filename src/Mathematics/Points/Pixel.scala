@@ -65,16 +65,22 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def radiansTo(other: Pixel): Double = {
     Maff.fastAtan2(other.y - y, other.x - x)
   }
-  @inline def midpoint(pixel: Pixel): Pixel = {
-    add(pixel).divide(2)
+  @inline def directionTo(other: Pixel): Direction = {
+    other.subtract(this).direction
   }
-  @inline def pixelDistance(pixel: Pixel): Double = {
-    Maff.broodWarDistance(x, y, pixel.x, pixel.y)
+  @inline def midpoint(other: Pixel): Pixel = {
+    add(other).divide(2)
+  }
+  @inline def pixelDistance(other: Pixel): Double = {
+    Maff.broodWarDistance(x, y, other.x, other.y)
   }
   @inline def pixelDistanceSquared(other: Pixel): Int = {
     val dx = x - other.x
     val dy = y - other.y
     dx * dx + dy * dy
+  }
+  @inline def pixelDistanceChebyshev(other: Pixel): Int = {
+    Math.max(Math.abs(x-other.x), Math.abs(y-other.y))
   }
   @inline def tile: Tile = {
     Tile(x / 32, y / 32) // Note! This will handle negative coordinates incorrectly

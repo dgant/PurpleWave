@@ -1,16 +1,18 @@
 package Placement.Walls
 
-import Information.Geography.Types.Zone
+import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile}
 import Mathematics.Shapes.{Corners, Rectangle, RoundedBox}
+import Placement.Generation.TileGeneratorRectangularSweep
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall}
+import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
 
-class WallCache {
+class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler: Seq[UnitClass]) {
 
   // Logging metrics
   var metricPermutations        = 0
@@ -29,22 +31,31 @@ class WallCache {
   val wallScores = new ArrayBuffer[(Wall, Double)]()
   var bestWall: Option[Wall] = None
 
-  def generate(zone: Zone, constraints: Seq[WallConstraint]): Option[Wall] = {
+  def generate(): Option[Wall] = {
+    placeRequiredBuildings()
+    if (bestWall.isEmpty) return None
+    placeFiller()
+    bestWall
+  }
+
+  def placeRequiredBuildings(): Option[Wall] = {
     if (constraints.isEmpty) return None
     if (zone.exitOriginal.isEmpty) return None
 
-    val incompleteWall  : Wall              = new Wall
-    var constraintIndex : Int               = 0
-    var gapsLeft        : Int               = 0
+    val incompleteWall  : Wall  = new Wall
+    var constraintIndex : Int   = 0
+    var gapsLeft        : Int   = 0
+
     def constraintAvailable: Boolean = constraintIndex < constraints.length
+
     def constraint: WallConstraint = incompleteWall.constraint
+
     def nextConstraint(): Unit = {
       incompleteWall.buildings.clear()
       incompleteWall.constraint = constraints(constraintIndex)
       constraintIndex += 1
       gapsLeft = constraint.gapTiles
     }
-
 
     // Overall plan:
     // - Identify starting boundary
@@ -64,7 +75,8 @@ class WallCache {
     def boundaryEnd = constraint.span match {
       case TerrainGas   => zone.wallPerimeterGas;
       case TerrainHall  => zone.wallPerimeterHall;
-      case _            => zone.wallPerimeterExit }
+      case _            => zone.wallPerimeterExit
+    }
 
     def tryPlace(horizon: Seq[Tile], buildingsLeft: Seq[UnitClass], gapsLeft: Int): Boolean = {
       // TODO: If gapsLeft is zero enforce constraint.blocksUnit
@@ -78,12 +90,14 @@ class WallCache {
           metricGapTooNarrow += 1
           return false
         }
+        // TODO: Test power
         wallScores += ((new Wall(incompleteWall), scoreWall(incompleteWall)))
         return true
       }
-      val building = buildingsLeft.head
-      val width = building.tileWidthPlusAddon
-      val height = building.tileHeight
+      val building  = buildingsLeft.head
+      val width     = building.tileWidthPlusAddon
+      val height    = building.tileHeight
+
       /*
       For each tile in the boundary,
         for each way to place a tile adjacent to it,
@@ -103,20 +117,19 @@ class WallCache {
          0000
          1111
        */
-      horizon.exists(horizonTile => {
+      0 < horizon.count(horizonTile => {
         metricTilesConsidered += 1
-
-        val boxWidth = width + 2
-        val boxHeight = height + 2
+        val boxWidth  = width   + 2
+        val boxHeight = height  + 2
         0 < RoundedBox(boxWidth, boxHeight).count(relative =>
           0 < (0 to gapsLeft).count(gapsUsed => {
             val buildingTile = horizonTile
               .subtract(width, height)
               .add(relative)
-              .add(   if (relative.x == 0)            Point(-gapsUsed, 0)
-                else  if (relative.y == 0)            Point(0,        -gapsUsed)
-                else  if (relative.x == boxWidth - 1) Point(gapsUsed, 0)
-                else                                  Point(0,        gapsUsed))
+              .add(if (relative.x == 0)             Point(-gapsUsed, 0)
+              else if (relative.y == 0)             Point(0, -gapsUsed)
+              else if (relative.x == boxWidth - 1)  Point(gapsUsed, 0)
+              else Point(0, gapsUsed))
             val buildingEndX = buildingTile.x + width
             val buildingEndY = buildingTile.y + height
             lazy val (alleyLeft, alleyRight, alleyUp, alleyDown) = incompleteWall.buildings.lastOption.map(b => {
@@ -132,7 +145,7 @@ class WallCache {
               val alleyDown     = if (tileGapDown   == 0) lastBuilding.marginUp     + building.marginDown   else -1
               (alleyLeft, alleyRight, alleyUp, alleyDown)
             }).getOrElse((-1, -1, -1, -1))
-            if ( ! With.grids.buildableW(width)(buildingTile)) {
+            if (!With.grids.buildableW(width)(buildingTile)) {
               metricUnbuildableTerrain += 1
               false
             } else if (incompleteWall.buildings.exists(existingBuilding => Maff.rectanglesIntersect(buildingTile.x, buildingTile.y, buildingEndX, buildingEndY,
@@ -157,10 +170,13 @@ class WallCache {
             } else {
               incompleteWall.buildings += ((buildingTile, building))
               val output = tryPlace(building.tileArea.tilesAtEdge.map(buildingTile.add), buildingsLeft.drop(1), gapsLeft - gapsUsed)
-              if ( ! output) { metricFailedRecursively += 1 }
+              if ( ! output) {
+                metricFailedRecursively += 1
+              }
               incompleteWall.buildings.remove(incompleteWall.buildings.length - 1)
               output
-            }}))})
+            }
+          }))})
     }
 
     while (constraintAvailable && bestWall.isEmpty) {
@@ -183,5 +199,42 @@ class WallCache {
     val yMax = endTiles.map(_.y).max
     val scoreArea = Maff.broodWarDistance(xMin, yMin, xMax, yMax)
     scoreArea
+  }
+
+  def placeFiller(): Unit = {
+    var i = 0
+    var lastFiller = Neutral.PsiDisruptor
+    var lastFilled = true
+    while (i < filler.length) {
+      val fill = filler(i)
+      // Don't try and fail to fill the same thing multiple times
+      if (lastFilled || fill != lastFiller) {
+        lastFilled = tryFill(fill)
+      }
+      lastFiller = fill
+      i += 1
+    }
+  }
+
+  def tryFill(fill: UnitClass): Boolean = {
+    val wall = bestWall.get
+    val generator = new TileGeneratorRectangularSweep(exit.pixelCenter.tile, zone.boundary.startInclusive, zone.boundary.endExclusive, exit.pixelCenter.directionTo(zone.heart.center))
+    while (generator.hasNext) {
+      val tile = generator.next()
+      if (tile.zone == zone
+        && With.grids.buildableW(fill.tileWidthPlusAddon)(tile)
+        && ! wall.buildings.exists(b =>
+          64 +  zone.heart.center.pixelDistanceChebyshev(b._1.topLeftPixel.add(16 * b._2.tileWidthPlusAddon, 16 * b._2.tileHeight))
+          <     zone.heart.center.pixelDistanceChebyshev(tile.topLeftPixel.add(16 * fill.tileWidthPlusAddon, 16 * fill.tileHeight)))
+        && ! wall.buildings.exists(b => Maff.rectanglesIntersect(
+          b._1.x, b._1.y, b._1.x + b._2.tileWidthPlusAddon, b._1.y + b._2.tileHeight,
+          tile.x, tile.y, tile.x + fill.tileWidthPlusAddon, tile.y + fill.tileHeight))) {
+        // TODO: Test power
+        // TODO: Test pathing
+        wall.buildings += ((tile, fill))
+        return true
+      }
+    }
+    false
   }
 }

@@ -16,7 +16,7 @@ final class PathfindProfile(
   var canCrossUnwalkable  : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
   var canEndUnwalkable    : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
   var employGroundDist    : Boolean         = false,
-  var acceptPartialPath   : Boolean         = false, // If we
+  var acceptPartialPath   : Boolean         = false,
   var costEnemyVision     : Double          = 0.0,
   var costImmobility      : Double          = 0.0,
   var costOccupancy       : Double          = 0.0,

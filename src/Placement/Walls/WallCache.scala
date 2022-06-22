@@ -1,5 +1,6 @@
 package Placement.Walls
 
+import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
@@ -12,7 +13,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
 
-class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler: Seq[UnitClass]) {
+class WallCache(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallConstraint], filler: Seq[UnitClass]) {
 
   // Logging metrics
   var metricPermutations        = 0
@@ -123,13 +124,15 @@ class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler
         val boxHeight = height  + 2
         0 < RoundedBox(boxWidth, boxHeight).count(relative =>
           0 < (0 to gapsLeft).count(gapsUsed => {
+            val gapOffset =
+                    if (relative.x == 0)            Point(- gapsUsed,   0)
+              else  if (relative.y == 0)            Point(  0,        - gapsUsed)
+              else  if (relative.x == boxWidth - 1) Point(  gapsUsed,   0)
+              else                                  Point(  0,          gapsUsed)
             val buildingTile = horizonTile
               .subtract(width, height)
               .add(relative)
-              .add(if (relative.x == 0)             Point(-gapsUsed, 0)
-              else if (relative.y == 0)             Point(0, -gapsUsed)
-              else if (relative.x == boxWidth - 1)  Point(gapsUsed, 0)
-              else Point(0, gapsUsed))
+              .add(gapOffset)
             val buildingEndX = buildingTile.x + width
             val buildingEndY = buildingTile.y + height
             lazy val (alleyLeft, alleyRight, alleyUp, alleyDown) = incompleteWall.buildings.lastOption.map(b => {
@@ -168,11 +171,21 @@ class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler
               metricInsufficientlyTight += 1
               false
             } else {
+              // Apply changes
+              val gapBefore = incompleteWall.gap
               incompleteWall.buildings += ((buildingTile, building))
+              if (gapBefore.isEmpty && gapsUsed > 0) {
+                incompleteWall.gap = Some(horizonTile.add(gapOffset.direction.x, gapOffset.direction.y))
+              }
+
+              // Test changes
               val output = tryPlace(building.tileArea.tilesAtEdge.map(buildingTile.add), buildingsLeft.drop(1), gapsLeft - gapsUsed)
               if ( ! output) {
                 metricFailedRecursively += 1
               }
+
+              // Revert changes
+              incompleteWall.gap = gapBefore
               incompleteWall.buildings.remove(incompleteWall.buildings.length - 1)
               output
             }
@@ -202,6 +215,15 @@ class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler
   }
 
   def placeFiller(): Unit = {
+    if (filler.isEmpty) return
+    if (bestWall.get.gap.isDefined) {
+      val gap = bestWall.get.gap.get
+      val hallwayWalls      = bestWall.get.buildings.flatMap(p => p._2.tileArea.add(p._1).tiles).toSet
+      val hallwayProfile    = new PathfindProfile(gap, Some(entrance), employGroundDist = true, alsoUnwalkable = hallwayWalls)
+      val hallwayPath       = hallwayProfile.find.tiles
+      bestWall.get.hallway  = hallwayPath.getOrElse(Seq.empty)
+      if (bestWall.get.hallway.isEmpty) return // We can't safely fill without preserving a path
+    }
     var i = 0
     var lastFiller = Neutral.PsiDisruptor
     var lastFilled = true
@@ -223,6 +245,7 @@ class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler
       val tile = generator.next()
       if (tile.zone == zone
         && With.grids.buildableW(fill.tileWidthPlusAddon)(tile)
+        && ! wall.hallway.contains(tile)
         && ! wall.buildings.exists(b =>
           64 +  zone.heart.center.pixelDistanceChebyshev(b._1.topLeftPixel.add(16 * b._2.tileWidthPlusAddon, 16 * b._2.tileHeight))
           <     zone.heart.center.pixelDistanceChebyshev(tile.topLeftPixel.add(16 * fill.tileWidthPlusAddon, 16 * fill.tileHeight)))
@@ -230,7 +253,6 @@ class WallCache(zone: Zone, exit: Edge, constraints: Seq[WallConstraint], filler
           b._1.x, b._1.y, b._1.x + b._2.tileWidthPlusAddon, b._1.y + b._2.tileHeight,
           tile.x, tile.y, tile.x + fill.tileWidthPlusAddon, tile.y + fill.tileHeight))) {
         // TODO: Test power
-        // TODO: Test pathing
         wall.buildings += ((tile, fill))
         return true
       }

@@ -24,11 +24,11 @@ class Placement extends Fitter {
     val basesSorted = With.geography.bases.sortBy(_.heart.groundTiles(With.geography.home))
     val zonesSorted = With.geography.zones.sortBy(_.heart.groundTiles(With.geography.home))
 
-    //basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
-    zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
-    //basesSorted.foreach(base => fitAndIndexConstrained(5, 1, if (base.isStartLocation) Templates.mainBases else Templates.bases, base))
-    //basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
-    //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
+    basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
+    //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
+    basesSorted.foreach(base => fitAndIndexConstrained(5, 1, if (base.isStartLocation) Templates.mainBases else Templates.bases, base))
+    basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
+    zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
   }
 
@@ -51,10 +51,6 @@ class Placement extends Fitter {
   }
 
   private def preplaceWalls(zone: Zone): Unit = {
-    //if (With.self.isTerran) {
-    //TerranWall(zone).foreach(index)
-    //}
-    //if ( ! zone.bases.exists(_.naturalOf.isDefined)) return
     val wall = WallDesigner(zone)
     val fit = wall.map(_.toFit)
     fit.foreach(index)

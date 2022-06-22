@@ -16,6 +16,7 @@ object WallDesigner {
   def protoss(zone: Zone): Option[Wall] = {
     val exit = zone.exitOriginal
     if (exit.isEmpty) return None
+    val entrance = zone.entranceOriginal.map(_.pixelCenter.tile).getOrElse(zone.heart)
     val constraints = Vector(
       WallConstraint(1, Zerg.Zergling,    TerrainTerrain, Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainTerrain, Protoss.Gateway, Protoss.Forge),
@@ -28,7 +29,7 @@ object WallDesigner {
       WallConstraint(1, Zerg.Zergling,    TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge, Protoss.Pylon))
-    val cache = new WallCache(zone, exit.get, constraints, Seq(
+    val cache = new WallCache(zone, exit.get, entrance, constraints, Seq(
       Protoss.Pylon,
       Protoss.PhotonCannon,
       Protoss.PhotonCannon,

@@ -18,7 +18,6 @@ object UpdateBase {
     base.gasLeft          = base.gas.view.map(_.gasLeft).sum
     base.lastPlannedExpo  = if (base.plannedExpo()) With.frame else base.lastPlannedExpo
     base.enemyCombatValue = base.units.view.filter(_.isEnemy).filter(IsWarrior).map(_.subjectiveValue).sum
-    updateOwner(base)
 
     if (base.townHallArea.tiles.exists(_.visibleUnchecked)) {
       base.lastFrameScoutedByUs = With.frame
@@ -26,6 +25,8 @@ object UpdateBase {
     if (base.units.exists(u => u.isOurs && u.unitClass.isBuilding && u.visibleToOpponents)) {
       base.lastFrameScoutedByEnemy = With.frame
     }
+
+    updateOwner(base)
   }
   
   private def updateOwner(base: Base): Unit = {
@@ -38,7 +39,6 @@ object UpdateBase {
       With.logger.debug(f"Detecting ownership of base from visible town hall: $hall")
       base.owner = hall.player
     } else {
-
       val scoutingNow = base.lastFrameScoutedByUs == With.frame
       val framesSinceScouting = With.framesSince(base.lastFrameScoutedByUs)
       val hiddenNaturalDelay = Minutes(3)()
@@ -49,7 +49,6 @@ object UpdateBase {
           With.logger.debug(f"Detecting absent base: $base")
         }
       } else if (base.owner.isNeutral) {
-
         if (With.scouting.enemyMain.contains(base)) {
           base.owner = With.enemy
           With.logger.debug(f"Assuming ${base.owner} owns $base as implicit starting location")

@@ -32,11 +32,17 @@ class PlacementQuery {
     requirements.building = Some(building).filter(_.isGas)
     requirements.labelYes = if (building.isTownHall) Seq(PlaceLabels.TownHall)  else Seq.empty
     requirements.labelNo  = if (building.isTownHall) Seq.empty                  else Seq(PlaceLabels.TownHall)
+    requirements.zone     = Seq.empty
+    requirements.base     = Seq.empty
+    requirements.tile     = Seq.empty
     preferences.width     = requirements.width
     preferences.height    = requirements.height
     preferences.building  = Some(building)
+    preferences.labelYes  = Seq.empty
+    preferences.labelNo   = Seq.empty
     preferences.zone      = With.geography.ourZones
     preferences.base      = With.geography.ourBases
+    preferences.tile      = Seq.empty
     if (Seq(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.RoboticsFacility).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.GroundProduction
     }
@@ -126,16 +132,16 @@ class PlacementQuery {
     bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, PointGas))
   }
 
-  def auditRequirements: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    With.placement.foundations.map(requirements.audit).sortBy(-_._2)
+  def auditRequirements: Vector[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+    With.placement.foundations.map(requirements.audit).toVector.sortBy(-_._2)
   }
 
-  def auditPreferences: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    foundations.map(preferences.audit).sortBy(-_._2)
+  def auditPreferences: Vector[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+    foundations.map(preferences.audit).toVector.sortBy(-_._2)
   }
 
-  def auditPreferencesUnfiltered: Seq[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
-    With.placement.foundations.map(preferences.audit).sortBy(-_._2)
+  def auditPreferencesUnfiltered: Vector[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
+    With.placement.foundations.map(preferences.audit).toVector.sortBy(-_._2)
   }
 
   override def toString: String = f"PlacementQuery Req$requirements) Pref$preferences)"

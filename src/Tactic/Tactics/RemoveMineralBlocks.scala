@@ -20,7 +20,8 @@ class RemoveMineralBlocks extends Tactic {
       .filter(unit => unit.unitClass.isMinerals && unit.isBlocker)
       .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixel) || edge.pixelCenter.pixelDistanceSquared(unit.pixel) < Math.pow(32.0 * 3, 2)))
       .toVector
-    
+
+    if (With.units.countOurs(IsWorker) < 45) return
     if (ourMineralBlocks.isEmpty) return
     
     val mineral = ourMineralBlocks.head

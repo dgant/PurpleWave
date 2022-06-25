@@ -69,7 +69,7 @@ object Skimulator {
       }
 
       // Consider detection
-      if ( ! team.opponent.hasDetection) {
+      if (unit.isEnemy && ! team.opponent.hasDetection) {
         if (Terran.Wraith(unit) && Terran.WraithCloak(player)) unit.skimStrength *= 5
         if (Protoss.DarkTemplar(unit)) unit.skimStrength *= 15
         if (Zerg.Lurker(unit)) unit.skimStrength *= 5

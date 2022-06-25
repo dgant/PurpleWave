@@ -9,7 +9,7 @@ import Utilities.Time.{GameTime, Seconds}
   */
 object ZergTimings {
   object OneHatchGasCompleteBy                    extends GameTime(2, 20)
-  object TwoHatchGasCompleteBy                    extends GameTime(2, 45)
+  object TwoHatchGasCompleteBy                    extends GameTime(2, 36)
   object ThreeHatchGasCompleteBy                  extends GameTime(3, 10)
 
   object FivePool_PoolCompleteBy                  extends GameTime(1, 32)

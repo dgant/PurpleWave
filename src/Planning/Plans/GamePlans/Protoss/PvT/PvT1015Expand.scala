@@ -5,7 +5,7 @@ import Macro.Requests.RequestBuildable
 import Planning.Plan
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, GasCapsUntouched, Pump}
 import Planning.Plans.Macro.Expanding.RequireMiningBases

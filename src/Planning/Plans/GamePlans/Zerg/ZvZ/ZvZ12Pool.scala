@@ -5,7 +5,6 @@ import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpJustEnoughScourge
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
@@ -17,6 +16,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ12Pool

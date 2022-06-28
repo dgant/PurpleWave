@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic._

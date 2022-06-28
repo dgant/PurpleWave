@@ -172,13 +172,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   val arrivalFrame = new Cache(() => {
     val home        = With.geography.home.center
     val classSpeed  = unitClass.topSpeed
-    val travelTime  = Math.min(24 * 60 * 60,
-      if (canMove)
-        framesToTravelTo(home)
-      else if (classSpeed > 0)
-        (pixelDistanceTravelling(home) / classSpeed).toInt
-      else
-        Int.MaxValue)
+    val travelTime  = Math.min(
+      24 * 60 * 60,
+      if (canMove)              framesToTravelTo(home)
+      else if (classSpeed > 0)  (pixelDistanceTravelling(home) / classSpeed).toInt
+      else                      Int.MaxValue)
     val completionTime  = Maff.clamp(completionFrame, With.frame, With.frame + unitClass.buildFrames)
     val arrivalTime     = completionTime + travelTime
     arrivalTime

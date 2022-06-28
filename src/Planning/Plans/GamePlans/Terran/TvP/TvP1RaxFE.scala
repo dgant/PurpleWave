@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.RepairBunker
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}

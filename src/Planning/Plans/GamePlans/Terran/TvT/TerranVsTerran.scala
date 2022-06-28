@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.TvT
 
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 import Planning.Plans.GamePlans.Terran.TvE.TerranReactionVsWorkerRush
 
 class TerranVsTerran extends ModalGameplan(

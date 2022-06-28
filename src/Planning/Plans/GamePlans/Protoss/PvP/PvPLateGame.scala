@@ -4,7 +4,7 @@ import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.Get
 import Mathematics.Maff
-import Planning.Plans.GamePlans.GameplanImperative
+import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
 import Utilities.UnitFilters.IsWarrior
@@ -108,9 +108,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString).foreach(status)
-
-    // Emergency reactions
-    new OldPvPReactions.ReactToDarkTemplarEmergencies().update()
+    PvPDTDefense.reactToDarkTemplarEmergencies()
   }
 
   override def executeMain(): Unit = {

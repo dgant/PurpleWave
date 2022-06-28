@@ -3,7 +3,6 @@ package Planning.Plans.GamePlans.Terran.TvR
 import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.GamePlans.Terran.RepairBunker
 import Planning.Plans.Macro.Automatic.{Friendly, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -13,6 +12,7 @@ import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.IsWarrior
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil

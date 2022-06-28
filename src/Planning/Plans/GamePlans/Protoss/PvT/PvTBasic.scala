@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
@@ -15,7 +15,7 @@ import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural
 import Planning.Plans.Scouting.{ScoutCleared, ScoutNow, ScoutOn}
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, GasAtMost}
-import Planning.Predicates.Milestones.{EnemyHasShownWraithCloak, _}
+import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive._
 import Planning.Predicates.Strategy.{Employing, EnemyIsRandom, EnemyRecentStrategy, EnemyStrategy}
 import ProxyBwapi.Races.{Protoss, Terran}

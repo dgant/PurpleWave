@@ -2,7 +2,6 @@ package Planning.Plans.GamePlans.Terran.TvR
 
 import Macro.Requests.Get
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases
@@ -11,6 +10,7 @@ import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax

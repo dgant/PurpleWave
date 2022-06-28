@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic.{CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build

@@ -3,7 +3,7 @@ package Strategery
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
-import Planning.Plans.GamePlans.StandardGamePlan
+import Planning.Plans.GamePlans.All.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Selection.{ExpandStrategy, StrategySelectionFixed, WinProbability}

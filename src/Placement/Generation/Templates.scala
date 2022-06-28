@@ -286,15 +286,17 @@ object Templates {
 
   val tech = Seq(
     new Template().from(
-      "3xxPx3xx",
-      "xxxxxxxx"),
+      "---------",
+      "3xxPx3xx-",
+      "xxxxxxxx-"),
     new Template().from(
-      "3xx",
-      "xxx",
-      "3xx",
-      "xxx",
-      "Pxx",
-      "xxx"))
+      "----",
+      "3xx-",
+      "xxx-",
+      "3xx-",
+      "xxx-",
+      "Pxx-",
+      "xxx-"))
 
   val batterycannon = Seq(
     new Template()

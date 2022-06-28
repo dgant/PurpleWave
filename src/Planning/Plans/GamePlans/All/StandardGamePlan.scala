@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans
+package Planning.Plans.GamePlans.All
 
 import Planning.Plans.Compound.SwitchOurRace
 import Planning.Plans.GamePlans.Protoss.ProtossStandardGamePlan

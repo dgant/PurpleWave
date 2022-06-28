@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Plans.GamePlans.GameplanImperative
+import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import Planning.Plans.Placement.BuildCannonsAtNatural
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
@@ -10,7 +10,7 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.SwapIf
-import Utilities.Time.{Frames, GameTime, Minutes}
+import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
 
 class PvPOpening extends GameplanImperative {
 
@@ -38,7 +38,6 @@ class PvPOpening extends GameplanImperative {
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
   val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
-  val reactToDTEmergencies = new OldPvPReactions.ReactToDarkTemplarEmergencies
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -252,15 +251,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
       shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
-      // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
-      // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
-      // Pylon + Forge + Cannon takes 1:15
-      // So we need to start the cannon process no later than 4:30 (adding some time as a buffer for construction delays)
-      // We can delay this based on things we've seen
-      timeToStartCannons = GameTime(4, 30)()
-      // TODO: Delay if they went Zealot-first into core
-      if (With.fingerprints.twoGate()) timeToStartCannons += GameTime(1, 10)()
-      if (With.fingerprints.dragoonRange()) timeToStartCannons += GameTime(0, 30)()
+      timeToStartCannons = PvPDTDefense.expectedDTArrivalFrame - Protoss.PhotonCannon.buildFrames + Protoss.Pylon.buildFrames + Seconds(15)()
       // Look for reasons to avoid getting cannons
       if (enemyDarkTemplarLikely) {
         getCannons = true
@@ -272,6 +263,8 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
         getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
         getCannons ||= With.fingerprints.dtRush()
+        getCannons ||= enemyDarkTemplarLikely
+        getCannons &&= ! With.units.existsOurs(Protoss.RoboticsFacility)
       }
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0 || (safeToMoveOut && units(Protoss.DarkTemplar) > 0) || (upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20)
     } else if (PvP3GateGoon()) {
@@ -352,7 +345,7 @@ class PvPOpening extends GameplanImperative {
       if (PvPRobo()) {
         buildOrder(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer))
       } else {
-        reactToDTEmergencies.update()
+        PvPDTDefense.reactToDarkTemplarEmergencies()
       }
     }
 

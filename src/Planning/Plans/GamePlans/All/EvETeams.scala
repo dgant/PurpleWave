@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.All
 
-import Planning.Plans.GamePlans.GameplanImperative
 import Utilities.DoQueue
 
 abstract class EvETeams extends GameplanImperative {

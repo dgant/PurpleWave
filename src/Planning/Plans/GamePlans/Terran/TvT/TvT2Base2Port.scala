@@ -4,7 +4,7 @@ import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.FloatBuildings
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}

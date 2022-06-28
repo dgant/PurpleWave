@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Placement.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.ScoutOn

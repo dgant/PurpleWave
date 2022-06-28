@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvR
 
 import Macro.Requests.Get
 import Planning.Plan
-import Planning.Plans.GamePlans.GameplanTemplateVsRandom
+import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast

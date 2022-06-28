@@ -2,8 +2,8 @@ package Planning.Plans.Compound
 
 import Lifecycle.With
 import Planning.Plans.Basic.NoPlan
-import Planning.Plans.GamePlans.Modal
 import Planning.Plan
+import Planning.Plans.GamePlans.All.Modal
 import Utilities.Property
 import bwapi.Race
 

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.FFA
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, TechContinuously, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}

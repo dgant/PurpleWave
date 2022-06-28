@@ -5,7 +5,6 @@ import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.CancelIncomplete
@@ -14,6 +13,7 @@ import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 

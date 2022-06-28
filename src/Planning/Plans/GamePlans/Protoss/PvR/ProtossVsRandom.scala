@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.PvR
 
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 
 class ProtossVsRandom extends ModalGameplan(
   new PvR2Gate910,

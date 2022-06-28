@@ -4,7 +4,7 @@ import Macro.Requests.RequestBuildable
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.Trigger
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.PumpWorkers
 import Planning.Plans.Macro.Expanding.RequireMiningBases

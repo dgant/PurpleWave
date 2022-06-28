@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss
 
 import Planning.Plans.Compound.SwitchEnemyRace
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 import Planning.Plans.GamePlans.Protoss.PvP.ProtossVsProtoss
 import Planning.Plans.GamePlans.Protoss.PvR.ProtossVsRandom
 import Planning.Plans.GamePlans.Protoss.PvT.ProtossVsTerran

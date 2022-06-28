@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanTemplate
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, ExtractorTrick, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.RequireMiningBases

@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.RepairBunker
 import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -16,6 +15,7 @@ import Planning.Predicates.Compound.{Latch, Not}
 import Planning.Predicates.Milestones.MiningBasesAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ1RaxFE

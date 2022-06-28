@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Zerg.ZvP
 
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 
 class ZergVsProtoss extends ModalGameplan(

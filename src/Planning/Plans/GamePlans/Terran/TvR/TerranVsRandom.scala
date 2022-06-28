@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Terran.TvR
 
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 
 class TerranVsRandom extends ModalGameplan(
   new TvRTinfoil,

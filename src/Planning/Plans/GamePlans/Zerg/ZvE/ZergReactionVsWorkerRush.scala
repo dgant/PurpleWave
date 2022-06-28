@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.CancelIncomplete
@@ -13,6 +12,7 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeStarted}
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.Plan
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 

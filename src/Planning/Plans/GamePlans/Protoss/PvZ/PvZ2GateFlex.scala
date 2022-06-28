@@ -2,7 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Plans.GamePlans.GameplanImperative
+import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Utilities.UnitFilters.IsWarrior

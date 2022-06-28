@@ -1,6 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
-import Planning.Plans.GamePlans.ModalGameplan
+import Planning.Plans.GamePlans.All.ModalGameplan
 
 class ProtossVsZerg extends ModalGameplan(
   // Openings

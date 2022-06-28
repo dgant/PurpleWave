@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvT
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.GameplanImperative
+import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.DoQueue
 

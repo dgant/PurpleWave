@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans
+package Planning.Plans.GamePlans.All
 
 import Lifecycle.With
 

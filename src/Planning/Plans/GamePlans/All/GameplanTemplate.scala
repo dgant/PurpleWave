@@ -1,6 +1,7 @@
-package Planning.Plans.GamePlans
+package Planning.Plans.GamePlans.All
 
 import Macro.Requests.RequestBuildable
+import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Automatic.{PumpWorkers, RequireSufficientSupply}
@@ -10,7 +11,6 @@ import Planning.Plans.Scouting._
 import Planning.Predicates.Compound.Not
 import Planning.Predicates.Strategy.WeAreZerg
 import Planning.Predicates.{Always, Never, Predicate}
-import Planning.Plan
 
 abstract class GameplanTemplate extends Plan with Modal {
   val activationCriteria    : Predicate       = new Always

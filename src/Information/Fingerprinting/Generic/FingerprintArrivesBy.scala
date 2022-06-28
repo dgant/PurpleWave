@@ -6,9 +6,9 @@ import Utilities.UnitFilters.UnitFilter
 import Utilities.Time.FrameCount
 
 class FingerprintArrivesBy(
-                            unitMatcher : UnitFilter,
-                            gameTime    : FrameCount,
-                            quantity    : Int = 1)
+  unitMatcher : UnitFilter,
+  gameTime    : FrameCount,
+  quantity    : Int = 1)
     extends Fingerprint {
   
   override val sticky = true

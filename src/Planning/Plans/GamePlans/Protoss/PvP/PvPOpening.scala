@@ -2,15 +2,15 @@ package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
-import Planning.Plans.Placement.BuildCannonsAtNatural
-import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.SwapIf
 import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
 
@@ -37,7 +37,6 @@ class PvPOpening extends GameplanImperative {
   override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
-  val buildCannonsAtNatural = new BuildCannonsAtNatural(2)
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -683,14 +682,14 @@ class PvPOpening extends GameplanImperative {
     } else if (speedlotAttack) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
-      if (getCannons) { buildCannonsAtNatural.update() }
+      if (getCannons) { buildCannonsAtNatural(2, PlaceLabels.DefendEntrance) }
       if (shouldExpand) { requireMiningBases(2) }
       SwapIf(
         safeAtHome && With.scouting.enemyProgress < 0.5,
         () => trainGatewayUnits(),
         () => get(5, Protoss.Gateway))
     } else if (PvPDT()) {
-      if (getCannons) { buildCannonsAtNatural.update() }
+      if (getCannons) { buildCannonsAtNatural(2, PlaceLabels.DefendEntrance) }
       if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
         buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
       }

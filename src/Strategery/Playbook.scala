@@ -5,7 +5,7 @@ import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.Sandbox
 import Strategery.Strategies.Protoss._
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{Protoss, Strategy}
 import Strategery.Strategies.Terran.TvR.TvR1Rax
 
 class Playbook extends SimpleString {
@@ -31,7 +31,9 @@ object StrategyGroups {
 
     PvTStove, // TODO: For ladder/fun play only
 
-    PvT2BaseGateway // Has issues and isn't good anyway
+    PvT2BaseGateway, // Has issues and isn't good anyway
+
+    Protoss.PvPTechBeforeRange // Doesn't actually beat what it's supposed to beat
   )
 }
 

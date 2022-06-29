@@ -1,7 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
+import Placement.Access.PlaceLabels
 import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.Protoss.PvZ.PvZIdeas.MeldArchonsUntilStorm
 import Planning.Plans.Macro.Automatic.{Enemy, Pump, PumpRatio, UpgradeContinuously}
@@ -91,7 +92,7 @@ class PvZ1BaseForgeTech extends GameplanTemplate {
         new UnitsAtLeast(1, Protoss.DarkTemplar, complete = true),
         new UnitsAtLeast(12, IsWarrior)),
       new Parallel(
-        new BuildCannonsAtNatural(2),
+        new BuildCannonsAtNatural(2, PlaceLabels.DefendEntrance),
         new RequireMiningBases(2))),
 
     new If(

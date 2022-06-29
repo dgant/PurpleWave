@@ -135,10 +135,10 @@ def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Un
     buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filter(_.isOurNatural))
   }
   def buildDefenseAtExpansions(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.isOurMain))
+    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.isOurMain).filterNot(_.isOurNatural))
   }
   def buildDefenseAtOpenings(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-
+    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.natural.exists(_.isOurs)))
   }
   def buildCannonsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Protoss.PhotonCannon,   labels)

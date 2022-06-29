@@ -30,13 +30,6 @@ abstract class PvR2GateStrategy extends PvRStrategy {
 object PvROpenZCoreZ extends PvR1GateCoreStrategy
 object PvROpen2Gate910 extends PvR2GateStrategy
 object PvROpen2Gate1012 extends PvR2GateStrategy
-object PvRDT extends PvRStrategy {
-  override lazy val choices = Vector(
-    Seq(PvTDTExpand),
-    Seq(PvPDT),
-    Seq(PvZMidgameBisu))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
-}
 object PvRProxy2Gate extends PvR2GateStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)

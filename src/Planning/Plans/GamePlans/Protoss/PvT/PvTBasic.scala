@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvT
 
 import Lifecycle.With
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels
 import Planning.Plan
 import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{FlipIf, If, Parallel, Trigger}
@@ -458,8 +459,8 @@ class PvTBasic extends GameplanTemplate {
     new If(
       new EnemyHasShown(Terran.Vulture),
       new Parallel(
-        new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(1)),
-        new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1)))),
+        new If(new UnitsAtLeast(3, Protoss.Gateway), new BuildCannonsAtExpansions(1, PlaceLabels.DefendHall)),
+        new If(new BasesAtLeast(3), new BuildCannonsAtNatural(1, PlaceLabels.DefendHall)))),
 
     new RequireMiningBases(4),
     new PumpReactiveGateways(12, 16),

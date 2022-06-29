@@ -1,8 +1,11 @@
 package Planning.Plans.Placement
 
-import Information.Geography.Types.Base
-import Lifecycle.With
+import Placement.Access.PlaceLabels.PlaceLabel
+import Planning.Plan
+import Planning.Plans.GamePlans.All.MacroActions
 
-class BuildCannonsAtNatural(initialCount: Int) extends BuildTowersAtBases(initialCount) {
-  override def eligibleBases: Vector[Base] = Vector(With.geography.ourNatural)
+class BuildCannonsAtNatural(count: Int, labels: PlaceLabel*) extends Plan with MacroActions {
+  override def onUpdate(): Unit = {
+    buildCannonsAtNatural(count, labels: _*)
+  }
 }

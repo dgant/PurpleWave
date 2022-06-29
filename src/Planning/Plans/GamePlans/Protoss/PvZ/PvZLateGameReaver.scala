@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels
 import Planning.Plan
 import Planning.Plans.Compound.{If, Parallel, Trigger}
 import Planning.Plans.GamePlans.All.GameplanTemplate
@@ -55,7 +56,7 @@ class PvZLateGameReaver extends GameplanTemplate {
         Get(Protoss.TemplarArchives),
         Get(Protoss.PsionicStorm))),
     new PvZIdeas.TrainAndUpgradeArmy,
-    new BuildCannonsAtExpansions(5),
+    new BuildCannonsAtExpansions(5, PlaceLabels.DefendEntrance),
     new PvZIdeas.AddGateways,
     new PvZRequireMiningBases(5)
   )

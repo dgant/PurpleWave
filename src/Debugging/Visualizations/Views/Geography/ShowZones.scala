@@ -44,6 +44,8 @@ object ShowZones extends DebugView {
         edge.sidePixels.last,
         edge.zones.find( ! _.owner.isNeutral).map(_.owner).getOrElse(With.neutral).colorDark))
 
+    DrawMap.tileRectangle(new TileRectangle(zone.downtown), Colors.BrightGreen)
+
     // Draw bases
     zone.bases.foreach(base => {
       base.resourcePathTiles.foreach(tile => DrawMap.cross(tile.center, 2, Colors.MediumRed))

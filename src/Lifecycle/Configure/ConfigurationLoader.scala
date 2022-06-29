@@ -113,8 +113,8 @@ object ConfigurationLoader {
   }
 
   private def setRoundRobinMode(): Unit = {
-    config.historyHalfLife    = 40
-    config.recentFingerprints = 4
+    config.historyHalfLife    = 30
+    config.recentFingerprints = 3
   }
 
   private def setLivestreamMode(): Unit = {

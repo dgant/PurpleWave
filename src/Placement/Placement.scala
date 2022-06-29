@@ -42,12 +42,12 @@ class Placement extends Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    fitAndIndexRectangle(1, 1, Templates.batterycannon,  exitTile,    bounds, directionToBack)
-    fitAndIndexRectangle(0, 1, Templates.initialLayouts, cornerFront, bounds, directionToBack)
-    fitAndIndexRectangle(2, 1, Templates.tech,           cornerBack,  bounds, directionToFront)
-    fitAndIndexRectangle(3, 1, Templates.gateways,       cornerFront, bounds, directionToBack)
-    fitAndIndexRectangle(4, 1, Templates.tech,           cornerBack,  bounds, directionToFront)
-    fitAndIndexRectangle(4, 5, Templates.gateways,       cornerFront, bounds, directionToBack)
+    fitAndIndexRectangle(1, 1, Templates.batterycannon,  exitTile,      bounds, directionToBack)
+    fitAndIndexRectangle(0, 1, Templates.initialLayouts, zone.downtown, bounds, directionToBack)
+    fitAndIndexRectangle(2, 1, Templates.tech,           cornerBack,    bounds, directionToFront)
+    fitAndIndexRectangle(3, 1, Templates.gateways,       cornerFront,   bounds, directionToBack)
+    fitAndIndexRectangle(4, 1, Templates.tech,           cornerBack,    bounds, directionToFront)
+    fitAndIndexRectangle(4, 5, Templates.gateways,       cornerFront,   bounds, directionToBack)
   }
 
   private def preplaceWalls(zone: Zone): Unit = {

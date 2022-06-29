@@ -9,7 +9,6 @@ object ProtossChoices {
     PvROpen2Gate910,
     PvROpen2Gate1012,
     PvROpenZCoreZ,
-    PvRDT,
     PvRProxy2Gate,
     PvR2Gate4Gate,
     PvR1BaseDT,

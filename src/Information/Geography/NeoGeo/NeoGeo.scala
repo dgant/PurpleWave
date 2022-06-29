@@ -5,6 +5,7 @@ import bwapi.Game
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Sorting
 
 /**
   * NeoGeo is a reliable and easy-to-use Java-compatible terrain analyzer for the StarCraft: Brood War API (BWAPI).
@@ -104,8 +105,8 @@ final class NeoGeo(game: Game) {
       y += 1
     }
   }
+
   // Populate altitude
-  /*
   private val walkCoast: Array[(Int, Int)] = (-1 to walkWidth).flatMap(dx => (-1 to walkHeight).map((dx, _))).filterNot(isWalkable).filter(adjacentWalks4(_).exists(isWalkable)).toArray
   private val distances: Array[((Int, Int), Double)] = (0 until walkMaxDim / 2  + 3).flatMap(dx => (dx until walkMaxDim / 2  + 3).map((dx, _))).map(p => (p, NeoMath.lengthBW(p))).toArray
   Sorting.quickSort(distances)(Ordering.by(_._2))
@@ -138,7 +139,7 @@ final class NeoGeo(game: Game) {
       i += 1
     }
   }
-  */
+
   // Populate clearance
   private def populateClearance(values: Array[Int], sx: Int, sy: Int, dx: Double, dy: Double): Unit = {
     val zMax = walkMaxDim / Math.min(Math.abs(dx), Math.abs(dy))

@@ -1,12 +1,11 @@
 package Planning.Plans.Placement
 
-import Information.Geography.Types.Base
-import Lifecycle.With
+import Placement.Access.PlaceLabels.PlaceLabel
+import Planning.Plan
+import Planning.Plans.GamePlans.All.MacroActions
 
-class BuildCannonsAtExpansions(initialCount: Int) extends BuildTowersAtBases(initialCount) {
-  override def eligibleBases: Iterable[Base] = {
-    With.geography.ourBases
-      .filterNot(With.geography.ourMain==)
-      .filterNot(With.geography.ourNatural==)
+class BuildCannonsAtExpansions(count: Int, labels: PlaceLabel*) extends Plan with MacroActions {
+  override def onUpdate(): Unit = {
+    buildCannonsAtExpansions(count, labels: _*)
   }
 }

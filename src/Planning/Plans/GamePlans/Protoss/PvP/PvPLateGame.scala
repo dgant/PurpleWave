@@ -4,12 +4,12 @@ import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.Get
 import Mathematics.Maff
+import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
-import Planning.Plans.Placement.{BuildCannonsAtExpansions, BuildCannonsAtNatural}
-import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
+import Utilities.UnitFilters.IsWarrior
 import Utilities._
 
 class PvPLateGame extends GameplanImperative {
@@ -28,6 +28,7 @@ class PvPLateGame extends GameplanImperative {
   var shouldHarass: Boolean = _
   var shouldAttack: Boolean = _
   var shouldExpand: Boolean = _
+  var shouldMindControl: Boolean = _
   var primaryTech: Option[PrimaryTech] = None
 
   def primaryTemplar: Boolean = primaryTech.contains(TemplarTech)
@@ -35,8 +36,6 @@ class PvPLateGame extends GameplanImperative {
 
   var firstDTFrame: Int = Forever()
 
-  val buildCannonsAtNatural = new BuildCannonsAtNatural(1)
-  val buildCannonsAtExpansions = new BuildCannonsAtExpansions(1)
   override def executeBuild(): Unit = {
     fearDeath   = ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
     fearMacro   = miningBases < Math.max(2, enemyBases)
@@ -54,6 +53,7 @@ class PvPLateGame extends GameplanImperative {
     }
 
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+    shouldMindControl = false // expectCarriers
     shouldDetect = enemyDarkTemplarLikely
     shouldDetect ||= enemyHasShown(Protoss.ArbiterTribunal, Protoss.Arbiter)
     shouldExpand = fearMacro || ! fearDeath
@@ -90,7 +90,7 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech).filter(x => units(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.PhotonCannon) > 0))
       .orElse(Some(RoboTech).filter(x => enemyDarkTemplarLikely))
       .orElse(Some(RoboTech).filter(x => With.fingerprints.cannonRush()))
-      .orElse(Some(TemplarTech).filter(x => commitToTech && expectCarriers))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && shouldMindControl))
       .orElse(Some(TemplarTech).filter(x => commitToTech && bases > 2))
       .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (With.fingerprints.fourGateGoon()) 0.5 else 0.25)))
       .orElse(Some(RoboTech).filter(x => commitToTech))
@@ -102,6 +102,7 @@ class PvPLateGame extends GameplanImperative {
     if (fearMacro) status("FearMacro")
     if (fearContain) status("FearContain")
     if (expectCarriers) status("ExpectCarriers")
+    if (shouldMindControl) status("MindControl")
     if (shouldDetect) status("Detect")
     if (shouldSecondaryTech) status("2ndTech")
     if (shouldExpand) status("ShouldExpand")
@@ -121,7 +122,7 @@ class PvPLateGame extends GameplanImperative {
 
     // TODO: Emergency/Proactive detection
 
-    if (expectCarriers) { makeDarkArchons() }
+    if (shouldMindControl) { makeDarkArchons() }
 
     get(Protoss.Gateway)
     get(Protoss.Assimilator)
@@ -257,7 +258,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldDetect) { get(Protoss.Forge) }
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)
-    if (expectCarriers) {
+    if (shouldMindControl) {
       if (upgradeComplete(Protoss.DarkArchonEnergy)) get(Protoss.MindControl) else get(Protoss.DarkArchonEnergy)
     } else if (readyForStorm) {
       get(Protoss.Forge)
@@ -277,9 +278,10 @@ class PvPLateGame extends GameplanImperative {
 
   def doCannons(): Unit = {
     if (units(Protoss.Forge) > 0) {
-      buildCannonsAtNatural.update()
-      if (bases > 2) {
-        buildCannonsAtExpansions.update()
+      if (enemyHasShown(Protoss.Shuttle)) {
+        buildCannonsAtBases(1, PlaceLabels.DefendHall)
+      } else {
+        buildCannonsAtOpenings(1, PlaceLabels.DefendHall)
       }
     }
   }

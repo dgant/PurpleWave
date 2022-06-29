@@ -7,9 +7,9 @@ import ProxyBwapi.Races.Zerg
 import Utilities.Time.FrameCount
 
 class FingerprintCompleteBy(
-                             unitMatcher : UnitFilter,
-                             gameTime    : FrameCount,
-                             quantity    : Int = 1) extends Fingerprint {
+  unitMatcher : UnitFilter,
+  gameTime    : FrameCount,
+  quantity    : Int = 1) extends Fingerprint {
 
   private val endFrame = gameTime()
   override def investigate: Boolean = {

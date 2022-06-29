@@ -158,12 +158,12 @@ object With {
     // Normal systems //
     ////////////////////
 
-    //geo = new NeoGeo(game)
-    analyzeTerrain()
-
+    geo = new NeoGeo(game)
     if (With.configuration.visualizeDebug) {
       //NeoRender(geo)
     }
+
+    analyzeTerrain()
 
     // Order-dependent initialization:
     // PerformanceMonitor must exist when creating any task

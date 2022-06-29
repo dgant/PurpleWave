@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
@@ -82,7 +83,7 @@ class PvZ5GateGoon extends GameplanTemplate {
           new PumpRatio(Protoss.Stargate, 0, 2, Seq(Enemy(Zerg.Mutalisk, 0.2))),
           new UpgradeContinuously(Protoss.AirDamage)))),
     new Build(Get(5, Protoss.Gateway)),
-    new BuildCannonsAtNatural(1),
+    new BuildCannonsAtNatural(1, PlaceLabels.DefendEntrance),
     new If(
       new Employing(PvZMidgame5GateGoon),
       new Parallel(
@@ -96,8 +97,8 @@ class PvZ5GateGoon extends GameplanTemplate {
           Get(Protoss.Shuttle),
           Get(Protoss.RoboticsSupportBay),
           Get(Protoss.ShuttleSpeed)))),
-    new BuildCannonsAtExpansions(5),
-    new BuildCannonsAtNatural(2),
+    new BuildCannonsAtExpansions(5, PlaceLabels.DefendEntrance),
+    new BuildCannonsAtNatural(2, PlaceLabels.DefendEntrance),
 
     // Transition
     new Trigger(

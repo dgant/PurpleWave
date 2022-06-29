@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels
 import Planning.Plan
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.GamePlans.All.GameplanTemplate
@@ -67,7 +68,7 @@ class PvZLateGameTemplar extends GameplanTemplate {
     new IfOnMiningBases(3, new If(new UnitsAtLeast(10, Protoss.Gateway), new RequireMiningBases(4))),
     new AddPriorityTech,
     new PvZIdeas.TrainAndUpgradeArmy,
-    new BuildCannonsAtExpansions(5),
+    new BuildCannonsAtExpansions(5, PlaceLabels.DefendEntrance),
     new AddTech,
     new PvZIdeas.AddGateways,
     new RequireMiningBases(5)

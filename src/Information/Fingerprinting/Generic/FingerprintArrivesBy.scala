@@ -2,8 +2,10 @@ package Information.Fingerprinting.Generic
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import Mathematics.Maff
+import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Time.{FrameCount, Frames}
 import Utilities.UnitFilters.UnitFilter
-import Utilities.Time.FrameCount
 
 class FingerprintArrivesBy(
   unitMatcher : UnitFilter,
@@ -12,16 +14,14 @@ class FingerprintArrivesBy(
     extends Fingerprint {
   
   override val sticky = true
+
+  protected def matchedUnits  : Iterable[UnitInfo] = With.units.everEnemy.filter(unitMatcher)
+  protected def arrivingUnits : Iterable[UnitInfo] = matchedUnits.filter(_.arrivalFrame() < gameTime())
   
   override def investigate: Boolean = {
-    val targetFrame = gameTime()
-
-    // Important performance short-circuit
-    if (With.frame > targetFrame) return false
-
-    val units           = With.units.everEnemy.filter(unitMatcher)
-    val arrivingOnTime  = units.count(_.arrivalFrame() < targetFrame)
-    val output          = arrivingOnTime >= quantity
-    output
+    // Game time cutoff spares performance
+    With.frame > gameTime() && arrivingUnits.size >= quantity
   }
+
+  override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame())).getOrElse(0))}"
 }

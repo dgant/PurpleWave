@@ -62,7 +62,7 @@ object ShowZones extends DebugView {
         base.townHallArea.center,
         drawBackground = true,
         base.owner.colorDark)
-      DrawMap.tileRectangle(new TileRectangle(base.heart), Colors.BrightYellow)
+      DrawMap.tileRectangle(new TileRectangle(base.heart), Colors.BrightOrange)
     })
 
     // Draw labels

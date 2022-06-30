@@ -1,13 +1,13 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Mathematics.{Maff, Shapes}
 import Mathematics.Points.Pixel
-import Mathematics.Shapes.{Circle, Ray}
-import Utilities.UnitFilters.IsWarrior
+import Mathematics.Shapes.Circle
+import Mathematics.{Maff, Shapes}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
 import Utilities.Time.{Forever, Minutes, Seconds}
+import Utilities.UnitFilters.IsWarrior
 
 object Imagination {
 
@@ -31,8 +31,11 @@ object Imagination {
         && tripper.pixelDistanceEdge(unit) < 96
         && unit.altitude >= tripper.altitude))
 
-    // Yay, we see the unit
-    if (unit.bwapiUnit.isVisible) {
+    // Yay, we see the unit!
+    //
+    // Check BOTH exists and visible because I have seen cases where one value or the other is nonsensical
+    // though this may just be a symptom of ghost unit data.
+    if (unit.bwapiUnit.exists && unit.bwapiUnit.isVisible) {
       unit.changeVisibility(Visibility.Visible)
       return
     }

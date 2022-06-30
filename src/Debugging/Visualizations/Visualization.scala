@@ -39,7 +39,7 @@ class Visualization extends TimedTask {
     //ShowStoryteller,
 
     // Temporary views
-    ShowZones,
+    // ShowZones,
     ShowFormations,
     ShowPlacement,
     ShowFoundations,

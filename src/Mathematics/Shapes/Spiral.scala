@@ -16,7 +16,7 @@ object Spiral {
     var segment_passed = 0
 
     val pointsToSearch = (2 * radius + 1) * (2 * radius + 1)
-    (0 to pointsToSearch).map(i => {
+    IndexedSeq(Point(0, 0)) ++ (0 to pointsToSearch).map(i => {
       x += dx
       y += dy
       segment_passed += 1

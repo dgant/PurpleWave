@@ -158,7 +158,7 @@ object With {
     // Normal systems //
     ////////////////////
 
-    geo = new NeoGeo(game)
+    //geo = new NeoGeo(game)
     if (With.configuration.visualizeDebug) {
       //NeoRender(geo)
     }

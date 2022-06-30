@@ -1,6 +1,6 @@
 package Placement.Generation
 
-import Information.Geography.Types.Base
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Points._
 import Placement.Access.Fits
@@ -12,10 +12,24 @@ import scala.collection.mutable.ArrayBuffer
 trait Fitter extends Fits {
 
   /**
-    * Attempts to fit each of a sequence of templates.
+    * Attempts to fit each of a sequence of templates using a rectangular sweep.
     */
   def fitAndIndexRectangle(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, bounds: TileRectangle, direction: Direction): mutable.Buffer[Fit] = {
     fitAndIndex(order, maxFits, templates, x => new TileGeneratorRectangularSweep(from, bounds.startInclusive, bounds.endExclusive, direction))
+  }
+
+  /**
+    * Attempts to fit each of a sequence of templates using a spiral.
+    */
+  def fitAndIndexSpiral(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, zone: Zone): mutable.Buffer[Fit] = {
+    fitAndIndex(order, maxFits, templates, x => new TileGeneratorSpiral(from.subtract(x.width / 2, x.height / 2), zone))
+  }
+
+  /**
+    * Attempts to fit each of a sequence of templates in proximity order.
+    */
+  def fitAndIndexProximity(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, zone: Zone): mutable.Buffer[Fit] = {
+    fitAndIndex(order, maxFits, templates, x => new TileGeneratorProximity(from.subtract(x.width / 2, x.height / 2), zone))
   }
 
   /**

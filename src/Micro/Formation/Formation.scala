@@ -22,7 +22,11 @@ trait Formation {
       if (p._1.pixelDistanceCenter(slot) < 320) {
         DrawMap.arrow(p._1.pixel, box.minBy(_.pixelDistanceSquared(p._1.pixel)), style.color)
       }
-      DrawMap.box(box(0), box(2), style.color)
+      if (unit.flying) {
+        DrawMap.triangle(box(0).midpoint(box(1)), box(2), box(3), style.color)
+      } else {
+        DrawMap.box(box(0), box(2), style.color)
+      }
     })
     DrawMap.polygon(Maff.convexHull(placements.flatMap(p => p._1.unitClass.corners.map(p._2.add)).toSeq), style.color)
   }

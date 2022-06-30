@@ -22,7 +22,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.Time.{Forever, Frames, Seconds}
-import bwapi._
+import bwapi.Color
 
 abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with UnitFilter {
 
@@ -57,7 +57,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private var lastUnitClass       : UnitClass = _
   private val previousPixels      : Array[Pixel] = Array.fill(48)(new Pixel(bwapiUnit.getPosition))
   @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((With.frame + previousPixels.length - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
-  def update() {
+  def update(): Unit = {
     _hasEverBeenVisibleToOpponents ||= visibleToOpponents
     // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
     if (Math.max(cooldownGround, cooldownAir) > lastCooldown) lastFrameStartingAttack = With.frame
@@ -108,7 +108,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     With.framesUntil(lastFrameStartingAttack + unitClass.stopFrames))
 
   private var _producer: Option[Prioritized] = None
-  @inline final def setProducer(plan: Prioritized) { _producer = Some(plan) }
+  @inline final def setProducer(plan: Prioritized): Unit = { _producer = Some(plan) }
   @inline final def producer: Option[Prioritized] = _producer
 
   @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)

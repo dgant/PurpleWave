@@ -49,6 +49,7 @@ final case class TileRectangle(
 
   @inline def width   : Int = endExclusive.x - startInclusive.x
   @inline def height  : Int = endExclusive.y - startInclusive.y
+  @inline def diagonal: Double = Math.sqrt(width * width + height * height)
   
   @inline def add(x: Int, y: Int): TileRectangle =
     TileRectangle(
@@ -63,7 +64,7 @@ final case class TileRectangle(
   @inline def add(Tile: Tile): TileRectangle =
     add(Tile.x, Tile.y)
 
-  @inline def center : Pixel = startPixel.midpoint(endPixel)
+  @inline def center  : Pixel = startPixel.midpoint(endPixel)
   @inline def midpoint : Tile  = startInclusive.midpoint(endExclusive)
   
   @inline def contains(x: Int, y: Int): Boolean =

@@ -62,14 +62,16 @@ class PlacementQueryParameters {
 
   protected def scoreBuilding(foundation: Foundation): Double = {
     val foundationBuildings = foundation.point.requirement.buildings
-    // Request building     -> Has building     : Accept & prefer
-    // Request building     -> Lacks building   : Reject
-    // Request no building  -> Has building     : Accept
-    // Request no building  -> Lacks building   : Accept & prefer
-          if (building.exists(foundationBuildings.contains))  2.0
-    else  if (building.isDefined)                             0.0
-    else  if (foundationBuildings.nonEmpty)                   1.0
-    else                                                      2.0
+    // Request building     -> Has right building : Accept & prefer
+    // Request building     -> Has wrong building : Reject hard
+    // Request building     -> Lacks building     : Reject
+    // Request no building  -> Has building       : Accept
+    // Request no building  -> Lacks building     : Accept & prefer
+          if (building.exists(foundationBuildings.contains))        2.0
+    else  if (building.isDefined && foundationBuildings.nonEmpty) - 1.0
+    else  if (building.isDefined)                                   0.0
+    else  if (foundationBuildings.nonEmpty)                         1.0
+    else                                                            2.0
   }
 
   protected def scoreLabelYes(foundation: Foundation): Double = {

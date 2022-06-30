@@ -82,8 +82,8 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
       lazy val candidateFoundations = placementQuery.foundations
       var candidateIndex = 0
       do {
-        if ((foundation.isEmpty && candidateFoundations.nonEmpty) || With.framesSince(lastSearch) > Seconds(if (builder.isDefined) 60 else 15)()) {
-          if (candidateIndex > candidateFoundations.length) return
+        if (foundation.isEmpty || With.framesSince(lastSearch) > Seconds(if (builder.isDefined) 60 else 15)()) {
+          if (candidateIndex >= candidateFoundations.length) return
           foundation = Some(candidateFoundations(candidateIndex))
           lastSearch = With.frame
           candidateIndex += 1
@@ -91,7 +91,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
         foundation = foundation.filter(f => With.architecture.assess(f.tile, buildingClass, expectedFrames) == ArchitecturalAssessment.Accepted)
         foundation = foundation.filter(f => With.groundskeeper.isFree(f.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight))
         foundation = foundation.filter(placementQuery.accept)
-      } while (foundation.isEmpty && candidateIndex < candidateFoundations.length)
+      } while (foundation.isEmpty)
       if (foundation.isEmpty) return
       With.architecture.assumePlacement(foundation.get.tile, buildingClass, expectedFrames) // Mainly needed so we know what will be powered in the future
       if ( ! tileLock.acquireTiles(new TileRectangle(foundation.get.tile, buildingClass.tileWidthPlusAddon, buildingClass.tileHeight).tiles)) {

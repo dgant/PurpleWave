@@ -161,7 +161,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def interceptorCount        : Int               = _interceptorCount
   @inline final def transport               : Option[FriendlyUnitInfo] = _transport
   def readProxy(): Unit = {
-    if (With.frame == 0 || bwapiUnit.isVisible(With.self.bwapiPlayer)) {
+    if (With.frame == 0 || bwapiUnit.exists()) {
       changeUnitType(UnitClasses.get(bwapiUnit.getType))
       changeVisibility(Visibility.Visible)
       _player                 = Players.get(bwapiUnit.getPlayer)

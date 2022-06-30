@@ -1,6 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
+import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, Defensive}
 import Placement.Templating.Template
 import bwapi.Race
 
@@ -300,35 +301,37 @@ object Templates {
 
   val batterycannon = Seq(
     new Template()
-      .forExitDirection(Directions.Up)
+      .addLabels(Defensive, DefendEntrance, DefendGround)
+      .forExitDirection(Directions.Left)
       .from(
       "--------",
       "-BxxPxCx",
-      "-xxxxxxx"),
+      "-xxxxxxx",
+      "--------"),
     new Template()
-      .forExitDirection(Directions.Down)
+      .addLabels(Defensive, DefendEntrance, DefendGround)
+      .forExitDirection(Directions.Right)
       .from(
+      "--------",
       "CxPxBxx-",
       "xxxxxxx-",
       "--------"),
     new Template()
-      .forExitDirection(Directions.Left)
+      .addLabels(Defensive, DefendEntrance, DefendGround)
+      .forExitDirection(Directions.Up)
       .from(
-      "----",
-      "-Bxx",
-      "-xxx",
-      "-Pxx",
-      "-xxx",
-      "-Cxx",
-      "-xxx"),
+      "-----",
+      "-Bxx-",
+      "-xxx--",
+      "-CxPx-",
+      "-xxxx-"),
     new Template()
-      .forExitDirection(Directions.Right)
+      .addLabels(Defensive, DefendEntrance, DefendGround)
+      .forExitDirection(Directions.Down)
       .from(
-        "----",
-        "Bxx-",
-        "xxx-",
-        "xPx-",
-        "xxx-",
-        "xCx-",
-        "xxx-"))
+        "-CxPx-",
+        "-xxxx-",
+        "-Bxx--",
+        "-xxx-",
+        "-----"))
 }

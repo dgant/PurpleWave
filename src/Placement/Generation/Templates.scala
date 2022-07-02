@@ -204,23 +204,26 @@ object Templates {
         "--CM2UTxxx",
         "--xxxxxxxx")) ++ bases // Default to generic base layouts if needed
 
+
   val initialLayouts = Seq(
+    // It's critical that the Gateways be on the bottom.
+    // Gateway above Citadel-Pylon-Core can trap Dark Templar.
     new Template().from(
-      "----------",
-      "-4xxx4xxx-",
-      "-xxxxxxxx-",
-      "-xxxxxxxx-",
-      "-TxxPxRxx-",
+      "xxxxxx---",
+      "xTxxPxRxx-",
       "xxxxxxxxx-",
-      "xxxxx-----"),
+      "x4xxx4xxx-",
+      "-xxxxxxxx-",
+      "-xxxxxxxx-",
+      "----------"),
     new Template().from(
-      "----------",
-      "-4xxx4xxx-",
-      "-xxxxxxxx-",
-      "-xxxxxxxx-",
-      "-RxxPxTxx-",
+      "----xxxxxx",
+      "-RxxPxTxxx",
       "-xxxxxxxxx",
-      "-----xxxxx")
+      "-4xxx4xxxx",
+      "-xxxxxxxx-",
+      "-xxxxxxxx-",
+      "----------")
   )
 
   val gateways = Seq(

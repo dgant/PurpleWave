@@ -32,8 +32,6 @@ object StrategyGroups {
     PvTStove, // TODO: For ladder/fun play only
 
     PvT2BaseGateway, // Has issues and isn't good anyway
-
-    Protoss.PvPTechBeforeRange // Doesn't actually beat what it's supposed to beat
   )
 }
 

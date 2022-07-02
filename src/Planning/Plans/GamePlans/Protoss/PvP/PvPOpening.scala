@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
-import Macro.Requests.Get
 import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
@@ -14,25 +13,26 @@ import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
 
-  var complete: Boolean = false
-  // General properties
-  var shouldExpand: Boolean = false
-  var shouldAttack: Boolean = false
-  var shouldHarass: Boolean = false
-  // 10-12 properties
-  var commitZealots: Boolean = false
-  var sevenZealot: Boolean = false
-  // 1 Gate Core properties
-  var zBeforeCore: Boolean = false
-  var zAfterCore: Boolean = false
-  // Robo properties
-  var getObservers: Boolean = false
-  var getObservatory: Boolean = false
-  var shuttleFirst: Boolean = false
-  // DT properties
-  var timeToStartCannons: Int = 0
-  var getCannons: Boolean = false
-  var speedlotAttack: Boolean = false
+  var complete          : Boolean = false
+  var shouldExpand      : Boolean = false
+  var shouldAttack      : Boolean = false
+  var shouldHarass      : Boolean = false
+  // 10-12
+  var commitZealots     : Boolean = false
+  var sevenZealot       : Boolean = false
+  // 1 Gate Core
+  var zBeforeCore       : Boolean = false
+  var zAfterCore        : Boolean = false
+  // Robo
+  var getObservers      : Boolean = false
+  var getObservatory    : Boolean = false
+  var getReavers        : Boolean = false
+  var shuttleFirst      : Boolean = false
+  var shuttleSpeed      : Boolean = false
+  // DT
+  var getCannons        : Boolean = false
+  var speedlotAttack    : Boolean = false
+  var cannonStartFrame  : Int = 0
 
   override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
@@ -204,23 +204,18 @@ class PvPOpening extends GameplanImperative {
     if (PvPRobo()) {
       getObservatory = true
       getObservers = true
+      if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
+        getReavers = ! With.fingerprints.dtRush()
+        shuttleFirst = getReavers
+      }
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
       } else {
-        if (units(Protoss.Shuttle) == 0) {
-          if (units(Protoss.RoboticsSupportBay, Protoss.Observer) == 0) {
-            shuttleFirst = true
-          }
-        }
 
         // Look for reasons to avoid making an Observer.
         // Don't stop to check if we already started an Observatory or Observers
         // because we can cancel and switch out of them at any time.
-
-        getObservatory = true
-        getObservers = true
-
-        if (PvPTechBeforeRange()) {
+        if (shuttleSpeed) {
           // This strategy demands a ton of gas; we can't afford the Observer
           getObservatory = false
           getObservers = false
@@ -230,16 +225,19 @@ class PvPOpening extends GameplanImperative {
           getObservers = false
         } else if (With.strategy.isFixedOpponent) {
           // Obs is what we're here for, so let's not get too cute
+        } else if (With.frame > GameTime(5, 15)() && ! With.fingerprints.dragoonRange()) {
+          // If Dragoon range is supiciously absent we should prepare for DT
         } else if (trackRecordLacks(With.fingerprints.dtRush) || enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGate, With.fingerprints.proxyGateway)) {
           if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
             getObservatory = false
             getObservers = false
           } else {
-            getObservatory = roll("SpeculativeObservatory", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 0.8 else 0.5)
+            getObservatory = roll("SpeculativeObservatory", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 0.8 else 0.4)
             getObservers = getObservatory && roll("SpeculativeObservers", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 1.0 else 0.75) // So the probability of obs is the *joint* probability
           }
         }
       }
+      shuttleSpeed = shuttleFirst && PvPTechBeforeRange() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.25)
 
       shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
       shouldExpand &&= safeToMoveOut
@@ -250,13 +248,13 @@ class PvPOpening extends GameplanImperative {
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
       shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
-      timeToStartCannons = PvPDTDefense.expectedDTArrivalFrame - Protoss.PhotonCannon.buildFrames + Protoss.Pylon.buildFrames + Seconds(15)()
+      cannonStartFrame = PvPDTDefense.expectedDTArrivalFrame - Protoss.PhotonCannon.buildFrames + Protoss.Pylon.buildFrames + Seconds(15)()
       // Look for reasons to avoid getting cannons
       if (enemyDarkTemplarLikely) {
         getCannons = true
       } else {
         getCannons = units(Protoss.TemplarArchives) > 0
-        getCannons &&= With.frame >= timeToStartCannons
+        getCannons &&= With.frame >= cannonStartFrame
         getCannons &&= safeAtHome
         getCannons &&= ! enemyRobo
         getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
@@ -294,7 +292,7 @@ class PvPOpening extends GameplanImperative {
       && ! upgradeComplete(Protoss.DragoonRange)
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
-    shouldAttack ||= With.units.ours.exists(u => u.agent.commit) && With.frame < Minutes(5)()
+    shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)()
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend
@@ -321,17 +319,16 @@ class PvPOpening extends GameplanImperative {
         (if (zAfterCore) status("CoreZ") else status("NZCore"))
       }
     }
-    if (sevenZealot) status("SevenZealots")
-    if (commitZealots) status("CommitZealots")
-    if (shuttleFirst) status("ShuttleFirst")
-    if (getObservers) status("Obs")
+    if (sevenZealot)    status("SevenZealots")
+    if (commitZealots)  status("CommitZealots")
+    if (shuttleFirst)   status("ShuttleFirst")
+    if (getObservers)   status("Obs")
     if (getObservatory) status("Observatory")
-    if (PvPDT()) status(f"Cannon@${Frames(timeToStartCannons)}")
-    if (getCannons) status("Cannons")
+    if (getCannons)     status(f"Cannons@${Frames(cannonStartFrame)}")
     if (speedlotAttack) status("Speedlot")
-    if (shouldAttack) status("Attack")
-    if (shouldHarass) status("Harass")
-    if (shouldExpand) status("ExpandNow")
+    if (shouldAttack)   status("Attack")
+    if (shouldHarass)   status("Harass")
+    if (shouldExpand)   status("ExpandNow")
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }
@@ -342,7 +339,7 @@ class PvPOpening extends GameplanImperative {
 
     if (units(Protoss.CyberneticsCore) > 0 && enemyDarkTemplarLikely) {
       if (PvPRobo()) {
-        buildOrder(Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore), Get(Protoss.RoboticsFacility), Get(Protoss.Observatory), Get(Protoss.Observer))
+        once(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       } else {
         PvPDTDefense.reactToDarkTemplarEmergencies()
       }
@@ -352,7 +349,9 @@ class PvPOpening extends GameplanImperative {
     // Scouting //
     //////////////
 
-    if (enemies(Protoss.Dragoon) == 0 && ! With.fingerprints.proxyGateway()) {
+    if (enemies(Protoss.Dragoon) == 0
+      && ! With.fingerprints.proxyGateway()
+      && ! With.units.enemy.filter(Protoss.CyberneticsCore).exists(With.frame - _.completionFrame > Protoss.Dragoon.buildFrames - Seconds(5)())) {
       if (PvP1012()) {
         if ( ! foundEnemyBase && ! PvPIdeas.attackFirstZealot) {
           scoutOn(Protoss.Gateway, quantity = 2)
@@ -388,11 +387,10 @@ class PvPOpening extends GameplanImperative {
     // Execute build order //
     /////////////////////////
 
-    buildOrder(
-      Get(8, Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway))
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
 
     /////////////////////////
     // React against proxy //
@@ -427,70 +425,65 @@ class PvPOpening extends GameplanImperative {
     ////////////
 
     if (PvP1012()) { // https://liquipedia.net/starcraft/2_Gate_(vs._Protoss)
-      buildOrder(
-        Get(12, Protoss.Probe),
-        Get(2, Protoss.Gateway),
-        Get(13, Protoss.Probe),
-        Get(Protoss.Zealot),
-        Get(2, Protoss.Pylon),
-        Get(15, Protoss.Probe),
-        Get(3, Protoss.Zealot))
+      once(12,  Protoss.Probe)
+      once(2,   Protoss.Gateway)
+      once(13,  Protoss.Probe)
+      once(1,   Protoss.Zealot)
+      once(2,   Protoss.Pylon)
+      once(15,  Protoss.Probe)
+      once(3,   Protoss.Zealot)
 
       ///////////////
       // 5+ Zealot //
       ///////////////
 
       if (PvP5Zealot()) { // https://tl.net/forum/bw-strategy/380852-pvp-2-gate-5-zealot-expand
-        buildOrder(
-          Get(16, Protoss.Probe),
-          Get(3, Protoss.Pylon),
-          Get(17, Protoss.Probe),
-          Get(5, Protoss.Zealot),
-          Get(18, Protoss.Probe))
+        once(16,  Protoss.Probe)
+        once(3,   Protoss.Pylon)
+        once(17,  Protoss.Probe)
+        once(5,   Protoss.Zealot)
+        once(18,  Protoss.Probe)
         if (With.fingerprints.proxyGateway()) {
           pump(Protoss.Probe, 12)
           pumpRatio(Protoss.Zealot, 3, 5, Seq(Flat(2.0), Enemy(Protoss.Zealot, 1.0)))
           pump(Protoss.Probe, 18)
         }
-        buildOrder(
-          Get(4, Protoss.Pylon),
-          Get(Protoss.Assimilator),
-          Get(19, Protoss.Probe),
-          Get(Protoss.CyberneticsCore))
+        once(4, Protoss.Pylon)
+        once(Protoss.Assimilator)
+        once(19, Protoss.Probe)
+        once(Protoss.CyberneticsCore)
         if (sevenZealot) {
-          buildOrder(Get(7, Protoss.Zealot))
+          once(7, Protoss.Zealot)
         } else if (PvP4GateGoon()) {
-          get(4, Protoss.Gateway)
+          once(4, Protoss.Gateway)
         }
-        buildOrder(
-          Get(21, Protoss.Probe),
-          Get(3, Protoss.Gateway),
-          Get(2, Protoss.Dragoon),
-          Get(Protoss.DragoonRange))
+        once(21, Protoss.Probe)
+        once(3, Protoss.Gateway)
+        once(2, Protoss.Dragoon)
+        once(Protoss.DragoonRange)
 
       //////////////
       // 3-Zealot //
       //////////////
 
       } else { // https://tl.net/forum/bw-strategy/567442-pvp-bonyth-style-2-gate-3-zealot-21-gas-guide
-        buildOrder(
-          Get(Protoss.Assimilator),
-          Get(17, Protoss.Probe),
-          Get(Protoss.CyberneticsCore),
-          Get(18, Protoss.Probe),
-          Get(3, Protoss.Pylon),
-          Get(20, Protoss.Probe),
-          Get(4, Protoss.Pylon), // On paper this build requires losing the Zealots to free supply, but with mineral optimization we can easily afford the Pylon
-          Get(2, Protoss.Dragoon),
-          Get(21, Protoss.Probe),
-          Get(Protoss.DragoonRange),
-          Get(22, Protoss.Probe),
-          Get(3, Protoss.Gateway), // Also not in the build but we can afford it so let's
-          Get(4, Protoss.Dragoon),
-          Get(23, Protoss.Probe),
-          Get(5, Protoss.Pylon),
-          Get(24, Protoss.Probe),
-          Get(6, Protoss.Dragoon))
+        once(Protoss.Assimilator)
+        once(17, Protoss.Probe)
+        once(Protoss.CyberneticsCore)
+        once(18, Protoss.Probe)
+        once(3, Protoss.Pylon)
+        once(20, Protoss.Probe)
+        once(4, Protoss.Pylon) // On paper this build requires losing the Zealots to free supply, but with mineral optimization we can easily afford the Pylon
+        once(2, Protoss.Dragoon)
+        once(21, Protoss.Probe)
+        once(Protoss.DragoonRange)
+        once(22, Protoss.Probe)
+        once(3, Protoss.Gateway) // Also not in the build but we can afford it so let's
+        once(4, Protoss.Dragoon)
+        once(23, Protoss.Probe)
+        once(5, Protoss.Pylon)
+        once(24, Protoss.Probe)
+        once(6, Protoss.Dragoon)
       }
 
     /////////////////
@@ -498,43 +491,40 @@ class PvPOpening extends GameplanImperative {
     /////////////////
 
     } else {
-      buildOrder(
-        Get(12, Protoss.Probe),
-        Get(Protoss.Assimilator),
-        Get(13, Protoss.Probe))
+      once(12, Protoss.Probe)
+      once(Protoss.Assimilator)
+      once(13, Protoss.Probe)
 
       /////////////
       // 17 Core //
       /////////////
 
       if (zBeforeCore) { // https://liquipedia.net/starcraft/1_Gate_Core_(vs._Protoss)
-        buildOrder(
-          Get(Protoss.Zealot),
-          Get(14, Protoss.Probe),
-          Get(2, Protoss.Pylon),
-          Get(15, Protoss.Probe),
-          Get(Protoss.CyberneticsCore),
-          Get(16, Protoss.Probe))
+        once(Protoss.Zealot)
+        once(14, Protoss.Probe)
+        once(2, Protoss.Pylon)
+        once(15, Protoss.Probe)
+        once(Protoss.CyberneticsCore)
+        once(16, Protoss.Probe)
         if (zAfterCore) {
-          buildOrder(Get(2, Protoss.Zealot))
-          if (PvPGateCoreGate()) { // https://liquipedia.net/starcraft/2_Gate_Reaver_(vs._Protoss)
-            buildOrder(
-              Get(18, Protoss.Probe),
-              Get(3, Protoss.Pylon),
-              Get(19, Protoss.Probe),
-              Get(Protoss.Dragoon),
-              Get(20, Protoss.Probe),
-              Get(2, Protoss.Gateway),
-              Get(21, Protoss.Probe),
-              Get(3, Protoss.Dragoon),
-              Get(3, Protoss.Dragoon),
-              Get(Protoss.DragoonRange),
-              Get(4, Protoss.Pylon),
-              Get(21, Protoss.Probe),
-              Get(4, Protoss.Dragoon))
+          once(2, Protoss.Zealot)
+          if (PvPGateCoreGate()) { // https://liquipedia.net/starcraft/2_Gate_Reaver_(vs._Protoss
+            once(18, Protoss.Probe)
+            once(3, Protoss.Pylon)
+            once(19, Protoss.Probe)
+            once(Protoss.Dragoon)
+            once(20, Protoss.Probe)
+            once(2, Protoss.Gateway)
+            once(21, Protoss.Probe)
+            once(3, Protoss.Dragoon)
+            once(3, Protoss.Dragoon)
+            once(Protoss.DragoonRange)
+            once(4, Protoss.Pylon)
+            once(21, Protoss.Probe)
+            once(4, Protoss.Dragoon)
           }
         }
-        buildOrder(Get(17, Protoss.Probe))
+        once(17, Protoss.Probe)
 
       /////////////
       // 13 Core //
@@ -542,62 +532,56 @@ class PvPOpening extends GameplanImperative {
 
       } else {
         // https://liquipedia.net/starcraft/1_Gate_Core_(vs._Protoss)
-        buildOrder(Get(Protoss.CyberneticsCore))
+        once(Protoss.CyberneticsCore)
         if (zAfterCore) {
           // https://namu-wiki.translate.goog/w/21%ED%88%AC%EA%B2%8C%EC%9D%B4%ED%8A%B8?_x_tr_sl=ko&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=ajax,sc,elem
-          buildOrder(
-            Get(14, Protoss.Probe),
-            Get(Protoss.Zealot),
-            Get(2, Protoss.Pylon),
-            Get(16, Protoss.Probe),
-            Get(Protoss.Dragoon))
+          once(14, Protoss.Probe)
+          once(Protoss.Zealot)
+          once(2, Protoss.Pylon)
+          once(16, Protoss.Probe)
+          once(Protoss.Dragoon)
 
           ///////////////////////
           // Robo before range //
           ///////////////////////
 
           if (PvPTechBeforeRange()) {
-            buildOrder(
-              Get(17, Protoss.Probe),
-              Get(Protoss.RoboticsFacility),
-              Get(18, Protoss.Probe),
-              Get(2, Protoss.Dragoon),
-              Get(3, Protoss.Pylon),
-              Get(19, Protoss.Probe),
-              Get(3, Protoss.Dragoon))
+            once(17, Protoss.Probe)
+            once(Protoss.RoboticsFacility)
+            once(18, Protoss.Probe)
+            once(2, Protoss.Dragoon)
+            once(3, Protoss.Pylon)
+            once(19, Protoss.Probe)
+            once(3, Protoss.Dragoon)
 
           /////////////////
           // Range-first //
           /////////////////
 
           } else {
-            buildOrder(
-              Get(Protoss.DragoonRange),
-              Get(17, Protoss.Probe))
+            once(Protoss.DragoonRange)
+            once(17, Protoss.Probe)
             if (PvPGateCoreGate()) {
-              buildOrder(
-                Get(2, Protoss.Gateway),
-                Get(2, Protoss.Dragoon),
-                Get(18, Protoss.Probe),
-                Get(3, Protoss.Pylon))
+              once(2, Protoss.Gateway)
+              once(2, Protoss.Dragoon)
+              once(18, Protoss.Probe)
+              once(3, Protoss.Pylon)
             } else {
-              buildOrder(
-                Get(2, Protoss.Dragoon),
-                Get(18, Protoss.Probe))
+              once(2, Protoss.Dragoon)
+              once(18, Protoss.Probe)
             }
           }
         } else {
-          buildOrder(
-            Get(15, Protoss.Probe),
-            Get(2, Protoss.Pylon),
-            Get(17, Protoss.Probe),
-            Get(Protoss.Dragoon),
-            Get(Protoss.DragoonRange),
-            Get(18, Protoss.Probe),
-            Get(3, Protoss.Pylon),
-            Get(19, Protoss.Probe),
-            Get(2, Protoss.Dragoon),
-            Get(20, Protoss.Probe))
+          once(15, Protoss.Probe)
+          once(2, Protoss.Pylon)
+          once(17, Protoss.Probe)
+          once(Protoss.Dragoon)
+          once(Protoss.DragoonRange)
+          once(18, Protoss.Probe)
+          once(3, Protoss.Pylon)
+          once(19, Protoss.Probe)
+          once(2, Protoss.Dragoon)
+          once(20, Protoss.Probe)
         }
       }
     }
@@ -618,9 +602,9 @@ class PvPOpening extends GameplanImperative {
     ////////////////////////
 
     // The build order should have requested all of these, but just in case:
-    buildOrder(Get(Protoss.Gateway), Get(Protoss.Assimilator), Get(Protoss.CyberneticsCore))
-    if (PvPGateCoreGate() || PvP1012()) { get(2, Protoss.Gateway) }
-    buildOrder(Get(Protoss.Dragoon))
+    once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    if (PvPGateCoreGate() || PvP1012()) { once(2, Protoss.Gateway) }
+    once(Protoss.Dragoon)
     if ( ! PvPTechBeforeRange()) { get(Protoss.DragoonRange) }
 
     //////////
@@ -641,32 +625,25 @@ class PvPOpening extends GameplanImperative {
           }
         }
         get(Protoss.Observatory)
-        if (With.fingerprints.dtRush()) {
-          get(Protoss.ObserverSpeed)
-        }
-        if (units(Protoss.Observer) > 0) {
-          get(Protoss.RoboticsSupportBay)
-        }
+        get(Protoss.Observer)
       } else {
         if ( ! getObservatory) {
           cancelIncomplete(Protoss.Observatory)
         }
         cancelIncomplete(Protoss.Observer)
+      }
+      if (getReavers) {
         get(Protoss.RoboticsSupportBay)
       }
-      if (PvPTechBeforeRange() && ! getObservers) {
-        buildOrder(
-          Get(Protoss.Reaver),
-          Get(Protoss.ShuttleSpeed),
-          Get(Protoss.Shuttle))
+      if (shuttleSpeed) {
+        once(Protoss.Reaver)
+        once(Protoss.ShuttleSpeed)
+        once(Protoss.Shuttle)
         pump(Protoss.Reaver)
       } else {
         trainRoboUnits()
       }
-
-      if (units(Protoss.Reaver) > 1) {
-        get(Protoss.DragoonRange)
-      }
+      get(Protoss.DragoonRange)
       if (shouldExpand && ! With.geography.ourNatural.units.exists(u =>
         u.isEnemy
         && u.canAttackGround
@@ -674,7 +651,6 @@ class PvPOpening extends GameplanImperative {
         && u.pixelDistanceCenter(With.geography.ourNatural.townHallArea.center) < 32 * 12)) {
         requireMiningBases(2)
       }
-
       trainGatewayUnits()
       get(2, Protoss.Gateway)
       get(Protoss.DragoonRange)
@@ -682,35 +658,35 @@ class PvPOpening extends GameplanImperative {
     } else if (speedlotAttack) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
-      if (getCannons) { buildCannonsAtNatural(2, PlaceLabels.DefendEntrance) }
+      if (getCannons) { buildCannonsAtNatural(1, PlaceLabels.DefendEntrance) }
       if (shouldExpand) { requireMiningBases(2) }
       SwapIf(
         safeAtHome && With.scouting.enemyProgress < 0.5,
         () => trainGatewayUnits(),
         () => get(5, Protoss.Gateway))
     } else if (PvPDT()) {
-      if (getCannons) { buildCannonsAtNatural(2, PlaceLabels.DefendEntrance) }
+      buildCannonsAtNatural(if (getCannons) 2 else 0, PlaceLabels.DefendEntrance)
       if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
-        buildOrder(Get(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar))
+        once(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar)
       }
-      trainGatewayUnits()
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
+      trainGatewayUnits()
       get(2, Protoss.Gateway)
       if (shouldExpand) { requireMiningBases(2) }
     } else if (PvP3GateGoon()) {
       if (shouldExpand) { requireMiningBases(2) }
-      buildOrder(Get(2, Protoss.Dragoon))
+      once(2, Protoss.Dragoon)
       get(3, Protoss.Gateway)
       trainGatewayUnits()
-      buildOrder(Get(8, Protoss.Dragoon))
+      once(8, Protoss.Dragoon)
       requireMiningBases(2)
     } else { // 4-Gate Goon
       if (shouldExpand) { requireMiningBases(2) }
-      buildOrder(Get(2, Protoss.Dragoon))
+      once(2, Protoss.Dragoon)
       get(4, Protoss.Gateway)
       trainGatewayUnits()
-      buildOrder(Get(10, Protoss.Dragoon))
+      once(10, Protoss.Dragoon)
     }
     SwapIf(
       oversaturate,
@@ -724,14 +700,14 @@ class PvPOpening extends GameplanImperative {
       pump(Protoss.Observer, 2)
       if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)
     }
-    if (shuttleFirst) buildOrder(Get(Protoss.Shuttle))
+    if (shuttleFirst) once(Protoss.Shuttle)
     if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
   }
 
   private def trainGatewayUnits(): Unit = {
-    if (zAfterCore && zBeforeCore) buildOrder(Get(2, Protoss.Zealot))
-    else if (zAfterCore || zBeforeCore) buildOrder(Get(Protoss.Zealot))
-    buildOrder(Get(Protoss.Dragoon))
+    if (zAfterCore && zBeforeCore) once(2, Protoss.Zealot)
+    else if (zAfterCore || zBeforeCore) once(Protoss.Zealot)
+    once(Protoss.Dragoon)
     if (upgradeComplete(Protoss.ZealotSpeed, 1, 2 * Protoss.Zealot.buildFrames)) {
       pump(Protoss.Dragoon, maximumConcurrently = 2)
       pump(Protoss.Zealot, 12)

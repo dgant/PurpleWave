@@ -11,9 +11,8 @@ import Utilities.Time._
 object PvPDTDefense extends MacroActions with MacroCounting {
 
   def expectedDTArrivalFrame: Int = {
-    // Super-fast DT finishes 5:12 and thus arrives at the natural around 5:45
-    // Example: http://www.openbw.com/replay-viewer/?rep=https://data.basil-ladder.net/bots/MegaBot2017/MegaBot2017%20vs%20Florian%20Richoux%20Heartbreak%20Ridge%20CTR_EA637F71.rep
-    var projectedArrival = GameTime(5, 45)()
+    // Super-fast DT finishes 4:40 and thus arrives at the natural around 5:15. BetaStar demonstrates this on replay.
+    var projectedArrival = GameTime(5, 15)()
     if (With.fingerprints.twoGate())      projectedArrival += GameTime(1, 10)()
     if (With.fingerprints.dragoonRange()) projectedArrival += GameTime(0, 30)()
     if ( ! enemyDarkTemplarLikely)        projectedArrival += GameTime(9, 15) ()// Guesstimate for delayed 2-base DT: 15:30 off one-gate core

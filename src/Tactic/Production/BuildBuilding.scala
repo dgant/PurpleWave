@@ -12,7 +12,7 @@ import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.Time.{Forever, Seconds}
+import Utilities.Time.Forever
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferClose
 
@@ -82,7 +82,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
       lazy val candidateFoundations = placementQuery.foundations
       var candidateIndex = 0
       do {
-        if (foundation.isEmpty || With.framesSince(lastSearch) > Seconds(if (builder.isDefined) 60 else 15)()) {
+        if (foundation.isEmpty || builder.isEmpty) {
           if (candidateIndex >= candidateFoundations.length) return
           foundation = Some(candidateFoundations(candidateIndex))
           lastSearch = With.frame

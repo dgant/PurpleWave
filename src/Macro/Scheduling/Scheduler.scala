@@ -18,6 +18,7 @@ class Scheduler {
   }
 
   def requestAll(requester: Prioritized, buildables: Iterable[RequestBuildable]): Unit = {
+    if (buildables.forall(_.quantity <= 0)) return
     requester.prioritize()
     _requests(requester) = _requests.getOrElse(requester, ArrayBuffer.empty)
     _requests(requester) ++= buildables

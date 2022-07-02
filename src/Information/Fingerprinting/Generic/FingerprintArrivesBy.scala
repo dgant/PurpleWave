@@ -20,7 +20,7 @@ class FingerprintArrivesBy(
   
   override def investigate: Boolean = {
     // Game time cutoff spares performance
-    With.frame > gameTime() && arrivingUnits.size >= quantity
+    With.frame < gameTime() && arrivingUnits.size >= quantity
   }
 
   override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame())).getOrElse(0))}"

@@ -2,13 +2,13 @@ package Planning.Plans.GamePlans.All
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Macro.Requests.{Get, RequestBuildable, RequestUnit}
+import Macro.Requests._
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
-import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
+import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
@@ -39,26 +39,24 @@ def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Un
   def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
   def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  def get(unit: UnitClass): Unit = get(1, unit)
+  def get(item: RequestBuildable): Unit = With.scheduler.request(_prioritizedRequester, item)
+  def get(units: UnitClass*): Unit = units.foreach(get(1, _))
   def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
   def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
   def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, Some(placementQuery)))
-  def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(With.geography.ourNatural))
-  def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(With.geography.ourNatural).requireLabelYes(labels: _*))
-  def get(upgrade: Upgrade): Unit = get(Get(upgrade))
+  def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base))
+  def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base).requireLabelYes(labels: _*))
+  def get(upgrade: Upgrade): Unit = get(RequestUpgrade(upgrade))
   def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
-  def get(tech: Tech): Unit = get(Get(tech))
-  def once(unit: UnitClass): Unit = buildOrder(Get(1, unit))
+  def get(tech: Tech): Unit = get(RequestTech(tech))
+  def once(units: UnitClass*): Unit = units.foreach(once(1, _))
   def once(upgrade: Upgrade): Unit = get(upgrade)
   def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
   def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = buildOrder(Get(quantity, unit))
-  def get(item: RequestBuildable): Unit = {
-    With.scheduler.request(_requesterPlan, item)
-  }
-  private def _requesterPlan = new Plan()
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(_prioritizedRequester, Get(quantity, unit))
 
+  private def _prioritizedRequester = new Plan()
   def buildOrder(items: RequestBuildable*): Unit = {
     new BuildOrder(items: _*).update()
   }

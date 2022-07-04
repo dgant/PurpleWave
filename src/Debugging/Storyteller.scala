@@ -19,7 +19,6 @@ import com.sun.management.OperatingSystemMXBean
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 class Storyteller {
@@ -88,8 +87,8 @@ class Storyteller {
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
   )
 
-  var firstLog: Boolean = true
-  val performanceThresholds = Vector(
+  private var firstLog: Boolean = true
+  private val performanceThresholds = Vector(
     (Minutes(10), 24),
     (Minutes(15), 24 * 10))
   def onFrame(): Unit = {
@@ -122,12 +121,12 @@ class Storyteller {
             tell(unit + " is already complete")
           } else {
             val remainingFrames = unit.completionFrame - With.frame
-            tell(unit + " projects to complete in " + remainingFrames + " frames at " + new Frames(unit.completionFrame) + "")
+            tell(unit + " projects to complete in " + remainingFrames + " frames at " + Frames(unit.completionFrame) + "")
           }
         } else {
           val arrivalFrame = unit.arrivalFrame()
           val arrivalFramesAhead = arrivalFrame - With.frame
-          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + new Frames(arrivalFrame))
+          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + Frames(arrivalFrame))
         }
       })
     })
@@ -141,7 +140,7 @@ class Storyteller {
     ourUnitsNew.foreach(unit => "New unit")
   }
 
-  private def logPerformance() {
+  private def logPerformance(): Unit = {
     val gameFastestSeconds = With.frame / 24
     val gameWallClockSeconds = (System.nanoTime() - With.startNanoTime) / 1000000000
     tell("Game duration (fastest):    " + gameFastestSeconds / 60 + "m " + gameFastestSeconds % 60 + "s")
@@ -245,13 +244,6 @@ class Storyteller {
       Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.filter(_.won).map(_.weight).sum)),
       Vector("WinPct")   ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
       Vector("WinEst")   ++ evaluations.map(e => formatPercentage(e.probabilityWin)))
-    if (columns.isEmpty) return
-      var rows = new ArrayBuffer[String]()
-      (0 until columns.map(_.length).max).foreach(rowIndex => {
-        var row: String = ""
-        columns.foreach(column => { if (rowIndex < column.length) row += column(rowIndex) })
-        rows += row
-     })
     columns.map(_.mkString("\t")).foreach(tell)
   }
   private def logStrategyInterest(): Unit = {

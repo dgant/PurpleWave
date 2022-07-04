@@ -3,6 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plan
+import Planning.Predicates.MacroFacts
 import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -18,7 +19,7 @@ class Pump(
 
   val builderClass: UnitClass = unitClass.whatBuilds._1
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     if ( ! canBuild) return
     val unitsComplete       = With.macroCounts.oursComplete(unitClass)
     val unitsExtant         = With.macroCounts.oursExtant(unitClass)
@@ -30,7 +31,7 @@ class Pump(
   }
 
   final protected def canBuild: Boolean = (
-    unitClass.buildTechEnabling.forall(With.self.hasTech)
+    unitClass.buildTechEnabling.forall(MacroFacts.techStarted)
     && unitClass.buildUnitsEnabling.forall(With.units.existsOurs(_))
     && unitClass.buildUnitsBorrowed.forall(With.units.existsOurs(_)))
 

@@ -15,11 +15,13 @@ trait Prioritized {
     if (isPrioritized) _priority else Int.MaxValue
   }
 
-  final def prioritize(): Int = {
-    if ( ! isPrioritized) {
-      _lastPrioritizationFrame = With.frame
-      _priority = With.priorities.nextPriority()
-    }
+  final def reprioritize(): Int = {
+    _lastPrioritizationFrame = With.frame
+    _priority = With.priorities.nextPriority()
     _priority
+  }
+
+  final def prioritize(): Int = {
+    if (isPrioritized) _priority else reprioritize()
   }
 }

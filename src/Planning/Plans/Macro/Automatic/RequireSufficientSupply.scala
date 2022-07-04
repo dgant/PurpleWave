@@ -1,21 +1,23 @@
 package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
-import Macro.Requests.Get
 import Planning.Plan
 import Planning.Predicates.Milestones.TechStarted
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClasses.UnitClasses
+import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 
 class RequireSufficientSupply extends Plan {
   
   private val supplyProvider =  UnitClasses.get(With.self.raceInitial.getSupplyProvider)
   
-  override def onUpdate() {
-    With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
+  override def onUpdate(): Unit = {
+    // Deprecated; Supplier now queues our supply
+    With.supplier.reprioritize()
+
+    //With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
   }
 
-  lazy val productionTypes = Seq(
+  lazy val productionTypes: Seq[UnitClass] = Seq(
     Terran.CommandCenter,
     Terran.Barracks,
     Terran.Factory,
@@ -51,7 +53,7 @@ class RequireSufficientSupply extends Plan {
   
     val depotCompletionFrames     = supplyProvider.buildFrames + (if (supplyProvider.isBuilding) 24 * 4 else 0) //Add a few seconds to account for builder transit time (and finishing time)
     val supplyPerProvider         = supplyProvider.supplyProvided
-    val currentSupplyOfTownHalls  = With.units.ours.view.filter(unit => unit.remainingCompletionFrames < depotCompletionFrames && ! unit.is(supplyProvider)).map(_.unitClass.supplyProvided).sum
+    val currentSupplyOfTownHalls  = With.units.ours.view.filter(unit => unit.remainingCompletionFrames < depotCompletionFrames && ! supplyProvider(unit)).map(_.unitClass.supplyProvided).sum
     val currentSupplyUsed         = With.self.supplyUsed400
     val unitSpendingRatio         = if (With.geography.ourBases.size < 3) 0.5 else 0.75 //This is the metric that needs the most improvement
     val costPerUnitSupply         = 50.0 / 2.0 // Assume 50 minerals buys 1 supply (then divide by two because 1 supply = 2 BWAPI supply)
@@ -64,7 +66,7 @@ class RequireSufficientSupply extends Plan {
     val supplyAddableBeforeDepotCompletion: Double =
       if (With.self.isZerg)
         larva + larvaPerFrame * depotCompletionFrames * (if (With.units.existsOurs(Zerg.Spire)) 2 else 1) +
-        (if (new TechStarted(Zerg.LurkerMorph).apply) Math.min(6, With.units.countOurs(Zerg.Hydralisk)) else 0)
+        (if (TechStarted(Zerg.LurkerMorph).apply) Math.min(6, With.units.countOurs(Zerg.Hydralisk)) else 0)
       else
         productionTypes
           .map(productionType =>

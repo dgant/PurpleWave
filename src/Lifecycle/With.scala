@@ -21,6 +21,7 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
+import Planning.Plans.Macro.Automatic.Supplier
 import _root_.Placement.Architecture.Architecture
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
@@ -97,9 +98,10 @@ object With {
   var scheduler         : Scheduler           = _
   var scouting          : Scouting            = _
   var simulation        : Simulation          = _
+  var squads            : Squads              = _
   var strategy          : Strategist          = _
   var storyteller       : Storyteller         = _
-  var squads            : Squads              = _
+  var supplier          : Supplier            = _
   var tactics           : Tactician           = _
   var tasks             : TaskQueueParallel   = _
   var units             : UnitTracker         = _
@@ -201,9 +203,10 @@ object With {
     scheduler         = new Scheduler
     scouting          = new Scouting
     simulation        = new Simulation
+    squads            = new Squads
     strategy          = new Strategist
     storyteller       = new Storyteller
-    squads            = new Squads
+    supplier          = new Supplier
     tactics           = new Tactician
     units             = new UnitTracker
     unitsShown        = new UnitsShown

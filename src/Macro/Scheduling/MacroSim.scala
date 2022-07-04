@@ -45,7 +45,7 @@ final class MacroSim {
     initialState.techs ++= Techs.all.view.filter(With.self.hasTech)
     insert(initialStep)
 
-    // Construct events for things in progress
+    // Construct events for production in progress
     // TODO: Count Eggs/Cocoon/Lurker Egg as what they're making
     // TODO: Don't occupy Probes
     // TODO: Don't replace morphers
@@ -122,6 +122,7 @@ final class MacroSim {
           insertAfter.foreach(i => {
             val stepBefore = steps(i)
             val framesAfter = Math.ceil(Seq(
+              request.minFrame - With.frame,
               stepBefore.event.dFrames,
               if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals,  Forever()),
               if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,       Forever()))

@@ -41,9 +41,9 @@ class Visualization extends TimedTask {
     // Temporary views
     // ShowZones,
     ShowFormations,
-    ShowPlacement,
-    ShowFoundations,
-    ShowExpansions
+    // ShowPlacement,
+    // ShowFoundations,
+    // ShowExpansions
   )
 
   lazy val knownViews: Vector[DebugView] = Vector[DebugView](

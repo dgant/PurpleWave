@@ -23,5 +23,5 @@ class FingerprintArrivesBy(
     With.frame < gameTime() && arrivingUnits.size >= quantity
   }
 
-  override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame())).getOrElse(0))}"
+  override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame())).getOrElse(0))})"
 }

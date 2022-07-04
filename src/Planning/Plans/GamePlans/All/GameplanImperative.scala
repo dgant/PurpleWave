@@ -24,7 +24,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
       executeBuild()
     }
     if (doBasics) {
-      pumpSupply()
+      pumpSupply() // This currently just prioritizes Supplier
       pumpWorkers(oversaturate = false)
     }
     executeMain()

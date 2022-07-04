@@ -25,7 +25,7 @@ trait MacroActions {
   def harass(): Unit = With.blackboard.wantToHarass.set(true)
   def allIn(): Unit = { With.blackboard.yoloing.set(true); attack() }
 
-def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Unit = {
+  def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Unit = {
     new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
   }
   def scoutAt(minimumSupply: Int, maxScouts: Int = 1): Unit = {
@@ -39,12 +39,12 @@ def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Un
   def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
   def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  def get(item: RequestBuildable): Unit = With.scheduler.request(_prioritizedRequester, item)
+  def get(item: RequestBuildable): Unit = With.scheduler.request(new Plan(), item)
   def get(units: UnitClass*): Unit = units.foreach(get(1, _))
   def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
   def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
-  def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, Some(placementQuery)))
+  def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, placementQueryArg = Some(placementQuery)))
   def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base))
   def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base).requireLabelYes(labels: _*))
   def get(upgrade: Upgrade): Unit = get(RequestUpgrade(upgrade))
@@ -54,9 +54,8 @@ def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Un
   def once(upgrade: Upgrade): Unit = get(upgrade)
   def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
   def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(_prioritizedRequester, Get(quantity, unit))
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(new Plan(), Get(quantity, unit))
 
-  private def _prioritizedRequester = new Plan()
   def buildOrder(items: RequestBuildable*): Unit = {
     new BuildOrder(items: _*).update()
   }

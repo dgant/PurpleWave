@@ -7,11 +7,13 @@ import ProxyBwapi.UnitClasses._
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import Tactic.Production._
+import Utilities.Time.Frames
 import bwapi.Race
 
 abstract class RequestBuildable(
   val buildable     : Buildable,
   val quantity      : Int = 0,
+  val minFrame      : Int = 0,
   val placement     : Option[PlacementQuery] = None,
   val specificUnit  : Option[FriendlyUnitInfo] = None) {
   def tech      : Option[Tech]      = buildable match { case c: Tech      => Some(c) case _ => None }
@@ -44,5 +46,5 @@ abstract class RequestBuildable(
     }
   }
 
-  override def toString: String = f"Buildable ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}${if (upgrade.isDefined) f" lvl $quantity" else ""}"
+  override def toString: String = f"Buildable ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}${if (upgrade.isDefined) f" lvl $quantity" else ""}${if (minFrame <= 0) "" else f" after ${Frames(minFrame)}"}"
 }

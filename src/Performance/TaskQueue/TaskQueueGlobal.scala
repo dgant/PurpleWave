@@ -34,6 +34,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.placement.initialize() // It's not relevant at time of writing, but strategy selection may depend on what placements are available
       With.strategy.update()
       With.strategy.gameplan.update()
+      With.supplier.update()
       With.macroSim.simulate()
       With.yolo.updateBlackboard() // YOLO trumps gameplan
     }),

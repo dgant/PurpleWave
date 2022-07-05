@@ -17,7 +17,7 @@ object ShowProduction extends DebugView {
     started: Boolean = true,
     paid: Boolean = true)
 
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val producibles: Seq[Producible] = With.units.ours.view.map(unit => {
       val unitClass = if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon)) unit.buildType else unit.unitClass
       if ( ! unit.complete)

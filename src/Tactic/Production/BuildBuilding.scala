@@ -6,6 +6,7 @@ import Macro.Requests.RequestBuildable
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
 import Micro.Agency.Intention
+import Performance.Cache
 import Placement.Access.{Foundation, PlacementQuery}
 import Placement.Architecture.ArchitecturalAssessment
 import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
@@ -28,12 +29,12 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
   builderLock.counter = CountOne
   builderLock.interruptable = false
 
-  var lastSearch  : Int                 = -Forever()
   var orderedTile : Option[Tile]        = None
   var foundation  : Option[Foundation]  = None
   var intendAfter : Option[Int]         = None
   private var _trainee: Option[FriendlyUnitInfo] = None
 
+  private val proposedBuilder = new Cache(() => builderLock.inquire().flatMap(_.headOption))
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
   override def trainee: Option[FriendlyUnitInfo] = _trainee
@@ -85,7 +86,6 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
         if (foundation.isEmpty || builder.isEmpty) {
           if (candidateIndex >= candidateFoundations.length) return
           foundation = Some(candidateFoundations(candidateIndex))
-          lastSearch = With.frame
           candidateIndex += 1
         }
         foundation = foundation.filter(f => With.architecture.assess(f.tile, buildingClass, expectedFrames) == ArchitecturalAssessment.Accepted)
@@ -101,6 +101,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     }
 
     if (desiredTile.isEmpty) return
+    if (request.minFrame > 0 && request.minFrame > With.frame + Math.max(builderTravelFrames, incomeFrames)) return
     if ( ! hasSpent) { currencyLock.acquire() }
     if ( ! needBuilder) {
       builderLock.release()
@@ -167,17 +168,20 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     }
   }
 
+  def builderTravelFramesMax            : Double = With.blackboard.maxBuilderTravelFrames() * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs)))
+  def builderTravelFrames               : Double = proposedBuilder().map(_.framesToTravelTo(desiredTile.get.center)).getOrElse(Forever()).toDouble
+  def builderTravelHysteresisFrames     : Double = if (builder.isDefined) 48 else 24
+  def builderTravelHysteresisMultiplier : Double = if (builder.isDefined) 1.35 else 1.2
+  def builderAdvanceFrames              : Double = builderTravelHysteresisFrames + builderTravelHysteresisMultiplier * builderTravelFrames
+  def incomeFrames                      : Double = Math.max(
+    Maff.nanToN(if (buildingClass.mineralPrice  == 0) 0 else buildingClass.mineralPrice / With.accounting.ourIncomePerFrameMinerals, Forever()),
+    Maff.nanToN(if (buildingClass.gasPrice      == 0) 0 else buildingClass.gasPrice     / With.accounting.ourIncomePerFrameGas, Forever()))
+
   def needBuilder: Boolean = {
-    lazy val proposedBuilder = builderLock.inquire().flatMap(_.headOption)
-    lazy val maxBuilderTravelFrames = With.blackboard.maxBuilderTravelFrames() * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs) && proposedBuilder.isDefined))
     if (trainee.isDefined)                                    return buildingClass.isTerran
     if (desiredTile.isEmpty)                                  return false
-    if (currencyLock.expectedFrames > maxBuilderTravelFrames) return false
-    if (proposedBuilder.isEmpty)                              return false
-    val travelFrames                = proposedBuilder.get.framesToTravelTo(desiredTile.get.center)
-    val travelHysteresisFrames      = if (builder.isDefined) 48 else 24
-    val travelHysteresisMultiplier  = if (builder.isDefined) 1.35 else 1.2
-    val builderAdvanceFrames        = travelHysteresisFrames + travelHysteresisMultiplier * travelFrames
+    if (currencyLock.expectedFrames > builderTravelFramesMax) return false
+    if (proposedBuilder().isEmpty)                            return false
     builderAdvanceFrames >= currencyLock.expectedFrames
   }
 }

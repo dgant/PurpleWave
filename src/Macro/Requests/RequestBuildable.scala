@@ -46,5 +46,10 @@ abstract class RequestBuildable(
     }
   }
 
-  override def toString: String = f"Buildable ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}${if (upgrade.isDefined) f" lvl $quantity" else ""}${if (minFrame <= 0) "" else f" after ${Frames(minFrame)}"}"
+  private def stringWhat  : String = f" ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}"
+  private def stringLevel : String = if (upgrade.isDefined) f" lvl $quantity" else ""
+  private def stringWhen  : String = if (minFrame <= 0) "" else f" after ${Frames(minFrame)}"
+  private def stringWhere : String = if (placement.isEmpty) "" else f" @ ${placement.get}"
+
+  override def toString: String = f"Buildable$stringWhat$stringLevel$stringWhen$stringWhere"
 }

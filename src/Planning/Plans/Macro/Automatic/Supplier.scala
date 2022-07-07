@@ -9,6 +9,7 @@ import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.CountMap
 import Utilities.Time.{Forever, Seconds}
 import Utilities.UnitFilters.IsTownHall
 
@@ -19,6 +20,7 @@ class Supplier extends Prioritized {
 
   var incomeMins      : Double  = 0.0
   var incomeGas       : Double  = 0.0
+  var appetite        : Int     = 0
   var simFarms        : Int     = 0
   var simSupplyUsed   : Int     = 0
   var simSupplyHalls  : Int     = 0
@@ -39,6 +41,7 @@ class Supplier extends Prioritized {
 
     incomeMins      = With.accounting.ourIncomePerFrameMinerals
     incomeGas       = With.accounting.ourIncomePerFrameGas
+    appetite        = measureAppetite
     simFarms        = With.units.countOurs(farm)
     simSupplyUsed   = With.self.supplyUsed400
     simSupplyHalls  = 0
@@ -53,7 +56,7 @@ class Supplier extends Prioritized {
 
     updateSim()
 
-    while(consumers.headOption.exists(_.cooldown < 3 * farm.buildFrames)) {
+    while(consumers.nonEmpty && simSupplyUsed < appetite) {
       val consumer = consumers.head
       advanceTo(consumer.framesToReady())
       consumed += ((simFrames, consumer.unitClass))
@@ -63,6 +66,13 @@ class Supplier extends Prioritized {
       consumer.cooldown += consumer.unitClass.buildFrames
       updateSim()
     }
+  }
+
+  private def measureAppetite: Int = {
+    val units = new CountMap[UnitClass]
+    With.units.ours.foreach(u => units(u.unitClass) += 1)
+    With.scheduler.requests.foreach(_._2.foreach(r => r.unit.foreach(u => units(u) = Math.max(units(u), r.quantity))))
+    units.view.map(p => p._1.supplyRequired * p._2).sum
   }
 
   private def updateSim(): Unit = {

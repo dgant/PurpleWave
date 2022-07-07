@@ -304,7 +304,6 @@ object Templates {
 
   val batterycannon = Seq(
     new Template()
-      .addLabels(Defensive, DefendEntrance, DefendGround)
       .forExitDirection(Directions.Left)
       .from(
       "--------",
@@ -312,7 +311,6 @@ object Templates {
       "-xxxxxxx",
       "--------"),
     new Template()
-      .addLabels(Defensive, DefendEntrance, DefendGround)
       .forExitDirection(Directions.Right)
       .from(
       "--------",
@@ -320,7 +318,6 @@ object Templates {
       "xxxxxxx-",
       "--------"),
     new Template()
-      .addLabels(Defensive, DefendEntrance, DefendGround)
       .forExitDirection(Directions.Up)
       .from(
       "-----",
@@ -329,7 +326,6 @@ object Templates {
       "-CxPx-",
       "-xxxx-"),
     new Template()
-      .addLabels(Defensive, DefendEntrance, DefendGround)
       .forExitDirection(Directions.Down)
       .from(
         "-CxPx-",
@@ -337,4 +333,5 @@ object Templates {
         "-Bxx--",
         "-xxx-",
         "-----"))
+    .map(_.addLabels(Defensive, DefendEntrance, DefendGround))
 }

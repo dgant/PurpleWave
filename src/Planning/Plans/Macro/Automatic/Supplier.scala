@@ -15,20 +15,21 @@ import Utilities.UnitFilters.IsTownHall
 import scala.collection.mutable.ArrayBuffer
 
 class Supplier extends Prioritized {
-  val depot: UnitClass = With.self.supplyClass
+  val farm: UnitClass = With.self.supplyClass
 
   var incomeMins      : Double  = 0.0
   var incomeGas       : Double  = 0.0
-  var simDepots       : Int     = 0
+  var simFarms        : Int     = 0
   var simSupplyUsed   : Int     = 0
   var simSupplyHalls  : Int     = 0
   var simFrames       : Int     = 0
   var simMins         : Double  = 0
   var simGas          : Double  = 0
 
-  var halls     : Vector[FriendlyUnitInfo] = Vector.empty
-  var producers : Vector[FriendlyUnitInfo] = Vector.empty
-  val consumers : ArrayBuffer[SupplyConsumer] = new ArrayBuffer[SupplyConsumer]
+  var halls       : Vector[FriendlyUnitInfo] = Vector.empty
+  var producers   : Vector[FriendlyUnitInfo] = Vector.empty
+  val consumers   : ArrayBuffer[SupplyConsumer] = new ArrayBuffer[SupplyConsumer]
+  val consumed    : ArrayBuffer[(Int, UnitClass)] = new ArrayBuffer[(Int, UnitClass)]
 
   def update(): Unit = {
 
@@ -38,23 +39,24 @@ class Supplier extends Prioritized {
 
     incomeMins      = With.accounting.ourIncomePerFrameMinerals
     incomeGas       = With.accounting.ourIncomePerFrameGas
-    simDepots       = With.units.countOurs(depot)
+    simFarms        = With.units.countOurs(farm)
     simSupplyUsed   = With.self.supplyUsed400
     simSupplyHalls  = 0
     simFrames       = 0
     simMins         = With.self.minerals
-    simGas          = With.self.gas
 
     halls           = With.units.ours.filter(IsTownHall).toVector
     producers       = With.units.ours.filter(_.isAny(productionTypes: _*)).toVector
     consumers.clear()
     consumers.appendAll(producers.map(produceConsumer))
+    consumed.clear()
 
     updateSim()
 
-    while(consumers.headOption.exists(_.cooldown < 3 * depot.buildFrames)) {
+    while(consumers.headOption.exists(_.cooldown < 3 * farm.buildFrames)) {
       val consumer = consumers.head
       advanceTo(consumer.framesToReady())
+      consumed += ((simFrames, consumer.unitClass))
       simSupplyUsed += consumer.unitClass.supplyRequired
       simMins -= consumer.unitClass.mineralPrice
       simGas -= consumer.unitClass.gasPrice
@@ -64,19 +66,21 @@ class Supplier extends Prioritized {
   }
 
   private def updateSim(): Unit = {
+    simSupplyHalls = halls.filter(h => h.remainingCompletionFrames <= simFrames + farm.buildFrames || h.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum
     consumers.foreach(_.framesToReady.invalidate())
     Maff.sortStablyInPlaceBy(consumers)(_.framesToReady())
 
-    val depotsAfter = Math.ceil((simSupplyUsed - simSupplyHalls).toDouble / depot.supplyProvided).toInt
-    if (depotsAfter > simDepots) {
-      simDepots = depotsAfter
-      With.scheduler.request(this, RequestUnit(depot, simDepots, minFrameArg = With.frame + simFrames - depot.buildFrames))
+    val farmsAfter = Math.ceil((simSupplyUsed - simSupplyHalls).toDouble / farm.supplyProvided).toInt
+    if (farmsAfter > simFarms) {
+      simFarms = farmsAfter
+      simMins -= farm.mineralPrice * (farmsAfter - simFarms)
+      With.scheduler.request(this, RequestUnit(farm, simFarms, minFrameArg = With.frame + simFrames - farm.buildFrames))
     }
 
     simSupplyHalls = halls
-      // Include supply from halls that will finish faster than any depot we could construct
+      // Include supply from halls that will finish faster than any farm we could construct
       // Include some slack time, too, to leverage nearly-done halls
-      .filter(h => h.remainingCompletionFrames < Seconds(5)() + Math.max(depot.buildFrames, simFrames) || h.isAny(Zerg.Lair, Zerg.Hive))
+      .filter(h => h.remainingCompletionFrames < Seconds(5)() + Math.max(farm.buildFrames, simFrames) || h.isAny(Zerg.Lair, Zerg.Hive))
       .map(_.unitClass.supplyProvided)
       .sum
   }

@@ -19,7 +19,7 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
     || (With.grids.walkableTerrain.get(iTile) && With.frame < 9 && With.units.ours.exists(_.tileArea.tiles.exists(_.i == iTile))))
 
   override def onInitialization(): Unit = {
-    val seeds = Maff.orElse(origins.filter(walkable), origins.flatMap(seed => Spiral(20).map(seed.add).find(walkable)))
+    val seeds = Maff.orElse(origins.filter(walkable), origins.flatMap(seed => Spiral(20).map(seed.add).filter(_.valid).find(walkable)))
     var distance = 0
     var openSize = 0
     val tilesA = new Array[Int](tiles.size * 100)

@@ -38,6 +38,7 @@ class Fingerprints {
       proxyGateway,
       cannonRush,
       twoGate,
+      twoGate99,
       oneGateCore,
       twoGateGoon,
       threeGateGoon,
@@ -108,6 +109,7 @@ class Fingerprints {
   lazy val proxyGateway   = addFingerprint(new FingerprintProxyGateway)
   lazy val cannonRush     = addFingerprint(new FingerprintCannonRush)
   lazy val twoGate        = addFingerprint(new Fingerprint2Gate)
+  lazy val twoGate99      = addFingerprint(new Fingerprint2Gate99)
   lazy val oneGateCore    = addFingerprint(new Fingerprint1GateCore)
   lazy val robo           = addFingerprint(new FingerprintRobo)
   lazy val twoGateGoon    = addFingerprint(new Fingerprint2GateGoon)

@@ -4,10 +4,10 @@ package Micro.Actions.Combat.Decisionmaking
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
-import Utilities.UnitFilters.{IsTank, IsWarrior, IsWorker}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.{IsTank, IsWarrior, IsWorker}
 
 object FightOrFlee extends Action {
 
@@ -41,6 +41,7 @@ object FightOrFlee extends Action {
     decide(false, "Drained",    () => ! unit.canAttack && unit.energyMax > 0 && unit.unitClass.spells.forall(s => s.energyCost > unit.energy || ! With.self.hasTech(s)))
     decide(false, "Disrupted",  () => unit.underDisruptionWeb && ! unit.flying && unit.matchups.threats.exists(t => t.flying || ! t.underDisruptionWeb))
     decide(false, "BideSiege",  () => Terran.SiegeTankUnsieged(unit) && ! With.blackboard.wantToAttack() && unit.matchups.threats.exists(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && unit.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
+    decide(false, "NoWorkers",  () => With.frame < Minutes(5)() && unit.metro.exists(_.bases.exists(b => b.isOurs && b.workerCount > 3)) && unit.matchups.threats.forall(_.unitClass.melee) && unit.matchups.allies.count(a => IsWorker(a) && a.pixelDistanceEdge(unit) < 32) < 2)
     decide(true,  "Workers",    () => unit.matchups.targets.exists(_.canAttackGround) && unit.matchups.allies.flatMap(_.friendly).exists(a => IsWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + unit.framesToGetInRange(t))))
     decide(true,  "Raze",       () => ((IsTank(unit) && Terran.SiegeMode()) || unit.isAny(Protoss.Reaver, Zerg.Guardian) && unit.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding)))
     decide(true,  "Energized",  () =>

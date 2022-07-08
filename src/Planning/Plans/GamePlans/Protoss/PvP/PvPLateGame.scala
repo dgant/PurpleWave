@@ -4,11 +4,12 @@ import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.Get
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
-import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
+import Utilities.Time.{Forever, Frames, GameTime, Minutes, Seconds}
 import Utilities.UnitFilters.IsWarrior
 import Utilities._
 
@@ -17,40 +18,33 @@ class PvPLateGame extends GameplanImperative {
   object RoboTech extends PrimaryTech
   object TemplarTech extends PrimaryTech
 
-  var fearDeath: Boolean = _
-  var fearDT: Boolean = _
-  var fearMacro: Boolean = _
-  var fearContain: Boolean = _
-  var dtBravery: Boolean = _
-  var expectCarriers: Boolean = _
-  var shouldDetect: Boolean = _
-  var shouldSecondaryTech: Boolean = _
-  var shouldHarass: Boolean = _
-  var shouldAttack: Boolean = _
-  var shouldExpand: Boolean = _
-  var shouldMindControl: Boolean = _
-  var primaryTech: Option[PrimaryTech] = None
+  var fearDeath           : Boolean = _
+  var fearDT              : Boolean = _
+  var fearMacro           : Boolean = _
+  var fearContain         : Boolean = _
+  var dtBraveryAbroad     : Boolean = _
+  var dtBraveryHome       : Boolean = _
+  var expectCarriers      : Boolean = _
+  var shouldDetect        : Boolean = _
+  var shouldSecondaryTech : Boolean = _
+  var shouldHarass        : Boolean = _
+  var shouldAttack        : Boolean = _
+  var shouldExpand        : Boolean = _
+  var shouldMindControl   : Boolean = _
+  var dtDebut             : Int     = Forever()
+  var obsDebut            : Int     = Forever()
+  var obsArrival          : Int     = Forever()
+  var primaryTech         : Option[PrimaryTech] = None
 
-  def primaryTemplar: Boolean = primaryTech.contains(TemplarTech)
-  def primaryRobo: Boolean = primaryTech.contains(RoboTech)
-
-  var firstDTFrame: Int = Forever()
+  def primaryTemplar      : Boolean = primaryTech.contains(TemplarTech)
+  def primaryRobo         : Boolean = primaryTech.contains(RoboTech)
 
   override def executeBuild(): Unit = {
-    fearDeath   = ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
+    updateDTBravery()
+    fearDeath   = ! dtBraveryAbroad && ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
-    fearContain = With.scouting.enemyProgress > 0.6
-
-    // Don't fear death or contain for a couple of minutes after getting DT if they have no mobile detection or evidence of Robo.
-    // It takes 1:34 to complete an Observer and another ~35 seconds to float it across the map,
-    // so making one DT buys about 2:10 of safety, plus the time it takes to actually make the DT
-    Maff.min(With.units.ours.filter(Protoss.DarkTemplar).map(_.frameDiscovered)).foreach(f => firstDTFrame = Math.min(firstDTFrame, f))
-    dtBravery = ! enemyRobo && unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < firstDTFrame + GameTime(2, 42)()
-    if (dtBravery) {
-      fearDeath = false
-      fearContain = false
-    }
+    fearContain = With.scouting.enemyProgress > 0.6 && ! dtBraveryHome
 
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldMindControl = false // expectCarriers
@@ -68,7 +62,7 @@ class PvPLateGame extends GameplanImperative {
     shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways
-    shouldAttack ||= (dtBravery && enemiesComplete(Protoss.PhotonCannon) == 0)
+    shouldAttack ||= (dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0)
     shouldAttack ||= shouldHarass
     shouldAttack &&= ! fearDeath
     shouldAttack &&= ! fearDT
@@ -96,7 +90,11 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
     if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
-    if (dtBravery) status("DTBravery")
+    if (obsDebut < Forever()) status(f"ObsDebut@${Frames(obsDebut)}")
+    if (obsArrival < Forever()) status(f"ObsArrival@${Frames(obsArrival)}")
+    if (dtDebut < Forever()) status(f"DTDebut@${Frames(dtDebut)}")
+    if (dtBraveryHome) status("DTBraveryHome")
+    if (dtBraveryAbroad) status("DTBraveryAbroad")
     if (fearDeath) status("FearDeath")
     if (fearDT) status("FearDT")
     if (fearMacro) status("FearMacro")
@@ -284,5 +282,38 @@ class PvPLateGame extends GameplanImperative {
         buildCannonsAtOpenings(1, PlaceLabels.DefendHall)
       }
     }
+  }
+
+  def obsTravelFrames(from: Pixel): Int = (from.pixelDistance(With.geography.ourNatural.zone.downtown.center) / Protoss.Observer.topSpeed).toInt
+  def updateDTBravery(): Unit = {
+    val roboFrames = Protoss.RoboticsFacility.buildFrames
+    val toryFrames = Protoss.Observatory.buildFrames
+    val obsFrames = Protoss.Observer.buildFrames
+    lazy val roboOrigin = Maff.minBy(With.units.enemy.filter(Protoss.RoboticsFacility))(_.completionFrame).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
+
+    With.units.enemy.filter(Protoss.RoboticsFacility).foreach(r => {
+      val obsBirth = r.remainingCompletionFrames + toryFrames + obsFrames
+      obsDebut    = Math.min(obsDebut,    obsBirth)
+      obsArrival  = Math.min(obsArrival,  obsBirth + obsTravelFrames(r.pixel))
+    })
+    With.units.enemy.filter(Protoss.Observatory).foreach(o => {
+      val obsBirth = o.remainingCompletionFrames + obsFrames
+      obsDebut    = Math.min(obsDebut,    obsBirth)
+      obsArrival  = Math.min(obsArrival,  obsBirth + obsTravelFrames(roboOrigin))
+    })
+    With.units.enemy.filter(Protoss.Observer).foreach(o => {
+      obsDebut    = Math.min(obsDebut,    With.frame)
+      obsArrival  = Math.min(obsArrival,  With.frame + obsTravelFrames(o.pixel))
+    })
+    With.units.enemy.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver)).foreach(r => {
+      obsDebut    = Math.min(obsDebut,    toryFrames + obsFrames)
+      obsArrival  = Math.min(obsDebut,    toryFrames + obsFrames + obsTravelFrames(roboOrigin))
+    })
+    With.units.ours.filter(_.isAny(Protoss.DarkTemplar, Protoss.TemplarArchives)).map(_.frameDiscovered).foreach(frame => dtDebut = Math.min(dtDebut, frame))
+    obsDebut    = Math.min(obsDebut,    dtDebut + roboFrames + toryFrames + obsFrames)
+    obsArrival  = Math.min(obsDebut,    dtDebut + roboFrames + toryFrames + obsFrames + obsTravelFrames(roboOrigin))
+
+    dtBraveryAbroad = With.frame < obsDebut
+    dtBraveryHome   = With.frame < obsArrival
   }
 }

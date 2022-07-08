@@ -38,7 +38,13 @@ object DefaultCombat extends Action {
   def potshot(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
     if ( ! unit.readyForAttackOrder) return false
-    val potshotTarget = unit.agent.toAttack.filter(TargetFilterPotshot.legal(unit, _)).orElse(Target.best(unit, TargetFilterPotshot))
+    val potshotTarget =
+      Seq(
+        Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)),
+        unit.agent.toAttack.filter(TargetFilterPotshot.legal(unit, _)),
+        Target.best(unit, TargetFilterPotshot))
+      .find(_.nonEmpty)
+      .flatten
     unit.agent.toAttack = potshotTarget.orElse(unit.agent.toAttack)
     if (potshotTarget.isDefined) {
       unit.agent.act("Potshot")

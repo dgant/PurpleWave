@@ -19,8 +19,8 @@ object Idle extends Action {
   final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.consider(unit))
   
   private val actions = Vector(
-    Liftoff,
     Cancel,
+    Liftoff,
     Unbunk,
     Meld,
     Build,

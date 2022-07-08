@@ -7,7 +7,7 @@ import Planning.Plans.Basic.WriteStatus
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic.{PumpWorkers, _}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.CancelIncomplete
+import Planning.Plans.Macro.Cancel
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.GasAtLeast
@@ -79,7 +79,7 @@ object PvTIdeas {
       new Pump(Protoss.Probe, 9),
       new If(
         new UnitsAtMost(3, IsWarrior),
-        new CancelIncomplete(Protoss.Nexus)),
+        new Cancel(Protoss.Nexus)),
       new CapGasAt(50),
       new If(
         new UnitsAtLeast(10, Protoss.Probe),
@@ -134,14 +134,14 @@ object PvTIdeas {
           new If(UnitsAtMost(1, Protoss.Gateway),
             new Parallel(
               new CapGasWorkersAt(0),
-              new CancelIncomplete(IsAny(Protoss.Assimilator, Protoss.CyberneticsCore)))))),
+              new Cancel(Protoss.Assimilator, Protoss.CyberneticsCore))))),
       new Pump(Protoss.Reaver),
       new Pump(Protoss.Zealot, 3),
       new PumpWorkers,
       new If(
         UnitsAtLeast(2, Protoss.Reaver),
         new RequireMiningBases(2),
-        new CancelIncomplete(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)),
+        new Cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)),
       new Pump(Protoss.Zealot),
       new Build(
         Get(2, Protoss.Gateway),

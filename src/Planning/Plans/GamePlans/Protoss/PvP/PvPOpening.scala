@@ -126,10 +126,9 @@ class PvPOpening extends GameplanImperative {
     if (PvPDT() && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
       PvPDT.swapOut()
       (if (roll("SwapDTInto4Gate", 0.5)) PvP4GateGoon else PvP3GateGoon).swapIn()
-      cancelIncomplete(Protoss.CitadelOfAdun)
-      cancelIncomplete(Protoss.TemplarArchives)
+      cancel(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
       if (enemies(Protoss.Observer) > 0 || enemies(Protoss.Observatory) > 0) {
-        cancelIncomplete(Protoss.DarkTemplar)
+        cancel(Protoss.DarkTemplar)
       }
     }
     // Goon+Obs is the strongest punishment against badly hidden DT openers.
@@ -181,14 +180,13 @@ class PvPOpening extends GameplanImperative {
         a.hasEverBeenVisibleToOpponents
         && ! a.visibleToOpponents
         && ! a.zone.units.exists(_.isEnemy))) {
-      if ( ! enemyRecentStrategy(With.fingerprints.dtRush) && roll("DTTo3Gate", 0.5)) {
-        cancelIncomplete(Protoss.TemplarArchives)
+      if (roll("DTToSpeedlot", 0.4)) {
+        cancel(Protoss.TemplarArchives)
+        speedlotAttack = true
+      } else if ( ! enemyRecentStrategy(With.fingerprints.dtRush) && roll("DTTo3Gate", 0.5)) {
+        cancel(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
         PvPDT.swapOut()
         PvP3GateGoon.swapIn()
-      }
-      if (roll("DTToSpeedlot", 0.3)) {
-        cancelIncomplete(Protoss.TemplarArchives)
-        speedlotAttack = true
       }
     }
 
@@ -399,9 +397,7 @@ class PvPOpening extends GameplanImperative {
       pumpSupply()
       pumpWorkers()
       if (units(Protoss.Gateway) < 2) {
-        cancelIncomplete(Protoss.Assimilator)
-        cancelIncomplete(Protoss.CyberneticsCore)
-        cancelOrders(Protoss.CyberneticsCore)
+        cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.DragoonRange)
         gasWorkerCeiling(0)
       } else if (units(Protoss.CyberneticsCore) == 0) {
         gasWorkerCeiling(1)
@@ -616,20 +612,19 @@ class PvPOpening extends GameplanImperative {
         if (enemyDarkTemplarLikely && units(Protoss.Observer) == 0) {
           if (units(Protoss.Observatory) == 0) {
             if (gas < 100) {
-              cancelIncomplete(Protoss.RoboticsSupportBay)
-              cancelOrders(Protoss.RoboticsSupportBay)
+              cancel(Protoss.RoboticsSupportBay, Protoss.ShuttleSpeed)
             }
           } else if (unitsComplete(Protoss.Observatory) > 0 && units(Protoss.Observer) == 0) {
-            cancelIncomplete(Protoss.Shuttle, Protoss.Reaver)
+            cancel(Protoss.Shuttle, Protoss.Reaver)
           }
         }
         get(Protoss.Observatory)
         get(Protoss.Observer)
       } else {
         if ( ! getObservatory) {
-          cancelIncomplete(Protoss.Observatory)
+          cancel(Protoss.Observatory)
         }
-        cancelIncomplete(Protoss.Observer)
+        cancel(Protoss.Observer)
       }
       if (getReavers) {
         get(Protoss.RoboticsSupportBay)

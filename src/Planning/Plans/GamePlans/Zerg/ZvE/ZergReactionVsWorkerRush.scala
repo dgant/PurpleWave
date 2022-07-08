@@ -6,7 +6,7 @@ import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.CancelIncomplete
+import Planning.Plans.Macro.Cancel
 import Planning.Plans.Placement.BuildSunkensInMain
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeStarted}
@@ -36,7 +36,7 @@ class ZergReactionVsWorkerRush extends GameplanTemplate {
 
         new If(
           new UnitsAtLeast(1, Zerg.Hatchery, complete = true),
-          new CancelIncomplete(Zerg.Hatchery)),
+          new Cancel(Zerg.Hatchery)),
 
         new Pump(Zerg.SunkenColony),
         new Pump(Zerg.Drone, 6),

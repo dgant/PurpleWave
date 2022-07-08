@@ -32,6 +32,5 @@ class Intention {
   var shouldMeld            : Boolean                   = false
   var canTickle             : Boolean                   = false
   var shouldLiftoff         : Boolean                   = false
-  var shouldCancel          : Boolean                   = false
   var targets               : Option[Seq[UnitInfo]]     = None
 }

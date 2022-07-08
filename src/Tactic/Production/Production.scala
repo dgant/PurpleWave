@@ -1,5 +1,6 @@
 package Tactic.Production
 
+import Lifecycle.With
 import Macro.Allocation.Prioritized
 import Macro.Requests.RequestBuildable
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -11,6 +12,7 @@ trait Production extends Prioritized {
   def expectTrainee(unit: FriendlyUnitInfo): Boolean = false
   def trainee: Option[FriendlyUnitInfo] = None
   final def update(): Unit = {
+    if (With.blackboard.toCancel().contains(request.buildable)) return
     prioritize()
     onUpdate()
   }

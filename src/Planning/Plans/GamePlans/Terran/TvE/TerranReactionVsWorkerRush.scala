@@ -7,7 +7,7 @@ import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.If
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump, PumpWorkers}
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.CancelIncomplete
+import Planning.Plans.Macro.Cancel
 import Planning.Plans.Placement.BuildBunkersAtMain
 import Planning.Predicates.Compound.Or
 import Planning.Predicates.Milestones.UnitsAtLeast
@@ -41,7 +41,7 @@ class TerranReactionVsWorkerRush extends GameplanTemplate {
 
     new If(
       new UnitsAtLeast(1, Terran.CommandCenter, complete = true),
-      new CancelIncomplete(Terran.CommandCenter)),
+      new Cancel(Terran.CommandCenter)),
 
     new Pump(Terran.Vulture),
     new Pump(Terran.SCV, 8),

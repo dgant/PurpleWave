@@ -2,13 +2,13 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Micro.Agency.Intention
 import Planning.Plan
+import Planning.Plans.GamePlans.All.MacroActions
 import ProxyBwapi.Races.Zerg
 
-class ExtractorTrick extends Plan {
+class ExtractorTrick extends Plan with MacroActions {
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     
     lazy val extractors = With.units.ours.filter(e => e.is(Zerg.Extractor) && ! e.complete)
     val shouldBuildExtractor = (
@@ -28,14 +28,8 @@ class ExtractorTrick extends Plan {
     
     if (shouldBuildExtractor) {
       With.scheduler.request(this, Get(1, Zerg.Extractor))
-    }
-    else if (shouldCancelExtractor) {
-      extractors.foreach(unit => {
-        val intent = new Intention
-        intent.shouldCancel = true
-        intent.toGather = unit.base.flatMap(_.minerals.headOption)
-        unit.intend(this, intent)
-      })
+    } else if (shouldCancelExtractor) {
+      cancel(Zerg.Extractor)
     }
   }
   

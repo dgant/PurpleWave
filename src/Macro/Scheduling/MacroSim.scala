@@ -84,15 +84,18 @@ final class MacroSim {
     updateStatesFrom(1)
 
     // Insert requests
-    With.scheduler.requests.view.flatMap(_._2).foreach(buildRequest => {
-      if (buildRequest.upgrade.exists(u => steps.last.state.upgrades(u) < buildRequest.quantity)) {
-        requests += buildRequest
-      } else if (buildRequest.tech.exists(t => ! steps.last.state.techs.contains(t))) {
-        requests += buildRequest
-      } else if (buildRequest.unit.isDefined) {
-        requests += buildRequest
-      }
-    })
+    With.scheduler.requests.view
+      .flatMap(_._2)
+      .filterNot(r => With.blackboard.toCancel().contains(r.buildable))
+      .foreach(buildRequest => {
+        if (buildRequest.upgrade.exists(u => steps.last.state.upgrades(u) < buildRequest.quantity)) {
+          requests += buildRequest
+        } else if (buildRequest.tech.exists(t => ! steps.last.state.techs.contains(t))) {
+          requests += buildRequest
+        } else if (buildRequest.unit.isDefined) {
+          requests += buildRequest
+        }
+      })
 
     // For each request, check if we've satisfied it by the end, and if not, insert it
     requests.foreach(request => {

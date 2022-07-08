@@ -10,8 +10,8 @@ import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
-import Planning.Plans.Macro.{CancelIncomplete, CancelOrders}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
+import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -94,11 +94,8 @@ trait MacroActions {
   def extractorTrick(): Unit = {
     new ExtractorTrick().update()
   }
-  def cancelIncomplete(matchers: UnitFilter*): Unit = {
-    new CancelIncomplete(matchers: _*).update()
-  }
-  def cancelOrders(matchers: UnitFilter*): Unit = {
-    new CancelOrders(matchers: _*).update()
+  def cancel(buildables: Buildable*): Unit = {
+    With.blackboard.toCancel.set(With.blackboard.toCancel() ++ buildables)
   }
   def buildGasPumps(quantity: Int = Int.MaxValue): Unit = {
     new BuildGasPumps(quantity).update()

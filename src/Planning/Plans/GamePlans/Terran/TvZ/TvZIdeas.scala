@@ -5,7 +5,7 @@ import Macro.Requests.Get
 import Planning.Plans.Compound.{If, Parallel}
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Plans.Macro.CancelIncomplete
+import Planning.Plans.Macro.Cancel
 import Planning.Plans.Placement.{BuildBunkersAtMain, BuildBunkersAtNatural}
 import Planning.Predicates.Compound.{And, Sticky}
 import Planning.Predicates.Economy.MineralsAtMost
@@ -23,13 +23,13 @@ object TvZIdeas {
         new And(
           new UnitsAtMost(0, Terran.Bunker),
           new UnitsAtMost(1, Terran.Barracks)),
-        new CancelIncomplete(Terran.SupplyDepot, Terran.Refinery)),
+        new Cancel(Terran.SupplyDepot, Terran.Refinery)),
       new If(
         new And(
           new UnitsAtMost(0, Terran.Bunker),
           new UnitsAtLeast(1, Terran.Barracks, complete = true),
           new MineralsAtMost(91)),
-        new CancelIncomplete(Terran.SupplyDepot, Terran.Barracks)),
+        new Cancel(Terran.SupplyDepot, Terran.Barracks)),
       new Pump(Terran.SCV, 5),
       new Build(Get(Terran.Barracks)),
       new Pump(Terran.Marine, 4),

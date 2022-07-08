@@ -10,8 +10,20 @@ import Utilities.Time.{Minutes, Seconds}
 object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    if (unit.intent.shouldCancel) return true
     if (With.framesSince(unit.frameDiscovered) < Seconds(5)()) return false
+
+    if ( ! unit.complete && With.blackboard.toCancel().contains(unit.unitClass)) {
+      return true
+    }
+    if (unit.trainee.exists(With.blackboard.toCancel().contains)) {
+      return true
+    }
+    if (unit.upgradeProducing.exists(With.blackboard.toCancel().contains)) {
+      return true
+    }
+    if (unit.techProducing.exists(With.blackboard.toCancel().contains)) {
+      return true
+    }
 
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
     lazy val framesCutoff     = 48 + With.reaction.agencyAverage
@@ -34,7 +46,7 @@ object Cancel extends Action {
     output
   }
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     Commander.cancel(unit)
   }
 }

@@ -2,28 +2,27 @@ package Planning.Plans.GamePlans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Plans.Army.{Aggression, AttackAndHarass}
-import Planning.Plans.Basic.Write
+import Planning.Plan
+import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
 import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
-import Planning.Plans.Macro.CancelOrders
+import Planning.Plans.Macro.Cancel
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Placement.{BuildSunkensAtExpansions, BuildSunkensAtNatural}
 import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Economy.GasAtLeast
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Utilities.UnitFilters._
-import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT2HatchLurker
 import Utilities.Time.Seconds
+import Utilities.UnitFilters._
 
 class ZvT2HatchLurker extends GameplanTemplate {
 
@@ -86,8 +85,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
   class HydraMuta extends Parallel(
 
     new CapGasAtRatioToMinerals(1.0, 100),
-    new CancelOrders(_.techProducing.contains(Zerg.LurkerMorph)),
-    new CancelOrders(_.upgradeProducing.contains(Zerg.ZerglingSpeed)),
+    new Cancel(Zerg.LurkerMorph, Zerg.ZerglingSpeed),
 
     new Pump(Zerg.SunkenColony),
     new BuildSunkensAtNatural(1),

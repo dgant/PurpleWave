@@ -17,7 +17,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
   var lastSetRally                    : Int     = 0
-  private var _knownToEnemy           : Boolean = false
   private var _lastFrameOccupied      : Int     = - Forever()
   private var _framesFailingToMove    : Int     = 0
   private var _framesFailingToAttack  : Int     = 0
@@ -25,7 +24,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     if (frameDiscovered < With.frame) readProxy()
     if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     super.update()
-    _knownToEnemy = _knownToEnemy || visibleToOpponents
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
     if (flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
@@ -35,7 +33,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     if (order == Orders.HarvestGas || order == Orders.MiningMinerals) orderTarget.foreach(_.lastFrameHarvested = With.frame)
   }
 
-  def knownToEnemy  : Boolean = _knownToEnemy
   def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > Math.max(24, cooldownMaxAirGround + 2)
   def resetSticking(): Unit = {
     _framesFailingToMove = 0

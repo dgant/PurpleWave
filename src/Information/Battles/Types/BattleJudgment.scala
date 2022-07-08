@@ -9,7 +9,7 @@ class BattleJudgment(battle: Battle) {
   val scoreAir            : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthAir,     battle.enemy.skimStrengthVsAir)     else scoreTotal
   val scoreGround         : Double  = if (battle.skimulated) calculateSkimulationScore(battle.us.skimStrengthGround,  battle.enemy.skimStrengthVsGround)  else scoreTotal
   val scoreTarget         : Double  = calculateTarget
-  val shouldFight         : Boolean = scoreTotal >= scoreTarget
+  val shouldFight         : Boolean = scoreTotal  >= scoreTarget
   val shouldFightAir      : Boolean = scoreAir    >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreGround)
   val shouldFightGround   : Boolean = scoreGround >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreAir)
   val confidence11Total   : Double  = calculateConfidence11(scoreTotal, scoreTarget)

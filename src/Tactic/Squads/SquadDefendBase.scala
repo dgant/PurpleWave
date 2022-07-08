@@ -56,7 +56,7 @@ class SquadDefendBase(base: Base) extends Squad {
         u.isOurs
         && u.unitClass.isBuilding
         && u.hitPoints < 300
-        && (u.friendly.exists(_.knownToEnemy) || u.canAttack)
+        && (u.friendly.exists(_.knownToOpponents) || u.canAttack)
         && (u.zone != With.geography.ourMain.zone || u.matchups.threats.exists( ! _.unitClass.isWorker))))(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(heart))
       .map(_.pixel)
       .getOrElse(heart))

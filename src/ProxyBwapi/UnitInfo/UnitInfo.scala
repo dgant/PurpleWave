@@ -58,7 +58,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private val previousPixels      : Array[Pixel] = Array.fill(48)(new Pixel(bwapiUnit.getPosition))
   @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((With.frame + previousPixels.length - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)
   def update(): Unit = {
-    _hasEverBeenVisibleToOpponents ||= visibleToOpponents
+    if (visibleToOpponents) _frameKnownToOpponents = Math.min(_frameKnownToOpponents, With.frame)
     // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
     if (Math.max(cooldownGround, cooldownAir) > lastCooldown) lastFrameStartingAttack = With.frame
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
@@ -384,8 +384,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   ////////////////
 
   def visibility: Visibility.Value
-  private var _hasEverBeenVisibleToOpponents: Boolean = false
-  @inline final def hasEverBeenVisibleToOpponents: Boolean = _hasEverBeenVisibleToOpponents
+  private var _frameKnownToOpponents: Int = Forever()
+  @inline final def frameKnownToOpponents: Int = _frameKnownToOpponents
+  @inline final def knownToOpponents: Boolean = _frameKnownToOpponents < Forever()
   @inline final def visibleToOpponents: Boolean = if (isEnemy) true else (
     tile.visibleToEnemy
     || (unitClass.tileWidth > 1 && unitClass.tileHeight > 1 && tileArea.tiles.exists(_.visibleToEnemy))

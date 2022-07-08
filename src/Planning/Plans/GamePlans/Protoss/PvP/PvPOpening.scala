@@ -177,7 +177,7 @@ class PvPOpening extends GameplanImperative {
     if (PvPDT()
       && scoutCleared
       && With.units.ours.filter(Protoss.TemplarArchives).exists(a =>
-        a.hasEverBeenVisibleToOpponents
+        a.knownToOpponents
         && ! a.visibleToOpponents
         && ! a.zone.units.exists(_.isEnemy))) {
       if (roll("DTToSpeedlot", 0.4)) {
@@ -325,7 +325,7 @@ class PvPOpening extends GameplanImperative {
     if (speedlotAttack) status("Speedlot")
     if (shouldAttack)   status("Attack")
     if (shouldHarass)   status("Harass")
-    if (shouldExpand)   status("ExpandNow")
+    if (shouldExpand)   status("Expand")
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }
@@ -672,10 +672,10 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.CitadelOfAdun)
         get(Protoss.TemplarArchives)
       }
+      if (shouldExpand) { requireMiningBases(2) }
       trainGatewayUnits()
       get(2, Protoss.Gateway)
       buildCannonsAtNatural(if (getCannons) 2 else 0, PlaceLabels.DefendEntrance)
-      if (shouldExpand) { requireMiningBases(2) }
 
     } else if (PvP3GateGoon()) {
       if (shouldExpand) { requireMiningBases(2) }

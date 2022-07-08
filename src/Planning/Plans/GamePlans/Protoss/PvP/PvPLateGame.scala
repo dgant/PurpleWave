@@ -285,33 +285,28 @@ class PvPLateGame extends GameplanImperative {
   }
 
   def obsTravelFrames(from: Pixel): Int = (from.pixelDistance(With.geography.ourNatural.zone.downtown.center) / Protoss.Observer.topSpeed).toInt
+  def newObsDebut(value: Int, origin: Pixel): Unit = {
+    obsDebut = Math.min(obsDebut, value)
+    obsArrival = Math.min(obsArrival, obsDebut + obsTravelFrames(origin))
+  }
   def updateDTBravery(): Unit = {
     val roboFrames = Protoss.RoboticsFacility.buildFrames
     val toryFrames = Protoss.Observatory.buildFrames
     val obsFrames = Protoss.Observer.buildFrames
     lazy val roboOrigin = Maff.minBy(With.units.enemy.filter(Protoss.RoboticsFacility))(_.completionFrame).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
 
-    With.units.enemy.filter(Protoss.RoboticsFacility).foreach(r => {
-      val obsBirth = r.remainingCompletionFrames + toryFrames + obsFrames
-      obsDebut    = Math.min(obsDebut,    obsBirth)
-      obsArrival  = Math.min(obsArrival,  obsBirth + obsTravelFrames(r.pixel))
-    })
-    With.units.enemy.filter(Protoss.Observatory).foreach(o => {
-      val obsBirth = o.remainingCompletionFrames + obsFrames
-      obsDebut    = Math.min(obsDebut,    obsBirth)
-      obsArrival  = Math.min(obsArrival,  obsBirth + obsTravelFrames(roboOrigin))
-    })
-    With.units.enemy.filter(Protoss.Observer).foreach(o => {
-      obsDebut    = Math.min(obsDebut,    With.frame)
-      obsArrival  = Math.min(obsArrival,  With.frame + obsTravelFrames(o.pixel))
-    })
-    With.units.enemy.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver)).foreach(r => {
-      obsDebut    = Math.min(obsDebut,    toryFrames + obsFrames)
-      obsArrival  = Math.min(obsDebut,    toryFrames + obsFrames + obsTravelFrames(roboOrigin))
-    })
-    With.units.ours.filter(_.isAny(Protoss.DarkTemplar, Protoss.TemplarArchives)).map(_.frameDiscovered).foreach(frame => dtDebut = Math.min(dtDebut, frame))
-    obsDebut    = Math.min(obsDebut,    dtDebut + roboFrames + toryFrames + obsFrames)
-    obsArrival  = Math.min(obsDebut,    dtDebut + roboFrames + toryFrames + obsFrames + obsTravelFrames(roboOrigin))
+    With.units.enemy.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.RoboticsSupportBay))
+                                                      .foreach(r => newObsDebut(r.frameDiscovered           + toryFrames  + obsFrames,  roboOrigin))
+    With.units.enemy.filter(Protoss.RoboticsFacility) .foreach(r => newObsDebut(r.remainingCompletionFrames + toryFrames  + obsFrames,  r.pixel))
+    With.units.enemy.filter(Protoss.Observatory)      .foreach(o => newObsDebut(o.remainingCompletionFrames               + obsFrames,  roboOrigin))
+    With.units.enemy.filter(Protoss.Observer)         .foreach(o => newObsDebut(o.frameDiscovered,                                      o.pixel))
+
+    With.units.ours.filter(_.isAny(Protoss.DarkTemplar, Protoss.TemplarArchives))
+      .filter(_.knownToOpponents)
+      .map(_.frameKnownToOpponents)
+      .foreach(frame => dtDebut = Math.min(dtDebut, frame))
+
+    newObsDebut(dtDebut + roboFrames + toryFrames + obsFrames, roboOrigin)
 
     dtBraveryAbroad = With.frame < obsDebut
     dtBraveryHome   = With.frame < obsArrival

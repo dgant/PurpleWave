@@ -15,7 +15,7 @@ object BeReaver extends Action {
     considerHopping(unit)
   }
 
-  def considerHopping(unit: FriendlyUnitInfo) {
+  def considerHopping(unit: FriendlyUnitInfo): Unit = {
     if (unit.agent.commit) return
     if (unit.agent.ride.isEmpty) return
     if (unit.transport.isDefined) return

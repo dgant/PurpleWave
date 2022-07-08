@@ -206,24 +206,69 @@ object Templates {
 
 
   val initialLayouts = Seq(
-    // It's critical that the Gateways be on the bottom.
+    // It's critical that the Gateways not have tech buildings below them.
     // Gateway above Citadel-Pylon-Core can trap Dark Templar.
-    new Template().from(
-      "xxxxxx---",
-      "xTxxPxRxx-",
-      "xxxxxxxxx-",
-      "x4xxx4xxx-",
-      "-xxxxxxxx-",
-      "-xxxxxxxx-",
-      "----------"),
-    new Template().from(
-      "----xxxxxx",
-      "-RxxPxTxxx",
-      "-xxxxxxxxx",
-      "-4xxx4xxxx",
-      "-xxxxxxxx-",
-      "-xxxxxxxx-",
-      "----------")
+    new Template()
+      .forExitDirection(Directions.Left, Directions.Down)
+      .from(
+        "------------",
+        "-4xxx3xx3xx-",
+        "-xxxxxxxxxx-",
+        "-xxxxPx2x---",
+        "-4xxxxxxx---",
+        "-xxxxTxxRxx-",
+        "-xxxxxxxxxx-",
+        "------------"),
+    new Template()
+      .forExitDirection(Directions.Right, Directions.Up)
+      .from(
+        "------------",
+        "-RxxTxx4xxx-",
+        "-xxxxxxxxxx-",
+        "---2xPxxxxx-",
+        "---xxxx4xxx-",
+        "-3xx3xxxxxx-",
+        "-xxxxxxxxxx-",
+        "------------"),
+    new Template()
+      .forExitDirection(Directions.Left, Directions.Up, Directions.Down)
+      .from(
+        "------------",
+        "-4xxx3xxRxx-",
+        "-xxxxxxxxxx-",
+        "-xxxxPx2x---",
+        "-4xxxxxxx-",
+        "-xxxxTxx--",
+        "-xxxxxxx-",
+        "---------"),
+    new Template()
+      .forExitDirection(Directions.Right, Directions.Up, Directions.Down)
+      .from(
+        "------------",
+        "-Rxx3xx4xxx-",
+        "-xxxxxxxxxx-",
+        "---2xPxxxxx-",
+        "xx-xxxx4xxx-",
+        "xx--Txxxxxx-",
+        "xxx-xxxxxxx-",
+        "xxx---------"),
+    new Template()
+      .from(
+        "----------",
+        "-RxxPxTxx-",
+        "-xxxxxxxx-",
+        "-4xxx4xxx-",
+        "-xxxxxxxx-",
+        "-xxxxxxxx-",
+        "----------"),
+    new Template()
+      .from(
+        "-RxxPxTxx",
+        "-xxxxxxxx",
+        "-4xxx4xxx",
+        "-xxxxxxxx-",
+        "-xxxxxxxx-",
+        "----------")
   )
 
   val gateways = Seq(

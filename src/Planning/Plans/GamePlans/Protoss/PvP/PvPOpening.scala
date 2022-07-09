@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
+import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
@@ -8,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.SwapIf
-import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
+import Utilities.Time._
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
@@ -393,7 +394,7 @@ class PvPOpening extends GameplanImperative {
     // React against proxy //
     /////////////////////////
 
-    if (With.fingerprints.proxyGateway() && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
+    if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99) && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
       pumpSupply()
       pumpWorkers()
       if (units(Protoss.Gateway) < 2) {
@@ -407,7 +408,7 @@ class PvPOpening extends GameplanImperative {
       get(2, Protoss.Gateway)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
-      get(Protoss.ShieldBattery)
+      //get(Protoss.ShieldBattery)
       get(Protoss.Assimilator)
       get(Protoss.CyberneticsCore)
       get(3, Protoss.Gateway)
@@ -591,6 +592,9 @@ class PvPOpening extends GameplanImperative {
     if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
       gasWorkerCeiling(2)
     }
+    if (PvPTechBeforeRange() && PvPDT() && units(Protoss.CitadelOfAdun) == 0) {
+      gasWorkerCeiling(2)
+    }
 
     ////////////////////////
     // Transition to tech //
@@ -608,6 +612,9 @@ class PvPOpening extends GameplanImperative {
 
     if (PvPRobo()) {
       get(Protoss.RoboticsFacility)
+      if (shuttleFirst) {
+        once(Protoss.Shuttle)
+      }
       if (getObservers || getObservatory) {
         if (enemyDarkTemplarLikely && units(Protoss.Observer) == 0) {
           if (units(Protoss.Observatory) == 0) {
@@ -618,8 +625,12 @@ class PvPOpening extends GameplanImperative {
             cancel(Protoss.Shuttle, Protoss.Reaver)
           }
         }
-        get(Protoss.Observatory)
-        get(Protoss.Observer)
+        get(RequestUnit(Protoss.Observatory, minFrameArg =
+          With.units.ours
+            .find(Protoss.Shuttle)
+            .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
+            .getOrElse(if (shuttleFirst) Forever() else 0)))
+        once(Protoss.Observer)
       } else {
         if ( ! getObservatory) {
           cancel(Protoss.Observatory)
@@ -627,16 +638,18 @@ class PvPOpening extends GameplanImperative {
         cancel(Protoss.Observer)
       }
       if (getReavers) {
-        get(Protoss.RoboticsSupportBay)
+        get(RequestUnit(Protoss.RoboticsSupportBay, minFrameArg =
+          With.units.ours
+            .find(Protoss.Observatory)
+            .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
+            .getOrElse(if (getObservatory) Forever() else 0)))
       }
       if (shuttleSpeed) {
         once(Protoss.Reaver)
         once(Protoss.ShuttleSpeed)
         once(Protoss.Shuttle)
-        pump(Protoss.Reaver)
-      } else {
-        trainRoboUnits()
       }
+      trainRoboUnits()
       get(Protoss.DragoonRange)
       if (shouldExpand && ! With.geography.ourNatural.units.exists(u =>
         u.isEnemy
@@ -672,7 +685,10 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.CitadelOfAdun)
         get(Protoss.TemplarArchives)
       }
-      if (shouldExpand) { requireMiningBases(2) }
+      if (shouldExpand) {
+        buildCannonsAtNatural(if (With.fingerprints.dragoonRange()) 0 else 1, PlaceLabels.DefendEntrance)
+        requireMiningBases(2)
+      }
       trainGatewayUnits()
       get(2, Protoss.Gateway)
       buildCannonsAtNatural(if (getCannons) 2 else 0, PlaceLabels.DefendEntrance)
@@ -699,7 +715,6 @@ class PvPOpening extends GameplanImperative {
   }
 
   private def trainRoboUnits(): Unit = {
-    if (shuttleFirst) once(Protoss.Shuttle)
     if (getObservers) {
       once(Protoss.Observer)
       if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)

@@ -31,6 +31,8 @@ abstract class Fingerprint {
     }
   }
 
+  def workerDelta: Int = 0
+
   protected def reason: String = "(No reason)"
   def explanation: String = f"$this ${if (matched) "matched" else "unmatched"}: $reason"
   override val toString: String = ToString(this).replace("Fingerprint", "Finger")

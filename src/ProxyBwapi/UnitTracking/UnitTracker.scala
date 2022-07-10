@@ -71,9 +71,12 @@ final class UnitTracker {
   @inline def playerOwned : Iterable[UnitInfo]          = ours ++ enemy
   @inline def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
   @inline def all         : Iterable[UnitInfo]          = playerOwned ++ neutral
-  @inline def ever        : Iterable[UnitInfo]          = all ++ bufferHistoric.all
-  @inline def everOurs    : Iterable[UnitInfo]          = ours ++ bufferHistoric.all.view.filter(_.isOurs)
-  @inline def everEnemy   : Iterable[UnitInfo]          = enemy ++ bufferHistoric.all.view.filter(_.isEnemy)
+  @inline def dead        : Iterable[UnitInfo]          = bufferHistoric.all
+  @inline def deadOurs    : Iterable[UnitInfo]          = dead.filter(_.isOurs)
+  @inline def deadEnemy   : Iterable[UnitInfo]          = dead.filter(_.isEnemy)
+  @inline def ever        : Iterable[UnitInfo]          = all ++ dead
+  @inline def everOurs    : Iterable[UnitInfo]          = ours ++ dead.filter(_.isOurs)
+  @inline def everEnemy   : Iterable[UnitInfo]          = enemy ++ dead.filter(_.isEnemy)
   @inline def selected    : Iterable[UnitInfo]          = all.filter(_.selected)
 
   def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)

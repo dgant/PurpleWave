@@ -99,8 +99,8 @@ abstract class MissionDrop extends Mission {
         With.framesSince(b.lastFrameScoutedByUs).toDouble
         * Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin),      10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))
         / Math.min(b.heart.groundTiles(With.scouting.enemyHome),  10 * b.heart.tileDistanceFast(With.scouting.enemyHome)))
-      else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProgress + 1)
-      else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProgress - 0.5)
+      else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProximity + 1)
+      else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProximity - 0.5)
       else Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin), 10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))).get
     val itineraries = Vector(
         With.geography.itineraryCounterwise(With.geography.ourMain, targetBase),

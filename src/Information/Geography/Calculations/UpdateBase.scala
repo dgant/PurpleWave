@@ -3,6 +3,7 @@ package Information.Geography.Calculations
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import ProxyBwapi.Races.Zerg
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
@@ -77,6 +78,10 @@ object UpdateBase {
           })
         }
       }
+    }
+
+    if (base.owner != originalOwner) {
+      base.frameTaken = Math.max(0, base.townHall.map(u => u.frameDiscovered - u.unitClass.buildFrames + (if (u.isAny(Zerg.Lair, Zerg.Hive)) 0 else u.remainingCompletionFrames)).getOrElse(With.frame))
     }
   }
 }

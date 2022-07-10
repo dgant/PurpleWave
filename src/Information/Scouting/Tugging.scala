@@ -1,21 +1,36 @@
 package Information.Scouting
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Tile
+import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
 trait Tugging {
-  def tugDistance: Int = With.geography.home.groundTiles(With.scouting.enemyHome)
-  def enemyProgress: Double = Maff.clamp(1 - enemyMuscleOrigin.groundTiles(With.geography.home).toDouble / tugDistance, 0, 1)
-  def ourProgress: Double = Maff.clamp(1 - ourMuscleOrigin.groundTiles(With.scouting.enemyHome).toDouble / tugDistance, 0, 1)
+  def tugStart                                  : Tile    = With.geography.home
+  def tugEnd                                    : Tile    = With.scouting.enemyHome
+  def tugLength                                 : Int     = tugStart.groundTiles(With.scouting.enemyHome)
+  def tugDistanceGroundUs     (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugStart)
+  def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugEnd)
+  def proximity               (pixel  : Pixel)  : Double  = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
+  def proximity               (tile   : Tile)   : Double  = proximity(tile.center)
+  def proximity               (base   : Base)   : Double  = proximity(base.townHallArea.center)
+  def ourProximity                              : Double  = proximity(ourMuscleOrigin)
+  def enemyProximity                            : Double  = proximity(enemyMuscleOrigin)
+  def weControl               (pixel  : Pixel)  : Boolean = ourProximity    < proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut)
+  def enemyControls           (pixel  : Pixel)  : Boolean = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
+  def weControl               (tile   : Tile)   : Boolean = weControl(tile.center)
+  def enemyControls           (tile   : Tile)   : Boolean = enemyControls(tile.center)
+  def weControl               (base   : Base)   : Boolean = weControl(base.townHallArea.center)
+  def weControlOurNatural                       : Boolean = weControl(With.geography.ourNatural)
 
-  def enemyThreatOrigin: Tile = _enemyThreatOrigin()
-  def enemyMuscleOrigin: Tile = _enemyMuscleOrigin()
-  def ourThreatOrigin: Tile = _ourThreatOrigin()
-  def ourMuscleOrigin: Tile = _ourMuscleOrigin()
+  def enemyThreatOrigin : Tile = _enemyThreatOrigin()
+  def enemyMuscleOrigin : Tile = _enemyMuscleOrigin()
+  def ourThreatOrigin   : Tile = _ourThreatOrigin()
+  def ourMuscleOrigin   : Tile = _ourMuscleOrigin()
 
   private lazy val productionWeight = 5 * Terran.Marine.subjectiveValue
   private val _enemyThreatOrigin = new Cache(() => {

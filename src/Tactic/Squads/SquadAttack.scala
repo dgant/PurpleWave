@@ -30,7 +30,7 @@ class SquadAttack extends Squad {
     }).toMap
     if (With.enemies.exists( ! _.isZerg)
       && With.enemy.bases.size < 3
-      && With.scouting.enemyProgress > 0.4
+      && With.scouting.enemyProximity > 0.4
       && enemyNonTrollyThreats > 6) {
       return With.scouting.enemyThreatOrigin.center
     }

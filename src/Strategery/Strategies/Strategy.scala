@@ -33,6 +33,7 @@ abstract class Strategy extends SimpleString {
   def responsesWhitelisted    : Iterable[Fingerprint]           = Vector.empty
   def allowedVsHuman          : Boolean                         = false
   def minimumGamesVsOpponent  : Int                             = 0
+  def workerDelta             : Int                             = 0
 
   /**
     * Flag a strategy as being salient to the gameplay.

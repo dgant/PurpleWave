@@ -44,7 +44,7 @@ class PvPLateGame extends GameplanImperative {
     fearDeath   = ! dtBraveryAbroad && ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
-    fearContain = With.scouting.enemyProgress > 0.6 && ! dtBraveryHome
+    fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryHome
 
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldMindControl = false // expectCarriers

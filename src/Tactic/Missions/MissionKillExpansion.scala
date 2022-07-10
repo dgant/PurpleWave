@@ -19,7 +19,7 @@ class MissionKillExpansion extends Mission {
       - base.heart.groundPixels(With.scouting.ourMuscleOrigin))
 
   override def shouldForm: Boolean = (With.blackboard.wantToAttack()
-    && With.scouting.ourProgress > 0.5
+    && With.scouting.ourProximity < 0.5
     && eligible.nonEmpty
     && With.recruiter.available.count(lock.matcher) >= 20)
 

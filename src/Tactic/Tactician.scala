@@ -143,7 +143,7 @@ class Tactician extends TimedTask {
     assign(freelancers, squadsDefending.view.map(_._2), 0.5)
 
     // Proactive drop/harassment defense
-    if (With.scouting.enemyProgress < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
+    if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already

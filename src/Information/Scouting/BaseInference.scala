@@ -6,14 +6,14 @@ import ProxyBwapi.Races.Zerg
 import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
 
 trait BaseInference {
-  def firstEnemyMain: Option[Base] = _firstEnemyMain
-  def enemyMain: Option[Base] = _firstEnemyMain.filter(base => ! base.scoutedByUs || base.owner.isEnemy)
-  def enemyNatural: Option[Base] = enemyMain.flatMap(_.natural)
-  def firstExpansionFrameEnemy: Int = _firstExpansionFrameEnemy
-  def firstExpansionFrameUs: Int = _firstExpansionFrameUs
-  def weExpandedFirst: Boolean = _firstExpansionFrameUs < _firstExpansionFrameEnemy
-  def enemyExpandedFirst: Boolean = _firstExpansionFrameEnemy < _firstExpansionFrameUs
-  def enemyMainFullyScouted: Boolean = _enemyMainScouted
+  def firstEnemyMain            : Option[Base]  = _firstEnemyMain
+  def enemyMain                 : Option[Base]  = _firstEnemyMain.filter(base => ! base.scoutedByUs || base.owner.isEnemy)
+  def enemyNatural              : Option[Base]  = enemyMain.flatMap(_.natural)
+  def firstExpansionFrameEnemy  : Int           = _firstExpansionFrameEnemy
+  def firstExpansionFrameUs     : Int           = _firstExpansionFrameUs
+  def weExpandedFirst           : Boolean       = _firstExpansionFrameUs < _firstExpansionFrameEnemy
+  def enemyExpandedFirst        : Boolean       = _firstExpansionFrameEnemy < _firstExpansionFrameUs
+  def enemyMainFullyScouted     : Boolean       = _enemyMainScouted
   private var _firstEnemyMain: Option[Base] = None
   private var _firstExpansionFrameEnemy: Int = Forever()
   private var _firstExpansionFrameUs: Int = Forever()

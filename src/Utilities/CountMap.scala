@@ -4,8 +4,8 @@ import scala.collection.mutable
 
 // OpenHashMap looks most favorable for our use cases based on:
 // https://github.com/dvmlls/scala-map-benchmarking/blob/master/src/R/plot.png
-class CountMap[T] extends mutable.OpenHashMap[T, Int] {
-  override def default(key: T): Int = { put(key, 0); 0 }
+class CountMap[T](argDefault: Int = 0) extends mutable.OpenHashMap[T, Int] {
+  override def default(key: T): Int = { put(key, argDefault); argDefault }
   def add         (key: T, value:Int)   : Option[Int] = put(key, this(key) + value)
   def addOne      (key: T)              : Option[Int] = add(key, 1)
   def subtract    (key: T, value: Int)  : Option[Int] = add(key, -value)
@@ -39,5 +39,13 @@ class CountMap[T] extends mutable.OpenHashMap[T, Int] {
       maximumCount = p._2
     })
     output
+  }
+
+  def reduceTo(key: T, value: Int): Unit = {
+    this(key) = Math.min(this(key), value)
+  }
+
+  def increaseTo(key: T, value: Int): Unit = {
+    this(key) = Math.max(this(key), value)
   }
 }

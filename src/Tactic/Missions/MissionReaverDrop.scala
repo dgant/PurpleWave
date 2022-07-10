@@ -18,7 +18,7 @@ class MissionReaverDrop extends MissionDrop {
       (With.enemies.forall(_.isTerran) && With.frame < Minutes(9)() && ! MacroFacts.enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.bio))
       || (
         // Will their base be empty?
-        (With.scouting.enemyProgress > 0.35 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
+        (With.scouting.enemyProximity > 0.35 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
         // Can we get there safely?
         && (MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)()) || With.unitsShown.allEnemies(Terran.Wraith, Terran.Goliath, Protoss.Dragoon, Zerg.Scourge, Zerg.Mutalisk) == 0))))
 

@@ -6,6 +6,7 @@ import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
 import Information.Counting.{Accounting, MacroCounts, ProductionHistory, Projections}
 import Information.Fingerprinting.Fingerprints
+import Information.GameSense.GameSensor
 import Information.Geography.{Expansions, Geography}
 import Information.Geography.NeoGeo.{MapIdentifier, NeoGeo}
 import Information.Geography.Pathfinding.Paths
@@ -96,7 +97,8 @@ object With {
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
   var scheduler         : Scheduler           = _
-  var scouting          : Scouting            = _
+  var scouting          : Scouting = _
+  var sense             : GameSensor          = _
   var simulation        : Simulation          = _
   var squads            : Squads              = _
   var strategy          : Strategist          = _
@@ -200,6 +202,7 @@ object With {
     projections       = new Projections
     reaction          = new ReactionTimes
     recruiter         = new Recruiter
+    sense             = new GameSensor
     scheduler         = new Scheduler
     scouting          = new Scouting
     simulation        = new Simulation

@@ -1,9 +1,8 @@
 package Information.Geography.Types
 
 import Lifecycle.With
-import Mathematics.{Maff, Shapes}
 import Mathematics.Points.{Direction, Points, Tile, TileRectangle}
-import Mathematics.Shapes.Ray
+import Mathematics.{Maff, Shapes}
 import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
@@ -35,6 +34,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   var lastPlannedExpo         : Int               = - Forever()
   var lastFrameScoutedByUs    : Int               = 0
   var lastFrameScoutedByEnemy : Int               = 0
+  var frameTaken              : Int               = 0
   def isOurs                  : Boolean           = owner.isUs
   def isAlly                  : Boolean           = owner.isAlly
   def isEnemy                 : Boolean           = owner.isEnemy

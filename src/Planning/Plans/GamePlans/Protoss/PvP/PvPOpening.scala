@@ -259,7 +259,7 @@ class PvPOpening extends GameplanImperative {
         getCannons &&= ! With.units.existsOurs(Protoss.RoboticsFacility)
       }
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0
-      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeToMoveOut || With.scouting.enemyProgress < 0.75)
+      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeToMoveOut || With.scouting.enemyProximity < 0.75)
       shouldExpand ||= upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20
     } else if (PvP3GateGoon()) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
@@ -632,10 +632,10 @@ class PvPOpening extends GameplanImperative {
             .getOrElse(if (shuttleFirst) Forever() else 0)))
         once(Protoss.Observer)
       } else {
+        cancel(Protoss.Observer)
         if ( ! getObservatory) {
           cancel(Protoss.Observatory)
         }
-        cancel(Protoss.Observer)
       }
       if (getReavers) {
         get(RequestUnit(Protoss.RoboticsSupportBay, minFrameArg =
@@ -669,7 +669,7 @@ class PvPOpening extends GameplanImperative {
       if (getCannons) { buildCannonsAtNatural(1, PlaceLabels.DefendEntrance) }
       if (shouldExpand) { requireMiningBases(2) }
       SwapIf(
-        safeAtHome && With.scouting.enemyProgress < 0.5,
+        safeAtHome && With.scouting.enemyProximity < 0.5,
         () => trainGatewayUnits(),
         () => get(5, Protoss.Gateway))
 

@@ -7,6 +7,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.Time.Forever
 import Utilities.UnitFilters.{IsAll, IsComplete}
 
 import scala.collection.mutable
@@ -36,8 +37,6 @@ class Projections {
     }
   }
 
-  private val forever: Int = 24 * 60 * 120
-
   // Frames before we could possibly have this unit, not counting costs
   //
   private def framesToUnits(
@@ -62,7 +61,7 @@ class Projections {
           .distinct
           .map(requiredClass =>
             if (unitsInCycle != null && unitsInCycle.contains(requiredClass))
-              forever
+              Forever()
             else
               framesToUnits(
                 requiredClass,
@@ -76,15 +75,11 @@ class Projections {
   private def framesToTech(tech: Tech): Int = {
 
     // Do we have it already?
-    if (With.self.hasTech(tech)) {
-      return 0
-    }
+    if (With.self.hasTech(tech)) return 0
 
     // How much longer before the tech finishes?
     val techer = With.units.ours.find(unit => unit.teching && unit.techingType == tech)
-    if (techer.isDefined) {
-      return techer.get.remainingTechFrames
-    }
+    if (techer.isDefined) return techer.get.remainingTechFrames
 
     // Do we need to build the thing that techs this?
     val framesToTecher = framesToUnits(tech.whatResearches)
@@ -96,9 +91,7 @@ class Projections {
   private def framesToUpgrade(upgrade: Upgrade, level: Int = 1): Int = {
 
     // Do we have it already?
-    if (With.self.getUpgradeLevel(upgrade) >= level) {
-      return 0
-    }
+    if (With.self.getUpgradeLevel(upgrade) >= level) return 0
 
     // Are we not even at the previous level?
     if (With.self.getUpgradeLevel(upgrade) < level - 1) {
@@ -107,9 +100,7 @@ class Projections {
 
     // How much longer before the upgrade finishes?
     val upgrader = With.units.ours.find(unit => unit.upgrading && unit.upgradingType == upgrade)
-    if (upgrader.isDefined) {
-      return upgrader.get.remainingUpgradeFrames
-    }
+    if (upgrader.isDefined) return upgrader.get.remainingUpgradeFrames
 
     // Do we need to build the thing that upgrades this?
     // or the thing that lets us get advanced levels of this?

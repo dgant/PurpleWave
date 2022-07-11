@@ -20,16 +20,16 @@ object ShowEconomicModel extends DebugView {
         Seq(
           (With.sense.ourLostMinerals, Color.White, "Our loss"),
           (With.sense.ourTechMinerals, Colors.BrightViolet, "Our tech"),
-          (With.sense.ourLostMinerals, Colors.BrightYellow, "Our upgr"),
-          (With.sense.ourMinedMinerals, Colors.BrightRed, "Our war"),
-          (With.sense.ourMinedMinerals, Colors.BrightBlue, "Our peace"),
+          (With.sense.ourUpgradeMinerals, Colors.BrightYellow, "Our upgr"),
+          (With.sense.ourWarUnitMinerals, Colors.BrightRed, "Our war"),
+          (With.sense.ourPeaceMinerals, Colors.BrightBlue, "Our peace"),
         ),
         Seq(
           (With.sense.enemyLostMinerals, Color.White, "Foe loss"),
           (With.sense.enemyTechMinerals, Colors.BrightViolet, "Foe tech"),
-          (With.sense.enemyLostMinerals, Colors.BrightYellow, "Foe upgr"),
-          (With.sense.enemyMinedMinerals, Colors.BrightRed, "Foe war"),
-          (With.sense.enemyMinedMinerals, Colors.BrightBlue, "Foe peace"),
+          (With.sense.enemyUpgradeMinerals, Colors.BrightYellow, "Foe upgr"),
+          (With.sense.enemyWarUnitMinerals, Colors.BrightRed, "Foe war"),
+          (With.sense.enemyPeaceMinerals, Colors.BrightBlue, "Foe peace"),
         ),
         Seq(
           (With.sense.ourMinedGas, With.self.colorBright, "Our gas")
@@ -40,16 +40,16 @@ object ShowEconomicModel extends DebugView {
         Seq(
           (With.sense.ourLostGas, Color.White, "Our loss"),
           (With.sense.ourTechGas, Colors.BrightViolet, "Our tech"),
-          (With.sense.ourLostGas, Colors.BrightYellow, "Our upgr"),
-          (With.sense.ourMinedGas, Colors.BrightRed, "Our war"),
-          (With.sense.ourMinedGas, Colors.BrightBlue, "Our peace"),
+          (With.sense.ourUpgradeGas, Colors.BrightYellow, "Our upgr"),
+          (With.sense.ourWarUnitGas, Colors.BrightRed, "Our war"),
+          (With.sense.ourPeaceGas, Colors.BrightBlue, "Our peace"),
         ),
         Seq(
           (With.sense.enemyLostGas, Color.White, "Foe loss"),
           (With.sense.enemyTechGas, Colors.BrightViolet, "Foe tech"),
-          (With.sense.enemyLostGas, Colors.BrightYellow, "Foe upgr"),
-          (With.sense.enemyMinedGas, Colors.BrightRed, "Foe war"),
-          (With.sense.enemyMinedGas, Colors.BrightBlue, "Foe peace"),
+          (With.sense.enemyUpgradeGas, Colors.BrightYellow, "Foe upgr"),
+          (With.sense.enemyWarUnitGas, Colors.BrightRed, "Foe war"),
+          (With.sense.enemyPeaceGas, Colors.BrightBlue, "Foe peace"),
         ),
       ))
   }

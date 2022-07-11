@@ -9,20 +9,20 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.CountMap
-import Utilities.Time.Minutes
+import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.{IsProxied, IsWorker}
 
 trait EconomicModel {
 
-  private var _enemyMinedMinerals         : Double = 0.0
+  private var _enemyMinedMinerals         : Double = 50.0
   private var _enemyMinedGas              : Double = 0.0
-  private var _enemyLarva                 : Double = 0.0
+  private var _enemyLarva                 : Double = 3.0
   private var _ourProductionFrames        : CountMap[UnitClass] = new CountMap
   private var _enemyProductionFrames      : CountMap[UnitClass] = new CountMap
   private var _enemyWorkerSnapshotFrame   : Int = 0
   private var _enemyWorkerSnapshotDeadOld : Int = 0
   private var _enemyWorkerSnapshotDeadNew : Int = 0
-  private var _enemyWorkerSnapshot        : Int = 0
+  private var _enemyWorkerSnapshot        : Int = 4
   private var _ourUpgradeMinerals         : Int = 0
   private var _ourUpgradeGas              : Int = 0
   private var _enemyUpgradeMinerals       : Int = 0
@@ -94,6 +94,7 @@ trait EconomicModel {
   private var lastUpdate: Int = 0
   protected def updateEconomicModel(): Unit = {
     val deadEnemyWorkers = With.units.deadEnemy.count(IsWorker)
+    val unscouted = With.geography.startBases.exists( ! _.scoutedByUs) && ! With.geography.enemyBases.exists(_.isStartLocation)
     if (With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(_.resources.forall(r => With.framesSince(r.lastSeen) < 4 * Terran.SCV.buildFrames))) {
       _enemyWorkerSnapshotDeadOld += deadEnemyWorkers
       _enemyWorkerSnapshotDeadNew = 0
@@ -104,10 +105,10 @@ trait EconomicModel {
     _ourUpgradeGas            = Upgrades.all.view.filter(_()).flatMap(u => (1 to With.self.getUpgradeLevel(u)).map(u.gasPrice(_))).sum
     _enemyUpgradeMinerals     = Upgrades.all.view.filter(_()).flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.mineralPrice(_))).sum
     _enemyUpgradeGas          = Upgrades.all.view.filter(_()).flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.gasPrice(_))).sum
-    _ourTechMinerals          = Techs.all.view.filter(_()).map(_.mineralPrice).sum
-    _ourTechGas               = Techs.all.view.filter(_()).map(_.gasPrice).sum
-    _enemyTechMinerals        = With.enemies.flatMap(e => Techs.all.view.filter(_(e))).map(_.mineralPrice).sum
-    _enemyTechGas             = With.enemies.flatMap(e => Techs.all.view.filter(_(e))).map(_.gasPrice).sum
+    _ourTechMinerals          = Techs.nonFree.view.filter(_()).map(_.mineralPrice).sum
+    _ourTechGas               = Techs.nonFree.view.filter(_()).map(_.gasPrice).sum
+    _enemyTechMinerals        = With.enemies.flatMap(e => Techs.nonFree.view.filter(_(e))).map(_.mineralPrice).sum
+    _enemyTechGas             = With.enemies.flatMap(e => Techs.nonFree.view.filter(_(e))).map(_.gasPrice).sum
     _ourLostMinerals          = With.units.deadOurs .map(_.unitClass.mineralValue).sum
     _ourLostGas               = With.units.deadOurs .map(_.unitClass.gasValue).sum
     _enemyLostMinerals        = With.units.deadEnemy.map(_.unitClass.mineralValue).sum
@@ -116,8 +117,10 @@ trait EconomicModel {
     _ourPeaceGas              = With.units.everOurs   .filterNot(isWar).map(_.unitClass.gasPrice).sum
     _enemyPeaceMinerals       = With.units.everEnemy  .filterNot(isWar).map(_.unitClass.mineralPrice).sum
     _enemyPeaceGas            = With.units.everEnemy  .filterNot(isWar).map(_.unitClass.gasPrice).sum
-    _ourWarMinerals           = With.units.everOurs   .filter   (isWar).map(_.unitClass.mineralPrice).sum
-    _ourWarGas                = With.units.everOurs   .filter   (isWar).map(_.unitClass.gasPrice).sum
+    _ourWarUnitMinerals       = With.units.everOurs   .filter   (isWar).map(_.unitClass.mineralPrice).sum
+    _ourWarUnitGas            = With.units.everOurs   .filter   (isWar).map(_.unitClass.gasPrice).sum
+    _ourWarMinerals           = ourWarUnitMinerals + ourTechMinerals + ourUpgradeMinerals
+    _ourWarGas                = ourWarUnitGas + ourTechGas + ourUpgradeGas
     _enemyWarUnitMinerals     = With.units.everEnemy  .filter   (isWar).map(_.unitClass.mineralPrice).sum
     _enemyWarUnitGas          = With.units.everEnemy  .filter   (isWar).map(_.unitClass.gasPrice).sum
     _enemyWarMineralsFloor    = _enemyWarUnitMinerals + _enemyUpgradeMinerals + enemyTechMinerals
@@ -130,7 +133,7 @@ trait EconomicModel {
     val deltaFrames           = With.framesSince(lastUpdate)
     val deltaFrameSnapshot    = With.framesSince(_enemyWorkerSnapshotFrame)
     val ourBaseCount          = MacroFacts.miningBases
-    val enemyBaseCount        = Math.max(Maff.fromBoolean(With.geography.startBases.exists(!_.scoutedByUs)), With.geography.enemyBases.count(MacroFacts.isMiningBase))
+    val enemyBaseCount        = Math.max(Maff.fromBoolean(unscouted), With.geography.enemyBases.count(MacroFacts.isMiningBase))
     val workersPar            = 4 + With.frame * Terran.SCV.buildFrames
     val ourWorkerCount        = With.units.countOurs        (IsWorker)
     val enemyWorkerCount      = With.units.countEnemy       (IsWorker)
@@ -138,8 +141,8 @@ trait EconomicModel {
     val enemyWorkerDeaths     = With.units.deadEnemy.count  (IsWorker)
     val ourWorkerDelta        = Maff.max(With.strategy.selected.view.map(_.workerDelta)).getOrElse(0) + With.blackboard.workerDelta()
     val enemyWorkerDelta      = Maff.max(With.fingerprints.all.view.filter(_()).map(_.workerDelta)).getOrElse(0)
-    val enemyBaseMinerals     = With.geography.enemyBases.view.flatMap(_.minerals).size
-    val enemyBaseGas          = With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
+    val enemyBaseMinerals     = (if (unscouted) 9 else 0)                                   + With.geography.enemyBases.view.flatMap(_.minerals).size
+    val enemyBaseGas          = (if (unscouted && With.frame > GameTime(1, 45)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
     val enemyWorkerCap        = Maff.clamp(21, 75, 2 + enemyBaseMinerals + 3 * enemyBaseGas)
     val enemyWorkerProject    = _enemyWorkerSnapshot + Math.min(Minutes(5)(), deltaFrameSnapshot) / Terran.SCV.buildFrames + _enemyWorkerSnapshotDeadOld - deadEnemyWorkers
     val enemyWorkerEstimate   = Math.min(enemyWorkerCap, Math.max(enemyWorkerProject, enemyWorkerCount))

@@ -2,10 +2,11 @@ package Information.GameSense
 
 import Information.GameSense.GameSenses._
 import Lifecycle.With
+import Performance.Tasks.TimedTask
 
 import scala.collection.mutable
 
-class GameSensor extends EconomicModel {
+class GameSensor extends TimedTask with EconomicModel {
 
   EconAdvantage.setOpposite(EconDisadvantage)
   EconDisadvantage.setOpposite(EconAdvantage)
@@ -22,7 +23,7 @@ class GameSensor extends EconomicModel {
 
   private var lastUpdate: Int = 0
 
-  def update(): Unit = {
+  override protected def onRun(budgetMs: Long): Unit = {
     updateEconomicModel()
     detectEvents()
     currentEvents --= currentEvents.filter(_._2.untilFrame <= With.frame).keys

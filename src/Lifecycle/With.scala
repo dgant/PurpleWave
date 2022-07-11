@@ -97,7 +97,7 @@ object With {
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
   var scheduler         : Scheduler           = _
-  var scouting          : Scouting = _
+  var scouting          : Scouting            = _
   var sense             : GameSensor          = _
   var simulation        : Simulation          = _
   var squads            : Squads              = _

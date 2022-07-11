@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.CountMap
 import Utilities.Time.{GameTime, Minutes}
-import Utilities.UnitFilters.{IsProxied, IsWorker}
+import Utilities.UnitFilters.{IsHatchlike, IsProxied, IsWorker}
 
 trait EconomicModel {
 
@@ -20,8 +20,7 @@ trait EconomicModel {
   private var _ourProductionFrames        : CountMap[UnitClass] = new CountMap
   private var _enemyProductionFrames      : CountMap[UnitClass] = new CountMap
   private var _enemyWorkerSnapshotFrame   : Int = 0
-  private var _enemyWorkerSnapshotDeadOld : Int = 0
-  private var _enemyWorkerSnapshotDeadNew : Int = 0
+  private var _enemyWorkerSnapshotDead    : Int = 0
   private var _enemyWorkerSnapshot        : Int = 4
   private var _ourUpgradeMinerals         : Int = 0
   private var _ourUpgradeGas              : Int = 0
@@ -35,14 +34,24 @@ trait EconomicModel {
   private var _ourLostGas                 : Double = 0.0
   private var _enemyLostMinerals          : Double = 0.0
   private var _enemyLostGas               : Double = 0.0
-  private var _ourPeaceMinerals           : Double = 0.0
-  private var _ourPeaceGas                : Double = 0.0
-  private var _enemyPeaceMinerals         : Double = 0.0
-  private var _enemyPeaceGas              : Double = 0.0
   private var _ourWarUnitMinerals         : Double = 0.0
   private var _ourWarUnitGas              : Double = 0.0
   private var _enemyWarUnitMinerals       : Double = 0.0
   private var _enemyWarUnitGas            : Double = 0.0
+  private var _ourProductionMinerals      : Double = 0.0
+  private var _ourProductionGas           : Double = 0.0
+  private var _enemyProductionMinerals    : Double = 0.0
+  private var _enemyProductionGas         : Double = 0.0
+  private var _ourScienceMinerals         : Double = 0.0
+  private var _ourScienceGas              : Double = 0.0
+  private var _enemyScienceMinerals       : Double = 0.0
+  private var _enemyScienceGas            : Double = 0.0
+  private var _ourBaseMinerals            : Double = 0.0
+  private var _enemyBaseMinerals          : Double = 0.0
+  private var _ourSupplyMinerals          : Double = 0.0
+  private var _enemySupplyMinerals        : Double = 0.0
+  private var _ourDefenseMinerals         : Double = 0.0
+  private var _enemyDefenseMinerals       : Double = 0.0
   private var _ourWarMinerals             : Double = 0.0
   private var _ourWarGas                  : Double = 0.0
   private var _enemyWarMineralsFloor      : Double = 0.0
@@ -68,10 +77,22 @@ trait EconomicModel {
   def ourLostGas              : Double = _ourLostGas
   def enemyLostMinerals       : Double = _enemyLostMinerals
   def enemyLostGas            : Double = _enemyLostGas
-  def ourPeaceMinerals        : Double = _ourPeaceMinerals
-  def ourPeaceGas             : Double = _ourPeaceGas
-  def enemyPeaceMinerals      : Double = _enemyPeaceMinerals
-  def enemyPeaceGas           : Double = _enemyPeaceGas
+  def ourWorkerMinerals       : Double = 50 * With.units.countOurs(IsWorker)
+  def enemyWorkerMinerals     : Double = 50 * With.units.countEnemy(IsWorker)
+  def ourProductionMinerals   : Double = _ourProductionMinerals
+  def ourProductionGas        : Double = _ourProductionGas
+  def enemyProductionMinerals : Double = _enemyProductionMinerals
+  def enemyProductionGas      : Double = _enemyProductionGas
+  def ourScienceMinerals      : Double = _ourScienceMinerals
+  def ourScienceGas           : Double = _ourScienceGas
+  def enemyScienceMinerals    : Double = _enemyScienceMinerals
+  def enemyScienceGas         : Double = _enemyScienceGas
+  def ourDefenseMinerals      : Double = _ourDefenseMinerals
+  def enemyDefenseMinerals    : Double = _enemyDefenseMinerals
+  def ourSupplyMinerals       : Double = _ourSupplyMinerals
+  def enemySupplyMinerals     : Double = _enemySupplyMinerals
+  def ourBaseMinerals         : Double = _ourBaseMinerals
+  def enemyBaseMinerals       : Double = _enemyBaseMinerals
   def ourWarUnitMinerals      : Double = _ourWarUnitMinerals
   def ourWarUnitGas           : Double = _ourWarUnitGas
   def ourWarMinerals          : Double = _ourWarMinerals
@@ -96,8 +117,7 @@ trait EconomicModel {
     val deadEnemyWorkers = With.units.deadEnemy.count(IsWorker)
     val unscouted = With.geography.startBases.exists( ! _.scoutedByUs) && ! With.geography.enemyBases.exists(_.isStartLocation)
     if ( ! unscouted && With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(_.resources.forall(r => With.framesSince(r.lastSeen) < 4 * Terran.SCV.buildFrames))) {
-      _enemyWorkerSnapshotDeadOld += deadEnemyWorkers
-      _enemyWorkerSnapshotDeadNew = 0
+      _enemyWorkerSnapshotDead    = deadEnemyWorkers
       _enemyWorkerSnapshot        = With.units.countEnemy(IsWorker)
       _enemyWorkerSnapshotFrame   = With.frame
     }
@@ -113,20 +133,30 @@ trait EconomicModel {
     _ourLostGas               = With.units.deadOurs .map(_.unitClass.gasValue).sum
     _enemyLostMinerals        = With.units.deadEnemy.map(_.unitClass.mineralValue).sum
     _enemyLostGas             = With.units.deadEnemy.map(_.unitClass.gasValue).sum
-    _ourPeaceMinerals         = With.units.everOurs   .filterNot(isWar).map(_.unitClass.mineralPrice).sum
-    _ourPeaceGas              = With.units.everOurs   .filterNot(isWar).map(_.unitClass.gasPrice).sum
-    _enemyPeaceMinerals       = With.units.everEnemy  .filterNot(isWar).map(_.unitClass.mineralPrice).sum
-    _enemyPeaceGas            = With.units.everEnemy  .filterNot(isWar).map(_.unitClass.gasPrice).sum
-    _ourWarUnitMinerals       = With.units.everOurs   .filter   (isWar).map(_.unitClass.mineralPrice).sum
-    _ourWarUnitGas            = With.units.everOurs   .filter   (isWar).map(_.unitClass.gasPrice).sum
-    _ourWarMinerals           = ourWarUnitMinerals + ourTechMinerals + ourUpgradeMinerals
-    _ourWarGas                = ourWarUnitGas + ourTechGas + ourUpgradeGas
-    _enemyWarUnitMinerals     = With.units.everEnemy  .filter   (isWar).map(_.unitClass.mineralPrice).sum
-    _enemyWarUnitGas          = With.units.everEnemy  .filter   (isWar).map(_.unitClass.gasPrice).sum
-    _enemyWarMineralsFloor    = _enemyWarUnitMinerals + _enemyUpgradeMinerals + enemyTechMinerals
-    _enemyWarGasFloor         = _enemyWarUnitGas      + _enemyUpgradeGas      + enemyTechGas
-    _enemySecretMinerals      = enemyMinedMinerals  - enemyLostMinerals - enemyPeaceMinerals  - enemyWarMineralsFloor
-    _enemySecretGas           = enemyMinedGas       - enemyLostGas      - enemyPeaceGas       - enemyWarGasFloor
+    _ourBaseMinerals          = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Base).map(u => if (IsHatchlike(u)) 350 else 400).sum
+    _enemyBaseMinerals        = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Base).map(u => if (IsHatchlike(u)) 350 else 400).sum
+    _ourSupplyMinerals        = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Supply).map(_.unitClass.mineralValue).sum
+    _enemySupplyMinerals      = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Supply).map(_.unitClass.mineralValue).sum
+    _ourDefenseMinerals       = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Defense).map(_.unitClass.mineralValue).sum
+    _enemyDefenseMinerals     = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Defense).map(_.unitClass.mineralValue).sum
+    _ourWarUnitMinerals       = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.War).map(_.unitClass.mineralValue).sum
+    _ourWarUnitGas            = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.War).map(_.unitClass.gasValue).sum
+    _enemyWarUnitMinerals     = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.War).map(_.unitClass.mineralValue).sum
+    _enemyWarUnitGas          = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.War).map(_.unitClass.gasValue).sum
+    _ourProductionMinerals    = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Production).map(_.unitClass.mineralValue).sum
+    _enemyProductionMinerals  = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Production).map(_.unitClass.mineralValue).sum
+    _ourProductionGas         = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Production).map(_.unitClass.gasValue).sum
+    _enemyProductionGas       = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Production).map(_.unitClass.gasValue).sum
+    _ourScienceMinerals       = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Science).map(_.unitClass.mineralValue).sum
+    _enemyScienceMinerals     = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Science).map(_.unitClass.mineralValue).sum
+    _ourScienceGas            = With.units.ours       .filter(_.unitClass.budgetCategory == Budgets.Science).map(_.unitClass.gasValue).sum
+    _enemyScienceGas          = With.units.enemy      .filter(_.unitClass.budgetCategory == Budgets.Science).map(_.unitClass.gasValue).sum
+    _ourWarMinerals           = ourWarUnitMinerals    + ourTechMinerals       + ourUpgradeMinerals
+    _ourWarGas                = ourWarUnitGas         + ourTechGas            + ourUpgradeGas
+    _enemyWarMineralsFloor    = enemyWarUnitMinerals  + enemyUpgradeMinerals  + enemyTechMinerals
+    _enemyWarGasFloor         = enemyWarUnitGas       + enemyUpgradeGas       + enemyTechGas
+    _enemySecretMinerals      = enemyMinedMinerals    - enemyLostMinerals     - enemyWarMineralsFloor - enemyProductionMinerals - enemyScienceMinerals -  enemyWorkerMinerals - enemyBaseMinerals - enemySupplyMinerals - enemyDefenseMinerals
+    _enemySecretGas           = enemyMinedGas         - enemyLostGas          - enemyWarGasFloor      - enemyProductionGas      - enemyScienceGas
     _enemyWarMineralsCeiling  = enemyWarMineralsFloor + Math.max(0, enemySecretMinerals)
     _enemyWarGasCeiling       = enemyWarGasFloor      + Math.max(0, enemySecretGas)
 
@@ -141,22 +171,23 @@ trait EconomicModel {
     val enemyWorkerDeaths     = With.units.deadEnemy.count  (IsWorker)
     val ourWorkerDelta        = Maff.max(With.strategy.selected.view.map(_.workerDelta)).getOrElse(0) + With.blackboard.workerDelta()
     val enemyWorkerDelta      = Maff.max(With.fingerprints.all.view.filter(_()).map(_.workerDelta)).getOrElse(0)
-    val enemyBaseMinerals     = (if (unscouted) 9 else 0)                                   + With.geography.enemyBases.view.flatMap(_.minerals).size
-    val enemyBaseGas          = (if (unscouted && With.frame > GameTime(1, 45)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
-    val enemyWorkerCap        = Maff.clamp(21, 75, 2 + enemyBaseMinerals + 3 * enemyBaseGas)
-    val enemyWorkerProject    = _enemyWorkerSnapshot + Math.min(Minutes(5)(), deltaFrameSnapshot) / Terran.SCV.buildFrames + _enemyWorkerSnapshotDeadOld - deadEnemyWorkers
+    val enemyBasePatchesMins  = (if (unscouted) 9 else 0)                                   + With.geography.enemyBases.view.flatMap(_.minerals).size
+    val enemyBasePatchesGas   = (if (unscouted && With.frame > GameTime(1, 45)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
+    val enemyWorkerCap        = Maff.clamp(21, 75, 2 + enemyBasePatchesMins + 3 * enemyBasePatchesGas)
+    val enemyWorkerProject    = _enemyWorkerSnapshot + Math.min(Minutes(5)(), deltaFrameSnapshot) / Terran.SCV.buildFrames + _enemyWorkerSnapshotDead - deadEnemyWorkers
     val enemyWorkerEstimate   = Math.min(enemyWorkerCap, Math.max(enemyWorkerProject, enemyWorkerCount))
-    var enemyGasMiners        = Math.min(3 * enemyBaseGas,      enemyWorkerEstimate * 8 / 3)
-    val enemyMineralMiners    = Math.min(2 * enemyBaseMinerals, enemyWorkerEstimate - enemyGasMiners)
-    enemyGasMiners            = Math.min(3 * enemyBaseGas,      enemyWorkerEstimate - enemyMineralMiners)
+    var enemyGasMiners        = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate * 8 / 3)
+    val enemyMineralMiners    = Math.min(2 * enemyBasePatchesMins,  enemyWorkerEstimate - enemyGasMiners)
+    enemyGasMiners            = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate - enemyMineralMiners)
     val enemyBaseMineralsGone = With.geography.bases.view.filterNot(b => b.allTimeOwners.exists(_.isEnemy) && ! b.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum
     _enemyMinedMinerals       += deltaFrames * enemyMineralMiners * With.accounting.workerIncomePerFrameMinerals
     _enemyMinedGas            += deltaFrames * enemyGasMiners     * With.accounting.workerIncomePerFrameGas
     _enemyMinedMinerals       = Math.max(_enemyMinedMinerals, enemyBaseMineralsGone)
 
     // TODO: Increase minerals/gas if observed exceeds predicted
-    // TODO: Flip bar charts
-    // TODO: More categories than war/peace: Workers, production
+    // TODO: Cut hypothetical workers if there's no budget
+    // TODO: Include our in-progress upgrades/tech
+
     lastUpdate = With.frame
   }
 }

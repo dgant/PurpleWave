@@ -12,45 +12,60 @@ object ShowEconomicModel extends DebugView {
     DrawScreen.barChart(
       Seq(
         Seq(
-          (With.sense.ourMinedMinerals, With.self.colorBright, "Our minerals")
+          (With.sense.ourMinedMinerals,         With.self.colorBright,  "Our minerals")
         ),
         Seq(
-          (With.sense.enemyMinedMinerals, With.enemy.colorBright, "Foe minerals")
+          (With.sense.enemyMinedMinerals,       With.enemy.colorBright, "Foe minerals")
         ),
         Seq(
-          (With.sense.ourLostMinerals, Color.White, "Our loss"),
-          (With.sense.ourTechMinerals, Colors.BrightViolet, "Our tech"),
-          (With.sense.ourUpgradeMinerals, Colors.BrightYellow, "Our upgr"),
-          (With.sense.ourWarUnitMinerals, Colors.BrightRed, "Our war"),
-          (With.sense.ourPeaceMinerals, Colors.BrightBlue, "Our peace"),
+          (With.sense.ourLostMinerals,          Color.White,            "Our loss"),
+          (With.self.minerals,                  Colors.BrightTeal,      "Our float"),
+          (With.sense.ourTechMinerals,          Colors.BrightViolet,    "Our tech"),
+          (With.sense.ourUpgradeMinerals,       Colors.BrightIndigo,    "Our upgr"),
+          (With.sense.ourWorkerMinerals,        Colors.BrightBlue,      "Our workers"),
+          (With.sense.ourBaseMinerals,          Colors.BrightTeal,      "Our bases"),
+          (With.sense.ourSupplyMinerals,        Colors.BrightGreen,     "Our supply"),
+          (With.sense.ourScienceMinerals,       Colors.BrightYellow,    "Our sci"),
+          (With.sense.ourDefenseMinerals,       Colors.BrightGray,      "Our def"),
+          (With.sense.ourProductionMinerals,    Colors.BrightOrange,    "Our prod"),
+          (With.sense.ourWarUnitMinerals,       Colors.BrightRed,       "Our war"),
         ),
         Seq(
-          (With.sense.enemyLostMinerals, Color.White, "Foe loss"),
-          (With.sense.enemyTechMinerals, Colors.BrightViolet, "Foe tech"),
-          (With.sense.enemyUpgradeMinerals, Colors.BrightYellow, "Foe upgr"),
-          (With.sense.enemyWarUnitMinerals, Colors.BrightRed, "Foe war"),
-          (With.sense.enemyPeaceMinerals, Colors.BrightBlue, "Foe peace"),
-          (With.sense.enemySecretMinerals, Colors.BrightGreen, "Foe mystery")
+          (With.sense.enemyLostMinerals,        Color.White,            "Foe loss"),
+          (With.sense.enemySecretMinerals,      Colors.BrightTeal,      "Foe secret"),
+          (With.sense.enemyTechMinerals,        Colors.BrightViolet,    "Foe tech"),
+          (With.sense.enemyUpgradeMinerals,     Colors.BrightIndigo,    "Foe upgr"),
+          (With.sense.enemyWorkerMinerals,      Colors.BrightBlue,      "Foe workers"),
+          (With.sense.enemyBaseMinerals,        Colors.BrightTeal,      "Foe bases"),
+          (With.sense.enemySupplyMinerals,      Colors.BrightGreen,     "Foe supply"),
+          (With.sense.enemyScienceMinerals,     Colors.BrightYellow,    "Foe sci"),
+          (With.sense.enemyDefenseMinerals,     Colors.BrightGray,      "Foe def"),
+          (With.sense.enemyProductionMinerals,  Colors.BrightOrange,    "Foe prod"),
+          (With.sense.enemyWarUnitMinerals,     Colors.BrightRed,       "Foe war"),
         ),
         Seq(
-          (With.sense.ourMinedGas, With.self.colorBright, "Our gas")
+          (With.sense.ourMinedGas,              With.self.colorBright,  "Our gas")
         ),
         Seq(
-          (With.sense.enemyMinedGas, With.enemy.colorBright, "Foe gas")
+          (With.sense.enemyMinedGas,            With.enemy.colorBright, "Foe gas")
         ),
         Seq(
-          (With.sense.ourLostGas, Color.White, "Our loss"),
-          (With.sense.ourTechGas, Colors.BrightViolet, "Our tech"),
-          (With.sense.ourUpgradeGas, Colors.BrightYellow, "Our upgr"),
-          (With.sense.ourWarUnitGas, Colors.BrightRed, "Our war"),
-          (With.sense.ourPeaceGas, Colors.BrightBlue, "Our peace"),
+          (With.sense.ourLostGas,               Color.White,            "Our loss"),
+          (With.self.gas,                       Colors.BrightTeal,      "Our float"),
+          (With.sense.ourTechGas,               Colors.BrightViolet,    "Our tech"),
+          (With.sense.ourUpgradeGas,            Colors.BrightIndigo,    "Our upgr"),
+          (With.sense.ourScienceGas,            Colors.BrightYellow,    "Our sci"),
+          (With.sense.ourProductionGas,         Colors.BrightOrange,    "Our prod"),
+          (With.sense.ourWarUnitGas,            Colors.BrightRed,       "Our war"),
         ),
         Seq(
-          (With.sense.enemyLostGas, Color.White, "Foe loss"),
-          (With.sense.enemyTechGas, Colors.BrightViolet, "Foe tech"),
-          (With.sense.enemyUpgradeGas, Colors.BrightYellow, "Foe upgr"),
-          (With.sense.enemyWarUnitGas, Colors.BrightRed, "Foe war"),
-          (With.sense.enemyPeaceGas, Colors.BrightBlue, "Foe peace"),
+          (With.sense.enemyLostGas,             Color.White,            "Foe loss"),
+          (With.sense.enemySecretGas,           Colors.BrightTeal,      "Foe secret"),
+          (With.sense.enemyTechGas,             Colors.BrightViolet,    "Foe tech"),
+          (With.sense.enemyUpgradeGas,          Colors.BrightIndigo,    "Foe upgr"),
+          (With.sense.enemyScienceGas,          Colors.BrightYellow,    "Foe sci"),
+          (With.sense.enemyProductionGas,       Colors.BrightOrange,    "Foe prod"),
+          (With.sense.enemyWarUnitGas,          Colors.BrightRed,       "Foe war"),
         ),
       ))
   }

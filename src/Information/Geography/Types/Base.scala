@@ -29,8 +29,11 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   var enemyCombatValue        : Double            = _
   var workerCount             : Int               = _
   val saturation              : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
+  var allTimeOwners           : Set[PlayerInfo]   = Set.empty
   var mineralsLeft            : Int               = 0
   var gasLeft                 : Int               = 0
+  var startingMinerals        : Int               = 0
+  var startingGas             : Int               = 0
   var lastPlannedExpo         : Int               = - Forever()
   var lastFrameScoutedByUs    : Int               = 0
   var lastFrameScoutedByEnemy : Int               = 0

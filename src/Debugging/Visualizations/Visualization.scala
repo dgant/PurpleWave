@@ -39,14 +39,8 @@ class Visualization extends TimedTask {
     //ShowStoryteller,
 
     // Temporary views
-    // ShowZones,
     ShowFormations,
-    // ShowPlacement,
-    // ShowFoundations,
-    // ShowExpansions
-
-    ShowProduction,
-    ShowSupply
+    ShowEconomicModel
   )
 
   lazy val knownViews: Vector[DebugView] = Vector[DebugView](
@@ -61,6 +55,7 @@ class Visualization extends TimedTask {
     ShowClustering,
     ShowDivisions,
     ShowDoom,
+    ShowEconomicModel,
     ShowExpansions,
     ShowHeader,
     ShowFingerprints,

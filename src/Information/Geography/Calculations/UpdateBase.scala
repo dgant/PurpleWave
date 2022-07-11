@@ -17,6 +17,8 @@ object UpdateBase {
     base.workerCount      = base.units.count(u => u.player == base.owner && u.is(IsWorker))
     base.mineralsLeft     = base.minerals.view.map(_.mineralsLeft).sum
     base.gasLeft          = base.gas.view.map(_.gasLeft).sum
+    base.startingMinerals = Math.max(base.startingMinerals, base.mineralsLeft)
+    base.startingGas      = Math.max(base.startingGas, base.gasLeft)
     base.lastPlannedExpo  = if (base.plannedExpo()) With.frame else base.lastPlannedExpo
     base.enemyCombatValue = base.units.view.filter(_.isEnemy).filter(IsWarrior).map(_.subjectiveValue).sum
 
@@ -31,7 +33,7 @@ object UpdateBase {
   }
   
   private def updateOwner(base: Base): Unit = {
-    val originalOwner = base.owner
+    val previousOwner = base.owner
     
     // Derive the owner from the current town hall
     // If we have previously inferred the base's owner, maintain the inference
@@ -80,8 +82,9 @@ object UpdateBase {
       }
     }
 
-    if (base.owner != originalOwner) {
+    if (base.owner != previousOwner) {
       base.frameTaken = Math.max(0, base.townHall.map(u => u.frameDiscovered - u.unitClass.buildFrames + (if (u.isAny(Zerg.Lair, Zerg.Hive)) 0 else u.remainingCompletionFrames)).getOrElse(With.frame))
+      base.allTimeOwners += base.owner
     }
   }
 }

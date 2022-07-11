@@ -8,11 +8,11 @@ import bwapi.Color
 
 object DrawScreen {
 
-  def column(x: Int, y: Int, text: Iterable[String]) {
+  def column(x: Int, y: Int, text: Iterable[String]): Unit = {
     column(x, y, text.mkString("\n"))
   }
 
-  def column(x: Int, y: Int, text: String) {
+  def column(x: Int, y: Int, text: String): Unit = {
     With.game.drawTextScreen(x, y, text)
   }
 
@@ -20,11 +20,11 @@ object DrawScreen {
     With.game.drawTextScreen(pixel.x, pixel.y, text)
   }
   
-  def table(x: Int, y: Int, cells: Iterable[Iterable[String]]) {
+  def table(x: Int, y: Int, cells: Iterable[Iterable[String]]): Unit = {
     cells.zipWithIndex.foreach(pair => tableRow(x, y, pair._2, pair._1))
   }
   
-  def tableRow(x: Int, y: Int, rowIndex: Int, row: Iterable[String]) {
+  def tableRow(x: Int, y: Int, rowIndex: Int, row: Iterable[String]): Unit = {
     row.zipWithIndex.foreach(pair =>
       With.game.drawTextScreen(
         x + pair._2 * 60,
@@ -56,7 +56,7 @@ object DrawScreen {
     color1:   Color = Colors.MidnightViolet,
     width:    Int = 90,
     height:   Int = 90 + With.visualization.lineHeightSmall,
-    margin:   Int = 2) {
+    margin:   Int = 2): Unit = {
 
     val end               = start.add(width, height)
     val innerBorderStart  = start             .add      (margin, margin + With.visualization.lineHeightSmall)
@@ -91,6 +91,23 @@ object DrawScreen {
           curve.color)
         i += 1
       }
+    })
+  }
+
+  def barChart(columns: Seq[Seq[(Double, Color, String)]], argX: Int = 5, argY: Int = 52, width: Int = 24, argHeight: Int = 450): Unit = {
+    var x = argX
+    val total = columns.map(_.map(_._1).sum).max
+    columns.foreach(column => {
+      var y = argY
+      var labelY = -100
+      column.filter(_._1 > 0).foreach(item => {
+        val height = (item._1 * argHeight / total).toInt
+        labelY = Math.max(labelY + With.visualization.lineHeightSmall, y + height / 2 - With.visualization.lineHeightSmall / 2)
+        With.game.drawBoxScreen(x, y, x + width, y + height, item._2)
+        With.game.drawTextScreen(x + width, labelY, item._3)
+        y += height
+      })
+      x += width + column.map(_._3.length * 5 + 15).max
     })
   }
 }

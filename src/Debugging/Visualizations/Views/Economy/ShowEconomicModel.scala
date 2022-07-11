@@ -30,6 +30,7 @@ object ShowEconomicModel extends DebugView {
           (With.sense.enemyUpgradeMinerals, Colors.BrightYellow, "Foe upgr"),
           (With.sense.enemyWarUnitMinerals, Colors.BrightRed, "Foe war"),
           (With.sense.enemyPeaceMinerals, Colors.BrightBlue, "Foe peace"),
+          (With.sense.enemySecretMinerals, Colors.BrightGreen, "Foe mystery")
         ),
         Seq(
           (With.sense.ourMinedGas, With.self.colorBright, "Our gas")

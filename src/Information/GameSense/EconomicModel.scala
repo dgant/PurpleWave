@@ -14,7 +14,7 @@ import Utilities.UnitFilters.{IsProxied, IsWorker}
 
 trait EconomicModel {
 
-  private var _enemyMinedMinerals         : Double = 50.0
+  private var _enemyMinedMinerals         : Double = 650.0
   private var _enemyMinedGas              : Double = 0.0
   private var _enemyLarva                 : Double = 3.0
   private var _ourProductionFrames        : CountMap[UnitClass] = new CountMap
@@ -52,7 +52,7 @@ trait EconomicModel {
   private var _enemySecretMinerals        : Double = 0.0
   private var _enemySecretGas             : Double = 0.0
 
-  def ourMinedMinerals        : Double = With.self.gatheredMinerals
+  def ourMinedMinerals        : Double = 600 + With.self.gatheredMinerals
   def ourMinedGas             : Double = With.self.gatheredGas
   def enemyMinedMinerals      : Double = _enemyMinedMinerals
   def enemyMinedGas           : Double = _enemyMinedGas
@@ -95,7 +95,7 @@ trait EconomicModel {
   protected def updateEconomicModel(): Unit = {
     val deadEnemyWorkers = With.units.deadEnemy.count(IsWorker)
     val unscouted = With.geography.startBases.exists( ! _.scoutedByUs) && ! With.geography.enemyBases.exists(_.isStartLocation)
-    if (With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(_.resources.forall(r => With.framesSince(r.lastSeen) < 4 * Terran.SCV.buildFrames))) {
+    if ( ! unscouted && With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(_.resources.forall(r => With.framesSince(r.lastSeen) < 4 * Terran.SCV.buildFrames))) {
       _enemyWorkerSnapshotDeadOld += deadEnemyWorkers
       _enemyWorkerSnapshotDeadNew = 0
       _enemyWorkerSnapshot        = With.units.countEnemy(IsWorker)
@@ -149,11 +149,14 @@ trait EconomicModel {
     var enemyGasMiners        = Math.min(3 * enemyBaseGas,      enemyWorkerEstimate * 8 / 3)
     val enemyMineralMiners    = Math.min(2 * enemyBaseMinerals, enemyWorkerEstimate - enemyGasMiners)
     enemyGasMiners            = Math.min(3 * enemyBaseGas,      enemyWorkerEstimate - enemyMineralMiners)
-    val enemyBaseMineralsGone = With.geography.enemyBases.view.filterNot(_.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum
+    val enemyBaseMineralsGone = With.geography.bases.view.filterNot(b => b.allTimeOwners.exists(_.isEnemy) && ! b.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum
     _enemyMinedMinerals       += deltaFrames * enemyMineralMiners * With.accounting.workerIncomePerFrameMinerals
     _enemyMinedGas            += deltaFrames * enemyGasMiners     * With.accounting.workerIncomePerFrameGas
     _enemyMinedMinerals       = Math.max(_enemyMinedMinerals, enemyBaseMineralsGone)
 
+    // TODO: Increase minerals/gas if observed exceeds predicted
+    // TODO: Flip bar charts
+    // TODO: More categories than war/peace: Workers, production
     lastUpdate = With.frame
   }
 }

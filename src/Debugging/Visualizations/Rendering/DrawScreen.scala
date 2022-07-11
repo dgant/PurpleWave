@@ -104,7 +104,7 @@ object DrawScreen {
         val height = (item._1 * argHeight / total).toInt
         labelY = Math.max(labelY + With.visualization.lineHeightSmall, y + height / 2 - With.visualization.lineHeightSmall / 2)
         With.game.drawBoxScreen(x, y, x + width, y + height, item._2, true)
-        With.game.drawTextScreen(x + width, labelY, item._3)
+        With.game.drawTextScreen(x + width + 1, labelY, item._3)
         y += height
       })
       x += width + column.map(_._3.length * 5 + 5).max

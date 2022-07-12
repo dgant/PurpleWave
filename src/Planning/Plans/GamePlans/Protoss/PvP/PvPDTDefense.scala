@@ -3,6 +3,7 @@ package Planning.Plans.GamePlans.Protoss.PvP
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Requests.RequestUnit
+import Mathematics.Maff
 import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, DefendHall, Defensive, PlaceLabel}
 import Placement.Access.PlacementQuery
 import Planning.Plans.GamePlans.All.MacroActions
@@ -67,12 +68,16 @@ object PvPDTDefense extends MacroActions with MacroCounting {
         val cannonMinStartFrame = expectedArrival     - Protoss.PhotonCannon.buildFrames  - cannonSafetyFrames
         val forgeMinStartFrame  = cannonMinStartFrame - Protoss.Forge.buildFrames         - Protoss.Forge.framesToFinishCompletion
         val pylonMinStartFrame  = cannonMinStartFrame - Protoss.Pylon.buildFrames         - Protoss.Pylon.framesToFinishCompletion
+        val naturalPylon        = With.units.ours.filter(Protoss.Pylon).forall(_.complete) && With.units.ours.count(Protoss.Pylon) > 4 - Maff.fromBoolean(With.scouting.weControlOurNatural)
 
         status(f"DTAfterCannon@${Frames(forgeMinStartFrame)}-${Frames(pylonMinStartFrame)}-${Frames(cannonMinStartFrame)}")
+        if (naturalPylon) {
+          status("NaturalPylon")
+        }
 
         get(RequestUnit(Protoss.Forge, minStartFrameArg = forgeMinStartFrame))
 
-        requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, pylonMinStartFrame)
+        requestTower(Protoss.Pylon, 1, With.geography.ourNatural, DefendEntrance, if (naturalPylon) 0 else pylonMinStartFrame)
 
         if (dtArePossibility) {
           requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, cannonMinStartFrame)
@@ -82,7 +87,7 @@ object PvPDTDefense extends MacroActions with MacroCounting {
     }
   }
   private def requestTower(unitClass: UnitClass, quantity: Int, base: Base, label: PlaceLabel, startFrame: Int): Unit = {
-    get(RequestUnit(unitClass, minStartFrameArg = startFrame,
+    get(RequestUnit(unitClass, quantity, minStartFrameArg = startFrame,
       placementQueryArg = Some(new PlacementQuery(unitClass)
         .requireBase(base)
         .preferLabelYes(Defensive, DefendGround, label))))

@@ -84,7 +84,7 @@ class Supplier extends Prioritized {
     if (farmsAfter > simFarms) {
       simFarms = farmsAfter
       simMins -= farm.mineralPrice * (farmsAfter - simFarms)
-      With.scheduler.request(this, RequestUnit(farm, simFarms, minFrameArg = With.frame + simFrames - farm.buildFrames))
+      With.scheduler.request(this, RequestUnit(farm, simFarms, minStartFrameArg = With.frame + simFrames - farm.buildFrames))
     }
 
     simSupplyHalls = halls

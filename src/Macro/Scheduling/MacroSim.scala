@@ -125,7 +125,7 @@ final class MacroSim {
           insertAfter.foreach(i => {
             val stepBefore = steps(i)
             val framesAfter = Math.ceil(Seq(
-              request.minFrame - With.frame,
+              request.minStartFrame - With.frame,
               stepBefore.event.dFrames,
               if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals,  Forever()),
               if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,       Forever()))

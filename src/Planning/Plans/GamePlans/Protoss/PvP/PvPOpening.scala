@@ -31,9 +31,7 @@ class PvPOpening extends GameplanImperative {
   var shuttleFirst      : Boolean = false
   var shuttleSpeed      : Boolean = false
   // DT
-  var getCannons        : Boolean = false
   var speedlotAttack    : Boolean = false
-  var cannonStartFrame  : Int = 0
 
   override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
@@ -243,21 +241,6 @@ class PvPOpening extends GameplanImperative {
       shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
       shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
-      cannonStartFrame = PvPDTDefense.expectedDTArrivalFrame - Protoss.PhotonCannon.buildFrames + Protoss.Pylon.buildFrames + Seconds(15)()
-      // Look for reasons to avoid getting cannons
-      if (enemyDarkTemplarLikely) {
-        getCannons = true
-      } else {
-        getCannons = units(Protoss.TemplarArchives) > 0
-        getCannons &&= With.frame >= cannonStartFrame
-        getCannons &&= safeAtHome
-        getCannons &&= ! enemyRobo
-        getCannons &&= ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
-        getCannons &&= roll("DTSkipCannons", if (enemyRecentStrategy(With.fingerprints.dtRush)) 0.2 else 0.5)
-        getCannons ||= With.fingerprints.dtRush()
-        getCannons ||= enemyDarkTemplarLikely
-        getCannons &&= ! With.units.existsOurs(Protoss.RoboticsFacility)
-      }
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0
       shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeToMoveOut || With.scouting.enemyProximity < 0.75)
       shouldExpand ||= upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20
@@ -322,7 +305,6 @@ class PvPOpening extends GameplanImperative {
     if (shuttleSpeed)   status("ShuttleSpeed")
     if (getObservers)   status("Obs")
     if (getObservatory) status("Observatory")
-    if (getCannons)     status(f"Cannons@${Frames(cannonStartFrame)}")
     if (speedlotAttack) status("Speedlot")
     if (shouldAttack)   status("Attack")
     if (shouldHarass)   status("Harass")
@@ -335,13 +317,7 @@ class PvPOpening extends GameplanImperative {
     // Emergency DT reactions //
     ////////////////////////////
 
-    if (units(Protoss.CyberneticsCore) > 0 && enemyDarkTemplarLikely) {
-      if (PvPRobo()) {
-        once(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
-      } else {
-        PvPDTDefense.reactToDarkTemplarEmergencies()
-      }
-    }
+    PvPDTDefense.requireTimelyDetection()
 
     //////////////
     // Scouting //
@@ -625,7 +601,7 @@ class PvPOpening extends GameplanImperative {
             cancel(Protoss.Shuttle, Protoss.Reaver)
           }
         }
-        get(RequestUnit(Protoss.Observatory, minFrameArg =
+        get(RequestUnit(Protoss.Observatory, minStartFrameArg =
           With.units.ours
             .find(Protoss.Shuttle)
             .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
@@ -638,7 +614,7 @@ class PvPOpening extends GameplanImperative {
         }
       }
       if (getReavers) {
-        get(RequestUnit(Protoss.RoboticsSupportBay, minFrameArg =
+        get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg =
           With.units.ours
             .find(Protoss.Observatory)
             .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
@@ -666,7 +642,6 @@ class PvPOpening extends GameplanImperative {
     } else if (speedlotAttack) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
-      if (getCannons) { buildCannonsAtNatural(1, PlaceLabels.DefendEntrance) }
       if (shouldExpand) { requireMiningBases(2) }
       SwapIf(
         safeAtHome && With.scouting.enemyProximity < 0.5,
@@ -691,7 +666,6 @@ class PvPOpening extends GameplanImperative {
       }
       trainGatewayUnits()
       get(2, Protoss.Gateway)
-      buildCannonsAtNatural(if (getCannons) 2 else 0, PlaceLabels.DefendEntrance)
 
     } else if (PvP3GateGoon()) {
       if (shouldExpand) { requireMiningBases(2) }

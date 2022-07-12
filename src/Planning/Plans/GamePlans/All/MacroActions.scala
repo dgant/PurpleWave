@@ -6,6 +6,7 @@ import Macro.Requests._
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plan
+import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
@@ -39,7 +40,7 @@ trait MacroActions {
   def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
   def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  def get(item: RequestBuildable): Unit = With.scheduler.request(new Plan(), item)
+  def get(item: RequestBuildable): Unit = With.scheduler.request(NoPlan(), item)
   def get(units: UnitClass*): Unit = units.foreach(get(1, _))
   def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
@@ -54,7 +55,7 @@ trait MacroActions {
   def once(upgrade: Upgrade): Unit = get(upgrade)
   def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
   def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(new Plan(), Get(quantity, unit))
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(NoPlan(), Get(quantity, unit))
 
   def buildOrder(items: RequestBuildable*): Unit = {
     new BuildOrder(items: _*).update()
@@ -108,7 +109,10 @@ trait MacroActions {
   }
 
   def buildDefensesAtBase(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], base: Base): Unit = {
-    def query(buildingClass: UnitClass): PlacementQuery = new PlacementQuery(buildingClass).requireBase(base).requireLabelYes(labels :+ PlaceLabels.Defensive: _*)
+    def query(buildingClass: UnitClass): PlacementQuery = new PlacementQuery(buildingClass)
+      .requireBase(base)
+      .requireLabelYes(PlaceLabels.Defensive)
+      .preferLabelYes(labels: _*)
     if (defenseClass.requiresPsi) get(Protoss.Pylon, query(Protoss.Pylon))
     get(count, Protoss.PhotonCannon, query(Protoss.PhotonCannon))
   }

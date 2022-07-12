@@ -5,19 +5,18 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Utilities.CountMap
 import Utilities.Time.{Forever, GameTime}
 import Utilities.UnitFilters.IsLandedBuilding
 
 trait Timings {
-  private val enemyContacts = new CountMap[UnitClass](Forever())
+  private val enemyCompletions = new CountMap[UnitClass](Forever())
+  private val enemyContacts     = new CountMap[UnitClass](Forever())
 
   protected def updateTimings(): Unit = {
-    With.units.enemy
-      .filter(_.visible)
-      .filter(u => enemyContacts(u.unitClass) > With.frame)
-      .foreach(u => enemyContacts.reduceTo(u.unitClass, With.frame + rushFrames(u)))
+    With.units.enemy.filter(_.visible).foreach(u => enemyCompletions.reduceTo(u.unitClass, u.completionFrame))
+    With.units.enemy.filter(_.visible).foreach(u => enemyContacts   .reduceTo(u.unitClass, With.frame + rushFrames(u)))
   }
 
   def expectedOrigin(unitClass: UnitClass): Tile = {
@@ -40,15 +39,28 @@ trait Timings {
 
   def expectedArrival(unitClass: UnitClass): Int = enemyContacts(unitClass)
 
-  def earliestArrival(unitClass: UnitClass): Int = {
-    enemyContacts.get(unitClass).foreach(return _)
+  private def timestampedBuildings: Iterable[ForeignUnitInfo] = {
+    With.units.enemy.filter(u => u.frameDiscovered < u.completionFrame)
+  }
+
+  def earliestCompletion(unitClass: UnitClass): Int = {
+    enemyCompletions.get(unitClass).foreach(return _)
     var earliestCompletionFrame = Forever()
     if (unitClass == Protoss.DarkTemplar) {
+      // Super-fast DT finishes 4:40. BetaStar demonstrates this on replay.
       earliestCompletionFrame                                       =  GameTime(4, 40)()
       if (With.fingerprints.twoGate())      earliestCompletionFrame += GameTime(1, 10)()
       if (With.fingerprints.dragoonRange()) earliestCompletionFrame += GameTime(0, 30)()
+      timestampedBuildings.filter(Protoss.CyberneticsCore).foreach(u => earliestCompletionFrame = u.completionFrame + Protoss.CitadelOfAdun.buildFrames + Protoss.TemplarArchives.buildFrames + Protoss.DarkTemplar.buildFrames)
+      timestampedBuildings.filter(Protoss.CitadelOfAdun)  .foreach(u => earliestCompletionFrame = u.completionFrame                                     + Protoss.TemplarArchives.buildFrames + Protoss.DarkTemplar.buildFrames)
+      timestampedBuildings.filter(Protoss.TemplarArchives).foreach(u => earliestCompletionFrame = u.completionFrame                                                                           + Protoss.DarkTemplar.buildFrames)
     }
+    // TODO: Support other unit types (and support DTs less maually)
+    earliestCompletionFrame
+  }
 
-    earliestCompletionFrame + rushFrames(unitClass)
+  def earliestArrival(unitClass: UnitClass): Int = {
+    enemyContacts.get(unitClass).foreach(return _)
+    earliestCompletion(unitClass) + rushFrames(unitClass)
   }
 }

@@ -101,7 +101,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     }
 
     if (desiredTile.isEmpty) return
-    if (request.minFrame > 0 && request.minFrame > With.frame + Math.max(builderTravelFrames, incomeFrames)) return
+    if (request.minStartFrame > 0 && request.minStartFrame > With.frame + Math.max(builderTravelFrames, incomeFrames)) return
     if ( ! hasSpent) { currencyLock.acquire() }
     if ( ! needBuilder) {
       builderLock.release()

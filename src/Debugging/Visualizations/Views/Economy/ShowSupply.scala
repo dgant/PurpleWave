@@ -17,13 +17,13 @@ object ShowSupply extends DebugView {
         Seq(),
         Seq("Farms now",          f"        ${With.units.countOurs(supplier.farm)}"),
         Seq("Farms needed",       f"        ${supplier.simFarms}"),
-        Seq("Farms demanded now", f"        ${With.scheduler.requests.find(_._1 == With.supplier).map(_._2.count(_.minFrame <= With.frame)).getOrElse(0)}"),
+        Seq("Farms demanded now", f"        ${With.scheduler.requests.find(_._1 == With.supplier).map(_._2.count(_.minStartFrame <= With.frame)).getOrElse(0)}"),
         Seq())
       ++ Seq("Farms queued")
         .padTo(requested.length, "")
         .take(requested.length)
         .zipWithIndex
-        .map(p => Seq(p._1,       f"        ${Frames(Math.max(0, requested(p._2).minFrame - With.frame))}"))
+        .map(p => Seq(p._1,       f"        ${Frames(Math.max(0, requested(p._2).minStartFrame - With.frame))}"))
       ++ Seq("Eaters")
         .padTo(supplier.consumed.length, "")
         .take(supplier.consumed.length)

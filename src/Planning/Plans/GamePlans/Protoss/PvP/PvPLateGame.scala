@@ -107,7 +107,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString).foreach(status)
-    PvPDTDefense.reactToDarkTemplarEmergencies()
+    PvPDTDefense.requireTimelyDetection()
   }
 
   override def executeMain(): Unit = {

@@ -172,11 +172,11 @@ trait EconomicModel {
     val ourWorkerDelta        = Maff.max(With.strategy.selected.view.map(_.workerDelta)).getOrElse(0) + With.blackboard.workerDelta()
     val enemyWorkerDelta      = Maff.max(With.fingerprints.all.view.filter(_()).map(_.workerDelta)).getOrElse(0)
     val enemyBasePatchesMins  = (if (unscouted) 9 else 0)                                   + With.geography.enemyBases.view.flatMap(_.minerals).size
-    val enemyBasePatchesGas   = (if (unscouted && With.frame > GameTime(1, 45)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
+    val enemyBasePatchesGas   = (if (unscouted && With.frame > GameTime(2, 5)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)
     val enemyWorkerCap        = Maff.clamp(21, 75, 2 + enemyBasePatchesMins + 3 * enemyBasePatchesGas)
     val enemyWorkerProject    = _enemyWorkerSnapshot + Math.min(Minutes(5)(), deltaFrameSnapshot) / Terran.SCV.buildFrames + _enemyWorkerSnapshotDead - deadEnemyWorkers
     val enemyWorkerEstimate   = Math.min(enemyWorkerCap, Math.max(enemyWorkerProject, enemyWorkerCount))
-    var enemyGasMiners        = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate * 8 / 3)
+    var enemyGasMiners        = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate / 6)
     val enemyMineralMiners    = Math.min(2 * enemyBasePatchesMins,  enemyWorkerEstimate - enemyGasMiners)
     enemyGasMiners            = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate - enemyMineralMiners)
     val enemyBaseMineralsGone = With.geography.bases.view.filterNot(b => b.allTimeOwners.exists(_.isEnemy) && ! b.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum

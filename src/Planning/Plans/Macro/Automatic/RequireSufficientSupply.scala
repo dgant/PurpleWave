@@ -12,7 +12,7 @@ class RequireSufficientSupply extends Plan {
   
   override def onUpdate(): Unit = {
     // Deprecated; Supplier now queues our supply
-    With.supplier.reprioritize()
+    With.supplier.prioritize()
 
     //With.scheduler.request(this, Get(totalRequiredRecalculate, supplyProvider))
   }

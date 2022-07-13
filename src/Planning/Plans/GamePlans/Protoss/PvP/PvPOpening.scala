@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
 import Macro.Requests.RequestUnit
+import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import ProxyBwapi.Races.Protoss
@@ -357,14 +358,15 @@ class PvPOpening extends GameplanImperative {
     once(10, Protoss.Probe)
     once(Protoss.Gateway)
 
-    /////////////////////////
-    // React against proxy //
-    /////////////////////////
+    ///////////////////////
+    // React against 9-9 //
+    ///////////////////////
 
     if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99) && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
+      status("99Defense")
       pumpSupply()
       pumpWorkers()
-      if (units(Protoss.Gateway) < 2) {
+      if (units(Protoss.Gateway) < 2 && minerals < 150) {
         cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.DragoonRange)
         gasWorkerCeiling(0)
       } else if (units(Protoss.CyberneticsCore) == 0) {
@@ -372,10 +374,11 @@ class PvPOpening extends GameplanImperative {
       } else if (unitsComplete(Protoss.CyberneticsCore) == 0) {
         gasWorkerCeiling(2)
       }
+      gasLimitCeiling(250)
       get(2, Protoss.Gateway)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
-      //get(Protoss.ShieldBattery)
+      buildBatteriesAtMain(1, DefendHall)
       get(Protoss.Assimilator)
       get(Protoss.CyberneticsCore)
       get(3, Protoss.Gateway)

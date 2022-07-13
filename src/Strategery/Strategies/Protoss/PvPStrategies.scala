@@ -29,6 +29,7 @@ object PvP1012 extends PvPStrategy {
 object PvPGateCoreTech extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Python)
   override def entranceInverted: Boolean = false
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)
 }
 object PvPGateCoreGate extends PvPStrategy {
   // No blacklisting: Preserve this option

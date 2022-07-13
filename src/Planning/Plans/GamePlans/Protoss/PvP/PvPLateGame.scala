@@ -60,6 +60,7 @@ class PvPLateGame extends GameplanImperative {
       || Math.min(unitsComplete(IsWarrior) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
     shouldExpand ||= miningBases < 1
     shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
+    shouldHarass = Protoss.PsionicStorm() && Protoss.ShuttleSpeed()
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways
     shouldAttack ||= (dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0)
@@ -117,8 +118,6 @@ class PvPLateGame extends GameplanImperative {
     val secondaryTech = new DoQueue(doSecondaryTech)
     val expand        = new DoQueue(doExpand)
     val cannons       = new DoQueue(doCannons)
-
-    // TODO: Emergency/Proactive detection
 
     if (shouldMindControl) { makeDarkArchons() }
 
@@ -236,11 +235,10 @@ class PvPLateGame extends GameplanImperative {
       }
     }
     get(Protoss.RoboticsSupportBay)
-    if (fearContain && ! fearDeath) {
+    if ( ! fearDeath) {
       get(Protoss.ShuttleSpeed)
     }
     pump(Protoss.Reaver, 1)
-    get(Protoss.ShuttleSpeed)
     if (upgradeComplete(Protoss.ShuttleSpeed) && units(Protoss.Reaver) >= 4) {
       get(Protoss.ScarabDamage)
     }
@@ -290,6 +288,11 @@ class PvPLateGame extends GameplanImperative {
     obsArrival = Math.min(obsArrival, obsDebut + obsTravelFrames(origin))
   }
   def updateDTBravery(): Unit = {
+    if (units(Protoss.TemplarArchives, Protoss.DarkTemplar) == 0) {
+      dtBraveryAbroad = false
+      dtBraveryHome = false
+      return
+    }
     val roboFrames = Protoss.RoboticsFacility.buildFrames
     val toryFrames = Protoss.Observatory.buildFrames
     val obsFrames = Protoss.Observer.buildFrames

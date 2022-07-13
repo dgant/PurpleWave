@@ -3,7 +3,7 @@ package Information.Scouting
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Utilities.CountMap
@@ -11,7 +11,7 @@ import Utilities.Time.{Forever, GameTime}
 import Utilities.UnitFilters.IsLandedBuilding
 
 trait Timings {
-  private val enemyCompletions = new CountMap[UnitClass](Forever())
+  private val enemyCompletions  = new CountMap[UnitClass](Forever())
   private val enemyContacts     = new CountMap[UnitClass](Forever())
 
   protected def updateTimings(): Unit = {
@@ -51,11 +51,18 @@ trait Timings {
       earliestCompletionFrame                                       =  GameTime(4, 40)()
       if (With.fingerprints.twoGate())      earliestCompletionFrame += GameTime(1, 10)()
       if (With.fingerprints.dragoonRange()) earliestCompletionFrame += GameTime(0, 30)()
-      timestampedBuildings.filter(Protoss.CyberneticsCore).foreach(u => earliestCompletionFrame = u.completionFrame + Protoss.CitadelOfAdun.buildFrames + Protoss.TemplarArchives.buildFrames + Protoss.DarkTemplar.buildFrames)
-      timestampedBuildings.filter(Protoss.CitadelOfAdun)  .foreach(u => earliestCompletionFrame = u.completionFrame                                     + Protoss.TemplarArchives.buildFrames + Protoss.DarkTemplar.buildFrames)
-      timestampedBuildings.filter(Protoss.TemplarArchives).foreach(u => earliestCompletionFrame = u.completionFrame                                                                           + Protoss.DarkTemplar.buildFrames)
+      timestampedBuildings.filter(Protoss.CyberneticsCore).foreach(u => earliestCompletionFrame = u.completionFrame + Protoss.CitadelOfAdun.buildFramesFull + Protoss.TemplarArchives.buildFramesFull + Protoss.DarkTemplar.buildFrames)
+      timestampedBuildings.filter(Protoss.CitadelOfAdun)  .foreach(u => earliestCompletionFrame = u.completionFrame                                         + Protoss.TemplarArchives.buildFramesFull + Protoss.DarkTemplar.buildFrames)
+      timestampedBuildings.filter(Protoss.TemplarArchives).foreach(u => earliestCompletionFrame = u.completionFrame                                                                                   + Protoss.DarkTemplar.buildFrames)
     }
-    // TODO: Support other unit types (and support DTs less maually)
+    if (unitClass == Protoss.Observer) {
+      // 13 Core Robo before range finishes at 4:05, but let's assume no Observers until they've given us cause to expect one
+      val cloakedDebut = With.scouting.ourDebut(Terran.SpiderMine, Protoss.Arbiter, Protoss.DarkTemplar, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Zerg.Lurker, Zerg.LurkerEgg)
+      val roboCompletionFrame = Math.min(cloakedDebut         + Protoss.RoboticsFacility.buildFramesFull, enemyCompletions(Protoss.RoboticsFacility))
+      val toryCompletionFrame = Math.min(roboCompletionFrame  + Protoss.Observatory.buildFramesFull,      enemyCompletions(Protoss.Observatory))
+      earliestCompletionFrame = Math.min(toryCompletionFrame  + Protoss.Observer.buildFramesFull,         enemyCompletions(Protoss.Observer))
+    }
+    // TODO: Support other unit types (and support current types less maually)
     earliestCompletionFrame
   }
 

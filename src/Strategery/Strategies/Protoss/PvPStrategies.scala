@@ -53,14 +53,13 @@ object PvPDT extends PvPStrategy {
 object PvP3GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech, PvPGateCoreGate))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def minimumGamesVsOpponent: Int = 5
+  override def minimumGamesVsOpponent: Int = 2
 }
 object PvP4GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreTech))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Aztec, CircuitBreaker, Destination, Roadrunner, MatchPoint)
-  override def minimumGamesVsOpponent: Int = 5
-  override def entranceRamped: Boolean = false
+  override def minimumGamesVsOpponent: Int = 2
 }
 
 //////////////

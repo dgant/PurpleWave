@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Requests._
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
-import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._

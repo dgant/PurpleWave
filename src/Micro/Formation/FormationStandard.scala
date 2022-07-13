@@ -61,7 +61,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val altitudeOutside   : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
   val altitudeRequired  : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
   val maxThreat         : Int                   = if (style == FormationStyleEngage) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
-  val face              : Pixel                 = if (style == FormationStyleGuard) goal else  if (style == FormationStyleEngage) target else goalPath5.center
+  val face              : Pixel                 = if (style == FormationStyleGuard) goal else if (style == FormationStyleEngage) target else goalPath5.center
   var apex              : Pixel                 = goal
   var stepTilesPace     : Int                   = 0
   var stepTilesEngage   : Int                   = 0

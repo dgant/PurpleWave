@@ -64,7 +64,7 @@ class Architecture {
     })
 
     if (unit == Protoss.Pylon) {
-      val powerFrame = With.frame + futureFrames + Protoss.Pylon.buildFrames + Protoss.Pylon.framesToFinishCompletion
+      val powerFrame = With.frame + futureFrames + Protoss.Pylon.buildFramesFull
       Pylons.points2.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame2Height.set(_, powerFrame))
       Pylons.points3.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame3Height.set(_, powerFrame))
     }
@@ -127,7 +127,7 @@ class Architecture {
   ///////////
 
   private def recalculatePower(): Unit = {
-    With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrame + unit.unitClass.framesToFinishCompletion))
+    With.units.ours.filter(Protoss.Pylon).foreach(unit => addPower(unit.tileTopLeft, unit.completionFrameFull))
   }
 
   private def addPower(tile: Tile, frame: Int): Unit = {

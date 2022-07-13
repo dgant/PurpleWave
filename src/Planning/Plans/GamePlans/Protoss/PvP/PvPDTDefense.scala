@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, DefendHall, Defensive, PlaceLabel}
+import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import Planning.Plans.GamePlans.All.MacroActions
 import Planning.Predicates.MacroCounting
@@ -20,7 +20,8 @@ object PvPDTDefense extends MacroActions with MacroCounting {
 
   def requireTimelyDetection(): Unit = {
     val dtArePossibility    = enemyDarkTemplarLikely || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
-    val expectedArrival     = if (enemyDarkTemplarLikely) With.scouting.earliestArrival(Protoss.DarkTemplar) else twoBaseDTFrame
+    val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
+    val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else twoBaseDTFrame
     val framesUntilArrival  = expectedArrival - With.frame
     val dtPrecedesCannon    = framesUntilArrival < framesUntilUnit(Protoss.PhotonCannon) + cannonSafetyFrames
     val dtPrecedesObserver  = framesUntilArrival < framesUntilUnit(Protoss.Observer)
@@ -36,8 +37,8 @@ object PvPDTDefense extends MacroActions with MacroCounting {
     if (goObserver) {
       if (enemyDarkTemplarLikely) {
         val observerMinStartFrame     = expectedArrival          - Protoss.Observer.buildFrames         - Seconds(10)() // Some margin for error/travel time
-        val observatoryMinStartFrame  = observerMinStartFrame    - Protoss.Observatory.buildFrames      - Protoss.Observatory.framesToFinishCompletion
-        val roboMinStartFrame         = observatoryMinStartFrame - Protoss.RoboticsFacility.buildFrames - Protoss.RoboticsFacility.framesToFinishCompletion
+        val observatoryMinStartFrame  = observerMinStartFrame    - Protoss.Observatory.buildFramesFull
+        val roboMinStartFrame         = observatoryMinStartFrame - Protoss.RoboticsFacility.buildFramesFull
         status(f"Obs4DT@${Frames(roboMinStartFrame)}-${Frames(observatoryMinStartFrame)}-${Frames(observerMinStartFrame)}")
         get(RequestUnit(Protoss.RoboticsFacility, 1, minStartFrameArg = roboMinStartFrame))
         get(RequestUnit(Protoss.Observatory,      1, minStartFrameArg = observatoryMinStartFrame))
@@ -64,10 +65,10 @@ object PvPDTDefense extends MacroActions with MacroCounting {
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendHall,     0)
 
       // Take reasonable precautions
-      } else if (PvPDT() || enemyHasShown(Protoss.CitadelOfAdun) || ! With.fingerprints.dragoonRange()) {
-        val cannonMinStartFrame = expectedArrival     - Protoss.PhotonCannon.buildFrames  - cannonSafetyFrames
-        val forgeMinStartFrame  = cannonMinStartFrame - Protoss.Forge.buildFrames         - Protoss.Forge.framesToFinishCompletion
-        val pylonMinStartFrame  = cannonMinStartFrame - Protoss.Pylon.buildFrames         - Protoss.Pylon.framesToFinishCompletion
+      } else if (dtArePossibility && (PvPDT() || enemyHasShown(Protoss.CitadelOfAdun))) {
+        val cannonMinStartFrame = expectedArrival - Protoss.PhotonCannon.buildFramesFull - cannonSafetyFrames
+        val forgeMinStartFrame  = earliestArrival - Protoss.Forge.buildFramesFull
+        val pylonMinStartFrame  = earliestArrival - Protoss.Pylon.buildFramesFull
         val naturalPylon        = With.units.ours.filter(Protoss.Pylon).forall(_.complete) && With.units.ours.count(Protoss.Pylon) > 4 - Maff.fromBoolean(With.scouting.weControlOurNatural)
 
         status(f"DTAfterCannon@${Frames(forgeMinStartFrame)}-${Frames(pylonMinStartFrame)}-${Frames(cannonMinStartFrame)}")
@@ -76,13 +77,9 @@ object PvPDTDefense extends MacroActions with MacroCounting {
         }
 
         get(RequestUnit(Protoss.Forge, minStartFrameArg = forgeMinStartFrame))
-
-        requestTower(Protoss.Pylon, 1, With.geography.ourNatural, DefendEntrance, if (naturalPylon) 0 else pylonMinStartFrame)
-
-        if (dtArePossibility) {
-          requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, cannonMinStartFrame)
-          requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, cannonMinStartFrame)
-        }
+        requestTower(Protoss.Pylon,         1, With.geography.ourNatural, DefendEntrance, if (naturalPylon) 0 else pylonMinStartFrame)
+        requestTower(Protoss.PhotonCannon,  1, With.geography.ourNatural, DefendEntrance, cannonMinStartFrame)
+        requestTower(Protoss.PhotonCannon,  1, With.geography.ourMain,    DefendEntrance, cannonMinStartFrame)
       }
     }
   }

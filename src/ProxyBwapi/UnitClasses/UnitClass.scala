@@ -191,6 +191,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   // Source: http://satirist.org/ai/starcraft/blog/archives/916-when-will-that-enemy-building-complete.html
   lazy val framesToFinishCompletion: Int = if (isBuilding) { if (isProtoss) 75 else if (isZerg) 9 else 2 } else 0
+  lazy val buildFramesFull: Int = buildFrames + framesToFinishCompletion
 
   lazy val unitsTrained: Vector[UnitClass] = UnitClasses.all.filter(_.whatBuilds._1 == this)
 

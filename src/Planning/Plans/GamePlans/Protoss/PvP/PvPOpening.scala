@@ -2,13 +2,12 @@ package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
 import Macro.Requests.RequestUnit
-import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
-import Utilities.SwapIf
+import Utilities.{?, SwapIf}
 import Utilities.Time._
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
@@ -224,8 +223,8 @@ class PvPOpening extends GameplanImperative {
             getObservatory = false
             getObservers = false
           } else {
-            getObservatory = roll("SpeculativeObservatory", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 0.8 else 0.4)
-            getObservers = getObservatory && roll("SpeculativeObservers", if (trackRecordLacks(With.fingerprints.fourGateGoon)) 1.0 else 0.75) // So the probability of obs is the *joint* probability
+            getObservatory = roll("SpeculativeObservatory", ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
+            getObservers = getObservatory && roll("SpeculativeObservers", ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
           }
         }
       }
@@ -245,9 +244,9 @@ class PvPOpening extends GameplanImperative {
       shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeToMoveOut || With.scouting.enemyProximity < 0.75)
       shouldExpand ||= upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20
     } else if (PvP3GateGoon()) {
-      shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
+      shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6 && safeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(IsWarrior) >= (if (safeToMoveOut) 20 else 28)
+      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, 20, 28)
     }
     shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
@@ -279,14 +278,6 @@ class PvPOpening extends GameplanImperative {
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
       aggression(0.6)
     }
-
-    oversaturate = units(Protoss.Reaver) > 0
-    oversaturate ||= PvPDT()
-    oversaturate ||= enemyBases > 1
-    oversaturate ||= enemyRobo
-    oversaturate ||= enemyDarkTemplarLikely
-    oversaturate &&= ! speedlotAttack
-    oversaturate &&= ! employing(PvP3GateGoon, PvP4GateGoon)
 
     /////////////
     // Logging //
@@ -646,45 +637,33 @@ class PvPOpening extends GameplanImperative {
       SwapIf(
         safeAtHome && With.scouting.enemyProximity < 0.5,
         () => trainGatewayUnits(),
-        () => get(5, Protoss.Gateway))
+        () => get(4, Protoss.Gateway))
 
     } else if (PvPDT()) {
       // If we scout the mirror, just cannon expand
       if (With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)) {
-        buildCannonsAtNatural(2, PlaceLabels.DefendEntrance)
         requireMiningBases(2)
-      } else {
-        if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
-          once(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar)
-        }
+      } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
+        once(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar)
         get(Protoss.CitadelOfAdun)
         get(Protoss.TemplarArchives)
       }
-      if (shouldExpand) {
-        buildCannonsAtNatural(if (With.fingerprints.dragoonRange()) 0 else 1, PlaceLabels.DefendEntrance)
-        requireMiningBases(2)
-      }
+      if (shouldExpand) { requireMiningBases(2) }
       trainGatewayUnits()
       get(2, Protoss.Gateway)
 
-    } else if (PvP3GateGoon()) {
-      if (shouldExpand) { requireMiningBases(2) }
-      once(2, Protoss.Dragoon)
-      get(3, Protoss.Gateway)
-      trainGatewayUnits()
-      once(8, Protoss.Dragoon)
-      requireMiningBases(2)
-
-    // 4-Gate Goon
+    // 3/4-Gate Goon
     } else {
       if (shouldExpand) { requireMiningBases(2) }
       once(2, Protoss.Dragoon)
-      get(4, Protoss.Gateway)
+      get(if (PvP3GateGoon()) 3 else 4, Protoss.Gateway)
       trainGatewayUnits()
-      once(10, Protoss.Dragoon)
+      if (PvP3GateGoon()) { requireMiningBases(2) }
     }
 
-    SwapIf(oversaturate, () => { get(Protoss.DragoonRange); get(4, Protoss.Gateway) }, () => pumpWorkers(oversaturate = true))
+    get(Protoss.DragoonRange)
+    pumpWorkers(oversaturate = true)
+    get(4, Protoss.Gateway)
     requireMiningBases(2)
   }
 

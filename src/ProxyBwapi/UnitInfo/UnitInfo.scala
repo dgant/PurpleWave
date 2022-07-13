@@ -46,7 +46,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   val initialHitPoints            : Int = bwapiUnit.getHitPoints
   val initialShields              : Int = bwapiUnit.getShields
   var completionFrame             : Int = Forever() // Can't use unitClass during construction
-  var lastHitPoints               : Int = _
   var lastShieldPoints            : Int = _
   var lastMatrixPoints            : Int = _
   var lastCooldown                : Int = _
@@ -54,6 +53,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastFrameStartingAttack     : Int = - Forever()
   var lastFrameHarvested          : Int = - Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
+  var lastHitPoints               : Int = _
+  @inline final def completionFrameFull: Int = completionFrame +  unitClass.framesToFinishCompletion
   private var lastUnitClass       : UnitClass = _
   private val previousPixels      : Array[Pixel] = Array.fill(48)(new Pixel(bwapiUnit.getPosition))
   @inline final def previousPixel(framesAgo: Int): Pixel = previousPixels((With.frame + previousPixels.length - Math.min(previousPixels.length, framesAgo)) % previousPixels.length)

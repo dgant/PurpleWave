@@ -88,6 +88,7 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech).filter(x => commitToTech && shouldMindControl))
       .orElse(Some(TemplarTech).filter(x => commitToTech && bases > 2))
       .orElse(Some(TemplarTech).filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", if (With.fingerprints.fourGateGoon()) 0.5 else 0.25)))
+      .orElse(Some(TemplarTech).filter(x => commitToTech && units(Protoss.Zealot) >= 5))
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
     if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
@@ -108,7 +109,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString).foreach(status)
-    PvPDTDefense.requireTimelyDetection()
+    PvPTools.requireTimelyDetection()
   }
 
   override def executeMain(): Unit = {
@@ -235,7 +236,7 @@ class PvPLateGame extends GameplanImperative {
       }
     }
     get(Protoss.RoboticsSupportBay)
-    if ( ! fearDeath) {
+    if ( ! fearDeath && units(Protoss.Shuttle) > 0 && (units(Protoss.Reaver) > 1 || Protoss.PsionicStorm())) {
       get(Protoss.ShuttleSpeed)
     }
     pump(Protoss.Reaver, 1)

@@ -13,15 +13,18 @@ import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss.{PvP3GateGoon, PvPDT}
 import Utilities.Time._
 
-object PvPDTDefense extends MacroActions with MacroCounting {
+object PvPTools extends MacroActions with MacroCounting {
 
+  private val lateOneBaseDTFrame = GameTime(7, 35)()
   private val twoBaseDTFrame = GameTime(15, 30)()
   private val cannonSafetyFrames = Seconds(10)()
 
+  def enemyContainedInMain: Boolean = With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(b => (Seq(b) ++ b.natural).exists(With.scouting.weControl))
+
   def requireTimelyDetection(): Unit = {
-    val dtArePossibility    = enemyDarkTemplarLikely || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
+    val dtArePossibility    = enemyDarkTemplarLikely || enemyContainedInMain || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
     val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
-    val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else twoBaseDTFrame
+    val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else if (enemyContainedInMain) lateOneBaseDTFrame else twoBaseDTFrame
     val framesUntilArrival  = expectedArrival - With.frame
     val dtPrecedesCannon    = framesUntilArrival < framesUntilUnit(Protoss.PhotonCannon) + cannonSafetyFrames
     val dtPrecedesObserver  = framesUntilArrival < framesUntilUnit(Protoss.Observer)

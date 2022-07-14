@@ -144,5 +144,5 @@ class PlacementQuery {
     With.placement.foundations.map(preferences.audit).toVector.sortBy(-_._2)
   }
 
-  override def toString: String = f"PlacementQuery Req$requirements) Pref$preferences)"
+  override def toString: String = f"PlacementQuery Req$requirements) Pref$preferences)".replace("PQP", "")
 }

@@ -49,7 +49,7 @@ abstract class RequestBuildable(
   private def stringWhat  : String = f" ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}"
   private def stringLevel : String = if (upgrade.isDefined) f" lvl $quantity" else ""
   private def stringWhen  : String = if (minStartFrame <= 0) "" else f" after ${Frames(minStartFrame)}"
-  private def stringWhere : String = if (placement.isEmpty) "" else f" @ ${placement.get}"
+  private def stringWhere : String = if (placement.isEmpty) "" else f" @ ${placement.get}".replace("PlacementQuery ", "")
 
   override def toString: String = f"Buildable$stringWhat$stringLevel$stringWhen$stringWhere"
 }

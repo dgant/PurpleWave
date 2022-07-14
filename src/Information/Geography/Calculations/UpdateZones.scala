@@ -65,6 +65,7 @@ object UpdateZones {
     zone.exitDistanceGrid.initialize()
     zone.bases.foreach(UpdateBase(_))
     zone.exitNow = calculateExit(zone)
+    zone.entranceNow = calculateEntrance(zone)
   
     val exitBuildings = zone.exitOriginal.map(exit =>
       zone.units

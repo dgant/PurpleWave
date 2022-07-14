@@ -8,6 +8,7 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
+import Utilities.?
 import Utilities.Time.Forever
 
 import scala.collection.mutable
@@ -33,14 +34,15 @@ final class MacroSim {
     // Construct initial state
     val initialStep = new MacroStep
     val initialState = initialStep.state
-    initialState.minerals         = With.self.minerals
-    initialState.gas              = With.self.gas
-    initialState.supplyAvailable  = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum)
-    initialState.supplyUsed       = With.units.ours.map(_.unitClass.supplyRequired).sum
-    initialState.mineralPatches   = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
-    initialState.geysers          = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
-    initialState.unitsExtant      = With.macroCounts.oursExtant
-    initialState.unitsComplete    = With.macroCounts.oursComplete
+    initialState.minerals           = With.self.minerals
+    initialState.gas                = With.self.gas
+    initialState.supplyAvailable    = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum)
+    initialState.supplyUsed         = With.units.ours.map(_.unitClass.supplyRequired).sum
+    initialState.mineralPatches     = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
+    initialState.geysers            = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
+    initialState.unitsExtant        = With.macroCounts.oursExtant
+    initialState.unitsComplete      = With.macroCounts.oursComplete
+    initialState.unitsCompleteASAP  = With.macroCounts.oursComplete
     Upgrades.all.foreach(u => initialState.upgrades(u) = With.self.getUpgradeLevel(u))
     initialState.techs ++= Techs.all.view.filter(With.self.hasTech)
     insert(initialStep)
@@ -56,8 +58,10 @@ final class MacroSim {
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
         step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificUnitArg = Some(u)))
-        event.dUnitComplete = u.unitClass
-        event.dUnitCompleteN = 1
+        event.dUnitComplete       = u.unitClass
+        event.dUnitCompleteN      = 1
+        event.dUnitCompleteASAP   = u.unitClass
+        event.dUnitCompleteASAPN  = 1
         if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
           event.dSupplyAvailable += u.unitClass.supplyProvided
         }
@@ -109,10 +113,8 @@ final class MacroSim {
       // - (Default) If there is no placement query, use our state count
       // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
       val unitDiff = request.unit.map(requestedUnit => request.quantity -
-        (if (request.placement.isEmpty)
-          steps.last.state.unitsComplete(requestedUnit)
-        else
-          With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
+        (if (request.placement.isEmpty) steps.last.state.unitsCompleteASAP(requestedUnit)
+        else With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
       val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
       val diff        = Seq(unitDiff, upgradeDiff, techDiff).max
@@ -146,14 +148,17 @@ final class MacroSim {
               eventFinish.dProducer1  = eventStart.dProducer1
               eventFinish.dProducer1N = - eventStart.dProducer1N
               request.unit.foreach(u => {
-                eventStart.dUnitExtant1       = u
-                eventStart.dUnitExtant1N      = u.copiesProduced
-                eventFinish.dUnitComplete     = u
-                eventFinish.dUnitCompleteN    = u.copiesProduced
-                eventFinish.dProducer2        = u
-                eventFinish.dProducer2N       = u.copiesProduced
-                eventFinish.dSupplyAvailable  = u.supplyProvided
-                eventFinish.dGeysers          = Maff.fromBoolean(u.isGas)
+                val ASAP                        = request.minStartFrame <= With.frame + u.buildFrames / 4
+                eventStart.dUnitExtant1         = u
+                eventStart.dUnitExtant1N        = u.copiesProduced
+                eventFinish.dUnitComplete       = u
+                eventFinish.dUnitCompleteN      = u.copiesProduced
+                eventFinish.dUnitCompleteASAP   = ?(ASAP, u, UnitClasses.None)
+                eventFinish.dUnitCompleteASAPN  = ?(ASAP, u.copiesProduced, 0)
+                eventFinish.dProducer2          = u
+                eventFinish.dProducer2N         = u.copiesProduced
+                eventFinish.dSupplyAvailable    = u.supplyProvided
+                eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
               })
               if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
                 eventStart.dUnitExtant2 = request.producerRequired
@@ -243,28 +248,31 @@ final class MacroSim {
       val stateNext = steps(i).state
       val event     = steps(i).event
       val dFrames   = event.dFrames - steps(i - 1).event.dFrames
-      stateNext.minerals        = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
-      stateNext.gas             = stateLast.gas + event.dGas + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
-      stateNext.supplyAvailable = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
-      stateNext.supplyUsed      = stateLast.supplyUsed + event.dSupplyUsed
-      stateNext.mineralPatches  = stateLast.mineralPatches + event.dMineralPatches
-      stateNext.geysers         = stateLast.geysers + event.dGeysers
-      stateNext.techs           = stateLast.techs
-      stateNext.upgrades        = stateLast.upgrades
-      stateNext.unitsExtant     = stateLast.unitsExtant
-      stateNext.unitsComplete   = stateLast.unitsComplete
-      stateNext.producers       = stateLast.producers
-      if (event.dUpgrade      != Upgrades.None)                                               stateNext.upgrades      = stateNext.upgrades.clone
-      if (event.dUnitExtant1  != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)  stateNext.unitsExtant   = stateNext.unitsExtant.clone
-      if (event.dUnitComplete != UnitClasses.None)                                            stateNext.unitsComplete = stateNext.unitsComplete.clone
-      if (event.dProducer1    != UnitClasses.None || event.dProducer2 != UnitClasses.None)    stateNext.producers     = stateNext.producers.clone
-      if (event.dTech         != Techs.None)        stateNext.techs                               += event.dTech
-      if (event.dUpgrade      != Upgrades.None)     stateNext.upgrades(event.dUpgrade)            =  event.dUpgradeLevel
-      if (event.dUnitExtant1  != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant1)     += event.dUnitExtant1N
-      if (event.dUnitExtant2  != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant2)     += event.dUnitExtant2N
-      if (event.dUnitComplete != UnitClasses.None)  stateNext.unitsComplete(event.dUnitComplete)  += event.dUnitCompleteN
-      if (event.dProducer1    != UnitClasses.None)  stateNext.producers(event.dProducer1)         += event.dProducer1N
-      if (event.dProducer2    != UnitClasses.None)  stateNext.producers(event.dProducer2)         += event.dProducer2N
+      stateNext.minerals          = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
+      stateNext.gas               = stateLast.gas + event.dGas + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
+      stateNext.supplyAvailable   = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
+      stateNext.supplyUsed        = stateLast.supplyUsed + event.dSupplyUsed
+      stateNext.mineralPatches    = stateLast.mineralPatches + event.dMineralPatches
+      stateNext.geysers           = stateLast.geysers + event.dGeysers
+      stateNext.techs             = stateLast.techs
+      stateNext.upgrades          = stateLast.upgrades
+      stateNext.unitsExtant       = stateLast.unitsExtant
+      stateNext.unitsComplete     = stateLast.unitsComplete
+      stateNext.unitsCompleteASAP = stateLast.unitsCompleteASAP
+      stateNext.producers         = stateLast.producers
+      if (event.dUpgrade          != Upgrades.None)                                               stateNext.upgrades          = stateNext.upgrades.clone
+      if (event.dUnitExtant1      != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)  stateNext.unitsExtant       = stateNext.unitsExtant.clone
+      if (event.dUnitComplete     != UnitClasses.None)                                            stateNext.unitsComplete     = stateNext.unitsComplete.clone
+      if (event.dUnitCompleteASAP != UnitClasses.None)                                            stateNext.unitsCompleteASAP = stateNext.unitsCompleteASAP.clone
+      if (event.dProducer1        != UnitClasses.None || event.dProducer2 != UnitClasses.None)    stateNext.producers         = stateNext.producers.clone
+      if (event.dTech             != Techs.None)        stateNext.techs                                       += event.dTech
+      if (event.dUpgrade          != Upgrades.None)     stateNext.upgrades(event.dUpgrade)                    =  event.dUpgradeLevel
+      if (event.dUnitExtant1      != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant1)             += event.dUnitExtant1N
+      if (event.dUnitExtant2      != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant2)             += event.dUnitExtant2N
+      if (event.dUnitComplete     != UnitClasses.None)  stateNext.unitsComplete(event.dUnitComplete)          += event.dUnitCompleteN
+      if (event.dUnitCompleteASAP != UnitClasses.None)  stateNext.unitsCompleteASAP(event.dUnitCompleteASAP)  += event.dUnitCompleteASAPN
+      if (event.dProducer1        != UnitClasses.None)  stateNext.producers(event.dProducer1)                 += event.dProducer1N
+      if (event.dProducer2        != UnitClasses.None)  stateNext.producers(event.dProducer2)                 += event.dProducer2N
       i += 1
     }
   }

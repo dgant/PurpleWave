@@ -148,7 +148,7 @@ trait MacroCounting {
   def enemyDarkTemplarLikely: Boolean = (
     With.fingerprints.dtRush()
     || enemyHasUpgrade(Protoss.ZealotSpeed)
-    || enemiesShown(Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Arbiter) > 0
+    || enemiesShown(Protoss.DarkTemplar, Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Arbiter) > 0
   )
 
   def enemyRobo: Boolean = {

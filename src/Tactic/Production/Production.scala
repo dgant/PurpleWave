@@ -30,12 +30,13 @@ trait Production extends Prioritized {
     * Is the output of this production satisfactory for this request?
     */
   def satisfies(requirement: RequestBuildable): Boolean = {
-    if (request.tech    != requirement.tech)    return false
-    if (request.upgrade != requirement.upgrade) return false
-    if (request.unit    != requirement.unit)    return false
-    if (request.upgrade.isDefined && request.quantity < requirement.quantity) return false
-    if ( ! request.specificUnit.forall(trainee.contains)) return false
+    if (request.tech      != requirement.tech)    return false
+    if (request.upgrade   != requirement.upgrade) return false
+    if (request.unit      != requirement.unit)    return false
     if (request.placement != requirement.placement) return false
+    if ( ! request.specificUnit.forall(trainee.contains)) return false
+    if (request.upgrade.isDefined && request.quantity < requirement.quantity) return false
+    if (request.minStartFrame > Math.max(requirement.minStartFrame, With.frame)) return false
     true
   }
 

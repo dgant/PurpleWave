@@ -8,9 +8,9 @@ import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
-import Utilities.{?, SwapIf}
 import Utilities.Time._
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
+import Utilities.{?, SwapIf}
 
 class PvPOpening extends GameplanImperative {
 
@@ -224,8 +224,8 @@ class PvPOpening extends GameplanImperative {
             getObservatory = false
             getObservers = false
           } else {
-            getObservatory = roll("SpeculativeObservatory", ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
-            getObservers = getObservatory && roll("SpeculativeObservers", ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
+            getObservatory =                  roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
+            getObservers = getObservatory &&  roll("SpeculativeObservers",    ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
           }
         }
       }
@@ -247,7 +247,7 @@ class PvPOpening extends GameplanImperative {
     } else if (PvP3GateGoon()) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6 && safeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, 20, 28)
+      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPTools.enemyContainedInMain, 14, 20), 28)
     }
     shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
@@ -309,7 +309,7 @@ class PvPOpening extends GameplanImperative {
     // Emergency DT reactions //
     ////////////////////////////
 
-    PvPDTDefense.requireTimelyDetection()
+    PvPTools.requireTimelyDetection()
 
     //////////////
     // Scouting //

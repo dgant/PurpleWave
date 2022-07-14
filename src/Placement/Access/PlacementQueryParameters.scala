@@ -17,8 +17,8 @@ class PlacementQueryParameters {
   var base      : Seq[Base]         = Seq.empty
   var tile      : Seq[Tile]         = Seq.empty
 
-  private def repr[T](name: String, values: Iterable[T]): String = if (values.isEmpty) "" else f"$name (${values.mkString(" ")})"
-  override def toString: String = f"PQP: ${repr("Width", width)} ${repr("Height", height)} ${repr("Building", building)} ${repr("LabelYes", labelYes)} ${repr("LabelNo", labelNo)} ${repr("Zone", zone)} ${repr("Base", base)} ${repr("Tile", tile)}"
+  private def repr[T](name: String, values: Iterable[T]): String = if (values.isEmpty) "" else f"$name(${values.mkString(" ")})"
+  override def toString: String = f"PQP: ${repr("Width", width)} ${repr("Height", height)} ${repr("Bldg", building)} ${repr("Yes", labelYes)} ${repr("No", labelNo)} ${repr("Zone", zone)} ${repr("Base", base)} ${repr("Tile", tile)}".replaceAll("  ", " ")
 
   // Required for Produce to match requests against existing production
   override def equals(other: Any): Boolean = {

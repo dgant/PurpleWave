@@ -28,6 +28,7 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   var contested       : Boolean           = false
   var walledIn        : Boolean           = false
   var exitNow         : Option[Edge]      = None
+  var entranceNow     : Option[Edge]      = None
   var lastPathfindId  : Long              = Long.MinValue
 
   def isOurs    : Boolean = owner.isUs

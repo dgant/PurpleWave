@@ -24,8 +24,6 @@ class FingerprintProxyGateway extends FingerprintAnd(
       override protected val reason: String = "Main empty"
     })) {
 
-
-
   // Stick only once we have some affirmative proof, so we don't permanently overreact against Nexus-first (which has an empty main)
   override def sticky: Boolean = With.units.countEnemy(Protoss.Zealot) > 0 || With.units.countEnemy(Protoss.Gateway) > 0
 }

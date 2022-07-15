@@ -22,6 +22,6 @@ object ShowHeader extends DebugView {
     With.game.drawTextScreen(80,  2 * h, f"+1000ms: ${With.performance.framesOver1000}/10")
     With.game.drawTextScreen(155, 2 * h, f"+10000ms: ${With.performance.framesOver10000}/1")
     With.game.drawTextScreen(230, 2 * h, With.blackboard.status.get.mkString(", "))
-    With.game.drawTextScreen(5,   3 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ")}")
+    With.game.drawTextScreen(5,   3 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
   }
 }

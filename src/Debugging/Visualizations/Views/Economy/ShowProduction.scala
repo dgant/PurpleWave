@@ -62,7 +62,7 @@ object ShowProduction extends DebugView {
         )})
 
     producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)
-    producibles.indices.foreach(i => {
+    producibles.indices.take(18).foreach(i => {
       val p = producibles(i)
       val y0 = 45 + 14 * i
       val y1 = y0 + 12

@@ -247,7 +247,7 @@ object Templates {
         "------------",
         "-Rxx3xx4xxx-",
         "-xxxxxxxxxx-",
-        "---2xPxxxxx-",
+        "---PUPxxxxx-",
         "xx-xxxx4xxx-",
         "xx--Txxxxxx-",
         "xxx-xxxxxxx-",
@@ -348,6 +348,7 @@ object Templates {
       "xxx-"))
 
   val batterycannon = Seq(
+    // Spacious
     new Template()
       .forExitDirection(Directions.Left)
       .from(
@@ -377,6 +378,60 @@ object Templates {
         "-xxxx-",
         "-Bxx--",
         "-xxx-",
-        "-----"))
+        "-----"),
+    // Less spacious
+    new Template()
+      .forExitDirection(Directions.Left)
+      .from(
+        "-BxxCxPx",
+        "-xxxxxxx",
+        "--------"),
+    new Template()
+      .forExitDirection(Directions.Right)
+      .from(
+        "PxCxBxx-",
+        "xxxxxxx-",
+        "--------"),
+    new Template()
+      .forExitDirection(Directions.Up)
+      .from(
+        "----",
+        "-Bxx",
+        "-xxx",
+        "-PxCx",
+        "-xxxx"),
+    new Template()
+      .forExitDirection(Directions.Down)
+      .from(
+        "CxPx-",
+        "xxxx-",
+        "Bxx--",
+        "xxx-",
+        "----"),
+    // No battery, directionless
+    new Template()
+      .from(
+        "CxPx-",
+        "xxxx-",
+        "-----"),
+    new Template()
+      .from(
+        "-----",
+        "PxCx-",
+        "xxxx-"),
+    new Template()
+      .from(
+        "---",
+        "Cx-",
+        "xx-",
+        "Px-",
+        "xx-"),
+    new Template()
+      .from(
+        "Px-",
+        "xx-",
+        "Cx-",
+        "xx-",
+        "---"))
     .map(_.addLabels(Defensive, DefendEntrance, DefendGround))
 }

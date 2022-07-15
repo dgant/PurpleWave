@@ -112,4 +112,6 @@ final case class TileRectangle(
 
   @inline def tilesAtEdge: IndexedSeq[Tile] = Box(width, height).map(startInclusive.add)
   @inline def tilesSurrounding: IndexedSeq[Tile] = Box(width + 2, height + 2).map(startInclusive.subtract(1, 1).add)
+
+  @inline def toPixels: PixelRectangle = PixelRectangle(startPixel, endPixel)
 }

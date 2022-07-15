@@ -22,6 +22,7 @@ object ShowUnitsFriendly extends DebugView {
   var showForces      : Boolean = true
   var showLeaders     : Boolean = true
   var showCharge      : Boolean = true
+  var showTarget      : Boolean = true
   
   override def renderMap(): Unit = { With.units.ours.foreach(renderUnitState) }
 
@@ -76,7 +77,7 @@ object ShowUnitsFriendly extends DebugView {
     }
 
     if (showCharge) {
-      if (unit.unitClass.spells.exists(spell => spell.energyCost > 0 && With.self.hasTech(spell) && unit.energy >= spell.energyCost)) {
+      if (unit.unitClass.spells.exists(spell => spell() && spell.energyCost > 0 && unit.energy >= spell.energyCost)) {
         val degrees = System.currentTimeMillis() % 360
         val radians = degrees * Math.PI / 360
         DrawMap.circle(origin.radiateRadians(radians, 10), 2, Colors.NeonYellow, solid = true)
@@ -89,7 +90,7 @@ object ShowUnitsFriendly extends DebugView {
     }
 
     if (showForces) {
-      val forceLengthMax = 48.0
+      val forceLengthMax = unit.unitClass.radialHypotenuse + 16.0
       val forceRadiusMin = 4
       val maxForce = Maff.max(agent.forces.values.view.map(_.lengthSlow)).getOrElse(0.0)
       if (maxForce > 0.0) {
@@ -119,6 +120,18 @@ object ShowUnitsFriendly extends DebugView {
         unit.pixel.add(0, 21),
         drawBackground = true,
         Color.Black)
+    }
+
+    if (showTarget) {
+      unit.orderTarget.foreach(t => {
+        DrawMap.box(t.topLeft, t.bottomRight, unit.unitColor)
+        DrawMap.line(unit.pixel, t.pixel, unit.unitColor)
+      })
+      unit.orderTargetPixel.foreach(t => {
+        val tp = if (t.pixelDistance(unit.pixel) < 16) t else t.project(unit.pixel, 2)
+        DrawMap.line(tp, unit.pixel, unit.unitColor)
+        DrawMap.circle(t, 2, unit.unitColor)
+      })
     }
   }
 }

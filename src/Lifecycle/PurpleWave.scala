@@ -2,7 +2,7 @@ package Lifecycle
 
 import Debugging._
 import Placement.JBWEBWrapper
-import bwapi.DefaultBWListener
+import bwapi.{DefaultBWListener, Player}
 import jbweb.Walls
 
 class PurpleWave extends DefaultBWListener {
@@ -68,6 +68,10 @@ class PurpleWave extends DefaultBWListener {
   
   override def onSendText(text: String): Unit = {
     tryCatch(() => KeyboardCommands.onSendText(text))
+  }
+
+  override def onReceiveText(player: Player, text: String): Unit = {
+    tryCatch(() => KeyboardCommands.onReceiveText(text))
   }
 
   private def tryCatch(lambda: () => Unit): Unit = {

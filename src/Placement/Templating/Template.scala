@@ -22,17 +22,6 @@ class Template extends TemplateFilter {
   def width   : Int                         = right() - left()
   def height  : Int                         = bottom() - top()
 
-  def this(units: Seq[(Tile, UnitClass)]) {
-    this()
-    val xMin = Maff.min(units.view.map(_._1.x)).getOrElse(0)
-    val yMin = Maff.min(units.view.map(_._1.y)).getOrElse(0)
-    units.foreach(tileUnit => add(
-      Point(
-        tileUnit._1.x - xMin,
-        tileUnit._1.y - yMin),
-      new TemplatePointRequirement(tileUnit._2)))
-  }
-
   def add(point: Point, requirement: TemplatePointRequirement): Template = {
     points += TemplatePoint(point, requirement)
     // Put Town Halls/Gas up front because those are the easiest points to reject when fitting

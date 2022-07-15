@@ -36,6 +36,19 @@ class PvPOpening extends GameplanImperative {
   override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
 
+  private def sneakyCitadel(): Unit = {
+    if (scoutCleared) {
+      get(Protoss.CitadelOfAdun)
+      cancel(Protoss.AirDamage)
+    } else if (units(Protoss.CitadelOfAdun) == 0) {
+      if (With.units.ours.find(_.upgradeProducing.contains(Protoss.AirDamage)).exists(_.remainingUpgradeFrames < Seconds(5)())) {
+        cancel(Protoss.AirDamage)
+      } else if ( ! upgradeStarted(Protoss.DragoonRange)) {
+        get(Protoss.AirDamage)
+      }
+    }
+  }
+
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -247,7 +260,7 @@ class PvPOpening extends GameplanImperative {
     } else if (PvP3GateGoon()) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6 && safeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPTools.enemyContainedInMain, 14, 20), 28)
+      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContainedInMain, 14, 20), 28)
     }
     shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
@@ -309,7 +322,7 @@ class PvPOpening extends GameplanImperative {
     // Emergency DT reactions //
     ////////////////////////////
 
-    PvPTools.requireTimelyDetection()
+    PvPIdeas.requireTimelyDetection()
 
     //////////////
     // Scouting //
@@ -366,15 +379,19 @@ class PvPOpening extends GameplanImperative {
       status("99Defense")
       pumpSupply()
       pumpWorkers()
-      if (units(Protoss.Gateway) < 2 && minerals < 150) {
+      if (units(Protoss.Gateway) < 2 || unitsComplete(Protoss.Probe) < 15) {
         cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.DragoonRange)
         gasWorkerCeiling(0)
       } else if (units(Protoss.CyberneticsCore) == 0) {
-        gasWorkerCeiling(1)
+        gasWorkerCeiling(0)
       } else if (unitsComplete(Protoss.CyberneticsCore) == 0) {
-        gasWorkerCeiling(2)
+        if (units(Protoss.Dragoon) == 0) {
+          gasLimitCeiling(50)
+        } else {
+          gasWorkerCeiling(2)
+        }
       }
-      gasLimitCeiling(250)
+      gasLimitCeiling(200)
       get(2, Protoss.Gateway)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
@@ -555,15 +572,17 @@ class PvPOpening extends GameplanImperative {
 
   def executeMain(): Unit = {
 
-    gasLimitCeiling(350)
-    if (zBeforeCore && employing(PvP3GateGoon, PvP4GateGoon) && unitsComplete(Protoss.CyberneticsCore) < 1) {
-      gasWorkerCeiling(1)
-    }
-    if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
-      gasWorkerCeiling(2)
-    }
-    if (PvPTechBeforeRange() && PvPDT() && units(Protoss.CitadelOfAdun) == 0) {
-      gasWorkerCeiling(2)
+    if (gasCapsUntouched) {
+      gasLimitCeiling(350)
+      if (zBeforeCore && employing(PvP3GateGoon, PvP4GateGoon) && unitsComplete(Protoss.CyberneticsCore) < 1) {
+        gasWorkerCeiling(1)
+      }
+      if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
+        gasWorkerCeiling(2)
+      }
+      if (PvPTechBeforeRange() && PvPDT() && units(Protoss.CitadelOfAdun) == 0) {
+        gasWorkerCeiling(2)
+      }
     }
 
     ////////////////////////
@@ -634,7 +653,7 @@ class PvPOpening extends GameplanImperative {
       get(3, Protoss.Gateway)
 
     } else if (speedlotAttack) {
-      get(Protoss.CitadelOfAdun)
+      sneakyCitadel()
       get(Protoss.ZealotSpeed)
       if (shouldExpand) { requireMiningBases(2) }
       SwapIf(
@@ -648,7 +667,7 @@ class PvPOpening extends GameplanImperative {
         requireMiningBases(2)
       } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
         once(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar)
-        get(Protoss.CitadelOfAdun)
+        sneakyCitadel()
         get(Protoss.TemplarArchives)
       }
       if (shouldExpand) { requireMiningBases(2) }

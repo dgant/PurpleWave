@@ -4,6 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.Color
@@ -17,20 +18,18 @@ object ShowHealthAndCooldown extends DebugView {
     if ( ! unit.alive) return
     if ( ! unit.likelyStillThere) return
     if (unit.invincible) return
+    if (unit.unitClass.maxTotalHealth == 0) return
     
-    val width = Math.min(48, Math.max(18, (unit.unitClass.maxTotalHealth + unit.matrixPoints) / 5))
-    val marginTopHp = 3
-    val denominator = unit.unitClass.maxTotalHealth + (if (unit.matrixPoints > 0) width * 250 else 0)
-    
-    if (denominator == 0) return
-    
-    val widthHpMax = width * unit.unitClass.maxHitPoints / denominator
-    val widthShMax = width * unit.unitClass.maxShields / denominator
-    val widthDmMax = if (unit.matrixPoints > 0) width * 250 / denominator else 0
-    val widthHpNow = width * unit.hitPoints / denominator
-    val widthShNow = width * unit.shieldPoints / denominator
-    val widthDmNow = width * unit.matrixPoints / denominator
-    val widthEnergyNow = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax)
+    val width           = Maff.clamp(unit.unitClass.width, 18, 48)
+    val marginTopHp     = 3
+    val denominator     = unit.unitClass.maxTotalHealth + (if (unit.matrixPoints > 0) width * 250 else 0)
+    val widthHpMax      = width * unit.unitClass.maxHitPoints / denominator
+    val widthShMax      = width * unit.unitClass.maxShields / denominator
+    val widthDmMax      = if (unit.matrixPoints > 0) width * 250 / denominator else 0
+    val widthHpNow      = width * unit.hitPoints / denominator
+    val widthShNow      = width * unit.shieldPoints / denominator
+    val widthDmNow      = width * unit.matrixPoints / denominator
+    val widthEnergyNow  = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax)
 
     // Min, because I haven't yet accounted for energy max upgrades
     val widthCooldownButton = 3

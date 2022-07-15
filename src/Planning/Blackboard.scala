@@ -34,7 +34,6 @@ class Blackboard {
   val allowIslandBases        : Property[Boolean]           = add(new Property(false))
   val makeDarkArchons         : Property[Boolean]           = add(new Property(false))
   val pushKiters              : Property[Boolean]           = add(new Property(false))
-  val darkTemplarHarass       : Property[Boolean]           = add(new Property(true))
   val floatableBuildings      : Property[Vector[UnitClass]] = add(new Property(Vector.empty))
   val toCancel                : Property[Vector[Buildable]] = add(new Property(Vector.empty))
 }

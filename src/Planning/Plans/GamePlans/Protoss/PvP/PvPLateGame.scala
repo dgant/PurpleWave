@@ -3,13 +3,11 @@ package Planning.Plans.GamePlans.Protoss.PvP
 import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.Get
-import Mathematics.Maff
-import Mathematics.Points.Pixel
 import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
-import Utilities.Time.{Forever, Frames, GameTime, Minutes, Seconds}
+import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitFilters.IsWarrior
 import Utilities._
 
@@ -25,22 +23,19 @@ class PvPLateGame extends GameplanImperative {
   var dtBraveryAbroad     : Boolean = _
   var dtBraveryHome       : Boolean = _
   var expectCarriers      : Boolean = _
-  var shouldDetect        : Boolean = _
   var shouldSecondaryTech : Boolean = _
   var shouldHarass        : Boolean = _
   var shouldAttack        : Boolean = _
   var shouldExpand        : Boolean = _
   var shouldMindControl   : Boolean = _
-  var dtDebut             : Int     = Forever()
-  var obsDebut            : Int     = Forever()
-  var obsArrival          : Int     = Forever()
   var primaryTech         : Option[PrimaryTech] = None
 
   def primaryTemplar      : Boolean = primaryTech.contains(TemplarTech)
   def primaryRobo         : Boolean = primaryTech.contains(RoboTech)
 
   override def executeBuild(): Unit = {
-    updateDTBravery()
+    dtBraveryAbroad = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
+    dtBraveryHome   = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestArrival(Protoss.Observer)
     fearDeath   = ! dtBraveryAbroad && ! enemyStrategy(With.fingerprints.dtRush, With.fingerprints.robo) && ( ! safeAtHome || unitsComplete(IsWarrior) < 8 || (PvPIdeas.recentlyExpandedFirst && unitsComplete(Protoss.Shuttle) * unitsComplete(Protoss.Reaver) < 2))
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearDT      = enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0 && (enemies(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.PhotonCannon) == 0)
@@ -48,8 +43,6 @@ class PvPLateGame extends GameplanImperative {
 
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     shouldMindControl = false // expectCarriers
-    shouldDetect = enemyDarkTemplarLikely
-    shouldDetect ||= enemyHasShown(Protoss.ArbiterTribunal, Protoss.Arbiter)
     shouldExpand = fearMacro || ! fearDeath
     shouldExpand &&= ! fearContain
     shouldExpand &&= ! fearDT
@@ -59,12 +52,10 @@ class PvPLateGame extends GameplanImperative {
       || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases)
       || Math.min(unitsComplete(IsWarrior) / 16, unitsComplete(Protoss.Gateway) / 3) >= miningBases)
     shouldExpand ||= miningBases < 1
-    shouldHarass = fearMacro || fearContain || upgradeComplete(Protoss.ShuttleSpeed)
     shouldHarass = Protoss.PsionicStorm() && Protoss.ShuttleSpeed()
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= unitsComplete(Protoss.Gateway) >= targetGateways
-    shouldAttack ||= (dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0)
-    shouldAttack ||= shouldHarass
+    shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
     shouldAttack &&= ! fearDeath
     shouldAttack &&= ! fearDT
     shouldAttack ||= shouldExpand
@@ -92,24 +83,20 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(RoboTech).filter(x => commitToTech))
 
     if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
-    if (obsDebut < Forever()) status(f"ObsDebut@${Frames(obsDebut)}")
-    if (obsArrival < Forever()) status(f"ObsArrival@${Frames(obsArrival)}")
-    if (dtDebut < Forever()) status(f"DTDebut@${Frames(dtDebut)}")
-    if (dtBraveryHome) status("DTBraveryHome")
-    if (dtBraveryAbroad) status("DTBraveryAbroad")
+    if (dtBraveryHome) status("DTBraveHome")
+    if (dtBraveryAbroad) status("DTBraveAbroad")
     if (fearDeath) status("FearDeath")
     if (fearDT) status("FearDT")
     if (fearMacro) status("FearMacro")
     if (fearContain) status("FearContain")
     if (expectCarriers) status("ExpectCarriers")
     if (shouldMindControl) status("MindControl")
-    if (shouldDetect) status("Detect")
     if (shouldSecondaryTech) status("2ndTech")
     if (shouldExpand) status("ShouldExpand")
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString).foreach(status)
-    PvPTools.requireTimelyDetection()
+    PvPIdeas.requireTimelyDetection()
   }
 
   override def executeMain(): Unit = {
@@ -224,7 +211,7 @@ class PvPLateGame extends GameplanImperative {
     }
     get(Protoss.RoboticsFacility)
     buildOrder(Get(Protoss.Shuttle))
-    val getObservers = shouldDetect || ( ! fearDeath && ! fearContain)
+    val getObservers = ! fearDeath && ! fearContain
     if (getObservers) {
       get(Protoss.Observatory)
       buildOrder(Get(Protoss.Observer))
@@ -252,7 +239,6 @@ class PvPLateGame extends GameplanImperative {
       && unitsComplete(Protoss.Assimilator) > 1
       && unitsComplete(IsWarrior) >= 12
       && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush) || techStarted(Protoss.PsionicStorm)))
-    if (shouldDetect) { get(Protoss.Forge) }
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)
     if (shouldMindControl) {
@@ -281,38 +267,5 @@ class PvPLateGame extends GameplanImperative {
         buildCannonsAtOpenings(1, PlaceLabels.DefendHall)
       }
     }
-  }
-
-  def obsTravelFrames(from: Pixel): Int = (from.pixelDistance(With.geography.ourNatural.zone.downtown.center) / Protoss.Observer.topSpeed).toInt
-  def newObsDebut(value: Int, origin: Pixel): Unit = {
-    obsDebut = Math.min(obsDebut, value)
-    obsArrival = Math.min(obsArrival, obsDebut + obsTravelFrames(origin))
-  }
-  def updateDTBravery(): Unit = {
-    if (units(Protoss.TemplarArchives, Protoss.DarkTemplar) == 0) {
-      dtBraveryAbroad = false
-      dtBraveryHome = false
-      return
-    }
-    val roboFrames = Protoss.RoboticsFacility.buildFrames
-    val toryFrames = Protoss.Observatory.buildFrames
-    val obsFrames = Protoss.Observer.buildFrames
-    lazy val roboOrigin = Maff.minBy(With.units.enemy.filter(Protoss.RoboticsFacility))(_.completionFrame).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
-
-    With.units.enemy.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver, Protoss.RoboticsSupportBay))
-                                                      .foreach(r => newObsDebut(r.frameDiscovered           + toryFrames  + obsFrames,  roboOrigin))
-    With.units.enemy.filter(Protoss.RoboticsFacility) .foreach(r => newObsDebut(r.remainingCompletionFrames + toryFrames  + obsFrames,  r.pixel))
-    With.units.enemy.filter(Protoss.Observatory)      .foreach(o => newObsDebut(o.remainingCompletionFrames               + obsFrames,  roboOrigin))
-    With.units.enemy.filter(Protoss.Observer)         .foreach(o => newObsDebut(o.frameDiscovered,                                      o.pixel))
-
-    With.units.ours.filter(_.isAny(Protoss.DarkTemplar, Protoss.TemplarArchives))
-      .filter(_.knownToOpponents)
-      .map(_.frameKnownToOpponents)
-      .foreach(frame => dtDebut = Math.min(dtDebut, frame))
-
-    newObsDebut(dtDebut + roboFrames + toryFrames + obsFrames, roboOrigin)
-
-    dtBraveryAbroad = With.frame < obsDebut
-    dtBraveryHome   = With.frame < obsArrival
   }
 }

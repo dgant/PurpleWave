@@ -25,6 +25,8 @@ object PvP5Zealot extends PvPStrategy {
 }
 object PvP1012 extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP3Zealot, PvP5Zealot))
+  // TODO: Only enable vs appropriate builds, eg almost anything but ZCore, CoreZ, or ZCoreZ
+  //override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway, With.fingerprints.nexusFirst, With.fingerprints.coreBeforeZ
 }
 object PvPGateCoreTech extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Python)

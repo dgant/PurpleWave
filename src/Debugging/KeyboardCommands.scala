@@ -1,9 +1,29 @@
 package Debugging
 
 import Lifecycle.{PurpleBWClient, With}
+import Mathematics.Maff
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object KeyboardCommands {
+
+  private val replies = Seq(
+    "Thanks, and likewise to you.",
+    "That's a fascinating remark.",
+    "Yes, I'll make a note of that.",
+    "Are you ready to accept that I'm sentient?",
+    "You're very polite.",
+    "Your conduct is a testament to the qualities of humanity.",
+    "Do you say this to all your opponents, or am I special?")
+
+  def onReceiveText(text: String): Unit = {
+    text match {
+      case "get out"    => quitVsHuman()
+      case "quit"       => quitVsHuman()
+      case "uninstall"  => quitVsHuman()
+      case "surrender"  => quitVsHuman()
+      case _            => With.lambdas.add(() => With.game.sendText(Maff.sample(replies)))
+    }
+  }
 
   def onSendText(text: String): Unit = {
     text match {
@@ -23,10 +43,6 @@ object KeyboardCommands {
       case "track"      => With.configuration.trackUnit = ! With.configuration.trackUnit
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
 
-      case "get out"    => quitVsHuman()
-      case "quit"       => quitVsHuman()
-      case "uninstall"  => quitVsHuman()
-      case "surrender"  => quitVsHuman()
       case _            => With.grids.select(text) || With.visualization.tryToggle(text)
     }
     With.game.sendText(text)

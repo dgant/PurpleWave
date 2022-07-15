@@ -6,8 +6,8 @@ import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Shapes.Circle
 import Mathematics.{Maff, Shapes}
-import Mathematics.Shapes.{Circle, Ray}
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
@@ -87,36 +87,26 @@ object MicroPathing {
     unit          : FriendlyUnitInfo,
     radians       : Double,
     mustApproach  : Option[Pixel] = None,
-    requireSafety : Boolean = false,
-    exactDistance : Option[Double] = None): Option[Pixel] = {
+    requireSafety : Boolean = false): Option[Pixel] = {
 
-    val distance = exactDistance.getOrElse(waypointDistancePixels.toDouble)
     lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
 
     val enemyRangeNow = unit.tile.enemyRangeAgainst(unit)
-
     def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || pixel.tile.enemyRangeAgainst(unit) <= enemyRangeNow
 
-    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < distance && acceptableForSafety(a))) return mustApproach
+    if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) return mustApproach
 
-    val rayStart = unit.pixel
-    val waypointDistance = Math.max(distance, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
+    val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
     val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
     val terminus = rayRadians
       .indices
       .view
-      .map(i => {
-        val deltaRadians = rayRadians(i)
-        castRay(rayStart, lengthPixels = waypointDistance, radians = radians + deltaRadians, flying = unit.flying)
-      })
+      .map(i => castRay(unit.pixel, lengthPixels = waypointDistance, radians = radians + rayRadians(i), flying = unit.flying))
       .find(p => {
-        val terminus = p.clamp(unit.unitClass.dimensionMax / 2)
-        lazy val towardsTerminus = unit.pixel.project(terminus, 8)
-        lazy val travelDistanceTerminus = mustApproach.map(a => if (unit.flying) terminus.pixelDistance(a) else terminus.groundPixels(a))
-        (
-          terminus.pixelDistance(rayStart) >= 80
-          && (travelDistanceTerminus.forall(_ < travelDistanceCurrent.get))
-          && (acceptableForSafety(towardsTerminus)))
+        val clamped = p.clamp(unit.unitClass.dimensionMax / 2)
+        (unit.pixelDistanceCenter(clamped) >= 80
+          && (mustApproach.map(unit.pixelDistanceTravelling).forall(_ < travelDistanceCurrent.get))
+          && (acceptableForSafety(unit.pixel.project(clamped, 80))))
       })
     terminus
   }

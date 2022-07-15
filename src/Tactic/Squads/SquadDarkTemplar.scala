@@ -4,17 +4,16 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
-import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.IsMobileDetector
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Seconds
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitFilters.IsMobileDetector
 
 class SquadDarkTemplar extends Squad {
   lock.matcher = Protoss.DarkTemplar
   lock.counter = CountEverything
 
   override def launch(): Unit = {
-    if ( ! With.blackboard.darkTemplarHarass()) return
     if (bases().isEmpty) return
     lock.acquire()
   }
@@ -38,10 +37,16 @@ class SquadDarkTemplar extends Squad {
       .sortBy( ! _.owner.isEnemy)
     val base = basesSorted.head
     vicinity = base.heart.center
+    targets = Some(base.units)
+
     if ( ! base.owner.isEnemy) {
       val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
-      Maff.minBy(divisions)(_.centroidGround.groundPixels(centroidGround)).foreach(b => vicinity = b.centroidGround)
+      Maff.minBy(divisions)(_.centroidGround.groundPixels(centroidGround)).foreach(b => {
+        vicinity = b.centroidGround
+        targets = Some(b.enemies.toVector)
+      })
     }
+
     units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
   }
 }

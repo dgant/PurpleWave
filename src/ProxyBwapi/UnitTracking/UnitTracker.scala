@@ -30,6 +30,7 @@ final class UnitTracker {
         else                                                              bufferNeutral   .add(new ForeignUnitInfo(bwapiUnit, id))
       units(id) = Some(newUnit)
       newUnit.readProxy()
+      With.scouting.onUnitBirthTimings(newUnit)
     }
   }
   private def kill(id: Int): Unit = {

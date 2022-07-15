@@ -5,6 +5,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.Time.Seconds
 
 object Sneak extends Action {
   
@@ -17,8 +18,10 @@ object Sneak extends Action {
     && ! unit.alliesBattle.exists(Protoss.Arbiter)
     && unit.matchups.enemies.exists(e => e.complete && ! e.unitClass.isWorker && e.attacksAgainst(unit) > 0))
   
-  override protected def perform(unit: FriendlyUnitInfo) {
-    if ( ! unit.effectivelyCloaked || unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.inRange)) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    lazy val nearDetectionRange = unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.inRange)
+    lazy val nearMobileDetector = unit.matchups.enemyDetectors.exists(u => u.pixelDistanceEdge(unit) < u.sightPixels + u.topSpeed * Seconds(8)())
+    if ( ! unit.effectivelyCloaked || nearDetectionRange || nearMobileDetector) {
       Potshot.delegate(unit)
       Retreat.delegate(unit)
     }

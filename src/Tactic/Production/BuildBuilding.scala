@@ -157,8 +157,6 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
             canFight    = false
           })
         }
-        // TODO: Use locks instead
-        //desiredTile.foreach(With.groundskeeper.reserve(this, _, buildingClass))
       } else if (buildingClass.isTerran) {
         builder.get.intend(this, new Intention {
           toFinishConstruction = trainee

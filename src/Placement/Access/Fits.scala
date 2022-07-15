@@ -69,6 +69,6 @@ trait Fits {
     byZone        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
     byBase        .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
     byBuilding    .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
-    byLabelYes       .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
+    byLabelYes    .foreach(b => Maff.sortStablyInPlaceBy(b._2)(_.order))
   }
 }

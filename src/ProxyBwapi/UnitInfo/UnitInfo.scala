@@ -402,8 +402,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     cloakedOrBurrowed
     && ! ensnared
     && ! plagued
-    && (
-      if (isOurs) (
+    && (if (isOurs) (
         ! tile.enemyDetected
         && ! matchups.enemies.exists(_.orderTarget.contains(this))
         && ! With.bullets.all.exists(_.targetUnit.contains(this)))

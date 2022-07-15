@@ -6,13 +6,22 @@ import Mathematics.Points.Tile
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
-import Utilities.CountMap
+import Utilities.{?, CountMap}
 import Utilities.Time.{Forever, GameTime}
 import Utilities.UnitFilters.IsLandedBuilding
 
 trait Timings {
   private val enemyCompletions  = new CountMap[UnitClass](Forever())
   private val enemyContacts     = new CountMap[UnitClass](Forever())
+
+  def onUnitBirthTimings(unit: UnitInfo): Unit = {
+    if (unit.isEnemy) {
+      val latestStartFrame = With.frame - unit.unitClass.buildFrames + ?(unit.unitClass.isBuilding, unit.remainingCompletionFrames, 0)
+      val provenTimings = unit.unitClass.buildUnitsEnabling.view ++ unit.unitClass.buildUnitsSpent ++ unit.unitClass.buildUnitsBorrowed
+      // We could apply this recursively to be more thorough but I don't think we need to in practice
+      provenTimings.foreach(enemyCompletions.reduceTo(_, latestStartFrame))
+    }
+  }
 
   protected def updateTimings(): Unit = {
     With.units.enemy.filter(_.visible).foreach(u => enemyCompletions.reduceTo(u.unitClass, u.completionFrame))

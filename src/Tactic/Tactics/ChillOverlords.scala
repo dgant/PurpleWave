@@ -28,9 +28,6 @@ class ChillOverlords extends Tactic {
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = Maff.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
     val tile = base.map(b => Maff.sample(Circle(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
-    overlord.intend(this, new Intention {
-      toTravel = Some(tile.center)
-      canFlee = true
-    })
+    overlord.intend(this, new Intention { toTravel = Some(tile.center) })
   }
 }

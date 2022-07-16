@@ -4,5 +4,5 @@ import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterEnemy extends TargetFilter {
-  override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = actor.isEnemy
+  override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = target.isEnemy
 }

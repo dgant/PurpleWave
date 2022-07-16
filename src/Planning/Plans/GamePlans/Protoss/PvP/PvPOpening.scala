@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Protoss.PvP
 
 import Lifecycle.With
 import Macro.Requests.RequestUnit
+import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
@@ -632,7 +633,7 @@ class PvPOpening extends GameplanImperative {
           .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
           .getOrElse(
             if (getObservatory) Forever()
-            else if (shuttleFirst) With.scouting.ourDebut(Protoss.Shuttle) - Protoss.RoboticsSupportBay.buildFrames
+            else if (shuttleFirst) Maff.min(With.units.everOurs.filter(Protoss.Shuttle).map(_.completionFrame)).getOrElse(Forever()) - Protoss.RoboticsSupportBay.buildFrames
             else 0)
         get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg = bayStartFrame))
       }

@@ -27,6 +27,14 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   def isUnknownOrZerg     : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Zerg
 
   def isFriendly : Boolean = isUs || isAlly
+
+  def enemies: Iterable[PlayerInfo] = if (isUs) {
+    With.enemies
+  } else if (isEnemy) {
+    Players.all.filter(p => p != this && (p.isFriendly || With.strategy.isFfa))
+  } else {
+    With.enemies
+  }
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
 

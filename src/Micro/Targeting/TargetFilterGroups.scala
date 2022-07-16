@@ -5,6 +5,7 @@ import Micro.Targeting.FiltersRequired._
 
 object TargetFilterGroups {
   val filtersRequired = Vector(
+    TargetFilterEnemy,
     TargetFilterPossible,
     TargetFilterLarvaAndEgg,
     TargetFilterFocus,

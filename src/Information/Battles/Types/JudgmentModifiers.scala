@@ -15,7 +15,7 @@ object JudgmentModifiers {
 
   def apply(battle: Battle): Seq[JudgmentModifier] = {
     val output = new ArrayBuffer[JudgmentModifier]
-    def add(name: String, color: Color, modifier: Option[JudgmentModifier]) {
+    def add(name: String, color: Color, modifier: Option[JudgmentModifier]): Unit = {
       modifier.foreach(m => {
         m.name = name
         m.color = color
@@ -25,6 +25,7 @@ object JudgmentModifiers {
     add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
     add("HiddenTanks",  Colors.NeonIndigo,    hiddenTanks(battle))
     add("Commitment",   Colors.NeonViolet,    commitment(battle))
+    add("Choke",        Colors.NeonOrange,    choke(battle))
     output
   }
   // Prefer fighting
@@ -95,5 +96,18 @@ object JudgmentModifiers {
     def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
     val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))
+  }
+
+  // Avoid fighting across chokes/bridges
+  def choke(battleLocal: Battle): Option[JudgmentModifier] = {
+    val pUs       = battleLocal.us.centroidGround
+    val pFoe      = battleLocal.enemy.vanguardGround()
+    val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
+    if (pUs.zone == pFoe.zone) return None
+    if (edge.isEmpty) return None
+    val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
+    val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
+    val deltaMod  = Maff.clamp((ranks - 1)* 0.1, 0.0, 0.4)
+    Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
   }
 }

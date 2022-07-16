@@ -216,7 +216,6 @@ class PvPOpening extends GameplanImperative {
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
       } else {
-
         // Look for reasons to avoid making an Observer.
         // Don't stop to check if we already started an Observatory or Observers
         // because we can cancel and switch out of them at any time.
@@ -229,17 +228,18 @@ class PvPOpening extends GameplanImperative {
           getObservatory = false
           getObservers = false
         } else if (With.strategy.isFixedOpponent) {
-          // Obs is what we're here for, so let's not get too cute
+          // Obs is probably what we're here for, so let's not get too cute
         } else if (With.frame > GameTime(5, 15)() && ! With.fingerprints.dragoonRange()) {
           // If Dragoon range is supiciously absent we should prepare for DT
-        } else if (trackRecordLacks(With.fingerprints.dtRush) || enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGate, With.fingerprints.proxyGateway)) {
-          if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
-            getObservatory = false
-            getObservers = false
-          } else {
-            getObservatory =                  roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
-            getObservers = getObservatory &&  roll("SpeculativeObservers",    ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
-          }
+        } else if (trackRecordLacks(With.fingerprints.dtRush)) {
+          getObservatory = false
+          getObservers = false
+        } else if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
+          getObservatory = roll("SpeculativeObservatory",  0.2)
+          getObservers = getObservatory
+        } else {
+          getObservatory  =                   roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
+          getObservers    = getObservatory && roll("SpeculativeObservers",    ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
         }
       }
       shuttleSpeed = shuttleFirst && PvPTechBeforeRange() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.25)
@@ -627,11 +627,14 @@ class PvPOpening extends GameplanImperative {
         }
       }
       if (getReavers) {
-        get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg =
-          With.units.ours
-            .find(Protoss.Observatory)
-            .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
-            .getOrElse(if (getObservatory) Forever() else 0)))
+        val bayStartFrame = With.units.ours
+          .find(Protoss.Observatory)
+          .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
+          .getOrElse(
+            if (getObservatory) Forever()
+            else if (shuttleFirst) With.scouting.ourDebut(Protoss.Shuttle) - Protoss.RoboticsSupportBay.buildFrames
+            else 0)
+        get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg = bayStartFrame))
       }
       if (shuttleSpeed) {
         once(Protoss.Reaver)
@@ -666,17 +669,20 @@ class PvPOpening extends GameplanImperative {
       if (With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)) {
         requireMiningBases(2)
       } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
-        once(Math.min(2, units(Protoss.Gateway)), Protoss.DarkTemplar)
         sneakyCitadel()
         get(Protoss.TemplarArchives)
+        once(2, Protoss.DarkTemplar)
       }
       if (shouldExpand) { requireMiningBases(2) }
+      pumpWorkers(oversaturate = true)
       trainGatewayUnits()
       get(2, Protoss.Gateway)
 
     // 3/4-Gate Goon
     } else {
-      if (shouldExpand) { requireMiningBases(2) }
+      if (shouldExpand) {
+        requireMiningBases(2)
+      }
       once(2, Protoss.Dragoon)
       get(if (PvP3GateGoon()) 3 else 4, Protoss.Gateway)
       trainGatewayUnits()

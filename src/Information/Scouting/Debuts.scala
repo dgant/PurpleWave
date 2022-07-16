@@ -14,6 +14,6 @@ trait Debuts {
     With.units.enemy.filter(_.visible)            .foreach(u => enemyDebuts .reduceTo(u.unitClass, With.frame + u.remainingCompletionFrames))
   }
 
-  def ourDebut(buildables: Buildable*): Int = buildables.map(ourDebuts).min
-  def enemyDebut(buildables: Buildable*): Int = buildables.map(enemyDebuts).min
+  def ourDebut(buildables: Buildable*)    : Int = buildables.map(ourDebuts).min
+  def enemyDebut(buildables: Buildable*)  : Int = buildables.map(enemyDebuts).min
 }

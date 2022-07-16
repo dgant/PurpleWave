@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
+import Planning.Predicates.MacroFacts
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsMobileDetector
 import Utilities.UnitPreferences.PreferClose
@@ -13,6 +14,7 @@ class SquadCatchDTRunby extends Squad {
 
   def launch(): Unit = {
     if ( ! With.enemies.exists(_.isProtoss)) return
+    if ( ! MacroFacts.enemyDarkTemplarLikely) return
     lock.matcher = IsMobileDetector
     lock.counter = CountOne
     lock.preference = PreferClose(destination())

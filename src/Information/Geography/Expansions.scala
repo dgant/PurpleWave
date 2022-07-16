@@ -1,24 +1,48 @@
 package Information.Geography
 
+import Information.Geography.Pathfinding.PathfindProfile
+import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Tile
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import bwapi.Race
 
 trait Expansions {
+  private var _safeExpansionPaths: Vector[(Base, Tile, TilePath)] = Vector.empty
+  private var _safeExpansions : Vector[Base] = Vector.empty
   private var _preferredOurs  : Vector[Base] = Vector.empty
   private var _preferredEnemy : Vector[Base] = Vector.empty
 
   def preferredExpansionsOurs   : Vector[Base] = _preferredOurs
   def preferredExpansionsEnemy  : Vector[Base] = _preferredEnemy
+  def safeExpansions            : Vector[Base] = _safeExpansions
 
-  protected def updateExpansions(): Unit = {
-    _preferredOurs  = rankForPlayer(With.self)
-    _preferredEnemy = Maff.maxBy(With.enemies)(_.supplyUsed400).map(rankForPlayer).getOrElse(Vector.empty)
+  def eligibleExpansions(player: PlayerInfo): Iterable[Base] = {
+    val enemies = player.enemies.toVector
+    Maff.orElse(With.geography.neutralBases, With.geography.bases.filter(b => enemies.contains(b.owner)))
   }
 
-  def rankForPlayer(player: PlayerInfo): Vector[Base] = {
+  protected def updateExpansions(): Unit = {
+    _safeExpansionPaths = eligibleExpansions(With.self)
+      .filter(_.isNeutral)
+      .map(b => (b, Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).minBy(_.groundPixels(b.heart))))
+      .map(bh => (bh._1, bh._2, {
+          val profile = new PathfindProfile(bh._2, Some(bh._1.heart))
+          profile.threatMaximum = Some(0)
+          profile.employGroundDist = true
+          profile.lengthMaximum = Some(2 * bh._2.groundTiles(bh._1.heart))
+          profile.find
+        }))
+      .toVector
+    _safeExpansions = _safeExpansionPaths.filter(_._3.pathExists).map(_._1)
+    _preferredOurs  = rankForPlayer(With.self)
+    _preferredEnemy = Maff.maxBy(With.enemies)(_.supplyUsed400).map(rankForPlayer).getOrElse(Vector.empty)
+    _safeExpansions = _preferredOurs.filter(_safeExpansions.contains)
+  }
+
+  private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
     val tileHome        = if (player.isFriendly)  With.geography.home               else With.scouting.enemyHome
@@ -43,11 +67,12 @@ trait Expansions {
       val enemyFactor   = Maff.clamp(1.0 - distanceEnemy  / 256.0,  0.1, 1.0)
       val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
       val gasFactor     = if (adequateGas(base) || gasBases > gasBasesNeeded) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
+      val safeFactor    = if (_safeExpansions.contains(base)) 1.0 else 0.2
       val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards
       output
     }
 
-    val scores = Maff.orElse(With.geography.neutralBases, enemyBases).map(b => (b, scoreBase(b))).toVector.sortBy(- _._2)
+    val scores = eligibleExpansions(player).map(b => (b, scoreBase(b))).toVector.sortBy(- _._2)
     scores.map(_._1)
   }
 

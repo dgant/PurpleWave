@@ -316,7 +316,13 @@ object Commander {
     if (unit.carrying) {
       // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
-        unit.bwapiUnit.returnCargo()
+        val incompleteHall = unit.base.flatMap(_.townHall.filterNot(_.complete))
+        lazy val nextClosestFrames = Maff.min(With.geography.ourBases.view.flatMap(_.townHall).filter(_.complete).map(h => unit.pixelDistanceTravelling(h.exitTile) / unit.topSpeed))
+        if (incompleteHall.exists(hall => nextClosestFrames.forall(_ * 2 > hall.remainingCompletionFrames))) {
+          rightClick(unit, incompleteHall.get)
+        } else {
+          unit.bwapiUnit.returnCargo()
+        }
       }
     } else {
       if (resource.visible) {

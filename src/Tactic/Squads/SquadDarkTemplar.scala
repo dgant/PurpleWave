@@ -26,8 +26,7 @@ class SquadDarkTemplar extends Squad {
         u.isEnemy
         && u.complete
         && u.unitClass.isDetector
-        && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <=  u.sightPixels)))),
-    24)
+        && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))))
 
   def run(): Unit = {
     if (bases().isEmpty) { lock.release(); return }
@@ -37,7 +36,7 @@ class SquadDarkTemplar extends Squad {
       .sortBy( ! _.owner.isEnemy)
     val base = basesSorted.head
     vicinity = base.heart.center
-    targets = Some(base.units)
+    targets = Some(base.units.filter(_.isEnemy))
 
     if ( ! base.owner.isEnemy) {
       val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))

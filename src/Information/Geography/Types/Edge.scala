@@ -40,5 +40,7 @@ final class Edge(choke: Chokepoint) {
   private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)
   def pixelTowards(zone: Zone): Pixel = endPixels.minBy(p => if (endsWalkable) zone.distanceGrid.get(p.tile) else p.pixelDistanceSquared(zone.centroid.center))
 
+  def diameterPixels: Double = 2 * radiusPixels
+
   override def toString: String = f"Edge @ $pixelCenter (${radiusPixels.toInt}px)"
 }

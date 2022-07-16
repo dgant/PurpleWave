@@ -4,9 +4,9 @@ import Information.Battles.Types.GroupCentroid
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Utilities.UnitFilters.{IsGroundWarrior, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.UnitFilters.UnitFilter
 
 import scala.collection.mutable
 
@@ -41,6 +41,7 @@ trait UnitGroup {
   def meanDpf                           = _meanDpf()
   def storms                            = _storms()
   def pace01                            = _pace01()
+  def combatGroundFraction              = _combatGroundFraction()
   def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
   def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
 
@@ -64,7 +65,7 @@ trait UnitGroup {
   private val _hasGround                = new Cache(() => groupOrderable.exists( ! _.flying))
   private val _engagingOn               = new Cache(() => groupOrderable.exists(u =>                         u.matchups.targetsInRange.nonEmpty))
   private val _engagedUpon              = new Cache(() => groupOrderable.exists(u => u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty))
-  private val _widthPixels              = new Cache(() => groupOrderable.view.filter(IsGroundWarrior).filter(_.canMove).map(_.unitClass.dimensionMax).sum)
+  private val _widthPixels              = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidAir              = new Cache(() => GroupCentroid.air(centroidUnits(groupOrderable)))
   private val _centroidGround           = new Cache(() => GroupCentroid.ground(centroidUnits(groupOrderable)))
   private val _centroidKey              = new Cache(() => if (_hasGround()) centroidGround else centroidAir)
@@ -77,6 +78,9 @@ trait UnitGroup {
   private val _meanDpf                  = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(u => Math.max(u.dpfGround, u.dpfAir))))
   private val _storms                   = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
   private val _pace01                   = new Cache(() => Maff.clamp(groupOrderable.view.map(u => (u.pixel - u.previousPixel(_paceAge)) / Math.max(0.01, u.topSpeed)).foldLeft(Pixel(0, 0))(_ + _).length / _paceAge, -1, 1))
+  private val _combatValueAir           = new Cache(() => attackersCasters.filter(_.flying).map(_.subjectiveValue).sum)
+  private val _combatValueGround        = new Cache(() => attackersCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
+  private val _combatGroundFraction     = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
   private def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)
 
 }

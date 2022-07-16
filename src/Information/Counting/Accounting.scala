@@ -1,9 +1,11 @@
 package Information.Counting
 
 import Lifecycle.With
+import Mathematics.Maff
 import Performance.Cache
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.Time.Forever
 
 class Accounting extends TimedTask {
   
@@ -15,7 +17,7 @@ class Accounting extends TimedTask {
   var ourEstimatedTotalGas = 0.0
 
   var _lastFrame = 0
-  override def onRun(budgetMs: Long) {
+  override def onRun(budgetMs: Long): Unit = {
     val frameDiff = With.framesSince(_lastFrame)
     ourEstimatedTotalMinerals += frameDiff * ourIncomePerFrameMinerals
     ourEstimatedTotalGas      += frameDiff * ourIncomePerFrameGas
@@ -30,6 +32,9 @@ class Accounting extends TimedTask {
 
   def ourActiveMiners   : Int = ourActiveMinersCache()
   def ourActiveDrillers : Int = ourActiveDrillersCache()
+
+  def framesToMineMinerals(amount: Int): Int = Math.ceil(Maff.nanToN(amount / ourIncomePerFrameMinerals, Forever())).toInt
+  def framesToMineGas     (amount: Int): Int = Math.ceil(Maff.nanToN(amount / ourIncomePerFrameGas, Forever())).toInt
 
   private val ourPatchesMineralsCache = new Cache(() => if (With.frame == 0) 9 else With.geography.ourBases.map(_.minerals.size).sum)
   private val ourPatchesGasCache      = new Cache(() =>                             With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)

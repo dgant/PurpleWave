@@ -28,7 +28,7 @@ class BattleJudgment(battle: Battle) {
   }
 
   def calculateTarget: Double = {
-    Maff.clamp(battle.judgmentModifiers.view.map(_.targetDelta).sum, -1, 1)
+    Maff.clamp(battle.judgmentModifiers.view.map(_.targetDelta).sum, -0.9, 0.9)
   }
 
   def calculateConfidence11(score: Double, target: Double): Double = {

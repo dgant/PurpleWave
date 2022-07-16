@@ -25,7 +25,7 @@ class Pump(
     val unitsExtant         = With.macroCounts.oursExtant(unitClass)
     val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(IsAll(IsHatchlike, IsComplete)) else 0
     val builders            = getBuildersExisting.size + larvaSpawning
-    val unitsToAdd          = Seq(maximumConcurrently, 3 * builders * unitClass.copiesProduced).min
+    val unitsToAdd          = Seq(maximumConcurrently, (builders + 1) * unitClass.copiesProduced).min
     val unitsToRequest      = Seq(maximumTotal, maxDesirable, unitsExtant + unitsToAdd).min
     With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }

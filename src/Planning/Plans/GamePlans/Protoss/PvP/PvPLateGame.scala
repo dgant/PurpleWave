@@ -7,6 +7,7 @@ import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
 import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
@@ -26,6 +27,7 @@ class PvPLateGame extends GameplanImperative {
   var shouldExpand        : Boolean = _
   var shouldUpgrade       : Boolean = _
   var shouldReaver        : Boolean = _
+  var shouldContain       : Boolean = _
   var primaryTech         : Option[PrimaryTech] = None
 
   private def productionCapacity        : Int = unitsComplete(Protoss.Gateway) + ?(shouldReaver, 2 * unitsComplete(Protoss.RoboticsFacility) * Math.min(1, unitsComplete(Protoss.RoboticsSupportBay)), 0)
@@ -46,10 +48,14 @@ class PvPLateGame extends GameplanImperative {
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
+    shouldContain = (PvP3GateGoon() || PvP4GateGoon()) && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()
+    shouldContain &&= With.geography.enemyBases.filter(_.isStartLocation).exists(_.natural.exists(With.scouting.weControl))
+    shouldContain &&= ! fearDeath
     shouldAttack = PvPIdeas.shouldAttack
     shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
     shouldAttack &&= ! fearDeath
     shouldAttack ||= shouldExpand
+    shouldAttack ||= shouldContain
     if (units(Protoss.RoboticsFacility) * units(Protoss.TemplarArchives) == 0) {
       shouldSecondaryTech = miningBases > 2
       shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)

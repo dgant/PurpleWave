@@ -93,7 +93,7 @@ class SquadDefendBase(base: Base) extends Squad {
         formations += formationScour
       }
       formations += formationWithdraw
-      scour()
+      if (canScour) scour() else SquadAutomation.send(this)
     } else if (canScour) {
       lastAction = "Scour"
       formations += formationScour
@@ -120,9 +120,9 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   def scour(): Unit = {
-    val assigned = new UnorderedBuffer[FriendlyUnitInfo]()
-    val antiAir = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackAir))
-    val antiGround = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
+    val assigned    = new UnorderedBuffer[FriendlyUnitInfo]()
+    val antiAir     = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackAir))
+    val antiGround  = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
     targets.get.foreach(target => {
       val antiTarget = if (target.flying) antiAir else antiGround
       assigned.clear()

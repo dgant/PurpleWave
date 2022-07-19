@@ -236,12 +236,12 @@ object DefaultCombat extends Action {
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
 
-    val breakFormationThreshold = 64
-    val targetDistanceHere = target.map(unit.pixelDistanceEdge).getOrElse(0d)
-    val targetDistanceThere = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
-    val formationExists = unit.squad.exists(_.formations.nonEmpty)
-    val formationHelpsEngage = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
-    lazy val breakFormationToAttack = ! formationExists || target.exists(targ =>
+    val breakThreshold        = 64
+    val targetDistanceHere    = target.map(unit.pixelDistanceEdge).getOrElse(0d)
+    val targetDistanceThere   = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
+    val formationExists       = unit.squad.exists(_.formations.nonEmpty)
+    val formationHelpsEngage  = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
+    lazy val breakFormationToAttack = unit.battle.isDefined && ( ! formationExists || target.exists(targ =>
       // If we're not ready to attack yet, just slide into formation
       (readyToAttackTarget(unit) || unit.unitClass.melee) && (
         // Break if we are already in range
@@ -252,7 +252,7 @@ object DefaultCombat extends Action {
         || unit.confidence11 > confidenceChaseThreshold
         || unit.matchups.threats.forall(IsWorker)
         // Break if the fight has already begun and the formation isn't helping us
-        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))))
+        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded)))))
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {
       unit.agent.lastAction = Some(if (formationExists) "Break" else "Charge")
       return

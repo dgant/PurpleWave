@@ -20,6 +20,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   val plannedExpo             : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
     With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))
     || ourUnits.filter(IsBuilding).exists(u => ! townHallArea.contains(u.tileTopLeft))))
+  val centroid                : Tile              = Maff.centroidTiles(tiles)
   var natural                 : Option[Base]      = None
   var naturalOf               : Option[Base]      = None
   var townHall                : Option[UnitInfo]  = None

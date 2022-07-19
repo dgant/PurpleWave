@@ -25,7 +25,7 @@ trait Tugging {
   def enemyControls           (pixel  : Pixel)  : Boolean = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
   def weControl               (tile   : Tile)   : Boolean = weControl(tile.center)
   def enemyControls           (tile   : Tile)   : Boolean = enemyControls(tile.center)
-  def weControl               (base   : Base)   : Boolean = weControl(base.townHallArea.center) || ?(proximity(base) > 0.5, base.zone.exitNow, base.zone.entranceNow).map(_.pixelCenter).exists(weControl)
+  def weControl               (base   : Base)   : Boolean = weControl(base.townHallArea.center) || weControl(base.centroid) || ?(proximity(base) > 0.5, base.zone.exitNow, base.zone.entranceNow).map(_.pixelCenter).exists(weControl)
   def weControlOurNatural                       : Boolean = weControl(With.geography.ourNatural)
 
   def enemyThreatOrigin : Tile = _enemyThreatOrigin()

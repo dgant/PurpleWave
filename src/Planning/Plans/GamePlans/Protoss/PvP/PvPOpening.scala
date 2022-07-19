@@ -57,7 +57,7 @@ class PvPOpening extends GameplanImperative {
     /////////////////////
 
     // Swap into 2-Gate
-    if (units(Protoss.Assimilator) == 0) {
+    if (units(Protoss.Assimilator) == 0 && With.frame < Minutes(2)()) {
       if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.gasSteal, With.fingerprints.mannerPylon) && ! With.fingerprints.cannonRush()) {
         PvP1012.swapIn()
         PvPGateCoreRange.swapOut()
@@ -200,7 +200,7 @@ class PvPOpening extends GameplanImperative {
         swapOutOfDT = roll("DTSwap", 0.65)
       } else if (citadelComplete) {
         swapOutOfDT = roll("DTSwap", 0.75)
-      } else {
+      } else if (caught.nonEmpty) {
         swapOutOfDT = roll("DTSwap", 0.85)
       }
       if (swapOutOfDT) {
@@ -350,7 +350,7 @@ class PvPOpening extends GameplanImperative {
         if ( ! foundEnemyBase && ! PvPIdeas.attackFirstZealot) {
           scoutOn(Protoss.Gateway, quantity = 2)
         }
-      } else if (starts > 3) {
+      } else if (starts > 3 || enemyRecentStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)) {
         scoutOn(Protoss.Gateway)
       } else if ( ! zBeforeCore || ! PvPIdeas.attackFirstZealot) {
         scoutOn(Protoss.CyberneticsCore)
@@ -545,7 +545,7 @@ class PvPOpening extends GameplanImperative {
 
           if (PvPGateCoreTech()) {
             once(17, Protoss.Probe)
-            once(if (PvPDT()) Protoss.CitadelOfAdun else Protoss.RoboticsFacility)
+            if (PvPDT()) once(Protoss.CitadelOfAdun) else if (PvPRobo()) once(Protoss.RoboticsFacility) else get(Protoss.DragoonRange)
             once(18, Protoss.Probe)
             once(2, Protoss.Dragoon)
             once(3, Protoss.Pylon)

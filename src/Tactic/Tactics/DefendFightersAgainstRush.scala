@@ -17,11 +17,11 @@ class DefendFightersAgainstRush extends Tactic {
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.base.exists(_.isOurs)
   def launch(): Unit = {
-    lazy val fighters     = With.units.ours .filter(u => u.complete && IsWarrior(u) && u.base.exists(b => b.isOurs && b.harvestingArea.expand(1, 1).contains(u.pixel)))
+    lazy val fighters     = With.units.ours .filter(u => u.complete && IsWarrior(u) && u.base.exists(_.isOurs))
     lazy val cannons      = With.units.ours .filter(u => u.complete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
     lazy val aggressors   = With.units.enemy.filter(u => u.complete && inOurBase(u) && (IsWarrior(u) || With.fingerprints.workerRush()))
     lazy val workers      = With.units.ours .filter(u => u.complete && IsWorker(u))
-    lazy val threatening  = aggressors.filter(_.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200))
+    lazy val threatening  = aggressors.filter(a => a.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200) && a.base.exists(b => b.isOurs && b.harvestingArea.expand(1, 1).contains(a.pixel)))
     if ( ! fingerprintsRequiringFighterProtection.exists(_())) return
     if (fighters.isEmpty)     return
     if (fighters.size > 9)    return
@@ -38,6 +38,7 @@ class DefendFightersAgainstRush extends Tactic {
     defenders.acquire()
     defenders.units.foreach(_.intend(this, new Intention {
       toTravel = Some(target)
+      targets = Some(aggressors.toVector)
       canFlee = false
     }))
   }

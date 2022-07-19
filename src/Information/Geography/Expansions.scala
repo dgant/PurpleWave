@@ -32,7 +32,8 @@ trait Expansions {
           val profile = new PathfindProfile(bh._2, Some(bh._1.heart))
           profile.threatMaximum = Some(0)
           profile.employGroundDist = true
-          profile.lengthMaximum = Some(2 * bh._2.groundTiles(bh._1.heart))
+          profile.endDistanceMaximum = 32 + bh._2.groundTiles(bh._1.heart)
+          profile.lengthMaximum = Some(64)
           profile.find
         }))
       .toVector

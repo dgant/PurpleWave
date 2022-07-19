@@ -8,6 +8,7 @@ import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters._
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.?
 import Utilities.Time.{Minutes, Seconds}
 
 class MissionReaverDrop extends MissionDrop {
@@ -26,8 +27,10 @@ class MissionReaverDrop extends MissionDrop {
     .filter(Protoss.Reaver)
     .forall(reaver =>
       reaver.doomed
-      || itinerary.headOption.exists(_.units.view.map(u => if (u.isEnemy && IsWarrior(u) && u.canAttackGround) u.subjectiveValue else 0).sum > passengers.view.map(_.subjectiveValue).sum)
-      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.matchups.targetsInRange.exists(IsWorker)))
+      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.agent.shouldEngage)
+      || itinerary.headOption.exists(_.enemies.filter(IsWarrior).filter(_.canAttackGround).map(_.subjectiveValue).sum
+        * ?(reaver.matchups.targetsInRange.count(IsWorker) > 2, 1, 2)
+        >= passengers.view.map(_.subjectiveValue).sum))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
   val reaverLock = new LockUnits(this)

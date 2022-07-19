@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.IsAll
+import Utilities.UnitFilters.{IsAll, IsDetector}
 import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.Protoss
 import Tactic.Squads.SquadAutomation
@@ -17,9 +17,7 @@ class MissionDTDrop extends MissionDrop {
   dtLock.matcher = Protoss.DarkTemplar
   dtLock.counter = CountUpTo(2)
 
-  override def additionalItineraryConditions(base: Base): Boolean = {
-    ! base.units.exists(u => u.isEnemy && u.unitClass.isDetector)
-  }
+  override def additionalItineraryConditions(base: Base): Boolean = ! base.enemies.exists(IsDetector)
 
   override protected def recruit(): Unit = {
     transportLock.preference = PreferClose(vicinity)

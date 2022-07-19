@@ -53,8 +53,7 @@ trait Timings {
   }
 
   def earliestCompletion(unitClass: UnitClass): Int = {
-    enemyCompletions.get(unitClass).foreach(return _)
-    var earliestCompletionFrame = Forever()
+    var earliestCompletionFrame = enemyCompletions(unitClass)
     if (unitClass == Protoss.DarkTemplar) {
       // Super-fast DT finishes 4:40. BetaStar demonstrates this on replay.
       earliestCompletionFrame                                       =  GameTime(4, 40)()

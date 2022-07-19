@@ -44,12 +44,12 @@ object Skimulator {
 
     // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
-      val energy = if (unit.isFriendly) unit.energy else 100
-      val player = unit.player
-      val casts75 = Math.floor(unit.energy / 75)
-      val casts100 = Math.floor(unit.energy / 100)
-      val casts125 = Math.floor(unit.energy / 125)
-      val casts150 = Math.floor(unit.energy / 150)
+      val energy        = if (unit.isFriendly) unit.energy else 100
+      val player        = unit.player
+      val casts75       = Math.floor(unit.energy / 75)
+      val casts100      = Math.floor(unit.energy / 100)
+      val casts125      = Math.floor(unit.energy / 125)
+      val casts150      = Math.floor(unit.energy / 150)
       unit.skimStrength = Maff.nanToZero(unit.unitClass.skimulationValue * unit.totalHealth / unit.unitClass.maxTotalHealth)
 
       // Count basic upgrades

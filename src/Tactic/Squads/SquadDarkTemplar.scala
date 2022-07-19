@@ -5,7 +5,6 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.Protoss
-import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.IsMobileDetector
 
@@ -22,9 +21,8 @@ class SquadDarkTemplar extends Squad {
     With.geography.bases
       .filterNot(_.owner.isUs)
       .filterNot(_.metro.units.exists(u => u.isEnemy && IsMobileDetector(u)))
-      .filterNot(_.units.exists(u =>
-        u.isEnemy
-        && u.complete
+      .filterNot(_.enemies.exists(u =>
+        u.complete
         && u.unitClass.isDetector
         && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))))
 
@@ -32,11 +30,11 @@ class SquadDarkTemplar extends Squad {
     if (bases().isEmpty) { lock.release(); return }
     val basesSorted = bases()
       .sortBy(_.heart.center.groundPixels(centroidGround))
-      .sortBy(b => With.framesSince(b.lastFrameScoutedByUs) < Seconds(30)())
+      .sortBy(With.scouting.baseIntrigue)
       .sortBy( ! _.owner.isEnemy)
     val base = basesSorted.head
     vicinity = base.heart.center
-    targets = Some(base.units.filter(_.isEnemy))
+    targets = Some(base.enemies.toVector)
 
     if ( ! base.owner.isEnemy) {
       val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))

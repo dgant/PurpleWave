@@ -28,9 +28,20 @@ object ShowRushDistances extends DebugView {
   Neo Chupung-Ryeong: 32
   Plasma: 20 (probably)
   Tau Cross: 39
+
+  Known distances (tiles)
+  -----------------------
+  Aztec: 202 - 214
+  Benzene: 225
+  Circuit Breakers: 162 - 229
+  Eclipse: 207
+  Fighting Spirit: 165 - 222
+  Match Point: 209
+  Outsider: 159 - 177
+  Polypoid: 165 - 224
   
-  Known distances
-  ---------------
+  Known distances (px)
+  --------------------
   Andromeda: 4940 - 5404 - 6083                     --- Manhattan: 5280 - 6196 - 7520
   Arcadia: 4216 - 5216 - 6008
   Benzene: 6140

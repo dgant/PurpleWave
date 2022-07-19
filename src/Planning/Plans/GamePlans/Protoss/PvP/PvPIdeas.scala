@@ -85,7 +85,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       With.units.existsOurs(Protoss.RoboticsFacility) // It's part of our plan already
         || ( ! dtPrecedesObserver && ! PvPDT()) // Observers are just better if we can swing them
         || (dtPrecedesCannon && ! With.units.existsOurs(Protoss.Forge)) // Cannons are awful once DTs are already inside your base; Obs is better
-        || (cannonsComplete && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.units.exists(Protoss.PhotonCannon))) // We need to leave our base eventually
+        || (cannonsComplete && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base eventually
 
     if (enemyContainedInMain) status(f"EMainContain")
     if (enemyDarkTemplarLikely) status(f"ExpectDT@${Frames(expectedArrival)}")
@@ -110,7 +110,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
     } else if (dtArePossibility && (PvPDT() || PvP3GateGoon())) {
 
       // If DTs are already here, spam cannons and pray one sticks
-      if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.units.exists(u => u.isEnemy && Protoss.DarkTemplar(u)))) {
+      if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {
         status("DTArrived")
         get(Protoss.Forge)
         get(RequestUnit(Protoss.PhotonCannon, 4,

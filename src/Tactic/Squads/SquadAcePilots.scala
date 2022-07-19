@@ -87,7 +87,7 @@ class SquadAcePilots extends Squad {
     val unscoutedEnemy = getStaleBase(With.geography.enemyBases)
     if (unscoutedEnemy.nonEmpty) {
       activity = "AceMonitor"
-      val base = unscoutedEnemy.minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
+      val base = unscoutedEnemy.minBy(_.enemies.count(_.canAttackAir))
       vicinity = base.townHallArea.center
       SquadAutomation.send(this)
       return
@@ -108,7 +108,7 @@ class SquadAcePilots extends Squad {
       activity = "AceExplore"
       val base = unscoutedNeutral
         .sortBy(_.townHallArea.center.pixelDistanceSquared(centroidAir))
-        .minBy(_.units.count(u => u.isEnemy && u.canAttackAir))
+        .minBy(_.enemies.count(_.canAttackAir))
       vicinity = base.townHallArea.center
       SquadAutomation.send(this)
       return
@@ -118,7 +118,7 @@ class SquadAcePilots extends Squad {
   }
 
   private def getStaleBase(bases: Seq[Base]): Seq[Base] = {
-    bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(30)() && ! b.units.exists(u => u.isEnemy && u.canAttackAir))
+    bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(30)() && ! b.enemies.exists(_.canAttackAir))
   }
 
   private def chill(): Unit = {

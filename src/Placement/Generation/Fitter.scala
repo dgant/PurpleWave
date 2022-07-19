@@ -28,7 +28,7 @@ trait Fitter extends Fits {
   /**
     * Attempts to fit each of a sequence of templates in proximity order.
     */
-  def fitAndIndexProximity(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, zone: Zone): mutable.Buffer[Fit] = {
+  def fitAndIndexProximity(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, zone: Zone, maximumDistance: Int = 256): mutable.Buffer[Fit] = {
     fitAndIndex(order, maxFits, templates, x => new TileGeneratorProximity(from.subtract(x.width / 2, x.height / 2), zone))
   }
 

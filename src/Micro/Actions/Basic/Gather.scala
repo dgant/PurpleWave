@@ -12,7 +12,7 @@ import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
-import Utilities.Time.Seconds
+import Utilities.Time.{Minutes, Seconds}
 
 object Gather extends Action {
   
@@ -22,7 +22,7 @@ object Gather extends Action {
 
   val defenseRadiusPixels = 160
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
 
     def resource = unit.agent.toGather.get
 
@@ -44,6 +44,12 @@ object Gather extends Action {
           val alternativeMineral = Maff.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
           unit.agent.toGather = alternativeMineral.filterNot(threatenedAt).orElse(Some(resource))
         }
+      }
+
+      // Help initial scout get home
+      if (With.frame < Minutes(8)() && unit.base.exists(_.isEnemy) && unit.matchups.threats.exists( ! _.unitClass.melee) && unit.visibleToOpponents) {
+        Commander.gather(unit)
+        return
       }
 
       // Burrow from threats

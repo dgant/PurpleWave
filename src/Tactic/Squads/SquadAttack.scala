@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Utilities.UnitFilters.{IsProxied, IsWarrior}
+import Utilities.UnitFilters.{IsBuilding, IsProxied, IsWarrior}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 
@@ -36,11 +36,11 @@ class SquadAttack extends Squad {
     }
     // Horror proxies/Gas steals
     Maff.orElse(
-      Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.units.filter(u => u.isEnemy && u.unitClass.isBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center)),
+      Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.enemies.filter(IsBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center)),
       // Remote proxies
       if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(IsProxied).map(_.pixel))(_.groundPixels(With.geography.home.center)),
       // Highest scoring enemy base
-      Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.units.view.filter(_.isEnemy).filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center)),
+      Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.enemies.filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center)),
       // Threat option, if there's an army to pursue
       Some(With.scouting.enemyThreatOrigin.center).filter(unused => enemyNonTrollyThreats > 0)).headOption
       .getOrElse(With.scouting.enemyHome.center)

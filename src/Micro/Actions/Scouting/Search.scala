@@ -26,9 +26,10 @@ abstract class AbstractSearch extends Action {
   
   protected val boredomFrames: Int
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.matchups.threats.isEmpty && ! unit.intent.toScoutTiles.exists(_.explored)) {
       Move.consider(unit)
+      return
     }
 
     def nearestNeutralBases(count: Int): Iterable[Base] = {
@@ -40,12 +41,16 @@ abstract class AbstractSearch extends Action {
         .take(count)
     }
 
+    val bannedTiles = unit.intent.toScoutTiles.view
+      .flatMap(_.base).toSet.filter(b => b.isEnemy && b.scoutedByUs)
+      .flatMap(_.harvestingArea.tiles.filter(t => t.x > 0 && t.y > 0 && t.x < With.mapTileWidth && t.y < With.mapTileHeight))
+
     val tilesToScout = unit.intent.toScoutTiles
       .filter(tile =>
         With.grids.lastSeen.framesSince(tile) > boredomFrames
-        && With.grids.buildableTerrain.get(tile)
-        && (unit.enemyRangeGrid.get(tile) <= 0 || ( unit.cloaked && ! tile.enemyDetected))
-        && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, tile.center))
+        && tile.buildableTerrain
+        && (tile.enemyRangeAgainst(unit) <= 0 || ( unit.cloaked && ! tile.enemyDetected))
+        && ! bannedTiles.contains(tile)
         && tile.base.forall(base =>
           ! base.owner.isEnemy
           || ! base.owner.isZerg
@@ -53,12 +58,7 @@ abstract class AbstractSearch extends Action {
           || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0))
   
     if (tilesToScout.isEmpty) return
-  
-    val pulls = tilesToScout.map(tile => Gravity(
-      tile.center,
-      With.grids.lastSeen.framesSince(tile)))
-    
-    val force = pulls.map(_.apply(unit.pixel)).reduce(_ + _)
+    val force = tilesToScout.view.map(tile => Gravity(tile.center, With.grids.lastSeen.framesSince(tile))).map(_.apply(unit.pixel)).reduce(_ + _)
 
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
     val tileToScout = tilesToScout.minBy(_.center.pixelDistance(target))
@@ -71,6 +71,7 @@ abstract class AbstractSearch extends Action {
     profile.repulsors         = MicroPathing.getPathfindingRepulsors(unit)
     profile.lengthMaximum     = Some(20)
     profile.unit              = Some(unit)
+    profile.alsoUnwalkable    = bannedTiles
     val path = profile.find
     unit.agent.toTravel = Some(tileToScout.center)
     MicroPathing.tryMovingAlongTilePath(unit, path)

@@ -107,7 +107,7 @@ object JudgmentModifiers {
     if (edge.isEmpty) return None
     val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
-    val deltaMod  = Maff.clamp((ranks - 1)* 0.1, 0.0, 0.4)
+    val deltaMod  = Maff.clamp((ranks - 1)* 0.0125, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
   }
 }

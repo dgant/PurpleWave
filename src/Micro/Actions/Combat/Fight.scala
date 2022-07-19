@@ -12,7 +12,7 @@ object Fight extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canAttack || unit.canMove) && ! unit.agent.isScout
 
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     Follow.consider(unit)
     StrategicNuke.consider(unit)
     Cast.consider(unit)

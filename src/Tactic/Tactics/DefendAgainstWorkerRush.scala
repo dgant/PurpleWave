@@ -12,11 +12,10 @@ class DefendAgainstWorkerRush extends Tactic {
   val defenders = new LockUnits(this)
   defenders.matcher = IsWorker
   
-  def launch() {
+  def launch(): Unit = {
     val attackingWorkers = With.geography.ourBases
-      .flatMap(_.units.filter(u =>
-        u.isEnemy
-        && u.unitClass.isWorker
+      .flatMap(_.enemies.filter(u =>
+        u.unitClass.isWorker
         && u.matchups.targets.exists(ally =>
           (ally.unitClass.isBuilding || ally.friendly.exists(_.intent.toBuild.isDefined))
           && u.framesToGetInRange(ally) < 24 * 3)))

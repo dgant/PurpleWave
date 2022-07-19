@@ -8,6 +8,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.{Forever, Minutes}
+import Utilities.UnitFilters.IsBuilding
 
 final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
         val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
@@ -15,10 +16,10 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
         val radians           : Double            = Points.middle.radiansTo(townHallArea.center)
         val zone              : Zone              = With.geography.zoneByTile(townHallTile)
   lazy  val metro             : Metro             = With.geography.metros.find(_.bases.contains(this)).get
-  lazy  val economicValue     : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
-  lazy  val plannedExpo       : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
+  val economicValue           : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
+  val plannedExpo             : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
     With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))
-    || units.exists(u => u.isOurs && u.unitClass.isBuilding && ! townHallArea.contains(u.tileTopLeft))))
+    || ourUnits.filter(IsBuilding).exists(u => ! townHallArea.contains(u.tileTopLeft))))
   var natural                 : Option[Base]      = None
   var naturalOf               : Option[Base]      = None
   var townHall                : Option[UnitInfo]  = None
@@ -48,6 +49,9 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def scoutedByEnemy          : Boolean           = lastFrameScoutedByEnemy > 0
   def plannedExpoRecently     : Boolean           = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
   def resources               : Seq[UnitInfo]     = minerals.view ++ gas
+  def ourUnits                : Seq[UnitInfo]     = units.view.filter(_.isOurs)
+  def allies                  : Seq[UnitInfo]     = units.view.filter(_.isFriendly)
+  def enemies                 : Seq[UnitInfo]     = units.view.filter(_.isEnemy)
 
   private lazy val initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
 

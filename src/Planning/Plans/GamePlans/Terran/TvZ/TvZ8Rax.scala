@@ -2,8 +2,10 @@ package Planning.Plans.GamePlans.Terran.TvZ
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
+import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.GamePlans.Terran.RepairBunker
 import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
@@ -13,15 +15,12 @@ import Planning.Plans.Placement.{BuildBunkersAtEnemyNatural, BuildBunkersAtNatur
 import Planning.Plans.Scouting.ScoutAt
 import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
-import Utilities.UnitCounters.{CountExcept, CountUpTo}
-import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ8Rax
-import Tactic.Tactics.DefendFightersAgainstRush
 import Utilities.Time.GameTime
+import Utilities.UnitCounters.{CountExcept, CountUpTo}
 
 class TvZ8Rax extends GameplanTemplate {
 
@@ -29,7 +28,7 @@ class TvZ8Rax extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new MiningBasesAtLeast(2))
 
   class CanBunkerRush extends Or(
-    new Check(() => With.geography.enemyBases.exists(_.units.exists(u => u.isFriendly && u.is(Terran.Bunker)))),
+    new Check(() => With.geography.enemyBases.exists(_.allies.exists(Terran.Bunker))),
     new And(
       new FrameAtMost(GameTime(3, 15)()),
       new EnemiesAtMost(0, Zerg.SunkenColony),

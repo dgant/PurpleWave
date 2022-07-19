@@ -35,7 +35,7 @@ class MissionKillExpansion extends Mission {
     lock.acquire()
   }
 
-  def unitsRequired(base: Base): Int = Math.max(4, base.units.view.count(u => u.isEnemy && u.canAttack && ! u.unitClass.isWorker) * 3)
+  def unitsRequired(base: Base): Int = Math.max(4, base.enemies.view.count(u => u.canAttack && ! u.unitClass.isWorker) * 3)
 
   private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(b => b.metro != base.metro && ! b.natural.contains(base))
   private def baseCloserToOurArmy(base: Base): Boolean = base.heart.groundPixels(With.scouting.ourMuscleOrigin) + 320 < base.heart.groundPixels(With.scouting.enemyThreatOrigin)

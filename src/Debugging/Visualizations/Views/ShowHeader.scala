@@ -14,14 +14,14 @@ object ShowHeader extends DebugView {
     With.game.drawTextScreen(5,   1 * h, f"${With.game.getLatencyFrames} latency frames")
     With.game.drawTextScreen(80,  1 * h, f"${With.latency.turnSize} frames/turn")
     With.game.drawTextScreen(155, 1 * h, f"${With.performance.frameMeanMs}ms avg")
-    With.game.drawTextScreen(230, 1 * h, f"${With.performance.frameMaxMs}ms max")
-    With.game.drawTextScreen(305, 1 * h, f"${PurpleBWClient.framesBehind} frames back")
+    With.game.drawTextScreen(215, 1 * h, f"${With.performance.frameMaxMs}ms max")
+    With.game.drawTextScreen(275, 1 * h, f"${PurpleBWClient.framesBehind} frames back")
     With.game.drawTextScreen(375, 1 * h, clock)
     With.game.drawTextScreen(405, 1 * h, f"${With.frame}")
     With.game.drawTextScreen(5,   2 * h, f"+${With.configuration.frameLimitMs}ms: ${With.performance.framesOverShort}/320")
     With.game.drawTextScreen(80,  2 * h, f"+1000ms: ${With.performance.framesOver1000}/10")
     With.game.drawTextScreen(155, 2 * h, f"+10000ms: ${With.performance.framesOver10000}/1")
-    With.game.drawTextScreen(230, 2 * h, With.blackboard.status.get.mkString(", "))
-    With.game.drawTextScreen(5,   3 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
+    With.game.drawTextScreen(215, 2 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
+    With.game.drawTextScreen(5,   3 * h, With.blackboard.status.get.mkString(", "))
   }
 }

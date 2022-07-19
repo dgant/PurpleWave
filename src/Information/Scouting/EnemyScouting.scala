@@ -13,6 +13,6 @@ trait EnemyScouting {
   private var _enemyHasScoutedUsWithWorker = false
 
   protected def updateEnemyScouting(): Unit = {
-    _enemyHasScoutedUsWithWorker = _enemyHasScoutedUsWithWorker || With.geography.ourBases.exists(_.units.exists(u => u.isEnemy && IsWorker(u)))
+    _enemyHasScoutedUsWithWorker ||= With.geography.ourBases.exists(_.enemies.exists(IsWorker))
   }
 }

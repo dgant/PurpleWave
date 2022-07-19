@@ -11,8 +11,8 @@ import scala.collection.mutable
 
 class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = Vector.empty, val isGlobal: Boolean) {
   lazy val frameCreated: Int = With.frame
-  lazy val us = new Team(this, unitsUs)
-  lazy val enemy = new Team(this, unitsEnemy)
+  lazy val us     = new Team(this, unitsUs)
+  lazy val enemy  = new Team(this, unitsEnemy)
   lazy val teams: Vector[Team] = Vector(us, enemy)
   lazy val focus: Pixel = Maff.centroid(teams.map(_.vanguardAll()))
 
@@ -27,7 +27,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val skimulated       : Boolean               = isGlobal || With.configuration.skimulate
   lazy val logSimulation    : Boolean               = With.configuration.debugging
   lazy val speedMultiplier  : Double                = if (isGlobal) 1.0 else judgmentModifiers.map(_.speedMultiplier).product
-  lazy val judgmentModifiers: Seq[JudgmentModifier] = JudgmentModifiers(this)
+  lazy val judgmentModifiers: Seq[JudgmentModifier] = if (isGlobal) Seq.empty else JudgmentModifiers(this)
 
 
   ////////////////////////

@@ -147,7 +147,7 @@ class Tactician extends TimedTask {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
-        && b.metro.bases.view.flatMap(_.units).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
+        && b.metro.bases.view.flatMap(_.ourUnits).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
       val qualifiedClasses = if (With.enemies.exists(_.isTerran))
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
       else

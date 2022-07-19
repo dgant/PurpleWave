@@ -25,7 +25,7 @@ object UpdateBase {
     if (base.townHallArea.tiles.exists(_.visibleUnchecked)) {
       base.lastFrameScoutedByUs = With.frame
     }
-    if (base.units.exists(u => u.isOurs && u.unitClass.isBuilding && u.visibleToOpponents)) {
+    if (base.ourUnits.exists(u => u.unitClass.isBuilding && u.visibleToOpponents)) {
       base.lastFrameScoutedByEnemy = With.frame
     }
 

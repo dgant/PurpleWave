@@ -34,7 +34,7 @@ object SquadAutomation {
                 || squad.units.exists(u => t.unitClass.canAttack(u) && t.inRangeToAttack(u))))
           .sortBy(t => ! t.unitClass.isWorker)
           .sortBy(t => - squad.units.count(_.inRangeToAttack(t))),
-        SquadAutomation.rankForArmy(squad, to.base.map(_.units).getOrElse(Seq.empty).filter(_.isEnemy)))
+        SquadAutomation.rankForArmy(squad, to.base.map(_.enemies).getOrElse(Seq.empty)))
       .toSeq)
   }
 
@@ -61,7 +61,7 @@ object SquadAutomation {
       Maff.orElse(
         combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.view.filter(_.team.isEmpty),
         // If there's no battle (defenseless targets) then wipe the zone!
-        to.base.map(_.units.view.filter(_.isEnemy)).getOrElse(to.zone.units.view.filter(e => e.isEnemy && (if (e.flying) group.attacksAir else group.attacksGround)))).toVector
+        to.base.map(_.enemies).getOrElse(to.zone.units.view.filter(e => e.isEnemy && (if (e.flying) group.attacksAir else group.attacksGround)))).toVector
     output
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {

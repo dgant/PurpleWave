@@ -42,7 +42,7 @@ class Battles extends TimedTask {
 
   override def isComplete: Boolean = framesSinceRunning < 1 && _processingState.isFinalStep
 
-  override def onRun(budgetMs: Long) {
+  override def onRun(budgetMs: Long): Unit = {
     val timer = new Timer(budgetMs)
     while (timer.ongoing) {
       val task = stateTasks.get(_processingState)
@@ -59,7 +59,7 @@ class Battles extends TimedTask {
     }
   }
 
-  def measureReactionTime() {
+  def measureReactionTime(): Unit = {
     estimationRuntimes.enqueue(With.framesSince(lastEstimationCompletion))
     while (estimationRuntimes.sum > With.reaction.runtimeQueueDuration) { estimationRuntimes.dequeue() }
     lastEstimationCompletion = With.frame

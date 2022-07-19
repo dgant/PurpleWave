@@ -7,7 +7,7 @@ import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon}
+import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand}
 import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
@@ -101,6 +101,10 @@ class PvPLateGame extends GameplanImperative {
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString.replaceAll("Tech", "")).foreach(status)
     PvPIdeas.requireTimelyDetection()
+    if (recentlyExpandedFirst && PvPCoreExpand() && units(Protoss.Gateway) < 3) {
+      doTrainArmy()
+      get(3, Protoss.Gateway)
+    }
   }
 
   override def executeMain(): Unit = {

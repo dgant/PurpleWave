@@ -268,6 +268,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       case Visibility.InvisibleBurrowed => _burrowed = true                 ; _alive = true; _detected = false
       case Visibility.InvisibleNearby   => _burrowed = false                ; _alive = true; _detected = false
       case Visibility.InvisibleMissing  => _burrowed = false                ; _alive = true; _detected = false
+      case Visibility.Hypothetical      => _burrowed = false                ; _alive = true; _detected = false
       case Visibility.Dead              => _alive = false
     }
   }

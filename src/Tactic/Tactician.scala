@@ -43,6 +43,7 @@ class Tactician extends TimedTask {
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
   private val ejectScout                = addPriorityTactic(new SquadEjectScout)
   private val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
+  private val backstabProxy             = addPriorityTactic(new SquadBackstabProxy)
   private val defendAgainstProxy        = addPriorityTactic(new DefendAgainstProxy)
   private val defendFightersAgainstRush = addPriorityTactic(new DefendFightersAgainstRush)
   private val defendAgainstWorkerRush   = addPriorityTactic(new DefendAgainstWorkerRush)

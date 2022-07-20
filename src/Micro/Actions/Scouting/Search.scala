@@ -43,7 +43,7 @@ abstract class AbstractSearch extends Action {
 
     val bannedTiles = unit.intent.toScoutTiles.view
       .flatMap(_.base).toSet.filter(b => b.isEnemy && b.scoutedByUs)
-      .flatMap(_.harvestingArea.tiles.filter(t => t.x > 0 && t.y > 0 && t.x < With.mapTileWidth && t.y < With.mapTileHeight))
+      .flatMap(_.harvestingTrafficTiles)
 
     val tilesToScout = unit.intent.toScoutTiles
       .filter(tile =>

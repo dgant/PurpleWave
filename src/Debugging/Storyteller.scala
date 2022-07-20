@@ -23,7 +23,7 @@ import scala.io.Source
 
 class Storyteller {
 
-  trait IStory { def update(): Unit}
+  trait IStory { def update(): Unit }
 
   class Story[T](label: String, currentValue: () => T, stringify: (T) => String = (x: T) => x.toString) extends IStory {
     var valueLast: T = _
@@ -54,7 +54,8 @@ class Storyteller {
   lazy val rushDistance = f"Rush distances on ${With.mapCleanName}"
   val stories: Seq[IStory] = Seq(
     new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                              _.map(_.name).mkString(", ")),
-    new Story[Iterable[Double]]         (rushDistance,          () => With.geography.rushDistances,                                                                                _.map(d => (d / 32).toInt.toString).mkString(", ")),
+    new Story[Iterable[Int]]            (rushDistance,          () => With.geography.rushDistances,                                                                                _.map(_.toString).mkString(", ")),
+    new Story                           ("Mean rush distance",  () => With.strategy.rushDistanceMean),
     new Story                           ("Playbook",            () => With.configuration.playbook),
     new Story                           ("Policy",              () => With.configuration.playbook.policy),
     new Story                           ("Enemy race",          () => With.enemy.raceCurrent),
@@ -217,10 +218,10 @@ class Storyteller {
     logMemoryUsage()
 
     try {
-      tell(f"This copy of PurpleWave was packaged for distribution on ${Source.fromFile(With.bwapiData.ai + "timestamp.txt").getLines.mkString}")
+      tell(f"This copy of PurpleWave was packaged for distribution on ${Source.fromFile(f"${With.bwapiData.ai}timestamp.txt").getLines.mkString}")
     } catch { case exception: Exception => tell("No deployment timestamp available") }
     try {
-      tell(f"This copy of PurpleWave came from Git revision ${Source.fromFile(With.bwapiData.ai + "revision.txt").getLines.mkString}")
+      tell(f"This copy of PurpleWave came from Git revision ${Source.fromFile(f"${With.bwapiData.ai}revision.txt").getLines.mkString}")
     } catch { case exception: Exception => tell("No deployment Git revision available") }
     tell("JBWAPI autocontinue: " + Main.jbwapiConfiguration.getAutoContinue)
     tell("JBWAPI debugConnection: " + Main.jbwapiConfiguration.getDebugConnection)

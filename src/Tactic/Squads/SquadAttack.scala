@@ -12,7 +12,7 @@ class SquadAttack extends Squad {
 
   override def launch(): Unit = { /* This squad is given its recruits externally */ }
 
-  override def run() {
+  override def run(): Unit = {
     if (units.isEmpty) return
     vicinity = getVicinity
     SquadAutomation.targetFormAndSend(this)

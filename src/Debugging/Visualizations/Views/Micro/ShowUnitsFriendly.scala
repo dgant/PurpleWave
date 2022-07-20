@@ -127,7 +127,7 @@ object ShowUnitsFriendly extends DebugView {
         DrawMap.box(t.topLeft, t.bottomRight, unit.unitColor)
         DrawMap.line(unit.pixel, t.pixel, unit.unitColor)
       })
-      unit.orderTargetPixel.foreach(t => {
+      unit.orderTargetPixel.filter(p => p.x > 0 && p.y > 0).foreach(t => {
         val tp = if (t.pixelDistance(unit.pixel) < 16) t else t.project(unit.pixel, 2)
         DrawMap.line(tp, unit.pixel, unit.unitColor)
         DrawMap.circle(t, 2, unit.unitColor)

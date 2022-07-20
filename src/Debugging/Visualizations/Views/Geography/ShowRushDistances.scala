@@ -37,6 +37,7 @@ object ShowRushDistances extends DebugView {
   Eclipse: 207
   Fighting Spirit: 165 - 222
   Match Point: 209
+  Neo Sylphid:
   Outsider: 159 - 177
   Polypoid: 165 - 224
   
@@ -87,9 +88,9 @@ object ShowRushDistances extends DebugView {
         Vector(
           With.mapFileName,
           "",
-          distances.min.toInt.toString,
-          Maff.mean(distances).toInt.toString,
-          distances.max.toInt.toString
+          distances.min.toString,
+          Maff.mean(distances.map(_.toDouble)).toInt.toString,
+          distances.max.toString
         )))
     DrawScreen.table(x, y + With.visualization.lineHeightSmall,
       Vector(

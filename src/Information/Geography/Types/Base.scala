@@ -57,6 +57,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   private lazy val initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
 
   lazy val harvestingArea = new TileRectangle(initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+  lazy val harvestingTrafficTiles = harvestingArea.tiles.filter(t => t.x > 0 && t.y > 0 && t.x < With.mapTileWidth && t.y < With.mapTileHeight).toSet
 
   lazy val heart: Tile = {
     val centroid = if (initialResources.isEmpty) townHallArea.center.subtract(Points.middle) else Maff.centroid(initialResources.view.map(_.pixel))

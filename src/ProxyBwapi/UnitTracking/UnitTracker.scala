@@ -10,12 +10,14 @@ import ProxyBwapi.UnitInfo._
 import scala.collection.JavaConverters._
 
 final class UnitTracker {
-  private val bwapiIds        = 10000 // BWAPI IDs are on [0, 10k) and don't repeat
+  val maxHypotheticals = 100
+  private val bwapiIds        = 10000 + maxHypotheticals // BWAPI IDs are on [0, 10k) and don't repeat
   private val units           = Array.fill[Option[UnitInfo]](bwapiIds)(None)
   private val bufferFriendly  = new UnorderedBuffer[FriendlyUnitInfo](bwapiIds)
   private val bufferEnemy     = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
   private val bufferNeutral   = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
   private val bufferHistoric  = new UnorderedBuffer[HistoricalUnitInfo](bwapiIds)
+  private val hypothetical    = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
 
   @inline def getId(id: Int): Option[UnitInfo] = units(id)
   @inline def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else units(unit.getID)

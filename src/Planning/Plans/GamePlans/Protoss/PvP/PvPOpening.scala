@@ -3,7 +3,6 @@ package Planning.Plans.GamePlans.Protoss.PvP
 import Lifecycle.With
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import ProxyBwapi.Races.Protoss
@@ -33,6 +32,7 @@ class PvPOpening extends GameplanImperative {
   var shuttleSpeed      : Boolean = false
   // DT
   var swapOutOfDT       : Boolean = false
+  var greedyDT          : Boolean = false
 
   override def activated: Boolean = true
   override def completed: Boolean = { complete ||= bases > 1; complete }
@@ -81,19 +81,16 @@ class PvPOpening extends GameplanImperative {
       }
     } else {
       if (units(Protoss.CyberneticsCore) == 0) {
-        zBeforeCore = With.geography.startLocations.size < 3
-        zBeforeCore &&= ! PvPDT()
-        zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
-        zBeforeCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
-        zBeforeCore ||= PvPGateCoreGate() || PvPCoreExpand() || PvP3GateGoon() || PvP4GateGoon()
+        zBeforeCore = enemyRecentStrategy(With.fingerprints.twoGate99, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zBeforeCore &&= ! PvPGateCoreTech()
+        zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
+        zBeforeCore ||= With.fingerprints.twoGate()
+        zBeforeCore ||= PvPGateCoreGate()
       }
       if (unitsComplete(Protoss.CyberneticsCore) == 0) {
-        zAfterCore = zBeforeCore
-        zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
-        zAfterCore ||= With.fingerprints.mannerPylon()
-        zAfterCore ||= With.fingerprints.gasSteal()
-        zAfterCore ||= enemyRecentStrategy(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
+        zAfterCore = true
+        zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)
+        zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zAfterCore ||= PvPGateCoreGate() || PvPGateCoreTech() || PvPDT()
       }
       if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) < 1) {
@@ -136,28 +133,20 @@ class PvPOpening extends GameplanImperative {
       PvP5Zealot.swapOut()
       (if (Seq(Heartbreak, Roadkill).exists(_()) || roll("1012ToGateCoreGate", 0.35)) PvPGateCoreGate else PvPGateCoreRange).swapIn()
     }
-    // If we catch them going Robo against our DT, go goon-only
-    if (PvPDT() && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
-      PvPDT.swapOut()
-      (if (roll("SwapDTInto4Gate", 0.5)) PvP4GateGoon else PvP3GateGoon).swapIn()
-      cancel(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
-      if (enemies(Protoss.Observer) > 0 || enemies(Protoss.Observatory) > 0) {
-        cancel(Protoss.DarkTemplar)
-      }
-    }
     // Goon+Obs is the strongest punishment against badly hidden DT openers.
     // A glimpse of Citadel doesn't sufficiently justify switching into Obs for its own sake,
     // as the Citadel could be a fake and the investment is a lot less than making even one Observer,
     // but a switch into full-blown Robotics at least lets us benefit from the investment if the Citadel was a fake
-    if (employing(PvP3GateGoon, PvP4GateGoon) && enemies(Protoss.CitadelOfAdun) > 0 && units(Protoss.Gateway) < 3) {
+    if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && enemies(Protoss.CitadelOfAdun) > 0 && units(Protoss.Gateway) < 3) {
       if (roll("SwapGateIntoRoboVsCitadel", 0.3)) {
+        PvPCoreExpand.swapOut()
         PvP3GateGoon.swapOut()
         PvP4GateGoon.swapOut()
         PvPRobo.swapIn()
       }
     }
     // Robo is a very middle-of-the-road build, and has a few pointed weaknesses.
-    // It's good against opponents playing diverse strategies but unimpressive against one-dimensional opponents.
+    // It's good against opponents playing diverse strategies bu3t unimpressive against one-dimensional opponents.
     if (PvPRobo()
       && upgradeStarted(Protoss.DragoonRange)
       && units(Protoss.RoboticsFacility) == 0
@@ -187,25 +176,37 @@ class PvPOpening extends GameplanImperative {
         }
       }
     }
+    // If we catch them going Robo against our DT, go goon-only
+    if (PvPDT() && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
+      PvPDT.swapOut()
+      (if (roll("SwapDTInto4Gate", 0.5)) PvP4GateGoon else PvP3GateGoon).swapIn()
+      cancel(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
+      if (enemies(Protoss.Observer) > 0 || enemies(Protoss.Observatory) > 0) {
+        cancel(Protoss.DarkTemplar)
+      }
+    }
     // Oops. We let them scout our DT rush. Maybe we switch tech advantageously
     if (PvPDT() && scoutCleared && unitsComplete(Protoss.Dragoon) > 0) {
       val caught = With.units.ours.filter(u => u.isAny(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && u.knownToOpponents && ! u.visibleToOpponents).toVector
       val archivesComplete  = caught.exists(c => Protoss.TemplarArchives(c) &&    c.complete)
       val archivesStarted   = caught.exists(c => Protoss.TemplarArchives(c) &&  ! c.complete)
       val citadelComplete   = caught.exists(c => Protoss.CitadelOfAdun(c)   &&    c.complete)
-
+      val maybeMirror       = enemyRecentStrategy(With.fingerprints.dtRush) && ! With.fingerprints.robo()
+      val mirrorMultiplier  = ?(maybeMirror, 0.25, 1.0)
       if (archivesComplete) {
         // We've come too far; no point switching
       } else if (archivesStarted) {
-        swapOutOfDT = roll("DTSwap", 0.65)
+        swapOutOfDT = roll("DTSwap", 0.65 * mirrorMultiplier)
       } else if (citadelComplete) {
-        swapOutOfDT = roll("DTSwap", 0.75)
+        swapOutOfDT = roll("DTSwap", 0.75 * mirrorMultiplier)
       } else if (caught.nonEmpty) {
-        swapOutOfDT = roll("DTSwap", 0.85)
+        swapOutOfDT = roll("DTSwap", 0.85 * mirrorMultiplier)
       }
       if (swapOutOfDT) {
         PvPDT.swapOut()
-        if ( ! citadelComplete && roll("DTToFE", 0.6)) {
+        if (maybeMirror && roll("DTToRobo", 0.6)) {
+          PvPRobo.swapIn()
+        } else if ( ! citadelComplete && roll("DTToFE", 0.6)) {
           PvPCoreExpand.swapIn()
         } else if (roll("DTTo4Gate", 0.4)) {
           PvP4GateGoon.swapIn()
@@ -227,7 +228,8 @@ class PvPOpening extends GameplanImperative {
       getObservers = true
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
         getReavers = ! With.fingerprints.dtRush()
-        shuttleFirst = getReavers
+        //shuttleFirst = getReavers
+        shuttleFirst = false
       }
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
@@ -260,23 +262,24 @@ class PvPOpening extends GameplanImperative {
       }
       shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.0)
 
-      shouldExpand = unitsComplete(Protoss.Gateway) >= 2 && unitsComplete(Protoss.Reaver) > 0
+      shouldExpand = unitsComplete(Protoss.Reaver) > 0 || ( ! getReavers && unitsComplete(IsWarrior) > 5)
       shouldExpand &&= safeToMoveOut
       shouldExpand &&= (
         (With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0)
         || (PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0))
       shouldExpand &&= ! shuttleSpeed
       shouldExpand &&= Protoss.DragoonRange()
-      shouldExpand ||= unitsComplete(Protoss.Reaver) >= 2
+      shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
       shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
+      greedyDT = ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0
-      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeToMoveOut || With.scouting.enemyProximity < 0.75)
-      shouldExpand ||= upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(IsWarrior) >= 20
+      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeAtHome || With.scouting.enemyProximity < 0.75)
+      shouldExpand ||= greedyDT
     } else if (PvP3GateGoon()) {
       shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6 && safeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContainedInMain, 14, 20), 28)
+      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
     shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
@@ -285,16 +288,17 @@ class PvPOpening extends GameplanImperative {
     shouldAttack = PvPIdeas.shouldAttack
     // Don't attack if we're also dropping
     shouldAttack &&= ! upgradeStarted(Protoss.ShuttleSpeed)
-    // Don't attack with just Gateway units if doing tech build vs non-tech one gate core
+    // Don't attack off 1-Gate Core if they've mustered any defense whatsoever
     shouldAttack &&= ! (employing(PvPGateCoreRange, PvPGateCoreTech)
-      && units(Protoss.CitadelOfAdun, Protoss.RoboticsFacility) > 0
+      && enemiesComplete(IsWarrior) > 0
+      && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) < 3
       && unitsComplete(Protoss.DarkTemplar) == 0
-      && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) == 0
-      && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
+      && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
+      && unitsComplete(IsWarrior) < 8
       && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural
     shouldAttack ||= shouldExpand
-    // 2-Gate vs 1-Gate core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
+    // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
     shouldAttack &&= ! (With.frame > GameTime(5, 10)()
       && PvP1012()
       && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
@@ -337,7 +341,9 @@ class PvPOpening extends GameplanImperative {
     // Emergency DT reactions //
     ////////////////////////////
 
-    PvPIdeas.requireTimelyDetection()
+    if ( ! greedyDT) {
+      PvPIdeas.requireTimelyDetection()
+    }
 
     //////////////
     // Scouting //
@@ -392,8 +398,7 @@ class PvPOpening extends GameplanImperative {
 
     if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99) && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
       status("99Defense")
-      pumpSupply()
-      pumpWorkers()
+      gasLimitCeiling(200)
       if (units(Protoss.Gateway) < 2 || unitsComplete(Protoss.Probe) < 15) {
         cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.DragoonRange)
         gasWorkerCeiling(0)
@@ -406,11 +411,16 @@ class PvPOpening extends GameplanImperative {
           gasWorkerCeiling(2)
         }
       }
-      gasLimitCeiling(200)
-      get(2, Protoss.Gateway)
+      once(8, Protoss.Probe)
+      once(Protoss.Pylon)
+      once(10, Protoss.Probe)
+      once(Protoss.Gateway)
+      once(11, Protoss.Probe)
+      once(2, Protoss.Gateway)
+      pumpSupply()
+      pumpWorkers(oversaturate = true)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
-      buildBatteriesAtMain(1, DefendHall)
       get(Protoss.Assimilator)
       get(Protoss.CyberneticsCore)
       get(3, Protoss.Gateway)
@@ -545,7 +555,7 @@ class PvPOpening extends GameplanImperative {
 
           if (PvPGateCoreTech()) {
             once(17, Protoss.Probe)
-            if (PvPDT()) once(Protoss.CitadelOfAdun) else if (PvPRobo()) once(Protoss.RoboticsFacility) else get(Protoss.DragoonRange)
+            if (PvPDT()) sneakyCitadel() else if (PvPRobo()) once(Protoss.RoboticsFacility) else get(Protoss.DragoonRange)
             once(18, Protoss.Probe)
             once(2, Protoss.Dragoon)
             once(3, Protoss.Pylon)
@@ -593,9 +603,6 @@ class PvPOpening extends GameplanImperative {
         gasWorkerCeiling(1)
       }
       else if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
-        gasWorkerCeiling(2)
-      }
-      else if (PvPGateCoreTech() && PvPDT() && units(Protoss.CitadelOfAdun) == 0) {
         gasWorkerCeiling(2)
       }
       if (PvPCoreExpand() && (upgradeStarted(Protoss.DragoonRange) || gas >= 200)) {
@@ -677,12 +684,16 @@ class PvPOpening extends GameplanImperative {
       } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
         sneakyCitadel()
         get(Protoss.TemplarArchives)
-        once(2, Protoss.DarkTemplar)
+        once(Math.min(2, unitsComplete(Protoss.Gateway)), Protoss.DarkTemplar)
+      }
+      if (unitsComplete(Protoss.Gateway) < 2) {
+        trainGatewayUnits()
       }
       if (shouldExpand) { requireMiningBases(2) }
       pumpWorkers(oversaturate = true)
       trainGatewayUnits()
       get(2, Protoss.Gateway)
+      requireMiningBases(2)
 
     } else if (PvPCoreExpand()) {
       if (shouldExpand) {
@@ -696,6 +707,10 @@ class PvPOpening extends GameplanImperative {
     // 3/4-Gate Goon
     } else {
       if (shouldExpand) {
+        if (PvP4GateGoon()) {
+          // PvPIdeas should be telling us when we need this anyway, but until it does so correctly, this is the workaround.
+          buildCannonsAtNatural(1)
+        }
         requireMiningBases(2)
       }
       once(2, Protoss.Dragoon)
@@ -722,10 +737,6 @@ class PvPOpening extends GameplanImperative {
     if (zAfterCore && zBeforeCore) once(2, Protoss.Zealot)
     else if (zAfterCore || zBeforeCore) once(Protoss.Zealot)
     once(Protoss.Dragoon)
-    if (upgradeComplete(Protoss.ZealotSpeed, 1, 2 * Protoss.Zealot.buildFrames)) {
-      pump(Protoss.Dragoon, 6, maximumConcurrently = 2)
-      pump(Protoss.Zealot, 12)
-    }
     pump(Protoss.Dragoon)
     pump(Protoss.Zealot)
   }

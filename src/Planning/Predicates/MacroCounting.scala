@@ -69,6 +69,10 @@ trait MacroCounting {
     With.units.countOurs(IsAll(IsComplete, IsAny(matchers: _*)))
   }
 
+  def unitsCompleteFor(frames: Int, matchers: UnitFilter*): Int = {
+    With.units.countOurs(IsAll(IsCompleteFor(frames), IsAny(matchers: _*)))
+  }
+
   def unitsEver(matchers: UnitFilter*): Int = {
     With.units.countEverOurs(_.isAny(matchers: _*))
   }

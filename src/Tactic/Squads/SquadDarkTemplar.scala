@@ -38,9 +38,9 @@ class SquadDarkTemplar extends Squad {
 
     if ( ! base.owner.isEnemy) {
       val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
-      Maff.minBy(divisions)(_.centroidGround.groundPixels(centroidGround)).foreach(b => {
-        vicinity = b.centroidGround
-        targets = Some(b.enemies.toVector)
+      Maff.minBy(divisions)(_.centroidGround.groundPixels(centroidGround)).foreach(division => {
+        vicinity = division.centroidGround
+        targets = Some(division.enemies.toVector)
       })
     }
 

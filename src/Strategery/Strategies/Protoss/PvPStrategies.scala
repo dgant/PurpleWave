@@ -53,22 +53,23 @@ object PvPRobo extends PvPStrategy {
 }
 object PvPDT extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo, With.fingerprints.forgeFe)
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate))
   override def rushDistanceMinimum: Double = 200 // Maybe extend if ramp is high ground
+  override def minimumGamesVsOpponent: Int = 1
 }
 object PvP3GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange, PvPGateCoreGate))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def minimumGamesVsOpponent: Int = 2
+  override def minimumGamesVsOpponent: Int = 1
 }
 object PvP4GateGoon extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Aztec, CircuitBreaker, Destination, Roadrunner, MatchPoint)
-  override def minimumGamesVsOpponent: Int = 2
+  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Aztec, Destination, Roadrunner, MatchPoint)
+  override def minimumGamesVsOpponent: Int = 1
 }
 
 //////////////

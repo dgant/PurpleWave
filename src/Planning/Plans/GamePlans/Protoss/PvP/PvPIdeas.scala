@@ -24,7 +24,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def attackFirstZealot: Boolean = trackRecordLacks(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
 
-  def enemyContainedInMain: Boolean = With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(b => (Seq(b) ++ b.natural).exists(With.scouting.weControl))
+  def enemyContained: Boolean = With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(b => (Seq(b) ++ b.natural).exists(With.scouting.weControl))
 
   def recentlyExpandedFirst: Boolean = With.scouting.weExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)()
 
@@ -73,9 +73,9 @@ object PvPIdeas extends MacroActions with MacroCounting {
   val cannonSafetyFrames  : Int = Seconds(10)()
 
   def requireTimelyDetection(): Unit = {
-    val dtArePossibility    = enemyDarkTemplarLikely || enemyContainedInMain || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
+    val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
     val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
-    val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else if (enemyContainedInMain) lateOneBaseDTFrame else twoBaseDTFrame
+    val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     val framesUntilArrival  = expectedArrival - With.frame
     val framesUntilObserver = framesUntilUnit(Protoss.Observer)
     val dtPrecedesCannon    = framesUntilArrival < framesUntilUnit(Protoss.PhotonCannon) + cannonSafetyFrames
@@ -87,7 +87,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
         || (dtPrecedesCannon && ! With.units.existsOurs(Protoss.Forge)) // Cannons are awful once DTs are already inside your base; Obs is better
         || (cannonsComplete && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base eventually
 
-    if (enemyContainedInMain) status(f"EMainContain")
+    if (enemyContained) status(f"Containing")
     if (enemyDarkTemplarLikely) status(f"ExpectDT@${Frames(expectedArrival)}")
 
     if (goObserver) {
@@ -106,8 +106,11 @@ object PvPIdeas extends MacroActions with MacroCounting {
             cancel(Protoss.Dragoon)
           }
         }
+        if (units(Protoss.Observer) == 0 && With.units.ours.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver)).forall(_.remainingCompletionFrames > framesUntilUnit(Protoss.Observatory))) {
+          cancel(Protoss.Shuttle, Protoss.Reaver)
+        }
       }
-    } else if (dtArePossibility && (PvPDT() || PvP3GateGoon())) {
+    } else if (dtArePossibility && (PvPDT() || PvPCoreExpand() || PvP3GateGoon() || PvP4GateGoon())) {
 
       // If DTs are already here, spam cannons and pray one sticks
       if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {

@@ -56,6 +56,7 @@ trait Timings {
     var earliestCompletionFrame = enemyCompletions(unitClass)
     if (unitClass == Protoss.DarkTemplar) {
       // Super-fast DT finishes 4:40. BetaStar demonstrates this on replay.
+      // BananaBrain completes DT after proxy 99 at 6:50
       earliestCompletionFrame                                       =  GameTime(4, 40)()
       if (With.fingerprints.twoGate())      earliestCompletionFrame += GameTime(1, 10)()
       if (With.fingerprints.dragoonRange()) earliestCompletionFrame += GameTime(0, 30)()

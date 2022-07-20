@@ -319,7 +319,7 @@ object Commander {
         val incompleteHall = unit.base.flatMap(_.townHall.filterNot(_.complete))
         lazy val nextClosestFrames = Maff.min(With.geography.ourBases.view.flatMap(_.townHall).filter(_.complete).map(h => unit.pixelDistanceTravelling(h.exitTile) / unit.topSpeed))
         if (incompleteHall.exists(hall => nextClosestFrames.forall(_ * 2 > hall.remainingCompletionFrames))) {
-          rightClick(unit, incompleteHall.get)
+          move(unit, incompleteHall.get.pixel)
         } else {
           unit.bwapiUnit.returnCargo()
         }

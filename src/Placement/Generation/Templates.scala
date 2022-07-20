@@ -212,46 +212,24 @@ object Templates {
       .forExitDirection(Directions.Left, Directions.Down)
       .from(
         "------------",
-        "-4xxx3xx3xx-",
+        "-4xxx3xxRxx-",
         "-xxxxxxxxxx-",
-        "-xxxxPx2x---",
-        "-4xxxxxxx---",
-        "-xxxxTxxRxx-",
-        "-xxxxxxxxxx-",
-        "------------"),
+        "-xxxxPx3xx--",
+        "-4xxxxxxxx-",
+        "-xxxxTxx2x-",
+        "-xxxxxxxxx-",
+        "-----------"),
     new Template()
       .forExitDirection(Directions.Right, Directions.Up)
       .from(
         "------------",
         "-RxxTxx4xxx-",
         "-xxxxxxxxxx-",
-        "---2xPxxxxx-",
-        "---xxxx4xxx-",
-        "-3xx3xxxxxx-",
-        "-xxxxxxxxxx-",
-        "------------"),
-    new Template()
-      .forExitDirection(Directions.Left, Directions.Up, Directions.Down)
-      .from(
-        "------------",
-        "-4xxx3xxRxx-",
-        "-xxxxxxxxxx-",
-        "-xxxxPx2x---",
-        "-4xxxxxxx-",
-        "-xxxxTxx--",
-        "-xxxxxxx-",
-        "---------"),
-    new Template()
-      .forExitDirection(Directions.Right, Directions.Up, Directions.Down)
-      .from(
-        "------------",
-        "-Rxx3xx4xxx-",
-        "-xxxxxxxxxx-",
-        "---PUPxxxxx-",
-        "xx-xxxx4xxx-",
-        "xx--Txxxxxx-",
-        "xxx-xxxxxxx-",
-        "xxx---------"),
+        "--3xxPxxxxx-",
+        "x-xxxxx4xxx-",
+        "x-2x3xxxxxx-",
+        "x-xxxxxxxxx-",
+        "x-----------"),
     new Template()
       .from(
         "----------",

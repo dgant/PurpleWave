@@ -15,37 +15,35 @@ object ShowHealthAndCooldown extends DebugView {
   
   def renderUnit(unit: UnitInfo): Unit = {
     if ( ! With.viewport.contains(unit.pixel)) return
-    if ( ! unit.alive) return
-    if ( ! unit.likelyStillThere) return
+    if ( ! unit.visible) return
     if (unit.invincible) return
     if (unit.unitClass.maxTotalHealth == 0) return
     
     val width           = Maff.clamp(unit.unitClass.width, 18, 48)
     val marginTopHp     = 3
-    val denominator     = unit.unitClass.maxTotalHealth + (if (unit.matrixPoints > 0) width * 250 else 0)
+    val denominator     = unit.unitClass.maxTotalHealth + width * 250 * Maff.fromBoolean(unit.matrixPoints > 0)
     val widthHpMax      = width * unit.unitClass.maxHitPoints / denominator
     val widthShMax      = width * unit.unitClass.maxShields / denominator
-    val widthDmMax      = if (unit.matrixPoints > 0) width * 250 / denominator else 0
+    val widthDmMax      = width * 250 / denominator * Maff.fromBoolean(unit.matrixPoints > 0)
     val widthHpNow      = width * unit.hitPoints / denominator
     val widthShNow      = width * unit.shieldPoints / denominator
     val widthDmNow      = width * unit.matrixPoints / denominator
-    val widthEnergyNow  = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax)
+    val widthEnergyNow  = if (unit.energyMax == 0) 0 else Math.min(width, width * unit.energy / unit.energyMax) // Min, because I haven't yet accounted for energy max upgrades
 
-    // Min, because I haven't yet accounted for energy max upgrades
-    val widthCooldownButton = 3
-    val widthCooldown = width - 2 * widthCooldownButton - 2
-    val widthCooldownNow = widthCooldown * Math.max(unit.cooldownLeft, unit.cooldownSpell) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
+    val widthCooldownButton   = 3
+    val widthCooldown         = width - 2 * widthCooldownButton - 2
+    val widthCooldownNow      = widthCooldown * Math.max(unit.cooldownLeft, unit.cooldownSpell) / Math.max(1, unit.cooldownMaxAirGround) //TODO: Max spell cooldown?
     
-    val yStartHp = unit.pixel.y + unit.unitClass.height / 2 - marginTopHp
-    val yEndHp = yStartHp + 4
-    val yStartEnergy = yEndHp + 2
-    val yEndEnergy = yStartEnergy + 4
-    val yStartCooldown = if (unit.energyMax > 0) yEndEnergy + 3 else yEndHp + 3
-    val yEndCooldown = yStartCooldown + 3
-    val xStart = unit.pixel.x - width / 2
-    val xStartSh = xStart + widthHpMax
-    val xStartDm = xStartSh + widthShMax
-    val xStartCooldown = xStart
+    val yStartHp              = unit.pixel.y + unit.unitClass.height / 2 - marginTopHp
+    val yEndHp                = yStartHp + 4
+    val yStartEnergy          = yEndHp + 2
+    val yEndEnergy            = yStartEnergy + 4
+    val yStartCooldown        = if (unit.energyMax > 0) yEndEnergy + 3 else yEndHp + 3
+    val yEndCooldown          = yStartCooldown + 3
+    val xStart                = unit.pixel.x - width / 2
+    val xStartSh              = xStart + widthHpMax
+    val xStartDm              = xStartSh + widthShMax
+    val xStartCooldown        = xStart
     val xStartCooldownButton0 = xStart + widthCooldown + 1
     val xStartCooldownButton1 = xStart + widthCooldown + 2 + widthCooldownButton
     

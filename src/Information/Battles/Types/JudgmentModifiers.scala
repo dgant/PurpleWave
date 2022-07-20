@@ -30,10 +30,12 @@ object JudgmentModifiers {
   }
   // Prefer fighting
   //  when close to home,
+  //  especially against ranged units
   //  especially if pushed into our main/natural
   //    because we will run out of room to retreat
   //    and because workers or buildings will be endangered if we don't
   def proximity(battleLocal: Battle): Option[JudgmentModifier] = {
+    val enemyRange      = battleLocal.enemy.meanAttackerRange
     val deltaMin        = -0.2 * Maff.clamp(With.frame / Minutes(10)(), 1, 2)
     val deltaMax        = 0.05
     val centroid        = battleLocal.enemy.centroidGround
@@ -41,7 +43,9 @@ object JudgmentModifiers {
     val distanceMax     = With.mapPixelWidth
     val distanceHome    = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.walkableTile)).map(centroid.groundPixels).min
     val distanceRatio   = Maff.clamp(distanceHome / distanceMax, 0, 1)
-    val targetDeltaRaw  = (distanceRatio * 2 - 1) * 0.3
+    val distanceMult    = (distanceRatio * 2 - 1)
+    val rangeMult       = Maff.clamp(enemyRange / 6.0, 0.0, 2.0)
+    val targetDeltaRaw  = distanceMult * rangeMult * 0.2
     val targetDelta     = Maff.clamp(targetDeltaRaw, deltaMin, deltaMax)
     Some(JudgmentModifier(targetDelta = targetDelta))
   }

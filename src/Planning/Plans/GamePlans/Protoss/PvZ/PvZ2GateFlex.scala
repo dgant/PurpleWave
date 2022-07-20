@@ -2,13 +2,14 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
 import Macro.Requests.Get
+import Placement.Access.PlaceLabels.DefendAir
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
-import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Minutes}
+import Utilities.UnitFilters.IsWarrior
 
 class PvZ2GateFlex extends GameplanImperative {
 
@@ -185,7 +186,7 @@ class PvZ2GateFlex extends GameplanImperative {
     val endgame       = new DoQueue(doEndgame)
     val expand        = new DoQueue(doExpand)
 
-    get(Protoss.Gateway); get(Protoss.Assimilator); get(3, Protoss.Gateway); get(Protoss.Stargate)
+    get(Protoss.Gateway, Protoss.Assimilator); get(3, Protoss.Gateway); get(Protoss.Stargate)
     if (saturated || (gas < 200 && units(Protoss.Gateway, Protoss.Stargate) >= 4)) buildGasPumps()
 
     var shouldConsiderExpanding = upgradeComplete(Protoss.ZealotSpeed) && unitsComplete(Protoss.Gateway) >= 6 && unitsComplete(Protoss.Observer) > 0
@@ -199,6 +200,11 @@ class PvZ2GateFlex extends GameplanImperative {
     }
     upgrades()
     trainCorsairs()
+    val mutaCannons = Math.min(3, enemies(Zerg.Mutalisk) / 3)
+    if (mutaCannons > 0) {
+      buildCannonsAtBases(mutaCannons, DefendAir)
+    }
+
     if (safeAtHome && unitsComplete(IsWarrior) >= 10) {
       tech2Base()
     }

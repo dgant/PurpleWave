@@ -1,8 +1,10 @@
 package Macro.Requests
 
+import Lifecycle.With
 import Placement.Access.PlacementQuery
 import ProxyBwapi.UnitClasses._
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 
 case class RequestUnit(
   unitClass         : UnitClass,
@@ -12,6 +14,6 @@ case class RequestUnit(
   specificUnitArg   : Option[FriendlyUnitInfo]  = None) extends RequestBuildable(
     unitClass,
     quantityArg,
-    minStartFrameArg,
+    ?(minStartFrameArg <= With.frame, 0, minStartFrameArg), // Not strictly necessary but reduces bug surface area
     placementQueryArg,
     specificUnitArg)

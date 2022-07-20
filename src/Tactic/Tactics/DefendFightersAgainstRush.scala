@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferClose
@@ -21,7 +21,7 @@ class DefendFightersAgainstRush extends Tactic {
     lazy val cannons      = With.units.ours .filter(u => u.complete && u.isAny(Terran.Bunker, Protoss.PhotonCannon))
     lazy val aggressors   = With.units.enemy.filter(u => u.complete && inOurBase(u) && (IsWarrior(u) || With.fingerprints.workerRush()))
     lazy val workers      = With.units.ours .filter(u => u.complete && IsWorker(u))
-    lazy val threatening  = aggressors.filter(a => a.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200) && a.base.exists(b => b.isOurs && b.harvestingArea.expand(1, 1).contains(a.pixel)))
+    lazy val threatening  = aggressors.filter(a => a.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200) && a.base.exists(b => b.isOurs && b.harvestingArea.expand(2, 2).contains(a.pixel)))
     if ( ! fingerprintsRequiringFighterProtection.exists(_())) return
     if (fighters.isEmpty)     return
     if (fighters.size > 9)    return
@@ -34,7 +34,7 @@ class DefendFightersAgainstRush extends Tactic {
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
     
     defenders.counter = CountUpTo(workersToFight.toInt)
-    defenders.preference = PreferClose(target)
+    defenders.preference = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
     defenders.acquire()
     defenders.units.foreach(_.intend(this, new Intention {
       toTravel = Some(target)

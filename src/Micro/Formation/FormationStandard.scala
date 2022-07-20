@@ -6,9 +6,8 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
-import Mathematics.{Maff, Shapes}
 import Mathematics.Points.{Pixel, Point, Tile}
-import Mathematics.Shapes.Ray
+import Mathematics.{Maff, Shapes}
 import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -17,6 +16,8 @@ import Tactic.Squads.FriendlyUnitGroup
 import Utilities.LightYear
 import Utilities.Time.Minutes
 
+//noinspection ComparingUnrelatedTypes
+//Disabling spurious IntelliJ warnings
 class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
   private def units = group.groupFriendlyOrderable

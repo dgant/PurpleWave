@@ -6,6 +6,7 @@ object Visibility extends Enumeration {
     InvisibleBurrowed,
     InvisibleNearby,
     InvisibleMissing,
+    Hypothetical,
     Dead
     = Value
 }

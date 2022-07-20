@@ -92,7 +92,7 @@ class Strategist {
   lazy val isFlat           : Boolean = heightMain == heightNatural
   lazy val isInverted       : Boolean = heightMain < heightNatural
   lazy val isFixedOpponent  : Boolean = With.configuration.playbook.policy.isInstanceOf[StrategySelectionFixed]
-  lazy val rushDistanceMean : Double  = Maff.mean(With.geography.rushDistances)
+  lazy val rushDistanceMean : Int     = Maff.mean(With.geography.rushDistances.map(_.toDouble)).toInt
   lazy val isIslandMap      : Boolean = With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly) && With.game.getGameType != GameType.Top_vs_Bottom
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games

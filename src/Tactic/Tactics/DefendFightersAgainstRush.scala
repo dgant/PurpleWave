@@ -6,6 +6,7 @@ import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferClose
@@ -22,6 +23,7 @@ class DefendFightersAgainstRush extends Tactic {
     lazy val aggressors   = With.units.enemy.filter(u => u.complete && inOurBase(u) && (IsWarrior(u) || With.fingerprints.workerRush()))
     lazy val workers      = With.units.ours .filter(u => u.complete && IsWorker(u))
     lazy val threatening  = aggressors.filter(a => a.inPixelRadius(32 * 4).exists(n => n.isOurs && n.totalHealth < 200) && a.base.exists(b => b.isOurs && b.harvestingArea.expand(2, 2).contains(a.pixel)))
+    if (With.frame > Minutes(6)()) return
     if ( ! fingerprintsRequiringFighterProtection.exists(_())) return
     if (fighters.isEmpty)     return
     if (fighters.size > 9)    return

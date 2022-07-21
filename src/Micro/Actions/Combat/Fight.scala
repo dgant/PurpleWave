@@ -2,7 +2,7 @@ package Micro.Actions.Combat
 
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Cast, DefaultCombat, Follow, Root}
-import Micro.Actions.Combat.Maneuvering.Sneak
+import Micro.Actions.Combat.Maneuvering.Stealth
 import Micro.Actions.Combat.Spells.{BeVulture, Stim}
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss._
@@ -28,7 +28,7 @@ object Fight extends Action {
     Recharge.consider(unit)
     Bust.consider(unit)
     Spot.consider(unit)
-    Sneak.consider(unit)
+    Stealth.consider(unit)
     DefaultCombat.consider(unit)
     OccupyBunker.consider(unit)
   }

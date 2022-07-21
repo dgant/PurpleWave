@@ -24,7 +24,7 @@ class SquadDarkTemplar extends Squad {
       .filterNot(_.enemies.exists(u =>
         u.complete
         && u.unitClass.isDetector
-        && u.zone.exitNow.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))))
+        && u.zone.edges.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))))
 
   def run(): Unit = {
     if (bases().isEmpty) { lock.release(); return }

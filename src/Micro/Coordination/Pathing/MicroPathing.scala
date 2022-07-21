@@ -78,7 +78,7 @@ object MicroPathing {
   }
 
   // More rays = more accurate movement, but more expensive
-  // 8 is definitely too little for competent mvoement
+  // 8 is definitely too little for competent movement
   private def rayRadiansN(rays: Int) = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
   private val rayRadians12 = rayRadiansN(12)
   private val rayRadians16 = rayRadiansN(16)
@@ -105,8 +105,8 @@ object MicroPathing {
       .find(p => {
         val clamped = p.clamp(unit.unitClass.dimensionMax / 2)
         (unit.pixelDistanceCenter(clamped) >= 80
-          && (mustApproach.map(unit.pixelDistanceTravelling).forall(_ < travelDistanceCurrent.get))
-          && (acceptableForSafety(unit.pixel.project(clamped, 80))))
+          && travelDistanceCurrent.forall(_ > clamped.travelPixelsFor(mustApproach.get, unit))
+          && acceptableForSafety(unit.pixel.project(clamped, 80)))
       })
     terminus
   }

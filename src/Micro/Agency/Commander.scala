@@ -527,7 +527,7 @@ object Commander {
 
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
       With.configuration.trackUnit = false
-      unit.sleepUntil(sleepUntil)
+      unit.sleepUntil(sleepUntil) // This is where you want the trackUnit breakpoint
     } else {
       unit.sleepUntil(sleepUntil)
     }

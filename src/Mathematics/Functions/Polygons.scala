@@ -1,5 +1,6 @@
 package Mathematics.Functions
 
+import Mathematics.Maff
 import Mathematics.Maff.signum
 import Mathematics.Points.{AbstractPoint, Pixel}
 
@@ -149,5 +150,20 @@ trait Polygons {
     val direct          = if (preserveRotation) (indexFrom > indexTo) else (directIsShorter == preferShort)
     val subsequence     = if (direct) rotation.view.slice(indexMin, indexMax + 1) else rotation.view.drop(indexMax) ++ rotation.view.take(indexMin + 1)
     if (subsequence.head == from) subsequence else subsequence.reverse
+  }
+
+  /**
+    * Given two fields of points, find a transformation from one to another that roughly preserves shape
+    */
+  @inline final def mapFieldsRadially(start: Seq[Pixel], end: Seq[Pixel]): Seq[(Pixel, Pixel)] = {
+    val croppedStart  = start .take(end.length)
+    val croppedEnd    = end   .take(start.length)
+    val centroidStart = Maff.centroid(croppedStart)
+    val centroidEnd   = Maff.centroid(croppedEnd)
+    val radiansStart  = start .map(p => (p, centroidStart .radiansTo(p)))
+    val radiansEnd    = end   .map(p => (p, centroidEnd   .radiansTo(p)))
+    val sortedStart   = radiansStart.sortBy(_._2)
+    val sortedEnd     = radiansEnd  .sortBy(_._2)
+    sortedStart.view.zipWithIndex.map(p => (p._1._1, sortedEnd(p._2)._1))
   }
 }

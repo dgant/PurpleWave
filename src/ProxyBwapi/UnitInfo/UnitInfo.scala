@@ -161,7 +161,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def sightPixels: Int = sightRangePixelsCache()
   private val sightRangePixelsCache = new Cache(() =>
     if (blind) 32 else
-    unitClass.sightRangePixels +
+    unitClass.sightPixels +
       (if (
         (is(Terran.Ghost)     && player.hasUpgrade(Terran.GhostVisionRange))      ||
         (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverVisionRange))  ||

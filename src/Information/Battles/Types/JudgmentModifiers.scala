@@ -23,9 +23,9 @@ object JudgmentModifiers {
     }
     add("Proximity",    Colors.NeonRed,       proximity(battle))
     add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
-    add("HiddenTanks",  Colors.NeonIndigo,    hiddenTanks(battle))
-    add("Commitment",   Colors.NeonViolet,    commitment(battle))
-    add("Choke",        Colors.NeonOrange,    choke(battle))
+    add("HiddenTanks",  Colors.MediumIndigo,  hiddenTanks(battle))
+    add("Commitment",   Colors.MediumViolet,  commitment(battle))
+    add("Choke",        Colors.MediumOrange,  choke(battle))
     output
   }
   // Prefer fighting
@@ -36,16 +36,12 @@ object JudgmentModifiers {
   //    and because workers or buildings will be endangered if we don't
   def proximity(battleLocal: Battle): Option[JudgmentModifier] = {
     val enemyRange      = battleLocal.enemy.meanAttackerRange
-    val deltaMin        = -0.2 * Maff.clamp(With.frame / Minutes(10)(), 1, 2)
+    val deltaMin        = -0.4 * Maff.clamp(With.frame.toDouble / Minutes(10)(), 0.5, 1.0)
     val deltaMax        = 0.05
-    val centroid        = battleLocal.enemy.centroidGround
-    val keyBases        = With.geography.ourBasesAndSettlements.filter(b => b.isOurMain || b.isOurNatural)
-    val distanceMax     = With.mapPixelWidth
-    val distanceHome    = (if (keyBases.isEmpty) Seq(With.geography.home) else keyBases.map(_.heart.walkableTile)).map(centroid.groundPixels).min
-    val distanceRatio   = Maff.clamp(distanceHome / distanceMax, 0, 1)
-    val distanceMult    = (distanceRatio * 2 - 1)
-    val rangeMult       = Maff.clamp(enemyRange / 6.0, 0.0, 2.0)
-    val targetDeltaRaw  = distanceMult * rangeMult * 0.2
+    val proximity       = With.scouting.proximity(battleLocal.enemy.centroidGround)
+    val proximityMult   = (proximity * 2 - 1)
+    val rangeMult       = Maff.clamp(enemyRange / (32 * 6.0), 0.0, 2.0)
+    val targetDeltaRaw  = -0.3 * proximityMult * rangeMult
     val targetDelta     = Maff.clamp(targetDeltaRaw, deltaMin, deltaMax)
     Some(JudgmentModifier(targetDelta = targetDelta))
   }
@@ -104,14 +100,14 @@ object JudgmentModifiers {
 
   // Avoid fighting across chokes/bridges
   def choke(battleLocal: Battle): Option[JudgmentModifier] = {
-    val pUs       = battleLocal.us.centroidGround
+    val pUs       = battleLocal.us.attackCentroidGround
     val pFoe      = battleLocal.enemy.vanguardGround()
     val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
     if (pUs.zone == pFoe.zone) return None
     if (edge.isEmpty) return None
     val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
-    val deltaMod  = Maff.clamp((ranks - 1)* 0.0125, 0.0, 0.3)
+    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0125, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
   }
 }

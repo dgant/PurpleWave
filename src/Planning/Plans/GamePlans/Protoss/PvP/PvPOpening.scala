@@ -35,7 +35,11 @@ class PvPOpening extends GameplanImperative {
   var greedyDT          : Boolean = false
 
   override def activated: Boolean = true
-  override def completed: Boolean = { complete ||= bases > 1; complete }
+  override def completed: Boolean = {
+    complete ||= bases > 1;
+    complete &&= ! PvPDT() || With.units.everOurs.exists(u => u.isOurs && u.complete && Protoss.DarkTemplar(u))
+    complete
+  }
 
   private def sneakyCitadel(): Unit = {
     if (scoutCleared) {
@@ -272,7 +276,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
       shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
-      greedyDT = ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
+      greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
       shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0
       shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeAtHome || With.scouting.enemyProximity < 0.75)
       shouldExpand ||= greedyDT
@@ -297,7 +301,7 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(IsWarrior) < 8
       && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural
-    shouldAttack ||= shouldExpand
+    shouldAttack ||= shouldExpand && With.units.ours.exists(_.intent.toBuildTile.exists(_.base.exists( ! _.isOurs)))
     // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
     shouldAttack &&= ! (With.frame > GameTime(5, 10)()
       && PvP1012()
@@ -330,6 +334,7 @@ class PvPOpening extends GameplanImperative {
     if (shuttleSpeed)   status("ShuttleSpeed")
     if (getObservers)   status("Obs")
     if (getObservatory) status("Observatory")
+    if (greedyDT)       status("GreedyDT")
     if (shouldAttack)   status("Attack")
     if (shouldHarass)   status("Harass")
     if (shouldExpand)   status("Expand")

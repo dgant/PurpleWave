@@ -3,11 +3,12 @@ package Macro.Scheduling
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
+import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
-import ProxyBwapi.Upgrades.Upgrades
+import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Utilities.?
 import Utilities.Time.Forever
 
@@ -112,9 +113,12 @@ final class MacroSim {
       // Units:
       // - (Default) If there is no placement query, use our state count
       // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
-      val unitDiff = request.unit.map(requestedUnit => request.quantity -
-        (if (request.placement.isEmpty) steps.last.state.unitsCompleteASAP(requestedUnit)
-        else With.units.ours.filter(requestedUnit).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
+
+      val unitDiff = request.unit.map(u => request.quantity -
+        (if (request.placement.isEmpty)
+          (if (request.minStartFrame <= 0) steps.last.state.unitsCompleteASAP(u) else extantBy(request.buildable, request.minStartFrame))
+        else
+          With.units.ours.filter(u).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
       val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
       val diff        = Seq(unitDiff, upgradeDiff, techDiff).max
@@ -177,6 +181,17 @@ final class MacroSim {
         })
       }
     })
+  }
+
+  private def extantAt(buildable: Buildable, step: MacroStep): Int = {
+    val state = step.state
+    buildable.asUnit.map(state.unitsExtant.apply)
+      .orElse(buildable.asTech.map(t => Maff.fromBoolean(state.techs.contains(t))))
+      .getOrElse(state.upgrades(buildable.asInstanceOf[Upgrade]))
+  }
+
+  private def extantBy(buildable: Buildable, absoluteFrame: Int = 0): Int = {
+    extantAt(buildable, if (absoluteFrame == 0) steps.last else steps.reverseIterator.find(_.event.dFrames + With.frame < absoluteFrame).getOrElse(steps.head))
   }
 
   private def canInsertAfter(request: RequestBuildable, i: Int): Boolean = {

@@ -106,9 +106,15 @@ class PvPLateGame extends GameplanImperative {
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString.replaceAll("Tech", "")).foreach(status)
     PvPIdeas.requireTimelyDetection()
-    if (recentlyExpandedFirst && PvPCoreExpand() && units(Protoss.Gateway) < 3) {
-      doTrainArmy()
-      get(3, Protoss.Gateway)
+    if (recentlyExpandedFirst) {
+      if (PvPCoreExpand()) {
+        if (units(Protoss.Gateway) < 3) {
+          doTrainArmy()
+          get(3, Protoss.Gateway)
+        }
+      } else {
+        get(?(dtBraveryAbroad, 6, 5 - 2 * units(Protoss.RoboticsSupportBay)), Protoss.Gateway)
+      }
     }
   }
 
@@ -126,9 +132,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldExpand) {
       expand()
     }
-    if (recentlyExpandedFirst && dtBraveryAbroad) {
-      addProduction()
-    }
+
     if (fearDeath) {
       trainArmy()
       addProduction()

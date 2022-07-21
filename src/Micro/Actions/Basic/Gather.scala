@@ -96,7 +96,9 @@ object Gather extends Action {
         }
       }
 
-      Potshot.consider(unit)
+      if (unit.base.exists(_.isOurs)) {
+        Potshot.consider(unit)
+      }
 
       // Run away if threatened during transfer
       lazy val zoneNow        = unit.zone

@@ -25,12 +25,21 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
     ).toMap
   }
 
+  private def assignRadiallyFromCentroid(unitClass: UnitClass): Map[FriendlyUnitInfo, Pixel] = {
+    val classUnits = group.groupFriendlyOrderable.view.filter(unitClass)
+    if (classUnits.isEmpty) return Map.empty
+    val mapping = Maff.mapFieldsRadially(classUnits.map(_.pixel), slots(unitClass).toSeq).toMap
+    classUnits.view.flatMap(u => mapping.get(u.pixel).map(p => (u, p))).toMap
+  }
+
   def outwardFromCentroid: Map[FriendlyUnitInfo, Pixel] = {
     if (slots.isEmpty) return Map.empty
-    slots
-      .keys
-      .map(unitClass => assignOutwardFromCentroid(unitClass))
-      .reduce(_ ++ _)
+    slots.keys.map(unitClass => assignOutwardFromCentroid(unitClass)).reduce(_ ++ _)
+  }
+
+  def radiallyFromCentroid: Map[FriendlyUnitInfo, Pixel] = {
+    if (slots.isEmpty) return Map.empty
+    slots.keys.map(unitClass => assignOutwardFromCentroid(unitClass)).reduce(_ ++ _)
   }
 
   def sprayToward(to: Pixel): Map[FriendlyUnitInfo, Pixel] = {

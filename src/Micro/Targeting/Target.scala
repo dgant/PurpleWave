@@ -189,22 +189,17 @@ object Target extends {
 
     // Detection bonus
     val aggressivelyDenyDetection = With.reaction.sluggishness > 0
-    val weHaveCloakedThreat = if (aggressivelyDenyDetection) target.matchups.enemies.exists(e => e.cloaked && e.matchups.targets.nonEmpty) && ! target.matchups.enemies.exists(Protoss.Arbiter)
+    val weHaveCloakedThreat = if (aggressivelyDenyDetection) target.matchups.isCloakedAttacker() && target.matchups.teamHasArbiter()
     else (
       With.self.hasTech(Terran.WraithCloak)
       || With.self.hasTech(Zerg.LurkerMorph)
-      || With.units.existsOurs(Protoss.Arbiter)
-      || With.units.existsOurs(Protoss.DarkTemplar))
+      || With.units.existsOurs(Protoss.Arbiter, Protoss.DarkTemplar))
     if (weHaveCloakedThreat) {
       val building = target.constructing || target.repairing
       val buildTarget = if (building) target.target else None
       val detects = aidsDetection(target) || buildTarget.exists(aidsDetection)
       if (detects) {
-        if (aggressivelyDenyDetection) {
-          output *= 40.0
-        } else {
-          output *= 4.0
-        }
+        output *= 12.0
       }
     }
 
@@ -215,7 +210,7 @@ object Target extends {
     }
 
     // Interceptor penalty
-    if (target.is(Protoss.Interceptor)) {
+    if (Protoss.Interceptor(target)) {
       output *= 0.25
     }
 

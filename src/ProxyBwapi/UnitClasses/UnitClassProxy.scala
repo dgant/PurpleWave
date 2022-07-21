@@ -71,9 +71,9 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val requiresCreep            = bwapiType.requiresCreep
   val requiresPsi              = bwapiType.requiresPsi
   lazy val techsWhat           = bwapiType.researchesWhat.asScala.map(Techs.get)
-  val seekRange                = bwapiType.seekRange
-  val sightRangePixels         = bwapiType.sightRange
-  val spaceProvided            = bwapiType.spaceProvided
+  val seekRange     = bwapiType.seekRange
+  val sightPixels   = bwapiType.sightRange
+  val spaceProvided = bwapiType.spaceProvided
   val spaceRequired            = bwapiType.spaceRequired
   val supplyProvided           = bwapiType.supplyProvided
   val supplyRequired           = bwapiType.supplyRequired

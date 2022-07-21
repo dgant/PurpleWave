@@ -1,6 +1,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
-import Debugging.ToString
+import Debugging.SimpleString
 import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Maff
@@ -14,21 +14,21 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
-import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.UnitFilters.IsWorker
 
 object DefaultCombat extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.intent.canFight
 
-  private abstract class Technique(val transitions: Technique*) {
+  private abstract class Technique(val transitions: Technique*) extends SimpleString {
     def canTransition(other: Technique): Boolean = transitions.contains(other)
-    override val toString: String = ToString(this)
   }
   private object Aim        extends Technique // Stand in place and shoot
   private object Dodge      extends Technique // Heed pushes
   private object Excuse     extends Technique(Dodge) // Let other units shove through us
+  private object Walk       extends Technique(Dodge, Excuse) // Just go on our merry way
   private object Dance      extends Technique(Dodge, Excuse) // Stay in fight with better position
   private object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
   private object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
@@ -179,10 +179,17 @@ object DefaultCombat extends Action {
     // Choose technique //
     //////////////////////
 
+    val formations = unit.squad.flatMap(_.formations)
+    val ignorant = unit.battle.isEmpty || unit.agent.withinSafetyMargin || unit.matchups.threatsInFrames(48).forall(IsWorker)
+    lazy val shouldEngageDeferringToSquad = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldEngage)
+
     var technique: Technique =
       if ( ! unit.canMove) Fight
-      else if (unit.agent.withinSafetyMargin || unit.agent.shouldEngage || unit.matchups.threatsInFrames(48).forall(IsWorker))
-        Fight else Flee
+      else if (ignorant && shouldEngageDeferringToSquad) Fight
+      else if (ignorant && formations.nonEmpty) Flee
+      else if (ignorant) Walk
+      else if (unit.agent.shouldEngage) Fight
+      else Flee
 
     def transition(newTechnique: Technique, predicate: () => Boolean = () => true, action: () => Unit = () => {}): Unit = {
       if (unit.ready && technique.canTransition(newTechnique) && predicate()) {
@@ -210,7 +217,7 @@ object DefaultCombat extends Action {
       || (
         unit.agent.receivedPushPriority() < TrafficPriorities.Shove
         && unit.matchups.threatsInFrames(unit.unitClass.framesToPotshot + 9).forall(_.topSpeed > unit.topSpeed))))
-    transition(Dance, () => unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
+    transition(Dance, () => unit.agent.shouldEngage && unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
 
     if (unit.unready) return
 
@@ -232,6 +239,7 @@ object DefaultCombat extends Action {
     // Execute //
     /////////////
 
+    if (technique == Walk) return
     if (goalRetreat && retreat(unit)) return
     if (goalEngage && Brawl.consider(unit)) return
     if (goalPotshot && potshot(unit)) return
@@ -239,22 +247,21 @@ object DefaultCombat extends Action {
     val breakThreshold        = 64
     val targetDistanceHere    = target.map(unit.pixelDistanceEdge).getOrElse(0d)
     val targetDistanceThere   = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
-    val formationExists       = unit.squad.exists(_.formations.nonEmpty)
     val formationHelpsEngage  = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
-    lazy val breakFormationToAttack = unit.battle.isDefined && ( ! formationExists || target.exists(targ =>
+    lazy val breakFormationToAttack = formations.isEmpty || target.exists(targ =>
       // If we're not ready to attack yet, just slide into formation
       (readyToAttackTarget(unit) || unit.unitClass.melee) && (
         // Break if we are already in range
         unit.inRangeToAttack(targ)
-        // Break if we are closer to range than the formation, and already pretty close
-        || targetDistanceHere < Math.min(targetDistanceThere, 32 * 8)
         // Break if we're just pillaging
         || unit.confidence11 > confidenceChaseThreshold
         || unit.matchups.threats.forall(IsWorker)
         // Break if the fight has already begun and the formation isn't helping us
-        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded)))))
+        || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))
+        // Break if we are closer to range than the formation, and already pretty close
+        || (targetDistanceHere < Math.min(targetDistanceThere, 32 * 8) && Maff.radiansTo(unit.pixel.radiansTo(target.get.pixel), unit.pixel.radiansTo(unit.agent.destination)) <= Math.PI / 2)))
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {
-      unit.agent.lastAction = Some(if (formationExists) "Break" else "Charge")
+      unit.agent.lastAction = Some(if (formations.nonEmpty) "Break" else "Charge")
       return
     }
 

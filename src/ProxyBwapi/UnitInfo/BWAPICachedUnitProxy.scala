@@ -208,7 +208,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _remainingTechFrames    = bwapiUnit.getRemainingResearchTime
       _removalFrames          = bwapiUnit.getRemoveTimer
       _spiderMines            = bwapiUnit.getSpiderMineCount
-      _angleRadians           = bwapiUnit.getAngle
+      _angleRadians           = ConvertBWAPI.angle(bwapiUnit.getAngle)
       _velocityX              = bwapiUnit.getVelocityX
       _velocityY              = bwapiUnit.getVelocityY
       _order                  = bwapiUnit.getOrder.toString

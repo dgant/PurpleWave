@@ -46,8 +46,8 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   lazy val accelerationFrames: Int = if (acceleration256 > 1) Math.ceil(256.0 * topSpeed / acceleration256).toInt else 1
 
-  def framesToTurn(radians: Double): Int = Math.abs(Maff.nanToZero(Math.ceil(Maff.normalizePiToPi(radians) / turnRadians))).toInt
-  lazy val turnRadians: Double = turnRadius256 * 2 * Math.PI / 256d
+  def framesToTurn(radians: Double): Int = if (this == Protoss.Dragoon) 0 else Math.abs(Maff.nanToZero(Math.ceil(Maff.normalizePiToPi(radians) / turnRadians))).toInt
+  lazy val turnRadians: Double = turnRadius256 * Maff.twoPI / 256d
   lazy val framesToTurn180: Int = framesToTurn(Math.PI)
   lazy val framesToTurn360: Int = framesToTurn(2 * Math.PI)
 

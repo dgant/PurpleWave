@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points.Pixel
+import ProxyBwapi.ConvertBWAPI
 import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Bullet, BulletType}
@@ -15,8 +16,8 @@ case class BulletInfo(bwapi: Bullet) {
   lazy val pixel            : Pixel             = new Pixel(bwapi.getPosition)
   lazy val sourceUnit       : Option[UnitInfo]  = With.units.get(bwapi.getSource)
   lazy val targetUnit       : Option[UnitInfo]  = With.units.get(bwapi.getTarget)
-  lazy val targetPixel      : Option[Pixel]     = Some(new Pixel(bwapi.getTargetPosition)).filter(_.valid)
-  lazy val angleRadians     : Double            = bwapi.getAngle
+  lazy val targetPixel      : Option[Pixel]     = ConvertBWAPI.position(bwapi.getTargetPosition)
+  lazy val angleRadians     : Double            = ConvertBWAPI.angle(bwapi.getAngle)
   lazy val bulletType       : BulletType        = bwapi.getType
   lazy val velocityX        : Double            = bwapi.getVelocityX
   lazy val velocityY        : Double            = bwapi.getVelocityY

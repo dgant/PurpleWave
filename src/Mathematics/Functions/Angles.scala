@@ -1,5 +1,8 @@
 package Mathematics.Functions
 
+import Mathematics.Maff
+import Mathematics.Points.Pixel
+
 import scala.annotation.tailrec
 
 trait Angles {
@@ -25,4 +28,8 @@ trait Angles {
   }
 
   @inline final def slowAtan2(y: Double, x: Double): Double = normalize0ToPi(Math.atan2(y, x))
+
+  @inline final def isTowards(from: Pixel, to: Pixel, direction: Double): Boolean = {
+    Math.abs(Maff.radiansTo(from.radiansTo(to), direction)) < Maff.halfPI
+  }
 }

@@ -179,7 +179,7 @@ object DefaultCombat extends Action {
     // Choose technique //
     //////////////////////
 
-    val formations = unit.squad.flatMap(_.formations)
+    val formations = unit.squad.map(_.formations).getOrElse(Seq.empty)
     val ignorant = unit.battle.isEmpty || unit.agent.withinSafetyMargin || unit.matchups.threatsInFrames(48).forall(IsWorker)
     lazy val shouldEngageDeferringToSquad = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldEngage)
 
@@ -248,56 +248,76 @@ object DefaultCombat extends Action {
     val targetDistanceHere    = target.map(unit.pixelDistanceEdge).getOrElse(0d)
     val targetDistanceThere   = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
     val formationHelpsEngage  = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
+    val formationHelpsChase   = targetDistanceThere <= targetDistanceHere
+    val confidentToChase      = unit.confidence11 > confidenceChaseThreshold
     lazy val breakFormationToAttack = formations.isEmpty || target.exists(targ =>
       // If we're not ready to attack yet, just slide into formation
       (readyToAttackTarget(unit) || unit.unitClass.melee) && (
         // Break if we are already in range
         unit.inRangeToAttack(targ)
         // Break if we're just pillaging
-        || unit.confidence11 > confidenceChaseThreshold
+        || confidentToChase
         || unit.matchups.threats.forall(IsWorker)
         // Break if the fight has already begun and the formation isn't helping us
         || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))
         // Break if we are closer to range than the formation, and already pretty close
-        || (targetDistanceHere < Math.min(targetDistanceThere, 32 * 8) && Maff.radiansTo(unit.pixel.radiansTo(target.get.pixel), unit.pixel.radiansTo(unit.agent.destination)) <= Math.PI / 2)))
+        || (targetDistanceHere < Math.min(targetDistanceThere, 32 * 8) && Maff.isTowards(unit.pixel, target.get.pixel, unit.pixel.radiansTo(unit.agent.destination)))))
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {
       unit.agent.lastAction = Some(if (formations.nonEmpty) "Break" else "Charge")
       return
     }
 
-    if (goalDance) {
-      val distanceIdeal   = idealTargetDistance(unit, target.get)
-      val distanceCurrent = unit.pixelDistanceEdge(target.get)
-      val distanceTowards = distanceCurrent - distanceIdeal
-      if (distanceTowards >= 0) {
-        if (breakFormationToAttack) {
-          if (distanceTowards >= 32) {
-            unit.agent.act("Chase")
-            val to                  = target.get.pixel
-            val step                = target.get.presumptiveStep
-            val chaseGoal           = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
-            val extraChaseDistance  = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
-            unit.agent.toTravel     = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
-            move(unit)
-            return
-          } else {
-            unit.agent.act("Approach")
-            Commander.attack(unit)
-            return
-          }
-        } else {
-          move(unit)
-          return
-        }
-      } else {
-        unit.agent.forces(Forces.threat) = Potential.avoidThreats(unit)
-        unit.agent.forces(Forces.spacing) = unit.agent.receivedPushForce()
-        retreat(unit)
-        unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))
+    if ( ! goalDance) {
+      move(unit)
+      return
+    }
+
+    lazy val nudged                   = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
+    lazy val nudgeAngle               = unit.agent.receivedPushForce().radians
+    lazy val nudgedTowards            = Maff.isTowards(unit.pixel, unit.agent.destination, nudgeAngle)
+    lazy val targetFleeing            = target.get.canMove && Maff.isTowards(unit.pixel, target.get.pixel, target.get.angleRadians)
+    lazy val nearestExtraneousThreat  = Maff.minBy(unit.matchups.threats.filterNot(target.contains))(t => t.pixelDistanceEdge(unit) - t.pixelRangeAgainst(unit))
+    lazy val framesToFaceTarget       = unit.framesToTurnTo(target.get)
+    lazy val framesToReadyFire        = framesToFaceTarget + unit.framesToGetInRange(target.get) + With.latency.framesRemaining
+
+    // If we have an attack formation
+    if (formations.size > 1) {
+      if ((confidentToChase && formationHelpsChase && targetFleeing) || (nudged && nudgedTowards)) {
+        unit.agent.act("Slide")
+        Commander.move(unit)
         return
       }
     }
-    move(unit)
+    val distanceIdeal   = idealTargetDistance(unit, target.get)
+    val distanceCurrent = unit.pixelDistanceEdge(target.get)
+    val distanceTowards = distanceCurrent - distanceIdeal
+    if (distanceTowards >= 0) {
+      if (breakFormationToAttack) {
+        if (distanceTowards >= 32) {
+          unit.agent.act("Chase")
+          val to                  = target.get.pixel
+          val step                = target.get.presumptiveStep
+          val chaseGoal           = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
+          val extraChaseDistance  = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
+          unit.agent.toTravel     = Some(unit.pixel.project(chaseGoal, distanceTowards + extraChaseDistance))
+          move(unit)
+          return
+        } else {
+          unit.agent.act("Approach")
+          Commander.attack(unit)
+          return
+        }
+      } else {
+        move(unit)
+        return
+      }
+    } else {
+      unit.agent.forces(Forces.threat) = Potential.avoidThreats(unit)
+      unit.agent.forces(Forces.spacing) = unit.agent.receivedPushForce()
+      retreat(unit)
+      unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))
+      return
+    }
   }
 
   val pickupCutoff = 64

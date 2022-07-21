@@ -1,7 +1,7 @@
 package Utilities.UnitPreferences
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-case class PreferAll(preferences: UnitPreference*) extends UnitPreference {
+case class PreferAll(preferences: Function[FriendlyUnitInfo, Double]*) extends UnitPreference {
   override def apply(unit: FriendlyUnitInfo): Double = {
     preferences
       .zipWithIndex

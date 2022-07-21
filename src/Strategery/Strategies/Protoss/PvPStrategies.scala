@@ -15,28 +15,22 @@ abstract class PvPStrategy extends Strategy {
 // Opening steps //
 ///////////////////
 
-object PvP3Zealot extends PvPStrategy {
-  // The value is arriving with 3 zealots vs fewer than 3 combat units, which ideally is NZCore but is probably okay vs coreZ too
-  override def responsesWhitelisted: Iterable[Fingerprint] = Seq(With.fingerprints.coreBeforeZ)
-  // Longer maps
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Arcadia, Heartbreak, Aztec, MatchPoint, TauCross)
-  override def rushDistanceMaximum: Double = 200
-}
-object PvP5Zealot extends PvPStrategy {
-  // No blacklisting: Preserve this option against someone who insists on proxying
-}
 object PvP1012 extends PvPStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP3Zealot, PvP5Zealot))
-  // TODO: Only enable vs appropriate builds, eg almost anything but ZCore, CoreZ, or ZCoreZ
   override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst, With.fingerprints.proxyGateway, With.fingerprints.twoGate99)
 }
+
+object PvP3Zealot extends PvPStrategy {
+  // You're advantaged when arriving with 3 zealots vs fewer than 3 combat units, which ideally is NZCore but is probably okay vs coreZ too
+  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.coreBeforeZ)
+}
+object PvP5Zealot extends PvPStrategy {
+}
 object PvPGateCoreRange extends PvPStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Python)
-  override def entranceInverted: Boolean = false
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)
+  // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPGateCoreGate extends PvPStrategy {
-  // No blacklisting; Preserve this as our "Always valid" choice
+  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.proxyGateway, With.fingerprints.twoGate99, With.fingerprints.twoGate)
 }
 object PvPGateCoreTech extends PvPStrategy {
   override def entranceInverted: Boolean = false
@@ -52,7 +46,7 @@ object PvPRobo extends PvPStrategy {
   // No blacklisting; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
@@ -66,7 +60,7 @@ object PvP3GateGoon extends PvPStrategy {
   override def minimumGamesVsOpponent: Int = 1
 }
 object PvP4GateGoon extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange, PvPGateCoreGate))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.dtRush)
   override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Aztec, Destination, Roadrunner, MatchPoint)
   override def minimumGamesVsOpponent: Int = 1
@@ -79,5 +73,6 @@ object PvP4GateGoon extends PvPStrategy {
 object PvPProxy2Gate extends PvPStrategy {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate, With.fingerprints.proxyGateway, With.fingerprints.forgeFe, With.fingerprints.earlyForge)
+  override def responsesWhitelisted: Iterable[Fingerprint] = Iterable(With.fingerprints.nexusFirst, With.fingerprints.coreBeforeZ)
 }
 

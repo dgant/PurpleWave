@@ -1,24 +1,27 @@
 package Tactic.Production
 
 import Information.Counting.MacroCounter
-import Macro.Requests.RequestBuildable
+import Macro.Requests.{RequestBuildable, RequestUnit}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.PreferTrainerFor
+import Utilities.UnitPreferences.{PreferAll, PreferTrainerFor}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
+import scala.util.Try
+
 class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
-  val traineeClass    : UnitClass         = request.unit.get
-  val trainerClass    : UnitClass         = traineeClass.whatBuilds._1
-  val addonClass      : Option[UnitClass] = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
-  val currencyLock    : LockCurrency      = new LockCurrencyFor(this, traineeClass, 1)
-  val trainerLock     : LockUnits         = new LockUnits(this)
+  val traineeClass    : UnitClass           = request.unit.get
+  val trainerClass    : UnitClass           = traineeClass.whatBuilds._1
+  val addonClass      : Option[UnitClass]   = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
+  val currencyLock    : LockCurrency        = new LockCurrencyFor(this, traineeClass, 1)
+  val trainerLock     : LockUnits           = new LockUnits(this)
+  val requestUnit     : Option[RequestUnit] = Try(requestArg.asInstanceOf[RequestUnit]).toOption
   trainerLock.counter     = CountOne
-  trainerLock.preference  = PreferTrainerFor(traineeClass)
-  trainerLock.matcher     = u => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains)
+  trainerLock.preference  = requestUnit.flatMap(_.parentPreference).map(p => PreferAll(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass))
+  trainerLock.matcher     = u => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r)))
 
   var finalTrainer: Option[FriendlyUnitInfo] = None
   var finalTrainee: Option[FriendlyUnitInfo] = None
@@ -32,7 +35,7 @@ class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
       true
     } else false
   }
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     // As we approach completion, lock in our trainer/trainee for our records and let another task acquire it
     if (trainee.exists(t => t.alive && t.remainingCompletionFrames < 96)) {
       finalTrainer = trainer

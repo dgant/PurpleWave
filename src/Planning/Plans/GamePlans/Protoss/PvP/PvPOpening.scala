@@ -97,23 +97,27 @@ class PvPOpening extends GameplanImperative {
         zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
         zAfterCore ||= PvPGateCoreGate() || PvPGateCoreTech() || PvPDT()
       }
-      if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) < 1) {
+      if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) < 1 && ! anyUpgradeStarted(Protoss.DragoonRange, Protoss.AirDamage)) {
         if (With.fingerprints.twoGate() || With.fingerprints.proxyGateway() || With.fingerprints.nexusFirst()) {
-          PvPGateCoreGate.swapIn()
           PvPGateCoreRange.swapOut()
           PvPGateCoreTech.swapOut()
+          PvPGateCoreGate.swapIn()
         } else if (With.fingerprints.cannonRush() || (With.fingerprints.earlyForge() && With.fingerprints.cannonRush.recently)) {
-          PvPGateCoreRange.swapIn()
+          PvP1012.swapOut()
+          PvPGateCoreRange.swapOut()
           PvPGateCoreTech.swapIn()
           PvPRobo.swapIn()
-          PvP1012.swapOut()
           PvPDT.swapOut()
           PvPCoreExpand.swapOut()
           PvP3GateGoon.swapOut()
           PvP4GateGoon.swapOut()
-        } else if (PvPGateCoreGate() && With.strategy.isRamped) {
+        } else if (PvPGateCoreGate()) {
           PvPGateCoreGate.swapOut()
-          PvPGateCoreRange.swapIn()
+          if (With.strategy.isRamped) {
+            PvPGateCoreTech.swapIn()
+          } else {
+            PvPGateCoreRange.swapIn()
+          }
         }
       }
     }

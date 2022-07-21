@@ -92,9 +92,11 @@ object JudgmentModifiers {
   //   until conditions look advantageous
   //     because surprise is on the enemy's side
   //     and because patience will tend to let us gather more force to fight
+  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.5, value) else value
   def commitment(battleLocal: Battle): Option[JudgmentModifier] = {
-    def fighters = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
-    val commitment = Maff.mean(fighters.map(u => Maff.clamp((32 + u.matchups.pixelsOfEntanglement) / 96d, 0, 1)))
+    def fighters      = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
+    val commitmentRaw = Maff.mean(fighters.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsOfEntanglement) / 96d), 0, 1)))
+    val commitment    = commitmentFloor(commitmentRaw)
     Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))
   }
 
@@ -104,6 +106,7 @@ object JudgmentModifiers {
     val pFoe      = battleLocal.enemy.vanguardGround()
     val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
     if (pUs.zone == pFoe.zone) return None
+    if (battleLocal.us.units.exists(u => u.zone == pUs.zone && u.matchups.threatsInRange.exists(_.zone == pFoe.zone))) return None
     if (edge.isEmpty) return None
     val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)

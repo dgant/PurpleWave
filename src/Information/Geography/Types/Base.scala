@@ -54,10 +54,22 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def allies                  : Seq[UnitInfo]     = units.view.filter(_.isFriendly)
   def enemies                 : Seq[UnitInfo]     = units.view.filter(_.isEnemy)
 
-  private lazy val initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+  val overlooks: Vector[(Tile, Double)] = {
+    val exit = zone.exitOriginal
+    if (exit.isEmpty) Vector.empty else {
+      val exitAltitude = exit.get.pixelCenter.altitude
+      tiles.view
+        .filter(_.walkable)
+        .filter(_.altitudeUnchecked > exitAltitude)
+        .filter(_.groundTiles(exit.get.pixelCenter) < 48)
+        .map(tile => (tile, tile.center.pixelDistance(exit.get.pixelCenter) / 32.0))
+        .toVector
+    }
+  }
 
-  lazy val harvestingArea = new TileRectangle(initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
-  lazy val harvestingTrafficTiles = harvestingArea.tiles.filter(t => t.x > 0 && t.y > 0 && t.x < With.mapTileWidth && t.y < With.mapTileHeight).toSet
+  private lazy val initialResources = With.units.all.filterNot(_.isBlocker).filter(_.pixelDistanceCenter(townHallTile.topLeftPixel.add(64, 48)) < 32 * 9).toVector
+  lazy val harvestingArea                    = new TileRectangle(initialResources.view.flatMap(_.tiles) ++ townHallArea.tiles)
+  lazy val harvestingTrafficTiles: Set[Tile] = harvestingArea.tiles.filter(t => t.x > 0 && t.y > 0 && t.x < With.mapTileWidth && t.y < With.mapTileHeight).toSet
 
   lazy val heart: Tile = {
     val centroid = if (initialResources.isEmpty) townHallArea.center.subtract(Points.middle) else Maff.centroid(initialResources.view.map(_.pixel))

@@ -64,7 +64,7 @@ object Commander {
       return
     }
 
-    if ( ! unit.is(Zerg.Lurker) && autoUnburrow(unit)) return
+    if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
 
     // We used to skip Photon Cannons here due to inadvertent attack cancelling.
@@ -94,8 +94,8 @@ object Commander {
     // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
     // as far as I can tell, no penalty for bad early guesses on attacking
 
-    if (unit.is(Zerg.Lurker) && ! unit.burrowed) { move(unit, target.pixel); return }
-    if (target.is(Protoss.Interceptor)) { attackMove(unit, target.pixel); return }
+    if (Zerg.Lurker(unit) && ! unit.burrowed) { move(unit, target.pixel); return }
+    if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
     
     if (target.visible) {
       lazy val moving           = unit.moving
@@ -106,7 +106,7 @@ object Commander {
       val shouldOrder = (
         thisIsANewTarget
         || (overdueToAttack && (moving || alreadyInRange))
-        || (target.isFriendly && unit.is(Protoss.Carrier))) // Carrier warmup; spam attack
+        || (target.isFriendly && Protoss.Carrier(unit))) // Carrier warmup; spam attack
 
       if (shouldOrder) {
         unit.bwapiUnit.attack(target.bwapiUnit)

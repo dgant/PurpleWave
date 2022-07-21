@@ -13,7 +13,7 @@ object Opponents {
   // COG 2022
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
-  val betastar    : Opponent = add("BetaStar",    StrategySelectionGreedy())
+  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPGateCoreTech))
   val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
   val cunybot     : Opponent = add("CUNYbot",     defaultPvZ)

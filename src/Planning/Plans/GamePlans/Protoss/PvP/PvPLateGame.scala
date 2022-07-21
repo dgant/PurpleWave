@@ -7,7 +7,7 @@ import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand}
+import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
 import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
@@ -112,8 +112,14 @@ class PvPLateGame extends GameplanImperative {
           doTrainArmy()
           get(3, Protoss.Gateway)
         }
+      } else if (PvPDT()) {
+        pump(Protoss.DarkTemplar, 1)
+        get(6, Protoss.Gateway)
+        shouldAttack = false
+        shouldContain = false
       } else {
-        get(?(dtBraveryAbroad, 6, 5 - 2 * units(Protoss.RoboticsSupportBay)), Protoss.Gateway)
+        get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
+        get(5 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
       }
     }
   }
@@ -132,18 +138,12 @@ class PvPLateGame extends GameplanImperative {
     if (shouldExpand) {
       expand()
     }
-
     if (fearDeath) {
       trainArmy()
       addProduction()
     }
     get(3, Protoss.Gateway)
     cannons()
-    if (fearContain) {
-      primaryTech()
-      trainArmy()
-      addProduction()
-    }
     primaryTech()
     if (shouldSecondaryTech) {
       secondaryTech()
@@ -280,7 +280,15 @@ class PvPLateGame extends GameplanImperative {
 
   private def doCannons(): Unit = {
     if (units(Protoss.Forge) > 0) {
-      buildCannonsAtBases(1, PlaceLabels.DefendHall)
+      buildCannonsAtMain(1, PlaceLabels.DefendHall)
+      buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
+      With.geography.ourBasesAndSettlements.view
+        .filterNot(_.isOurMain)
+        .filterNot(_.isOurNatural)
+        .foreach(base => {
+          val coverHall = base.zone.edges.exists(_.pixelCenter.pixelDistance(base.heart.center) > 32 * 10)
+          buildDefensesAt(3, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
+        })
     }
   }
 }

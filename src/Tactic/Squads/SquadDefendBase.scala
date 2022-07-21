@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Micro.Formation.{Formation, FormationEmpty, FormationGeneric, FormationZone}
+import Micro.Formation._
 import Performance.Cache
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -78,7 +78,7 @@ class SquadDefendBase(base: Base) extends Squad {
     lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(travelGoal))
     lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
     lazy val formationBastion   = FormationGeneric.march(this, bastion())
-    lazy val formationGuard     = guardChoke.map(c => FormationZone(this, guardZone, c)).getOrElse(formationBastion)
+    lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
 
     val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))

@@ -121,11 +121,31 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))
       .toVector
       .sortBy(_.formationRangePixels)
-    val arc = arcSlots(classCount, 32 + apex.pixelDistance(face))
-    val groundPlacementCentroid = Maff.exemplarOpt(arc.values.view.flatten).getOrElse(apex)
-    val output = arc ++ airUnits
-      .groupBy(_.unitClass)
-      .map(u => (u._1, u._2.map(x => groundPlacementCentroid)))
+
+    val classSlotsOverlook: Map[UnitClass, Seq[Pixel]] = if (style == FormationStyleGuard) overlookSlots(classCount) else Map.empty
+    val classCountRemaining = classCount.map(c => c.slots - classSlotsOverlook.get(c.unitClass).map(_.length).getOrElse(0))
+    val classSlotsArc       = arcSlots(classCount, 32 + apex.pixelDistance(face))
+    val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)
+    val classSlotsAir       = airUnits.groupBy(_.unitClass).map(u => (u._1, u._2.map(x => groundExemplar)))
+    val output              = classSlotsOverlook ++ classSlotsArc ++ classSlotsAir
+    output
+  }
+
+  /**
+    * Positions formation slots by using overlooks from a nearby base
+    */
+  private def overlookSlots(classSlots: Vector[ClassSlots]): Map[UnitClass, Seq[Pixel]] = {
+    val overlooks = goal.base.filter(base => argZone.forall(_.bases.contains(base))).map(_.overlooks).getOrElse(Vector.empty)
+    var i = 0
+    val output = classSlots
+      .map(slots => (slots.unitClass, (0 until slots.slots)
+        .map(unused => {
+          val output = if (i < overlooks.length && overlooks(i)._2 <= slots.formationRangePixels) overlooks(i)._1.center else null
+          i += 1
+          output
+        }).filter(_ != null)))
+      .toMap
+    output.foreach(o => o._2.foreach(p => With.grids.formationSlots.tryPlace(o._1, p)))
     output
   }
 
@@ -133,16 +153,16 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     * Positions formation slots by tracing an arc around the goal, centered at the apex.
     */
   private def arcSlots(classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
-    var unitClass = Terran.Marine
-    var angleIncrement = 0d
-    val angleCenter = face.radiansTo(apex)
+    var unitClass       = Terran.Marine
+    var angleIncrement  = 0d
+    val angleCenter     = face.radiansTo(apex)
     val radiusIncrement = 4d
-    var radius = face.pixelDistance(apex) - radiusIncrement
-    var rowSlot = -1
-    var slotsEvaluated = 0
-    var haltNegative = false
-    var haltPositive = false
-    var arcZone: Zone = null
+    var radius          = face.pixelDistance(apex) - radiusIncrement
+    var rowSlot         = -1
+    var slotsEvaluated  = 0
+    var haltNegative    = false
+    var haltPositive    = false
+    var arcZone: Zone   = null
     def nextRow(): Boolean = {
       radius += radiusIncrement
       angleIncrement = radiusIncrement / radius

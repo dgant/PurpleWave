@@ -406,6 +406,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && (if (isOurs) (
         ! tile.enemyDetected
         && ! matchups.enemies.exists(_.orderTarget.contains(this))
+        && ! matchups.enemies.exists(_.target.contains(this))
         && ! With.bullets.all.exists(_.targetUnit.contains(this)))
       else ! detected))
 

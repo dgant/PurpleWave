@@ -204,21 +204,20 @@ object Templates {
         "--CM2UTxxx",
         "--xxxxxxxx")) ++ bases // Default to generic base layouts if needed
 
-
   val initialLayouts = Seq(
     // It's critical that the Gateways not have tech buildings below them.
     // Gateway above Citadel-Pylon-Core can trap Dark Templar.
     new Template()
       .forExitDirection(Directions.Left, Directions.Down)
       .from(
-        "------------",
-        "-4xxx3xxRxx-",
-        "-xxxxxxxxxx-",
-        "-xxxxPx3xx--",
-        "-4xxxxxxxx-",
-        "-xxxxTxx2x-",
-        "-xxxxxxxxx-",
-        "-----------"),
+        "-------------",
+        "-4xxx-3xxRxx-",
+        "-xxxx-xxxxxx-", // Extra column is because Citadel right of that top Gateway can trap units
+        "-xxxx-Px3xx--",
+        "-4xxx-xxxxx-",
+        "-xxxx-2xTxx-",
+        "-xxxx-xxxxx-",
+        "------------"),
     new Template()
       .forExitDirection(Directions.Right, Directions.Up)
       .from(

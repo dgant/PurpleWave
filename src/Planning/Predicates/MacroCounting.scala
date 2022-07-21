@@ -46,6 +46,10 @@ trait MacroCounting {
     tech() || (withinFrames >= 0 && With.units.ours.exists(u => u.teching && u.techingType == tech && u.remainingTechFrames <= withinFrames))
   }
 
+  def anyUpgradeStarted(upgrades: Upgrade*): Boolean = {
+    upgrades.exists(upgradeStarted(_, 1))
+  }
+
   def upgradeStarted(upgrade: Upgrade, level: Int = 1): Boolean = {
     upgradeComplete(upgrade, level, upgrade.upgradeFrames(level))
   }

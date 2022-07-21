@@ -21,7 +21,8 @@ object Stealth extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     lazy val impendingTurret = unit.matchups.enemies.exists(e =>
       Protoss.PhotonCannon(e)
-      && unit.pixelDistanceEdge(e) + unit.topSpeed * e.remainingCompletionFrames < e.unitClass.sightPixels + 48)
+      && unit.pixelDistanceEdge(e) + unit.topSpeed * e.remainingCompletionFrames < e.unitClass.sightPixels + 48
+      && unit.pixelDistanceEdge(e) > Protoss.Probe.dimensionMax)
     lazy val nearDetectionRange = unit.tileArea.expand(2, 2).tiles.exists(With.grids.enemyDetection.inRange)
     lazy val nearMobileDetector = unit.matchups.enemyDetectors.exists(u => u.pixelDistanceEdge(unit) < u.sightPixels + u.topSpeed * Seconds(8)())
     if ( ! unit.effectivelyCloaked || nearDetectionRange || nearMobileDetector || impendingTurret) {

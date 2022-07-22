@@ -213,7 +213,7 @@ object Templates {
         "-------------",
         "-4xxx-3xxRxx-",
         "-xxxx-xxxxxx-", // Extra column is because Citadel right of that top Gateway can trap units
-        "-xxxx-Px3xx--",
+        "-xxxx-Px3Ix--",
         "-4xxx-xxxxx-",
         "-xxxx-2xTxx-",
         "-xxxx-xxxxx-",
@@ -224,7 +224,7 @@ object Templates {
         "------------",
         "-RxxTxx4xxx-",
         "-xxxxxxxxxx-",
-        "--3xxPxxxxx-",
+        "--3IxPxxxxx-",
         "x-xxxxx4xxx-",
         "x-2x3xxxxxx-",
         "x-xxxxxxxxx-",

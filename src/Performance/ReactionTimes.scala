@@ -22,7 +22,7 @@ class ReactionTimes {
   def planningAverage     : Int = planningAverageCache()
   def framesTotal         : Int = agencyAverage + estimationAverage + clusteringAverage
 
-  def sluggishness = _sluggishness()
+  def sluggishness: Int = _sluggishness()
   private val sluggishThresholds = Seq(4, 8, 12)
   private val _sluggishness = new Cache(() => sluggishThresholds.zipWithIndex.find(agencyAverage < _._1).map(_._2).getOrElse(sluggishThresholds.size))
 

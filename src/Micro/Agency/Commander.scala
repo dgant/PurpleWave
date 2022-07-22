@@ -49,70 +49,73 @@ object Commander {
     }
   }
 
+  // We used to refuse to issue commands to Photon Cannons due to inadvertent attack cancelling.
+  // It looks like we've fixed that by using a 6-frame stopFrame
+  //
+  // Via Ankmairdor, the iscript for Photon Cannon attacks:
+  // PhotonCannonGndAttkInit:
+  //   playfram           2
+  //   wait               2
+  //   playfram           1
+  //   wait               2
+  //   playfram           3
+  //   wait               2
+  // PhotonCannonGndAttkRpt:
+  //   wait               1
+  //   attack
+  //   gotorepeatattk
+  //   ignorerest
+  //
+  // on first frame of attack, the animation runs twice
+  // so there is 6 frame delay for first attack and 0 frame delay for continued attacks, also no non-interruptible section so additional commands can interupt an attack
+  // though the biggest optimization would be issuing an attack command rather than waiting for them to autotarget
+  // though I suppose with latency, this can backfire a small percentage(about 1/15 or 2/15) of the time and result in fewer attacks
+  //
+  // on average issuing an attack command that arrives on the first frame that a target is available will save 7 frames
+  // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
+  // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
   private val tryingToMoveThreshold = 32
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
     leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
+    if (Protoss.Reaver(unit)) With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
     if (unit.unready) return
-    if (Protoss.Reaver(unit)) {
-      With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
-    }
-    if (unit.transport.exists(_.flying)) {
-      unload(unit.transport.get, unit)
-      return
-    }
-
+    if (unit.transport.exists(_.flying)) { unload(unit.transport.get, unit); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
-
-    // We used to skip Photon Cannons here due to inadvertent attack cancelling.
-    // Now experimenting with using a 6-frame stopFrame and resuming targeting.
-    //
-    // Via Ankmairdor, the iscript for Photon Cannon attacks:
-    // PhotonCannonGndAttkInit:
-    //   playfram           2
-    //   wait               2
-    //   playfram           1
-    //   wait               2
-    //   playfram           3
-    //   wait               2
-    // PhotonCannonGndAttkRpt:
-    //   wait               1
-    //   attack
-    //   gotorepeatattk
-    //   ignorerest
-    //
-    // on first frame of attack, the animation runs twice
-    // so there is 6 frame delay for first attack and 0 frame delay for continued attacks, also no non-interruptible section so additional commands can interupt an attack
-    // though the biggest optimization would be issuing an attack command rather than waiting for them to autotarget
-    // though I suppose with latency, this can backfire a small percentage(about 1/15 or 2/15) of the time and result in fewer attacks
-    //
-    // on average issuing an attack command that arrives on the first frame that a target is available will save 7 frames
-    // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
-    // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
-    // as far as I can tell, no penalty for bad early guesses on attacking
-
-    if (Zerg.Lurker(unit) && ! unit.burrowed) { move(unit, target.pixel); return }
     if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
-    
-    if (target.visible) {
+    if (Zerg.Lurker(unit) && ! unit.burrowed) { move(unit, target.pixel); return }
+    if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) { move(unit, target.pixel); return }
+
+    // If we should be attack-commanding
+    if (target.visible && (unit.unitClass.melee || unit.flying || ! unit.canMove || unit.pixelsToGetInRange(target) < unit.topSpeed * (With.latency.latencyFrames + With.reaction.agencyAverage))) {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
       lazy val thisIsANewTarget = ! unit.orderTarget.contains(target)
-      
       val shouldOrder = (
         thisIsANewTarget
-        || (overdueToAttack && (moving || alreadyInRange))
-        || (target.isFriendly && Protoss.Carrier(unit))) // Carrier warmup; spam attack
+          || (overdueToAttack && (moving || alreadyInRange))
+          || (target.isFriendly && Protoss.Carrier(unit))) // Carrier warmup; spam attack to avoid actually doing damage
 
       if (shouldOrder) {
         unit.bwapiUnit.attack(target.bwapiUnit)
         target.addFutureAttack(unit)
       }
       sleepAttack(unit)
+      return
+    }
+
+    // Otherwise, we should be move-commanding.
+    //
+    // "obviousPosition" isn't necessarily obvious:
+    //  - For example, to shoot at a unit below a cliff we often need to manually walk up to the cliff.
+    //    Neither direct attack commands nor moving to the target's pixel will achieve that.
+    val obviousPosition = target.pixel.project(unit.pixel, unit.pixelRangeAgainst(target) + unit.unitClass.dimensionMin + target.unitClass.dimensionMin)
+    if (obviousPosition.traversableBy(unit) && (target.visible || obviousPosition.altitude >= target.altitude)) {
+      move(unit, obviousPosition)
     } else {
       move(unit, target.pixel)
     }

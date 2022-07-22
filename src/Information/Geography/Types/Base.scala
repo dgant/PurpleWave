@@ -54,16 +54,17 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def allies                  : Seq[UnitInfo]     = units.view.filter(_.isFriendly)
   def enemies                 : Seq[UnitInfo]     = units.view.filter(_.isEnemy)
 
-  val overlooks: Vector[(Tile, Double)] = {
+  lazy val overlooks: Vector[(Tile, Double)] = {
     val exit = zone.exitOriginal
-    if (exit.isEmpty) Vector.empty else {
+    if (exit.isEmpty || naturalOf.isEmpty) Vector.empty else {
       val exitAltitude = exit.get.pixelCenter.altitude
-      tiles.view
+      naturalOf.get.zone.tiles.view
         .filter(_.walkable)
         .filter(_.altitudeUnchecked > exitAltitude)
         .filter(_.groundTiles(exit.get.pixelCenter) < 48)
-        .map(tile => (tile, tile.center.pixelDistance(exit.get.pixelCenter) / 32.0))
+        .map(tile => (tile, tile.center.pixelDistance(exit.get.pixelCenter)))
         .toVector
+        .sortBy(_._2)
     }
   }
 

@@ -269,11 +269,13 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output                = distanceEntangled + distanceClosedByEnemy
     output
   }
-  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
   @inline val ptfVeryFarSquared: Int = With.mapPixelPerimeter * With.mapPixelPerimeter
   @inline private final def ptfBadAltitudePenalty(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) ptfVeryFarSquared  else 0
   @inline private final def ptfGoodAltitudeBonus(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
+  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
   @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
+    // Note: The entire "Exhaustive" branch of this was written for SSCAIT 2020 and unused since creating DefaultCombat. It is probably not well-tested.
+
     // Simple calculation
     if (unitClass.melee || With.reaction.sluggishness > 1 || ! canMove) {
       if (inRangeToAttack(enemy)) return pixel

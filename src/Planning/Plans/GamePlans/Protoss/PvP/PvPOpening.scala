@@ -73,8 +73,7 @@ class PvPOpening extends GameplanImperative {
       if (units(Protoss.Assimilator) == 0) {
         PvP3Zealot()
         PvP5Zealot()
-        // TODO: Against 10-12 it's okay to stay 3-Zealot. We only need 5-Zealot vs 9-9.
-        if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)) {
+        if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99, With.fingerprints.nexusFirst, With.fingerprints.gasSteal)) {
           PvP5Zealot.swapIn()
           PvP3Zealot.swapOut()
         }
@@ -164,11 +163,11 @@ class PvPOpening extends GameplanImperative {
       // 4-Gating quickly becomes a lot less appealing with more DT in the mix.
       if (PvPRobo()
         && ! With.strategy.isFixedOpponent
-        && trackRecordLacks(With.fingerprints.robo)) {
-        if (roll("SwapRoboIntoDT", ?(enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon), 0.6, 0.3))) {
-          PvPRobo.swapOut()
-          PvPDT.swapIn()
-        }
+        && trackRecordLacks(With.fingerprints.robo)
+        && roll("SwapRoboIntoDT", ?(enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon), 0.5, 0.3))) {
+        // COG 2022: DT results are underwhelming and robo needs more testing
+        //  PvPRobo.swapOut()
+        //  PvPDT.swapIn()
       }
       // 3/4-Gate Goon are advantaged against most Robo variants.
       // But we don't want to make this switch too predictably, as it's abusable.

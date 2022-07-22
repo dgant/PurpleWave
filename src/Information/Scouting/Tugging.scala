@@ -11,9 +11,8 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
 
 trait Tugging {
-  def tugStart                                  : Tile    = With.geography.home
-  def tugEnd                                    : Tile    = With.scouting.enemyHome
-  def tugLength                                 : Int     = tugStart.groundTiles(With.scouting.enemyHome)
+  def tugStart                                  : Tile    = With.geography.home.walkableTile
+  def tugEnd                                    : Tile    = With.scouting.enemyHome.walkableTile
   def tugDistanceGroundUs     (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugStart)
   def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugEnd)
   def proximity               (pixel  : Pixel)  : Double  = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)

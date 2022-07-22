@@ -114,7 +114,7 @@ object SquadAutomation {
 
   def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] =
     // Rush scenarios: Send army directly to vicinity
-    if (With.frame < Minutes(5)() && ! With.units.existsEnemy(IsWarrior)) Some(squad.vicinity) else
+    if (With.frame < Minutes(5)() && ! With.units.existsEnemy(IsWarrior) && unit.pixelDistanceTravelling(squad.vicinity) > 32 * 30) Some(squad.vicinity) else
     squad
     .formations
     .headOption

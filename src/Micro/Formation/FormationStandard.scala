@@ -77,7 +77,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {
-      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(_.groundPixels(zone.centroid)), 32 * expectRangeTiles)).getOrElse(apex)
+      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(_.walkablePixel.groundPixels(zone.centroid)), 32 * expectRangeTiles)).getOrElse(apex)
     } else if (goalPath.pathExists) {
       // Engage: Walk far enough to be in range
       // March: Walk far enough to advance our army
@@ -122,7 +122,10 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       .toVector
       .sortBy(_.formationRangePixels)
 
-    val classSlotsOverlook: Map[UnitClass, Seq[Pixel]] = if (style == FormationStyleGuard) overlookSlots(classCount) else Map.empty
+    val classSlotsOverlook: Map[UnitClass, Seq[Pixel]] =
+      if      (style == FormationStyleGuard)  overlookSlots(classCount, requireTarget = false)
+      else if (style == FormationStyleEngage) overlookSlots(classCount, requireTarget = true)
+      else                                    Map.empty
     val classCountRemaining = classCount.map(c => c.slots - classSlotsOverlook.get(c.unitClass).map(_.length).getOrElse(0))
     val classSlotsArc       = arcSlots(classCount, 32 + apex.pixelDistance(face))
     val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)
@@ -134,14 +137,21 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   /**
     * Positions formation slots by using overlooks from a nearby base
     */
-  private def overlookSlots(classSlots: Vector[ClassSlots]): Map[UnitClass, Seq[Pixel]] = {
+  private def overlookSlots(classSlots: Vector[ClassSlots], requireTarget: Boolean = false): Map[UnitClass, Seq[Pixel]] = {
     val overlooks = goal.base.filter(base => argZone.forall(_.bases.contains(base))).map(_.overlooks).getOrElse(Vector.empty)
     var i = 0
     val output = classSlots
+      .filter(slots => ! slots.unitClass.isFlyer && slots.unitClass != Protoss.Reaver && slots.unitClass != Terran.Medic)
       .map(slots => (slots.unitClass, (0 until slots.slots)
         .map(unused => {
-          val output = if (i < overlooks.length && overlooks(i)._2 <= slots.formationRangePixels) overlooks(i)._1.center else null
-          i += 1
+          var output: Pixel = null
+          while (output == null && i < overlooks.length && overlooks(i)._2 <= slots.formationRangePixels + 96) {
+            val overlook = overlooks(i)
+            if ( ! requireTarget || overlook._1.enemyVulnerabilityGround < With.grids.enemyVulnerabilityGround.margin) {
+              output = overlook._1.center
+            }
+            i += 1
+          }
           output
         }).filter(_ != null)))
       .toMap

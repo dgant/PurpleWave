@@ -32,12 +32,12 @@ class SquadDarkTemplar extends Squad {
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
   private lazy val backstabTargetDistance = backstabTarget.groundTiles(With.geography.home)
-  private lazy val hideyholeSpiral        = Spiral(32).map(backstabTarget.add).filter(_.walkable).filter(_.groundTiles(With.geography.home) < backstabTargetDistance + 16)
-  private lazy val hideyhole =
-    hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 14).orElse(
-      hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 12)).orElse(
-        hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 10)).orElse(
-          hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 8))
+  private lazy val hideyholeSpiral        = Spiral(48).map(backstabTarget.add).filter(_.walkable).filter(_.groundTiles(With.geography.home) < backstabTargetDistance + 16)
+  private lazy val hideyhole = // This should really be scoutingPathsStartLocations but that grid is bugged as of 7/2022 despite being nearly identical
+    hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 14).orElse(
+      hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 12)).orElse(
+        hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 10)).orElse(
+          hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 8))
 
   def run(): Unit = {
     if (bases().isEmpty) { lock.release(); return }

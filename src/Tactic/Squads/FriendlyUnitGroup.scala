@@ -2,6 +2,7 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -13,9 +14,10 @@ trait FriendlyUnitGroup extends UnitGroup {
   def groupUnits: Seq[UnitInfo] = groupFriendlyUnits
 
   def groupFriendlyOrderable: SeqView[FriendlyUnitInfo, Seq[FriendlyUnitInfo]] = groupFriendlyUnits.view.filter(_.unitClass.orderable)
-  def fightConsensus  = _fightConsensus()
-  def homeConsensus   = _homeConsensus()
-  def confidence11    = _confidence11()
+
+  def fightConsensus  : Boolean = _fightConsensus()
+  def homeConsensus   : Pixel   = _homeConsensus()
+  def confidence11    : Double  = _confidence11()
 
   private val _fightConsensus = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldEngage || u.battle.forall(_.judgement.exists(_.unitShouldFight(u))))).getOrElse(true))
   private val _homeConsensus  = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.home)).getOrElse(With.geography.home.center))

@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Micro.Formation.{Formation, FormationGeneric, FormationStyleDisengage, FormationStyleGuard}
+import Micro.Formation.{Formation, Formations, FormationStyleDisengage, FormationStyleGuard}
 import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -82,13 +82,13 @@ object SquadAutomation {
     // If advancing, give a formation for forward movement
     if (squad.fightConsensus) {
       val engageTarget = squad.targets.flatMap(_.headOption.map(_.pixel))
-      output += FormationGeneric.march(squad, to)
+      output += Formations.march(squad, to)
     }
     // Always include a disengagey formation for units that want to retreat/kite
     if (squad.centroidKey.zone == squad.homeConsensus.zone && With.scouting.enemyThreatOrigin.zone != squad.homeConsensus.zone) {
-      output += FormationGeneric.guard(squad, Some(squad.homeConsensus))
+      output += Formations.guard(squad, Some(squad.homeConsensus))
     } else {
-      output += FormationGeneric.disengage(squad)
+      output += Formations.disengage(squad)
     }
     output
   }

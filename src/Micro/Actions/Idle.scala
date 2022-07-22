@@ -39,6 +39,7 @@ object Idle extends Action {
     Transport,
     Scout,
     Bunk,
+    Crack,
     Fight,
     Attack,
     Move

@@ -153,7 +153,7 @@ class PvPOpening extends GameplanImperative {
       }
     }
     // Robo is a very middle-of-the-road build, and has a few pointed weaknesses.
-    // It's good against opponents playing diverse strategies bu3t unimpressive against one-dimensional opponents.
+    // It's good against opponents playing diverse strategies but unimpressive against one-dimensional opponents.
     if (PvPRobo()
       && upgradeStarted(Protoss.DragoonRange)
       && units(Protoss.RoboticsFacility) == 0
@@ -184,9 +184,17 @@ class PvPOpening extends GameplanImperative {
       }
     }
     // If we catch them going Robo against our DT, go goon-only
-    if (PvPDT() && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
+    if (PvPDT() && unitsComplete(Protoss.TemplarArchives) == 0 && (enemyRobo || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe))) {
       PvPDT.swapOut()
-      (if (roll("SwapDTInto4Gate", 0.5)) PvP4GateGoon else PvP3GateGoon).swapIn()
+      if (roll("SwapDTIntoExpand", 0.6)) {
+        PvPCoreExpand.swapIn()
+      } else if (roll("SwapDTInto4Gate", 0.5)) {
+        PvP4GateGoon.swapIn()
+      } else {
+        PvP3GateGoon.swapIn()
+      }
+    }
+    if ( ! PvPDT()) {
       cancel(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
       if (enemies(Protoss.Observer) > 0 || enemies(Protoss.Observatory) > 0) {
         cancel(Protoss.DarkTemplar)
@@ -313,6 +321,7 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
     shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)()
+    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend
@@ -676,8 +685,7 @@ class PvPOpening extends GameplanImperative {
       }
       trainRoboUnits()
       get(Protoss.DragoonRange)
-      // Distance check in case map has a degenerate natural
-      if (shouldExpand && ! With.geography.ourNatural.enemies.exists(u => u.canAttackGround && u.pixelDistanceCenter(With.geography.ourNatural.townHallArea.center) < 32 * 12)) {
+      if (shouldExpand && (With.scouting.weControlOurNatural || unitsComplete(Protoss.Reaver) > 1)) {
         requireMiningBases(2)
       }
       trainGatewayUnits()

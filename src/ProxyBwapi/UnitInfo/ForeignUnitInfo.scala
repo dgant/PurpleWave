@@ -19,6 +19,9 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
     }
     super.update()
     Imagination.checkVisibility(this)
+    if ( ! visible && ! complete && remainingCompletionFrames <= 0) {
+      changeCompletion(true)
+    }
   }
 
   private def remainingFrames(snapshotHitPoints: Int, snapshotShields: Int, dataFrame: Int): Int = {

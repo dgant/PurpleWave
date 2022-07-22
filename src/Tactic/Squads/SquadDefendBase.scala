@@ -75,9 +75,9 @@ class SquadDefendBase(base: Base) extends Squad {
       && u.pixelDistanceTravelling(heart) + 32 * 15 > travelGoal.travelPixelsFor(heart, u)
       && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
 
-    lazy val formationWithdraw  = FormationGeneric.disengage(this, Some(travelGoal))
-    lazy val formationScour     = FormationGeneric.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
-    lazy val formationBastion   = FormationGeneric.march(this, bastion())
+    lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
+    lazy val formationScour     = Formations.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
+    lazy val formationBastion   = Formations.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
 
     val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
@@ -112,9 +112,15 @@ class SquadDefendBase(base: Base) extends Squad {
 
   def intendScouring(scourer: FriendlyUnitInfo, target: UnitInfo): Unit = {
     val squad = this
+    val slot = formations.headOption.flatMap(_(scourer))
+    val where = slot
+      .filter(p => scourer.pixelsToGetInRangeFrom(target, p) <= scourer.pixelsToGetInRange(target))
+      .orElse(slot.map(p => target.pixel.project(p, scourer.pixelRangeAgainst(target))))
+      .getOrElse(target.pixel)
+      .traversiblePixel(scourer)
     scourer.intend(this, new Intention {
       targets = targets.map(target +: _)
-      toTravel = Some(target.pixel.traversiblePixel(scourer))
+      toTravel = Some(where)
       toReturn = SquadAutomation.getReturn(scourer, squad)
     })
   }

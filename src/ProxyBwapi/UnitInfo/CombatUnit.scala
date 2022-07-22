@@ -95,7 +95,7 @@ trait CombatUnit {
   @inline final def cooldownMaxAgainst(enemy: CombatUnit): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   @inline final def pixelRangeAgainst(enemy: CombatUnit): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
-  @inline final def formationRangePixels: Double = Math.max(0, Math.max(effectiveRangePixels, if (unitClass == Terran.SiegeTankUnsieged && Terran.SiegeMode(player)) Terran.SiegeTankSieged.effectiveRangePixels else 0) - (if (unitClass == Protoss.Reaver) 64 else 32))
+  @inline final def formationRangePixels: Double = Math.max(0, Math.max(effectiveRangePixels, if (unitClass == Terran.SiegeTankUnsieged && Terran.SiegeMode(player)) Terran.SiegeTankSieged.effectiveRangePixels else 0) - (if (unitClass == Protoss.Reaver) 80 else 32))
   @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
 
   @inline final def x           : Int   = pixel.x
@@ -137,8 +137,9 @@ trait CombatUnit {
   @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)      : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: CombatUnit, usAt: Pixel, to: Pixel): Boolean = { val d = pixelDistanceEdge(enemy, usAt, to); d <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || d > pixelRangeMin) }
   @inline final def inRangeToAttackFrom(enemy: CombatUnit, usAt: Pixel)   : Boolean = pixelDistanceEdgeFrom(enemy, usAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdgeFrom(enemy, usAt) > pixelRangeMin)
-  @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy)          - pixelRangeAgainst(enemy)) else LightYear()
-  @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt) - pixelRangeAgainst(enemy)) else LightYear()
+  @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy)            - pixelRangeAgainst(enemy)) else LightYear()
+  @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt)   - pixelRangeAgainst(enemy)) else LightYear()
+  @inline final def pixelsToGetInRangeFrom(enemy: CombatUnit, usAt: Pixel): Double = if (canAttack(enemy)) (pixelDistanceEdgeFrom(enemy, usAt)  - pixelRangeAgainst(enemy)) else LightYear()
   @inline final def pixelsToGetInRangeTraveling(enemy: CombatUnit)        : Double = Math.max(pixelsToGetInRange(enemy), if ( ! canAttack(enemy) || flying || inRangeToAttack(enemy)) 0 else pixelDistanceTravelling(enemy.pixel) - pixelRangeAgainst(enemy) - unitClass.dimensionMin - enemy.unitClass.dimensionMin)
   @inline final def framesToTravelTo(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   @inline final def framesToTravelTo(destination: Tile)     : Int = framesToTravelTo(destination.center)

@@ -50,12 +50,12 @@ object UpdateZones {
 
   def calculateExit(zone: Zone): Option[Edge] = {
     val enemyZone = zone.bases.exists(_.isEnemy) && ! zone.bases.exists(_.isOurs)
+    // Take the edge closest to opposing production
     Maff.minBy(zone.edges)(edge =>
         Maff.orElse(
-          (if (enemyZone) With.geography.enemyBases else With.geography.ourBases).map(_.heart),
-          Seq(if (enemyZone) With.scouting.ourThreatOrigin else With.scouting.enemyThreatOrigin))
-        .map(edge.distanceGrid.get)
-      .min)
+          (if (enemyZone) Seq(With.geography.ourMain.heart)   else With.scouting.enemyMain.map(_.heart).toSeq),
+          (if (enemyZone) Seq(With.scouting.ourThreatOrigin)  else Seq(With.scouting.enemyThreatOrigin)))
+        .map(edge.distanceGrid.get))
   }
   def calculateEntrance(zone: Zone): Option[Edge] = {
     Maff.minBy(zone.edges)(edge => With.geography.startLocations.map(edge.distanceGrid.get).min)

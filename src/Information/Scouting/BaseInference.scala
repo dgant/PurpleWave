@@ -2,7 +2,7 @@ package Information.Scouting
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Terran, Zerg}
 import Utilities.Time.{Forever, GameTime, Minutes, Seconds}
 
 trait BaseInference {
@@ -18,6 +18,20 @@ trait BaseInference {
   private var _firstExpansionFrameEnemy: Int = Forever()
   private var _firstExpansionFrameUs: Int = Forever()
   private var _enemyMainScouted: Boolean = false
+
+  def enemyNaturalPossiblyMining: Boolean = {
+    // Recent observations are proof
+    var output = enemyNatural.forall(b => With.framesSince(b.lastFrameScoutedByUs) > Terran.CommandCenter.buildFrames)
+    // Infer
+    output &&= ! With.fingerprints.dtRush()         && With.frame < GameTime(5, 40)()
+    output &&= ! With.fingerprints.threeGateGoon()  && With.frame < GameTime(6, 45)()
+    output &&= ! With.fingerprints.fourGateGoon()   && With.frame < GameTime(8, 0)()
+    output &&= With.sense.enemySecretMinerals >= 400
+    // Accept obvious proof
+    output ||= enemyNatural.exists(_.townHall.exists(_.complete))
+    output ||= enemyNatural.exists(_.owner.isEnemy)
+    output
+  }
 
   protected def updateBaseInference(): Unit = {
     _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.find(_.owner.isEnemy))

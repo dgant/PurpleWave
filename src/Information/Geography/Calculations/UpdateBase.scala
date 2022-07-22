@@ -67,13 +67,14 @@ object UpdateBase {
 
         if ( ! With.self.isZerg
           && With.scouting.weExpandedFirst
+          && With.scouting.enemyNaturalPossiblyMining
           && base.naturalOf.exists(With.scouting.enemyMain.contains)
           && With.frame > Math.max(With.scouting.firstExpansionFrameUs, base.lastFrameScoutedByUs) + hiddenNaturalDelay) {
           base.owner = base.naturalOf.get.owner
           With.logger.debug(f"Assuming ${base.owner} has taken $base last scouted at ${base.lastFrameScoutedByUs} after we expanded on ${With.scouting.firstExpansionFrameUs}")
         }
 
-        if ( ! base.scoutedByUs && base.owner.bases.forall(base.natural.contains)) {
+        if ( ! base.scoutedByUs && base.owner.bases.forall(base.natural.contains) && With.sense.enemySecretMinerals >= 400) {
           base.natural.filter(_.isEnemy).foreach(natural => {
             base.owner = natural.owner
             With.logger.debug(f"Assuming ${base.owner} owns unscouted main $base due to possession of its natural {$base.natural}")

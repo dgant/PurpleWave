@@ -3,7 +3,7 @@ package Micro.Formation
 import Mathematics.Points.Pixel
 import Tactic.Squads.FriendlyUnitGroup
 
-object FormationGeneric {
+object Formations {
   def march(group: FriendlyUnitGroup, destination: Pixel) : Formation = {
     new FormationStandard(group, FormationStyleMarch, destination)
   }

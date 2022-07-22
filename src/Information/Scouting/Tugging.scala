@@ -1,6 +1,6 @@
 package Information.Scouting
 
-import Information.Geography.Types.Base
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
@@ -8,24 +8,28 @@ import Performance.Cache
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.?
 
 trait Tugging {
-  def tugStart                                  : Tile    = With.geography.home.walkableTile
-  def tugEnd                                    : Tile    = With.scouting.enemyHome.walkableTile
-  def tugDistanceGroundUs     (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugStart)
-  def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double  = pixel.walkablePixel.groundPixels(tugEnd)
-  def proximity               (pixel  : Pixel)  : Double  = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
-  def proximity               (tile   : Tile)   : Double  = proximity(tile.center)
-  def proximity               (base   : Base)   : Double  = proximity(base.townHallArea.center)
-  def ourProximity                              : Double  = proximity(ourMuscleOrigin)
-  def enemyProximity                            : Double  = proximity(enemyMuscleOrigin)
-  def weControl               (pixel  : Pixel)  : Boolean = ourProximity    < proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut)
-  def enemyControls           (pixel  : Pixel)  : Boolean = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
-  def weControl               (tile   : Tile)   : Boolean = weControl(tile.center)
-  def enemyControls           (tile   : Tile)   : Boolean = enemyControls(tile.center)
-  def weControl               (base   : Base)   : Boolean = weControl(base.townHallArea.center) || weControl(base.centroid) || ?(proximity(base) > 0.5, base.zone.exitNow, base.zone.entranceNow).map(_.pixelCenter).exists(weControl)
-  def weControlOurNatural                       : Boolean = weControl(With.geography.ourNatural)
+  def tugStart                                  : Tile        = With.geography.home.walkableTile
+  def tugEnd                                    : Tile        = With.scouting.enemyHome.walkableTile
+  def tugDistanceGroundUs     (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugStart)
+  def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugEnd)
+  def proximity               (pixel  : Pixel)  : Double      = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
+  def proximity               (tile   : Tile)   : Double      = proximity(tile.center)
+  def proximity               (base   : Base)   : Double      = proximity(base.townHallArea.center)
+  def ourProximity                              : Double      = proximity(ourMuscleOrigin)
+  def enemyProximity                            : Double      = proximity(enemyMuscleOrigin)
+  def weControl               (pixel  : Pixel)  : Boolean     = ourProximity    < proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut)
+  def enemyControls           (pixel  : Pixel)  : Boolean     = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
+  def weControl               (tile   : Tile)   : Boolean     = weControl(tile.center)
+  def enemyControls           (tile   : Tile)   : Boolean     = enemyControls(tile.center)
+  def weControlOurNatural                       : Boolean     = weControl(With.geography.ourNatural)
+  def weControl               (base   : Base)   : Boolean     = controlPoints(base).count(weControl) > controlPoints(base).count(enemyControls)
+  def weControl               (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) > controlPoints(zone).count(enemyControls)
+  def enemyControls           (base   : Base)   : Boolean     = controlPoints(base).count(weControl) < controlPoints(base).count(enemyControls)
+  def enemyControls           (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) < controlPoints(zone).count(enemyControls)
+  private def controlPoints   (base   : Base)   : Seq[Pixel]  = Seq(Some(base.townHallArea.center), Some(base.centroid.center), base.zone.entranceNow.map(_.pixelCenter), base.zone.exitNow.map(_.pixelCenter)).flatten
+  private def controlPoints   (zone   : Zone)   : Seq[Pixel]  = (zone.bases.flatMap(controlPoints) ++ Seq(Some(zone.centroid.center), zone.entranceNow.map(_.pixelCenter), zone.exitNow.map(_.pixelCenter)).flatten).distinct
 
   def enemyThreatOrigin : Tile = _enemyThreatOrigin()
   def enemyMuscleOrigin : Tile = _enemyMuscleOrigin()

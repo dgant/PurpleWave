@@ -30,4 +30,6 @@ trait Formation {
     })
     DrawMap.polygon(Maff.convexHull(placements.flatMap(p => p._1.unitClass.corners.map(p._2.add)).toSeq), style.color)
   }
+
+  def apply(unit: FriendlyUnitInfo): Option[Pixel] = placements.get(unit)
 }

@@ -33,11 +33,14 @@ class SquadDarkTemplar extends Squad {
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
   private lazy val backstabTargetDistance = backstabTarget.groundTiles(With.geography.home)
   private lazy val hideyholeSpiral        = Spiral(48).map(backstabTarget.add).filter(_.walkable).filter(_.groundTiles(With.geography.home) < backstabTargetDistance + 16)
-  private lazy val hideyhole = // This should really be scoutingPathsStartLocations but that grid is bugged as of 7/2022 despite being nearly identical
-    hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 14).orElse(
-      hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 12)).orElse(
-        hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 10)).orElse(
-          hideyholeSpiral.find(With.grids.scoutingPathsBases(_) > 8))
+  private lazy val hideyhole = {
+    val output = hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 16).orElse(
+      hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 13)).orElse(
+        hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 10)).orElse(
+          hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 8))
+    With.logger.debug(f"Selected DT hidey hole: $output")
+    output
+  }
 
   def run(): Unit = {
     if (bases().isEmpty) { lock.release(); return }

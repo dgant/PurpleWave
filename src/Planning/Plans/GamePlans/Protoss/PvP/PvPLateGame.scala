@@ -47,7 +47,7 @@ class PvPLateGame extends GameplanImperative {
     shouldExpand = fearMacro || ! fearDeath
     shouldExpand &&= ( ! fearContain || With.geography.safeExpansions.nonEmpty)
     shouldExpand &&= (fearMacro || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases) || miningBases <= Math.min(unitsComplete(IsWarrior) / 14, productionCapacity / 3))
-    shouldExpand ||= miningBases < 1
+    shouldExpand ||= miningBases < 1 + Math.min(unitsComplete(Protoss.Reaver), 2 * unitsComplete(Protoss.Shuttle))
     shouldExpand &&= With.geography.ourBases.isEmpty || With.geography.ourBases.exists(With.scouting.weControl)
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
@@ -92,6 +92,33 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech) .filter(x => commitToTech && upgradeStarted(Protoss.GroundDamage)))
       .orElse(Some(RoboTech)    .filter(x => commitToTech))
 
+    ///////////////////////////
+    // High-priority builds! //
+    ///////////////////////////
+
+    PvPIdeas.requireTimelyDetection()
+    if (recentlyExpandedFirst) {
+      if (PvPCoreExpand()) {
+        if (units(Protoss.Gateway) < 3) {
+          doTrainArmy()
+          get(3, Protoss.Gateway)
+        }
+      } else if (PvPDT()) {
+        pump(Protoss.DarkTemplar, 1)
+        get(5, Protoss.Gateway)
+        shouldAttack = false
+        shouldContain = false
+      } else {
+        get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
+        get(4 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
+      }
+      if ( ! With.scouting.enemyNaturalPossiblyMining) {
+        pumpSupply()
+        doTrainArmy()
+        get(6, Protoss.Gateway)
+      }
+    }
+
     if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
     if (dtBraveryHome) status("DTBraveHome")
     if (dtBraveryAbroad) status("DTBraveAbroad")
@@ -105,23 +132,6 @@ class PvPLateGame extends GameplanImperative {
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString.replaceAll("Tech", "")).foreach(status)
-    PvPIdeas.requireTimelyDetection()
-    if (recentlyExpandedFirst) {
-      if (PvPCoreExpand()) {
-        if (units(Protoss.Gateway) < 3) {
-          doTrainArmy()
-          get(3, Protoss.Gateway)
-        }
-      } else if (PvPDT()) {
-        pump(Protoss.DarkTemplar, 1)
-        get(6, Protoss.Gateway)
-        shouldAttack = false
-        shouldContain = false
-      } else {
-        get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
-        get(5 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
-      }
-    }
   }
 
   override def executeMain(): Unit = {
@@ -160,7 +170,9 @@ class PvPLateGame extends GameplanImperative {
     }
     if (enemies(Protoss.Observer) == 0 || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
       pump(Protoss.DarkTemplar, 1)
-      once(2, Protoss.DarkTemplar)
+      if (unitsComplete(Protoss.DarkTemplar) == 0) {
+        once(2, Protoss.DarkTemplar)
+      }
     }
     pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))
     if ( ! expectCarriers && ! fearDeath && ( ! fearContain || ! enemyRobo)) {

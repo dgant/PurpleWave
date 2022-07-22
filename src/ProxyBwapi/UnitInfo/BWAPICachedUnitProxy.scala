@@ -261,7 +261,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
     }
   }
 
-  final def changeVisibility(value: Visibility.Value): Unit = {
+  @inline final def changeVisibility(value: Visibility.Value): Unit = {
     _visibility = value
     _visibility match {
       case Visibility.Visible           => _burrowed = bwapiUnit.isBurrowed ; _alive = true; _lastSeen = With.frame
@@ -271,5 +271,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       case Visibility.Hypothetical      => _burrowed = false                ; _alive = true; _detected = false
       case Visibility.Dead              => _alive = false
     }
+  }
+
+  @inline final def changeCompletion(value: Boolean): Unit = {
+    _complete = value
   }
 }

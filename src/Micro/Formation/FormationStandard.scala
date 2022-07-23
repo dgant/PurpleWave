@@ -74,7 +74,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
 
   val slots       : Map[UnitClass,        Seq[Pixel]] = slotsByClass()
   val unassigned  : UnassignedFormation               = UnassignedFormation(style, slots, group)
-  val placements  : Map[FriendlyUnitInfo, Pixel]      = unassigned.radiallyFromCentroid
+  val placements  : Map[FriendlyUnitInfo, Pixel]      = unassigned.outwardFromCentroid
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {

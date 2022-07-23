@@ -168,6 +168,6 @@ trait Polygons {
     val radiansEnd    = end   .map(p => (p, centroidEnd   .radiansTo(p)))
     val sortedStart   = radiansStart.sortBy(u => Maff.radiansTo(radiansOrigin, u._2))
     val sortedEnd     = radiansEnd  .sortBy(u => Maff.radiansTo(radiansOrigin, u._2))
-    sortedStart.view.zipWithIndex.map(p => (p._1._1, sortedEnd(p._2)._1))
+    sortedStart.view.take(sortedEnd.length).zipWithIndex.map(p => (p._1._1, sortedEnd(p._2)._1))
   }
 }

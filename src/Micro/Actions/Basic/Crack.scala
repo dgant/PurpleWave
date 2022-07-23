@@ -12,7 +12,7 @@ object Crack extends Action {
     unit.zone.units.find(u => u.unitClass.isBuilding && u.isNeutral && unit.canAttack(u))
   }
 
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = (
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canAttack
     && ! unit.unitClass.melee
     && With.frame > Minutes(5)()

@@ -312,7 +312,7 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(IsWarrior) < 8
       && ! PvPIdeas.enemyLowUnitStrategy)
     // Push out to take our natural
-    shouldAttack ||= shouldExpand && With.units.ours.exists(_.intent.toBuildTile.exists(_.base.exists( ! _.isOurs)))
+    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural
     // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
     shouldAttack &&= ! (With.frame > GameTime(5, 10)()
       && PvP1012()
@@ -321,7 +321,6 @@ class PvPOpening extends GameplanImperative {
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
     // Ensure that committed Zealots keep wanting to attack
     shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)()
-    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     // Chill vs. 2-Gate until we're ready to defend

@@ -1,18 +1,17 @@
 package Micro.Actions.Combat.Maneuvering
 
 import Lifecycle.With
-import Mathematics.{Maff, Shapes}
 import Mathematics.Points.Pixel
-import Mathematics.Shapes.Ray
+import Mathematics.{Maff, Shapes}
 import Micro.Actions.Action
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsTank
 
 object Retreat extends Action {
   
@@ -46,7 +45,7 @@ object Retreat extends Action {
     }
     lazy val force = forceVector.radians
 
-    if (unit.agent.ride.exists(_.pixelDistanceCenter(unit) < Shuttling.pickupRadius) && unit.matchups.targetsInRange.isEmpty) {
+    if (unit.agent.ride.exists(_.pixelDistanceCenter(unit) < Shuttling.pickupRadius + 32) && unit.matchups.targetsInRange.isEmpty) {
       Commander.rightClick(unit, unit.agent.ride.get)
       return RetreatPlan(unit, unit.agent.ride.get.pixel, "Hail")
     }

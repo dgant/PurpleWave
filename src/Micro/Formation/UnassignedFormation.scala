@@ -39,7 +39,7 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
 
   def radiallyFromCentroid: Map[FriendlyUnitInfo, Pixel] = {
     if (slots.isEmpty) return Map.empty
-    slots.keys.map(unitClass => assignOutwardFromCentroid(unitClass)).reduce(_ ++ _)
+    slots.keys.map(unitClass => assignRadiallyFromCentroid(unitClass)).reduce(_ ++ _)
   }
 
   def sprayToward(to: Pixel): Map[FriendlyUnitInfo, Pixel] = {

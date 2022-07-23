@@ -46,7 +46,7 @@ object DefaultCombat extends Action {
       .find(_.nonEmpty)
       .flatten
     unit.agent.toAttack = potshotTarget.orElse(unit.agent.toAttack)
-    if (potshotTarget.isDefined) {
+    if (potshotTarget.exists(TargetFilterPotshot.legal(unit, _))) {
       unit.agent.act("Potshot")
       Commander.attack(unit)
     }

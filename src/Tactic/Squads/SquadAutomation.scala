@@ -4,10 +4,11 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
-import Micro.Formation.{Formation, Formations, FormationStyleDisengage, FormationStyleGuard}
+import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
 import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 import Utilities.Time.Minutes
 
 import scala.collection.mutable.ArrayBuffer
@@ -54,7 +55,7 @@ object SquadAutomation {
       .filter(_.likelyStillThere)
       .filter(e => (e.canAttack || e.team.isDefined) && group.groupUnits.exists(u =>
         e.canAttack(u)
-        && e.pixelsToGetInRange(u) < 32 * (if (u.visibleToOpponents && u.pixelDistanceTravelling(to) < e.pixelDistanceTravelling(to)) 1 else 8)))
+        && e.pixelsToGetInRange(u) < 32 * ?( ! u.visibleToOpponents || u.pixelDistanceTravelling(to) < e.pixelDistanceTravelling(to), 1, 8)))
       .toVector
     val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct
     val output =

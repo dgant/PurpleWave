@@ -160,10 +160,14 @@ trait Polygons {
     val croppedEnd    = end   .take(start.length)
     val centroidStart = Maff.centroid(croppedStart)
     val centroidEnd   = Maff.centroid(croppedEnd)
+    // We're sorting points by angle from field centroid.
+    // 0 is kind of an arbitrary angle to start our sort, isn't it? Let's choose a different arbitrary angle.
+    // I have no idea if this produces better results but it feels reasonable.
+    val radiansOrigin = centroidStart.radiansTo(centroidEnd)
     val radiansStart  = start .map(p => (p, centroidStart .radiansTo(p)))
     val radiansEnd    = end   .map(p => (p, centroidEnd   .radiansTo(p)))
-    val sortedStart   = radiansStart.sortBy(_._2)
-    val sortedEnd     = radiansEnd  .sortBy(_._2)
+    val sortedStart   = radiansStart.sortBy(u => Maff.radiansTo(radiansOrigin, u._2))
+    val sortedEnd     = radiansEnd  .sortBy(u => Maff.radiansTo(radiansOrigin, u._2))
     sortedStart.view.zipWithIndex.map(p => (p._1._1, sortedEnd(p._2)._1))
   }
 }

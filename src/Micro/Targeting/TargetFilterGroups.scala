@@ -7,6 +7,7 @@ object TargetFilterGroups {
   val filtersRequired = Vector(
     TargetFilterEnemy,
     TargetFilterPossible,
+    TargetFilterMissing,
     TargetFilterLarvaAndEgg,
     TargetFilterFocus,
     TargetFilterStayCloaked,

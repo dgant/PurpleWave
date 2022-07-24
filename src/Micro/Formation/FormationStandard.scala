@@ -142,7 +142,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     val overlooks = goal.base.filter(base => argZone.forall(_.bases.contains(base))).map(_.overlooks).getOrElse(Vector.empty)
     var i = 0
     val output = classSlots
-      .filter(slots => ! slots.unitClass.isFlyer && slots.unitClass != Protoss.Reaver && slots.unitClass != Terran.Medic)
+      .filter(slots => ! slots.unitClass.isFlyer && slots.unitClass != Protoss.Reaver && slots.unitClass != Terran.Medic && slots.unitClass.effectiveRangePixels >= 128)
       .map(slots => (slots.unitClass, (0 until slots.slots)
         .map(unused => {
           var output: Pixel = null

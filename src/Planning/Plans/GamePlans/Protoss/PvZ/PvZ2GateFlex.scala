@@ -1,8 +1,8 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
-import Macro.Requests.Get
-import Placement.Access.PlaceLabels.DefendAir
+import Placement.Access.PlaceLabels
+import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
@@ -19,46 +19,43 @@ class PvZ2GateFlex extends GameplanImperative {
   var goObserver: Boolean = false
 
   override def executeBuild(): Unit = {
-    buildOrder(
-      Get(8, Protoss.Probe),
-      Get(Protoss.Pylon),
-      Get(10, Protoss.Probe),
-      Get(Protoss.Gateway))
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
     if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(IsWarrior) < 5) {
       pumpSupply()
       pumpWorkers()
       pump(Protoss.Zealot)
     }
-    buildOrder(
-      Get(12, Protoss.Probe),
-      Get(2, Protoss.Gateway),
-      Get(13, Protoss.Probe),
-      Get(Protoss.Zealot),
-      Get(2, Protoss.Pylon),
-      Get(15, Protoss.Probe),
-      Get(3, Protoss.Zealot),
-      Get(16, Protoss.Probe),
-      Get(3, Protoss.Pylon),
-      Get(17, Protoss.Probe),
-      Get(5, Protoss.Zealot),
-      Get(18, Protoss.Probe),
-      Get(4, Protoss.Pylon),
-      Get(Protoss.Assimilator),
-      Get(19, Protoss.Probe))
+    once(12, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(3, Protoss.Pylon)
+    once(17, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(4, Protoss.Pylon)
+    once(Protoss.Assimilator)
+    once(19, Protoss.Probe)
     if (goCorsair) {
-      buildOrder(
-        Get(Protoss.CyberneticsCore),
-        Get(7, Protoss.Zealot),
-        Get(21, Protoss.Probe),
-        Get(8, Protoss.Zealot),
-        Get(1, Protoss.Dragoon))
+      once(Protoss.CyberneticsCore)
+      once(7, Protoss.Zealot)
+      once(21, Protoss.Probe)
+      once(8, Protoss.Zealot)
+      once(1, Protoss.Dragoon)
     } else if (goSpeedlots) {
-      buildOrder(
-        Get(Protoss.Forge),
-        Get(7, Protoss.Zealot),
-        Get(21, Protoss.Probe),
-        Get(Protoss.GroundDamage),
-        Get(9, Protoss.Zealot))
+      once(Protoss.Forge)
+      once(7, Protoss.Zealot)
+      once(21, Protoss.Probe)
+      once(Protoss.GroundDamage)
+      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
+      once(9, Protoss.Zealot)
     }
   }
   override def executeMain(): Unit = {
@@ -75,6 +72,7 @@ class PvZ2GateFlex extends GameplanImperative {
   }
 
   private val meldAllArchons = new MeldArchons
+  private val meldMostArchons = new MeldArchons(60)
   private val meldSomeArchons = new MeldArchons(49)
   def earlyGame(): Unit = {
     // Goal is to be home before any Mutalisks can pop.
@@ -143,37 +141,32 @@ class PvZ2GateFlex extends GameplanImperative {
     }
     meldAllArchons.update()
     if (units(Protoss.TemplarArchives) > 0) {
-      buildOrder(Get(2, Protoss.HighTemplar))
+      once(2, Protoss.HighTemplar)
     }
     pump(Protoss.DarkTemplar, 1)
     pump(Protoss.HighTemplar)
     pump(Protoss.Zealot, 12)
     pump(Protoss.Corsair, 1)
     if (goSpeedlots) {
-      get(Protoss.Assimilator)
-      get(Protoss.Forge)
-      get(Protoss.CyberneticsCore)
+      get(Protoss.Assimilator, Protoss.Forge, Protoss.CyberneticsCore)
       get(Protoss.GroundDamage)
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
       get(Protoss.TemplarArchives)
     }
     pump(Protoss.Zealot)
-    get(Protoss.CitadelOfAdun)
-    get(Protoss.TemplarArchives)
+    get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
     get(Protoss.ZealotSpeed)
     pumpWorkers(oversaturate = true)
-    get(4, Protoss.Gateway)
-    if (units(Protoss.TemplarArchives) > 0) {
-      get(5, Protoss.Gateway)
-    }
+    get(5, Protoss.Gateway)
     requireMiningBases(2)
   }
 
   def restOfGame(): Unit = {
     val safeFromMutalisks = ! enemyMutalisksLikely || unitsComplete(Protoss.Corsair) >= 5
     val safeFromGround = (upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.GroundDamage)) || enemyMutalisksLikely
-    if (safeFromGround && safeFromMutalisks && safeToMoveOut) {
+    // This unitsComplete() check is from observing excess passivity in COG2022 testing
+    if (safeFromGround && safeFromMutalisks && (safeToMoveOut || unitsComplete(IsWarrior) >= 24)) {
       attack()
       requireMiningBases(2)
     }
@@ -202,7 +195,7 @@ class PvZ2GateFlex extends GameplanImperative {
     trainCorsairs()
     val mutaCannons = Math.min(3, enemies(Zerg.Mutalisk) / 3)
     if (mutaCannons > 0) {
-      buildCannonsAtBases(mutaCannons, DefendAir)
+      buildCannonsAtBases(mutaCannons, DefendHall)
     }
 
     if (safeAtHome && unitsComplete(IsWarrior) >= 10) {
@@ -222,7 +215,7 @@ class PvZ2GateFlex extends GameplanImperative {
   }
 
   def doTrainCorsairs(): Unit = {
-    buildOrder(Get(Protoss.Corsair))
+    once(Protoss.Corsair)
     if (enemyMutalisksLikely) {
       pumpRatio(Protoss.Corsair, 7, 12, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Scourge, 0.5)))
       get(2, Protoss.Stargate)
@@ -238,6 +231,8 @@ class PvZ2GateFlex extends GameplanImperative {
   def doTrainMainArmy(): Unit = {
     if ( ! techStarted(Protoss.PsionicStorm)) {
       meldAllArchons.update()
+    } else if (unitsComplete(IsWarrior) < 12) {
+      meldMostArchons.update()
     } else {
       meldSomeArchons.update()
     }
@@ -250,9 +245,9 @@ class PvZ2GateFlex extends GameplanImperative {
     if (minerals > 500 && gas < 50) {
       pump(Protoss.Zealot)
     }
+    pumpRatio(Protoss.HighTemplar, 4, 12, Seq(Friendly(IsWarrior, 0.15)))
     pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Corsair, -1.5), Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Lurker, 1.5)))
     pumpRatio(Protoss.Dragoon, 0, 24, Seq(Flat(-12), Friendly(Protoss.Zealot, 2.0)))
-    pumpRatio(Protoss.HighTemplar, 4, 12, Seq(Friendly(IsWarrior, 0.15)))
     if (upgradeComplete(Protoss.ShuttleSpeed, 1, Protoss.Shuttle.buildFrames)) {
       pump(Protoss.Shuttle, 1)
     }

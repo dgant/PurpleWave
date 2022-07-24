@@ -9,10 +9,10 @@ import Utilities.UnitFilters.IsTank
 trait GeographyCache extends GeographyBuilder {
   private def geo: Geography = With.geography
 
-  protected val enemyBasesCache     : Cache[Vector[Base]]     = new Cache(() => geo.bases.filter(_.isEnemy))
-  protected val ourZonesCache       : Cache[Vector[Zone]]     = new Cache(() => geo.zones.filter(_.isOurs))
-  protected val ourBasesCache       : Cache[Vector[Base]]     = new Cache(() => geo.bases.filter(_.isOurs))
-  protected val ourSettlementsCache : Cache[Vector[Base]]     = new Cache(() => getSettlements)
+  protected val enemyBasesCache     : Cache[Vector[Base]] = new Cache(() => geo.bases.filter(_.isEnemy))
+  protected val ourZonesCache       : Cache[Vector[Zone]] = new Cache(() => geo.zones.filter(_.isOurs))
+  protected val ourBasesCache       : Cache[Vector[Base]] = new Cache(() => geo.bases.filter(_.isOurs))
+  protected val ourSettlementsCache : Cache[Vector[Base]] = new Cache(() => getSettlements)
 
   protected val ourMainCache: Cache[Base] = new Cache(() =>
     Maff.orElse(

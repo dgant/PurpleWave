@@ -6,18 +6,17 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.{IsFlyingWarrior, IsAny}
+import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
 import Utilities.Time.Seconds
 
 class SquadAcePilots extends Squad {
-  val acePilots = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
-  val acePilotMatcher = IsAny(acePilots: _*)
-
-  val splashPilots = Seq(Terran.Valkyrie, Protoss.Corsair)
-  val splashPilotMatcher = IsAny(splashPilots: _*)
-
+  val acePilots         : Seq[UnitClass]  = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
+  val acePilotMatcher   : UnitFilter      = IsAny(acePilots: _*)
+  val splashPilots      : Seq[UnitClass]  = Seq(Terran.Valkyrie, Protoss.Corsair)
+  val splashPilotMatcher: UnitFilter      = IsAny(splashPilots: _*)
   lock.matcher = acePilotMatcher
   lock.counter = CountEverything
   override def launch(): Unit = {
@@ -28,12 +27,21 @@ class SquadAcePilots extends Squad {
   override def toString: String = activity
 
   override def run(): Unit = {
+    val lastActivity = activity
+    chooseActivity()
+    if (activity != lastActivity) {
+      With.logger.debug(f"Pilots switch from $lastActivity to $activity")
+    }
+  }
+
+  private def chooseActivity(): Unit = {
+
     // Help other squads with anti-air
     val otherSquads = With.squads.all.view.filterNot(==)
     val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
     if (squadsToCover.nonEmpty) {
       val squad = squadsToCover
-        .sortBy(_.isInstanceOf[SquadDefendBase])
+        .sortBy( ! _.isInstanceOf[SquadDefendBase])
         .maxBy(_.targets.get.count(IsFlyingWarrior))
       activity = "AceHelpSquad"
       followSquad(squad)

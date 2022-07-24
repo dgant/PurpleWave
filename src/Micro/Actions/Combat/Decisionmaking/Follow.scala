@@ -3,24 +3,15 @@ package Micro.Actions.Combat.Decisionmaking
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
+    unit.unitClass.followingAllowed
+    && unit.canMove
     && ! unit.agent.leader().contains(unit)
-    && (
-      unit.flying // Performance shortcut
-      && unit.isAny(
-        Terran.Battlecruiser,
-        Terran.Wraith,
-        Terran.Valkyrie,
-        Protoss.Carrier,
-        Protoss.Corsair,
-        Protoss.Scout,
-        Zerg.Mutalisk)
-      && ! unit.matchups.groupEnemy.splashesAir))
+    && ! unit.matchups.groupEnemy.splashesAir)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()

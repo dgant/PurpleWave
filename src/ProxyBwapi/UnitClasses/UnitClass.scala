@@ -567,6 +567,15 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Performance optimization //
   //////////////////////////////
 
+  lazy val followingAllowed: Boolean = Vector(
+    Terran.Battlecruiser,
+    Terran.Wraith,
+    Terran.Valkyrie,
+    Protoss.Carrier,
+    Protoss.Corsair,
+    Protoss.Scout,
+    Zerg.Mutalisk).contains(this)
+
   lazy val abuseAllowed: Boolean = Vector(
     Terran.Marine,
     Terran.Vulture,

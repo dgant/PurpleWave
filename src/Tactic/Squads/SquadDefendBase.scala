@@ -134,11 +134,13 @@ class SquadDefendBase(base: Base) extends Squad {
       assigned.clear()
       var valueAssigned: Double = 0
       while (antiTarget.nonEmpty && valueAssigned < 3 * target.subjectiveValue) {
-        val next = antiTarget.minBy(_.framesToGetInRange(target))
-        assigned.add(next)
-        antiAir.remove(next)
-        antiGround.remove(next)
-        valueAssigned += next.subjectiveValue
+        // Send all follower units, like Corsairs, to the most urgent target. We expect SquadAcePilots to preempt this, but we still want this logic available in its absence.
+        val antiTargetFollowers = antiTarget.view.filter(_.unitClass.followingAllowed)
+        val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target)))
+        assigned.addAll(next)
+        antiAir.removeAll(next)
+        antiGround.removeAll(next)
+        valueAssigned += next.map(_.subjectiveValue).sum
       }
       val squad = this
       assigned.foreach(intendScouring(_, target))

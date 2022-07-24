@@ -91,7 +91,7 @@ object Commander {
     if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) { move(unit, target.pixel); return }
 
     // If we should be attack-commanding
-    if (target.visible && (unit.unitClass.melee || unit.flying || ! unit.canMove || unit.pixelsToGetInRange(target) < unit.topSpeed * (With.latency.latencyFrames + With.reaction.agencyAverage))) {
+    if (target.visible && (unit.unitClass.melee || unit.flying || ! unit.canMove || unit.pixelsToGetInRange(target) <= unit.unitClass.dimensionMax + unit.topSpeed * (With.latency.latencyFrames + With.reaction.agencyAverage))) {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround

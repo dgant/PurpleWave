@@ -35,6 +35,23 @@ class PvPLateGame extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+
+    lazy val commitToTech = productionCapacity >= 5 && saturated
+    primaryTech = primaryTech
+      .orElse(Some(RoboTech)    .filter(x => units(Protoss.RoboticsFacility) > 0))
+      .orElse(Some(TemplarTech) .filter(x => units(Protoss.TemplarArchives) > 0))
+      .orElse(Some(TemplarTech) .filter(x => With.units.ours.filter(Protoss.CitadelOfAdun).exists( ! _.knownToOpponents)))
+      .orElse(Some(RoboTech)    .filter(x => enemyDarkTemplarLikely))
+      .orElse(Some(RoboTech)    .filter(x => With.fingerprints.cannonRush()))
+      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) > 2 && roll("RoboVsCannon", 0.7)))
+      .orElse(Some(TemplarTech) .filter(x => commitToTech && bases > 2))
+      .orElse(Some(TemplarTech) .filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", 0.4)))
+      .orElse(Some(TemplarTech) .filter(x => commitToTech && units(Protoss.Zealot) >= 5))
+      .orElse(Some(TemplarTech) .filter(x => commitToTech && upgradeStarted(Protoss.GroundDamage)))
+      .orElse(Some(RoboTech)    .filter(x => commitToTech))
+    shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage)
+    //shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
+
     fearDeath   = ! safeAtHome
     fearDeath   ||= unitsComplete(IsWarrior) < 8
     fearDeath   ||= recentlyExpandedFirst && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
@@ -46,7 +63,7 @@ class PvPLateGame extends GameplanImperative {
     shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
     shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
-    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 2
+    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 20
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
@@ -73,22 +90,6 @@ class PvPLateGame extends GameplanImperative {
       shouldSecondaryTech ||= primaryTech.contains(RoboTech) && gas > 800
       shouldSecondaryTech ||= unitsComplete(IsWarrior) >= 40
     }
-    shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage)
-    //shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
-
-    lazy val commitToTech = productionCapacity >= 5 && saturated
-    primaryTech = primaryTech
-      .orElse(Some(RoboTech)    .filter(x => units(Protoss.RoboticsFacility) > 0))
-      .orElse(Some(TemplarTech) .filter(x => units(Protoss.TemplarArchives) > 0))
-      .orElse(Some(TemplarTech) .filter(x => With.units.ours.filter(Protoss.CitadelOfAdun).exists( ! _.knownToOpponents)))
-      .orElse(Some(RoboTech)    .filter(x => enemyDarkTemplarLikely))
-      .orElse(Some(RoboTech)    .filter(x => With.fingerprints.cannonRush()))
-      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) > 2 && roll("RoboVsCannon", 0.7)))
-      .orElse(Some(TemplarTech) .filter(x => commitToTech && bases > 2))
-      .orElse(Some(TemplarTech) .filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", 0.7)))
-      .orElse(Some(TemplarTech) .filter(x => commitToTech && units(Protoss.Zealot) >= 5))
-      .orElse(Some(TemplarTech) .filter(x => commitToTech && upgradeStarted(Protoss.GroundDamage)))
-      .orElse(Some(RoboTech)    .filter(x => commitToTech))
 
     ///////////////////////////
     // High-priority builds! //

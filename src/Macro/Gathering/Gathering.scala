@@ -12,7 +12,7 @@ import Utilities.Time.Forever
 import scala.collection.mutable
 
 class Gathering extends TimedTask with AccelerantMinerals with Zippers {
-  private def isValidBase     (base: Base): Boolean = base.townHall.filter(_.isOurs).exists(_.remainingCompletionFrames < 240)
+  private def isValidBase     (base: Base): Boolean = base.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 360))
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
   private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 5
@@ -71,7 +71,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   override protected def onRun(budgetMs: Long): Unit = {
 
     val basesBefore = bases
-    bases = With.geography.bases.filter(_.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 360))) // Geography.ourBases isn't valid frame 0
+    bases = With.geography.bases.filter(isValidBase) // Geography.ourBases may not be valid on frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
       val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
       workers.foreach(_.intend(this, new Intention { toTravel = Some(goal) }))

@@ -28,7 +28,7 @@ trait BaseInference {
     output &&= ! (With.fingerprints.oneGateCore()   && With.frame < GameTime(5, 15)())
     output &&= ! (With.fingerprints.twoGateGoon()   && With.frame < GameTime(6,  0)()) // Haven't actually timed this one; just interpolating
     output &&= ! (With.fingerprints.threeGateGoon() && With.frame < GameTime(6, 45)())
-    output &&= ! (With.fingerprints.fourGateGoon()  && With.frame < GameTime(8,  0)())
+    output &&= ! (With.fingerprints.fourGateGoon()  && With.frame < GameTime(7,  5)())
     output &&= With.sense.enemySecretMinerals >= 400
     // Accept obvious proof
     output ||= enemyNatural.exists(_.townHall.exists(_.complete))

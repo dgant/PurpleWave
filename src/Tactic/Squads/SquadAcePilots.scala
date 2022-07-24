@@ -24,6 +24,7 @@ class SquadAcePilots extends Squad {
   }
 
   var activity: String = toString
+  var hasFleet: Boolean = false
   override def toString: String = activity
 
   override def run(): Unit = {
@@ -55,7 +56,7 @@ class SquadAcePilots extends Squad {
     // and we don't have enough to contend against them,
     // seek shelter with the ground army
     val requireFleet = MacroFacts.enemyHasShown(acePilots: _*) || With.units.enemy.exists(u => u.complete && Zerg.Spire(u))
-    lazy val hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
+    hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
     if (requireFleet && ! hasFleet) {
       activity = "AceChill"
       chill()

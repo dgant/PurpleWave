@@ -4,6 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
+import Planning.Predicates.MacroFacts
 import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -143,6 +144,13 @@ class Tactician extends TimedTask {
     assign(freelancers, squadsDefending.view.map(_._2), 1.0)
     assign(freelancers, squadsDefending.view.map(_._2), 0.5)
 
+    // Proactive Muta defense with Archon
+    if (With.scouting.enemyProximity < 0.5 && MacroFacts.enemyHasShown(Zerg.Mutalisk) && ( ! With.blackboard.wantToAttack() || ! acePilots.hasFleet)) {
+      assign(
+        freelancers,
+        With.geography.ourBases.filter(MacroFacts.isMiningBase).map(baseSquads(_)),
+        filter = (f, s) => Protoss.Archon(f) && s.unitsNext.size == 0)
+    }
     // Proactive drop/harassment defense
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>

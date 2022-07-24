@@ -26,7 +26,7 @@ class PvZ2GateFlex extends GameplanImperative {
     if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(IsWarrior) < 5) {
       pumpSupply()
       pumpWorkers()
-      pump(Protoss.Zealot)
+      pump(Protoss.Zealot, 12)
     }
     once(12, Protoss.Probe)
     once(2, Protoss.Gateway)
@@ -158,7 +158,11 @@ class PvZ2GateFlex extends GameplanImperative {
       get(Protoss.ZealotSpeed)
       get(Protoss.TemplarArchives)
     }
-    pump(Protoss.Zealot)
+    if (units(Protoss.Dragoon) > 1) {
+      get(Protoss.DragoonRange)
+    }
+    pump(Protoss.Zealot, 12)
+    pump(Protoss.Dragoon)
     get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
     get(Protoss.ZealotSpeed)
     pumpWorkers(oversaturate = true)

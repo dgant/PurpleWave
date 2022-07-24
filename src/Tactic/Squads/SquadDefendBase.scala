@@ -55,8 +55,7 @@ class SquadDefendBase(base: Base) extends Squad {
       base.ourUnits.filter(u =>
         u.unitClass.isBuilding
         && u.hitPoints < 300
-        && (u.friendly.exists(_.knownToOpponents) || u.canAttack)
-        && (u.zone != With.geography.ourMain.zone || u.matchups.threats.exists( ! _.unitClass.isWorker))))(u => u.matchups.framesOfSafety + 0.0001 * u.pixelDistanceCenter(heart))
+        && (u.friendly.exists(_.knownToOpponents) || u.unitClass.canAttack)))(u => u.matchups.framesOfSafety - 0.0001 * u.pixelDistanceCenter(With.scouting.enemyThreatOrigin.center))
       .map(_.pixel)
       .getOrElse(heart))
 
@@ -134,7 +133,8 @@ class SquadDefendBase(base: Base) extends Squad {
       assigned.clear()
       var valueAssigned: Double = 0
       while (antiTarget.nonEmpty && valueAssigned < 3 * target.subjectiveValue) {
-        // Send all follower units, like Corsairs, to the most urgent target. We expect SquadAcePilots to preempt this, but we still want this logic available in its absence.
+        // Send all follower units, like Carriers, to the most urgent target, because otherwise they'll just follow the leader
+        // SquadAcePilots will often preempt this logic due to substantial overlap between followers/aces
         val antiTargetFollowers = antiTarget.view.filter(_.unitClass.followingAllowed)
         val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target)))
         assigned.addAll(next)

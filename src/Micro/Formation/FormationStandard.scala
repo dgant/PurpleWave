@@ -7,6 +7,7 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Point, Tile}
+import Mathematics.Shapes.Ray
 import Mathematics.{Maff, Shapes}
 import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -62,7 +63,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val altitudeOutside   : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
   val altitudeRequired  : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
   val maxThreat         : Int                   = if (style == FormationStyleEngage) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
-  val face              : Pixel                 = if (style == FormationStyleGuard) goal else if (style == FormationStyleEngage) target else goalPath5.center
+  var face              : Pixel                 = if (style == FormationStyleGuard) goal else if (style == FormationStyleEngage) target else goalPath5.center
   var apex              : Pixel                 = goal
   var stepTilesPace     : Int                   = 0
   var stepTilesEngage   : Int                   = 0
@@ -78,7 +79,18 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {
-      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(_.walkablePixel.groundPixels(zone.centroid)), 32 * expectRangeTiles)).getOrElse(apex)
+      val guardRadius = edge.map(e => e.radiusPixels + 32 * expectRangeTiles).getOrElse(32d)
+      if (edge.isDefined) {
+        val rayStart    = edge.get.pixelCenter
+        val rayTarget   = edge.get.endPixels.minBy(_.walkablePixel.groundPixels(zone.centroid))
+        val rayEnd      = rayStart.project(rayTarget, guardRadius)
+        val apexRay     = Ray(rayStart, rayEnd)
+        // A common problem is natural town halls that intersect our arc and make us take inferior positions.
+        // Prefer to stand in front of them.
+        apex = apexRay.find(t => ! t.base.exists(_.townHall.exists(_.tileArea.contains(t)))).getOrElse(apexRay.last).center
+        // Extend the face outwards to broaden our arc
+        face = apex.project(face, guardRadius)
+      }
     } else if (goalPath.pathExists) {
       // Engage: Walk far enough to be in range
       // March: Walk far enough to advance our army

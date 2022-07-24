@@ -40,6 +40,11 @@ class PvZ2GateFlex extends GameplanImperative {
     once(17, Protoss.Probe)
     once(5, Protoss.Zealot)
     once(18, Protoss.Probe)
+    if (anticipateSpeedlings) {
+      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
+      once(21, Protoss.Probe)
+      once(7, Protoss.Zealot)
+    }
     once(4, Protoss.Pylon)
     once(Protoss.Assimilator)
     once(19, Protoss.Probe)
@@ -54,7 +59,6 @@ class PvZ2GateFlex extends GameplanImperative {
       once(7, Protoss.Zealot)
       once(21, Protoss.Probe)
       once(Protoss.GroundDamage)
-      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
       once(9, Protoss.Zealot)
     }
   }

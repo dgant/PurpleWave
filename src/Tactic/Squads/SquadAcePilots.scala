@@ -5,12 +5,12 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
-import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, UnitFilter}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
 import Utilities.Time.Seconds
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, UnitFilter}
 
 class SquadAcePilots extends Squad {
   val acePilots         : Seq[UnitClass]  = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
@@ -138,13 +138,13 @@ class SquadAcePilots extends Squad {
   }
 
   private def followSquad(otherSquad: Squad): Unit = {
-    vicinity = otherSquad.centroidAir
-    targets = otherSquad.targets
-      .map(_.filter(_.flying))
-      .orElse(Some(SquadAutomation.rankForArmy(this,
-        Maff.orElse(
-          SquadAutomation.unrankedEnRouteTo(this, vicinity),
-          SquadAutomation.unrankedAround(this, vicinity)).toVector)))
+    vicinity = otherSquad.vicinity
+    val base = vicinity.base
+    val targetsUnsorted = Maff.orElse(
+      otherSquad.targets.map(_.filter(_.flying)).getOrElse(Seq.empty),
+      base.map(_.enemies.filter(_.flying)).getOrElse(Seq.empty),
+      SquadAutomation.unrankedAround(this, vicinity))
+    targets = Some(targetsUnsorted.toVector.sortBy(_.pixelDistanceSquared(base.map(_.heart.center).getOrElse(vicinity))))
     SquadAutomation.send(this)
   }
 }

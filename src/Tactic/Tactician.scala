@@ -170,7 +170,7 @@ class Tactician extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else Maff.maxBy(With.geography.bases.filter(b => b.isOurs || b.plannedExpoRecently))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
+        else Maff.maxBy(Maff.orElse(With.blackboard.basesToHold(), With.geography.ourBasesAndSettlements))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
       assign(freelancers, squadsDefendingOrWaiting)
     }
   }

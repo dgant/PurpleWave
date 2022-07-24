@@ -103,9 +103,10 @@ class PvPLateGame extends GameplanImperative {
           doTrainArmy()
           get(3, Protoss.Gateway)
         }
-      } else if (PvPDT()) {
+      } else if (PvPDT() && ! With.fingerprints.dtRush()) {
         pump(Protoss.DarkTemplar, 1)
         pumpSupply()
+        get(Protoss.DragoonRange)
         get(5, Protoss.Gateway)
         shouldAttack = false
       } else {
@@ -234,7 +235,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doRobo(): Unit = {
-    if (productionCapacity >= 5 && gas < 250) {
+    if (productionCapacity >= 6 && gas < 150) {
       buildGasPumps()
     }
     get(Protoss.RoboticsFacility)
@@ -270,10 +271,11 @@ class PvPLateGame extends GameplanImperative {
     get(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Forge)
     if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
       doUpgrades()
-      if (gas < 250) {
+      val gasThreshold = 250
+      if (gas < gasThreshold) {
         buildGasPumps()
       }
-      val readyForStorm = techStarted(Protoss.PsionicStorm) || (gasPumps > 1 && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)))
+      val readyForStorm = techStarted(Protoss.PsionicStorm) || ((gasPumps > 1 || gas >= gasThreshold) && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)))
       if (readyForStorm) {
         status("Ready4Storm")
         get(Protoss.PsionicStorm)
@@ -301,7 +303,6 @@ class PvPLateGame extends GameplanImperative {
   private def doCannons(): Unit = {
     if (units(Protoss.Forge) > 0) {
       if (units(Protoss.Observer) == 0) {
-        buildCannonsAtMain(1, PlaceLabels.DefendHall)
         buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
       }
       With.geography.ourBasesAndSettlements.view

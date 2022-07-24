@@ -315,7 +315,6 @@ class PvPOpening extends GameplanImperative {
     shouldAttack = atTiming && ! noTiming
     shouldAttack &&= safeToMoveOut
     shouldAttack &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
-    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural // Push out to take our natural
     shouldAttack &&= ! (PvP1012() // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
       && With.frame > GameTime(5, 10)()
       && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
@@ -340,16 +339,23 @@ class PvPOpening extends GameplanImperative {
       shouldExpand &&= unitsComplete(IsWarrior) >= 6
       shouldExpand &&= PvPIdeas.pvpSafeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = atTiming
-      shouldExpand &&= unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
-      shouldExpand ||= atTiming && ! noTiming && PvPIdeas.safeAtHome
+      shouldExpand = atTiming && ! noTiming
+      shouldExpand || unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
-    shouldExpand &&= ! With.scouting.enemyControls(With.geography.ourNatural)
+    // If we want to expand, make sure we control our natural
+    if (shouldAttack || shouldExpand) {
+      holdNatural()
+    }
 
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
       aggression(0.6)
+    } else {
+      // Amp up aggression to ensure we can get down our ramp
+      aggression(1.0 + 0.2 * unitsComplete(Protoss.Reaver))
     }
+
+
 
     /////////////
     // Logging //
@@ -711,7 +717,7 @@ class PvPOpening extends GameplanImperative {
       trainRoboUnits()
       get(Protoss.DragoonRange)
       if (shouldExpand && (With.scouting.weControlOurNatural || unitsComplete(Protoss.Reaver) > 1)) {
-        requireMiningBases(2)
+        expand()
       }
       trainGatewayUnits()
       get(2, Protoss.Gateway)
@@ -721,7 +727,7 @@ class PvPOpening extends GameplanImperative {
     } else if (PvPDT()) {
       // If we scout the mirror, just cannon expand
       if (With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)) {
-        requireMiningBases(2)
+        expand()
       } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
         sneakyCitadel()
         get(Protoss.TemplarArchives)
@@ -730,40 +736,40 @@ class PvPOpening extends GameplanImperative {
       if (unitsComplete(Protoss.Gateway) < 2) {
         trainGatewayUnits()
       }
-      if (shouldExpand) { requireMiningBases(2) }
+      if (shouldExpand) { expand() }
       pumpWorkers(oversaturate = true)
       trainGatewayUnits()
       get(2, Protoss.Gateway)
-      requireMiningBases(2)
+      expand()
 
     } else if (PvPCoreExpand()) {
       if (shouldExpand) {
-        requireMiningBases(2)
+        expand()
       }
       trainGatewayUnits()
       once(3, Protoss.Dragoon)
-      requireMiningBases(2)
+      expand()
       get(3, Protoss.Gateway)
 
     // 3/4-Gate Goon
     } else {
       if (shouldExpand) {
-        if (PvP4GateGoon()) {
+        if (PvP4GateGoon() && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
           // PvPIdeas should be telling us when we need this anyway, but until it does so correctly, this is the workaround.
           buildCannonsAtNatural(1)
         }
-        requireMiningBases(2)
+        expand()
       }
       once(2, Protoss.Dragoon)
       get(if (PvP3GateGoon()) 3 else 4, Protoss.Gateway)
       trainGatewayUnits()
-      if (PvP3GateGoon()) { requireMiningBases(2) }
+      if (PvP3GateGoon()) { expand() }
     }
 
     get(Protoss.DragoonRange)
     pumpWorkers(oversaturate = true)
     get(4, Protoss.Gateway)
-    requireMiningBases(2)
+    expand()
   }
 
   private def trainRoboUnits(): Unit = {
@@ -771,7 +777,9 @@ class PvPOpening extends GameplanImperative {
       once(Protoss.Observer)
       if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)
     }
-    if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+    // Disabling Shuttles until we get better at ferrying units into our natural
+    //if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+    pump(Protoss.Reaver)
   }
 
   private def trainGatewayUnits(): Unit = {
@@ -781,6 +789,16 @@ class PvPOpening extends GameplanImperative {
     pump(Protoss.Dragoon)
     if ( ! PvPCoreExpand() || gas < 32) {
       pump(Protoss.Zealot)
+    }
+  }
+
+  private def holdNatural(): Unit = {
+    With.blackboard.basesToHold.set(Vector(With.geography.ourNatural))
+  }
+
+  private def expand(): Unit = {
+    if ( ! With.scouting.enemyControls(With.geography.ourNatural)) {
+      requireMiningBases(2)
     }
   }
 }

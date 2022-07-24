@@ -1,5 +1,6 @@
 package Planning
 
+import Information.Geography.Types.Base
 import Lifecycle.With
 import ProxyBwapi.Buildable
 import ProxyBwapi.UnitClasses.UnitClass
@@ -36,4 +37,5 @@ class Blackboard {
   val pushKiters              : Property[Boolean]           = add(new Property(false))
   val floatableBuildings      : Property[Vector[UnitClass]] = add(new Property(Vector.empty))
   val toCancel                : Property[Vector[Buildable]] = add(new Property(Vector.empty))
+  val basesToHold             : Property[Vector[Base]]      = add(new Property(Vector.empty))
 }

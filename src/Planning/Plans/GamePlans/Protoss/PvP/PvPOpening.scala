@@ -56,6 +56,18 @@ class PvPOpening extends GameplanImperative {
     }
   }
 
+  private var doSneakyRobo = true
+  private def sneakyRobo(): Unit = {
+    if (doSneakyRobo && units(Protoss.Probe) >= 17 && ! scoutCleared) {
+      doSneakyRobo = false
+    }
+    if (doSneakyRobo) {
+      get(Protoss.RoboticsFacility)
+    } else {
+      get(Protoss.DragoonRange)
+    }
+  }
+
   override def executeBuild(): Unit = {
 
     /////////////////////
@@ -332,6 +344,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand &&= unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
       shouldExpand ||= atTiming && ! noTiming && PvPIdeas.safeAtHome
     }
+    shouldExpand &&= ! With.scouting.enemyControls(With.geography.ourNatural)
 
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
@@ -581,7 +594,7 @@ class PvPOpening extends GameplanImperative {
 
           if (PvPGateCoreTech()) {
             once(17, Protoss.Probe)
-            if (PvPDT()) sneakyCitadel() else if (PvPRobo()) once(Protoss.RoboticsFacility) else get(Protoss.DragoonRange)
+            if (PvPDT()) sneakyCitadel() else if (PvPRobo()) sneakyRobo() else get(Protoss.DragoonRange)
             once(18, Protoss.Probe)
             once(2, Protoss.Dragoon)
             once(3, Protoss.Pylon)

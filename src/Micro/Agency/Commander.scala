@@ -77,7 +77,8 @@ object Commander {
   private val tryingToMoveThreshold = 32
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    unit.agent.setRideGoal(target.pixel)
+    // This is likely incorrect because we don't want to fly into the target
+    //unit.agent.setRideGoal(target.pixel)
     leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (Protoss.Reaver(unit)) With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
@@ -113,7 +114,8 @@ object Commander {
     // "obviousPosition" isn't necessarily obvious:
     //  - For example, to shoot at a unit below a cliff we often need to manually walk up to the cliff.
     //    Neither direct attack commands nor moving to the target's pixel will achieve that.
-    val obviousPosition = target.pixel.project(unit.pixel, unit.pixelRangeAgainst(target) + unit.unitClass.dimensionMin + target.unitClass.dimensionMin)
+    // - Reavers can't shoot downhill so probably do need to go directly to the target
+    val obviousPosition = if (Protoss.Reaver(unit)) target.pixel else target.pixel.project(unit.pixel, unit.pixelRangeAgainst(target) + unit.unitClass.dimensionMin + target.unitClass.dimensionMin)
     if (obviousPosition.traversableBy(unit) && (target.visible || obviousPosition.altitude >= target.altitude)) {
       move(unit, obviousPosition)
     } else {
@@ -177,10 +179,8 @@ object Commander {
     // So we'll try to get the best of both worlds, and recalculate paths *occasionally*
     // and only at distances long enough to avoid the issue.
     //
-    // Also, give different units different paths to avoid "conga line" behavior
-    //
     if (unit.pixelDistanceCenter(to) > 160) {
-      to = to.add((unit.id + With.frame / 24) % 3 - 1, 0)
+      to = to.add((unit.id + With.frame / 96) % 3 - 1, 0)
     }
     to
   }

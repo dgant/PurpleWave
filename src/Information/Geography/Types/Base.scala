@@ -7,6 +7,7 @@ import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.Time.{Forever, Minutes}
 import Utilities.UnitFilters.IsBuilding
 
@@ -63,6 +64,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
         .filter(_.altitudeUnchecked > exitAltitude)
         .filter(_.groundTiles(exit.get.pixelCenter) < 48)
         .map(tile => (tile, tile.center.pixelDistance(exit.get.pixelCenter)))
+        .filter(_._2 < 32 * ?(With.self.isTerran, 11 + 4, 6 + 4))
         .toVector
         .sortBy(_._2)
     }

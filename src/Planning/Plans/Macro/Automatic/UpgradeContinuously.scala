@@ -6,7 +6,7 @@ import Planning.Plan
 
 class UpgradeContinuously(upgrade: ProxyBwapi.Upgrades.Upgrade, maxLevel: Int = 3) extends Plan {
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     if (With.self.getUpgradeLevel(upgrade) >= Math.min(maxLevel, upgrade.levels.size)) return
     if ( ! With.units.existsOurs(upgrade.whatUpgrades)) return
     With.scheduler.request(this, Get(upgrade, With.self.getUpgradeLevel(upgrade) + 1))

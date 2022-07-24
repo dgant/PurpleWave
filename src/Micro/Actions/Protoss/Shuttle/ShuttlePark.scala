@@ -6,16 +6,20 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
+import scala.collection.SeqView
+
 object ShuttlePark extends Action {
 
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && exposedPassengers(shuttle).nonEmpty
 
-  def exposedPassengers(shuttle: FriendlyUnitInfo) = shuttle.agent.passengers.view.filterNot(_.transport.contains(shuttle))
+  def exposedPassengers(shuttle: FriendlyUnitInfo): SeqView[FriendlyUnitInfo, Seq[FriendlyUnitInfo]] = {
+    shuttle.agent.passengers.view.filterNot(_.transport.contains(shuttle))
+  }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val radius = Shuttling.pickupRadius
+    val radius  = Shuttling.pickupRadius
     val exposed = exposedPassengers(shuttle)
-    var to = exposed.head.pixel.project(shuttle.agent.safety, radius / 2)
+    var to      = exposed.head.pixel.project(shuttle.agent.safety, radius / 2)
     if (exposed.size > 1) {
       val centroid = Maff.centroid(exposed.view.map(_.pixel))
       val slack = exposed.map(_.pixelDistanceCenter(centroid)).max

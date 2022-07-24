@@ -8,7 +8,7 @@ import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
-import Utilities.Time.{GameTime, Minutes, Seconds}
+import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
 
@@ -30,7 +30,7 @@ class PvPLateGame extends GameplanImperative {
   var primaryTech         : Option[PrimaryTech] = None
 
   private def productionCapacity        : Int = unitsComplete(Protoss.Gateway) + ?(shouldReaver, 2 * unitsComplete(Protoss.RoboticsFacility) * Math.min(1, unitsComplete(Protoss.RoboticsSupportBay)), 0)
-  private def targetProductionCapacity  : Int = 1 + miningBases * 3
+  private def targetProductionCapacity  : Int = miningBases * 4
   private def targetGateways            : Int = targetProductionCapacity - ?(shouldReaver, 2 * units(Protoss.RoboticsFacility), 0)
 
   override def executeBuild(): Unit = {
@@ -42,11 +42,11 @@ class PvPLateGame extends GameplanImperative {
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
     fearContain ||= enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
-    shouldExpand = ! fearDeath || (fearMacro && miningBases < 3)
-    shouldExpand &&= ( ! fearContain || With.geography.safeExpansions.nonEmpty)
-    shouldExpand &&= (fearMacro || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases) || miningBases <= Math.min(unitsComplete(IsWarrior) / 14, productionCapacity / 3))
-    shouldExpand ||= miningBases < 1 + Math.min(unitsComplete(Protoss.Reaver), 2 * unitsComplete(Protoss.Shuttle))
-    shouldExpand &&= With.geography.ourBases.isEmpty || With.geography.ourBases.exists(With.scouting.weControl)
+    shouldExpand = productionCapacity >= targetProductionCapacity
+    shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
+    shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
+    shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
+    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 2
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
@@ -74,7 +74,7 @@ class PvPLateGame extends GameplanImperative {
       shouldSecondaryTech ||= unitsComplete(IsWarrior) >= 40
     }
     shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage)
-    shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
+    //shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
 
     lazy val commitToTech = productionCapacity >= 5 && saturated
     primaryTech = primaryTech
@@ -207,8 +207,8 @@ class PvPLateGame extends GameplanImperative {
     if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) {
       get(Protoss.TemplarArchives)
     }
-    get(7, Protoss.Gateway)
-    buildGasPumps()
+    get(?(units(Protoss.RoboticsSupportBay) > 0, 4, 6), Protoss.Gateway)
+    doUpgrades()
     get(targetGateways + miningBases, Protoss.Gateway)
   }
 
@@ -268,7 +268,7 @@ class PvPLateGame extends GameplanImperative {
   private def doTemplar(): Unit = {
     get(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Forge)
     if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
-      get(Protoss.ZealotSpeed)
+      doUpgrades()
       if (gas < 250) {
         buildGasPumps()
       }
@@ -277,28 +277,38 @@ class PvPLateGame extends GameplanImperative {
         status("Ready4Storm")
         get(Protoss.PsionicStorm)
         get(2, Protoss.HighTemplar)
-      }
-      get(Protoss.ZealotSpeed)
-      upgradeContinuously(Protoss.GroundDamage)
-      if (upgradeStarted(Protoss.GroundDamage, 3)) {
-        upgradeContinuously(Protoss.GroundArmor)
-      }
-      if (readyForStorm) {
         get(Protoss.HighTemplarEnergy)
       }
     }
   }
 
+  private def doUpgrades(): Unit = {
+    get(Protoss.Forge)
+    if (units(Protoss.TemplarArchives) > 0) {
+      upgradeContinuously(Protoss.GroundDamage)
+      upgradeContinuously(Protoss.GroundArmor)
+    } else {
+      get(Protoss.GroundDamage)
+      get(Protoss.GroundArmor)
+    }
+    if (gas < 300) {
+      get(Protoss.CitadelOfAdun)
+      get(Protoss.ZealotSpeed)
+    }
+  }
+
   private def doCannons(): Unit = {
     if (units(Protoss.Forge) > 0) {
-      buildCannonsAtMain(1, PlaceLabels.DefendHall)
-      buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
+      if (units(Protoss.Observer) == 0) {
+        buildCannonsAtMain(1, PlaceLabels.DefendHall)
+        buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
+      }
       With.geography.ourBasesAndSettlements.view
         .filterNot(_.isOurMain)
         .filterNot(_.isOurNatural)
         .foreach(base => {
           val coverHall = base.zone.edges.exists(_.pixelCenter.pixelDistance(base.townHallArea.center) > 32 * 15)
-          buildDefensesAt(3, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
+          buildDefensesAt(1, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
         })
     }
   }

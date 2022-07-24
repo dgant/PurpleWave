@@ -146,9 +146,11 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       .map(slots => (slots.unitClass, (0 until slots.slots)
         .map(unused => {
           var output: Pixel = null
-          while (output == null && i < overlooks.length && overlooks(i)._2 <= slots.formationRangePixels + 96) {
+          while (output == null && i < overlooks.length) {
             val overlook = overlooks(i)
-            if ( ! requireTarget || overlook._1.enemyVulnerabilityGround < With.grids.enemyVulnerabilityGround.margin) {
+            lazy val rangeAppropriate = overlook._2 <= slots.formationRangePixels + 96
+            lazy val enemyInRange     = overlook._1.enemyVulnerabilityGround <= With.grids.enemyVulnerabilityGround.margin
+            if (enemyInRange || ( ! requireTarget && rangeAppropriate)) {
               output = overlook._1.center
             }
             i += 1

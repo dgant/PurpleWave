@@ -3,7 +3,7 @@ package Tactic.Squads
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Points
+import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Agency.Intention
 import ProxyBwapi.Races.Protoss
@@ -41,12 +41,12 @@ class SquadDarkTemplar extends Squad {
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
   private lazy val backstabTargetDistance = backstabTarget.groundTiles(With.geography.home)
-  private lazy val hideyholeSpiral        = Spiral(48).map(backstabTarget.add).filter(_.walkable).filter(_.groundTiles(With.geography.home) < backstabTargetDistance + 16)
-  private lazy val hideyhole = {
-    val output = hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 16).orElse(
-      hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 13)).orElse(
-        hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 10)).orElse(
-          hideyholeSpiral.find(With.grids.scoutingPathsStartLocations(_) > 8))
+  private lazy val hideyholeSpiral        = Spiral(48).map(backstabTarget.add).filter(_.walkable).filterNot(_.metro.exists(_.bases.exists(_.isEnemy)))
+  private lazy val hideyhole: Option[Pixel] = {
+    val output = hideyholeSpiral
+      .find(With.grids.scoutingPathsStartLocations(_) > 16)
+      .map(_.center)
+      .orElse(With.geography.preferredExpansionsEnemy.filterNot(_.naturalOf.exists(_.isEnemy)).headOption.map(b => b.zone.exitNow.map(_.pixelCenter).getOrElse(b.heart.center)))
     With.logger.debug(f"Selected DT hidey hole: $output")
     output
   }
@@ -78,7 +78,7 @@ class SquadDarkTemplar extends Squad {
         })
         if (division.isEmpty) {
           if (backstabTime && hideyhole.isDefined) {
-            dt.intend(this, new Intention { toTravel = Some(hideyhole.get.center); targets = Some(Seq.empty) })
+            dt.intend(this, new Intention { toTravel = hideyhole; targets = Some(Seq.empty) })
             return
           } else {
             intendDTToBase(dt, base)

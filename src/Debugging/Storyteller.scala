@@ -1,11 +1,8 @@
 package Debugging
 
-import java.lang.management.{ManagementFactory, MemoryType}
-import java.text.DecimalFormat
-import java.util.Calendar
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformance
-import Lifecycle.{PurpleBWClient, Main, With}
+import Lifecycle.{Main, PurpleBWClient, With}
 import Mathematics.Maff
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
@@ -17,6 +14,9 @@ import Strategery.Strategies.Strategy
 import Utilities.Time.{Frames, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
+import java.lang.management.{ManagementFactory, MemoryType}
+import java.text.DecimalFormat
+import java.util.Calendar
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.io.Source
@@ -76,7 +76,9 @@ class Storyteller {
     new Story                           ("Enemy Hatcheries",    () => With.units.countEnemy(_.unitClass.isHatchlike)),
     new Story                           ("Safe at home",        () => MacroFacts.safeAtHome),
     new Story                           ("Safe to move out",    () => MacroFacts.safeToMoveOut),
+    new Story                           ("Aggression",          () => With.blackboard.aggressionRatio.get),
     new Story                           ("Should attack",       () => With.blackboard.wantToAttack.get),
+    new Story                           ("Should harass",       () => With.blackboard.wantToHarass.get),
     new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                    _.mkString(" ")),
     new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                  _.mkString(", ")),
     new Story                           ("Performance danger",  () => With.performance.danger),

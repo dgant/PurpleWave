@@ -294,12 +294,12 @@ class PvPOpening extends GameplanImperative {
     }
 
     // Identify when we reach an attack timing
-    atTiming ||= PvP1012()          && unitsComplete(Protoss.Zealot) >= 3
-    atTiming ||= PvPGateCoreGate()  && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
-    atTiming ||= PvP3GateGoon()     && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
-    atTiming ||= PvP4GateGoon()     && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 6
-    atTiming ||= PvPDT()            && unitsComplete(Protoss.DarkTemplar) > 0
-    atTiming ||= PvPRobo()          && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
+    atTiming ||= PvP1012()                                                    && unitsComplete(Protoss.Zealot) >= 3
+    atTiming ||= PvPGateCoreGate()                                            && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
+    atTiming ||= PvP3GateGoon()     && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
+    atTiming ||= PvP4GateGoon()     && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 6
+    atTiming ||= PvPDT()                                                      && unitsComplete(Protoss.DarkTemplar) > 0
+    atTiming ||= PvPRobo()          && upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
     atTiming ||= unitsComplete(Protoss.Observer)  > 0 && With.fingerprints.dtRush()
     atTiming ||= unitsComplete(Protoss.Dragoon)   > 0 && With.fingerprints.proxyGateway()
     atTiming ||= unitsComplete(Protoss.Reaver)    > 0 && With.fingerprints.cannonRush()

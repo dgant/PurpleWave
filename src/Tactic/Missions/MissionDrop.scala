@@ -92,6 +92,8 @@ abstract class MissionDrop extends Mission {
     val eligibleBases = With.geography.bases.view
       .filter(_.mineralsLeft > 1500)
       .filterNot(ignore)
+      // COG 2022: Bots react too fast to the drop (and often cannon up)
+      .filter(b => With.configuration.humanMode || ! (With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b)))
     val bases = Maff.orElse(eligibleBases.filter(_.owner.isEnemy), eligibleBases).toVector
     if (bases.isEmpty) return
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
@@ -107,7 +109,7 @@ abstract class MissionDrop extends Mission {
         With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
       .sortBy(_.size)
       .sortBy(_.count(_.owner.isEnemy))
-    itinerary ++= itineraries.head.filter(eligibleBases.contains)
+    itinerary ++= itineraries.head.filter(bases.contains)
     With.logger.debug(f"$this itinerary: ${itinerary.view.map(_.toString).mkString(" -> ")}")
   }
 

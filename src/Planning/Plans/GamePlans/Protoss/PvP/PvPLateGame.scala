@@ -112,10 +112,13 @@ class PvPLateGame extends GameplanImperative {
       } else {
         get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
         get(4 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
+
       }
       if ( ! With.scouting.enemyNaturalPossiblyMining) {
         pumpSupply()
         doTrainArmy()
+        get(3, Protoss.Gateway)
+        doCannons()
         get(6, Protoss.Gateway)
       }
     }
@@ -138,8 +141,8 @@ class PvPLateGame extends GameplanImperative {
   override def executeMain(): Unit = {
     val trainArmy     = new DoQueue(doTrainArmy)
     val addProduction = new DoQueue(doAddProduction)
-    val primaryTech   = new DoQueue(doPrimaryTech)
-    val secondaryTech = new DoQueue(doSecondaryTech)
+    val tech1         = new DoQueue(doPrimaryTech)
+    val tech2         = new DoQueue(doSecondaryTech)
     val expand        = new DoQueue(doExpand)
     val cannons       = new DoQueue(doCannons)
 
@@ -155,14 +158,14 @@ class PvPLateGame extends GameplanImperative {
     }
     get(3, Protoss.Gateway)
     cannons()
-    primaryTech()
+    tech1()
     if (shouldSecondaryTech) {
-      secondaryTech()
+      tech2()
     }
     trainArmy()
     addProduction()
     expand()
-    secondaryTech()
+    tech2()
   }
 
   private def doTrainArmy(): Unit = {
@@ -301,7 +304,11 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doCannons(): Unit = {
-    if (units(Protoss.Forge) > 0) {
+    val addForge = ! primaryTech.contains(RoboTech)
+    if (addForge) {
+      get(Protoss.Forge)
+    }
+    if (addForge || units(Protoss.Forge) > 0) {
       if (units(Protoss.Observer) == 0) {
         buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
       }

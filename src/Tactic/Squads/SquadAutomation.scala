@@ -95,7 +95,11 @@ object SquadAutomation {
   }
 
   def send(squad: Squad, defaultReturn: Option[Pixel] = None): Unit = {
-    squad.units.foreach(unit => {
+    sendUnits(squad, squad.units, defaultReturn)
+  }
+
+  def sendUnits(squad: Squad, units: Iterable[FriendlyUnitInfo], defaultReturn: Option[Pixel] = None): Unit = {
+    units.foreach(unit => {
       lazy val finalTravel = getTravel(unit, squad, defaultReturn)
       lazy val finalReturn = getReturn(unit, squad, defaultReturn)
       unit.intend(squad, new Intention {

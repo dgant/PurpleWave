@@ -82,7 +82,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
 
-    val targetsUnranked = if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else if (canScour) scourables else enemies.filter(threateningBase)
+    val targetsUnranked = if (canScour) scourables else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else enemies.filter(threateningBase)
     targets = Some(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
     formations.clear()

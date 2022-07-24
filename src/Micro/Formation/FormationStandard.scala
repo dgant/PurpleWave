@@ -87,7 +87,12 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
         val apexRay     = Ray(rayStart, rayEnd)
         // A common problem is natural town halls that intersect our arc and make us take inferior positions.
         // Prefer to stand in front of them.
-        apex = apexRay.find(t => ! t.base.exists(_.townHall.exists(_.tileArea.contains(t)))).getOrElse(apexRay.last).center
+        var continueRay = true
+        apexRay.foreach(t => {
+          if (continueRay && ! t.base.exists(_.townHall.exists(_.tileArea.contains(t)))) {
+            apex = t.center
+          } else continueRay = false
+        })
         // Extend the face outwards to broaden our arc
         face = apex.project(face, guardRadius)
       }

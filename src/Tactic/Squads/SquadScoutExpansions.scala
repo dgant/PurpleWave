@@ -27,7 +27,7 @@ class SquadScoutExpansions extends Squad {
     }
   }
 
-  val matchAll = IsAny(
+  val matchAll: UnitFilter = IsAny(
     Terran.Marine,
     Terran.Firebat,
     Terran.Vulture,
@@ -41,7 +41,7 @@ class SquadScoutExpansions extends Squad {
     Zerg.Hydralisk,
     Zerg.Overlord,
     Zerg.Scourge)
-  val matchFlying = IsAny(
+  val matchFlying: UnitFilter = IsAny(
     Terran.Wraith,
     Protoss.Observer,
     Zerg.Overlord,
@@ -85,9 +85,9 @@ class SquadScoutExpansions extends Squad {
   }
 
   def run(): Unit = {
-    SquadAutomation.send(this)
-    units.foreach(u => {
-      u.intent.canFight = u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty
-    })
+    val harassers = units.filter(u => u.canAttackGround && u.base.exists(_.isEnemy) && u.agent.shouldEngage)
+    val scouts = units.filterNot(harassers.contains)
+    SquadAutomation.sendUnits(this, scouts)
+    scouts.foreach(u => u.intent.canFight = u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty)
   }
 }

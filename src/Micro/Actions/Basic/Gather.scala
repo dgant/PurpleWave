@@ -43,8 +43,9 @@ object Gather extends Action {
       lazy val baseRemote   = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
       lazy val basePaired   = baseOpposite.orElse(baseRemote).filter(_.isOurs)
       if (minerThreatenedAt(unit, resource)) {
-        val       alternativeMineralLocal   = Maff.minBy(baseOriginal .map(_.minerals.view.filterNot(minerThreatenedAt(unit, _))).getOrElse(Seq.empty))(_.pixelDistanceEdge(unit))
+        var       alternativeMineralLocal   = Maff.minBy(baseOriginal .map(_.minerals.view.filterNot(minerThreatenedAt(unit, _))).getOrElse(Seq.empty))(_.pixelDistanceEdge(unit))
         lazy val  alternativeMineralRemote  = Maff.minBy(basePaired   .map(_.minerals.view.filterNot(minerThreatenedAt(unit, _))).getOrElse(Seq.empty))(_.pixelDistanceEdge(unit))
+        alternativeMineralLocal = None // TODO: Be smarter about deciding when to abandon base
         unit.agent.toGather = (alternativeMineralLocal.toSeq ++ alternativeMineralRemote).find( ! minerThreatenedAt(unit, _)).orElse(Some(resource))
       }
 

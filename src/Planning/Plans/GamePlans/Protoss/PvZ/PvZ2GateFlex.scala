@@ -106,6 +106,7 @@ class PvZ2GateFlex extends GameplanImperative {
     var safeToExpand = safeOutside
     safeToExpand &&= unitsComplete(IsWarrior) + 2 * unitsComplete(Protoss.Archon) >= 9
     safeToExpand ||= unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Corsair) > 0 && enemies(Zerg.Hydralisk) == 0 && enemies(Zerg.Mutalisk) == 0
+    safeToExpand &&= ! anticipateSpeedlings || (unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Archon) > 0)
     var shouldExpand = frame > mutaFrame
     shouldExpand ||= enemiesComplete(Zerg.SunkenColony) > 1
     shouldExpand &&= safeToExpand

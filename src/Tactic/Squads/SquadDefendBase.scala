@@ -50,14 +50,10 @@ class SquadDefendBase(base: Base) extends Squad {
   })
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
-  val bastion = new Cache(() =>
-    Maff.minBy(
-      base.ourUnits.filter(u =>
-        u.unitClass.isBuilding
-        && u.hitPoints < 300
-        && (u.friendly.exists(_.knownToOpponents) || u.unitClass.canAttack)))(u => u.matchups.framesOfSafety - 0.0001 * u.pixelDistanceCenter(With.scouting.enemyThreatOrigin.center))
-      .map(_.pixel)
-      .getOrElse(heart))
+  val bastion: Cache[Pixel] = new Cache(() => Maff.minBy(
+    base.metro.zones.flatMap(_.units.view.filter(_.isOurs))
+      .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || (u.complete && u.totalHealth < 300)))
+      .map(_.pixel))(_.groundPixels(guardChoke.map(_.pixelCenter).getOrElse(heart))).getOrElse(heart))
 
   private var formationReturn: Formation = FormationEmpty
 

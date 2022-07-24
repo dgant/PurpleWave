@@ -27,7 +27,6 @@ class PvPLateGame extends GameplanImperative {
   var shouldExpand        : Boolean = _
   var shouldUpgrade       : Boolean = _
   var shouldReaver        : Boolean = _
-  var shouldContain       : Boolean = _
   var primaryTech         : Option[PrimaryTech] = None
 
   private def productionCapacity        : Int = unitsComplete(Protoss.Gateway) + ?(shouldReaver, 2 * unitsComplete(Protoss.RoboticsFacility) * Math.min(1, unitsComplete(Protoss.RoboticsSupportBay)), 0)
@@ -38,13 +37,12 @@ class PvPLateGame extends GameplanImperative {
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
     fearDeath   = ! safeAtHome
     fearDeath   ||= unitsComplete(IsWarrior) < 8
-    fearDeath   ||= recentlyExpandedFirst && ! employing(PvP4GateGoon) && ( ! employing(PvP3GateGoon) || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
+    fearDeath   ||= recentlyExpandedFirst && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
     fearDeath   &&= ! dtBraveryHome
-    fearDeath   &&= ! With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
     fearContain ||= enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
-    shouldExpand = fearMacro || ! fearDeath
+    shouldExpand = ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ( ! fearContain || With.geography.safeExpansions.nonEmpty)
     shouldExpand &&= (fearMacro || (expectCarriers && With.frame > GameTime(3, 30)() * miningBases) || miningBases <= Math.min(unitsComplete(IsWarrior) / 14, productionCapacity / 3))
     shouldExpand ||= miningBases < 1 + Math.min(unitsComplete(Protoss.Reaver), 2 * unitsComplete(Protoss.Shuttle))
@@ -52,14 +50,15 @@ class PvPLateGame extends GameplanImperative {
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
-    shouldContain = (PvP3GateGoon() || PvP4GateGoon()) && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()
-    shouldContain &&= With.geography.enemyBases.filter(_.isStartLocation).exists(_.natural.exists(With.scouting.weControl))
-    shouldContain &&= ! fearDeath
-    shouldAttack = PvPIdeas.shouldAttack
+    shouldAttack = enemyMiningBases > miningBases
+    shouldAttack ||= bases > 2
+    shouldAttack ||= bases > miningBases
+    shouldAttack ||= ! recentlyExpandedFirst
     shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
+    shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
     shouldAttack &&= ! fearDeath
-    shouldAttack ||= shouldExpand
-    shouldAttack ||= shouldContain
+    shouldAttack ||= shouldExpand && With.geography.safeExpansions.isEmpty
     if (units(Protoss.RoboticsFacility) * units(Protoss.TemplarArchives) == 0) {
       shouldSecondaryTech = miningBases > 2
       shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)
@@ -76,7 +75,6 @@ class PvPLateGame extends GameplanImperative {
     }
     shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage)
     shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
-    oversaturate = fearContain && ! fearDeath
 
     lazy val commitToTech = productionCapacity >= 5 && saturated
     primaryTech = primaryTech
@@ -100,14 +98,15 @@ class PvPLateGame extends GameplanImperative {
     if (recentlyExpandedFirst) {
       if (PvPCoreExpand()) {
         if (units(Protoss.Gateway) < 3) {
+          pumpSupply()
           doTrainArmy()
           get(3, Protoss.Gateway)
         }
       } else if (PvPDT()) {
         pump(Protoss.DarkTemplar, 1)
+        pumpSupply()
         get(5, Protoss.Gateway)
         shouldAttack = false
-        shouldContain = false
       } else {
         get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
         get(4 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
@@ -298,7 +297,7 @@ class PvPLateGame extends GameplanImperative {
         .filterNot(_.isOurMain)
         .filterNot(_.isOurNatural)
         .foreach(base => {
-          val coverHall = base.zone.edges.exists(_.pixelCenter.pixelDistance(base.heart.center) > 32 * 10)
+          val coverHall = base.zone.edges.exists(_.pixelCenter.pixelDistance(base.townHallArea.center) > 32 * 15)
           buildDefensesAt(3, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
         })
     }

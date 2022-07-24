@@ -11,9 +11,9 @@ object ShuttlePickup extends Action {
   private def hailers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = shuttle.agent.passengersPrioritized.filter(_.orderTarget.contains(shuttle))
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    hailers(shuttle).headOption.map(_.pixel).foreach(p => {
-      shuttle.agent.toTravel = Some(p)
-      Commander.move(shuttle)
+    hailers(shuttle).headOption.foreach(hailer => {
+      shuttle.agent.toTravel = Some(hailer.pixel)
+      Commander.rightClick(shuttle, hailer)
     })
   }
 }

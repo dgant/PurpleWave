@@ -11,7 +11,6 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._
 import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
-import Utilities.UnitFilters.IsWarrior
 
 object PvPIdeas extends MacroActions with MacroCounting {
   def enemyLowUnitStrategy: Boolean = enemyBases > 1 || enemyStrategy(
@@ -30,41 +29,16 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
   def dtBraveryHome   : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestArrival(Protoss.Observer)
-
-  def shouldAttack: Boolean = {
-    // Attack subject to global safety
-    var output = enemyLowUnitStrategy
-    output ||= unitsComplete(IsWarrior) > 0 && enemiesComplete(IsWarrior, Protoss.PhotonCannon) == 0 && (attackFirstZealot || With.frame > Minutes(4)() || unitsComplete(IsWarrior) > 2)
-    output ||= employing(PvP1012)         && (unitsComplete(Protoss.Zealot) > 3 || ! enemyStrategy(With.fingerprints.twoGate))
-    output ||= employing(PvPGateCoreGate) && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon) && bases < 2
-    output ||= employing(PvP3GateGoon)    && unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
-    output ||= employing(PvP4GateGoon)    && unitsComplete(Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 6
-    output ||= enemyStrategy(With.fingerprints.dtRush) && unitsComplete(Protoss.Observer) > 1
-    output ||= enemyStrategy(With.fingerprints.dtRush) && enemies(Protoss.DarkTemplar) == 0
-    output ||= unitsComplete(Protoss.Shuttle) > 0 && unitsComplete(Protoss.Reaver) > 1 && unitsComplete(IsWarrior) >= 8
-    output ||= upgradeComplete(Protoss.ZealotSpeed)
-    output ||= enemyMiningBases > miningBases
-    output ||= With.scouting.weExpandedFirst && ! recentlyExpandedFirst
-    output ||= bases > 2
-    output ||= bases > miningBases
-    output &&= safeToMoveOut
-    output &&= ! recentlyExpandedFirst
-
-    // Attack disregarding global safety
-    output ||= enemyBases > 1 && miningBases < 2
+  def pvpSafeToMoveOut: Boolean = {
+    var output = safeToMoveOut
     output ||= dtBraveryAbroad
-
-    // Don't let cannon rushes encroach
-    output ||= With.fingerprints.cannonRush()
-
-    // Attack when we have range advantage (and they're not hiding behind a wall)
-    if ( ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.forgeFe)) {
-      output ||= unitsComplete(Protoss.Dragoon) > 0     && ! enemyHasShown(Protoss.Dragoon)         && (enemiesShown(Protoss.Zealot) > 2 || With.fingerprints.twoGate())
-      output ||= upgradeComplete(Protoss.DragoonRange)  && ! enemyHasUpgrade(Protoss.DragoonRange)
-    }
-
-    // Require Observer before attacking through a DT (unless we're going into a base trade! how exciting)
-    output &&= unitsComplete(Protoss.Observer) > 0 || ! enemyHasShown(Protoss.DarkTemplar) || dtBraveryAbroad
+    output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
+    output
+  }
+  def pvpSafeAtHome: Boolean = {
+    var output = safeAtHome
+    output ||= dtBraveryHome
+    output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     output
   }
 

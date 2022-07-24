@@ -15,6 +15,8 @@ import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 class PvPOpening extends GameplanImperative {
 
   var complete          : Boolean = false
+  var atTiming          : Boolean = false
+  var noTiming          : Boolean = false
   var shouldExpand      : Boolean = false
   var shouldAttack      : Boolean = false
   var shouldHarass      : Boolean = false
@@ -243,8 +245,7 @@ class PvPOpening extends GameplanImperative {
       getObservers = true
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
         getReavers = ! With.fingerprints.dtRush()
-        //shuttleFirst = getReavers
-        shuttleFirst = false
+        shuttleFirst = enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst)
       }
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
@@ -276,52 +277,61 @@ class PvPOpening extends GameplanImperative {
         }
       }
       shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.0)
-
-      shouldExpand = unitsComplete(Protoss.Reaver) > 0 || ( ! getReavers && unitsComplete(IsWarrior) > 5)
-      shouldExpand &&= safeToMoveOut
-      shouldExpand &&= (
-        (With.fingerprints.dtRush() && unitsComplete(Protoss.Observer) > 0)
-        || (PvPIdeas.enemyLowUnitStrategy && unitsComplete(Protoss.Reaver) > 0))
-      shouldExpand &&= ! shuttleSpeed
-      shouldExpand &&= Protoss.DragoonRange()
-      shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
-      shouldExpand ||= unitsComplete(IsWarrior) >= 20 && safeToMoveOut
     } else if (PvPDT()) {
       greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
-      shouldExpand = unitsComplete(Protoss.DarkTemplar) > 0
-      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (safeAtHome || With.scouting.enemyProximity < 0.75)
-      shouldExpand ||= greedyDT
-    } else if (PvP3GateGoon()) {
-      shouldExpand = unitsComplete(Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6 && safeAtHome
-    } else if (PvP4GateGoon()) {
-      shouldExpand = unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
-    shouldExpand &&= ! With.fingerprints.dtRush() || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
-    shouldExpand &&= ! With.fingerprints.dtRush() || (units(Protoss.Observer, Protoss.PhotonCannon) > 0 && enemies(Protoss.DarkTemplar) == 0)
 
-    // Attack when we reach an attack timing
-    shouldAttack = PvPIdeas.shouldAttack
-    // Don't attack if we're also dropping
-    shouldAttack &&= ! upgradeStarted(Protoss.ShuttleSpeed)
-    // Don't attack off 1-Gate Core if they've mustered any defense whatsoever
-    shouldAttack &&= ! (employing(PvPGateCoreRange, PvPGateCoreTech)
-      && enemiesComplete(IsWarrior) > 0
-      && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) < 3
-      && unitsComplete(Protoss.DarkTemplar) == 0
-      && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
-      && unitsComplete(IsWarrior) < 8
-      && ! PvPIdeas.enemyLowUnitStrategy)
-    // Push out to take our natural
-    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural
-    // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
-    shouldAttack &&= ! (With.frame > GameTime(5, 10)()
-      && PvP1012()
+    // Identify when we reach an attack timing
+    atTiming ||= PvP1012()          && unitsComplete(Protoss.Zealot) >= 3
+    atTiming ||= PvPGateCoreGate()  && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
+    atTiming ||= PvP3GateGoon()     && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
+    atTiming ||= PvP4GateGoon()     && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 6
+    atTiming ||= PvPDT()            && unitsComplete(Protoss.DarkTemplar) > 0
+    atTiming ||= PvPRobo()          && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
+    atTiming ||= unitsComplete(Protoss.Observer)  > 0 && With.fingerprints.dtRush()
+    atTiming ||= unitsComplete(Protoss.Dragoon)   > 0 && With.fingerprints.proxyGateway()
+    atTiming ||= unitsComplete(Protoss.Reaver)    > 0 && With.fingerprints.cannonRush()
+    atTiming ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush)
+    // There may not be a timing depending on what our opponent does,
+    // or the timing window might close permanently.
+    noTiming ||= PvP1012()          && enemyStrategy(With.fingerprints.twoGate)
+    noTiming ||= PvPGateCoreGate()  && enemyHasUpgrade(Protoss.DragoonRange) && ! safeToMoveOut && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    noTiming ||= PvP3GateGoon()     && enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    noTiming ||= PvP4GateGoon()     && enemyStrategy(With.fingerprints.fourGateGoon)
+    noTiming ||= PvPDT()            && enemiesComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
+
+    shouldAttack = atTiming && ! noTiming
+    shouldAttack &&= safeToMoveOut
+    shouldAttack &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
+    shouldAttack ||= shouldExpand && ! With.scouting.weControlOurNatural // Push out to take our natural
+    shouldAttack &&= ! (PvP1012() // 2-Gate vs 1-Gate Core needs to wait until range before venturing out again, to avoid rangeless goons fighting ranged goons
+      && With.frame > GameTime(5, 10)()
       && (With.fingerprints.oneGateCore() || enemyHasUpgrade(Protoss.DragoonRange))
       && ! upgradeComplete(Protoss.DragoonRange)
       && unitsComplete(Protoss.DarkTemplar, Protoss.Reaver) == 0)
-    // Ensure that committed Zealots keep wanting to attack
-    shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)()
+    shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
+
+    if (PvPRobo()) {
+      shouldExpand = unitsComplete(Protoss.Reaver) > 0 || ( ! getReavers && unitsComplete(IsWarrior) >= 6)
+      shouldExpand &&= PvPIdeas.pvpSafeToMoveOut
+      shouldExpand &&= ! shuttleSpeed
+      shouldExpand &&= Protoss.DragoonRange()
+      shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
+      shouldExpand ||= unitsComplete(IsWarrior) >= 12 && safeToMoveOut
+    } else if (PvPDT()) {
+      shouldExpand = atTiming
+      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (PvPIdeas.pvpSafeAtHome || With.scouting.enemyProximity < 0.75)
+      shouldExpand ||= greedyDT
+    } else if (PvP3GateGoon()) {
+      shouldExpand = atTiming
+      shouldExpand &&= unitsComplete(IsWarrior) >= 6
+      shouldExpand &&= PvPIdeas.pvpSafeAtHome
+    } else if (PvP4GateGoon()) {
+      shouldExpand = atTiming
+      shouldExpand &&= unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
+      shouldExpand ||= atTiming && ! noTiming && PvPIdeas.safeAtHome
+    }
 
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
@@ -615,14 +625,17 @@ class PvPOpening extends GameplanImperative {
 
     if (gasCapsUntouched) {
       gasLimitCeiling(350)
-      if (zBeforeCore && employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && unitsComplete(Protoss.CyberneticsCore) < 1) {
+      if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
         gasWorkerCeiling(1)
-      }
-      else if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
+      } else if (zBeforeCore && unitsComplete(Protoss.CyberneticsCore) < 1) {
         gasWorkerCeiling(2)
+      } else if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && units(Protoss.Gateway) < ?(PvP4GateGoon(), 4, 3)) {
+        gasWorkerCeiling(2)
+        gasLimitCeiling(250)
       }
       if (PvPCoreExpand() && (upgradeStarted(Protoss.DragoonRange) || gas >= 200)) {
         gasWorkerCeiling(1)
+        gasLimitCeiling(100)
       }
     }
 
@@ -753,6 +766,8 @@ class PvPOpening extends GameplanImperative {
     else if (zAfterCore || zBeforeCore) once(Protoss.Zealot)
     once(Protoss.Dragoon)
     pump(Protoss.Dragoon)
-    pump(Protoss.Zealot)
+    if ( ! PvPCoreExpand() || gas < 32) {
+      pump(Protoss.Zealot)
+    }
   }
 }

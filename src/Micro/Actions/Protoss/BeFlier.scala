@@ -11,7 +11,6 @@ import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 object BeFlier extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.airborne && unit.canMove && ! unit.unitClass.isBuilding

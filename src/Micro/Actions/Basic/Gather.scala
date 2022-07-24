@@ -21,6 +21,14 @@ object Gather extends Action {
   private val combatWindow = Seconds(2)()
 
   val defenseRadiusPixels = 160
+
+  private def resourceThreatened(resource: UnitInfo): Boolean = resource.tileArea.tiles.map(With.grids.enemyRangeGround.get).max > 0
+
+  private def minerThreatenedAt(miner: FriendlyUnitInfo, resource: UnitInfo): Boolean = (
+    resourceThreatened(resource)
+    && miner.matchups.threats.exists(threat =>
+      ! threat.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+      && threat.pixelsToGetInRange(miner, resource.pixel) < defenseRadiusPixels))
   
   override def perform(unit: FriendlyUnitInfo): Unit = {
 
@@ -29,25 +37,19 @@ object Gather extends Action {
     // Gatherer combat micro
     if (unit.battle.nonEmpty) {
 
-      // Move between bases if resource isn't safe to mine and we hope help will arrive
-      if (With.reaction.sluggishness < 2) {
-        val baseOriginal = resource.base
-        lazy val baseOpposite = baseOriginal.flatMap(b => b.naturalOf.orElse(b.natural))
-        lazy val baseRemote = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
-        lazy val basePaired = baseOpposite.orElse(baseRemote)
-
-        def threatenedAt(atResource: UnitInfo): Boolean = unit.matchups.threats.exists(threat =>
-          ! threat.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
-            && threat.pixelsToGetInRange(unit, atResource.pixel) < defenseRadiusPixels)
-
-        if (basePaired.exists(_.owner.isUs) && threatenedAt(resource)) {
-          val alternativeMineral = Maff.minBy(basePaired.get.minerals.filter(_.alive))(_.pixelDistanceEdge(unit)).orElse(unit.agent.toGather)
-          unit.agent.toGather = alternativeMineral.filterNot(threatenedAt).orElse(Some(resource))
-        }
+      // Move between resources if ours isn't safe to mine and we hope help will arrive
+      val baseOriginal      = resource.base
+      lazy val baseOpposite = baseOriginal.flatMap(b => b.naturalOf.orElse(b.natural))
+      lazy val baseRemote   = Maff.minBy(With.geography.ourBases.filterNot(baseOriginal.contains))(_.heart.groundPixels(baseOriginal.map(_.heart).getOrElse(resource.tileTopLeft)))
+      lazy val basePaired   = baseOpposite.orElse(baseRemote).filter(_.isOurs)
+      if (minerThreatenedAt(unit, resource)) {
+        val       alternativeMineralLocal   = Maff.minBy(baseOriginal .map(_.minerals.view.filterNot(minerThreatenedAt(unit, _))).getOrElse(Seq.empty))(_.pixelDistanceEdge(unit))
+        lazy val  alternativeMineralRemote  = Maff.minBy(basePaired   .map(_.minerals.view.filterNot(minerThreatenedAt(unit, _))).getOrElse(Seq.empty))(_.pixelDistanceEdge(unit))
+        unit.agent.toGather = (alternativeMineralLocal.toSeq ++ alternativeMineralRemote).find( ! minerThreatenedAt(unit, _)).orElse(Some(resource))
       }
 
       // Help initial scout get home
-      if (With.frame < Minutes(8)() && unit.base.exists(_.isEnemy) && unit.matchups.threats.exists( ! _.unitClass.melee) && unit.visibleToOpponents) {
+      if (With.frame < Minutes(8)() && unit.metro.exists(_.bases.exists(_.isEnemy)) && unit.matchups.threats.exists( ! _.unitClass.melee) && unit.visibleToOpponents) {
         Commander.gather(unit)
         return
       }

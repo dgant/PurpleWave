@@ -117,6 +117,14 @@ trait MacroCounting {
     With.battles.globalAway.judgement.exists(_.shouldFight)
   }
 
+  def confidenceHome11: Double = {
+    With.battles.globalHome.judgement.map(_.confidence11Total).getOrElse(0.0)
+  }
+
+  def confidenceAway11: Double = {
+    With.battles.globalAway.judgement.map(_.confidence11Total).getOrElse(0.0)
+  }
+
   def gasCapsUntouched: Boolean = (
     ! With.blackboard.gasWorkerCeiling.isSet
     && ! With.blackboard.gasWorkerFloor.isSet

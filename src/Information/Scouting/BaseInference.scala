@@ -23,9 +23,12 @@ trait BaseInference {
     // Recent observations are proof
     var output = enemyNatural.forall(b => With.framesSince(b.lastFrameScoutedByUs) > Terran.CommandCenter.buildFrames)
     // Infer
+    output &&= ! (With.fingerprints.twoGate()       && With.frame < GameTime(5, 35)() && ! With.fingerprints.twoGate99()) // 10-12 only
     output &&= ! (With.fingerprints.dtRush()        && With.frame < GameTime(5, 40)())
+    output &&= ! (With.fingerprints.oneGateCore()   && With.frame < GameTime(5, 15)())
+    output &&= ! (With.fingerprints.twoGateGoon()   && With.frame < GameTime(6,  0)()) // Haven't actually timed this one; just interpolating
     output &&= ! (With.fingerprints.threeGateGoon() && With.frame < GameTime(6, 45)())
-    output &&= ! (With.fingerprints.fourGateGoon()  && With.frame < GameTime(8, 0)())
+    output &&= ! (With.fingerprints.fourGateGoon()  && With.frame < GameTime(8,  0)())
     output &&= With.sense.enemySecretMinerals >= 400
     // Accept obvious proof
     output ||= enemyNatural.exists(_.townHall.exists(_.complete))

@@ -24,15 +24,19 @@ object BeReaver extends Action {
     lazy val needRefresh          = unit.cooldownLeft > 30 + 2 * With.latency.latencyFrames // Reaver cooldown resets to 30 when dropped: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
     lazy val needlesslyEndangered = unit.cooldownLeft >= unit.cooldownMaxGround / 2 && (inRangeOfPlebian || ! canShoot)
     lazy val needlesslyDoomed     = unit.cooldownLeft >= unit.doomedInFrames
-    if (needRefresh || needlesslyEndangered || needlesslyDoomed) {
+    if (needlesslyEndangered || needlesslyDoomed) {
       unit.agent.act("Hop")
       demandPickup(unit)
       Retreat.consider(unit)
+    } else if (needRefresh) {
+      unit.agent.act("Refresh")
+      demandPickup(unit)
     }
   }
 
-  def demandPickup(unit: FriendlyUnitInfo): Unit = {
-    // TODO: This should be arbitrated so shuttle controls itself
-    unit.agent.ride.filter(_.agent.passengersPrioritized.find( ! _.loaded).contains(unit)).foreach(Commander.rightClick(unit, _))
+  def demandPickup(unit: FriendlyUnitInfo): Boolean = {
+    val ride = unit.agent.ride.filter(_.agent.passengersPrioritized.find( ! _.loaded).contains(unit))
+    ride.foreach(Commander.rightClick(unit, _))
+    ride.isDefined
   }
 }

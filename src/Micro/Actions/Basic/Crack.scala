@@ -9,7 +9,7 @@ import Utilities.Time.Minutes
 object Crack extends Action {
 
   private def egg(unit: FriendlyUnitInfo): Option[UnitInfo] = {
-    unit.zone.units.find(u => u.unitClass.isBuilding && u.isNeutral && unit.canAttack(u))
+    unit.zone.units.find(u => ! u.flying && u.isNeutral && unit.canAttack(u))
   }
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
@@ -20,7 +20,7 @@ object Crack extends Action {
     && ! unit.team.exists(_.engagedUpon)
     && unit.base.exists(_.isOurs)
     && unit.matchups.framesOfSafety > unit.cooldownMaxGround
-    && unit.pixelDistanceCenter(unit.agent.destination) < 32
+    && unit.pixelDistanceCenter(unit.agent.destination) < unit.pixelRangeMax
     && unit.cooldownLeft == 0
     && egg(unit).isDefined)
 

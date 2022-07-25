@@ -9,7 +9,7 @@ object TargetFilterFutility extends TargetFilter {
   // Ignore targets we have no chance of reaching
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if (actor.inRangeToAttack(target)) return true
-    if ( ! actor.canMove ) return false
+    if ( ! actor.canMove) return false
     if (target.burrowed) return true
 
     val targetReachable = (

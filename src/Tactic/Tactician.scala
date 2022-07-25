@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import Planning.Predicates.MacroFacts
-import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactic.Missions._
@@ -14,6 +13,7 @@ import Tactic.Squads._
 import Tactic.Tactics._
 import Utilities.?
 import Utilities.Time.Minutes
+import Utilities.UnitFilters._
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -86,7 +86,14 @@ class Tactician extends TimedTask {
     With.squads.run(budgetMs)
   }
 
-  private def assign(
+  private def assignFreelancer(freelancers: mutable.Buffer[FriendlyUnitInfo], i: Int, squad: Squad): Unit = {
+    val freelancer = freelancers(i)
+    squad.addUnit(freelancers.remove(i))
+    With.recruiter.lockTo(squad.lock, freelancer)
+  }
+
+  // Let freelancers pick the squad they can best serve
+  private def freelancersPick(
       freelancers: mutable.Buffer[FriendlyUnitInfo],
       squads: Seq[Squad],
       minimumValue: Double = Double.NegativeInfinity,
@@ -97,12 +104,34 @@ class Tactician extends TimedTask {
       val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
       val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + (if (freelancer.squad.contains(squad)) 0 else 320))
       if (bestSquad.isDefined) {
-        bestSquad.get.addUnit(freelancers.remove(i))
-        With.recruiter.lockTo(bestSquad.get.lock, freelancer)
+        assignFreelancer(freelancers, i, bestSquad.get)
       } else {
         i += 1
       }
     }
+  }
+
+  // Let squads pick the freelancers they need
+  private def squadsPick(
+      freelancers: mutable.Buffer[FriendlyUnitInfo],
+      squads: Seq[Squad],
+      minimumValue: Double = Double.NegativeInfinity,
+      filter: (FriendlyUnitInfo, Squad) => Boolean = (f, s) => true): Unit = {
+    val freelancersSorted     = new ArrayBuffer[(FriendlyUnitInfo, Int)]
+    val freelancersAvailable  = new mutable.HashSet[Int]
+    freelancersSorted     ++= freelancers.zipWithIndex
+    freelancersAvailable  ++= freelancers.indices
+    squads.foreach(squad => {
+      Maff.sortStablyInPlaceBy(freelancersSorted)(_._1.framesToTravelTo(squad.vicinity))
+      var hired: Option[(FriendlyUnitInfo, Int)] = None
+      do {
+        hired = freelancersSorted.find(u => freelancersAvailable.contains(u._2) && squad.candidateValue(u._1) > minimumValue)
+        hired.foreach(h => {
+          assignFreelancer(freelancers, h._2, squad)
+          freelancersAvailable -= h._2
+        })
+      } while (hired.isDefined)
+    })
   }
 
   private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
@@ -144,18 +173,11 @@ class Tactician extends TimedTask {
     // First satisfy each defense squad
     // First pass gets essential defenders
     // Second pass gets additional defenders to be sure
-
-    // Old approach: Assign to all defense squads simultaneously; this causes units to get assigned to their best squad, wihch causes waffling
-    //assign(freelancers, squadsDefending.view.map(_._2), 1.0)
-    //assign(freelancers, squadsDefending.view.map(_._2), 0.5)
-    //
-    // New approach (COG 2022) -- assign to each squad in descending order of distance from home
-    // ideally to reduce waffling and to get units to remote locations faster
-    Seq(1.0, 0.75).foreach(ratio => squadsDefending.foreach(squad => assign(freelancers, Seq(squad._2), ratio)))
+    Seq(1.0, 0.75).foreach(ratio => squadsDefending.foreach(squad => squadsPick(freelancers, Seq(squad._2), ratio)))
 
     // Proactive Muta defense with Archon
     if (With.scouting.enemyProximity < 0.5 && MacroFacts.enemyHasShown(Zerg.Mutalisk) && ( ! With.blackboard.wantToAttack() || ! acePilots.hasFleet)) {
-      assign(
+      freelancersPick(
         freelancers,
         With.geography.ourBases.filter(MacroFacts.isMiningBase).map(baseSquads(_)),
         filter = (f, s) => Protoss.Archon(f) && s.unitsNext.size == 0)
@@ -170,7 +192,7 @@ class Tactician extends TimedTask {
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
       else
         Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
-      assign(
+      squadsPick(
         freelancers,
         dropVulnerableBases.map(baseSquads(_)),
         filter = (f, s) => f.isAny(qualifiedClasses: _*) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
@@ -182,13 +204,13 @@ class Tactician extends TimedTask {
     // If we want to attack and engough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .7)) {
-      assign(freelancers, Seq(attackSquad))
+      freelancersPick(freelancers, Seq(attackSquad))
     } else {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
         else Maff.maxBy(Maff.orElse(With.blackboard.basesToHold(), With.geography.ourBasesAndSettlements))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
-      assign(freelancers, squadsDefendingOrWaiting)
+      freelancersPick(freelancers, squadsDefendingOrWaiting)
     }
   }
 }

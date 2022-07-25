@@ -44,6 +44,7 @@ abstract class MissionDrop extends Mission {
   protected val transportLock = new LockUnits(this)
   transportLock.matcher = unit => unit.isTransport && recruitable(unit)
   transportLock.counter = CountOne
+  transportLock.interruptable = false
 
   val itinerary = new mutable.Queue[Base]
   val transports = new ArrayBuffer[FriendlyUnitInfo]
@@ -117,8 +118,8 @@ abstract class MissionDrop extends Mission {
   private def allLanded: Boolean = passengers.forall( ! _.loaded)
   private def allHome: Boolean = units.forall(_.base.exists(_.owner.isUs))
   final override def run(): Unit = {
-    transports --= transports.filterNot(_.alive)
-    passengers --= passengers.filterNot(_.alive)
+    transports --= transports.filterNot(u => u.alive && u.squad.contains(this))
+    passengers --= passengers.filterNot(u => u.alive && u.squad.contains(this))
     if (duration > Seconds(45)() && state != Raiding && state != Evacuating) { terminate("Expired (not raiding)"); return }
     if (duration > Seconds(90)()) { terminate("Expired"); return }
     if (passengers.isEmpty) { terminate("No passengers left"); return }

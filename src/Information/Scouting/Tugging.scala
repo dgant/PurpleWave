@@ -10,20 +10,20 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 
 trait Tugging {
-  def tugStart                                  : Tile        = With.geography.home.walkableTile
-  def tugEnd                                    : Tile        = With.scouting.enemyHome.walkableTile
+  def tugStart                                  : Tile        = _tugStart()
+  def tugEnd                                    : Tile        = _tugEnd()
   def tugDistanceGroundUs     (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugStart)
   def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugEnd)
   def proximity               (pixel  : Pixel)  : Double      = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
   def proximity               (tile   : Tile)   : Double      = proximity(tile.center)
   def proximity               (base   : Base)   : Double      = proximity(base.townHallArea.center)
-  def ourProximity                              : Double      = proximity(ourMuscleOrigin)
-  def enemyProximity                            : Double      = proximity(enemyMuscleOrigin)
+  def ourProximity                              : Double      = _ourProximity()
+  def enemyProximity                            : Double      = _enemyProximity()
   def weControl               (pixel  : Pixel)  : Boolean     = ourProximity    < proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut)
   def enemyControls           (pixel  : Pixel)  : Boolean     = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
   def weControl               (tile   : Tile)   : Boolean     = weControl(tile.center)
   def enemyControls           (tile   : Tile)   : Boolean     = enemyControls(tile.center)
-  def weControlOurNatural                       : Boolean     = weControl(With.geography.ourNatural)
+  def weControlOurNatural                       : Boolean     = _weControlOurNatural()
   def weControl               (base   : Base)   : Boolean     = controlPoints(base).count(weControl) > controlPoints(base).count(enemyControls)
   def weControl               (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) > controlPoints(zone).count(enemyControls)
   def enemyControls           (base   : Base)   : Boolean     = controlPoints(base).count(weControl) < controlPoints(base).count(enemyControls)
@@ -35,6 +35,12 @@ trait Tugging {
   def enemyMuscleOrigin : Tile = _enemyMuscleOrigin()
   def ourThreatOrigin   : Tile = _ourThreatOrigin()
   def ourMuscleOrigin   : Tile = _ourMuscleOrigin()
+
+  private val _tugStart             = new Cache(() => With.geography.home.walkableTile)
+  private val _tugEnd               = new Cache(() => With.scouting.enemyHome.walkableTile)
+  private val _ourProximity         = new Cache(() => proximity(ourMuscleOrigin))
+  private val _enemyProximity       = new Cache(() => proximity(enemyMuscleOrigin))
+  private val _weControlOurNatural  = new Cache(() => weControl(With.geography.ourNatural))
 
   private lazy val productionWeight = 5 * Terran.Marine.subjectiveValue
   private val _enemyThreatOrigin = new Cache(() => {

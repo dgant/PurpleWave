@@ -24,6 +24,7 @@ object FightOrFlee extends Action {
         unit.agent.fightReason = description
       }
     }
+    
     decide(true,  "Static",     () => ! unit.canMove)
     decide(true,  "CantFlee",   () => ! unit.intent.canFlee)
     decide(true,  "Committed",  () => unit.agent.commit)

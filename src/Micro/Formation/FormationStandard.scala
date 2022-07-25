@@ -2,11 +2,11 @@ package Micro.Formation
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Geography.Pathfinding.PathfindProfile
+import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Point, Tile}
+import Mathematics.Points.{Pixel, Point, Points, Tile}
 import Mathematics.Shapes.Ray
 import Mathematics.{Maff, Shapes}
 import Micro.Coordination.Pushing.TrafficPriorities
@@ -43,8 +43,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val vanguardOrigin    : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) vanguardTarget else goal
   val vanguardUnits     : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
   val centroid          : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
-  val goalPath          : TilePath              =                                   new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile),   lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5).find
-  val targetPath        : TilePath              = if (goal == target) goalPath else new PathfindProfile(centroid.walkableTile, Some(target.walkableTile), lengthMaximum = Some(0), employGroundDist = true, costImmobility = 1.5).find
+  val goalPath          : TilePath              =                                   new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile),   lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+  val targetPath        : TilePath              = if (goal == target) goalPath else new PathfindProfile(centroid.walkableTile, Some(target.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
   val goalPathTiles     : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
   val targetPathTiles   : Seq[Tile]             = targetPath.tiles.getOrElse(Seq.empty).view
   val goalPath5         : Tile                  = goalPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(goal.walkableTile)
@@ -79,17 +79,18 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {
-      val guardRadius = edge.map(e => e.radiusPixels + 32 * expectRangeTiles).getOrElse(32d)
+      val guardDepth  = 32 * expectRangeTiles
+      val guardRadius = guardDepth + edge.map(_.radiusPixels).getOrElse(32d)
       if (edge.isDefined) {
         val rayStart    = edge.get.pixelCenter
         val rayTarget   = edge.get.endPixels.minBy(_.walkablePixel.groundPixels(zone.centroid))
-        val rayEnd      = rayStart.project(rayTarget, guardRadius)
+        val rayEnd      = rayStart.project(rayTarget, guardDepth)
         val apexRay     = Ray(rayStart, rayEnd)
         // A common problem is natural town halls that intersect our arc and make us take inferior positions.
         // Prefer to stand in front of them.
         var continueRay = true
         apexRay.foreach(t => {
-          if (continueRay && ! t.base.exists(_.townHall.exists(_.tileArea.contains(t)))) {
+          if (continueRay && t.walkable) {
             apex = t.center
           } else continueRay = false
         })

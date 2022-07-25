@@ -38,7 +38,7 @@ class PvPOpening extends GameplanImperative {
 
   override def activated: Boolean = true
   override def completed: Boolean = {
-    complete ||= bases > 1;
+    complete ||= bases > 1
     complete &&= ! PvPDT() || With.units.everOurs.exists(u => u.isOurs && u.complete && Protoss.DarkTemplar(u))
     complete
   }
@@ -126,7 +126,7 @@ class PvPOpening extends GameplanImperative {
           PvP4GateGoon.swapOut()
         } else if (PvPGateCoreGate()) {
           PvPGateCoreGate.swapOut()
-          if (With.strategy.isRamped) {
+          if (With.strategy.isRamped && With.strategy.selected.exists(_.choices.exists(_.toSeq.contains(PvPGateCoreTech)))) {
             PvPGateCoreTech.swapIn()
           } else {
             PvPGateCoreRange.swapIn()
@@ -741,6 +741,7 @@ class PvPOpening extends GameplanImperative {
       expand()
 
     } else if (PvPCoreExpand()) {
+      get(Protoss.DragoonRange)
       if (shouldExpand) {
         expand()
       }
@@ -751,6 +752,7 @@ class PvPOpening extends GameplanImperative {
 
     // 3/4-Gate Goon
     } else {
+      get(Protoss.DragoonRange)
       if (shouldExpand) {
         if (PvP4GateGoon() && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
           // PvPIdeas should be telling us when we need this anyway, but until it does so correctly, this is the workaround.

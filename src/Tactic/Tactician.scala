@@ -12,6 +12,7 @@ import Tactic.Missions._
 import Tactic.Production.Produce
 import Tactic.Squads._
 import Tactic.Tactics._
+import Utilities.?
 import Utilities.Time.Minutes
 
 import scala.collection.mutable
@@ -107,24 +108,26 @@ class Tactician extends TimedTask {
   private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
   private def runCoreTactics(): Unit = {
 
-    // Sort defense divisions by descending importance
-    var divisionsDefending = With.battles.divisions.filter(_.bases.exists(b => b.isOurs || b.plannedExpoRecently))
-    divisionsDefending = divisionsDefending
+    // Sort defense divisions by descending distance from home.
+    // The further the base is, the pickier we must be about which defenders we bring along.
+    var divisionsToDefend = With.battles.divisions.filter(_.bases.exists(b => b.isOurs || b.plannedExpoRecently))
+    divisionsToDefend = divisionsToDefend
       .filterNot(d =>
         // TODO: Old checks which we should probably generalize better
         (d.enemies.size < 3 && d.enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && ! e.isTransport))
-        || d.enemies.forall(e => e.is(Protoss.Observer) && ! e.matchups.enemyDetectors.exists(_.canMove)))
+        || d.enemies.forall(e => Protoss.Observer(e) && ! e.matchups.enemyDetectors.exists(_.canMove)))
+      .sortBy(d => - ?(d.attackers.nonEmpty, d.attackCentroidGround, d.centroidGround).walkablePixel.groundPixels(With.geography.home))
 
     // Pick a squad for each
-    val squadsDefending = divisionsDefending.map(d => (d, baseSquads({
+    val squadsDefending = divisionsToDefend.map(d => (d, baseSquads({
       val base = d.bases
         .toVector
         .sortBy( - _.economicValue())
-        .sortBy( ! _.owner.isEnemy)
-        .sortBy( ! _.owner.isUs)
+        .sortBy( ! _.isEnemy)
+        .sortBy( ! _.isOurs)
         .minBy( ! _.plannedExpoRecently)
-       adjustDefenseBase(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
-    })))
+      adjustDefenseBase(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
+    }))).distinct
 
     // Assign division to each squad
     squadsDefending.foreach(p => p._2.vicinity = Maff.centroid(p._2.enemies.view.map(_.pixel)))
@@ -141,8 +144,14 @@ class Tactician extends TimedTask {
     // First satisfy each defense squad
     // First pass gets essential defenders
     // Second pass gets additional defenders to be sure
-    assign(freelancers, squadsDefending.view.map(_._2), 1.0)
-    assign(freelancers, squadsDefending.view.map(_._2), 0.5)
+
+    // Old approach: Assign to all defense squads simultaneously; this causes units to get assigned to their best squad, wihch causes waffling
+    //assign(freelancers, squadsDefending.view.map(_._2), 1.0)
+    //assign(freelancers, squadsDefending.view.map(_._2), 0.5)
+    //
+    // New approach (COG 2022) -- assign to each squad in descending order of distance from home
+    // ideally to reduce waffling and to get units to remote locations faster
+    Seq(1.0, 0.75).foreach(ratio => squadsDefending.foreach(squad => assign(freelancers, Seq(squad._2), ratio)))
 
     // Proactive Muta defense with Archon
     if (With.scouting.enemyProximity < 0.5 && MacroFacts.enemyHasShown(Zerg.Mutalisk) && ( ! With.blackboard.wantToAttack() || ! acePilots.hasFleet)) {
@@ -155,7 +164,7 @@ class Tactician extends TimedTask {
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
-        && ! divisionsDefending.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
+        && ! divisionsToDefend.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.ourUnits).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
       val qualifiedClasses = if (With.enemies.exists(_.isTerran))
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)

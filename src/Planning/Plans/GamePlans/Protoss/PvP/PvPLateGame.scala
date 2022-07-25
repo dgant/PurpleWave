@@ -273,13 +273,13 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doTemplar(): Unit = {
-    get(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Forge)
+    get(Protoss.Forge, Protoss.CitadelOfAdun, Protoss.TemplarArchives)
+    val gasThreshold = 250
+    if (gas < gasThreshold) {
+      buildGasPumps()
+    }
     if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
       doUpgrades()
-      val gasThreshold = 250
-      if (gas < gasThreshold) {
-        buildGasPumps()
-      }
       val readyForStorm = techStarted(Protoss.PsionicStorm) || ((gasPumps > 1 || gas >= gasThreshold) && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)))
       if (readyForStorm) {
         status("Ready4Storm")

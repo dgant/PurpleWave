@@ -92,7 +92,9 @@ object JudgmentModifiers {
   //   until conditions look advantageous
   //     because surprise is on the enemy's side
   //     and because patience will tend to let us gather more force to fight
-  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.5, value) else value
+  //
+  // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
+  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
   def commitment(battleLocal: Battle): Option[JudgmentModifier] = {
     def fighters      = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
     val commitmentRaw = Maff.mean(fighters.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsOfEntanglement) / 96d), 0, 1)))
@@ -110,7 +112,7 @@ object JudgmentModifiers {
     if (edge.isEmpty) return None
     val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
-    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0175, 0.0, 0.3)
+    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0225, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
   }
 }

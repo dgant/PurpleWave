@@ -70,7 +70,7 @@ trait Expansions {
       val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
       val gasFactor     = if (adequateGas(base) || gasBases > gasBasesNeeded) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
       val safeFactor    = if (_safeExpansions.contains(base) || player.isEnemy) 1.0 else 0.2
-      val threatFactor  = 1.0 / (2.0 + base.enemies.count(IsWarrior))
+      val threatFactor  = 1.0 / (2.0 + (if (base.metro == With.geography.ourMain.metro) 0 else base.enemies.count(IsWarrior)))
       val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards * threatFactor
       output
     }

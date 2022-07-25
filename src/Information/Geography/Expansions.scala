@@ -7,6 +7,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import ProxyBwapi.Players.{PlayerInfo, Players}
+import Utilities.UnitFilters.IsWarrior
 import bwapi.Race
 
 trait Expansions {
@@ -61,19 +62,20 @@ trait Expansions {
     val weightTowards   = Maff.min(opposingRaces.flatMap(raceWeights.get)).getOrElse(-0.75)
     val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get)).getOrElse(3)
 
-    def scoreBase(base: Base): Double = {
+    def scoreBase(base: Base, player: PlayerInfo): Double = {
       val distanceHome  = Maff.mean(friendlyTiles.map(base.heart.groundPixels)) / 32
       val distanceEnemy = Maff.mean(opposingTiles.map(base.heart.groundPixels)) / 32
       val homeFactor    = Maff.clamp(1.0 - distanceHome   / 256.0,  0.1, 1.0)
       val enemyFactor   = Maff.clamp(1.0 - distanceEnemy  / 256.0,  0.1, 1.0)
       val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
       val gasFactor     = if (adequateGas(base) || gasBases > gasBasesNeeded) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
-      val safeFactor    = if (_safeExpansions.contains(base)) 1.0 else 0.2
-      val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards
+      val safeFactor    = if (_safeExpansions.contains(base) || player.isEnemy) 1.0 else 0.2
+      val threatFactor  = 1.0 / (2.0 + base.enemies.count(IsWarrior))
+      val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards * threatFactor
       output
     }
 
-    val scores = eligibleExpansions(player).map(b => (b, scoreBase(b))).toVector.sortBy(- _._2)
+    val scores = eligibleExpansions(player).map(b => (b, scoreBase(b, player))).toVector.sortBy(- _._2)
     scores.map(_._1)
   }
 

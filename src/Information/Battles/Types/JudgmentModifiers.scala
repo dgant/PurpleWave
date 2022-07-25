@@ -107,7 +107,6 @@ object JudgmentModifiers {
     val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
     if (pUs.zone == pFoe.zone) return None
     if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
-    if (battleLocal.us.units.exists(u => u.zone == pUs.zone && u.matchups.threatsInRange.exists(_.zone == pFoe.zone))) return None
     if (edge.isEmpty) return None
     val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)

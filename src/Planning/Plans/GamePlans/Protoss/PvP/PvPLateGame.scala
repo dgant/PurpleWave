@@ -147,6 +147,7 @@ class PvPLateGame extends GameplanImperative {
     val cannons       = new DoQueue(doCannons)
 
     get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    get(3, Protoss.Gateway)
     get(Protoss.DragoonRange)
 
     if (shouldExpand) {
@@ -156,8 +157,10 @@ class PvPLateGame extends GameplanImperative {
       trainArmy()
       addProduction()
     }
-    get(3, Protoss.Gateway)
     cannons()
+    if (productionCapacity >= 6) {
+      doUpgrades()
+    }
     tech1()
     if (shouldSecondaryTech) {
       tech2()
@@ -213,7 +216,6 @@ class PvPLateGame extends GameplanImperative {
       get(Protoss.TemplarArchives)
     }
     get(?(units(Protoss.RoboticsSupportBay) > 0, 4, 6), Protoss.Gateway)
-    doUpgrades()
     get(targetGateways + miningBases, Protoss.Gateway)
   }
 
@@ -238,7 +240,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doRobo(): Unit = {
-    if (productionCapacity >= 6 && gas < 150) {
+    if (productionCapacity >= 6 && gas < 250) {
       buildGasPumps()
     }
     get(Protoss.RoboticsFacility)
@@ -297,7 +299,7 @@ class PvPLateGame extends GameplanImperative {
       get(Protoss.GroundDamage)
       get(Protoss.GroundArmor)
     }
-    if (gas < 300) {
+    if (units(Protoss.Zealot) > 4 || gas < 200) {
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
     }

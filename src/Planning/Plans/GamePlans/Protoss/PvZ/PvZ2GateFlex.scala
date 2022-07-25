@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Minutes}
-import Utilities.UnitFilters.IsWarrior
+import Utilities.UnitFilters.{IsAll, IsAntiAir, IsWarrior}
 
 class PvZ2GateFlex extends GameplanImperative {
 
@@ -175,7 +175,7 @@ class PvZ2GateFlex extends GameplanImperative {
   }
 
   def restOfGame(): Unit = {
-    val safeFromMutalisks = ! enemyMutalisksLikely || unitsComplete(Protoss.Corsair) >= 5
+    val safeFromMutalisks = ! enemyMutalisksLikely || unitsComplete(IsAll(IsWarrior, IsAntiAir)) >= 6
     val safeFromGround = (upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.GroundDamage)) || enemyMutalisksLikely
     // This unitsComplete() check is from observing excess passivity in COG2022 testing
     if (safeFromGround && safeFromMutalisks && (safeToMoveOut || unitsComplete(IsWarrior) >= 24)) {

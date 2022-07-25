@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
+import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
@@ -204,9 +205,13 @@ class PvZ2GateFlex extends GameplanImperative {
     }
     upgrades()
     trainCorsairs()
-    val mutaCannons = Math.min(3, enemies(Zerg.Mutalisk) / 3)
+    val minCannons = Maff.fromBoolean(With.fingerprints.twoHatchGas()) + enemiesComplete(Zerg.Spire)
+    var mutaCannons = Maff.clamp(enemies(Zerg.Mutalisk) / 3, minCannons, 3)
     if (mutaCannons > 0) {
       buildCannonsAtBases(mutaCannons, DefendHall)
+    }
+    if (With.blackboard.wantToAttack()) {
+      buildCannonsAtNatural(2, DefendHall)
     }
 
     if (safeAtHome && unitsComplete(IsWarrior) >= 10) {

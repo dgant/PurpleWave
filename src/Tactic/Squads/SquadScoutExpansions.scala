@@ -68,7 +68,7 @@ class SquadScoutExpansions extends Squad {
     if (With.geography.ourBases.size < 2) return
     if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return
     if (scoutableBases().isEmpty) return
-    lock.matcher = if (With.blackboard.wantToAttack() && With.scouting.ourProximity < 0.65) matchAll else matchFlying
+    lock.matcher = if (With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65) matchAll else matchFlying
 
     val toScoutBases = Maff.orElse(
       scoutableBases().filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(90)()),

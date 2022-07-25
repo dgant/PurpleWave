@@ -16,7 +16,7 @@ object Crack extends Action {
     unit.canAttack
     && ! unit.unitClass.melee
     && With.frame > Minutes(5)()
-    && With.frame < Minutes(8)() // For performance, mainly
+    && With.frame < Minutes(12)() // For performance, mainly
     && ! unit.team.exists(_.engagedUpon)
     && unit.base.exists(_.isOurs)
     && unit.matchups.framesOfSafety > unit.cooldownMaxGround

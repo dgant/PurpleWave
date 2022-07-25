@@ -86,12 +86,6 @@ class Tactician extends TimedTask {
     With.squads.run(budgetMs)
   }
 
-  private def assignFreelancer(freelancers: mutable.Buffer[FriendlyUnitInfo], i: Int, squad: Squad): Unit = {
-    val freelancer = freelancers(i)
-    squad.addUnit(freelancers.remove(i))
-    With.recruiter.lockTo(squad.lock, freelancer)
-  }
-
   // Let freelancers pick the squad they can best serve
   private def freelancersPick(
       freelancers: mutable.Buffer[FriendlyUnitInfo],
@@ -104,7 +98,8 @@ class Tactician extends TimedTask {
       val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
       val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + (if (freelancer.squad.contains(squad)) 0 else 320))
       if (bestSquad.isDefined) {
-        assignFreelancer(freelancers, i, bestSquad.get)
+        bestSquad.get.addUnit(freelancers.remove(i))
+        With.recruiter.lockTo(bestSquad.get.lock, freelancer)
       } else {
         i += 1
       }
@@ -117,19 +112,22 @@ class Tactician extends TimedTask {
       squads: Seq[Squad],
       minimumValue: Double = Double.NegativeInfinity,
       filter: (FriendlyUnitInfo, Squad) => Boolean = (f, s) => true): Unit = {
-    val freelancersSorted     = new ArrayBuffer[(FriendlyUnitInfo, Int)]
-    val freelancersAvailable  = new mutable.HashSet[Int]
-    freelancersSorted     ++= freelancers.zipWithIndex
-    freelancersAvailable  ++= freelancers.indices
+    val freelancersSorted     = new ArrayBuffer[FriendlyUnitInfo]
+    val freelancersAvailable  = new mutable.HashSet[FriendlyUnitInfo]
+    freelancersSorted     ++= freelancers
+    freelancersAvailable  ++= freelancers
     squads.foreach(squad => {
-      Maff.sortStablyInPlaceBy(freelancersSorted)(_._1.framesToTravelTo(squad.vicinity))
-      var hired: Option[(FriendlyUnitInfo, Int)] = None
+      Maff.sortStablyInPlaceBy(freelancersSorted)(_.framesToTravelTo(squad.vicinity))
+      var hired: Option[FriendlyUnitInfo] = None
       do {
-        hired = freelancersSorted.find(u => freelancersAvailable.contains(u._2) && squad.candidateValue(u._1) > minimumValue)
-        hired.foreach(h => {
-          assignFreelancer(freelancers, h._2, squad)
-          freelancersAvailable -= h._2
-        })
+        freelancersSorted
+          .find(u => freelancersAvailable.contains(u) && squad.candidateValue(u) > minimumValue)
+          .foreach(hired => {
+            freelancersAvailable -= hired
+            freelancers -= hired
+            squad.addUnit(hired)
+            With.recruiter.lockTo(squad.lock, hired)
+          })
       } while (hired.isDefined)
     })
   }

@@ -21,7 +21,7 @@ class SquadAttack extends Squad {
 
   private def isNonTrolly(u: UnitInfo): Boolean = u.likelyStillThere && ! u.flying && IsWarrior(u) && ! u.isAny(Terran.Vulture, Zerg.Zergling) && ( ! u.effectivelyCloaked || With.units.existsOurs(IsMobileDetector) || With.units.existsOurs(Terran.Comsat))
   protected def getVicinity: Pixel = {
-    lazy val weHaveDetector   = units.exists(_.unitClass.isDetector) || With.units.existsOurs(Terran.Comsat)
+    lazy val weHaveDetector   = units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)
     lazy val nonTrollyThreats = With.units.enemy.count(isNonTrolly)
     lazy val airValue         = units.view.filter(_.flying).map(_.subjectiveValue).sum
     lazy val totalValue       = units.view.map(_.subjectiveValue).sum

@@ -31,13 +31,13 @@ class SquadDarkTemplar extends Squad {
       .sortBy(_.heart.center.groundPixels(centroidGround))
       .sortBy( - With.scouting.baseIntrigue(_))
       .sortBy( ! _.owner.isEnemy)
-      .sortBy(backstabTime && With.scouting.enemyProximity > 0.5 && ! _.naturalOf.exists(_.isEnemy))
+      .sortBy(waitForBackstab && With.scouting.enemyProximity > 0.5 && ! _.naturalOf.exists(_.isEnemy))
     if (bases.isEmpty) return
     lock.acquire()
   }
 
   private val bases = new ArrayBuffer[Base]
-  private def backstabTime: Boolean = With.frame < Minutes(9)()
+  private def waitForBackstab: Boolean = With.enemy.isProtoss && With.frame < Minutes(9)() && With.units.enemy.filter(IsMobileDetector).forall(o => With.scouting.proximity(o.pixel) < 0.5)
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
   private lazy val backstabTargetDistance = backstabTarget.groundTiles(With.geography.home)
@@ -67,8 +67,9 @@ class SquadDarkTemplar extends Squad {
     dts.addAll(units)
     val firstBase = bases.head
     var isFirstDT = true
+    var iDt = 0
     while (dts.nonEmpty) {
-      val base  = bases.headOption.getOrElse(firstBase)
+      var base  = bases.headOption.getOrElse(firstBase)
       val dt    = dts.minBy(_.pixelDistanceTravelling(base.heart))
       val dtTargets = Some(base.enemies.toVector)
       if (base.isEnemy && ! base.owner.isZerg) {
@@ -82,20 +83,22 @@ class SquadDarkTemplar extends Squad {
         division.foreach(division => {
           dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(base.enemies) })
         })
+
         if (division.isEmpty) {
-          if (backstabTime && hideyhole.isDefined) {
-            dt.intend(this, new Intention { toTravel = hideyhole; targets = Some(Seq.empty) })
-            return
-          } else {
-            intendDTToBase(dt, base)
+          if (waitForBackstab) {
+            base = With.geography.preferredExpansionsEnemy.view
+              .filterNot(With.scouting.enemyNatural.contains)
+              .filterNot(With.scouting.enemyMain.contains)
+              .drop(iDt).headOption.getOrElse(base)
           }
+          intendDTToBase(dt, base)
         }
       }
 
-      if (isFirstDT) {
+      if (iDt == 0) {
         vicinity = dt.intent.toTravel.get
       }
-      isFirstDT = false
+      iDt += 1
       dts.remove(dt)
     }
   }

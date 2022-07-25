@@ -2,12 +2,11 @@ package Micro.Formation
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Pathfinding.Types.TilePath
+import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Point, Points, Tile}
-import Mathematics.Shapes.Ray
 import Mathematics.{Maff, Shapes}
 import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -81,22 +80,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     if (style == FormationStyleGuard) {
       val guardDepth  = 32 * expectRangeTiles
       val guardRadius = guardDepth + edge.map(_.radiusPixels).getOrElse(32d)
-      if (edge.isDefined) {
-        val rayStart    = edge.get.pixelCenter
-        val rayTarget   = edge.get.endPixels.minBy(_.walkablePixel.groundPixels(zone.centroid))
-        val rayEnd      = rayStart.project(rayTarget, guardDepth)
-        val apexRay     = Ray(rayStart, rayEnd)
-        // A common problem is natural town halls that intersect our arc and make us take inferior positions.
-        // Prefer to stand in front of them.
-        var continueRay = true
-        apexRay.foreach(t => {
-          if (continueRay && t.walkable) {
-            apex = t.center
-          } else continueRay = false
-        })
-        // Extend the face outwards to broaden our arc
-        face = apex.project(face, guardRadius)
-      }
+      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(_.groundPixels(zone.centroid)), guardDepth)).getOrElse(apex)
+      face = apex.project(face, guardRadius) // Extend the face outwards to broaden our arc
     } else if (goalPath.pathExists) {
       // Engage: Walk far enough to be in range
       // March: Walk far enough to advance our army

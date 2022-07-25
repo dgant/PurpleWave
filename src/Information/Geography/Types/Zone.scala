@@ -20,7 +20,6 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   lazy  val entranceOriginal  : Option[Edge]        = UpdateZones.calculateEntrance(this)
   lazy  val exitOriginal      : Option[Edge]        = Maff.minBy(edges)(e => With.geography.startBases.map(_.heart).map(e.distanceGrid.get).max)
   lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(if (bases.length == 1) bases.head.heart else centroid)
-  lazy  val exitDistanceGrid  : GridGroundDistance  = exitOriginal.map(_.distanceGrid).getOrElse(distanceGrid)
   lazy  val exitDirection     : Option[Direction]   = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
   
   var units           : Vector[UnitInfo]  = Vector.empty

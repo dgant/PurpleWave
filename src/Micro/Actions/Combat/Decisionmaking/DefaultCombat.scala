@@ -83,13 +83,16 @@ object DefaultCombat extends Action {
     // Retreat, but potshot if we're trapped
     val retreat = Retreat.getRetreat(unit)
     if (unit.unitClass.fallbackAllowed && ! unit.loaded) {
-      val retreatDistance = unit.pixelDistanceCenter(retreat.to)
-      val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
-      if (unit.matchups.threats.exists(_.inRangeToAttack(unit, retreatStep))) {
+      lazy val retreatDistance = unit.pixelDistanceCenter(retreat.to)
+      lazy val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
+      // Reavers always potshot because their attacks are too valuable to not get off
+      if (Protoss.Reaver(unit)) {
+        if (potshot(unit)) return true
+      } else if (unit.matchups.threats.exists(_.inRangeToAttack(unit, retreatStep))) {
         if (potshot(unit)) return true
       }
       // If we're a strong potshotter and are just going to bump into an ally while retreating, potshot
-      if (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Dragoon)) {
+      else if (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Dragoon)) {
         val babyStepSize = 8
         val retreatBabyStep = unit.pixel.project(retreatStep, Math.min(babyStepSize, unit.pixelDistanceCenter(retreatStep)))
         val delta = retreatBabyStep.subtract(unit.pixel)

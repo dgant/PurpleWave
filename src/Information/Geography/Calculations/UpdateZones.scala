@@ -65,7 +65,6 @@ object UpdateZones {
   private def updateZone(zone: Zone): Unit = {
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
-    zone.exitDistanceGrid.initialize()
     zone.bases.foreach(UpdateBase(_))
     zone.exitNow = calculateExit(zone)
     zone.entranceNow = calculateEntrance(zone)

@@ -126,10 +126,10 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       .toVector
       .sortBy(_.formationRangePixels)
 
-    val classSlotsOverlook: Map[UnitClass, Seq[Pixel]] =
+    val classSlotsOverlook: Map[UnitClass, Seq[Pixel]] = Map.empty /*
       if      (style == FormationStyleGuard)  overlookSlots(classCount, requireTarget = false)
       else if (style == FormationStyleEngage) overlookSlots(classCount, requireTarget = true)
-      else                                    Map.empty
+      else                                    Map.empty */
     val classCountRemaining = classCount.map(c => c.slots - classSlotsOverlook.get(c.unitClass).map(_.length).getOrElse(0))
     val classSlotsArc       = arcSlots(classCount, 32 + apex.pixelDistance(face))
     val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)

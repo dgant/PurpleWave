@@ -8,7 +8,6 @@ import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
-import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, UnitFilter}
 
@@ -96,7 +95,7 @@ class SquadAcePilots extends Squad {
 
     // Monitor their bases
     // Don't look to target anything; just get scouting information first
-    val unscoutedEnemy = getStaleBase(With.geography.enemyBases)
+    val unscoutedEnemy = getStaleBase(With.geography.enemyBases, 120)
     if (unscoutedEnemy.nonEmpty) {
       activity = "AceMonitor"
       val base = unscoutedEnemy.minBy(_.enemies.count(_.canAttackAir))
@@ -114,23 +113,28 @@ class SquadAcePilots extends Squad {
       return
     }
 
-    // Explore
-    val unscoutedNeutral = getStaleBase(With.geography.enemyBases)
-    if (unscoutedNeutral.nonEmpty) {
+    // Explore, and snipe
+    val staleBases = Maff.orElse(
+      getStaleBase(With.geography.enemyBases,   30),
+      getStaleBase(With.geography.neutralBases, 30),
+      getStaleBase(With.geography.enemyBases,   10)).toVector
+    if (staleBases.nonEmpty) {
       activity = "AceExplore"
-      val base = unscoutedNeutral
+      val base = staleBases
         .sortBy(_.townHallArea.center.pixelDistanceSquared(centroidAir))
         .minBy(_.enemies.count(_.canAttackAir))
       vicinity = base.townHallArea.center
-      SquadAutomation.send(this)
+      SquadAutomation.targetAndSend(this)
       return
     }
 
     chill()
   }
 
-  private def getStaleBase(bases: Seq[Base]): Seq[Base] = {
-    bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(30)() && ! b.enemies.exists(_.canAttackAir))
+  private def getStaleBase(bases: Seq[Base], thresholdSeconds: Int): Seq[Base] = {
+    bases.filter(b =>
+      With.framesSince(b.lastFrameScoutedByUs) > thresholdSeconds
+      && ! b.enemies.exists(_.canAttackAir))
   }
 
   private def chill(): Unit = {

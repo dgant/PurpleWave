@@ -25,18 +25,10 @@ object SquadAutomation {
   }
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
-    squad.targets = Some(
-      Maff.orElse(
-        SquadAutomation
-          .rankForArmy(squad,
-            unrankedEnRouteTo(squad, to).filter(t =>
-                t.unitClass.isWorker
-                || squad.units.exists(t.canAttack)
-                || squad.units.exists(u => t.unitClass.canAttack(u) && t.inRangeToAttack(u))))
-          .sortBy(t => ! t.unitClass.isWorker)
-          .sortBy(t => - squad.units.count(_.inRangeToAttack(t))),
-        SquadAutomation.rankForArmy(squad, to.base.map(_.enemies).getOrElse(Seq.empty)))
-      .toSeq)
+    val unrankedTargets   = unrankedAround(squad, to)
+    lazy val targetCombat = unrankedTargets.filter(t => t.unitClass.isWorker || squad.canBeAttackedBy(t) || (t.unitClass.isStaticDefense && squad.units.exists(t.inRangeToAttack)))
+    lazy val targetHall   = unrankedTargets.filter(_.unitClass.isTownHall)
+    squad.targets = Some(SquadAutomation.rankForArmy(squad, Maff.orElse(targetCombat, targetHall, unrankedTargets).toSeq).sortBy( ! _.unitClass.isWorker))
   }
 
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
@@ -66,7 +58,7 @@ object SquadAutomation {
     output
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    With.units.enemy.filter(u => u.likelyStillThere && u.zone == to.zone || u.pixelDistanceCenter(to) < 32 * 12).toVector
+    With.units.enemy.filter(u => u.likelyStillThere && (u.zone == to.zone || u.pixelDistanceCenter(to) < 32 * 12)).toVector
   }
 
   def rankedEnRoute(squad: Squad): Seq[UnitInfo] = rankedEnRoute(squad, squad.vicinity)
@@ -140,6 +132,12 @@ object SquadAutomation {
   def targetFormAndSend(squad: Squad): Unit = targetFormAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def targetFormAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     target(squad)
+    squad.formations = form(squad, from, to)
+    send(squad, defaultReturn = Some(from))
+  }
+
+  def formAndSend(squad: Squad): Unit = formAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
+  def formAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     squad.formations = form(squad, from, to)
     send(squad, defaultReturn = Some(from))
   }

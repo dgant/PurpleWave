@@ -11,9 +11,8 @@ import Utilities.Time.Minutes
 
 class MissionKillExpansion extends Mission {
 
-  def eligible: Seq[Base] = {
-    With.geography.bases.filter(b => baseIsEnemy(b) && baseFarFromMain(b) && baseCloserToOurArmy(b))
-  }
+  def eligible: Seq[Base] = With.geography.bases.filter(b => b.isEnemy && baseFarFromMain(b) && baseCloserToOurArmy(b))
+
   def best: Option[Base] = Maff.maxBy(eligible)(base =>
     2 * base.heart.groundPixels(With.scouting.enemyThreatOrigin)
       - base.heart.groundPixels(With.scouting.ourMuscleOrigin))
@@ -39,7 +38,6 @@ class MissionKillExpansion extends Mission {
 
   private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(b => b.metro != base.metro && ! b.natural.contains(base))
   private def baseCloserToOurArmy(base: Base): Boolean = base.heart.groundPixels(With.scouting.ourMuscleOrigin) + 320 < base.heart.groundPixels(With.scouting.enemyThreatOrigin)
-  private def baseIsEnemy(base: Base): Boolean = base.owner.isEnemy
   private def enoughKillers: Boolean = vicinity.base.forall(unitsRequired(_) > Maff.orElse(units, With.units.ours.filter(IsWarrior)).size)
 
   override def run(): Unit = {
@@ -48,8 +46,10 @@ class MissionKillExpansion extends Mission {
     }
     if (duration > Minutes(3)()) { terminate("Exceeded duration"); return }
     if (With.framesSince(Math.max(launchFrame, lastFrameInBase)) > Minutes(1)()) { terminate("Left base or never made it in"); return }
-    if ( ! vicinity.base.exists(baseIsEnemy)) { terminate("Vicinity not an eligible base"); return }
+    if ( ! vicinity.base.exists(_.isEnemy)) { terminate("Vicinity not an eligible base"); return }
     if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired(vicinity.base.get)} "); return }
-    SquadAutomation.targetFormAndSend(this)
+
+    SquadAutomation.targetRaid(this)
+    SquadAutomation.formAndSend(this)
   }
 }

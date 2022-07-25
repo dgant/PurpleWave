@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
-import Placement.Access.PlaceLabels
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Access.PlaceLabels.DefendHall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
@@ -41,9 +41,13 @@ class PvZ2GateFlex extends GameplanImperative {
     once(5, Protoss.Zealot)
     once(18, Protoss.Probe)
     if (anticipateSpeedlings) {
-      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
-      once(21, Protoss.Probe)
+      get(Protoss.Forge)
+      once(19, Protoss.Probe)
+      get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
+      once(20, Protoss.Probe)
+      once(4, Protoss.Pylon)
       once(7, Protoss.Zealot)
+      get(3, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
     }
     once(4, Protoss.Pylon)
     once(Protoss.Assimilator)
@@ -78,18 +82,21 @@ class PvZ2GateFlex extends GameplanImperative {
   private val meldAllArchons = new MeldArchons
   private val meldMostArchons = new MeldArchons(60)
   private val meldSomeArchons = new MeldArchons(49)
+  private val speedlingStrategies = Vector(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
   def earlyGame(): Unit = {
     // Goal is to be home before any Mutalisks can pop.
     // Optimization: Detect 2 vs 3 hatch muta and stay out the extra 30s vs 3hatch
     scoutOn(Protoss.Gateway, quantity = 2)
 
-    anticipateSpeedlings = enemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
+    anticipateSpeedlings = enemyStrategy(speedlingStrategies: _*)
+    anticipateSpeedlings ||= enemyRecentStrategy(speedlingStrategies: _*) && ! With.scouting.enemyMainFullyScouted
     anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()
     anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(4, 30)()
     anticipateSpeedlings &&= ! enemyHydralisksLikely
     anticipateSpeedlings &&= ! enemyMutalisksLikely
     anticipateSpeedlings &&= ! enemyLurkersLikely
     anticipateSpeedlings ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
+
     goCorsair = ! anticipateSpeedlings
     goCorsair &&= ! enemyHydralisksLikely
     goCorsair ||= enemyMutalisksLikely
@@ -128,16 +135,11 @@ class PvZ2GateFlex extends GameplanImperative {
     }
 
     if (goCorsair) {
-      get(Protoss.Assimilator)
-      get(Protoss.CyberneticsCore)
-      get(Protoss.Stargate)
+      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Stargate)
       pump(Protoss.Corsair, if (enemyMutalisksLikely) 8 else if (enemyHydralisksLikely) 1 else 5)
     }
     if (goObserver) {
-      get(Protoss.Assimilator)
-      get(Protoss.CyberneticsCore)
-      get(Protoss.RoboticsFacility)
-      get(Protoss.Observatory)
+      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory)
       pump(Protoss.Observer, 1)
     }
     if (enemyMutalisksLikely) {

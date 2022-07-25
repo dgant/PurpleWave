@@ -29,7 +29,7 @@ class Tactician extends TimedTask {
   // Missions //
   //////////////
 
-  //private val missionKillExpansion      = addMission(new MissionKillExpansion)
+  private val missionKillExpansion      = addMission(new MissionKillExpansion)
   private val missionDTDrop             = addMission(new MissionDTDrop)
   private val missionStormDrop          = addMission(new MissionStormDrop)
   private val missionSpeedlotDrop       = addMission(new MissionSpeedlotDrop)

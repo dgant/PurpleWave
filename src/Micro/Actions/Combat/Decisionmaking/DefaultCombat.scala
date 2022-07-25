@@ -85,8 +85,28 @@ object DefaultCombat extends Action {
     if (unit.unitClass.fallbackAllowed && ! unit.loaded) {
       val retreatDistance = unit.pixelDistanceCenter(retreat.to)
       val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
-      if (unit.matchups.threats.exists(threat => threat.inRangeToAttack(unit, retreatStep))) {
+      if (unit.matchups.threats.exists(_.inRangeToAttack(unit, retreatStep))) {
         if (potshot(unit)) return true
+      }
+      // If we're a strong potshotter and are just going to bump into an ally while retreating, potshot
+      if (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Dragoon)) {
+        val babyStepSize = 8
+        val retreatBabyStep = unit.pixel.project(retreatStep, Math.min(babyStepSize, unit.pixelDistanceCenter(retreatStep)))
+        val delta = retreatBabyStep.subtract(unit.pixel)
+        if (retreatBabyStep.tile.toRectangle.expand(1, 1).tiles.exists(_.units.exists(n =>
+          ! n.flying
+          && n.pixelDistanceEdge(unit) < babyStepSize
+          && Maff.rectanglesIntersect(
+            unit.topLeft.x      + delta.x,
+            unit.topLeft.y      + delta.y,
+            unit.bottomRight.x  + delta.x,
+            unit.bottomRight.y  + delta.y,
+            n.topLeft.x,
+            n.topLeft.y,
+            n.bottomRight.x,
+            n.bottomRight.y)))) {
+          if (potshot(unit)) return true
+        }
       }
     }
     Retreat.applyRetreat(retreat)

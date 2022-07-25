@@ -26,6 +26,7 @@ trait UnitGroup {
   def splashesAir                       = _splashesAir()
   def splashesGround                    =  _splashesGround()
   def hasGround                         = _hasGround()
+  def hasAir                            = _hasAir()
   def engagingOn                        = _engagingOn()
   def engagedUpon                       = _engagedUpon()
   def widthPixels                       = _widthPixels()
@@ -45,6 +46,7 @@ trait UnitGroup {
   def combatGroundFraction              = _combatGroundFraction()
   def keyDistanceTo(pixel: Pixel): Double = if (hasGround) centroidKey.groundPixels(pixel.walkablePixel) else centroidKey.pixelDistance(pixel)
   def attackKeyDistanceTo(pixel: Pixel): Double = if (hasGround) attackCentroidKey.groundPixels(pixel.walkablePixel) else attackCentroidKey.pixelDistance(pixel)
+  def canBeAttackedBy(unit: UnitInfo): Boolean = unit.canAttackGround && hasGround || unit.canAttackAir && hasAir
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()
   def count(matcher: UnitFilter): Int = {
@@ -64,6 +66,7 @@ trait UnitGroup {
   private val _splashesAir              = new Cache(() => attackers.exists(a => a.unitClass.dealsRadialSplashDamage && a.canAttackAir))
   private val _splashesGround           = new Cache(() => attackers.exists(a => a.unitClass.dealsRadialSplashDamage && a.canAttackGround))
   private val _hasGround                = new Cache(() => groupOrderable.exists( ! _.flying))
+  private val _hasAir                   = new Cache(() => groupOrderable.exists(_.flying))
   private val _engagingOn               = new Cache(() => groupOrderable.exists(u =>                         u.matchups.targetsInRange.nonEmpty))
   private val _engagedUpon              = new Cache(() => groupOrderable.exists(u => u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty))
   private val _widthPixels              = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)

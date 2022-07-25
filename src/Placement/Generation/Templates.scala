@@ -325,6 +325,43 @@ object Templates {
       "xxx-"))
 
   val batterycannon = Seq(
+    // Super spacious
+    new Template()
+      .forExitDirection(Directions.Left)
+      .from(
+        "-------",
+        "-BxxCx-",
+        "-xxxxx-",
+        "--PxCx-",
+        "x-xxxx-",
+        "x------"),
+    new Template()
+      .forExitDirection(Directions.Right)
+      .from(
+        "-------",
+        "-CxBxx-",
+        "-xxxxx-",
+        "-CxPx--",
+        "-xxxx-",
+        "------"),
+    new Template()
+      .forExitDirection(Directions.Up)
+      .from(
+        "-------",
+        "-BxxPx-",
+        "-xxxxx-",
+        "--CxCx-",
+        "x-xxxx-",
+        "x------"),
+    new Template()
+      .forExitDirection(Directions.Down)
+      .from(
+        "x------",
+        "x-CxCx-",
+        "--xxxx-",
+        "-BxxPx-",
+        "-xxxxx-",
+        "-------"),
     // Spacious
     new Template()
       .forExitDirection(Directions.Left)

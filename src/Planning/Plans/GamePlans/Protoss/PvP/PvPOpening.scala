@@ -350,12 +350,10 @@ class PvPOpening extends GameplanImperative {
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
       aggression(0.6)
-    } else {
+    } else if (atTiming) {
       // Amp up aggression to ensure we can get down our ramp
-      aggression(1.0 + 0.2 * unitsComplete(Protoss.Reaver))
+      aggression(1.0 + 0.25 * unitsComplete(Protoss.Reaver))
     }
-
-
 
     /////////////
     // Logging //

@@ -37,25 +37,14 @@ class SquadAcePilots extends Squad {
 
   private def chooseActivity(): Unit = {
 
-    // Help other squads with anti-air
-    val otherSquads = With.squads.all.view.filterNot(==)
-    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
-    if (squadsToCover.nonEmpty) {
-      val squad = squadsToCover
-        .sortBy( ! _.isInstanceOf[SquadDefendBase])
-        .maxBy(_.targets.get.count(IsFlyingWarrior))
-      activity = "AceHelpSquad"
-      followSquad(squad)
-      return
-    }
-
-    val weSplash = units.exists(splashPilotMatcher)
+    val otherSquads   = With.squads.all.view.filterNot(==)
+    val weSplash      = units.exists(splashPilotMatcher)
     val enemySplashes = With.units.enemy.exists(splashPilotMatcher)
+    val requireFleet  = MacroFacts.enemyHasShown(acePilots: _*) || MacroFacts.enemiesCompleteFor(Zerg.Scourge.buildFrames, Zerg.Spire) > 0
 
     // If they have fast fliers,
     // and we don't have enough to contend against them,
     // seek shelter with the ground army
-    val requireFleet = MacroFacts.enemyHasShown(acePilots: _*) || With.units.enemy.exists(u => u.complete && Zerg.Spire(u))
     hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
     if (requireFleet && ! hasFleet) {
       activity = "AceChill"
@@ -64,11 +53,14 @@ class SquadAcePilots extends Squad {
     }
 
     // Aggressively engage air divisions
-    val aceDivision =
-      Maff.minBy(With.battles.divisions
-        .view
-        .filter(_.enemies.exists(IsFlyingWarrior))
-        .filter(d => hasFleet || units.size > d.enemies.count(IsFlyingWarrior)))(_.centroidAir.pixelDistanceSquared(centroidAir))
+    val aceDivisions = With.battles.divisions
+      .view
+      .filter(_.enemies.exists(IsFlyingWarrior))
+      .filter(d => hasFleet || units.size > d.enemies.count(IsFlyingWarrior))
+    val aceDivision = aceDivisions
+      .sortBy(d => d.centroidAir.pixelDistanceSquared(centroidAir))
+      .sortBy(d => if (weSplash) d.enemies.size else 1)
+      .headOption
     if (aceDivision.isDefined) {
       activity = "AceAir2Air"
       vicinity = aceDivision.get.centroidAir
@@ -89,6 +81,17 @@ class SquadAcePilots extends Squad {
     if (dropMissions.nonEmpty) {
       activity = "AceEscortDrop"
       followSquad(dropMissions.maxBy(_.duration))
+    }
+
+    // Help other squads with anti-air
+    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
+    if (squadsToCover.nonEmpty) {
+      val squad = squadsToCover
+        .sortBy( ! _.isInstanceOf[SquadDefendBase])
+        .maxBy(_.targets.get.count(IsFlyingWarrior))
+      activity = "AceHelpSquad"
+      followSquad(squad)
+      return
     }
 
     // Monitor their bases

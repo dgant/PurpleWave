@@ -41,10 +41,10 @@ class Tactician extends TimedTask {
   ////////////////////
 
           val produce: Produce          = addPriorityTactic(new Produce)
-  private val acePilots                 = addPriorityTactic(new SquadAcePilots)
+          val acePilots                 = addPriorityTactic(new SquadAcePilots)
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
   private val ejectScout                = addPriorityTactic(new SquadEjectScout)
-  private val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
+          val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
   private val backstabProxy             = addPriorityTactic(new SquadBackstabProxy)
   private val defendAgainstProxy        = addPriorityTactic(new DefendAgainstProxy)
   private val defendFightersAgainstRush = addPriorityTactic(new DefendFightersAgainstRush)
@@ -54,9 +54,9 @@ class Tactician extends TimedTask {
   private val mindControl               = addPriorityTactic(new SquadMindControl)
   private val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
   private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
-  private val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
-  private val monitorWithObserver       = addPriorityTactic(new MonitorTerranWithObserver)
-  private val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
+          val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
+          val monitorWithObserver       = addPriorityTactic(new MonitorTerranWithObserver)
+          val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
 
   //////////////////
   // Basic squads //

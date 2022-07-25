@@ -70,14 +70,14 @@ object DefaultCombat extends Action {
     unit.unready
   }
   def readyToAttackTarget(unit: FriendlyUnitInfo): Boolean = {
-    if (unit.agent.ride.exists(_.flying)) return true
     if (unit.agent.toAttack.isEmpty) return false
-    if (unit.unitClass.ranged && unit.framesToGetInRange(unit.agent.toAttack.get) + 4 < unit.cooldownLeft) return false
+    val effectiveCooldown = if (unit.transport.exists(_.flying)) 0 else unit.cooldownLeft
+    if (unit.unitClass.ranged && effectiveCooldown > unit.framesToGetInRange(unit.agent.toAttack.get) + 4) return false
     true
   }
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
-    if (readyToAttackTarget(unit)) {  Commander.attack(unit) }
-    unit.ready
+    if (readyToAttackTarget(unit)) { Commander.attack(unit) }
+    unit.unready
   }
   def retreat(unit: FriendlyUnitInfo): Boolean = {
     // Retreat, but potshot if we're trapped

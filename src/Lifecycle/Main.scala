@@ -18,7 +18,7 @@ object Main {
 
   val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()
     .withAutoContinue(true)
-    .withMaxFrameDurationMs(40)
+    .withMaxFrameDurationMs(30)
     .withAsyncFrameBufferCapacity(framesToBuffer)
     .withAsync(useFrameBuffer)
     .withAsyncUnsafe(useFrameBuffer)

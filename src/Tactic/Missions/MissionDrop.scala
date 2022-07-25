@@ -81,10 +81,23 @@ abstract class MissionDrop extends Mission {
     With.framesSince(base.lastFrameScoutedByUs) < Seconds(90)() && ! base.owner.isEnemy
   }
 
+  private def scoutTactics = Vector(With.tactics.scoutExpansions, With.tactics.acePilots, With.tactics.scoutWithOverlord, With.tactics.monitorWithObserver, With.tactics.darkTemplar)
+
   final private def skipBase(base: Base): Boolean = {
+
     if (ignore(base)) return true
     if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
-    if (itinerary.size > 1 && With.frame < Minutes(10)() && ! base.owner.isEnemy) return true
+    if (base.isNeutral && itinerary.size > 1 && With.frame < Minutes(10)()) return true
+    if (base.isNeutral) {
+      val maxCost = if (itinerary.size > 1 && With.frame < Minutes(10)()) 0
+        else if (scoutTactics.exists(t => With.recruiter.lockedBy(t).nonEmpty)) 32  * 24
+        else 32 * 48
+      val here  = transports.headOption.map(_.pixel).getOrElse(centroidAir)
+      val there = base.townHallArea.center
+      val next  = itinerary.drop(1).headOption.map(_.townHallArea.center).getOrElse(there)
+      val cost = here.pixelDistance(there) + there.pixelDistance(next) - here.pixelDistance(next)
+      if (cost > maxCost) return true
+    }
     if (shouldStopRaiding && units.exists(_.base.contains(base))) return true
     false
   }

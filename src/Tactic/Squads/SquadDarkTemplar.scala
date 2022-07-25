@@ -37,16 +37,22 @@ class SquadDarkTemplar extends Squad {
   }
 
   private val bases = new ArrayBuffer[Base]
-  private def backstabTime: Boolean = With.frame < Minutes(10)()
+  private def backstabTime: Boolean = With.frame < Minutes(9)()
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
   private lazy val backstabTargetDistance = backstabTarget.groundTiles(With.geography.home)
   private lazy val hideyholeSpiral        = Spiral(48).map(backstabTarget.add).filter(_.walkable).filterNot(_.metro.exists(_.bases.exists(_.isEnemy)))
   private lazy val hideyhole: Option[Pixel] = {
+    /*
     val output = hideyholeSpiral
       .find(With.grids.scoutingPathsStartLocations(_) > 16)
       .map(_.center)
       .orElse(With.geography.preferredExpansionsEnemy.filterNot(_.naturalOf.exists(_.isEnemy)).headOption.map(b => b.zone.exitNow.map(_.pixelCenter).getOrElse(b.heart.center)))
+     */
+    val output = With.geography.preferredExpansionsEnemy.view
+      .filterNot(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b))
+      .headOption
+      .map(_.townHallArea.center)
     With.logger.debug(f"Selected DT hidey hole: $output")
     output
   }
@@ -71,7 +77,7 @@ class SquadDarkTemplar extends Squad {
         bases -= base
 
         val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
-        val division = Maff.minBy(divisions)(_.centroidGround.groundPixels(centroidGround))
+        val division = Maff.minBy(divisions)(_.centroidGround.groundPixels(dt.pixel))
 
         division.foreach(division => {
           dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(base.enemies) })

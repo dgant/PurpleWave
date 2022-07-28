@@ -13,7 +13,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 trait Fits {
-  protected lazy val points: Array[TemplatePoint]       = Array.fill(With.mapTileArea)(PointAnything)
+  protected lazy val points: Array[TemplatePoint]       = Array.fill(With.mapTileArea)(new PointAnything)
   protected lazy val byTile: Array[Option[Foundation]]  = Array.fill(With.mapTileArea)(None)
   private val _fits         = new ArrayBuffer[Fit] // We only keep these for debugging
   private val _foundations  = new ArrayBuffer[Foundation]
@@ -21,9 +21,9 @@ trait Fits {
   private val byZone        = new mutable.HashMap[Zone,       ArrayBuffer[Foundation]]
   private val byBase        = new mutable.HashMap[Base,       ArrayBuffer[Foundation]]
   private val byBuilding    = new mutable.HashMap[UnitClass,  ArrayBuffer[Foundation]]
-  private val byLabelYes       = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
+  private val byLabelYes    = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
 
-  def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else PointNothing
+  def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else new PointNothing
   def get(tile: Tile)               : Option[Foundation]  = if (tile.valid) byTile(tile.i) else None
   def get(width: Int, height: Int)  : Seq[Foundation]     = byDimensions.getOrElse((width, height), Seq.empty)
   def get(zone: Zone)               : Seq[Foundation]     = byZone.getOrElse(zone, Seq.empty)

@@ -8,8 +8,6 @@ import Utilities.CountMap
 import Utilities.Time.Seconds
 import mjson.Json
 
-import java.io.PrintWriter
-import java.nio.file.Paths
 import scala.collection.mutable
 
 /**
@@ -138,20 +136,13 @@ trait Zippers {
   lazy val filename: String = f"accelerants-${With.mapCleanName}.json"
 
   def read(): Unit = {
-    Seq(With.bwapiData.ai, With.bwapiData.read, With.bwapiData.write).foreach(directory => {
-      try {
-        val file = Paths.get(directory, filename).toFile
-        if (file.exists()) {
-          With.logger.debug(s"Found accelerant logs in ${file.getAbsoluteFile}")
-          val jsonText = scala.io.Source.fromFile(file).mkString
-          val json = Json.read(jsonText)
-          val mapInfo = new MapInfo(json)
-          if (mapInfo.hash == With.game.mapHash) {
-            mapInfo.zippersSpawn.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSpawn.contains).foreach(add(_, p._2, 10)))
-            mapInfo.zippersSteady.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSteady.contains).foreach(add(_, p._2, 10)))
-          }
-        }
-      } catch { case exception: Exception => With.logger.onException(exception) }
+    With.bwapiData.readFromARWToString(filename).foreach(jsonText => {
+      val json = Json.read(jsonText)
+      val mapInfo = new MapInfo(json)
+      if (mapInfo.hash == With.game.mapHash) {
+        mapInfo.zippersSpawn.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSpawn.contains).foreach(add(_, p._2, 10)))
+        mapInfo.zippersSteady.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSteady.contains).foreach(add(_, p._2, 10)))
+      }
     })
   }
 
@@ -161,12 +152,7 @@ trait Zippers {
       zippersSpawn.map(p => (p._1.tileTopLeft, p._2)).toBuffer,
       zippersSteady.filterNot(_._2.mode.isEmpty).map(p => (p._1.tileTopLeft, p._2.mode.get)).toBuffer)
     val text = info.asJson.toString()
-    try {
-      val file = Paths.get(With.bwapiData.write, filename).toFile
-      val writer = new PrintWriter(file)
-      writer.print(text)
-      writer.close()
-    } catch { case exception: Exception => With.logger.onException(exception) }
+    With.bwapiData.writeToFile(filename, text)
   }
 
   def onStart(): Unit = {

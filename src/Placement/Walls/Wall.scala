@@ -33,7 +33,7 @@ class Wall {
       new TemplatePointRequirement(b._2).withLabels(PlaceLabels.Defensive, PlaceLabels.DefendEntrance, PlaceLabels.DefendGround, PlaceLabels.Wall)))
     hallway.foreach(tile => fit.template.add(
       Point(tile.x - origin.x, tile.y - origin.y),
-      RequireWalkable))
+      new RequireWalkable))
     fit
   }
 }

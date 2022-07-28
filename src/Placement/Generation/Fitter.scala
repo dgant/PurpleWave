@@ -84,14 +84,18 @@ trait Fitter extends Fits {
       if ( ! With.grids.buildableW(requirement.width).get(pointTile)) {
         return false
       }
-      for (dx <- 0 until requirement.width) {
-        for (dy <- 0 until requirement.height) {
+      var dx = 0
+      while (dx < requirement.width) {
+        var dy = 0
+        while(dy < requirement.height) {
           val relative = Point(dx, dy)
           val tile = pointTile.add(relative)
           if ( ! accept(requirement, relative, tile)) {
             return false
           }
+          dy += 1
         }
+        dx += 1
       }
     }
     true

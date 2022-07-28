@@ -1,6 +1,6 @@
 package Placement.Templating
 
-object RequireWalkable extends TemplatePointRequirement {
+class RequireWalkable extends TemplatePointRequirement {
   override val buildableBefore  : Boolean = false
   override val walkableBefore   : Boolean = true
   override val buildableAfter   : Boolean = false

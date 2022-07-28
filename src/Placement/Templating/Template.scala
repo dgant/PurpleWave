@@ -5,7 +5,6 @@ import Mathematics.Points._
 import Performance.{Cache, CacheForever}
 import Placement.Access.PlaceLabels._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitClasses.UnitClass
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -46,46 +45,46 @@ class Template extends TemplateFilter {
       while (x < string.length) {
         val char = string(x)
         val pt: TemplatePointRequirement = char.toUpper match {
-          case '-' => RequireWalkable
-          case 'A' =>RequireWalkable
+          case '-' => new RequireWalkable
+          case 'A' => new RequireWalkable
           case 'B' => new TemplatePointRequirement(Terran.Bunker, Protoss.ShieldBattery).withLabels(Defensive)
           case 'C' => new TemplatePointRequirement(Terran.MissileTurret, Protoss.PhotonCannon, Zerg.CreepColony).withLabels(Defensive)
-          case 'D' => last.labels ++= Seq(Defensive, DefendHall); RequireAnything
-          case 'E' => last.labels ++= Seq(Defensive, DefendEntrance); RequireAnything
+          case 'D' => last.labels ++= Seq(Defensive, DefendHall); null
+          case 'E' => last.labels ++= Seq(Defensive, DefendEntrance); null
           case 'F' => new TemplatePointRequirement(Terran.Factory).withLabels(GroundProduction)
           case 'G' => new TemplatePointRequirement(4, 2).withLabels(Gas)
           case 'H' => new TemplatePointRequirement(4, 3).withLabels(TownHall)
-          case 'I' => last.labels += Important; RequireAnything
-          case 'J' => RequireAnything
-          case 'K' => RequireAnything
-          case 'L' => RequireAnything
-          case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); RequireAnything
-          case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); RequireAnything
-          case 'O' => RequireAnything
+          case 'I' => last.labels += Important; null
+          case 'J' => null
+          case 'K' => null
+          case 'L' => null
+          case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); null
+          case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); null
+          case 'O' => null
           case 'P' => new TemplatePointRequirement(Protoss.Pylon).withLabels(Important, Supply)
-          case 'Q' => RequireAnything
+          case 'Q' => null
           case 'R' => new TemplatePointRequirement(3, 2).withLabels(GroundProduction) // 3x2 ground production, eg. Robotics
           case 'S' => new TemplatePointRequirement(Protoss.Stargate).withLabels(Tech)
           case 'T' => new TemplatePointRequirement(3, 2).withLabels(Tech) // 3x2 tech
-          case 'U' => last.labels += Unimportant; RequireAnything
-          case 'V' => RequireAnything
+          case 'U' => last.labels += Unimportant; null
+          case 'V' => null
           case 'W' => new TemplatePointRequirement(4, 3).withLabels(GroundProduction) // 4x3 ground production, eg. Gateway
-          case 'X' => RequireAnything
-          case 'Y' => RequireAnything
-          case 'Z' => RequireAnything
-          case '0' => RequireAnything
-          case '1' => RequireAnything
+          case 'X' => null
+          case 'Y' => null
+          case 'Z' => null
+          case '0' => null
+          case '1' => null
           case '2' => new TemplatePointRequirement(2, 2)
           case '3' => new TemplatePointRequirement(3, 2)
           case '4' => new TemplatePointRequirement(4, 3)
-          case '5' => RequireAnything
+          case '5' => null
           case '6' => new TemplatePointRequirement(Terran.Starport, Terran.ScienceFacility).withLabels(Tech)
-          case '7' => RequireAnything
-          case '8' => RequireAnything
-          case '9' => RequireAnything
-          case default => RequireAnything
+          case '7' => null
+          case '8' => null
+          case '9' => null
+          case default => null
         }
-        if (pt != RequireAnything) {
+        if (pt != null) {
           add(Point(x, y), pt)
           // TODO: Add postfix modifiers here
           // -Optional fits

@@ -1,6 +1,6 @@
 package Placement.Templating
 
-object RequireNothing extends TemplatePointRequirement {
+class RequireNothing extends TemplatePointRequirement {
   override val buildableBefore  : Boolean = false
   override val walkableBefore   : Boolean = false
   override val buildableAfter   : Boolean = false

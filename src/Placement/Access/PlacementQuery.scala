@@ -129,7 +129,7 @@ class PlacementQuery {
     } else {
       requirements.zone.view.flatMap(_.bases).filter(requirements.base.contains)
     })
-    bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, PointGas))
+    bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, new PointGas))
   }
 
   def auditRequirements: Vector[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {

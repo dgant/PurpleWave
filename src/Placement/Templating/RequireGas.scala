@@ -2,7 +2,7 @@ package Placement.Templating
 
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-object RequireGas extends TemplatePointRequirement(Terran.Refinery, Protoss.Assimilator, Zerg.Extractor) {
+class RequireGas extends TemplatePointRequirement(Terran.Refinery, Protoss.Assimilator, Zerg.Extractor) {
   override val buildableBefore  : Boolean = false
   override val walkableBefore   : Boolean = false
   override val buildableAfter   : Boolean = false

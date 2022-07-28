@@ -55,7 +55,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       makeObservers()
       return
     }
-    lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
+    lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
     lazy val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
     lazy val expectedArrival     = if (enemyDarkTemplarLikely) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame

@@ -102,7 +102,7 @@ class DefendAgainstProxy extends Tactic {
       && IsProxied(e))
   }
   
-  lazy val scaryTypes = Vector(
+  private lazy val scaryTypes = Vector(
     Terran.Bunker,
     Terran.Barracks,
     Terran.Factory,

@@ -9,13 +9,12 @@ import scala.collection.mutable.ArrayBuffer
 
 object HistoryLoader {
   
-  private val filenameHistoryPrefix = "_v" + HistorySerializer.formatVersion + "_history_"
-  private val filenameEnemyToken = "{opponent}"
-  private val filenameTemplate = filenameHistoryPrefix + filenameEnemyToken + ".csv"
-  private def loadFilesDirectory = With.bwapiData.read
-  private def saveFilesDirectory = With.bwapiData.write
-  private val seedFilesDirectories = Array("", "PretrainP", "PretrainT", "PretrainZ")
-    .map(relative => With.bwapiData.ai + relative)
+  private val filenameHistoryPrefix = f"_v${HistorySerializer.formatVersion}_history_"
+  private val filenameEnemyToken    = "{opponent}"
+  private val filenameTemplate      = f"${filenameHistoryPrefix}${filenameEnemyToken}.csv"
+  private def loadFilesDirectory    = With.bwapiData.read
+  private def saveFilesDirectory    = With.bwapiData.write
+  private val seedFilesDirectories  = Array("", "PretrainP", "PretrainT", "PretrainZ").map(relative => With.bwapiData.ai + relative)
   
   // The order matters (see below) thus meriting the explicit naming
   private val directoriesInDecendingOrderOfRecency = Array(loadFilesDirectory, saveFilesDirectory) ++ seedFilesDirectories
@@ -35,7 +34,7 @@ object HistoryLoader {
     output
   }
   
-  def save(games: Iterable[HistoricalGame]) {
+  def save(games: Iterable[HistoricalGame]): Unit = {
     val gamesVsOpponent       = games.filter(_.enemyName == With.history.currentEnemyName)
     val gamesToSave           = gamesVsOpponent.toSeq.sortBy(- _.timestamp).take(With.configuration.maximumGamesHistoryPerOpponent)
     val gamesToSaveSerialized = HistorySerializer.writeGames(gamesToSave)
@@ -59,8 +58,7 @@ object HistoryLoader {
       }
       val historyFiles = files.filter(_.getName.contains(filenameHistoryPrefix))
       return historyFiles.flatMap(loadGamesFromFile)
-    }
-    catch { case exception: Exception =>
+    } catch { case exception: Exception =>
       With.logger.warn("Failed to read games directory " + directory)
       With.logger.onException(exception)
     }
@@ -87,11 +85,9 @@ object HistoryLoader {
             lines += nextLine
           }
         }
-  
         output = lines
       }
-    }
-    catch { case exception: Exception =>
+    } catch { case exception: Exception =>
       With.logger.warn("Failed to load game history from " + filename)
       With.logger.onException(exception)
     }
@@ -101,7 +97,7 @@ object HistoryLoader {
     output
   }
   
-  private def saveGames(filename: String, lines: Iterable[String]) {
+  private def saveGames(filename: String, lines: Iterable[String]): Unit = {
     WriteFile(filename, lines, "save game history")
   }
 }

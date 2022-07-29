@@ -53,6 +53,7 @@ class Storyteller {
 
   lazy val rushDistance = f"Rush distances on ${With.mapCleanName}"
   val stories: Seq[IStory] = Seq(
+    new Story                           ("Frame 0 (secs)",      () => With.frame0ms / 1000),
     new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                              _.map(_.name).mkString(", ")),
     new Story[Iterable[Int]]            (rushDistance,          () => With.geography.rushDistances,                                                                                _.map(_.toString).mkString(", ")),
     new Story                           ("Mean rush distance",  () => With.strategy.rushDistanceMean),

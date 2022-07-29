@@ -7,33 +7,45 @@ import jbweb.Walls
 
 class PurpleWave extends DefaultBWListener {
 
+  private def timeFrameZero(todo: () => Unit): Unit = {
+    val msBefore = System.nanoTime / 1000000
+    todo()
+    if (With.frame == 0) {
+      With.frame0ms += System.nanoTime / 1000000 - msBefore
+    }
+  }
+
   override def onStart(): Unit = {
-    tryCatch(() => {
-      With.onStart()
-      Walls.logInfo = With.configuration.logstd
-      JBWEBWrapper.onStart()
-      With.history.onStart()
-      With.units.onStart()
-      With.geography.onStart()
-    })
+    With.frame0ms = 0
+    timeFrameZero(() => {
+      tryCatch(() => {
+        With.onStart()
+        Walls.logInfo = With.configuration.logstd
+        JBWEBWrapper.onStart()
+        With.history.onStart()
+        With.units.onStart()
+        With.geography.onStart()
+      })})
   }
 
   override def onFrame(): Unit = {
-    tryCatch(() => {
-      With.performance.startFrame()
-      With.onFrame()
-      With.latency.onFrame()
-      With.units.onFrame()
-      With.gathering.updateAccelerantPixels()
-      With.lambdas.onFrame()
-      With.tasks.run(With.performance.msBeforeTarget)
-      With.storyteller.onFrame()
-      With.performance.endFrame()
-      With.camera.onRun(24000)
-      With.visualization.onRun(24000)
+    timeFrameZero(() => {
+      tryCatch(() => {
+        With.performance.startFrame()
+        With.onFrame()
+        With.latency.onFrame()
+        With.units.onFrame()
+        With.gathering.updateAccelerantPixels()
+        With.lambdas.onFrame()
+        With.tasks.run(With.performance.msBeforeTarget)
+        With.storyteller.onFrame()
+        With.performance.endFrame()
+        With.camera.onRun(24000)
+        With.visualization.onRun(24000)
+      })
+      // If we don't initialize static units on frame 0 we're in trouble
+      tryCatch(() => if (With.frame == 0 && With.units.neutral.isEmpty) { With.units.onFrame() })
     })
-    // If we don't initialize static units on frame 0 we're in trouble
-    tryCatch(() => if (With.frame == 0 && With.units.neutral.isEmpty) { With.units.onFrame() })
   }
 
   override def onUnitDestroy(unit: bwapi.Unit): Unit = {

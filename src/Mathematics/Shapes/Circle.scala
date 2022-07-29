@@ -11,7 +11,7 @@ object Circle {
       .filter(_._3)
       .map(point => Point(point._1, point._2))
 
-  private val _cachedPointMax = 50
+  private val _cachedPointMax = 32
   private val _cachedPoints = (0 to _cachedPointMax).map(pointsForRadius(_).toVector).toVector
 
   def apply(radius: Int): IndexedSeq[Point] = if (radius <= _cachedPointMax) _cachedPoints(Math.max(0, radius)) else pointsForRadius(radius)

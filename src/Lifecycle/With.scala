@@ -41,6 +41,7 @@ import scala.collection.JavaConverters._
 
 object With {
 
+  var frame0ms          : Long                = 0
   var frame             : Int                 = 0
   var self              : PlayerInfo          = _
   var neutral           : PlayerInfo          = _

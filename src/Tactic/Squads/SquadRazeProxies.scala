@@ -13,7 +13,7 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
 
   override def launch(): Unit = {}
 
-  override def run() {
+  override def run(): Unit = {
     units.foreach(unit => {
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(IsWarrior)) None else assignee

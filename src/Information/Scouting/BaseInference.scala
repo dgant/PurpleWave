@@ -23,6 +23,7 @@ trait BaseInference {
     // Recent observations are proof
     var output = enemyNatural.forall(b => With.framesSince(b.lastFrameScoutedByUs) > Terran.CommandCenter.buildFrames)
     // Infer
+    output &&= ! (With.fingerprints.cannonRush()    && With.frame < GameTime(7,  0)())
     output &&= ! (With.fingerprints.twoGate()       && With.frame < GameTime(5, 35)() && ! With.fingerprints.twoGate99()) // 10-12 only
     output &&= ! (With.fingerprints.dtRush()        && With.frame < GameTime(5, 40)())
     output &&= ! (With.fingerprints.oneGateCore()   && With.frame < GameTime(5, 15)())

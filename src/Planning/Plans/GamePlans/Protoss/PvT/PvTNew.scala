@@ -7,17 +7,24 @@ import Utilities.DoQueue
 
 class PvTNew extends GameplanImperative {
 
+  // Learnable/swappable: ZZCoreZ
+  // Learnable/swappable: 1 Zealot 16 Nexus (Bag of Builds; has reactions)
+  // Learnable/swappable: Modern expand builds
+  // Learnable/swappable: Modern nexus first with reactions
+  // Learnable/swappable: 2-base Carrier
+
+  var roboBeforeRange: Boolean = false
+
   var goObs: Boolean = true
   var goReavers: Boolean = true
   var goCarriers: Boolean = false
   var goArbiters: Boolean = true
 
   def doEmergencyReactions(): Unit = {
-    // Vs. BBS: Zealots into 3-Gate Goon
-    // Vs. 10-12: Zealots into 3-Gate Goon
+    // Vs. BBS: Zealots into 3-Gate Goon into Reaver (And expand after Reaver if they do)
+    // Vs. 11-13: Zealots into 3-Gate Goon into Reaver (And expand after Reaver if they do)
     // Vs. Worker rush: Zealots into 3-Gate Goon
     // Vs. 2-Fac, or possibly any scout-blocking wall-in: Gate-Core-Gate before expand
-
     Vector(new PvTIdeas.ReactToRaxCheese, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush).foreach(_.update())
   }
 

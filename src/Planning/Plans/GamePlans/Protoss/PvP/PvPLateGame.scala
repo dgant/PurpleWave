@@ -43,14 +43,14 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech) .filter(x => With.units.ours.filter(Protoss.CitadelOfAdun).exists( ! _.knownToOpponents)))
       .orElse(Some(RoboTech)    .filter(x => enemyDarkTemplarLikely))
       .orElse(Some(RoboTech)    .filter(x => With.fingerprints.cannonRush()))
-      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) > 2 && roll("RoboVsCannon", 0.7)))
+      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) >= 5))
+      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) >= 2 && roll("RoboVsCannon", 0.7)))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && bases > 2))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", 0.4)))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && units(Protoss.Zealot) >= 5))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && upgradeStarted(Protoss.GroundDamage)))
       .orElse(Some(RoboTech)    .filter(x => commitToTech))
-    shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage)
-    //shouldReaver &&= units(Protoss.TemplarArchives) == 0 || enemies(Protoss.PhotonCannon) > 4
+    shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage) || enemies(Protoss.PhotonCannon) >= 5
 
     fearDeath   = ! safeAtHome
     fearDeath   ||= unitsComplete(IsWarrior) < 8
@@ -72,6 +72,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= bases > 2
     shouldAttack ||= bases > miningBases
     shouldAttack ||= ! recentlyExpandedFirst
+    shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
     shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut

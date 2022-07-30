@@ -6,7 +6,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import ProxyBwapi.Players.{PlayerInfo, Players}
+import ProxyBwapi.Players.PlayerInfo
 import Utilities.UnitFilters.IsWarrior
 import bwapi.Race
 
@@ -47,14 +47,14 @@ trait Expansions {
   private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
-    val tileHome        = if (player.isFriendly)  With.geography.home               else With.scouting.enemyHome
-    val tileEnemy       = if (player.isEnemy)     With.geography.home               else With.scouting.enemyHome
-    val friendlyPlayers = if (player.isFriendly)  Players.all.filter(_.isFriendly)  else With.enemies
-    val opposingPlayers = if (player.isEnemy)     Players.all.filter(_.isFriendly)  else With.enemies
-    val playerBases     = With.geography.bases.filter(b => player == b.owner)
-    val enemyBases      = With.geography.bases.filter(b => opposingPlayers.exists(_ == b.owner))
-    val friendlyTiles   = Maff.orElse(playerBases .map(_.heart), Seq(tileHome))
-    val opposingTiles   = Maff.orElse(With.geography.bases.filter(b => opposingPlayers.exists(_ == b.owner)).map(_.heart), Seq(tileEnemy))
+    val tileHome        = if (player.isFriendly)  With.geography.home     else With.scouting.enemyHome
+    val tileEnemy       = if (player.isEnemy)     With.scouting.enemyHome else With.geography.home
+    val friendlyPlayers = if (player.isFriendly)  Vector(player)          else With.enemies
+    val opposingPlayers = if (player.isEnemy)     With.enemies            else With.friendlies
+    val friendlyBases   = With.geography.bases.filter(b => friendlyPlayers.contains(b.owner))
+    val opposingBases   = With.geography.bases.filter(b => opposingPlayers.contains(b.owner))
+    val friendlyTiles   = Maff.orElse(friendlyBases.map(_.heart), Seq(tileHome))
+    val opposingTiles   = Maff.orElse(opposingBases.map(_.heart), Seq(tileEnemy))
     val opposingRaces   = opposingPlayers.map(_.raceCurrent).filterNot(Race.Unknown==)
 
     val raceWeights     = weightsTowards  .getOrElse(player.raceCurrent, Map.empty)
@@ -63,8 +63,8 @@ trait Expansions {
     val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get)).getOrElse(3)
 
     def scoreBase(base: Base, player: PlayerInfo): Double = {
-      val distanceHome  = Maff.mean(friendlyTiles.map(base.heart.groundPixels)) / 32
-      val distanceEnemy = Maff.mean(opposingTiles.map(base.heart.groundPixels)) / 32
+      val distanceHome  = Maff.mean(friendlyTiles.map(base.heart.groundTiles).map(_.toDouble))
+      val distanceEnemy = Maff.mean(opposingTiles.map(base.heart.groundTiles).map(_.toDouble))
       val homeFactor    = Maff.clamp(1.0 - distanceHome   / 256.0,  0.1, 1.0)
       val enemyFactor   = Maff.clamp(1.0 - distanceEnemy  / 256.0,  0.1, 1.0)
       val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0

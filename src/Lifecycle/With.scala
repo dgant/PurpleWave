@@ -46,6 +46,7 @@ object With {
   var self              : PlayerInfo          = _
   var neutral           : PlayerInfo          = _
   var enemies           : Vector[PlayerInfo]  = _
+  var friendlies        : Vector[PlayerInfo]  = _
   var mapFileName       : String              = _
   var mapCleanName      : String              = _
   var mapClock          : String              = _
@@ -137,6 +138,7 @@ object With {
     self              = Players.get(game.self)
     neutral           = Players.get(game.neutral)
     enemies           = game.enemies.asScala.map(Players.get).toVector
+    friendlies        = With.self +: game.allies.asScala.map(Players.get).toVector
     mapFileName       = game.mapFileName
     mapCleanName      = MapIdentifier.apply(mapFileName)
     mapClock          = MapIdentifier.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).center)

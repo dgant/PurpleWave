@@ -42,7 +42,7 @@ class PlacementQuery {
     preferences.labelNo   = Seq.empty
     preferences.zone      = With.geography.ourZones
     preferences.base      = With.geography.ourBases
-    preferences.tile      = Seq.empty
+    preferences.tile      = if (building.isGas) Seq(With.geography.home) else Seq.empty
     if (Seq(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.RoboticsFacility).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.GroundProduction
     }

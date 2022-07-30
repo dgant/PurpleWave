@@ -14,7 +14,7 @@ object Scout extends Action {
     SabotageProxy.consider(unit)
     KnockKnock.consider(unit)
     PreserveScout.consider(unit)
-    DisruptBuilder.consider(unit)
+    AttackBuilder.consider(unit)
     BlockConstruction.consider(unit)
     Search.consider(unit)
     SearchWhenBored.consider(unit)

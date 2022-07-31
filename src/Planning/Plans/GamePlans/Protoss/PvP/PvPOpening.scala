@@ -35,11 +35,12 @@ class PvPOpening extends GameplanImperative {
   // DT
   var swapOutOfDT       : Boolean = false
   var greedyDT          : Boolean = false
+  var cannonExpand      : Boolean = false
 
   override def activated: Boolean = true
   override def completed: Boolean = {
     complete ||= bases > 1
-    complete &&= ! PvPDT() || With.units.everOurs.exists(u => u.isOurs && u.complete && Protoss.DarkTemplar(u))
+    complete &&= ! PvPDT() || cannonExpand || With.units.everOurs.exists(u => u.isOurs && u.complete && Protoss.DarkTemplar(u))
     complete
   }
 
@@ -112,10 +113,14 @@ class PvPOpening extends GameplanImperative {
       }
       if (units(Protoss.Gateway) < 2 && units(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) < 1 && ! anyUpgradeStarted(Protoss.DragoonRange, Protoss.AirDamage)) {
         if (With.fingerprints.twoGate() || With.fingerprints.proxyGateway() || With.fingerprints.nexusFirst()) {
+          PvP1012.swapOut()
           PvPGateCoreRange.swapOut()
           PvPGateCoreTech.swapOut()
           PvPGateCoreGate.swapIn()
-        } else if (With.fingerprints.cannonRush() || (With.fingerprints.earlyForge() && With.fingerprints.cannonRush.recently)) {
+        } else if (
+          With.fingerprints.cannonRush()
+          || (With.fingerprints.earlyForge() && With.fingerprints.cannonRush.recently)
+          || (With.fingerprints.rampBlock() && roll("ReactToRampBlock", 0.6))) {
           PvP1012.swapOut()
           PvPGateCoreRange.swapOut()
           PvPGateCoreTech.swapIn()
@@ -124,7 +129,7 @@ class PvPOpening extends GameplanImperative {
           PvPCoreExpand.swapOut()
           PvP3GateGoon.swapOut()
           PvP4GateGoon.swapOut()
-        } else if (PvPGateCoreGate()) {
+        } else if (PvPGateCoreGate() && enemyStrategy(With.fingerprints.oneGateCore) && ! With.strategy.isInverted) {
           PvPGateCoreGate.swapOut()
           if (With.strategy.isRamped && With.strategy.selected.exists(_.choices.exists(_.toSeq.contains(PvPGateCoreTech)))) {
             PvPGateCoreTech.swapIn()
@@ -291,6 +296,8 @@ class PvPOpening extends GameplanImperative {
       shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.0)
     } else if (PvPDT()) {
       greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
+      // If we scout the mirror, just cannon expand
+      cannonExpand = With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)
     }
 
     // Identify when we reach an attack timing
@@ -303,7 +310,8 @@ class PvPOpening extends GameplanImperative {
     atTiming ||= unitsComplete(Protoss.Observer)  > 0 && With.fingerprints.dtRush()
     atTiming ||= unitsComplete(Protoss.Dragoon)   > 0 && With.fingerprints.proxyGateway()
     atTiming ||= unitsComplete(Protoss.Reaver)    > 0 && With.fingerprints.cannonRush()
-    atTiming ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst)
+    atTiming ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst, With.fingerprints.rampBlock)
+    atTiming ||= enemyBases > 1
     // There may not be a timing depending on what our opponent does,
     // or the timing window might close permanently.
     noTiming ||= PvP1012()          && enemyStrategy(With.fingerprints.twoGate)
@@ -722,8 +730,7 @@ class PvPOpening extends GameplanImperative {
       trainGatewayUnits()
       get(3, Protoss.Gateway)
     } else if (PvPDT()) {
-      // If we scout the mirror, just cannon expand
-      if (With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)) {
+      if (cannonExpand) {
         expand()
       } else if ( ! enemyHasShown(Protoss.Observer, Protoss.Observatory)) {
         sneakyCitadel()

@@ -1,6 +1,6 @@
 package Information.Fingerprinting
 
-import Information.Fingerprinting.Generic.FingerprintGasSteal
+import Information.Fingerprinting.Generic.{FingerprintGasSteal, FingerprintRampBlock}
 import Information.Fingerprinting.ProtossStrategies._
 import Information.Fingerprinting.TerranStrategies._
 import Information.Fingerprinting.ZergStrategies._
@@ -17,7 +17,8 @@ class Fingerprints {
   def relevant: Seq[Fingerprint] =
     Seq(
       workerRush,
-      gasSteal) ++
+      gasSteal,
+      rampBlock) ++
     (if (With.enemies.exists(_.isUnknownOrTerran)) Seq(
       bunkerRush,
       fiveRax,
@@ -82,6 +83,7 @@ class Fingerprints {
   // Generic
   lazy val workerRush           = addFingerprint(new FingerprintWorkerRush)
   lazy val gasSteal             = addFingerprint(new FingerprintGasSteal)
+  lazy val rampBlock            = addFingerprint(new FingerprintRampBlock)
   // Terran
   lazy val bunkerRush           = addFingerprint(new FingerprintBunkerRush)
   lazy val fiveRax              = addFingerprint(new Fingerprint5Rax)

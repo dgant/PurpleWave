@@ -32,7 +32,7 @@ class SquadDefendBase(base: Base) extends Squad {
         val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).indices.map(i => {
           val step          = path.steps(i)
           val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
-          val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 5
+          val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 6
           val altitudeDiff  = Maff.signum(step.to.centroid.altitude - step.from.centroid.altitude)
           val altitudeMult  = Math.pow(altitudeValue, altitudeDiff)
           val distanceFrom  = step.edge.pixelCenter.groundPixels(With.geography.home)

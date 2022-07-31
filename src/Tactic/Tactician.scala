@@ -52,7 +52,7 @@ class Tactician extends TimedTask {
   private val defendFFEAgainst4Pool     = addPriorityTactic(new DefendFFEWithProbes)
   private val makeDarkArchons           = addPriorityTactic(new SquadMergeDarchons)
   private val mindControl               = addPriorityTactic(new SquadMindControl)
-  private val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
+          val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
   private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
           val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
           val monitorWithObserver       = addPriorityTactic(new MonitorTerranWithObserver)

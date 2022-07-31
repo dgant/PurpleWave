@@ -11,7 +11,7 @@ trait BaseInference {
   def enemyNatural              : Option[Base]  = enemyMain.flatMap(_.natural)
   def firstExpansionFrameEnemy  : Int           = _firstExpansionFrameEnemy
   def firstExpansionFrameUs     : Int           = _firstExpansionFrameUs
-  def weExpandedFirst           : Boolean       = _firstExpansionFrameUs < _firstExpansionFrameEnemy
+  def weExpandedFirst           : Boolean       = _firstExpansionFrameUs < _firstExpansionFrameEnemy && With.scouting.enemyNatural.forall(b => b.mineralsLeft >= With.geography.ourNatural.mineralsLeft)
   def enemyExpandedFirst        : Boolean       = _firstExpansionFrameEnemy < _firstExpansionFrameUs
   def enemyMainFullyScouted     : Boolean       = _enemyMainScouted
   private var _firstEnemyMain: Option[Base] = None

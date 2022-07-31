@@ -22,12 +22,12 @@ object Recharge extends Action {
   
   protected def validBattery(unit: UnitInfo): Boolean = (
     unit.isOurs
-    && unit.aliveAndComplete
-    && unit.is(Protoss.ShieldBattery)
+    && unit.complete
+    && Protoss.ShieldBattery(unit)
     && unit.energy > 20 // 2 shield per energy
   )
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(validBattery)
     if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
 

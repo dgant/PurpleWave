@@ -40,9 +40,12 @@ class SquadWorkerScout extends Squad {
   }
 
   def launch(): Unit = {
-    lazy val unexploredStarts = With.geography.startBases.view.filterNot(_.townHallArea.tiles.exists(_.explored))
+    lazy val unexploredStarts = With.geography.startBases.view.filterNot(_.scoutedByUs)
     lazy val basesToScout: Seq[Base] = Maff.orElse(
-      With.geography.enemyBases.view.filterNot(_.zone.island).sortBy(_.isStartLocation).lastOption.toIterable,
+      if (With.scouting.enemyMainFullyScouted)
+        With.geography.enemyBases.view.filterNot(_.zone.island).flatMap(b => Vector(b) ++ b.natural ++ b.naturalOf).distinct
+      else
+        With.scouting.enemyMain,
       unexploredStarts.view.filterNot(_.zone.island),
       With.geography.neutralBases.view.filterNot(_.zone.island)).toSeq
 
@@ -85,7 +88,7 @@ class SquadWorkerScout extends Squad {
     if (scouts.isEmpty) return
 
     val enemyHasCombatUnits = With.units.enemy.exists(u  => u.canAttack && ! IsWorker(u))
-    val orderedScouts = scouts.toVector.sortBy(s => basesToScout.view.map(_.townHallTile).map(s.pixelDistanceTravelling).min)
+    val orderedScouts = scouts.sortBy(s => basesToScout.view.map(_.townHallTile).map(s.pixelDistanceTravelling).min)
     val basesToScoutQueue = new UnorderedBuffer[Base](basesToScout)
     orderedScouts.indices.foreach(i => {
       if (basesToScoutQueue.isEmpty) {

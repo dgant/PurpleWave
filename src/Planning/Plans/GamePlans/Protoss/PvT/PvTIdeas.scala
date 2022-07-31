@@ -142,13 +142,17 @@ object PvTIdeas {
         UnitsAtLeast(2, Protoss.Reaver),
         new RequireMiningBases(2),
         new Cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)),
-      new Pump(Protoss.Zealot),
+      new Pump(Protoss.Zealot, 7),
       new Build(
         Get(2, Protoss.Gateway),
         Get(Protoss.Assimilator),
         Get(Protoss.CyberneticsCore),
         Get(Protoss.RoboticsFacility),
         Get(Protoss.RoboticsSupportBay),
+        Get(Protoss.DragoonRange)),
+      new Pump(Protoss.Zealot, 12),
+      new Pump(Protoss.Dragoon),
+      new Build(
         Get(3, Protoss.Gateway),
         Get(2, Protoss.Nexus))))
 

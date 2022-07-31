@@ -6,12 +6,13 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Agency.Intention
-import ProxyBwapi.Races.Protoss
+import Micro.Targeting.Target
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.IsMobileDetector
+import Utilities.UnitFilters.{IsMobileDetector, IsWorker}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -58,7 +59,26 @@ class SquadDarkTemplar extends Squad {
   }
 
   private def intendDTToBase(dt: FriendlyUnitInfo, base: Base): Unit = {
-    dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(base.enemies) })
+    lazy val engagedDetectors = base.enemies.filter(u => u.unitClass.isDetector && u.matchups.threatsInRange.nonEmpty)
+    lazy val killableDetectors = base.enemies.filter(u => u.unitClass.isDetector && ( ! u.complete || ! u.canAttack(dt)))
+    lazy val detectionMakers = base.enemies.filter(u => Target.aidsDetection(u) && ! u.isAny(Terran.Academy, Terran.ScienceFacility))
+    lazy val workers = base.enemies.filter(IsWorker)
+    lazy val townHall = base.townHall.toVector
+
+    val baseTargets =
+      Maff.orElse(
+        Seq(
+          engagedDetectors,
+          killableDetectors,
+          detectionMakers,
+          workers,
+          townHall)
+        .map(_.filter(dt.canAttack)): _*).toVector
+          .sortBy(_.totalHealth)
+          .sortBy(_.pixelDistanceEdge(dt))
+          .sortBy(_.remainingCompletionFrames)
+
+    dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(baseTargets) })
   }
 
   def run(): Unit = {

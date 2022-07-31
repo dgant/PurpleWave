@@ -303,7 +303,7 @@ class PvPOpening extends GameplanImperative {
     atTiming ||= unitsComplete(Protoss.Observer)  > 0 && With.fingerprints.dtRush()
     atTiming ||= unitsComplete(Protoss.Dragoon)   > 0 && With.fingerprints.proxyGateway()
     atTiming ||= unitsComplete(Protoss.Reaver)    > 0 && With.fingerprints.cannonRush()
-    atTiming ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush)
+    atTiming ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst)
     // There may not be a timing depending on what our opponent does,
     // or the timing window might close permanently.
     noTiming ||= PvP1012()          && enemyStrategy(With.fingerprints.twoGate)
@@ -707,21 +707,20 @@ class PvPOpening extends GameplanImperative {
             else 0)
         get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg = bayStartFrame))
       }
-      if (shuttleSpeed) {
+      if (getReavers) {
         once(Protoss.Reaver)
+      }
+      if (shuttleSpeed) {
         once(Protoss.ShuttleSpeed)
         once(Protoss.Shuttle)
       }
-      trainRoboUnits()
       get(Protoss.DragoonRange)
       if (shouldExpand && (With.scouting.weControlOurNatural || unitsComplete(Protoss.Reaver) > 1)) {
         expand()
       }
+      trainRoboUnits()
       trainGatewayUnits()
-      get(2, Protoss.Gateway)
-      get(Protoss.DragoonRange)
       get(3, Protoss.Gateway)
-
     } else if (PvPDT()) {
       // If we scout the mirror, just cannon expand
       if (With.fingerprints.dtRush() && (units(Protoss.TemplarArchives) == 0 || enemies(Protoss.Forge, Protoss.PhotonCannon) > 0)) {

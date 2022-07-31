@@ -92,6 +92,9 @@ class PvPLateGame extends GameplanImperative {
       shouldSecondaryTech ||= primaryTech.contains(RoboTech) && gas > 800
       shouldSecondaryTech ||= unitsComplete(IsWarrior) >= 40
     }
+    if (primaryTech.contains(TemplarTech) && units(Protoss.TemplarArchives) > 0 && enemyDarkTemplarLikely && ! fearDeath) {
+      primaryTech = Some(RoboTech)
+    }
 
     ///////////////////////////
     // High-priority builds! //

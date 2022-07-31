@@ -1,10 +1,16 @@
 package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Generic._
+import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
 
-class FingerprintNexusFirst extends FingerprintCompleteBy(Protoss.Nexus,  GameTime(3, 30), 2) {
+class FingerprintNexusFirst extends FingerprintCompleteBy(
+  u => Protoss.Nexus(u) && (
+    ! u.base.exists(_.isStartLocation)
+    || ! u.complete
+    || With.scouting.enemyMain.exists( ! u.base.contains(_))),
+  GameTime(3, 30), 2) {
   
-  override val sticky = true
+  override def sticky: Boolean = With.frame > GameTime(3, 20)()
 }

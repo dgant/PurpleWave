@@ -45,6 +45,7 @@ object UpdateBase {
       val scoutingNow = base.lastFrameScoutedByUs == With.frame
       val framesSinceScouting = With.framesSince(base.lastFrameScoutedByUs)
       val hiddenNaturalDelay = Minutes(3)()
+      val enemyCanAffordBase = With.sense.enemySecretMinerals >= With.enemy.townHallClass.mineralPrice
 
       if (scoutingNow) {
         if (base.townHall.isEmpty && ! base.owner.isNeutral) {
@@ -57,7 +58,7 @@ object UpdateBase {
           With.logger.debug(f"Assuming ${base.owner} owns $base as implicit starting location")
         }
 
-        if (framesSinceScouting > hiddenNaturalDelay) {
+        if (framesSinceScouting > hiddenNaturalDelay && enemyCanAffordBase) {
           val building = base.zone.units.find(u => u.isEnemy && ! u.flying && u.unitClass.isBuilding)
           if (building.isDefined && With.frame > base.lastFrameScoutedByUs + hiddenNaturalDelay) {
             base.owner = building.get.player
@@ -74,7 +75,7 @@ object UpdateBase {
           With.logger.debug(f"Assuming ${base.owner} has taken $base last scouted at ${base.lastFrameScoutedByUs} after we expanded on ${With.scouting.firstExpansionFrameUs}")
         }
 
-        if ( ! base.scoutedByUs && base.owner.bases.forall(base.natural.contains) && With.sense.enemySecretMinerals >= 400) {
+        if ( ! base.scoutedByUs && base.owner.bases.forall(base.natural.contains) && (enemyCanAffordBase || With.scouting.enemyMain.isEmpty)) {
           base.natural.filter(_.isEnemy).foreach(natural => {
             base.owner = natural.owner
             With.logger.debug(f"Assuming ${base.owner} owns unscouted main $base due to possession of its natural {$base.natural}")

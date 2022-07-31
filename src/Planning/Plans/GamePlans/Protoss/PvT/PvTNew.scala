@@ -4,6 +4,7 @@ import Lifecycle.With
 import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.DoQueue
+import Utilities.UnitFilters.IsWarrior
 
 class PvTNew extends GameplanImperative {
 
@@ -109,7 +110,7 @@ class PvTNew extends GameplanImperative {
     // TODO: Cross-spawn informs Nexus-first choices
     // TODO: 10-12 is informative
     // TODO: 14 CC is informative
-    // TODO: 1 Rax FE is informative
+    // TODO: 1 Rax FE is informative -- if we're not trying to pressure it (eg 1-zealot core builds) we can always expand off gate
     // TODO: Fac is informative
     // TODO: 2 Fac is informative
     // TODO: 3 Fac is informative
@@ -166,23 +167,20 @@ class PvTNew extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
-    val observers = new DoQueue(doObserver)
-    val emergencyReavers = new DoQueue(doEmergencyReaver)
-    val reavers = new DoQueue(doReaver)
-    val shuttles = new DoQueue(doShuttles)
-    val storm = new DoQueue(doStorm)
-    val stasis = new DoQueue(doStasis)
-    val recall = new DoQueue(doRecall)
-    val carrier = new DoQueue(doCarriers)
-    val singleUpgrades = new DoQueue(doSingleUpgrades)
-    val doubleUpgrades = new DoQueue(doDoubleUpgrades)
+    val observers         = new DoQueue(doObserver)
+    val emergencyReavers  = new DoQueue(doEmergencyReaver)
+    val reavers           = new DoQueue(doReaver)
+    val shuttles          = new DoQueue(doShuttles)
+    val storm             = new DoQueue(doStorm)
+    val stasis            = new DoQueue(doStasis)
+    val recall            = new DoQueue(doRecall)
+    val carrier           = new DoQueue(doCarriers)
+    val singleUpgrades    = new DoQueue(doSingleUpgrades)
+    val doubleUpgrades    = new DoQueue(doDoubleUpgrades)
 
-    get(Protoss.Pylon)
-    get(Protoss.Gateway)
-    get(Protoss.Assimilator)
-    get(Protoss.CyberneticsCore)
-    get(Protoss.DragoonRange)
-    get(2, Protoss.Nexus)
+    get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    get(Protoss.DragoonRange) // TODO: Robo before range
+    get(2, Protoss.Nexus) // TODO: Make sure we can, eg measure enemy progress and no bunker in natural
     // Against one-base Siege push, 3-Gate goon: https://youtu.be/djZt3n1Po6s?t=6681
 
     // TODO: Go Reaver if siege tech and no Vulture tech or minimal Vultures (suggesting bio)
@@ -214,8 +212,7 @@ class PvTNew extends GameplanImperative {
   }
 
   def doEmergencyReaver(): Unit = {
-    get(Protoss.RoboticsFacility)
-    get(Protoss.RoboticsSupportBay)
+    get(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)
   }
 
   def doReaver(): Unit = {
@@ -234,9 +231,8 @@ class PvTNew extends GameplanImperative {
 
 
   def doObserver(): Unit = {
-    get(Protoss.RoboticsFacility)
-    get(Protoss.Observatory)
-    if (enemyHasShown(Terran.SpiderMine) || enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1 || goCarriers || gasPumps > 2) {
+    get(Protoss.RoboticsFacility, Protoss.Observatory)
+    if (unitsComplete(IsWarrior) > 12 && safeAtHome && (enemyHasShown(Terran.SpiderMine) || enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1 || goCarriers || gasPumps > 2)) {
       get(Protoss.ObserverSpeed)
       if (upgradeComplete(Protoss.ObserverSpeed)) {
         get(Protoss.ObserverVisionRange)

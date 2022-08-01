@@ -49,11 +49,20 @@ object PvPIdeas extends MacroActions with MacroCounting {
   private def makeObservers(): Unit = {
     pump(Protoss.Observer, if (enemyHasShown(Protoss.DarkTemplar)) 2 else 1)
   }
-  def requireTimelyDetection(): Unit = {
+
+  def preferObserverForDetection: Boolean = {
+    detectWithObserverOrCannon(auditing = true)
+  }
+  def requireTimelyDetection(): Boolean = {
+    detectWithObserverOrCannon(auditing = false)
+  }
+  private def detectWithObserverOrCannon(auditing: Boolean): Boolean = {
     // Performance shortcut
     if (With.units.existsOurs(Protoss.Observer, Protoss.Observatory)) {
-      makeObservers()
-      return
+      if ( ! auditing) {
+        makeObservers()
+      }
+      return true
     }
     lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
     lazy val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
@@ -68,6 +77,8 @@ object PvPIdeas extends MacroActions with MacroCounting {
         || ( ! dtPrecedesObserver && ! PvPDT()) // Observers are just better if we can swing them
         || (dtPrecedesCannon && ! With.units.existsOurs(Protoss.Forge)) // Cannons are awful once DTs are already inside your base; Obs is better
         || (cannonsComplete && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base eventually
+
+    if (auditing) return goObserver
 
     // Performance check
     if (enemyContained) status(f"Containing")
@@ -135,6 +146,8 @@ object PvPIdeas extends MacroActions with MacroCounting {
         }
       }
     }
+
+    goObserver
   }
   private def requestTower(unitClass: UnitClass, quantity: Int, base: Base, label: PlaceLabel, startFrame: Int): Unit = {
     get(RequestUnit(unitClass, quantity, minStartFrameArg = startFrame,

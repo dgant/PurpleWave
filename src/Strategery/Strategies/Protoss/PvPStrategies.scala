@@ -36,21 +36,25 @@ object PvPGateCoreTech extends PvPStrategy {
   override def entranceInverted: Boolean = false
   override def entranceFlat: Boolean = false
 }
+object PvP1015 extends PvPStrategy {
+  override def entranceRamped: Boolean = false
+  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.twoGate99, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon)
+}
 
 ////////////////////////
 // Core continuations //
 ////////////////////////
 
 object PvPRobo extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech, PvP1015))
   // No restrictions; Preserve this as our "Always valid" choice
 }
 object PvPDT extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvP1012, PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech, PvP1015))
   override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate))
+  override def choices: Iterable[Iterable[Strategy]] = Seq(Seq(PvPGateCoreRange, PvPGateCoreGate, PvP1015))
   override def rushDistanceMinimum: Double = 200 // Maybe extend if ramp is high ground
   override def minimumGamesVsOpponent: Int = 1
 }

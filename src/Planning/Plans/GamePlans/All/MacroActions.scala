@@ -11,11 +11,13 @@ import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.Time.Seconds
 import Utilities.UnitFilters.UnitFilter
 
 trait MacroActions {
@@ -84,6 +86,9 @@ trait MacroActions {
   }
   def makeDarkArchons(): Unit = {
     With.blackboard.makeDarkArchons.set(true)
+  }
+  def roll(key: String, probability: Double): Boolean = {
+    With.strategy.roll(key, probability)
   }
   def pylonBlock(): Unit = {
     new PylonBlock().update()
@@ -168,5 +173,16 @@ trait MacroActions {
   def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels)
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
 
-  def roll(key: String, orobability: Double): Boolean = { With.strategy.roll(key, orobability) }
+  def sneakyCitadel(): Unit = {
+    if (MacroFacts.scoutCleared) {
+      get(Protoss.CitadelOfAdun)
+      cancel(Protoss.AirDamage)
+    } else if (MacroFacts.units(Protoss.CitadelOfAdun) == 0) {
+      if (With.units.ours.find(_.upgradeProducing.contains(Protoss.AirDamage)).exists(_.remainingUpgradeFrames < Seconds(5)())) {
+        cancel(Protoss.AirDamage)
+      } else if ( ! MacroFacts.upgradeStarted(Protoss.DragoonRange)) {
+        get(Protoss.AirDamage)
+      }
+    }
+  }
 }

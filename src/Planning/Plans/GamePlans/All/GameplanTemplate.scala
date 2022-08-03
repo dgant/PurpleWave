@@ -39,7 +39,7 @@ abstract class GameplanTemplate extends Plan with Modal {
 
   override def isComplete: Boolean = completionCriteria.apply || ! activationCriteria.apply
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     children.foreach(_.update())
   }
   

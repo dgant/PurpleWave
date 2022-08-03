@@ -1,109 +1,22 @@
 package Planning.Plans.GamePlans.Protoss.PvT
 
+import Debugging.SimpleString
 import Lifecycle.With
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Mathematics.Maff
+import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.{Protoss, Terran}
-import Utilities.DoQueue
-import Utilities.UnitFilters.IsWarrior
+import Strategery.Strategies.Protoss._
+import Utilities.Time.Minutes
+import Utilities.UnitFilters._
+import Utilities.{?, DoQueue}
 
-class PvTNew extends GameplanImperative {
+import scala.collection.mutable.ArrayBuffer
 
-  // Learnable/swappable: ZZCoreZ
-  // Learnable/swappable: 1 Zealot 16 Nexus (Bag of Builds; has reactions)
-  // Learnable/swappable: Modern expand builds
-  // Learnable/swappable: Modern nexus first with reactions
-  // Learnable/swappable: 2-base Carrier
+class PvTNew extends PvTOpeners {
 
-  var roboBeforeRange: Boolean = false
+  val workerGoal = 65
 
-  var goObs: Boolean = true
-  var goReavers: Boolean = true
-  var goCarriers: Boolean = false
-  var goArbiters: Boolean = true
-
-  def doEmergencyReactions(): Unit = {
-    // Vs. BBS: Zealots into 3-Gate Goon into Reaver (And expand after Reaver if they do)
-    // Vs. 11-13: Zealots into 3-Gate Goon into Reaver (And expand after Reaver if they do)
-    // Vs. Worker rush: Zealots into 3-Gate Goon
-    // Vs. 2-Fac, or possibly any scout-blocking wall-in: Gate-Core-Gate before expand
-    Vector(new PvTIdeas.ReactToRaxCheese, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush).foreach(_.update())
-  }
-
-  def openNexusFirst(): Unit = {
-    once(8, Protoss.Probe)
-    once(Protoss.Pylon)
-    once(12, Protoss.Probe)
-    once(2, Protoss.Nexus)
-    // TODO: I think one gate core if cross-spawn, two if close. Also might depend on gas/no gas
-  }
-
-  def openGateNexus(): Unit = {
-    // Reference: https://youtu.be/jYRHZVAjhX8?t=4932
-    once(8, Protoss.Probe)
-    once(Protoss.Pylon)
-    once(10, Protoss.Probe)
-    once(Protoss.Gateway)
-    once(13, Protoss.Probe)
-    once(Protoss.Zealot)
-    once(14, Protoss.Probe)
-    doEmergencyReactions()
-    once(2, Protoss.Nexus)
-    scoutOn(Protoss.Nexus, quantity = 2)
-    once(Protoss.Assimilator)
-    once(Protoss.CyberneticsCore)
-    once(15, Protoss.Probe)
-    once(2, Protoss.Zealot)
-    once(17, Protoss.Probe)
-    once(2, Protoss.Pylon)
-    once(Protoss.Dragoon)
-  }
-
-  def openZZCoreZ(): Unit = {
-    // Reference: https://www.youtube.com/watch?v=MXYRhJOmOkc
-    once(8,  Protoss.Probe)
-    once(Protoss.Pylon)
-    once(10, Protoss.Probe)
-    once(Protoss.Gateway)
-    once(12, Protoss.Probe)
-    once(2, Protoss.Pylon)
-    once(13, Protoss.Probe)
-    once(Protoss.Zealot)
-    once(14, Protoss.Probe)
-    once(Protoss.Assimilator)
-    once(15, Protoss.Probe)
-    once(2, Protoss.Zealot)
-    once(16, Protoss.Probe)
-    once(Protoss.CyberneticsCore)
-    once(17, Protoss.Probe)
-    once(3, Protoss.Zealot)
-    once(18, Protoss.Probe)
-    once(3, Protoss.Pylon)
-    once(20, Protoss.Probe)
-    once(Protoss.DragoonRange)
-    once(Protoss.Dragoon)
-    once(21, Protoss.Probe)
-    once(2, Protoss.Nexus)
-  }
-
-  def open24Nexus(): Unit = {
-
-  }
-
-  def open3Gate(): Unit = {
-
-  }
-
-  def open4Gate(): Unit = {
-
-  }
-
-  def openReaver(): Unit = {
-
-  }
-
-  def openDT(): Unit = {
-
-  }
+  override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = workerGoal)
 
   override def executeBuild(): Unit = {
     // TODO: Expansion is informative
@@ -145,173 +58,247 @@ class PvTNew extends GameplanImperative {
     // 3rd CC -> Fast 4th
     // Bio -> Reaver, 3rd, upgrades, 4th, double upgrades
 
-    if (false) {
-      openNexusFirst()
-    } else if (false) {
-      openGateNexus()
-    } else if (false) {
-      openZZCoreZ()
-    } else if (false) {
-      open24Nexus()
-    } else if (false) {
-      open3Gate()
-    } else if (false) {
-      open4Gate()
-    } else if (false) {
-      openReaver()
-    } else if (false) {
-      openDT()
-    } else {
-      openZZCoreZ() // A safe default
-    }
-  }
-
-  override def executeMain(): Unit = {
-    val observers         = new DoQueue(doObserver)
-    val emergencyReavers  = new DoQueue(doEmergencyReaver)
-    val reavers           = new DoQueue(doReaver)
-    val shuttles          = new DoQueue(doShuttles)
-    val storm             = new DoQueue(doStorm)
-    val stasis            = new DoQueue(doStasis)
-    val recall            = new DoQueue(doRecall)
-    val carrier           = new DoQueue(doCarriers)
-    val singleUpgrades    = new DoQueue(doSingleUpgrades)
-    val doubleUpgrades    = new DoQueue(doDoubleUpgrades)
-
-    get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
-    get(Protoss.DragoonRange) // TODO: Robo before range
-    get(2, Protoss.Nexus) // TODO: Make sure we can, eg measure enemy progress and no bunker in natural
     // Against one-base Siege push, 3-Gate goon: https://youtu.be/djZt3n1Po6s?t=6681
-
     // TODO: Go Reaver if siege tech and no Vulture tech or minimal Vultures (suggesting bio)
     // TODO: Lock into doing one of these two things first, then getting the other
-    if (enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.bio, With.fingerprints.oneRaxFE, With.fingerprints.fourteenCC)) {
-      reavers()
-    } else {
-      observers()
-    }
-    get(3, Protoss.Gateway)
-    requireMiningBases(2)
-    get((1 + enemies(Terran.Factory)) * 3 / 2, Protoss.Gateway)
-    if (safeAtHome) get(3, Protoss.Nexus)
-    get(6, Protoss.Gateway)
-    singleUpgrades()
-    storm()
-    requireMiningBases(3)
-    get(9, Protoss.Gateway)
-    get(4, Protoss.Nexus)
-    shuttles()
-    stasis()
-    requireMiningBases(4)
-    get(14, Protoss.Gateway)
-    doubleUpgrades()
-    requireMiningBases(5)
-    get(22, Protoss.Gateway)
-    requireMiningBases(6)
-    get(30, Protoss.Gateway)
-  }
 
-  def doEmergencyReaver(): Unit = {
-    get(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)
-  }
-
-  def doReaver(): Unit = {
-    doShuttles()
-    if (units(Protoss.Reaver) > 2) {
-      get(Protoss.ScarabDamage)
-    }
-  }
-
-  def doShuttles(): Unit = {
-    get(Protoss.RoboticsFacility)
-    once(Protoss.Shuttle)
-    get(Protoss.RoboticsSupportBay)
-    get(Protoss.ShuttleSpeed)
+    open()
   }
 
 
-  def doObserver(): Unit = {
-    get(Protoss.RoboticsFacility, Protoss.Observatory)
-    if (unitsComplete(IsWarrior) > 12 && safeAtHome && (enemyHasShown(Terran.SpiderMine) || enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1 || goCarriers || gasPumps > 2)) {
-      get(Protoss.ObserverSpeed)
-      if (upgradeComplete(Protoss.ObserverSpeed)) {
-        get(Protoss.ObserverVisionRange)
+  val techs = new ArrayBuffer[TechTransition]
+  def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())
+  trait TechTransition extends SimpleString {
+    def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
+    def apply(): Unit = techs += this
+    def started: Boolean
+    def complete: Boolean
+    def perform(): Unit
+    def queued: Boolean = techs.contains(this)
+    override def toString: String = f"${super.toString}${if (complete) "(Done)" else if (started) "(Start)" else ""}"
+  }
+  object TechObservers extends TechTransition {
+    def started: Boolean = units(Protoss.Observatory) > 0
+    def complete: Boolean = unitsEver(Protoss.Observer) > 0
+    def perform(): Unit = {
+      once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
+      get(Protoss.DragoonRange)
+      requireGas()
+      if (unitsComplete(IsWarrior) > 12 && safeAtHome && (enemyHasShown(Terran.SpiderMine) || enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1 || gasPumps > 2)) {
+        get(?(upgradeStarted(Protoss.ObserverSpeed), Protoss.ObserverVisionRange, Protoss.ObserverSpeed))
       }
     }
   }
-
-  def doStorm(): Unit = {
-    get(Protoss.CitadelOfAdun)
-    buildGasPumps()
-    get(Protoss.TemplarArchives)
-    get(Protoss.PsionicStorm)
-    if (techComplete(Protoss.PsionicStorm) && gasPumps > 2) get(Protoss.HighTemplarEnergy)
-  }
-
-  def doSingleUpgrades(): Unit = {
-    get(Protoss.Forge)
-    get(Protoss.GroundDamage)
-    get(Protoss.CitadelOfAdun)
-    buildGasPumps()
-    get(Protoss.ZealotSpeed)
-    get(Protoss.TemplarArchives)
-    upgradeContinuously(Protoss.GroundDamage)
-    if (upgradeComplete(Protoss.GroundDamage)) {
-      upgradeContinuously(Protoss.GroundArmor)
+  object TechReavers extends TechTransition {
+    def started: Boolean = complete || upgradeStarted(Protoss.ScarabDamage)
+    def complete: Boolean = unitsEver(Protoss.Reaver) > 0
+    def perform(): Unit = {
+      get(Protoss.RoboticsFacility)
+      once(Protoss.Shuttle)
+      get(Protoss.RoboticsSupportBay)
+      once(2, Protoss.Reaver)
+      get(Protoss.ShuttleSpeed)
+      get(Protoss.DragoonRange)
+      requireGas()
+      if (units(Protoss.Reaver) > 2) get(Protoss.ScarabDamage)
     }
   }
-
-  def doDoubleUpgrades(): Unit = {
-    get(2, Protoss.Forge)
-    get(Protoss.GroundDamage)
-    get(Protoss.GroundArmor)
-    get(Protoss.CitadelOfAdun)
-    buildGasPumps()
-    get(Protoss.ZealotSpeed)
-    get(Protoss.TemplarArchives)
-    upgradeContinuously(Protoss.GroundDamage)
-    upgradeContinuously(Protoss.GroundArmor)
-  }
-
-  def doArbiters(): Unit = {
-    get(Protoss.CitadelOfAdun)
-    buildGasPumps()
-    get(Protoss.Stargate)
-    get(Protoss.TemplarArchives)
-    get(Protoss.ArbiterTribunal)
-    if (gasPumps > 2) get(2, Protoss.Stargate)
-    if (techComplete(Protoss.Stasis) || techComplete(Protoss.Recall)) get(Protoss.ArbiterEnergy)
-  }
-
-  def doCarriers(): Unit = {
-    get(2, Protoss.Stargate)
-    get(Protoss.FleetBeacon)
-    once(2, Protoss.Carrier)
-    if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
-    get(Protoss.CarrierCapacity)
-    if (upgradeComplete(Protoss.AirArmor, 3))  upgradeContinuously(Protoss.AirDamage)
-    if (upgradeComplete(Protoss.AirDamage, 3))  upgradeContinuously(Protoss.AirArmor)
-    if (units(Protoss.Carrier) > 3 && miningBases > 2) {
+  object TechUpgrades extends TechTransition {
+    def started: Boolean = upgradeStarted(Protoss.ZealotSpeed)
+    def complete: Boolean = upgradeStarted(Protoss.ZealotSpeed) && upgradeStarted(Protoss.GroundDamage)
+    def perform(): Unit = {
+      get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
+      requireGas()
       get(Protoss.ZealotSpeed)
+      get(?(counterBio, 2, 1), Protoss.Forge)
+      get(Protoss.TemplarArchives)
+      get(Protoss.GroundDamage)
+      if (counterBio) get(Protoss.GroundArmor)
+      buildCannonsAtExpansions(1)
+      upgradeContinuously(Protoss.GroundDamage)
+      if (counterBio || upgradeStarted(Protoss.GroundDamage, 3)) upgradeContinuously(Protoss.GroundArmor)
+    }
+  }
+  object TechStorm extends TechTransition {
+    def started: Boolean = complete || unitsEver(Protoss.HighTemplar) > 0
+    def complete: Boolean = techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
+    def perform(): Unit = {
+      get(Protoss.DragoonRange)
+      get(Protoss.CitadelOfAdun)
+      requireGas()
+      get(Protoss.TemplarArchives)
+      once(2, Protoss.HighTemplar)
+      get(Protoss.PsionicStorm)
+      get(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)
+      get(Protoss.ShuttleSpeed)
+      once(Protoss.Shuttle)
+      get(Protoss.HighTemplarEnergy)
+    }
+  }
+  object TechCarrier extends TechTransition {
+    def started: Boolean = complete || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
+    def complete: Boolean = unitsEver(Protoss.Carrier) >= 4
+    def perform(): Unit = {
+      get(miningBases, Protoss.Stargate)
+      requireGas()
+      get(Protoss.FleetBeacon)
+      once(4, Protoss.Carrier)
+      get(Protoss.DragoonRange)
+      if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
+      get(Protoss.CarrierCapacity)
+      if (upgradeComplete(Protoss.AirArmor, 3))  upgradeContinuously(Protoss.AirDamage)
+      if (upgradeComplete(Protoss.AirDamage, 3))  upgradeContinuously(Protoss.AirArmor)
+    }
+  }
+  object TechArbiter extends TechTransition {
+    def started: Boolean = complete || units(Protoss.ArbiterTribunal) > 0
+    def complete: Boolean = unitsEver(Protoss.Arbiter) > 0
+    def perform(): Unit = {
+      get(Protoss.DragoonRange)
+      get(Protoss.CitadelOfAdun)
+      requireGas()
+      get(Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Stargate)
+      get(Protoss.ArbiterEnergy)
+      once(2, Protoss.Arbiter)
+      get(Protoss.Stasis)
+      if (gasPumps > 3) get(2, Protoss.Stargate)
     }
   }
 
-  def doStasis(): Unit = {
-    doArbiters()
-    get(Protoss.Stasis)
+  def counterBio: Boolean = With.fingerprints.bio()
+  def executeMain(): Unit = {
+    val reaverVsBio = counterBio && ! PvTDT()
+    val stormVsBio  = counterBio && ! reaverVsBio
+    techs.clear()
+    TechReavers         (TechReavers.started  || reaverVsBio)
+    TechStorm           (PvTMidgameStorm()    || stormVsBio)
+    TechCarrier         (PvTMidgameCarrier()  && ! counterBio)
+    TechUpgrades        (counterBio)
+    TechObservers       ()
+    TechReavers         (PvTMidgameReaver())
+    TechUpgrades        ()
+    TechCarrier         (PvTEndgameCarrier()  && ! counterBio)
+    TechStorm           (PvTMidgameStorm()    || PvTEndgameStorm() || counterBio)
+    TechArbiter         ()
+    val techsComplete   = techs.count(_.complete)
+    val gatewayTarget   = ?(TechCarrier.queued, 2, 3) * miningBases - ?(TechReavers.queued, 2, 0)
+    var gatewayNeed     = miningBases
+    gatewayNeed         = Math.max(gatewayNeed, 1.5 * enemies(Terran.Factory) + Math.max(0, enemies(Terran.Barracks) - 1)).toInt
+    gatewayNeed         = Math.max(gatewayNeed, ?(enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac), 3, 0))
+    gatewayNeed         = Math.min(gatewayNeed, gatewayTarget)
+    val vulturesEnemy   = With.units.enemy.count(Terran.Vulture)
+    val antiVulture     = With.units.ours.filter(_.isAny(Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Protoss.Carrier)).map(_.unitClass.supplyRequired / 2).sum
+    val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(_.unitClass.supplyRequired / 4.0).sum
+    val armySizeNow     = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
+    var armySizeMinimum = 1.5 * armySizeEnemy
+    armySizeMinimum     = Math.max(armySizeMinimum, 16 * techsComplete)
+    armySizeMinimum     = Math.max(armySizeMinimum, 12 * Math.max(1, miningBases - 1))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.siegeExpand(),  8, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoRaxAcad(),   12, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       12, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     16, 0))
+    armySizeMinimum     = Math.min(armySizeMinimum, 200 - workerGoal)
+    var armySizeLow     = ! safeAtHome || armySizeNow < armySizeMinimum
+    armySizeLow       &&= unitsComplete(Protoss.DarkTemplar) == 0 || enemyHasShown(Terran.SpellScannerSweep, Terran.SpiderMine, Terran.ScienceVessel)
+    val zealotAggro     = frame < Minutes(4)() && unitsComplete(Protoss.Zealot) > 0
+    val pushMarines     = barracksCheese && ! With.strategy.isRamped
+    val mineContain     = enemyHasShown(Terran.SpiderMine) && unitsComplete(Protoss.Observer) == 0
+    val vultureContain  = vulturesEnemy > antiVulture * ?(enemyHasUpgrade(Terran.VultureSpeed), 1.25, 1.5)
+    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures) && (armySizeNow < 12 || unitsComplete(Protoss.Observer) == 0)
+    val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
+    val nascentCarriers = TechCarrier.started && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
+    val encroaching     = With.scouting.enemyProximity > 0.65
+    var shouldAttack    = ! barracksCheese || unitsComplete(IsWarrior) >= 7
+    shouldAttack      &&= ! mineContain
+    shouldAttack      &&= ! vultureContain
+    shouldAttack      &&= ! vultureRush
+    shouldAttack      &&= ! consolidatingFE
+    shouldAttack      &&= ! nascentCarriers
+    shouldAttack      ||= zealotAggro
+    shouldAttack      ||= bases > 2
+    shouldAttack      ||= enemyMiningBases > miningBases
+    shouldAttack      ||= frame > Minutes(10)()
+    shouldAttack      ||= pushMarines
+
+    status(f"${gatewayNeed}-${gatewayTarget}gate")
+    status(techs.mkString("-").replaceAll("Tech", "") + f"${techsComplete}/${techs.length}")
+    if (armySizeLow) status("ArmyLow")
+    if (zealotAggro) status("ZealotAggro")
+    if (pushMarines) status("PushMarines")
+    if (mineContain) status("MineContain")
+    if (vultureContain) status("VultureContain")
+    if (vultureRush) status("VultureRush")
+    if (consolidatingFE) status("ConsolidatingFE")
+    if (nascentCarriers) status("NascentCarriers")
+    if (encroaching) status("Encroaching")
+
+    if (shouldAttack) {
+      attack()
+    }
+    harass()
+
+    val army = new DoQueue(doArmy)
+
+    ////////////////
+    // Transition //
+    ////////////////
+
+    get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    if (encroaching || armySizeLow) {
+      army()
+      get(gatewayTarget, Protoss.Gateway)
+    }
+    get(gatewayNeed, Protoss.Gateway)
+
+    ////////////
+    // Expand //
+    ////////////
+
+    if (With.scouting.weControlOurNatural) {
+      requireMiningBases(2)
+    }
+    if ( ! encroaching && shouldAttack) {
+      requireMiningBases(1 + enemyMiningBases)
+      requireMiningBases(Maff.clamp(2 + techsComplete, 2, 4))
+    }
+
+    ///////////
+    // Spend //
+    ///////////
+
+    techs.find( ! _.complete).foreach(_.perform())
+    army()
+    get(gatewayTarget, Protoss.Gateway)
+    requireMiningBases(4)
+    techs.foreach(_.perform())
+    requireMiningBases(5)
+    get(6 * miningBases, Protoss.Gateway)
   }
 
-  def doRecall(): Unit = {
-    doArbiters()
-    get(Protoss.Recall)
+  def requireGas(): Unit = {
+    if (With.self.gas < 500) buildGasPumps()
   }
 
-  def doTrainArmy(): Unit = {
-    new PvTIdeas.TrainArmy().update()
-  }
-
-  def doExpand(): Unit = {
-
+  def doArmy(): Unit = {
+    if (units(Protoss.TemplarArchives) > 0 && ! enemyHasShown(Terran.SpiderMine) && 0 == units(Protoss.FleetBeacon, Protoss.Arbiter) + unitsComplete(Protoss.ArbiterTribunal) + enemies(Terran.ScienceVessel)) {
+      once(2, Protoss.DarkTemplar)
+      pump(Protoss.DarkTemplar, 1)
+    }
+    if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = With.fingerprints.bio() || units(Protoss.Observatory) == 0)
+    pump(Protoss.Carrier, 4)
+    pumpRatio(Protoss.Dragoon, 12, 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0)))
+    pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 1, 2), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
+    pumpRatio(Protoss.HighTemplar, 2, 6, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
+    pumpRatio(Protoss.Corsair, 0, 6, Seq(Flat(-2), Enemy(Terran.Wraith, 2)))
+    if (With.scouting.enemyProximity > 0.4 && enemies(Terran.Goliath) + enemies(Terran.Marine) / 5 == 0) { pump(Protoss.Scout, 2) }
+    pump(Protoss.Carrier, 12)
+    pumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(IsTank, 0.5)))
+    pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+    pump(Protoss.HighTemplar)
+    if ( ! upgradeStarted(Protoss.ZealotSpeed)) {
+      pump(Protoss.Dragoon, 24)
+    }
+    pump(Protoss.Zealot)
   }
 }

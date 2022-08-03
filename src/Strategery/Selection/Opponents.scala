@@ -6,7 +6,7 @@ object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
-  val defaultPvT = StrategySelectionFixed(PvTZZCoreZ, PvT2BaseReaver, PvT3BaseGateway, PvEStormYes)
+  val defaultPvT = StrategySelectionFixed(PvTZZCoreZ, PvTEndgameCarrier)
   val defaultPvP = StrategySelectionGreedy()
   val defaultPvZ = StrategySelectionFixed(PvZ2GateFlex)
 

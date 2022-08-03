@@ -14,7 +14,7 @@ abstract class PvZStrategy extends Strategy {
 }
 
 abstract class PvZFFEOpening extends PvZStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForWalling ++ MapGroups.tooShortForFFE
+  override def rushTilesMinimum: Int = 160
   override def choices: Iterable[Iterable[Strategy]] = Vector(
     ProtossChoices.pvzMidgameTransitioningFromTwoBases
   )

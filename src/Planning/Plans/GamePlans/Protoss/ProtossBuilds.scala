@@ -52,47 +52,6 @@ object ProtossBuilds {
     Get(16,  Protoss.Probe),
     Get(2,   Protoss.Zealot))
   
-  val ZZCore = Vector[RequestBuildable] (
-    Get(8,   Protoss.Probe),
-    Get(Protoss.Pylon),
-    Get(10,  Protoss.Probe),
-    Get(Protoss.Gateway),
-    Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),
-    Get(13,  Protoss.Probe),
-    Get(Protoss.Zealot),
-    Get(14,  Protoss.Probe),
-    Get(Protoss.Assimilator),
-    Get(15,  Protoss.Probe),
-    Get(2,   Protoss.Zealot),
-    Get(16,  Protoss.Probe),
-    Get(Protoss.CyberneticsCore))
-
-  val ZCoreZTwoGateGoon = Vector[RequestBuildable](
-    Get(8, Protoss.Probe),
-    Get(Protoss.Pylon),
-    Get(10, Protoss.Probe),
-    Get(Protoss.Gateway),
-    Get(12, Protoss.Probe),
-    Get(Protoss.Assimilator),
-    Get(13, Protoss.Probe),
-    Get(Protoss.Zealot),
-    Get(14, Protoss.Probe),
-    Get(2,  Protoss.Pylon),
-    Get(15, Protoss.Probe),
-    Get(Protoss.CyberneticsCore),
-    Get(16, Protoss.Probe),
-    Get(2,  Protoss.Zealot),
-    Get(2, Protoss.Gateway),
-    Get(17, Protoss.Probe),
-    Get(Protoss.Dragoon),
-    Get(18, Protoss.Probe),
-    Get(3, Protoss.Pylon),
-    Get(20, Protoss.Probe),
-    Get(3, Protoss.Dragoon),
-    Get(Protoss.DragoonRange),
-    Get(21, Protoss.Probe))
-  
   val PvT1015GateGoon = Vector[RequestBuildable] (
     Get(8,   Protoss.Probe),
     Get(Protoss.Pylon),
@@ -122,48 +81,6 @@ object ProtossBuilds {
     Get(19,  Protoss.Probe),
     Get(2,   Protoss.Nexus)
   )
-  
-  val PvT12Nexus_2Gate = Vector[RequestBuildable] (
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(12,  Protoss.Probe),
-    Get(2,   Protoss.Nexus),
-    Get(14,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
-    Get(15,  Protoss.Probe),
-    Get(1,   Protoss.Assimilator),
-    Get(17,  Protoss.Probe),
-    Get(1,   Protoss.CyberneticsCore),
-    Get(2,   Protoss.Gateway),
-    Get(1,   Protoss.Zealot),
-    Get(19,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),
-    Get(2,   Protoss.Dragoon),
-    Get(Protoss.DragoonRange),
-    Get(21,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),
-    Get(4,   Protoss.Dragoon),
-    Get(23,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),
-    Get(6,   Protoss.Dragoon)
-  )
-
-  val PvT10Gate14Nexus = Vector[RequestBuildable](
-    Get(8,  Protoss.Probe),
-    Get(Protoss.Pylon),
-    Get(10,  Protoss.Probe),
-    Get(Protoss.Gateway),
-    Get(14, Protoss.Probe),
-    Get(2, Protoss.Nexus),
-    Get(15, Protoss.Probe),
-    Get(2, Protoss.Pylon),
-    Get(Protoss.Zealot),
-    Get(18, Protoss.Probe),
-    Get(Protoss.Assimilator),
-    Get(19, Protoss.Probe),
-    Get(Protoss.CyberneticsCore),
-    Get(20, Protoss.Probe),
-    Get(2, Protoss.Gateway))
 
   val PvT13Nexus_GateCoreGateZ = Vector[RequestBuildable] (
     Get(8,  Protoss.Probe),
@@ -333,46 +250,6 @@ object ProtossBuilds {
     Get(5,  Protoss.Pylon),
     Get(23, Protoss.Probe),
     Get(Protoss.DragoonRange))
-  
-  val PvT2GateObs = Vector[RequestBuildable] (
-    Get(8,   Protoss.Probe),
-    Get(1,   Protoss.Pylon),
-    Get(10,  Protoss.Probe),
-    Get(1,   Protoss.Gateway),
-    Get(12,  Protoss.Probe),
-    Get(Protoss.Assimilator),
-    Get(14,  Protoss.Probe),
-    Get(Protoss.CyberneticsCore),
-    Get(15,  Protoss.Probe),
-    Get(2,   Protoss.Pylon),
-    Get(16,  Protoss.Probe),
-    Get(1,   Protoss.Dragoon),
-    Get(17,  Protoss.Probe),
-    Get(Protoss.DragoonRange),
-    Get(20,  Protoss.Probe),
-    Get(3,   Protoss.Pylon),
-    Get(2,   Protoss.Dragoon),
-    Get(22,  Protoss.Probe),
-    Get(Protoss.RoboticsFacility),
-    Get(23,  Protoss.Probe),
-    Get(3,   Protoss.Dragoon),
-    Get(24,  Protoss.Probe),
-    Get(2,   Protoss.Gateway),
-    Get(25,  Protoss.Probe),
-    Get(4,   Protoss.Pylon),
-    Get(4,   Protoss.Dragoon),
-    Get(26,  Protoss.Probe),
-    Get(5,   Protoss.Dragoon),
-    Get(27,  Protoss.Probe),
-    Get(Protoss.Observatory),
-    Get(6,   Protoss.Dragoon),
-    Get(28,  Protoss.Probe),
-    Get(5,   Protoss.Pylon),
-    Get(1,   Protoss.Observer),
-    Get(29,  Protoss.Probe),
-    Get(2,   Protoss.Nexus),
-    Get(8,   Protoss.Dragoon),
-    Get(30,  Protoss.Probe))
 
   val PvTDTExpand_BeforeCitadel = Vector[RequestBuildable] (
     Get(8,   Protoss.Probe),

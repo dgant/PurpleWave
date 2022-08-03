@@ -43,7 +43,6 @@ class GameSensor extends TimedTask with EconomicModel {
     val previous = currentEvents.get(event.sense)
     val canonical = (previous.toSeq :+ event).maxBy(_.untilFrame)
 
-
     currentEvents(event.sense) = canonical
     canonical.sense.opposite.foreach(currentEvents.remove)
   }

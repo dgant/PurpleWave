@@ -36,7 +36,7 @@ class ZvT3HatchLing extends GameplanTemplate {
 
   override def scoutPlan: Plan = new If(
     new And(
-      new Not(new EnemyWalledIn),
+      new Not(EnemyWalledIn),
       new Not(new EnemyStrategy(With.fingerprints.twoFacVultures))),
     new Trigger(
       new Or(
@@ -109,7 +109,7 @@ class ZvT3HatchLing extends GameplanTemplate {
     new RequireMiningBases(3),
     new Trigger(
       new Or(
-        new EnemyWalledIn,
+        EnemyWalledIn,
         new And(
           new Not(new UpgradeStarted(Zerg.ZerglingSpeed)),
           new Or(

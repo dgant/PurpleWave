@@ -10,6 +10,9 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
 
   var doBasics: Boolean = true
   var doBuildOrder: Boolean = true
+  def doWorkers(): Unit = {
+    pumpWorkers(oversaturate = false)
+  }
 
   override def onUpdate(): Unit = {
     if ( ! activated) return
@@ -23,7 +26,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroCounting wit
     }
     if (doBasics) {
       pumpSupply() // This currently just prioritizes Supplier
-      pumpWorkers(oversaturate = false)
+      doWorkers()
     }
     executeMain()
   }

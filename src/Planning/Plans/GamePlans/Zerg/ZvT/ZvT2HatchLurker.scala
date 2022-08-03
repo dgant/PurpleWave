@@ -36,7 +36,7 @@ class ZvT2HatchLurker extends GameplanTemplate {
         new EnemiesAtMost(5, Terran.Marine),
         new Or(
           new EnemiesAtLeast(1, Terran.Refinery),
-          new EnemyWalledIn,
+          EnemyWalledIn,
           new EnemyStrategy(With.fingerprints.oneFac, With.fingerprints.twoFac)))))
 
   override def scoutPlan: Plan = new Trigger(

@@ -6,7 +6,6 @@ import Lifecycle.With
 abstract class StarCraftMap {
   val name: String = ToString(this)
   val nameStub: String = MapIdentifier.apply(name)
-  var mineralWalkingOkay: Boolean = true
   def apply(): Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
 }
 object Alchemist extends StarCraftMap
@@ -21,7 +20,7 @@ object Eddy extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
 object Gladiator extends StarCraftMap
 object GoldRush extends StarCraftMap
-object GreatBarrierReef extends StarCraftMap { mineralWalkingOkay = false }
+object GreatBarrierReef extends StarCraftMap
 object Heartbreak extends StarCraftMap
 object Hitchhiker extends StarCraftMap
 object Hunters extends StarCraftMap
@@ -69,10 +68,8 @@ object StarCraftMaps {
 }
 
 object MapGroups {
-  val badForProxying = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
-  val badForWalling = Vector(Alchemist, Pathfinder)
-  val tooShortForFFE = Vector(Python)
-  val narrowRamp = Vector(Plasma, ThirdWorld)
-  val needCustomPathing = Vector(Benzene, BlueStorm, GoldRush)
+  val badForProxying: Vector[StarCraftMap] = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
+  val badForMassGoon: Vector[StarCraftMap] = Vector(Aztec, CircuitBreaker, Destination, MatchPoint, Roadrunner)
+  val narrowRamp    : Vector[StarCraftMap] = Vector(Plasma, ThirdWorld)
 }
 

@@ -27,7 +27,7 @@ class StrategyLegality(strategy: Strategy) {
   val isIsland                = With.strategy.isIslandMap
   val isGround                = ! isIsland
   val rampOkay                = (strategy.entranceInverted || ! With.strategy.isInverted) && (strategy.entranceFlat || ! With.strategy.isFlat) && (strategy.entranceRamped || ! With.strategy.isRamped)
-  val rushOkay                = With.strategy.rushDistanceMean > strategy.rushDistanceMinimum && With.strategy.rushDistanceMean < strategy.rushDistanceMaximum
+  val rushOkay                = With.strategy.rushDistanceMean > strategy.rushTilesMinimum && With.strategy.rushDistanceMean < strategy.rushTilesMaximum
   val startLocations          = With.geography.startLocations.size
   val disabledInPlaybook      = With.configuration.playbook.disabled.contains(strategy)
   val disabledOnMap           = strategy.mapsBlacklisted.exists(_()) || ! strategy.mapsWhitelisted.forall(_.exists(_()))

@@ -5,6 +5,7 @@ import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
+import Utilities.LightYear
 import bwapi.Race
 
 abstract class Strategy extends SimpleString {
@@ -19,8 +20,8 @@ abstract class Strategy extends SimpleString {
   def entranceRamped          : Boolean                         = true
   def entranceFlat            : Boolean                         = true
   def entranceInverted        : Boolean                         = true
-  def rushDistanceMinimum     : Double                          = Double.NegativeInfinity
-  def rushDistanceMaximum     : Double                          = Double.PositiveInfinity
+  def rushTilesMinimum        : Int                             = - LightYear()
+  def rushTilesMaximum        : Int                             =   LightYear()
   def multipleEntrances       : Boolean                         = true
   def ourRaces                : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg)
   def enemyRaces              : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)

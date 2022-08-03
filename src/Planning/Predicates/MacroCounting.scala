@@ -189,10 +189,6 @@ trait MacroCounting {
     enemyHasShown(Protoss.Carrier, Protoss.Interceptor, Protoss.FleetBeacon) || enemyHasUpgrade(Protoss.CarrierCapacity)
   }
 
-  def enemyWalledIn: Boolean = {
-    With.geography.zones.exists(z => z.walledIn && ! z.metro.exists(_.bases.exists(_.owner.isUs)))
-  }
-
   def scoutCleared: Boolean = {
     With.scouting.enemyScouts().isEmpty || (
       With.scouting.enemyScouts().forall( ! _.likelyStillThere)
@@ -203,6 +199,7 @@ trait MacroCounting {
   def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
   def foundEnemyBase: Boolean = enemyBases > 0
   def enemyNaturalConfirmed: Boolean = With.geography.enemyBases.exists(b => b.naturalOf.isDefined && b.townHall.isDefined)
+  def enemyCrossSpawn: Boolean = With.scouting.enemyMain.exists(b => With.geography.startBases.sortBy(_.heart.groundPixels(With.geography.ourMain.heart)).indexOf(b) >= 3)
 
   def enemyIs(race: Race): Boolean = With.enemies.exists(_.raceCurrent == race)
   def enemyIsTerran: Boolean = enemyIs(Race.Terran)

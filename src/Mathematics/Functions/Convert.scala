@@ -5,6 +5,7 @@ trait Convert {
   @inline final def toBoolean(value: Int): Boolean = value != 0
   @inline final def toInt(value: Boolean): Int = if (value) 1 else 0
   @inline final def toSign(value: Boolean): Int = if (value) 1 else -1
+  @inline final def count(values: Boolean*): Int = values.count(_ == true)
 
   @inline final def nanToN(value: Double, n: Double): Double = if (value.isNaN || value.isInfinity) n else value
   @inline final def nanToZero(value: Double): Double = nanToN(value, 0)

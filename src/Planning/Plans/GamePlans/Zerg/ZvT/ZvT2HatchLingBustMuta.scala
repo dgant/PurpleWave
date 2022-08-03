@@ -56,7 +56,7 @@ class ZvT2HatchLingBustMuta extends GameplanTemplate {
     new If(
       new EnemiesAtLeast(1, Terran.Vulture),
       new Parallel(
-        new AllInIf(new Not(new EnemyWalledIn)),
+        new AllInIf(new Not(EnemyWalledIn)),
         new BuildSunkensAtNatural(1),
         new BuildSunkensAtExpansions(1)
       )),

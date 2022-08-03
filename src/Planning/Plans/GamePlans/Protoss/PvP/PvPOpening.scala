@@ -43,19 +43,6 @@ class PvPOpening extends GameplanImperative {
     complete
   }
 
-  private def sneakyCitadel(): Unit = {
-    if (scoutCleared) {
-      get(Protoss.CitadelOfAdun)
-      cancel(Protoss.AirDamage)
-    } else if (units(Protoss.CitadelOfAdun) == 0) {
-      if (With.units.ours.find(_.upgradeProducing.contains(Protoss.AirDamage)).exists(_.remainingUpgradeFrames < Seconds(5)())) {
-        cancel(Protoss.AirDamage)
-      } else if ( ! upgradeStarted(Protoss.DragoonRange)) {
-        get(Protoss.AirDamage)
-      }
-    }
-  }
-
   private var doSneakyRobo = true
   private def sneakyRobo(): Unit = {
     if (doSneakyRobo && units(Protoss.Probe) >= 17 && ! scoutCleared) {

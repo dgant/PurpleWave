@@ -70,7 +70,7 @@ class PvTNew extends PvTOpeners {
   def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())
   trait TechTransition extends SimpleString {
     def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
-    def apply(): Unit = techs += this
+    def apply(): Unit = if ( ! queued) techs += this
     def started: Boolean
     def complete: Boolean
     def perform(): Unit
@@ -173,33 +173,33 @@ class PvTNew extends PvTOpeners {
     techs.clear()
     TechReavers         (TechReavers.started  || reaverVsBio)
     TechStorm           (PvTMidgameStorm()    || stormVsBio)
-    TechCarrier         (PvTMidgameCarrier()  && ! counterBio)
+    TechCarrier         (PvTMidgameCarrier()  && ( ! counterBio || TechCarrier.started))
     TechUpgrades        (counterBio)
     TechObservers       ()
     TechReavers         (PvTMidgameReaver())
     TechUpgrades        ()
-    TechCarrier         (PvTEndgameCarrier()  && ! counterBio)
-    TechStorm           (PvTMidgameStorm()    || PvTEndgameStorm() || counterBio)
+    TechCarrier         (PvTEndgameCarrier()  && ( ! counterBio || TechCarrier.started))
+    TechStorm           (PvTMidgameStorm() || PvTEndgameStorm() || TechCarrier.queued || counterBio)
     TechArbiter         ()
     val techsComplete   = techs.count(_.complete)
-    val gatewayTarget   = ?(TechCarrier.queued, 2, 3) * miningBases - ?(TechReavers.queued, 2, 0)
+    val gatewayWant     = ?(TechCarrier.queued, 2, 3) * miningBases - ?(TechReavers.queued, 2, 0)
     var gatewayNeed     = miningBases
     gatewayNeed         = Math.max(gatewayNeed, 1.5 * enemies(Terran.Factory) + Math.max(0, enemies(Terran.Barracks) - 1)).toInt
     gatewayNeed         = Math.max(gatewayNeed, ?(enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac), 3, 0))
-    gatewayNeed         = Math.min(gatewayNeed, gatewayTarget)
+    gatewayNeed         = Math.min(gatewayNeed, gatewayWant)
     val vulturesEnemy   = With.units.enemy.count(Terran.Vulture)
     val antiVulture     = With.units.ours.filter(_.isAny(Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Protoss.Carrier)).map(_.unitClass.supplyRequired / 2).sum
-    val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(_.unitClass.supplyRequired / 4.0).sum
+    val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(u => if (Terran.Vulture(u)) 1.5 else if (IsTank(u)) 2.5 else u.unitClass.supplyRequired / 4.0).sum
     val armySizeNow     = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
     var armySizeMinimum = 1.5 * armySizeEnemy
-    armySizeMinimum     = Math.max(armySizeMinimum, 16 * techsComplete)
-    armySizeMinimum     = Math.max(armySizeMinimum, 12 * Math.max(1, miningBases - 1))
-    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.siegeExpand(),  8, 0))
-    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoRaxAcad(),   12, 0))
-    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       12, 0))
-    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     16, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, 12 * techsComplete)
+    armySizeMinimum     = Math.max(armySizeMinimum, 6 * Math.max(1, miningBases - 1))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.siegeExpand(),  4, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoRaxAcad(),   8, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       10, 0))
+    armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     12, 0))
     armySizeMinimum     = Math.min(armySizeMinimum, 200 - workerGoal)
-    var armySizeLow     = ! safeAtHome || armySizeNow < armySizeMinimum
+    var armySizeLow     = armySizeNow < armySizeMinimum || With.battles.globalHome.judgement.exists(_.confidence01Total < With.scouting.enemyProximity)
     armySizeLow       &&= unitsComplete(Protoss.DarkTemplar) == 0 || enemyHasShown(Terran.SpellScannerSweep, Terran.SpiderMine, Terran.ScienceVessel)
     val zealotAggro     = frame < Minutes(4)() && unitsComplete(Protoss.Zealot) > 0
     val pushMarines     = barracksCheese && ! With.strategy.isRamped
@@ -221,8 +221,8 @@ class PvTNew extends PvTOpeners {
     shouldAttack      ||= frame > Minutes(10)()
     shouldAttack      ||= pushMarines
 
-    status(f"${gatewayNeed}-${gatewayTarget}gate")
-    status(techs.mkString("-").replaceAll("Tech", "") + f"${techsComplete}/${techs.length}")
+    status(f"${gatewayNeed}-${gatewayWant}gate")
+    status(techs.mkString("-").replaceAll("Tech", "") + f":${techsComplete}/${techs.length}")
     if (armySizeLow) status("ArmyLow")
     if (zealotAggro) status("ZealotAggro")
     if (pushMarines) status("PushMarines")
@@ -245,9 +245,10 @@ class PvTNew extends PvTOpeners {
     ////////////////
 
     get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
-    if (encroaching || armySizeLow) {
+    if (armySizeLow) {
       army()
-      get(gatewayTarget, Protoss.Gateway)
+      get(Protoss.DragoonRange)
+      get(Math.min(3, gatewayWant), Protoss.Gateway)
     }
     get(gatewayNeed, Protoss.Gateway)
 
@@ -269,7 +270,10 @@ class PvTNew extends PvTOpeners {
 
     techs.find( ! _.complete).foreach(_.perform())
     army()
-    get(gatewayTarget, Protoss.Gateway)
+    get(gatewayNeed, Protoss.Gateway)
+    requireMiningBases(3)
+    requireGas()
+    get(gatewayWant, Protoss.Gateway)
     requireMiningBases(4)
     techs.foreach(_.perform())
     requireMiningBases(5)

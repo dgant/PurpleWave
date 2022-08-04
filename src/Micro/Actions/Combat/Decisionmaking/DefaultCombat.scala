@@ -40,7 +40,7 @@ object DefaultCombat extends Action {
     if ( ! unit.readyForAttackOrder) return false
     val potshotTarget =
       Seq(
-        Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)),
+        Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).filter(TargetFilterPotshot.legal(unit, _)),
         unit.agent.toAttack.filter(TargetFilterPotshot.legal(unit, _)),
         Target.best(unit, TargetFilterPotshot))
       .find(_.nonEmpty)

@@ -13,7 +13,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleFilters.local(u)) else Seq.empty.view
 
-  def groupUs: UnitGroup = _groupUs()
+  def groupUs   : UnitGroup = _groupUs()
   def groupEnemy: UnitGroup = _groupEnemy()
   private val _groupUs = new Cache(() => me.team.orElse(me.friendly.flatMap(_.squad)).getOrElse(GenericUnitGroup(Seq(me))))
   private val _groupEnemy = new KeyedCache(
@@ -59,7 +59,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     || victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
     || (victim.cloaked
       && shooter.unitClass.canAttack(victim)
-      && (shooter.unitClass.isDetector || enemyDetectors.exists(_.canMove))
+      && (shooter.unitClass.isDetector || groupEnemy.mobileDetectors.nonEmpty)
       && shooter.framesToBeReadyForAttackOrder <= Maff.nanToInfinity((64 + shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim)) / (shooter.topSpeed + victim.topSpeed))))
 
   def repairers: Seq[UnitInfo] = {

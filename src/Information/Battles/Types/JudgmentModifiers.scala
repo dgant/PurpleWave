@@ -110,7 +110,7 @@ object JudgmentModifiers {
     if (pUs.zone == pFoe.zone) return None
     if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
     if (edge.isEmpty) return None
-    val ranks     = battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels)
+    val ranks     = Math.max(1.0, battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels))
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
     val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0175, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))

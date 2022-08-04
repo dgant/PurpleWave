@@ -42,6 +42,9 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     */
   protected def range(unit: UnitInfo): Int
 
+  def unitsOn(i: Int): Seq[UnitInfo] = if (valid(i)) tiles(i).view.map(_.unit.unit) else Seq.empty
+  def unitsOn(tile: Tile): Seq[UnitInfo] = if (tile.valid) unitsOn(tile.i) else Seq.empty
+
   override def update(): Unit = {
     units.view.filterNot(f => shouldInclude(f._1)).toVector.foreach(f => removeUnit(f._2))
     With.units.all.foreach(updateUnit)
@@ -49,7 +52,7 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
 
   private final def shouldInclude(unit: UnitInfo): Boolean = unit.likelyStillThere && include(unit)
 
-  @inline final def updateUnit(unit: UnitInfo): Unit = {
+  @inline private final def updateUnit(unit: UnitInfo): Unit = {
     if (shouldInclude(unit)) {
       val floodyOld = units.get(unit)
       lazy val unitRadius = range(unit)

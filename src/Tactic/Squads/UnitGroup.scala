@@ -15,6 +15,7 @@ trait UnitGroup {
   def groupOrderable    : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
   def attackers         : Seq[UnitInfo] = _attackers()
   def detectors         : Seq[UnitInfo] = _detectors()
+  def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
   def attackersCasters  : Seq[UnitInfo] = groupOrderable.view.filter(_.unitClass.attacksOrCasts)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
   def attackersCastersCount             = _attackersCastersCount()
@@ -56,7 +57,8 @@ trait UnitGroup {
 
   private val _paceAge = 24
   private def _attackers()              = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
-  private def _detectors()              = groupOrderable.view.filter(u => u.aliveAndComplete && u.unitClass.isDetector)
+  private val _detectors                = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && u.unitClass.isDetector))
+  private val _mobileDetectors          = new Cache(() => detectors.filter(_.canMove))
   private val _attackersCastersCount    = new Cache(() => attackersCasters.size)
   private val _attackersBioCount        = new Cache(() => attackersBio.size)
   private val _attacksAir               = new Cache(() => attackers.exists(_.canAttackAir))

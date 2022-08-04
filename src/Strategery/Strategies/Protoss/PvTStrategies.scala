@@ -17,6 +17,9 @@ object PvTEndgameStorm extends PvTStrategy
 
 object PvTMidgameCarrier extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvTEndgameCarrier))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.bio
+  )
 }
 object PvTMidgameReaver extends PvTStrategy {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm))

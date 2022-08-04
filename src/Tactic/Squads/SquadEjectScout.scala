@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
-import Planning.Plans.Scouting.ScoutCleared
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountOne
@@ -19,10 +19,9 @@ class SquadEjectScout extends Squad {
     .map(_.pixel)
     .getOrElse(Maff.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
 
-  private val scoutCleared = new ScoutCleared
-  def launch() {
+  def launch(): Unit = {
     if (With.frame > Minutes(8)()) return
-    if (scoutCleared.apply) return
+    if (MacroFacts.scoutCleared) return
     if (targetScout().isEmpty) return
 
     lock.matcher = unit => (
@@ -35,7 +34,7 @@ class SquadEjectScout extends Squad {
     lock.acquire()
   }
   
-  override def run() {
+  override def run(): Unit = {
     units.foreach(ejector => {
       ejector.intend(this, new Intention {
         toScoutTiles = if (targetScout().exists(_.likelyStillThere)) Seq.empty else tilesToConsider()

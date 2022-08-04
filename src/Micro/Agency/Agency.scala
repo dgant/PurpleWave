@@ -19,7 +19,7 @@ class Agency extends TimedTask {
 
   override def isComplete: Boolean = agentQueue.isEmpty
 
-  override def onRun(budgetMs: Long) {
+  override def onRun(budgetMs: Long): Unit = {
 
     val timer = new Timer(budgetMs)
 

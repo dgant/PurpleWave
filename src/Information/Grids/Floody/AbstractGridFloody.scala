@@ -42,8 +42,12 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     */
   protected def range(unit: UnitInfo): Int
 
-  def unitsOn(i: Int): Seq[UnitInfo] = if (valid(i)) tiles(i).view.map(_.unit.unit) else Seq.empty
-  def unitsOn(tile: Tile): Seq[UnitInfo] = if (tile.valid) unitsOn(tile.i) else Seq.empty
+  def floodiesNear(i: Int)      : Seq[FloodyTile] = if (valid(i))   tiles(i)      .view else Seq.empty
+  def floodiesNear(tile: Tile)  : Seq[FloodyTile] = if (tile.valid) tiles(tile.i) .view else Seq.empty
+  def unitsNear(i: Int)         : Seq[UnitInfo]   = floodiesNear(i)   .map(_.unit.unit)
+  def unitsNear(tile: Tile)     : Seq[UnitInfo]   = floodiesNear(tile).map(_.unit.unit)
+  def unitsOn(i: Int)           : Seq[UnitInfo]   = floodiesNear(i)   .filter(_.value >= margin).map(_.unit.unit)
+  def unitsOn(tile: Tile)       : Seq[UnitInfo]   = floodiesNear(tile).filter(_.value >= margin).map(_.unit.unit)
 
   override def update(): Unit = {
     units.view.filterNot(f => shouldInclude(f._1)).toVector.foreach(f => removeUnit(f._2))

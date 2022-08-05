@@ -304,8 +304,5 @@ abstract class PvTOpeners extends GameplanImperative{
       once(3, Protoss.Gateway)
       once(2, Protoss.Nexus)
     }
-
-    //TODO
-    //Vector(new PvTIdeas.ReactToRaxCheese, new PvTIdeas.ReactToBunkerRush, new PvTIdeas.ReactToWorkerRush).foreach(_.update())
   }
 }

@@ -286,4 +286,22 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def creepUnchecked: Boolean = {
     With.game.hasCreep(x, y) // TODO: Replace with actually unchecked variant
   }
+  @inline def enemiesVulnerableGround: Seq[UnitInfo] = {
+    With.grids.enemyVulnerabilityGround.unitsOn(i)
+  }
+  @inline def enemiesAttackingGround: Seq[UnitInfo] = {
+    With.grids.enemyRangeGround.unitsOn(i)
+  }
+  @inline def enemiesNearlyExposedGround: Seq[UnitInfo] = {
+    With.grids.enemyVulnerabilityGround.unitsNear(i)
+  }
+  @inline def enemiesNearlyAttackingGround: Seq[UnitInfo] = {
+    With.grids.enemyRangeGround.unitsNear(i)
+  }
+  @inline def enemiesAttackingAir: Seq[UnitInfo] = {
+    With.grids.enemyRangeAir.unitsOn(i)
+  }
+  @inline def enemiesNearlyAttackingAir: Seq[UnitInfo] = {
+    With.grids.enemyRangeAir.unitsNear(i)
+  }
 }

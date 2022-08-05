@@ -108,8 +108,9 @@ object JudgmentModifiers {
     val pFoe      = battleLocal.enemy.vanguardGround()
     val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
     if (pUs.zone == pFoe.zone) return None
-    if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
     if (edge.isEmpty) return None
+    if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
+    if (pFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < battleLocal.us.maxRangeGround) return None
     val ranks     = Math.max(1.0, battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels))
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
     val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0175, 0.0, 0.3)

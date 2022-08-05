@@ -9,7 +9,7 @@ object Cast extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.energyMax > 0
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.cooldownSpell == 0 ) {
       spells.foreach(_.consider(unit))
     }
@@ -24,7 +24,7 @@ object Cast extends Action {
     }
   }
   
-  val spells = Array(
+  val spells: Array[Action] = Array(
     Heal,
     WraithCloak,
     WraithUncloak,

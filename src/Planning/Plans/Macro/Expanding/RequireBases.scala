@@ -8,7 +8,7 @@ class RequireBases(basesDesired: Int = 1) extends Plan {
 
   protected def basesNow: Int = With.geography.ourBases.size
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     val basesAll  = With.geography.ourBases.size
     val goal      = basesDesired + basesAll - basesNow
     

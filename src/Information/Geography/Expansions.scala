@@ -7,7 +7,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import ProxyBwapi.Players.PlayerInfo
-import Utilities.UnitFilters.IsWarrior
 import bwapi.Race
 
 trait Expansions {
@@ -44,6 +43,7 @@ trait Expansions {
     _safeExpansions = _preferredOurs.filter(_safeExpansions.contains)
   }
 
+  private def distanceToMultiplier(value: Double): Double = 1.0 - Maff.clamp(value / 256.0, 0.0, 0.9)
   private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
@@ -57,21 +57,26 @@ trait Expansions {
     val opposingTiles   = Maff.orElse(opposingBases.map(_.heart), Seq(tileEnemy))
     val opposingRaces   = opposingPlayers.map(_.raceCurrent).filterNot(Race.Unknown==)
 
-    val raceWeights     = weightsTowards  .getOrElse(player.raceCurrent, Map.empty)
-    val raceGasBases    = gasNeeds        .getOrElse(player.raceCurrent, Map.empty)
-    val weightTowards   = Maff.min(opposingRaces.flatMap(raceWeights.get)).getOrElse(-0.75)
+    val raceShyness     = matchupShyness  .getOrElse(player.raceCurrent, Map.empty)
+    val raceGasBases    = gasNeeds              .getOrElse(player.raceCurrent, Map.empty)
+    val shyness         = Maff.min(opposingRaces.flatMap(raceShyness.get)).getOrElse(1.0)
     val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get)).getOrElse(3)
 
     def scoreBase(base: Base, player: PlayerInfo): Double = {
-      val distanceHome  = Maff.mean(friendlyTiles.map(base.heart.groundTiles).map(_.toDouble))
-      val distanceEnemy = Maff.mean(opposingTiles.map(base.heart.groundTiles).map(_.toDouble))
-      val homeFactor    = Maff.clamp(1.0 - distanceHome   / 256.0,  0.1, 1.0)
-      val enemyFactor   = Maff.clamp(1.0 - distanceEnemy  / 256.0,  0.1, 1.0)
-      val naturalFactor = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
-      val gasFactor     = if (adequateGas(base) || gasBases > gasBasesNeeded) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
-      val safeFactor    = if (_safeExpansions.contains(base) || player.isEnemy) 1.0 else 0.2
-      val threatFactor  = 1.0 / (2.0 + (if (base.metro == With.geography.ourMain.metro) 0 else base.enemies.count(IsWarrior)))
-      val output        = homeFactor * naturalFactor * gasFactor + enemyFactor * weightTowards * threatFactor
+      val originStrength    = if (player.isFriendly)  With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin
+      val originThreat      = if (player.isEnemy)     With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin
+      val distanceHome      = Maff.mean(friendlyTiles.map(base.heart.groundTiles).map(_.toDouble))
+      val distanceEnemy     = Maff.mean(opposingTiles.map(base.heart.groundTiles).map(_.toDouble))
+      val distanceStrength  = originStrength.walkableTile.groundTiles(base.heart)
+      val distanceThreat    = originThreat.walkableTile.groundTiles(base.heart)
+      val nearHome          = distanceToMultiplier(distanceHome)
+      val nearEnemy         = distanceToMultiplier(distanceEnemy)
+      val nearStrength      = distanceToMultiplier(distanceStrength)
+      val nearThreat        = distanceToMultiplier(distanceThreat)
+      val factorNatural     = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
+      val factorGas         = if (adequateGas(base) || gasBases > gasBasesNeeded || player.gas > 800) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
+      val factorSafe        = if (_safeExpansions.contains(base) || player.isEnemy) 1.0 else 0.2
+      val output            = nearHome * nearStrength * factorNatural * factorGas * factorSafe - nearEnemy * nearThreat * shyness
       output
     }
 
@@ -95,18 +100,18 @@ trait Expansions {
       (Race.Protoss,  3),
       (Race.Zerg,     5))))
 
-  private val weightsTowards = Map[Race, Map[Race, Double]](
+  private val matchupShyness = Map[Race, Map[Race, Double]](
     (Race.Terran, Map[Race, Double](
-      (Race.Terran,   -0.75),
-      (Race.Protoss,  -0.25),
-      (Race.Zerg,     -0.25))),
+      (Race.Terran,   1.25),
+      (Race.Protoss,  0.75),
+      (Race.Zerg,     0.75))),
     (Race.Protoss, Map[Race, Double](
-      (Race.Terran,   -0.75),
-      (Race.Protoss,  -0.75),
-      (Race.Zerg,     -0.25))),
+      (Race.Terran,   1.5),
+      (Race.Protoss,  1.25),
+      (Race.Zerg,     0.75))),
     (Race.Zerg, Map[Race, Double](
-      (Race.Terran,   -0.75),
-      (Race.Protoss,  -0.75),
-      (Race.Zerg,     -0.75))))
+      (Race.Terran,   0.75),
+      (Race.Protoss,  0.75),
+      (Race.Zerg,     0.75))))
 
 }

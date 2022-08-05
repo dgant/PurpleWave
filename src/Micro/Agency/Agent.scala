@@ -92,7 +92,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Execution //
   ///////////////
 
-  def execute() {
+  def execute(): Unit = {
     if ( ! unit.isFriendly) return // Mind Control
     lastFrame = With.frame
     resetState()
@@ -100,7 +100,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     updateRiding()
     unit.intent.action.consider(unit)
   }
-  private def resetState() {
+  private def resetState(): Unit = {
     forces.clear()
     lastPath = None
     unit.agent.priority = TrafficPriorities.None
@@ -111,7 +111,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     unit.orderTarget.foreach(_.removeDamage(unit))
   }
 
-  private def followIntent() {
+  private def followIntent(): Unit = {
     toTravel  = unit.intent.toTravel
     toReturn  = unit.intent.toReturn
     toAttack  = unit.intent.toAttack
@@ -151,7 +151,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   private var _rideGoal: Option[Pixel] = None
   def ride: Option[FriendlyUnitInfo] = _ride
   def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
-  def passengersPrioritized: Seq[FriendlyUnitInfo] = passengers.sortBy(p => p.unitClass.subjectiveValue - p.frameDiscovered / 10000.0)
+  def passengersPrioritized: Seq[FriendlyUnitInfo] = passengers.sortBy(p => p.unitClass.subjectiveValue + p.energy / 250.0 - p.frameDiscovered / 10000.0 / 10.0)
   def passengerSize: Int = passengers.view.map(_.unitClass.spaceRequired).sum
   def addPassenger(passenger: FriendlyUnitInfo): Unit = {
     if (passengerSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return

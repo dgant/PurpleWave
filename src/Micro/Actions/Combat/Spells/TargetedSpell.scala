@@ -10,7 +10,6 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 abstract class TargetedSpell extends Action {
   
   protected def casterClass       : UnitClass
@@ -33,7 +32,7 @@ abstract class TargetedSpell extends Action {
   
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val safeDistance  = Math.max(0, -unit.matchups.pixelsOfEntanglement)
     val totalRange    = safeDistance + 32.0 * castRangeTiles + bonusSearchPixels // The margin is just some encouragement
     

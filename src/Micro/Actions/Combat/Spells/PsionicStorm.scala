@@ -1,13 +1,12 @@
 package Micro.Actions.Combat.Spells
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.Maff
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Mathematics.Points.Pixel
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.?
 
 object PsionicStorm extends TargetedSpell {
   
@@ -15,11 +14,9 @@ object PsionicStorm extends TargetedSpell {
   override protected def tech             : Tech      = Protoss.PsionicStorm
   override protected def aoe              : Boolean   = true
   override protected def castRangeTiles   : Int       = 9
-  override protected def thresholdValue   : Double    = 4 * baseValue
+  override protected def thresholdValue   : Double    = 1.0
   override protected def lookaheadPixels  : Int       = 12
   override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldEngage || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isEnemy)
-
-  private val baseValue = 3 * Terran.Marine.subjectiveValue
 
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tile)) return 0.0
@@ -33,18 +30,10 @@ object PsionicStorm extends TargetedSpell {
 
     val multiplierConfidence  = Math.max(1.0, Maff.nanToOne(1 / (1 + caster.confidence11)))
     val multiplierPlayer      = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
-    val multiplierUnit        = baseValue + Math.min(target.unitClass.subjectiveValue, Terran.SiegeTankUnsieged.subjectiveValue)
-    val multiplierDanger      = if (caster.matchups.threatsInRange.nonEmpty) 2.0 else 1.0
-    val multiplierRich        = 1.0 + 0.3 * caster.team.map(_.storms).getOrElse(0)
-    val multiplierSpeed       = Maff.clamp(Maff.nanToOne(Protoss.Dragoon.topSpeed / target.topSpeed) * ?(target.flying, 0.5, 1.0), 0, 1)
-    val multiplierSilly =
-      if (target.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Overlord))
-        0.1
-      else if (target.isAny(Terran.Vulture, Zerg.Mutalisk, Protoss.Dragoon) && target.matchups.targetsInRange.isEmpty && target.matchups.threatsInRange.isEmpty)
-        0.2
-      else
-        1.0
-    val output = multiplierConfidence * multiplierPlayer * multiplierUnit * multiplierDanger * multiplierRich * multiplierSpeed * multiplierSilly
+    val multiplierUnit        = target.unitClass.stormValue
+    val multiplierDanger      = 1.0 + 0.5 * (if (caster.matchups.threatsInRange.nonEmpty) caster.unitClass.maxTotalHealth / caster.totalHealth else 0.0)
+    val multiplierRich        = Math.max(1.0, 0.25 * caster.team.map(_.storms).getOrElse(0))
+    val output                = multiplierConfidence * multiplierPlayer * multiplierUnit * multiplierDanger * multiplierRich
     output
   }
   

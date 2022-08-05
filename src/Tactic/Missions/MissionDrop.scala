@@ -73,6 +73,7 @@ abstract class MissionDrop extends Mission {
   }
 
   private def ignore(base: Base): Boolean = {
+    if (base.owner.isNeutral) return true
     if (base.owner.isFriendly) return true
     if (base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true

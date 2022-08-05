@@ -111,6 +111,9 @@ trait MacroActions {
   def requireMiningBases(count: Int): Unit = {
     new RequireMiningBases(count).update()
   }
+  def approachMiningBases(count: Int): Unit = {
+    if (MacroFacts.miningBases < count) requireMiningBases(MacroFacts.miningBases + 1)
+  }
 
   def buildDefensesAtBase(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], base: Base): Unit = {
     def query(buildingClass: UnitClass): PlacementQuery = new PlacementQuery(buildingClass)

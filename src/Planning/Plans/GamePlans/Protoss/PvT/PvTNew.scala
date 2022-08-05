@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.PvT
 import Debugging.SimpleString
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
+import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.Time.Minutes
@@ -68,18 +68,22 @@ class PvTNew extends PvTOpeners {
 
   val techs = new ArrayBuffer[TechTransition]
   def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())
+  def doNextTech(): Unit = {
+    techs.foreach(t => { t.perform(); if ( ! t.profited) return })
+  }
   trait TechTransition extends SimpleString {
     def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
     def apply(): Unit = if ( ! queued) techs += this
-    def started: Boolean
-    def complete: Boolean
+    def started: Boolean // Have we invested anything significant into this tech?
+    def profited: Boolean // Have we finished the up-front investment to gain value out of ti
     def perform(): Unit
+    def order: Int = if (techs.contains(this)) techs.indexOf(this) else techs.length
     def queued: Boolean = techs.contains(this)
-    override def toString: String = f"${super.toString}${if (complete) "(Done)" else if (started) "(Start)" else ""}"
+    override def toString: String = f"${super.toString}${if (profited) "(Done)" else if (started) "(Start)" else ""}"
   }
   object TechObservers extends TechTransition {
     def started: Boolean = units(Protoss.Observatory) > 0
-    def complete: Boolean = unitsEver(Protoss.Observer) > 0
+    def profited: Boolean = unitsEver(Protoss.Observer) > 0
     def perform(): Unit = {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       get(Protoss.DragoonRange)
@@ -90,8 +94,8 @@ class PvTNew extends PvTOpeners {
     }
   }
   object TechReavers extends TechTransition {
-    def started: Boolean = complete || upgradeStarted(Protoss.ScarabDamage)
-    def complete: Boolean = unitsEver(Protoss.Reaver) > 0
+    def started: Boolean = unitsEver(Protoss.Reaver) > 0
+    def profited: Boolean = unitsEver(Protoss.Reaver) > 1
     def perform(): Unit = {
       get(Protoss.RoboticsFacility)
       once(Protoss.Shuttle)
@@ -105,7 +109,7 @@ class PvTNew extends PvTOpeners {
   }
   object TechUpgrades extends TechTransition {
     def started: Boolean = upgradeStarted(Protoss.ZealotSpeed)
-    def complete: Boolean = upgradeStarted(Protoss.ZealotSpeed) && upgradeStarted(Protoss.GroundDamage)
+    def profited: Boolean = started && upgradeStarted(Protoss.GroundDamage)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -121,8 +125,8 @@ class PvTNew extends PvTOpeners {
     }
   }
   object TechStorm extends TechTransition {
-    def started: Boolean = complete || unitsEver(Protoss.HighTemplar) > 0
-    def complete: Boolean = techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
+    def started: Boolean = profited || unitsEver(Protoss.HighTemplar) > 0
+    def profited: Boolean = techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -137,8 +141,8 @@ class PvTNew extends PvTOpeners {
     }
   }
   object TechCarrier extends TechTransition {
-    def started: Boolean = complete || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
-    def complete: Boolean = unitsEver(Protoss.Carrier) >= 4
+    def started: Boolean = profited || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
+    def profited: Boolean = unitsEver(Protoss.Carrier) >= 4
     def perform(): Unit = {
       get(miningBases, Protoss.Stargate)
       requireGas()
@@ -152,8 +156,8 @@ class PvTNew extends PvTOpeners {
     }
   }
   object TechArbiter extends TechTransition {
-    def started: Boolean = complete || units(Protoss.ArbiterTribunal) > 0
-    def complete: Boolean = unitsEver(Protoss.Arbiter) > 0
+    def started: Boolean = profited || units(Protoss.ArbiterTribunal) > 0
+    def profited: Boolean = unitsEver(Protoss.Arbiter) > 0
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -166,11 +170,12 @@ class PvTNew extends PvTOpeners {
     }
   }
 
-  def counterBio: Boolean = With.fingerprints.bio()
+  def counterBio: Boolean = With.fingerprints.bio() && enemies(Terran.Marine, Terran.Firebat, Terran.Medic) >= enemies(Terran.Vulture) * 1.5
   def executeMain(): Unit = {
     val reaverVsBio = counterBio && ! PvTDT()
     val stormVsBio  = counterBio && ! reaverVsBio
     techs.clear()
+    TechObservers       (With.fingerprints.twoFacVultures() || With.fingerprints.threeFacVultures())
     TechReavers         (TechReavers.started  || reaverVsBio)
     TechStorm           (PvTMidgameStorm()    || stormVsBio)
     TechCarrier         (PvTMidgameCarrier()  && ( ! counterBio || TechCarrier.started))
@@ -181,9 +186,10 @@ class PvTNew extends PvTOpeners {
     TechCarrier         (PvTEndgameCarrier()  && ( ! counterBio || TechCarrier.started))
     TechStorm           (PvTMidgameStorm() || PvTEndgameStorm() || TechCarrier.queued || counterBio)
     TechArbiter         ()
-    val techsComplete   = techs.count(_.complete)
-    val gatewayWant     = ?(TechCarrier.queued, 2, 3) * miningBases - ?(TechReavers.queued, 2, 0)
-    var gatewayNeed     = miningBases
+    val techsComplete   = techs.count(_.profited)
+    val gatewayEquivs   = ?(TechCarrier.queued, miningBases, 0) + ?(TechReavers.queued, 2, 0)
+    val gatewayWant     = (3.0 * miningBases).toInt - gatewayEquivs
+    var gatewayNeed     = (2.0 * miningBases).toInt - gatewayEquivs - 1
     gatewayNeed         = Math.max(gatewayNeed, 1.5 * enemies(Terran.Factory) + Math.max(0, enemies(Terran.Barracks) - 1)).toInt
     gatewayNeed         = Math.max(gatewayNeed, ?(enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac), 3, 0))
     gatewayNeed         = Math.min(gatewayNeed, gatewayWant)
@@ -248,7 +254,6 @@ class PvTNew extends PvTOpeners {
     if (armySizeLow) {
       army()
       get(Protoss.DragoonRange)
-      get(Math.min(3, gatewayWant), Protoss.Gateway)
     }
     get(gatewayNeed, Protoss.Gateway)
 
@@ -257,26 +262,26 @@ class PvTNew extends PvTOpeners {
     ////////////
 
     if (With.scouting.weControlOurNatural) {
-      requireMiningBases(2)
+      approachMiningBases(2)
     }
     if ( ! encroaching && shouldAttack) {
-      requireMiningBases(1 + enemyMiningBases)
-      requireMiningBases(Maff.clamp(2 + techsComplete, 2, 4))
+      approachMiningBases(1 + enemyMiningBases)
+      approachMiningBases(Maff.clamp(2 + techsComplete, 2, 4))
     }
 
     ///////////
     // Spend //
     ///////////
 
-    techs.find( ! _.complete).foreach(_.perform())
+    doNextTech()
     army()
-    get(gatewayNeed, Protoss.Gateway)
-    requireMiningBases(3)
+    get(?(armySizeLow, gatewayWant, gatewayNeed), Protoss.Gateway)
+    approachMiningBases(3)
     requireGas()
     get(gatewayWant, Protoss.Gateway)
-    requireMiningBases(4)
+    approachMiningBases(4)
     techs.foreach(_.perform())
-    requireMiningBases(5)
+    approachMiningBases(5)
     get(6 * miningBases, Protoss.Gateway)
   }
 
@@ -285,21 +290,25 @@ class PvTNew extends PvTOpeners {
   }
 
   def doArmy(): Unit = {
-    if (units(Protoss.TemplarArchives) > 0 && ! enemyHasShown(Terran.SpiderMine) && 0 == units(Protoss.FleetBeacon, Protoss.Arbiter) + unitsComplete(Protoss.ArbiterTribunal) + enemies(Terran.ScienceVessel)) {
+    if (units(Protoss.TemplarArchives) > 0
+      && 0 == units(Protoss.FleetBeacon, Protoss.Arbiter) + unitsComplete(Protoss.ArbiterTribunal) + enemies(Terran.ScienceVessel)
+      && ( ! enemyHasShown(Terran.SpiderMine) || With.scouting.enemyProximity > 0.7))  {
       once(2, Protoss.DarkTemplar)
       pump(Protoss.DarkTemplar, 1)
     }
-    if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = With.fingerprints.bio() || units(Protoss.Observatory) == 0)
+    if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = TechReavers.order < TechObservers.order)
     pump(Protoss.Carrier, 4)
-    pumpRatio(Protoss.Dragoon, 12, 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0)))
+    pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
     pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 1, 2), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
-    pumpRatio(Protoss.HighTemplar, 2, 6, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
-    pumpRatio(Protoss.Corsair, 0, 6, Seq(Flat(-2), Enemy(Terran.Wraith, 2)))
-    if (With.scouting.enemyProximity > 0.4 && enemies(Terran.Goliath) + enemies(Terran.Marine) / 5 == 0) { pump(Protoss.Scout, 2) }
+    if (techStarted(Protoss.PsionicStorm)) {
+      pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
+    }
+    if (unitsComplete(Protoss.FleetBeacon) == 0 && With.scouting.enemyProximity > 0.4 && enemies(Terran.Goliath) + enemies(Terran.Marine) / 5 == 0) {
+      pump(Protoss.Scout, 2)
+    }
     pump(Protoss.Carrier, 12)
     pumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(IsTank, 0.5)))
     pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
-    pump(Protoss.HighTemplar)
     if ( ! upgradeStarted(Protoss.ZealotSpeed)) {
       pump(Protoss.Dragoon, 24)
     }

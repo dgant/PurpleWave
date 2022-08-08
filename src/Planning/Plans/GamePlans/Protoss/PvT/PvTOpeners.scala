@@ -125,7 +125,7 @@ abstract class PvTOpeners extends GameplanImperative{
   def open28Nexus(): Unit = {
     // Reference: https://liquipedia.net/starcraft/28_Nexus_(vs._Terran)
     openGateCore()
-    scoutOn(Protoss.CyberneticsCore)
+    scoutOn(Protoss.CyberneticsCore) // I think if BBS is possibility you might want to cross-spawn
     once(15, Protoss.Probe)
     once(2, Protoss.Pylon)
     once(16, Protoss.Probe)

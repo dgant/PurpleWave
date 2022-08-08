@@ -36,7 +36,7 @@ abstract class PvTOpener extends PvTStrategy {
 }
 object PvT13Nexus extends PvTOpener {
   override def startLocationsMin: Int = 4
-  override def rushTilesMinimum: Int = 200
+  override def rushTilesMinimum: Int = 180
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,

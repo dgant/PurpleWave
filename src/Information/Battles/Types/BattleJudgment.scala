@@ -19,6 +19,13 @@ class BattleJudgment(battle: Battle) {
   val confidence01Air     : Double  = confidence11Air / 2 + 1
   val confidence01Ground  : Double  = confidence11Ground / 2 + 1
 
+  def simWeight: Double = {
+    val output = Maff.clamp(1.0 - battle.teams.map(_.units.size).sum / 20.0, 0.0, 1.0)
+    if (output < 0.1) return 0.0
+    if (output > 0.9) return 1.0
+    output
+  }
+
   def calculateSkimulationScore(us: Double, enemy: Double): Double = {
     Maff.nanToOne((us - enemy) / (us + enemy))
   }

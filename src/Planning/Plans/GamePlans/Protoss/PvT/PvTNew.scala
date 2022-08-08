@@ -186,6 +186,9 @@ class PvTNew extends PvTOpeners {
     TechCarrier         (PvTEndgameCarrier()  && ( ! counterBio || TechCarrier.started))
     TechStorm           (PvTMidgameStorm() || PvTEndgameStorm() || TechCarrier.queued || counterBio)
     TechArbiter         ()
+    PvTMidgameOpen.activate()
+    PvTEndgameArbiter.activate()
+
     val techsComplete   = techs.count(_.profited)
     val gatewayEquivs   = ?(TechCarrier.queued, miningBases, 0) + ?(TechReavers.queued, 2, 0)
     val gatewayWant     = (3.0 * miningBases).toInt - gatewayEquivs

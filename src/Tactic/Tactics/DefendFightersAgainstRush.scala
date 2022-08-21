@@ -31,10 +31,11 @@ class DefendFightersAgainstRush extends Tactic {
     if (threatening.isEmpty)  return
     
     val workersNeeded   = 1 + 3 * (aggressors.map(_.unitClass.mineralValue).sum - fighters.map(_.unitClass.mineralValue).sum) / 100.0
-    val workerCap       = workers.size - 4
+    val workerCap       = workers.size - 4 - With.blackboard.workersPulled()
     val workersToFight  = Maff.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
-    
+
+
     defenders.counter = CountUpTo(workersToFight.toInt)
     defenders.preference = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
     defenders.acquire()

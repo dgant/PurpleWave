@@ -29,13 +29,13 @@ class DefendFFEWithProbes extends Tactic {
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
     val workerCount         = With.units.countOurs(IsWorker)
     val workersToMine       = if (cannonsComplete < 2) 4 else 4 + 2 * cannonsComplete
-    val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine - With.units.ours.count(_.agent.isScout), zerglings * 4 - cannonsComplete * 3)
+    val workersDesired      = if (cannonsComplete >= 5) 0 else Math.min(workerCount - workersToMine - With.blackboard.workersPulled(), zerglings * 4 - cannonsComplete * 3)
     workersDesired
   }
 
   var haveMinedEnoughForTwoCannons: Boolean = false
   
-  def launch() {
+  def launch(): Unit = {
     if (With.frame > Minutes(6)()) return
     if (With.enemies.size > 1) return
     haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2

@@ -47,6 +47,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   lazy val dpfReceiving         : Cache[Double]   = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
   lazy val isCloakedAttacker    : Cache[Boolean]  = new Cache(() => me.cloaked && targets.nonEmpty)
   lazy val teamHasArbiter       : Cache[Boolean]  = new Cache(() => alliesInclSelf.exists(Protoss.Arbiter))
+  lazy val inTankRange          : Cache[Boolean]  = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
   lazy val framesToLive         : Double          = _framesToLive()
   lazy val framesOfSafety       : Double          = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsOfEntanglement / me.topSpeed)
   lazy val pixelsOfEntanglement : Double          = _pixelsOfEntanglement()

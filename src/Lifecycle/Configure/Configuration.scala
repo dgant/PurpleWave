@@ -6,13 +6,13 @@ import Utilities.Time.Seconds
 class Configuration {
 
   /////////////////////////
-  // Tournament settings //s
+  // Tournament settings //
   /////////////////////////
 
   var enableSurrenders  = false
   var enableChat        = false
   var frameTargetMs     = 20
-  var frameLimitMs      = 55
+  var frameLimitMs      = 35
 
   ///////////////////
   // Mode settings //
@@ -42,10 +42,8 @@ class Configuration {
   // Battles //
   /////////////
 
-  var skimulate                     = true
   var simulationFrames              = Seconds(15)()
   var simulationResolution          = 8
-  var simulationBonusTankRange      = 64.0
   var simulationDamageValueRatio    = 0.1
 
   /////////////////
@@ -53,7 +51,7 @@ class Configuration {
   /////////////////
 
   var enablePerformancePauses             = true
-  var maximumGamesHistoryPerOpponent      = 500
+  var maximumGamesHistoryPerOpponent      = 100
   var logTaskDuration                     = false
   
   ///////////////////
@@ -64,7 +62,6 @@ class Configuration {
   var visualizeMap                        = true
   var visualizationProbabilityHappyVision = 0.0 // 0.05
   var visualizationProbabilityTextOnly    = 0.0 // 0.01
-  var visualizationCullViewport           = true
 
   var cameraDynamicSpeed          = false
   var cameraDynamicSpeedSlowest   = 30
@@ -77,5 +74,6 @@ class Configuration {
   ///////////////
   // Debugging //
   ///////////////
+
   var trackUnit = false
 }

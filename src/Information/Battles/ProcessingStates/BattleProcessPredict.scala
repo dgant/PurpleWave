@@ -11,12 +11,18 @@ class BattleProcessPredict extends BattleProcessState {
   override def step(): Unit = {
     val unpredicted = With.battles.nextBattles.find( ! _.predictionComplete)
     if (unpredicted.isDefined) {
-      if (unpredicted.get.skimulated) {
-        Skimulator.predict(unpredicted.get)
-        unpredicted.get.predictionComplete = true
+      val battle = unpredicted.get
+      battle.simulationComplete   ||= ! battle.simulated
+      battle.skimulationComplete  ||= ! battle.skimulated
+
+      if (battle.predictionComplete) return
+
+      if ( ! battle.skimulationComplete) {
+        Skimulator.predict(battle)
+        battle.skimulationComplete = true
       } else {
-        if (With.simulation.battle != unpredicted.get) {
-          With.simulation.reset(unpredicted.get)
+        if (With.simulation.battle != battle) {
+          With.simulation.reset(battle)
         }
         With.simulation.step()
       }

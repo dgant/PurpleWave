@@ -51,11 +51,11 @@ object ShowBattles extends DebugView {
     ))
   }
 
-  def renderBattleScreen(battle: Battle) {
-    if (With.configuration.skimulate) {
+  def renderBattleScreen(battle: Battle): Unit = {
+    if (battle.skimulated) {
       renderSkimulationScreen(battle)
-      return
     }
+    if ( ! battle.simulated) return
     val x = 5
     battle.simulationCheckpoints.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
@@ -91,11 +91,11 @@ object ShowBattles extends DebugView {
     battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrength), u.pixel, u.player.colorDark))
   }
 
-  def renderBattleMap(battle: Battle) {
-    if (With.configuration.skimulate) {
+  def renderBattleMap(battle: Battle): Unit = {
+    if (battle.skimulated) {
       renderSkimulationMap(battle)
-      return
     }
+    if ( ! battle.simulated) return
 
     val shouldFight = battle.judgement.get.shouldFight
     battle.units.view.filter(_.simulacrum.initialized).foreach(unit => {

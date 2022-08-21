@@ -51,24 +51,23 @@ class DefendFFEWithProbes extends Tactic {
     if ( ! EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
     if ( ! With.fingerprints.fourPool() && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
-    var cannons = With.units.ours.filter(Protoss.PhotonCannon)
-    if (cannons.isEmpty) cannons = With.units.ours.filter(Protoss.Forge)
+    val defensePoints = Maff.orElse(With.units.ours.filter(Protoss.PhotonCannon), With.units.ours.filter(Protoss.Forge))
     
     lazy val zerglings    = With.units.enemy.find(Zerg.Zergling)
     lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.enemyHome.center)
 
-    if (cannons.isEmpty) return
-    cannons.toVector.sortBy(_.totalHealth)
+    if (defensePoints.isEmpty) return
+    defensePoints.toVector.sortBy(_.totalHealth)
     
     val probesRequired = probeCount
     if (defenders.units.size > probesRequired) {
       defenders.release()
     }
-    defenders.preference = PreferClose(cannons.map(_.pixel).minBy(_.groundPixels(threatSource)))
+    defenders.preference = PreferClose(defensePoints.map(_.pixel).minBy(_.groundPixels(threatSource)))
     defenders.counter = CountUpTo(probesRequired)
     defenders.acquire()
-    val closestDistance = cannons.map(_.pixelDistanceTravelling(threatSource)).min
-    val threatenedCannons = cannons.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)
+    val closestDistance = defensePoints.map(_.pixelDistanceTravelling(threatSource)).min
+    val threatenedCannons = defensePoints.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)
     val workers = new ArrayBuffer[FriendlyUnitInfo]
     val workersByCannon = threatenedCannons.map(c => (c, new ArrayBuffer[FriendlyUnitInfo])).toMap
     workers ++= defenders.units

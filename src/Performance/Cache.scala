@@ -15,7 +15,7 @@ class Cache[T](getValue: () => T, refreshPeriod: Int = 1) {
     lastValue
   }
   
-  @inline final def invalidate() {
+  @inline final def invalidate(): Unit = {
     nextUpdateFrame = With.frame
     lastValue = defaultValue
   }

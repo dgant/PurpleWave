@@ -49,7 +49,7 @@ abstract class TargetedSpell extends Action {
     } else {
       val targetUnit = SpellTargetSingle.chooseTarget(unit, totalRange, thresholdValue, valueTarget)
       targetUnit.foreach(target => {
-        if (unit.pixelDistanceEdge(target) < castRangePixels) {
+        if (unit.pixelDistanceEdge(target) <= castRangePixels) {
           targetUnit.foreach(Commander.useTechOnUnit(unit, tech, _))
         } else {
           moveInRange(unit, target.pixel)
@@ -59,7 +59,7 @@ abstract class TargetedSpell extends Action {
   }
   
   // Event handler for when the unit issues a cast
-  protected def onCast(caster: FriendlyUnitInfo, target: Pixel) {}
+  protected def onCast(caster: FriendlyUnitInfo, target: Pixel): Unit = {}
 
   private def moveInRange(caster: FriendlyUnitInfo, target: Pixel): Unit ={
     if (caster.flying || caster.transport.exists(_.flying)) {

@@ -19,6 +19,8 @@ class PvTNew extends PvTOpeners {
   override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = workerGoal)
 
   override def executeBuild(): Unit = {
+    // TODO: Gas steal. Pylon scout on 2/3 player. See https://www.youtube.com/watch?v=Cl2MHjmGBLk for ideal build and 2-rax reaction
+
     // TODO: Expansion is informative
     // TODO: Cross-spawn informs Nexus-first choices
     // TODO: 10-12 is informative
@@ -64,7 +66,6 @@ class PvTNew extends PvTOpeners {
 
     open()
   }
-
 
   val techs = new ArrayBuffer[TechTransition]
   def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())

@@ -5,7 +5,7 @@ import Utilities.Property
 
 class Write[T](property: Property[T], lambda: () => T) extends Plan{
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     property.set(lambda())
   }
 }

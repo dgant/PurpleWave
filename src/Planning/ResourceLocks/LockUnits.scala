@@ -36,7 +36,7 @@ class LockUnits(val owner: Prioritized) {
     With.recruiter.inquire(this, isDryRun = true).map(_.toVector) // toVector ensures we don't return a view with invalid owner
   }
 
-  def release() {
+  def release(): Unit = {
     With.recruiter.deactivate(this)
   }
 

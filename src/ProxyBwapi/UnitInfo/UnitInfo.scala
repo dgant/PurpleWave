@@ -196,12 +196,13 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var nextInCluster: Option[UnitInfo] = None
 
   val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
+  var spellTargetValue: Double = _
+
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
   private lazy val armorHealthCache   = new Cache(() => unitClass.armor + unitClass.armorUpgrade.map(player.getUpgradeLevel).getOrElse(0))
   private lazy val armorShieldsCache  = new Cache(() => player.getUpgradeLevel(Protoss.Shields))
 
-  // Used by MCRS
   @inline final def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
   @inline final def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
 

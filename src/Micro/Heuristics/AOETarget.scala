@@ -1,8 +1,5 @@
 package Micro.Heuristics
 
-import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
-import Lifecycle.With
 import Mathematics.Points.{Pixel, PixelRectangle}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -14,29 +11,30 @@ class AOETarget(
     my: Int,
     pixelWidth: Int,
     pixelHeight: Int,
-    lookaheadPixels: Double,
-    evaluate: (UnitInfo, FriendlyUnitInfo) => Double) {
-  val margin = 8
-  private val p = target.pixel
-  private val xs = Seq(target.x - mx * margin, target.x + mx * (pixelWidth - margin))
-  private val ys = Seq(target.y - my * margin, target.y + my * (pixelHeight - margin))
-  private val evalPixelStart = Pixel(xs.min, ys.min)
-  private val evalPixelEnd = Pixel(xs.max, ys.max)
-  val rectangle = PixelRectangle(evalPixelStart, evalPixelEnd)
-  // Get units in the *expanded* rectangle to handle the potential out-of-dateness of the unit grid
-  def units: Iterable[UnitInfo] = rectangle.expand(64, 64)
+    lookaheadPixels: Double) {
+
+  private val margin          = 8
+  private val p               = target.pixel
+  private val xs              = Seq(target.x - mx * margin, target.x + mx * (pixelWidth - margin))
+  private val ys              = Seq(target.y - my * margin, target.y + my * (pixelHeight - margin))
+  private val evalPixelStart  = Pixel(xs.min, ys.min)
+  private val evalPixelEnd    = Pixel(xs.max, ys.max)
+
+  val rectangle: PixelRectangle = PixelRectangle(evalPixelStart, evalPixelEnd)
+
+  def units: Iterable[UnitInfo] = rectangle
     .pixelsEach32
-    .view
     .map(_.tile)
     .filter(_.valid)
-    .flatMap(With.grids.units.get(_).view.filter(u =>
+    .flatMap(_.units.view.filter(u =>
       u.likelyStillThere
       && rectangle.contains(u.pixel))) // Require the unit to actually be there; don't trust the grid))
-  val netValue: Double = units.view.map(evaluate(_, caster)).sum
-  var xMin = Int.MaxValue
-  var yMin = Int.MaxValue
-  var xMax = Int.MinValue
-  var yMax = Int.MinValue
+
+  val netValue: Double = units.view.map(_.spellTargetValue).sum
+  var xMin: Int = Int.MaxValue
+  var yMin: Int = Int.MaxValue
+  var xMax: Int = Int.MinValue
+  var yMax: Int = Int.MinValue
   if (units.isEmpty) {
     xMin = evalPixelStart.x
     yMin = evalPixelStart.y
@@ -50,19 +48,6 @@ class AOETarget(
     xMax = Math.max(xMax, positionProjected.x)
     yMax = Math.max(yMax, positionProjected.y)
   })
-  lazy val finalTarget = Pixel((xMin + xMax) / 2, (yMin + yMax) / 2)
 
-  def drawMap(): Unit = {
-    val colorBright = Colors.NeonTeal
-    val colorDark = Colors.DarkTeal
-    DrawMap.circle(target.pixel, target.unitClass.dimensionMin + 2, Colors.MediumRed)
-    DrawMap.box(Pixel(xMin, yMin), Pixel(xMax, yMax), colorBright)
-    DrawMap.box(evalPixelStart, evalPixelEnd, colorDark)
-    DrawMap.star(finalTarget, 7, colorBright, solid = true)
-    units.foreach(unit => {
-      DrawMap.circle(unit.pixel, unit.unitClass.dimensionMin, colorBright)
-      DrawMap.label(evaluate(unit, caster).toInt.toString, unit.pixel.add(0, unit.unitClass.dimensionDown + 8))
-    })
-    DrawMap.label(netValue.toInt.toString, Pixel(finalTarget.x, yMax + 8), backgroundColor = colorDark, drawBackground = true)
-  }
+  val finalTarget: Pixel = Pixel((xMin + xMax) / 2, (yMin + yMax) / 2)
 }

@@ -4,7 +4,6 @@ import Information.GameSense.Budgets
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile, TileRectangle}
-import Micro.Heuristics.MicroValue
 import ProxyBwapi.Buildable
 import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
@@ -404,7 +403,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val subjectiveValue: Double =
     if (isSpell) 0 else if (this == Zerg.LurkerEgg) Zerg.Lurker.subjectiveValue else if (this == Zerg.Cocoon) Zerg.Guardian.subjectiveValue else (
       (mineralValue
-          + MicroValue.gasToMineralsRatio * gasValue
+          + 1.5 * gasValue
           + 6.25 * supplyRequired // 100 minerals buys 16 supply; 100 / 16 = 6.25
           + (if (isZerg) 25.0 / copiesProduced else 0.0)) // Larva value
         * (if (isWorker) 1.3 else 1.0)

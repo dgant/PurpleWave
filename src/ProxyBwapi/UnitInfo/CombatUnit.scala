@@ -72,7 +72,6 @@ trait CombatUnit {
   @inline final def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
     unitClass.pixelRangeAir +
-      (if (unitClass == Terran.Bunker)                                                32.0 else 0.0) +
       (if (unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
       (if (unitClass == Terran.Goliath  && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
@@ -81,7 +80,6 @@ trait CombatUnit {
   @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.pixelRangeGround +
-      (if (unitClass == Terran.Bunker)                                              32.0 else 0.0) +
       (if (unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
       (if (unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +

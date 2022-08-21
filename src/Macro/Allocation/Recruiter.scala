@@ -19,7 +19,7 @@ class Recruiter {
   def locksOf(owner: Prioritized): Iterable[LockUnits] = unitsByLock.view.filter(_._1.owner == owner).map(_._1)
   def lockedBy(owner: Prioritized): Iterable[FriendlyUnitInfo] = locksOf(owner).flatMap(_.units.view)
 
-  def update() {
+  def update(): Unit = {
     // Remove ineligible units
     unitsByLock.values.foreach(_.view.filterNot(recruitable).foreach(unlock))
 
@@ -43,7 +43,7 @@ class Recruiter {
     unitsByLock(lock) ++= units
   }
 
-  def deactivate(lock: LockUnits) {
+  def deactivate(lock: LockUnits): Unit = {
     unitsByLock.get(lock).foreach(_.foreach(unlock))
     unitsByLock.remove(lock)
     activeLocks -= lock
@@ -64,7 +64,7 @@ class Recruiter {
     lock.offerUnits(lock.units.view ++ available, isDryRun)
   }
 
-  def satisfy(lock: LockUnits) {
+  def satisfy(lock: LockUnits): Unit = {
     activate(lock)
     val requiredUnits = inquire(lock, isDryRun = false)
     if (requiredUnits.isEmpty) {
@@ -92,12 +92,12 @@ class Recruiter {
 
   private def recruitable(unit: FriendlyUnitInfo): Boolean = unit.alive && unit.unitClass.orderable && unit.remainingCompletionFrames < With.latency.framesRemaining
   
-  private def lockTo(unit: FriendlyUnitInfo, lock: LockUnits) {
+  private def lockTo(unit: FriendlyUnitInfo, lock: LockUnits): Unit = {
     unitsByLock(lock).add(unit)
     unlockedUnits.remove(unit)
   }
   
-  private def unlock(unit: FriendlyUnitInfo) {
+  private def unlock(unit: FriendlyUnitInfo): Unit = {
     unlockedUnits.add(unit)
     unitsByLock.find(_._2.contains(unit)).foreach(pair => unitsByLock(pair._1).remove(unit))
   }

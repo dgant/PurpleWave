@@ -15,7 +15,7 @@ object WraithUncloak extends Action {
     && With.framesSince(unit.agent.lastCloak) > 24 * 10
   )
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Commander.decloak(unit, Terran.GhostCloak)
   }
 }

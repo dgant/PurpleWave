@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import ProxyBwapi.Races.Terran
+import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsTank, IsWorker}
 import bwapi.Color
@@ -24,8 +25,9 @@ object JudgmentModifiers {
     add("Proximity",    Colors.NeonRed,       proximity(battle))
     add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
     add("HiddenTanks",  Colors.MediumIndigo,  hiddenTanks(battle))
-    add("Commitment",   Colors.MediumViolet,  commitment(battle))
+    add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))
     add("Choke",        Colors.MediumOrange,  choke(battle))
+    add("TankLock",     Colors.MediumRed,     tankLock(battle))
     output
   }
   // Prefer fighting
@@ -95,11 +97,13 @@ object JudgmentModifiers {
   //
   // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
   private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
-  def commitment(battleLocal: Battle): Option[JudgmentModifier] = {
-    def fighters      = battleLocal.us.units.view.filter(_.unitClass.attacksOrCastsOrDetectsOrTransports)
-    val commitmentRaw = Maff.mean(fighters.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsOfEntanglement) / 96d), 0, 1)))
-    val commitment    = commitmentFloor(commitmentRaw)
-    Some(JudgmentModifier(targetDelta = if (commitment > 0) -commitment * 0.15 else 0.15))
+  def hysteresis(battleLocal: Battle): Option[JudgmentModifier] = {
+    val commitmentRaw             = Maff.mean(battleLocal.us.attackers.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsOfEntanglement) / 96d), 0, 1)))
+    val commitment                = commitmentFloor(commitmentRaw)
+    lazy val enemyAttackers       = battleLocal.enemy.attackers.size.toDouble
+    lazy val hesitanceVisibility  = 0.08 / enemyAttackers * battleLocal.enemy.attackers.count( ! _.visible)
+    lazy val hesitanceTanks       = 0.12 / enemyAttackers * battleLocal.enemy.attackers.count(t => Terran.SiegeTankSieged(t) || (Terran.SiegeTankUnsieged(t) && With.framesSince(t.lastSeen) > 24))
+    Some(JudgmentModifier(targetDelta = ?(commitment > 0, -commitment * 0.15, hesitanceVisibility + hesitanceTanks)))
   }
 
   // Avoid fighting across chokes/bridges
@@ -115,5 +119,18 @@ object JudgmentModifiers {
     val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
     val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0175, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
+  }
+
+  // Prefer fighting tanks when we are already in range to attack them, or vice versa
+  def tankLock(battleLocal: Battle): Option[JudgmentModifier] = {
+    if ( ! With.enemies.exists(_.isTerran)) return None
+    if ( ! battleLocal.enemy.units.exists(Terran.SiegeTankSieged)) return None
+    val attackers         = battleLocal.us.attackers.size
+    val inTankRange       = battleLocal.us.attackers.count(_.matchups.inTankRange())
+    val tankInRange       = battleLocal.us.attackers.count(_.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
+    val inRankRangeScore  = 1.0 / 3.0 * inTankRange / attackers
+    val tankInRangeScore  = 2.0 / 3.0 * tankInRange / attackers
+    val score             = 0.5 * (inRankRangeScore + tankInRangeScore)
+    ?(score <= 0, None, Some(JudgmentModifier(targetDelta = score)))
   }
 }

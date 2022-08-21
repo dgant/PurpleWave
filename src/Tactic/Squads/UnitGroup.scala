@@ -57,7 +57,7 @@ trait UnitGroup {
   }
 
   private val _paceAge = 24
-  private def _attackers()              = groupOrderable.view.filter(u => u.unitClass.canAttack  && ! u.unitClass.isWorker)
+  private def _attackers()              = groupOrderable.view.filter(u => u.unitClass.canAttack && ! u.unitClass.isWorker)
   private val _detectors                = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && u.unitClass.isDetector))
   private val _mobileDetectors          = new Cache(() => detectors.filter(_.canMove))
   private val _attackersCastersCount    = new Cache(() => attackersCasters.size)

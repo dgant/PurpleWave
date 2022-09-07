@@ -43,8 +43,16 @@ object PvT13Nexus extends PvTOpener {
     With.fingerprints.bunkerRush,
     With.fingerprints.twoRax1113)
 }
-object PvTZealotExpand extends PvTOpener
+object PvTRangeless extends PvTOpener {
+  // Late scout + no range = Dangerous vs. aggressive builds
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.bunkerRush,
+    With.fingerprints.twoRax1113)
+}
 object PvT28Nexus extends PvTOpener
+object PvTZealotExpand extends PvTOpener
 object PvTZZCoreZ extends PvTOpener
 object PvT1015 extends PvTOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForMassGoon

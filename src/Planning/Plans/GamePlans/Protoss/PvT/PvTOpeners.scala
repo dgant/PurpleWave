@@ -18,6 +18,7 @@ abstract class PvTOpeners extends GameplanImperative{
           if (PvT13Nexus())       openNexusFirst()
     else  if (PvTZealotExpand())  openZealotExpand()
     else  if (PvTZZCoreZ())       openZZCoreZ()
+    else  if (PvTRangeless())     open20Rangeless()
     else  if (PvT28Nexus())       open28Nexus()
     else  if (PvT4Gate())         open4Gate()
     else  if (PvT1BaseReaver())   openReaver()
@@ -120,6 +121,25 @@ abstract class PvTOpeners extends GameplanImperative{
     doOpeningReactions()
     once(2, Protoss.Nexus)
     openingComplete ||= units(Protoss.Nexus) > 1
+  }
+
+  def open20Rangeless(): Unit = {
+    // Reference: https://www.youtube.com/watch?v=gCtO31tlrBs
+    openGateCore()
+    once(15, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    once(16, Protoss.Probe)
+    once(Protoss.Dragoon)
+    doOpeningReactions()
+    once(18, Protoss.Probe)
+    once(2, Protoss.Nexus)
+    scoutOn(Protoss.Nexus, quantity = 2)
+    once(2, Protoss.Dragoon)
+    once(19, Protoss.Probe)
+    if (gasCapsUntouched) {
+      gasWorkerCeiling(Math.max(1, unitsComplete(Protoss.Probe) - 12))
+    }
+    openingComplete ||= units(Protoss.Nexus) > 1 && unitsEver(Protoss.Dragoon) > 1
   }
 
   def open28Nexus(): Unit = {

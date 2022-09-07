@@ -20,7 +20,7 @@ class PvTNew extends PvTOpeners {
 
   override def executeBuild(): Unit = {
     // TODO: Gas steal. Pylon scout on 2/3 player. See https://www.youtube.com/watch?v=Cl2MHjmGBLk for ideal build and 2-rax reaction
-
+    // TODO: Khala says, if you confirm expansion, you can cancel Range for faster Robo
     // TODO: Expansion is informative
     // TODO: Cross-spawn informs Nexus-first choices
     // TODO: 10-12 is informative

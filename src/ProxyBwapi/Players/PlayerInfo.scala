@@ -6,7 +6,7 @@ import Lifecycle.With
 import Performance.Cache
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.Upgrades.Upgrade
-import bwapi.{Player, Race}
+import bwapi.{GameType, Player, Race}
 
 case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   
@@ -34,6 +34,18 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
     Players.all.filter(p => p != this && (p.isFriendly || With.strategy.isFfa))
   } else {
     With.enemies
+  }
+
+  def allies: Iterable[PlayerInfo] = if (isUs) {
+    Players.all.filterNot(==).filter(_.isAlly)
+  } else if (isAlly) {
+    Players.all.filterNot(With.self==).filter(_.isAlly)
+  } else if (isNeutral) {
+    Iterable.empty
+  } else if (With.game.getGameType == GameType.Free_For_All) {
+    Iterable.empty
+  } else { // We can't know enemy team structures programatically, so we assume the worst
+    Players.all.filterNot(==).filter(_.isEnemy)
   }
   
   def hasUpgrade(upgrade: Upgrade): Boolean = getUpgradeLevel(upgrade) > 0
@@ -80,5 +92,8 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
 
   def bases: Vector[Base] = With.geography.bases.filter(_.owner == this)
 
+  def allianceDescription: String = if (isUs) "Us" else if (isNeutral) "Neutral" else if (isAlly) "Ally" else "Enemy"
+  def raceDescription: String = if (raceCurrent == raceInitial) f"always $raceCurrent" else f"$raceCurrent; originally $raceInitial"
+  def fullDescription: String = f"$name ($allianceDescription, $raceDescription)"
   override def toString: String = name
 }

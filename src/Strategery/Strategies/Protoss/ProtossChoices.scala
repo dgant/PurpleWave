@@ -80,11 +80,11 @@ object ProtossChoices {
   )
 
   val pvzOpenersTransitioningFrom1GateCore = Vector(
-    PvZ2GateFlex
+    PvZ1Base
   )
 
   val pvzOpenersTransitioningFrom2Gate = Vector(
-    PvZ2GateFlex
+    PvZ1Base
   )
   
   val pvzMidgameTransitioningFromTwoBases = Vector(

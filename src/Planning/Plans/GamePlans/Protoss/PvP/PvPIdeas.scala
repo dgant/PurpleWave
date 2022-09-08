@@ -6,10 +6,11 @@ import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import Planning.Plans.GamePlans.All.MacroActions
-import Planning.Predicates.MacroCounting
+import Planning.Predicates.{MacroCounting, MacroFacts}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._
+import Utilities.?
 import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
 
 object PvPIdeas extends MacroActions with MacroCounting {
@@ -59,9 +60,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
   private def detectWithObserverOrCannon(auditing: Boolean): Boolean = {
     // Performance shortcut
     if (With.units.existsOurs(Protoss.Observer, Protoss.Observatory)) {
-      if ( ! auditing) {
-        makeObservers()
-      }
+      if ( ! auditing) { makeObservers() }
       return true
     }
     lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
@@ -69,18 +68,26 @@ object PvPIdeas extends MacroActions with MacroCounting {
     lazy val expectedArrival     = if (enemyDarkTemplarLikely || With.fingerprints.rampBlock()) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame
     lazy val framesUntilObserver = framesUntilUnit(Protoss.Observer)
-    lazy val dtPrecedesCannon    = framesUntilArrival < framesUntilUnit(Protoss.PhotonCannon) + cannonSafetyFrames
-    lazy val dtPrecedesObserver  = framesUntilArrival < framesUntilObserver
-    lazy val cannonsComplete     = With.units.ours.filter(Protoss.PhotonCannon).count(_.complete) >= Math.max(1, With.units.countOurs(Protoss.PhotonCannon))
+    lazy val dtPrecedesCannon    = framesUntilArrival - cannonSafetyFrames  < framesUntilUnit(Protoss.PhotonCannon)
+    lazy val dtPrecedesObserver  = framesUntilArrival                       < framesUntilObserver
+    lazy val cannonsAreReady = (
+      MacroFacts.unitsComplete(Protoss.PhotonCannon) > 0
+      && With.units.ours.filter(Protoss.PhotonCannon).forall(_.complete)
+      && Some(With.geography.ourNatural)
+        .filter(_.isOurs)
+        .getOrElse(With.geography.ourMain)
+        .ourUnits
+        .exists(u => Protoss.PhotonCannon(u)
+          && u.complete
+          && ! With.units.enemy.filter(Protoss.DarkTemplar).exists(_.pixelDistanceTravelling(With.geography.ourMain.heart) < u.pixel.groundPixels(With.geography.ourMain.heart))))
     lazy val goObserver = (
       With.units.existsOurs(Protoss.RoboticsFacility) // It's part of our plan already
         || ( ! dtPrecedesObserver && ! PvPDT()) // Observers are just better if we can swing them
         || (dtPrecedesCannon && ! With.units.existsOurs(Protoss.Forge)) // Cannons are awful once DTs are already inside your base; Obs is better
-        || (cannonsComplete && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base eventually
+        || (cannonsAreReady && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base sooner rather than later
 
     if (auditing) return goObserver
 
-    // Performance check
     if (enemyContained) status(f"Containing")
     if (enemyDarkTemplarLikely) status(f"ExpectDT@${Frames(expectedArrival)}")
 
@@ -105,18 +112,21 @@ object PvPIdeas extends MacroActions with MacroCounting {
         }
       }
     } else if (dtArePossibility && (PvPDT() || PvPCoreExpand() || PvP3GateGoon() || PvP4GateGoon())) {
-
       // If DTs are already here, spam cannons and pray one sticks
       if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {
-        status("DTArrived")
         get(Protoss.Forge)
-        get(RequestUnit(Protoss.PhotonCannon, 4,
+        val bestBase    = Some(With.geography.ourNatural).filter(_.ourUnits.exists(u => Protoss.PhotonCannon(u) && u.complete)).getOrElse(With.geography.ourMain)
+        val holdNatural = bestBase.naturalOf.isDefined
+        val bestTile    = ?(holdNatural, bestBase.zone.exitNowOrHeart, ?(cannonsAreReady, bestBase.zone.exitNowOrHeart, bestBase.heart))
+        val label       = ?(holdNatural || cannonsAreReady, DefendEntrance, DefendHall)
+        status(f"DTHere-Hold${?(holdNatural, "Nat", "Main")}-${?(cannonsAreReady, "Prepared", "Scrambling")}")
+        get(RequestUnit(Protoss.PhotonCannon, ?(cannonsAreReady, 3, 4),
           placementQueryArg = Some(new PlacementQuery(Protoss.PhotonCannon)
-            .preferBase(With.geography.ourMain)
-            .preferTile(With.geography.ourMain.heart)
-            .preferLabelYes(Defensive, DefendHall, DefendGround))))
+            .preferBase(bestBase)
+            .preferTile(bestTile)
+            .preferLabelYes(Defensive, DefendGround, label))))
 
-        // If DTs will arrive before cannons, try a tiered approach to maximize our potential outcomes
+      // If DTs will arrive before cannons, try a tiered approach to maximize our potential outcomes
       } else if (dtPrecedesCannon) {
         status("DTPrecedesCannon")
         get(Protoss.Forge)
@@ -124,7 +134,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, 0)
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendHall,     0)
 
-        // Take reasonable precautions
+      // Take reasonable precautions
       } else {
         val cannonMinStartFrame = expectedArrival - Protoss.PhotonCannon.buildFramesFull - cannonSafetyFrames
         val forgeMinStartFrame  = earliestArrival - Protoss.Forge.buildFramesFull

@@ -5,10 +5,10 @@ import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleJudgment(battle: Battle) {
-  private lazy val scoreSim: Double = calculateSimulationScore
+  lazy val scoreSim11     : Double  = calculateSimulationScore11
   val scoreTotal          : Double  = weigh(battle.us.skimStrengthTotal,  battle.enemy.skimStrengthTotal)
-  val scoreAir            : Double  = weigh(battle.us.skimStrengthAir,     battle.enemy.skimStrengthVsAir)
-  val scoreGround         : Double  = weigh(battle.us.skimStrengthGround,  battle.enemy.skimStrengthVsGround)
+  val scoreAir            : Double  = weigh(battle.us.skimStrengthAir,    battle.enemy.skimStrengthVsAir)
+  val scoreGround         : Double  = weigh(battle.us.skimStrengthGround, battle.enemy.skimStrengthVsGround)
   val scoreTarget         : Double  = calculateTarget
   val shouldFight         : Boolean = scoreTotal  >= scoreTarget
   val shouldFightAir      : Boolean = scoreAir    >= scoreTarget || (scoreTotal >= scoreTarget && scoreTotal > scoreGround)
@@ -22,10 +22,10 @@ class BattleJudgment(battle: Battle) {
 
   private def weigh(skimUs: => Double, skimEnemy: => Double): Double = {
     lazy val scoreSkim = Maff.nanToOne((skimUs - skimEnemy) / (skimUs + skimEnemy))
-    scoreSim * battle.simWeight + scoreSkim * battle.skimWeight
+    scoreSim11 * battle.simWeight + scoreSkim * battle.skimWeight
   }
 
-  private def calculateSimulationScore: Double = {
+  private def calculateSimulationScore11: Double = {
     if ( ! battle.simulated) return 0.0
     // This can happen when all simulated enemies run away and nobody does any damage
     if (battle.simulationCheckpoints.lastOption.forall(metric => metric.localHealthLostUs <= 0)) return 1.0

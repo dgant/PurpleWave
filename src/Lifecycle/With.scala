@@ -165,6 +165,8 @@ object With {
     // Normal systems //
     ////////////////////
 
+    With.logger.debug(f"${game.getGameType.toString.replace("_", " ")} on ${game.mapName} at ${game.mapFileName()} as ${self.fullDescription} with ${(self.allies ++ self.enemies).map(_.fullDescription).mkString(", ")}")
+
     //geo = new NeoGeo(game)
     if (With.configuration.visualizeDebug) {
       //NeoRender(geo)
@@ -226,7 +228,6 @@ object With {
   }
   
   private def analyzeTerrain(): Unit = {
-    With.logger.debug(f"Loading fake BWTA for ${game.mapName} at ${game.mapFileName()}")
     try {
       BWTA.readMap(game)
       BWTA.analyze()

@@ -30,8 +30,8 @@ trait ZonePathfinder {
   // The shortest path from other points of the zone may be different.
   protected def zonePathfind(from: Zone, to: Zone, pathHere: Vector[ZonePathNode] = Vector.empty): Option[ZonePath] = {
     from.lastPathfindId = pathfindId
-    val startTile = from.centroid
-    val endTile = to.centroid
+    val startTile = from.centroid.walkableTile
+    val endTile = to.centroid.walkableTile
     if ( ! With.paths.groundPathExists(startTile, endTile)) return None
     if (from == to) return Some(Types.ZonePath(from, to, pathHere))
 

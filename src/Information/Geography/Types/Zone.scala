@@ -37,6 +37,8 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   def heart     : Tile    = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
   def downtown  : Tile    = heart.center.midpoint(exitOriginal.map(_.pixelCenter).getOrElse(heart.center)).walkableTile
 
+  def exitNowOrHeart: Tile = exitNow.map(_.pixelCenter.walkableTile).getOrElse(heart)
+
   override def toString: String = f"$name ${if (bases.nonEmpty) f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) " else ""}$centroid"
 
   /////////////////////

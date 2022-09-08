@@ -19,7 +19,6 @@ import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvZ1RaxFE
-import Tactic.Tactics.DefendFightersAgainstRush
 
 class TvZ1RaxFE extends GameplanTemplate {
 

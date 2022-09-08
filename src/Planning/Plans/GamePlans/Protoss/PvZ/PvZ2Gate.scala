@@ -2,35 +2,68 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
 import Mathematics.Maff
-import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Access.PlaceLabels.DefendHall
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.DoQueue
+import Strategery.Strategies.Protoss.{PvZ1012, PvZ1BaseCorsair, PvZ4GateGoon, PvZ910, PvZZZCoreZ}
+import Utilities.{?, DoQueue}
 import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.{IsAll, IsAntiAir, IsWarrior}
 
-class PvZ2GateFlex extends GameplanImperative {
+class PvZ2Gate extends GameplanImperative {
 
   var anticipateSpeedlings: Boolean = false
-  var goSpeedlots: Boolean = false
-  var goCorsair: Boolean = true
-  var goObserver: Boolean = false
+  var goGoons     : Boolean = false
+  var goSpeedlots : Boolean = false
+  var goCorsair   : Boolean = true
+  var goObserver  : Boolean = false
 
-  override def executeBuild(): Unit = {
-    once(8, Protoss.Probe)
-    once(Protoss.Pylon)
-    once(10, Protoss.Probe)
-    once(Protoss.Gateway)
+  private def reactVs4Pool(): Unit = {
     if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(IsWarrior) < 5) {
+      once(8, Protoss.Probe)
+      once(Protoss.Pylon)
+      once(9, Protoss.Probe)
+      once(Protoss.Gateway)
       pumpSupply()
       pumpWorkers()
-      pump(Protoss.Zealot, 12)
+      pump(Protoss.Zealot)
     }
+  }
+  private def open910(): Unit = {
+    once(9, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(10, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(11, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(2, Protoss.Zealot)
+    once(12, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(13, Protoss.Probe)
+    once(4, Protoss.Zealot)
+    once(14, Protoss.Probe)
+    reactVs4Pool()
+    once(3, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(4, Protoss.Pylon)
+    once(17, Protoss.Probe)
+    once(7, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(5, Protoss.Pylon)
+    once(19, Protoss.Probe)
+  }
+  private def open1012(): Unit = {
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
     once(12, Protoss.Probe)
     once(2, Protoss.Gateway)
+    scoutOn(Protoss.Gateway, quantity = 2)
     once(13, Protoss.Probe)
     once(Protoss.Zealot)
     once(2, Protoss.Pylon)
@@ -41,7 +74,36 @@ class PvZ2GateFlex extends GameplanImperative {
     once(17, Protoss.Probe)
     once(5, Protoss.Zealot)
     once(18, Protoss.Probe)
-    if (anticipateSpeedlings) {
+  }
+  private def openZZCoreZ(): Unit = {
+    once(8,  Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    scoutOn(Protoss.Gateway)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(14, Protoss.Probe)
+    once(Protoss.Assimilator)
+    once(15, Protoss.Probe)
+    once(2, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(17, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(3, Protoss.Pylon)
+  }
+
+  override def executeBuild(): Unit = {
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    if (PvZ910()) open910()
+    if (PvZ1012()) open1012()
+    if (PvZZZCoreZ()) openZZCoreZ()
+    if (anticipateSpeedlings && PvZ1BaseCorsair()) {
       get(Protoss.Forge)
       once(19, Protoss.Probe)
       get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
@@ -50,34 +112,16 @@ class PvZ2GateFlex extends GameplanImperative {
       once(7, Protoss.Zealot)
       get(3, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
     }
-    once(4, Protoss.Pylon)
     once(Protoss.Assimilator)
     once(19, Protoss.Probe)
-    if (goCorsair) {
-      once(Protoss.CyberneticsCore)
-      once(7, Protoss.Zealot)
-      once(21, Protoss.Probe)
-      once(8, Protoss.Zealot)
-      once(1, Protoss.Dragoon)
-    } else if (goSpeedlots) {
-      once(Protoss.Forge)
-      once(7, Protoss.Zealot)
-      once(21, Protoss.Probe)
-      once(Protoss.GroundDamage)
-      once(9, Protoss.Zealot)
-    }
   }
+
   override def executeMain(): Unit = {
     if (enemyHydralisksLikely) status("Hydras")
     if (enemyMutalisksLikely) status("Mutas")
     if (enemyLurkersLikely) status("Lurkers")
-    if (bases < 2) {
-      status("Early")
-      earlyGame()
-    } else {
-      status("Late")
-      restOfGame()
-    }
+    if (bases < 2) { status("Early"); earlyGame() }
+    else { status("Late"); restOfGame() }
   }
 
   private val meldAllArchons = new MeldArchons
@@ -85,40 +129,42 @@ class PvZ2GateFlex extends GameplanImperative {
   private val meldSomeArchons = new MeldArchons(49)
   private val speedlingStrategies = Vector(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
   def earlyGame(): Unit = {
-    // Goal is to be home before any Mutalisks can pop.
-    // Optimization: Detect 2 vs 3 hatch muta and stay out the extra 30s vs 3hatch
-    scoutOn(Protoss.Gateway, quantity = 2)
-
     anticipateSpeedlings = enemyStrategy(speedlingStrategies: _*)
     anticipateSpeedlings ||= enemyRecentStrategy(speedlingStrategies: _*) && ! With.scouting.enemyMainFullyScouted
     anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()
     anticipateSpeedlings ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(4, 30)()
+    anticipateSpeedlings ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
     anticipateSpeedlings &&= ! enemyHydralisksLikely
     anticipateSpeedlings &&= ! enemyMutalisksLikely
     anticipateSpeedlings &&= ! enemyLurkersLikely
-    anticipateSpeedlings ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
 
-    goCorsair = ! anticipateSpeedlings
-    goCorsair &&= ! enemyHydralisksLikely
-    goCorsair ||= enemyMutalisksLikely
-    goSpeedlots = ! goCorsair || enemyBases > 2
-    goObserver = With.frame > GameTime(8, 30)()
-    goObserver &&= With.units.ours.exists(u => u.intent.toBuild.contains(Protoss.Nexus))
-    goObserver &&= safeAtHome
-    goObserver ||= enemyLurkersLikely
+    goGoons       = PvZ4GateGoon()
+    goGoons     ||= enemiesComplete(Zerg.Mutalisk, Zerg.Spire) > 0 && units(Protoss.Stargate) == 0
+    goCorsair     = ! anticipateSpeedlings
+    goCorsair   &&= ! enemyHydralisksLikely
+    goCorsair   ||= enemyMutalisksLikely
+    goCorsair   &&= PvZ1BaseCorsair()
+    goSpeedlots   = ! goCorsair || enemyBases > 2
+    goSpeedlots &&= ! goGoons
+    goObserver    = With.frame > GameTime(8, 30)()
+    goObserver  &&= With.units.ours.exists(u => u.intent.toBuild.contains(Protoss.Nexus))
+    goObserver  &&= safeAtHome
+    goObserver  ||= enemyLurkersLikely
 
-    val mutaFrame = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
-
-    var safeOutside = safeToMoveOut
-    safeOutside &&= ! goSpeedlots || upgradeComplete(Protoss.GroundDamage, 10) || unitsComplete(Protoss.Zealot) >= 11
-    var safeToExpand = safeOutside
-    safeToExpand &&= unitsComplete(IsWarrior) + 2 * unitsComplete(Protoss.Archon) >= 9
-    safeToExpand ||= unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Corsair) > 0 && enemies(Zerg.Hydralisk) == 0 && enemies(Zerg.Mutalisk) == 0
-    safeToExpand &&= ! anticipateSpeedlings || (unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Archon) > 0)
-    var shouldExpand = frame > mutaFrame
-    shouldExpand ||= enemiesComplete(Zerg.SunkenColony) > 1
-    shouldExpand &&= safeToExpand
-    var shouldAttack = safeOutside
+    // Goal is to be home before any Mutalisks can pop.
+    // Optimization: Detect 2 vs 3 hatch muta and stay out the extra 30s vs 3hatch
+    val armySize        = unitsComplete(IsWarrior) + unitsComplete(Protoss.Archon)
+    var safeOutside     = safeToMoveOut
+    safeOutside       &&= ! anticipateSpeedlings || upgradeComplete(Protoss.GroundDamage) || upgradeComplete(Protoss.DragoonRange) || armySize >= 12
+    var safeToExpand    = safeOutside
+    safeToExpand      &&= unitsComplete(IsWarrior) + 2 * unitsComplete(Protoss.Archon) >= 9
+    safeToExpand      ||= unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Corsair) > 0 && enemies(Zerg.Hydralisk) == 0 && enemies(Zerg.Mutalisk) == 0
+    safeToExpand      &&= ! anticipateSpeedlings || (unitsComplete(Protoss.DarkTemplar) > 0 && unitsComplete(Protoss.Archon) > 0)
+    val mutaFrame       = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
+    var shouldExpand    = frame > mutaFrame
+    shouldExpand      ||= enemiesComplete(Zerg.SunkenColony) > 1
+    shouldExpand      &&= safeToExpand
+    val shouldAttack    = safeOutside
 
     if (anticipateSpeedlings) status("Speedlings")
     if (goSpeedlots) status("Speedlots")
@@ -126,21 +172,36 @@ class PvZ2GateFlex extends GameplanImperative {
     if (goObserver) status("Obs")
     if (safeOutside) status("SafeOutside")
     if (safeToExpand) status("SafeToExpand")
-    if (shouldExpand) {
-      status("ShouldExpand")
-      requireMiningBases(2)
-    }
-    if (shouldAttack) {
-      status("Attack")
-      attack()
+    if (shouldExpand) { status("ShouldExpand"); requireMiningBases(2) }
+    if (shouldAttack) { status("Attack"); attack() }
+
+    if (goGoons || goCorsair) {
+      once(Protoss.CyberneticsCore)
+      once(7, Protoss.Zealot)
+      once(21, Protoss.Probe)
+      if (goGoons) {
+        once(2, Protoss.Dragoon)
+        once(Protoss.DragoonRange)
+        once(4, Protoss.Dragoon)
+        once(4, Protoss.Gateway)
+      } else {
+        once(8, Protoss.Zealot)
+        once(1, Protoss.Dragoon)
+      }
+    } else if (goSpeedlots) {
+      once(Protoss.Forge)
+      once(7, Protoss.Zealot)
+      once(21, Protoss.Probe)
+      once(Protoss.GroundDamage)
+      once(9, Protoss.Zealot)
     }
 
     if (goCorsair) {
-      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Stargate)
-      pump(Protoss.Corsair, if (enemyMutalisksLikely) 8 else if (enemyHydralisksLikely) 1 else 5)
+      get(Protoss.Stargate)
+      pump(Protoss.Corsair, ?(enemyMutalisksLikely, 8, ?(enemyHydralisksLikely, 1, 5)))
     }
     if (goObserver) {
-      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory)
+      get(Protoss.RoboticsFacility, Protoss.Observatory)
       pump(Protoss.Observer, 1)
     }
     if (enemyMutalisksLikely) {
@@ -148,9 +209,7 @@ class PvZ2GateFlex extends GameplanImperative {
       pump(Protoss.Dragoon)
     }
     meldAllArchons.update()
-    if (units(Protoss.TemplarArchives) > 0) {
-      once(2, Protoss.HighTemplar)
-    }
+    once(2 * units(Protoss.TemplarArchives), Protoss.HighTemplar)
     pump(Protoss.DarkTemplar, 1)
     pump(Protoss.HighTemplar)
     pump(Protoss.Zealot, 12)

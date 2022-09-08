@@ -28,7 +28,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   //////////////////////////
 
   // Simulation is expensive and gets less accurate as team sizes increase
-  lazy val skimWeight: Double = if (isGlobal) 0.0 else {
+  lazy val skimWeight: Double = if (isGlobal) 1.0 else {
     val output = teams.map(_.units.size).min / 20.0 + frameCreated / Minutes(20)() - 0.2
     if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
   }
@@ -38,7 +38,8 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val logSimulation    : Boolean               = With.configuration.debugging
   lazy val speedMultiplier  : Double                = if (isGlobal) 1.0 else judgmentModifiers.map(_.speedMultiplier).product
   lazy val judgmentModifiers: Seq[JudgmentModifier] = if (isGlobal) Seq.empty else JudgmentModifiers(this)
-
+  lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal
+  def      differential     : Double                = judgement.map(j => skimWeight * differentialSkim + simWeight * j.scoreSim11 * (us.skimStrengthTotal + enemy.skimStrengthTotal) / 2.0).getOrElse(differentialSkim)
 
   ////////////////////////
   // Simulation results //

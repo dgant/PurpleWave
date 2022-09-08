@@ -8,15 +8,22 @@ object Opponents {
 
   val defaultPvT = StrategySelectionGreedy()
   val defaultPvP = StrategySelectionGreedy()
-  val defaultPvZ = StrategySelectionFixed(PvZ2GateFlex)
+  val defaultPvZ = StrategySelectionGreedy()
 
-  // COG 2022
+  // AIIDE  2022
   val bananabrain : Opponent = add("BananaBrain", StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",    StrategySelectionGreedy())
-  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPGateCoreTech))
+  val daqin       : Opponent = add("DaQin",       StrategySelectionGreedy())
   val mcrave      : Opponent = add("McRave",      defaultPvZ)
   val microwave   : Opponent = add("Microwave",   defaultPvZ)
+  val steamhammer : Opponent = add("Steamhammer", defaultPvZ)
   val cunybot     : Opponent = add("CUNYbot",     defaultPvZ)
+  val dragon      : Opponent = add("Dragon",      defaultPvT)
+  val haopan      : Opponent = add("Hao Pan",     defaultPvT)
+  val ualbertabot : Opponent = add("UAlbertaBot", StrategySelectionFixed(PvR2Gate4Gate))
+
+  // COG 2022
+  val betastar    : Opponent = add("BetaStar",    StrategySelectionFixed(PvPRobo, PvPGateCoreTech))
   val xiaoyi      : Opponent = add("XIAOYI",      defaultPvT)
 
   // Aliased
@@ -28,7 +35,7 @@ object Opponents {
   val bryanweber        : Opponent = add("Bryan Weber",         cunybot.policy)
   val mcravez           : Opponent = add("McRaveZ",             mcrave.policy)
   //val chriscoxe         : Opponent = add("Chris Coxe",          zzzkbot.policy)
-  //val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
+  val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
   //val saida             : Opponent = add("SAIDA",               adias.policy)
   //val jadien            : Opponent = add("jadien",              adias.policy) // Local testing policy
 

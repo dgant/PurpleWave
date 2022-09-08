@@ -6,7 +6,9 @@ import Placement.Access.PlaceLabels
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
+import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.UnitInfo
 import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
 import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
@@ -33,10 +35,23 @@ class PvPLateGame extends GameplanImperative {
   private def targetProductionCapacity  : Int = miningBases * 4
   private def targetGateways            : Int = targetProductionCapacity - ?(shouldReaver, 2 * units(Protoss.RoboticsFacility), 0)
 
+  private def unitsNotStrengthening(player: PlayerInfo): Iterable[UnitInfo] = With.units.ever
+    .filter(_.player == player)
+    .filterNot(Protoss.Scarab)
+    .filter(u =>
+      ! u.alive
+      || u.isAny(Protoss.Nexus, Protoss.Forge, Protoss.PhotonCannon, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer))
+    .filterNot(u => Protoss.Nexus(u) && u.base.exists(_.isStartLocation))
+
+  private def skimEquivalent(unit: UnitInfo): Double = unit.subjectiveValue * Protoss.Zealot.skimulationValue / Protoss.Zealot.subjectiveValue
+
   override def executeBuild(): Unit = {
     expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
 
-    lazy val commitToTech = productionCapacity >= 5 && saturated
+    lazy val nonStrengthUs              = unitsNotStrengthening(With.self).map(skimEquivalent).sum
+    lazy val nonStrengthEnemy           = unitsNotStrengthening(With.enemy).map(skimEquivalent).sum
+    lazy val estimatedArmyDifferential  = With.battles.globalAway.differential + nonStrengthEnemy - nonStrengthUs
+    lazy val commitToTech               = productionCapacity >= 5 && saturated
     primaryTech = primaryTech
       .orElse(Some(RoboTech)    .filter(x => units(Protoss.RoboticsFacility) > 0))
       .orElse(Some(TemplarTech) .filter(x => units(Protoss.TemplarArchives) > 0))
@@ -54,7 +69,7 @@ class PvPLateGame extends GameplanImperative {
 
     fearDeath   = ! safeAtHome
     fearDeath   ||= unitsComplete(IsWarrior) < 8
-    fearDeath   ||= recentlyExpandedFirst && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
+    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
     fearDeath   &&= ! dtBraveryHome
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
@@ -75,6 +90,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
     shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    shouldAttack ||= estimatedArmyDifferential > 3 * Protoss.Dragoon.skimulationValue
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
     shouldAttack &&= ! fearDeath
     shouldAttack ||= shouldExpand && With.geography.safeExpansions.isEmpty

@@ -28,6 +28,10 @@ object StrategyGroups {
     PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
     PvZProxy2Gate, // Proxy builds are temporarily broken due to new building placer
+
+    PvZGatewayFE,
+    PvZFFE,
+    PvZ1BaseForgeTech
   )
 }
 

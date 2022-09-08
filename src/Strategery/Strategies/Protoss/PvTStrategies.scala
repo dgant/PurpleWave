@@ -38,6 +38,7 @@ object PvT13Nexus extends PvTOpener {
   override def startLocationsMin: Int = 4
   override def rushTilesMinimum: Int = 180
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
     With.fingerprints.bunkerRush,
@@ -46,12 +47,18 @@ object PvT13Nexus extends PvTOpener {
 object PvTRangeless extends PvTOpener {
   // Late scout + no range = Dangerous vs. aggressive builds
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
     With.fingerprints.bunkerRush,
     With.fingerprints.twoRax1113)
 }
-object PvT28Nexus extends PvTOpener
+object PvT28Nexus extends PvTOpener {
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs)
+}
 object PvTZealotExpand extends PvTOpener
 object PvTZZCoreZ extends PvTOpener
 object PvT1015 extends PvTOpener {
@@ -60,14 +67,19 @@ object PvT1015 extends PvTOpener {
   override def entranceRamped: Boolean = false
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
-    With.fingerprints.oneRaxFE
-  )
+    With.fingerprints.oneRaxFE)
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
-    With.fingerprints.wallIn
-  )
+    With.fingerprints.workerRush,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.wallIn)
 }
 object PvT1BaseReaver extends PvTOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvTMidgameReaver))
+  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs)
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
@@ -79,10 +91,13 @@ object PvT1BaseReaver extends PvTOpener {
 object PvTDT extends PvTOpener {
   override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(PvTMidgameStorm, PvTMidgameOpen))
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
+    With.fingerprints.twoRax1113,
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
-    With.fingerprints.threeFacVultures
-  )
+    With.fingerprints.threeFacVultures)
 }
 object PvT4Gate extends PvTOpener {
   override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForMassGoon
@@ -91,9 +106,11 @@ object PvT4Gate extends PvTOpener {
   override def responsesWhitelisted: Iterable[Fingerprint] = Seq(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
-    With.fingerprints.twoRaxAcad
-  )
+    With.fingerprints.twoRaxAcad)
   override def responsesBlacklisted: Iterable[Fingerprint] = Seq(
+    With.fingerprints.workerRush,
+    With.fingerprints.fiveRax,
+    With.fingerprints.bbs,
     With.fingerprints.wallIn
   )
 }

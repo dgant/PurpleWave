@@ -20,6 +20,7 @@ abstract class PvTOpeners extends GameplanImperative{
     else  if (PvTZZCoreZ())       openZZCoreZ()
     else  if (PvTRangeless())     open20Rangeless()
     else  if (PvT28Nexus())       open28Nexus()
+    else  if (PvT1015())          open1015()
     else  if (PvT4Gate())         open4Gate()
     else  if (PvT1BaseReaver())   openReaver()
     else  if (PvTDT())            openDT()
@@ -320,7 +321,10 @@ abstract class PvTOpeners extends GameplanImperative{
       if (units(Protoss.Reaver) > 1) requireMiningBases(2) else cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)
       pump(Protoss.Zealot)
       once(2, Protoss.Gateway)
-      once(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsSupportBay, Protoss.RoboticsSupportBay)
+      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs)) once(5, Protoss.Zealot) // I think this is best but am not sure
+      once(Protoss.Assimilator, Protoss.CyberneticsCore)
+      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs))  once(7, Protoss.Zealot) // I think this is best but am not sure
+      once(Protoss.RoboticsSupportBay, Protoss.RoboticsSupportBay)
       once(3, Protoss.Gateway)
       once(2, Protoss.Nexus)
     }

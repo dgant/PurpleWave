@@ -91,6 +91,7 @@ class Storyteller {
     new Story                           ("Aggression",          () => With.blackboard.aggressionRatio.get),
     new Story                           ("Should attack",       () => With.blackboard.wantToAttack.get),
     new Story                           ("Should harass",       () => With.blackboard.wantToHarass.get),
+    new Story                           ("Monitor bases",       () => With.blackboard.monitorBases.get),
     new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                    _.mkString(" "), expand = true),
     new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                  _.mkString(", "), expand = true),
     new Story                           ("Performance danger",  () => With.performance.danger),

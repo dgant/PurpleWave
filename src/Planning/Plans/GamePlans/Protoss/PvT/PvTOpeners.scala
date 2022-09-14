@@ -122,7 +122,7 @@ abstract class PvTOpeners extends GameplanImperative{
     once(21, Protoss.Probe)
     doOpeningReactions()
     once(2, Protoss.Nexus)
-    openingComplete ||= units(Protoss.Nexus) > 1
+    openingComplete ||= units(Protoss.Nexus) > 1 && unitsEver(Protoss.Dragoon) > 0
   }
 
   def open20Rangeless(): Unit = {

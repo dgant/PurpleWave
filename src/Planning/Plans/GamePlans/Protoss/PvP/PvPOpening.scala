@@ -119,6 +119,7 @@ class PvPOpening extends GameplanImperative {
             PvPGateCoreTech.swapIn()
           }
           PvPRobo.swapIn()
+          PvPReaver.swapIn()
           PvPDT.swapOut()
           PvPCoreExpand.swapOut()
           PvP3GateGoon.swapOut()
@@ -163,6 +164,7 @@ class PvPOpening extends GameplanImperative {
         PvP3GateGoon.swapOut()
         PvP4GateGoon.swapOut()
         PvPRobo.swapIn()
+        PvPObs.swapIn()
       }
     }
     // Robo is a very middle-of-the-road build, and has a few pointed weaknesses.
@@ -179,6 +181,8 @@ class PvPOpening extends GameplanImperative {
         && (With.fingerprints.robo() || ! With.fingerprints.dtRush.recently)
         && roll("SwapRoboIntoCoreExpand", ?(With.fingerprints.robo(), 0.6, 0.25))) {
         PvPRobo.swapOut()
+        PvPObs.swapOut()
+        PvPReaver.swapOut()
         PvPCoreExpand.swapIn()
       }
     }
@@ -190,6 +194,7 @@ class PvPOpening extends GameplanImperative {
         cannonExpand = true
       } else if (earlyForge && roll("SwapDTIntoRobo", 0.6)) {
         PvPRobo.swapIn()
+        PvPReaver.swapIn()
       } else if (roll("SwapDTIntoExpand", 0.6)) {
         PvPCoreExpand.swapIn()
       } else if (roll("SwapDTInto4Gate", 0.3)) {
@@ -204,7 +209,7 @@ class PvPOpening extends GameplanImperative {
       val archivesComplete  = caught.exists(c => Protoss.TemplarArchives(c) &&    c.complete)
       val archivesStarted   = caught.exists(c => Protoss.TemplarArchives(c) &&  ! c.complete)
       val citadelComplete   = caught.exists(c => Protoss.CitadelOfAdun(c)   &&    c.complete)
-      val maybeMirror       = enemyRecentStrategy(With.fingerprints.dtRush) && ! With.fingerprints.robo()
+      val maybeMirror       = enemyRecentStrategy(With.fingerprints.dtRush) &&  ! With.fingerprints.robo()
       val mirrorMultiplier  = ?(maybeMirror, 0.25, 1.0)
       var swapOutOfDT       = false
       if (archivesComplete) {
@@ -220,6 +225,7 @@ class PvPOpening extends GameplanImperative {
         PvPDT.swapOut()
         if (maybeMirror && roll("DTToRobo", 0.6)) {
           PvPRobo.swapIn()
+          PvPObs.swapIn()
         } else if ( ! citadelComplete && roll("DTToFE", 0.6)) {
           PvPCoreExpand.swapIn()
         } else if (roll("DTTo4Gate", 0.4)) {
@@ -241,41 +247,42 @@ class PvPOpening extends GameplanImperative {
     /////////////////////////////
 
     if (PvPRobo()) {
+      getReavers = PvPReaver() || units(Protoss.RoboticsSupportBay, Protoss.Shuttle) > 0
       getObservatory = true
       getObservers = true
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
-        getReavers = ! With.fingerprints.dtRush()
-        shuttleFirst = enemyBases > 1 || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst)
+        shuttleFirst = getReavers && (enemyBases > 1 || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst, With.fingerprints.robo))
       }
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
-      } else {
+      } else if ( ! PvPObs()) {
         // Look for reasons to avoid making an Observer.
         // Don't stop to check if we already started an Observatory or Observers
         // because we can cancel and switch out of them at any time.
         if (shuttleSpeed) {
           // This strategy demands a ton of gas; we can't afford the Observer
-          getObservatory = false
-          getObservers = false
+          getObservatory  = false
+          getObservers    = false
         } else if (enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
           // These builds generally let us rule out DT entirely
-          getObservatory = false
-          getObservers = false
+          getObservatory  = false
+          getObservers    = false
         } else if (With.strategy.isFixedOpponent) {
           // Obs is probably what we're here for, so let's not get too cute
         } else if (With.frame > GameTime(5, 15)() && ! With.fingerprints.dragoonRange()) {
           // If Dragoon range is supiciously absent we should prepare for DT
         } else if (trackRecordLacks(With.fingerprints.dtRush)) {
-          getObservatory = false
-          getObservers = false
+          getObservatory  = false
+          getObservers    = false
         } else if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
-          getObservatory = roll("SpeculativeObservatory",  0.2)
-          getObservers = getObservatory
+          getObservatory  = roll("SpeculativeObservatory",  0.2)
+          getObservers    = getObservatory
         } else {
           getObservatory  =                   roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
           getObservers    = getObservatory && roll("SpeculativeObservers",    ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
         }
       }
+      shuttleFirst &&= getReavers
       shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.0)
     } else if (PvPDT()) {
       greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
@@ -340,6 +347,7 @@ class PvPOpening extends GameplanImperative {
       // Amp up aggression to ensure we can get down our ramp
       aggression(1.0 + 0.25 * unitsComplete(Protoss.Reaver))
     }
+    PvPIdeas.considerMonitoring()
 
     /////////////
     // Logging //

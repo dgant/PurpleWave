@@ -157,6 +157,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldAttack) { status("Attack"); attack() }
     if (shouldHarass) { status("Harass"); harass() }
     primaryTech.map(_.toString.replaceAll("Tech", "")).foreach(status)
+    PvPIdeas.considerMonitoring()
   }
 
   override def executeMain(): Unit = {

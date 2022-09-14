@@ -28,6 +28,13 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def recentlyExpandedFirst: Boolean = With.scouting.weExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)()
 
+  def considerMonitoring(): Unit = {
+    With.blackboard.monitorBases.set(
+      ! enemyRobo
+      && enemies(Protoss.Observer, Protoss.DarkTemplar) == 0
+      && (units(Protoss.Observer) > 1 || ! enemyRecentStrategy(With.fingerprints.dtRush)))
+  }
+
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
   def dtBraveryHome   : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestArrival(Protoss.Observer)
   def pvpSafeToMoveOut: Boolean = {

@@ -70,7 +70,7 @@ class ProtossVsTerran extends PvTOpeners {
     def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
     def apply(): Unit = if ( ! queued) techs += this
     def started: Boolean // Have we invested anything significant into this tech?
-    def profited: Boolean // Have we finished the up-front investment to gain value out of ti
+    def profited: Boolean // Have we finished the up-front investment to gain value out of it
     def perform(): Unit
     def order: Int = if (techs.contains(this)) techs.indexOf(this) else techs.length
     def queued: Boolean = techs.contains(this)
@@ -239,6 +239,7 @@ class ProtossVsTerran extends PvTOpeners {
 
     if (shouldAttack) attack()
     harass()
+    With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
 
     val army = new DoQueue(doArmy)
     val tech = new DoQueue(doNextTech)

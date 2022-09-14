@@ -34,6 +34,7 @@ class Blackboard {
   val gasWorkerRatio          : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
   val yoloing                 : Property[Boolean]           = add(new Property(false))
   val allowIslandBases        : Property[Boolean]           = add(new Property(false))
+  val monitorBases            : Property[Boolean]           = add(new Property(false))
   val makeDarkArchons         : Property[Boolean]           = add(new Property(false))
   val pushKiters              : Property[Boolean]           = add(new Property(false))
   val floatableBuildings      : Property[Vector[UnitClass]] = add(new Property(Vector.empty))

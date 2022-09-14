@@ -20,6 +20,7 @@ abstract class PvTOpeners extends GameplanImperative{
     else  if (PvTZZCoreZ())       openZZCoreZ()
     else  if (PvTRangeless())     open20Rangeless()
     else  if (PvT28Nexus())       open28Nexus()
+    else  if (PVT910())           open910()
     else  if (PvT1015())          open1015()
     else  if (PvT4Gate())         open4Gate()
     else  if (PvT1BaseReaver())   openReaver()
@@ -165,6 +166,32 @@ abstract class PvTOpeners extends GameplanImperative{
     once(22, Protoss.Probe)
     once(4, Protoss.Dragoon)
     openingComplete ||= unitsEver(Protoss.Dragoon) > 3
+  }
+
+  def open910(): Unit = {
+    once(9, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(10, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(11, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(2, Protoss.Zealot)
+    once(12, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(13, Protoss.Probe)
+    once(4, Protoss.Zealot)
+    once(14, Protoss.Probe)
+    doOpeningReactions()
+    once(3, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(Protoss.Assimilator)
+    once(17, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(19, Protoss.Probe)
+    openingComplete ||= unitsEver(Protoss.Dragoon) > 1
   }
 
   def open1015(): Unit = {

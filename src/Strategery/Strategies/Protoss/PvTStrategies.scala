@@ -1,89 +1,67 @@
 package Strategery.Strategies.Protoss
 
-import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import Strategery.MapGroups
 import Strategery.Strategies.Strategy
-import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvTStrategy extends Strategy {
-  override def ourRaces    : Seq[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Seq[Race] = Vector(Race.Terran)
+  setOurRace(Race.Protoss)
+  setEnemyRace(Race.Terran)
 }
 
-object PvTEndgameCarrier extends PvTStrategy
-object PvTEndgameArbiter extends PvTStrategy
-object PvTEndgameStorm extends PvTStrategy
+object PvTEndgameCarrier  extends PvTStrategy
+object PvTEndgameArbiter  extends PvTStrategy
+object PvTEndgameStorm    extends PvTStrategy
 
-object PvTMidgameCarrier extends PvTStrategy {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTEndgameCarrier))
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.bio
-  )
-}
-object PvTMidgameReaver extends PvTStrategy {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm))
-}
-object PvTMidgameStorm extends PvTStrategy {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm))
-}
-object PvTMidgameOpen extends PvTStrategy {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm))
-}
+object PvTMidgameCarrier  extends PvTStrategy { setChoice(PvTEndgameCarrier); blacklistVs(With.fingerprints.bio) }
+object PvTMidgameReaver   extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
+object PvTMidgameStorm    extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
+object PvTMidgameOpen     extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
 
 abstract class PvTOpener extends PvTStrategy {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTMidgameCarrier, PvTMidgameReaver, PvTMidgameStorm, PvTMidgameOpen))
+  setChoice(PvTMidgameCarrier, PvTMidgameReaver, PvTMidgameStorm, PvTMidgameOpen)
 }
-object PvT13Nexus extends PvTOpener {
-  override def startLocationsMin: Int = 4
-  override def rushTilesMinimum: Int = 180
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.workerRush,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.bunkerRush,
-    With.fingerprints.twoRax1113)
-}
-object PvTRangeless extends PvTOpener {
-  // Late scout + no range = Dangerous vs. aggressive builds
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.workerRush,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
-    With.fingerprints.bunkerRush,
-    With.fingerprints.twoRax1113)
-}
-object PvT28Nexus extends PvTOpener {
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
+abstract class PvTOpenerNoZealot extends PvTOpener {
+  blacklistVs(
     With.fingerprints.workerRush,
     With.fingerprints.fiveRax,
     With.fingerprints.bbs)
 }
+abstract class PvTOpenerNoZealotNoRange extends PvTOpenerNoZealot {
+  blacklistVs(
+    With.fingerprints.bunkerRush,
+    With.fingerprints.twoRax1113)
+}
+object PvT13Nexus extends PvTOpenerNoZealotNoRange {
+  setStartLocationsMin(4)
+  setRushTilesMinimum(180)
+}
+object PvTRangeless extends PvTOpenerNoZealotNoRange
+object PvT28Nexus extends PvTOpenerNoZealot
 object PvTZealotExpand extends PvTOpener
 object PvTZZCoreZ extends PvTOpener
 object PVT910 extends PvTOpener {
-
-}
-object PvT1015 extends PvTOpener {
-  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForMassGoon
-  override def rushTilesMaximum: Int = 200
-  override def entranceRamped: Boolean = false
-  override def responsesWhitelisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.fourteenCC,
-    With.fingerprints.oneRaxFE)
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
+  whitelistVs(
     With.fingerprints.workerRush,
     With.fingerprints.fiveRax,
     With.fingerprints.bbs,
+    With.fingerprints.fourteenCC,
+    With.fingerprints.oneRaxFE)
+}
+object PvT1015 extends PvTOpenerNoZealot {
+  setRushTilesMaximum(200)
+  setEntranceRamped(false)
+  blacklistOn(MapGroups.badForMassGoon: _*)
+  whitelistVs(
+    With.fingerprints.fourteenCC,
+    With.fingerprints.oneRaxFE)
+  blacklistVs(
     With.fingerprints.wallIn)
 }
-object PvT1BaseReaver extends PvTOpener {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTMidgameReaver))
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.workerRush,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs)
-  override def responsesWhitelisted: Seq[Fingerprint] = Seq(
+object PvT1BaseReaver extends PvTOpenerNoZealot {
+  setChoice(PvTMidgameReaver)
+  whitelistVs(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
     With.fingerprints.twoFacVultures,
@@ -91,35 +69,27 @@ object PvT1BaseReaver extends PvTOpener {
     With.fingerprints.bio,
     With.fingerprints.twoRaxAcad)
 }
-object PvTDT extends PvTOpener {
-  override def choices: Seq[Seq[Strategy]] = Vector(Vector(PvTMidgameStorm, PvTMidgameOpen))
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.workerRush,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
+object PvTDT extends PvTOpenerNoZealot {
+  setChoice(PvTMidgameStorm, PvTMidgameOpen)
+  blacklistVs(
     With.fingerprints.twoRax1113,
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFacVultures)
 }
-object PvT4Gate extends PvTOpener {
-  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForMassGoon
-  override def rushTilesMaximum: Int = 200
-  override def entranceRamped: Boolean = false
-  override def responsesWhitelisted: Seq[Fingerprint] = Seq(
+object PvT4Gate extends PvTOpenerNoZealot {
+  setRushTilesMaximum(200)
+  setEntranceRamped(false)
+  blacklistOn(MapGroups.badForMassGoon: _*)
+  whitelistVs(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
     With.fingerprints.twoRaxAcad)
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.workerRush,
-    With.fingerprints.fiveRax,
-    With.fingerprints.bbs,
+  blacklistVs(
     With.fingerprints.wallIn
   )
 }
 object PvTProxy2Gate extends PvTOpener {
-  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
-    With.fingerprints.wallIn
-  )
+  blacklistOn(MapGroups.badForProxying: _*)
+  blacklistVs(With.fingerprints.wallIn)
 }

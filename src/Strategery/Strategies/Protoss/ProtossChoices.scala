@@ -37,6 +37,7 @@ object ProtossChoices {
 
   val pvtOpenersTransitioningFrom2Gate = Vector(
     PvTZZCoreZ, // Not really, but it should behave well
+    PVT910,
     PvT4Gate,
     PvT1015
   )

@@ -59,26 +59,27 @@ abstract class Strategy extends SimpleString {
   // 2022 style of implementing strategies: Mutators //
   /////////////////////////////////////////////////////
 
-  def setIslandMaps(value: Boolean): Unit = { _islandMaps = value }
-  def setGroundMaps(value: Boolean): Unit = { _groundMaps = value }
-  def setEntranceRamped(value: Boolean): Unit = { _entranceRamped = value }
-  def setEntranceFlat(value: Boolean): Unit = { _entranceFlat = value }
-  def setEntranceInverted(value: Boolean): Unit = { _entranceInverted = value }
-  def setFFA(value: Boolean): Unit = { _ffa = value }
-  def setAllowedVsHuman(value: Boolean): Unit = { _allowedVsHuman = value }
-  def setRushTilesMinimum(value: Int): Unit = { _rushTilesMinimum = value }
-  def setRushTilesMaximum(value: Int): Unit = { _rushTilesMaximum = value }
-  def setStartLocationsMin(value: Int): Unit = { _startLocationsMin = value }
-  def setStartLocationsMax(value: Int): Unit = { _startLocationsMax = value }
-  def setMinimumGamesPerOpponent(value: Int): Unit = { _minimumGamesVsOpponent = value }
-  def setWorkerDelta(value: Int): Unit = { _workerDelta = value }
-  def setOurRace(values: Race*): Unit = { _ourRaces = values }
-  def setEnemyRace(values: Race*): Unit = { _enemyRaces = values }
-  def whitelistMaps(maps: StarCraftMap*): Unit = { _mapsWhitelisted ++= maps }
-  def blacklistMaps(maps: StarCraftMap*): Unit = { _mapsBlacklisted ++= maps }
-  def whitelistVs(fingerprints: Fingerprint*): Unit = { _responsesWhitelisted ++= fingerprints }
-  def blacklistVs(fingerprints: Fingerprint*): Unit = { _responsesBlacklisted ++= fingerprints }
-  def choice(strategies: Strategy*): Unit = { _choices = _choices :+ strategies }
+  def setIslandMaps(value: Boolean)           : Unit = { _islandMaps = value }
+  def setGroundMaps(value: Boolean)           : Unit = { _groundMaps = value }
+  def setEntranceRamped(value: Boolean)       : Unit = { _entranceRamped = value }
+  def setEntranceFlat(value: Boolean)         : Unit = { _entranceFlat = value }
+  def setEntranceInverted(value: Boolean)     : Unit = { _entranceInverted = value }
+  def setFFA(value: Boolean)                  : Unit = { _ffa = value }
+  def setAllowedVsHuman(value: Boolean)       : Unit = { _allowedVsHuman = value }
+  def setRushTilesMinimum(value: Int)         : Unit = { _rushTilesMinimum = value }
+  def setRushTilesMaximum(value: Int)         : Unit = { _rushTilesMaximum = value }
+  def setStartLocationsMin(value: Int)        : Unit = { _startLocationsMin = value }
+  def setStartLocationsMax(value: Int)        : Unit = { _startLocationsMax = value }
+  def setMinimumGamesVsOpponent(value: Int)   : Unit = { _minimumGamesVsOpponent = value }
+  def setWorkerDelta(value: Int)              : Unit = { _workerDelta = value }
+  def setOurRace(values: Race*)               : Unit = { _ourRaces = values }
+  def setEnemyRace(values: Race*)             : Unit = { _enemyRaces = values }
+  def whitelistOn(maps: StarCraftMap*)        : Unit = { _mapsWhitelisted ++= maps }
+  def blacklistOn(maps: StarCraftMap*)        : Unit = { _mapsBlacklisted ++= maps }
+  def whitelistVs(fingerprints: Fingerprint*) : Unit = { _responsesWhitelisted ++= fingerprints }
+  def blacklistVs(fingerprints: Fingerprint*) : Unit = { _responsesBlacklisted ++= fingerprints }
+  def addChoice(strategies: Strategy*)        : Unit = { _choices = _choices :+ strategies }
+  def setChoice(strategies: Strategy*)        : Unit = { _choices = Seq(strategies) }
 
   /**
     * Flag a strategy as being salient to the gameplay.

@@ -6,31 +6,30 @@ import Strategery.Strategies.Strategy
 import bwapi.Race
 
 abstract class TvZStrategy extends Strategy {
-  override def ourRaces: Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
+  override def ourRaces: Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces: Seq[Race] = Seq(Race.Zerg)
 }
 
 abstract class TvZMidgame extends TvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(TvZSK))
+  override def choices: Seq[Seq[Strategy]] = Seq(
+    Seq(TvZSK))
 }
 
 object TvZ8Rax extends TvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(TvZRaxCCAcademy, TvZRaxCCRax),
-    Vector(TvZ5Rax, TvZ2RaxTech, TvZ2RaxTank))
+  override def choices: Seq[Seq[Strategy]] = Seq(
+    Seq(TvZRaxCCAcademy, TvZRaxCCRax),
+    Seq(TvZ5Rax, TvZ2RaxTech, TvZ2RaxTank))
 }
 
 object TvZ1RaxFE extends TvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(TvZRaxCCAcademy, TvZRaxCCRax),
-    Vector(TvZ5Rax, TvZ2RaxTech, TvZ2RaxTank))
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
+  override def choices: Seq[Seq[Strategy]] = Seq(
+    Seq(TvZRaxCCAcademy, TvZRaxCCRax),
+    Seq(TvZ5Rax, TvZ2RaxTech, TvZ2RaxTank))
+  override def responsesBlacklisted: Seq[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 
 object TvZ2RaxAcademy extends TvZStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(
-    Vector(TvZ5Rax))
+  override def choices: Seq[Seq[Strategy]] = Seq(Seq(TvZ5Rax))
 }
 
 object TvZRaxCCAcademy extends TvZStrategy

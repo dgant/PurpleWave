@@ -5,6 +5,6 @@ import bwapi.Race
 
 object TvRTinfoil extends Strategy {
   
-  override def ourRaces    : Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)
+  override def ourRaces    : Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces  : Seq[Race] = Seq(Race.Unknown)
 }

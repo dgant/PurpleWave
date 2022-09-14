@@ -7,8 +7,8 @@ import Strategery.{Heartbreak, StarCraftMap}
 import bwapi.Race
 
 abstract class ZvTStrategy extends Strategy {
-  override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Terran)
+  override def ourRaces: Seq[Race] = Vector(Race.Zerg)
+  override def enemyRaces: Seq[Race] = Vector(Race.Terran)
 }
 object ZvT13PoolMuta extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT13PoolMuta)
@@ -25,7 +25,7 @@ object ZvT2HatchLingBustMuta extends ZvTStrategy {
 }
 object ZvT3HatchLing extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT3HatchLing)
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Heartbreak)
+  override def mapsBlacklisted: Seq[StarCraftMap] = Seq(Heartbreak)
 }
 object ZvT2HatchLurker extends ZvTStrategy {
   override def gameplan: Option[Plan] = Some(new ZvT2HatchLurker)

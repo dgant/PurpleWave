@@ -10,7 +10,7 @@ object TvEProxyBBS extends Strategy {
   
   override def gameplan: Option[Plan] = { Some(new TvEProxyBBS) }
   
-  override def ourRaces: Iterable[Race] = Vector(Race.Terran)
+  override def ourRaces: Seq[Race] = Seq(Race.Terran)
 
-  override def mapsBlacklisted: Vector[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForProxying
 }

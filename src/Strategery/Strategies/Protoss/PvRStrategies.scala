@@ -9,8 +9,8 @@ import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvRStrategy extends Strategy {
-  override def ourRaces    : Iterable[Race] = Vector(Race.Protoss)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)
+  override def ourRaces    : Seq[Race] = Vector(Race.Protoss)
+  override def enemyRaces  : Seq[Race] = Vector(Race.Unknown)
 }
 
 abstract class PvR1GateCoreStrategy extends PvRStrategy {
@@ -31,8 +31,8 @@ object PvROpenZCoreZ extends PvR1GateCoreStrategy
 object PvROpen2Gate910 extends PvR2GateStrategy
 object PvROpen2Gate1012 extends PvR2GateStrategy
 object PvRProxy2Gate extends PvR2GateStrategy {
-  override def mapsBlacklisted: Iterable[StarCraftMap] = MapGroups.badForProxying
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
+  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForProxying
+  override def responsesBlacklisted: Seq[Fingerprint] = Seq(With.fingerprints.fourPool)
 }
 
 object PvR2Gate4Gate extends PvRStrategy {

@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Points, Tile}
 import Performance.Tasks.TimedTask
+import Planning.Predicates.MacroFacts
 
 import scala.collection.JavaConverters._
 
@@ -23,8 +24,10 @@ final class Geography extends TimedTask with GeographyCache with Expansions {
   def ourMetro                : Metro         = ourMain.metro
   def ourZones                : Vector[Zone]  = ourZonesCache()
   def ourBases                : Vector[Base]  = ourBasesCache()
+  def ourMiningBases          : Vector[Base]  = ourBases.filter(MacroFacts.isMiningBase)
   def ourBasesAndSettlements  : Vector[Base]  = (ourBases ++ ourSettlementsCache()).distinct
   def enemyBases              : Vector[Base]  = enemyBasesCache()
+  def enemyMiningBases        : Vector[Base]  = enemyBases.filter(MacroFacts.isMiningBase)
   def neutralBases            : Vector[Base]  = bases.filter(_.owner.isNeutral)
 
   def itinerary             (start: Base, end: Base): Iterable[Base] = if (Maff.normalizePiToPi(Maff.radiansTo(start.radians, end.radians)) > 0) itineraryClockwise(start, end) else itineraryCounterwise(start, end)

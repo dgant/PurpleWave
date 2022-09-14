@@ -6,6 +6,7 @@ import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import Strategery.StarCraftMap
 import Strategery.Strategies.Strategy
@@ -31,11 +32,14 @@ trait MacroCounting {
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
   def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
-  private val minedOutThreshold = 150 * 8
+  // Mineout thresold is is "how much we can mine from a patch in the time it takes to build a new town hall"
+  // 7 patch/base * (158mins/patch = 75secs/base * 24frames/sec * 0.044minerals/worker * 2workers/patch)
+  private val minedOutThreshold = 7 * 158
   def bases: Int = With.geography.ourBases.size
+  def miningBases: Int = With.geography.ourMiningBases.size
+  def ourBaseTownHalls: Iterable[FriendlyUnitInfo] = With.units.ours.filter(IsTownHall).filter(u => u.base.map(_.townHallTile).exists(u.tileTopLeft.tileDistanceManhattan(_) <= 3))
   def isMiningBase(base: Base): Boolean = base.minerals.size >= 5 && base.mineralsLeft > minedOutThreshold
-  def miningBases: Int = With.geography.ourBases.view.filter(_.townHall.isDefined).count(isMiningBase)
-  def mineralOnlyBase: Boolean = With.geography.ourBases.exists(base => base.gas.isEmpty && base.mineralsLeft > minedOutThreshold)
+  def mineralOnlyBase: Boolean = With.geography.ourMiningBases.exists(_.gas.isEmpty)
   def gasPumps: Int = With.geography.ourBases.map(_.gas.view.filter(_.isOurs).count(_.gasLeft > 300)).sum
 
   def techStarted(tech: Tech): Boolean = {

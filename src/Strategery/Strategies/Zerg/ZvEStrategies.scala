@@ -9,14 +9,14 @@ import Strategery.Strategies.Strategy
 import bwapi.Race
 
 class ZergStrategy extends Strategy {
-  override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
+  override def ourRaces: Seq[Race] = Seq(Race.Zerg)
 }
 
 object ZvE4Pool extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ZvE4Pool)
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Seq(Benzene)
+  override def mapsBlacklisted: Seq[StarCraftMap] = Seq(Benzene)
 
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(
+  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
     With.fingerprints.ninePool,
     With.fingerprints.overpool,
   )
@@ -25,7 +25,7 @@ object ZvE4Pool extends ZergStrategy {
 object ZvE9Pool2HatchSpeed extends ZergStrategy {
   override def gameplan: Option[Plan] = Some(new ZvE9Pool2HatchSpeed)
 
-  override def responsesBlacklisted: Iterable[Fingerprint] = Iterable(
+  override def responsesBlacklisted: Seq[Fingerprint] = Seq(
     With.fingerprints.wallIn,
     With.fingerprints.twoGate,
     With.fingerprints.tenHatch,

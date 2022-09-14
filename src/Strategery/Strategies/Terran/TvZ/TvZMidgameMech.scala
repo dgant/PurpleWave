@@ -5,6 +5,6 @@ import bwapi.Race
 
 object TvZMidgameMech extends Strategy {
   
-  override def ourRaces: Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
+  override def ourRaces: Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces: Seq[Race] = Seq(Race.Zerg)
 }

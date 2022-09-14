@@ -34,11 +34,11 @@ class MissionKillExpansion extends Mission {
     lock.acquire()
   }
 
-  def unitsRequired(base: Base): Int = Math.max(4, base.enemies.view.count(u => u.canAttack && ! u.unitClass.isWorker) * 3)
-
   private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(b => b.metro != base.metro && ! b.natural.contains(base))
   private def baseCloserToOurArmy(base: Base): Boolean = base.heart.groundPixels(With.scouting.ourMuscleOrigin) + 320 < base.heart.groundPixels(With.scouting.enemyThreatOrigin)
-  private def enoughKillers: Boolean = vicinity.base.forall(unitsRequired(_) > Maff.orElse(units, With.units.ours.filter(IsWarrior)).size)
+  private def unitsRequired(base: Base): Int = Math.max(4, base.enemies.view.count(u => u.canAttack && ! u.unitClass.isWorker) * 3)
+  private def unitsRequired(): Int = vicinity.base.map(unitsRequired).sum
+  private def enoughKillers: Boolean = Maff.orElse(units, With.recruiter.available.filter(IsWarrior)).size >= unitsRequired()
 
   override def run(): Unit = {
     if (vicinity.base.exists(b => units.exists(_.base.contains(b)))) {
@@ -47,7 +47,7 @@ class MissionKillExpansion extends Mission {
     if (duration > Minutes(3)()) { terminate("Exceeded duration"); return }
     if (With.framesSince(Math.max(launchFrame, lastFrameInBase)) > Minutes(1)()) { terminate("Left base or never made it in"); return }
     if ( ! vicinity.base.exists(_.isEnemy)) { terminate("Vicinity not an eligible base"); return }
-    if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired(vicinity.base.get)} "); return }
+    if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired()} "); return }
 
     SquadAutomation.targetRaid(this)
     SquadAutomation.formAndSend(this)

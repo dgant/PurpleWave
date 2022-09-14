@@ -3,13 +3,14 @@ package Planning.Plans.GamePlans.All
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Requests._
+import Mathematics.Maff
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
-import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
+import Planning.Plans.Macro.Expanding.BuildGasPumps
 import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Buildable
@@ -22,6 +23,12 @@ import Utilities.UnitFilters.UnitFilter
 
 trait MacroActions {
   def status(text: String): Unit = With.blackboard.status.set(With.blackboard.status() :+ text)
+  def recordRequestedBases(): Unit = {
+    val max = Maff.max(With.scheduler.requests.view.flatMap(_._2).filter(_.unit.exists(_.isTier1TownHall)).map(_.quantity)).getOrElse(0)
+    if (max > 0) {
+      status(f"${max}base")
+    }
+  }
 
   def attack(): Unit = With.blackboard.wantToAttack.set(true)
   def harass(): Unit = With.blackboard.wantToHarass.set(true)
@@ -105,14 +112,29 @@ trait MacroActions {
   def buildGasPumps(quantity: Int = Int.MaxValue): Unit = {
     new BuildGasPumps(quantity).update()
   }
+
+  // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
+  def expandOnce(): Unit = {
+    expandNTimes(1)
+  }
+  def expandNTimes(times: Int): Unit = {
+    if (times <= 0) return
+    get(MacroFacts.ourBaseTownHalls.count(_.complete) + times, With.self.townHallClass)
+  }
   def requireBases(count: Int): Unit = {
-    new RequireBases(count).update()
+    expandNTimes(count - MacroFacts.ourBaseTownHalls.count(_.complete))
   }
   def requireMiningBases(count: Int): Unit = {
-    new RequireMiningBases(count).update()
+    expandNTimes(count - MacroFacts.ourBaseTownHalls.filter(_.complete).count(_.base.exists(MacroFacts.isMiningBase)))
+  }
+  def approachBases(count: Int) : Unit = {
+    if (MacroFacts.ourBaseTownHalls.size < count) expandOnce()
   }
   def approachMiningBases(count: Int): Unit = {
-    if (MacroFacts.miningBases < count) requireMiningBases(MacroFacts.miningBases + 1)
+    if (MacroFacts.ourBaseTownHalls.count(_.base.exists(MacroFacts.isMiningBase)) < count) expandOnce()
+  }
+  def maintainMiningBases(max: Int = 10): Unit = {
+    approachMiningBases(Math.min(max, With.geography.maxMiningBasesOurs))
   }
 
   def buildDefensesAtBase(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], base: Base): Unit = {

@@ -6,15 +6,22 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
+import Utilities.?
 import bwapi.Race
 
 trait Expansions {
+
+  private var _maxMiningBasesOurs: Int = 1
+  private var _maxMiningBasesEnemy: Int = 1
   private var _safeExpansionPaths: Vector[(Base, Tile, TilePath)] = Vector.empty
   private var _safeExpansions : Vector[Base] = Vector.empty
   private var _preferredOurs  : Vector[Base] = Vector.empty
   private var _preferredEnemy : Vector[Base] = Vector.empty
 
+  def maxMiningBasesOurs        : Int          = _maxMiningBasesOurs
+  def maxMiningBasesEnemy       : Int          = _maxMiningBasesEnemy
   def preferredExpansionsOurs   : Vector[Base] = _preferredOurs
   def preferredExpansionsEnemy  : Vector[Base] = _preferredEnemy
   def safeExpansions            : Vector[Base] = _safeExpansions
@@ -25,6 +32,8 @@ trait Expansions {
   }
 
   protected def updateExpansions(): Unit = {
+    _maxMiningBasesOurs = Math.max(_maxMiningBasesOurs, With.geography.ourMiningBases.size)
+    _maxMiningBasesEnemy = Math.max(_maxMiningBasesOurs, With.geography.enemyMiningBases.size)
     _safeExpansionPaths = eligibleExpansions(With.self)
       .filter(_.isNeutral)
       .map(b => (b, Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).minBy(_.groundPixels(b.heart))))
@@ -73,10 +82,11 @@ trait Expansions {
       val nearEnemy         = distanceToMultiplier(distanceEnemy)
       val nearStrength      = distanceToMultiplier(distanceStrength)
       val nearThreat        = distanceToMultiplier(distanceThreat)
-      val factorNatural     = if (base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player)) 100.0 else 1.0
-      val factorGas         = if (adequateGas(base) || gasBases > gasBasesNeeded || player.gas > 800) 1.0 else if (gasBases == gasBasesNeeded) 0.75 else 0.1
-      val factorSafe        = if (_safeExpansions.contains(base) || player.isEnemy) 1.0 else 0.2
-      val output            = nearHome * nearStrength * factorNatural * factorGas * factorSafe - nearEnemy * nearThreat * shyness
+      val factorNatural     = ?(base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player), 100.0, 1.0)
+      val factorGas         = ?(adequateGas(base) || gasBases > gasBasesNeeded || player.gas > 800, 1.0, ?(gasBases == gasBasesNeeded, 0.75, 0.1))
+      val factorSafe        = ?(_safeExpansions.contains(base) || player.isEnemy, 1.0, 0.2)
+      val factorFullness    = ?(MacroFacts.isMiningBase(base), 1.0, 0.1)
+      val output            = nearHome * nearStrength * factorNatural * factorGas * factorSafe * factorFullness - nearEnemy * nearThreat * shyness
       output
     }
 

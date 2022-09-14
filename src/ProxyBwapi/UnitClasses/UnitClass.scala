@@ -9,6 +9,7 @@ import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.UnitFilters.UnitFilter
 import bwapi.{Race, UnitType}
 
@@ -397,9 +398,10 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
 
+  lazy val supplyNet    : Int = supplyProvided - supplyRequired
   lazy val mineralValue : Int = if (this == Zerg.Larva) 0 else mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue     : Int = if (this == Zerg.Larva) 0 else gasPrice     + buildUnitsSpent.map(_.gasValue).sum
-  lazy val copiesProduced: Int = if (isTwoUnitsInOneEgg) 2 else 1
+  lazy val copiesProduced: Int = ?(isTwoUnitsInOneEgg, 2, 1)
   lazy val subjectiveValue: Double =
     if (isSpell) 0 else if (this == Zerg.LurkerEgg) Zerg.Lurker.subjectiveValue else if (this == Zerg.Cocoon) Zerg.Guardian.subjectiveValue else (
       (mineralValue
@@ -411,6 +413,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
         * (if (this == Protoss.Carrier) 2.0 else 1.0)
         * (if (this == Protoss.Interceptor) 0.25 else 1.0)
         / copiesProduced)
+  lazy val isTier1TownHall: Boolean = ==(Terran.CommandCenter) || ==(Protoss.Nexus) || ==(Zerg.Hatchery)
 
   lazy val skimulationValue: Double =
     if (isWorker) 0.01

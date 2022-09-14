@@ -7,8 +7,8 @@ import bwapi.Race
 
 object TerranFFABio extends Strategy {
   
-  override def gameplan: Option[Plan] = {  Some(new TerranFFABio) }
+  override def gameplan: Option[Plan] = { Some(new TerranFFABio) }
   
-  override def ourRaces: Iterable[Race] = Vector(Race.Terran)
+  override def ourRaces: Seq[Race] = Seq(Race.Terran)
   override def ffa = true
 }

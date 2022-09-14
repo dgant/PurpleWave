@@ -6,11 +6,11 @@ import bwapi.Race
 
 object TvR1Rax extends Strategy {
   
-  override lazy val choices = Vector(
+  override lazy val choices = Seq(
     TerranChoices.tvtOpeners.filterNot(TvT14CC==),
     TerranChoices.tvpOpeners,
     TerranChoices.tvzOpeners)
   
-  override def ourRaces    : Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Unknown)
+  override def ourRaces    : Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces  : Seq[Race] = Seq(Race.Unknown)
 }

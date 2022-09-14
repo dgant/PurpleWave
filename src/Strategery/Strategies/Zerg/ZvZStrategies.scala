@@ -8,8 +8,8 @@ import Strategery.Strategies.Strategy
 import bwapi.Race
 
 abstract class ZvZStrategy extends Strategy {
-  override def ourRaces: Iterable[Race] = Vector(Race.Zerg)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Zerg)
+  override def ourRaces: Seq[Race] = Seq(Race.Zerg)
+  override def enemyRaces: Seq[Race] = Seq(Race.Zerg)
 }
 
 object ZvZ9PoolSpeed extends ZvZStrategy {
@@ -22,5 +22,5 @@ object ZvZ12Pool extends ZvZStrategy {
 
 object ZvZ10HatchLing extends ZvZStrategy {
   override def gameplan: Option[Plan] = Some(new ZvZ10HatchLing)
-  override def responsesBlacklisted: Iterable[Fingerprint] = Seq(With.fingerprints.fourPool)
+  override def responsesBlacklisted: Seq[Fingerprint] = Seq(With.fingerprints.fourPool)
 }

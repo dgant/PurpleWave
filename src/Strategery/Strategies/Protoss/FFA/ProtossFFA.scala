@@ -10,8 +10,8 @@ object ProtossFFA extends Strategy {
 
   override def gameplan: Option[Plan] = { Some(new ProtossFFA) }
   
-  override def ourRaces: Iterable[Race] = Vector(Race.Protoss)
+  override def ourRaces: Seq[Race] = Vector(Race.Protoss)
   override def ffa = true
   
-  override def mapsBlacklisted: Iterable[StarCraftMap] = Vector(Hunters)
+  override def mapsBlacklisted: Seq[StarCraftMap] = Vector(Hunters)
 }

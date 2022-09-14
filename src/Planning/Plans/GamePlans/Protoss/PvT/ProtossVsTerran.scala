@@ -77,7 +77,7 @@ class ProtossVsTerran extends PvTOpeners {
     override def toString: String = f"${super.toString}${if (profited) "(Done)" else if (started) "(Start)" else ""}"
   }
   object TechObservers extends TechTransition {
-    def started: Boolean = units(Protoss.Observatory) > 0
+    def started: Boolean = units(Protoss.Observatory) > 0 // TODO: Consider Robo, not being used for earlier tech
     def profited: Boolean = unitsEver(Protoss.Observer) > 0
     def perform(): Unit = {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
@@ -89,7 +89,7 @@ class ProtossVsTerran extends PvTOpeners {
     }
   }
   object TechReavers extends TechTransition {
-    def started: Boolean = unitsEver(Protoss.Reaver) > 0
+    def started: Boolean = unitsEver(Protoss.Reaver) > 0 // TODO: Consider Robo+Bay, not being used for earlier tech
     def profited: Boolean = unitsEver(Protoss.Reaver) > 1
     def perform(): Unit = {
       get(Protoss.RoboticsFacility)
@@ -192,10 +192,10 @@ class ProtossVsTerran extends PvTOpeners {
     gatewayNeed         = Math.max(gatewayNeed, ?(enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac), 3, 0))
     gatewayNeed         = Math.min(gatewayNeed, gatewayWant)
     val vulturesEnemy   = With.units.enemy.count(Terran.Vulture)
-    val antiVulture     = With.units.ours.filter(_.isAny(Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Protoss.Carrier)).map(_.unitClass.supplyRequired / 2).sum
-    val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(u => if (Terran.Vulture(u)) 1.5 else if (IsTank(u)) 2.5 else u.unitClass.supplyRequired / 4.0).sum
-    val armySizeNow     = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
-    var armySizeMinimum = 1.5 * armySizeEnemy
+    val antiVulture     = With.units.ours.filter(_.isAny(Protoss.Dragoon, Protoss.Reaver, Protoss.Scout, Protoss.Carrier)).map(_.unitClass.supplyRequired / 2.0).sum
+    val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(u => ?(Terran.Vulture(u), 1.5, ?(IsTank(u), 2.5, u.unitClass.supplyRequired / 4.0))).sum
+    val armySizeUd      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
+    var armySizeMinimum = 1.2 * armySizeEnemy
     armySizeMinimum     = Math.max(armySizeMinimum, 12 * techsComplete)
     armySizeMinimum     = Math.max(armySizeMinimum, 6 * Math.max(1, miningBases - 1))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.siegeExpand(),  4, 0))
@@ -203,13 +203,13 @@ class ProtossVsTerran extends PvTOpeners {
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       10, 0))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     12, 0))
     armySizeMinimum     = Math.min(armySizeMinimum, 200 - workerGoal)
-    var armySizeLow     = armySizeNow < armySizeMinimum || With.battles.globalHome.judgement.exists(_.confidence01Total < With.scouting.enemyProximity)
+    var armySizeLow     = armySizeUd < armySizeMinimum || With.battles.globalHome.judgement.exists(_.confidence01Total < With.scouting.enemyProximity)
     armySizeLow       &&= unitsComplete(Protoss.DarkTemplar) == 0 || enemyHasShown(Terran.SpellScannerSweep, Terran.SpiderMine, Terran.ScienceVessel)
     val zealotAggro     = frame < Minutes(4)() && unitsComplete(Protoss.Zealot) > 0
     val pushMarines     = barracksCheese && ! With.strategy.isRamped
     val mineContain     = enemyHasShown(Terran.SpiderMine) && unitsComplete(Protoss.Observer) == 0
     val vultureContain  = vulturesEnemy > antiVulture * ?(enemyHasUpgrade(Terran.VultureSpeed), 1.25, 1.5)
-    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures) && (armySizeNow < 12 || unitsComplete(Protoss.Observer) == 0)
+    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures) && (armySizeUd < 12 || unitsComplete(Protoss.Observer) == 0)
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
     val nascentCarriers = TechCarrier.started && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
     val encroaching     = With.scouting.enemyProximity > 0.65
@@ -237,12 +237,11 @@ class ProtossVsTerran extends PvTOpeners {
     if (nascentCarriers) status("NascentCarriers")
     if (encroaching) status("Encroaching")
 
-    if (shouldAttack) {
-      attack()
-    }
+    if (shouldAttack) attack()
     harass()
 
     val army = new DoQueue(doArmy)
+    val tech = new DoQueue(doNextTech)
 
     ////////////////
     // Transition //
@@ -250,6 +249,9 @@ class ProtossVsTerran extends PvTOpeners {
 
     get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
     if (armySizeLow) {
+      if (miningBases > 1 && gasPumps > 1 && techs.exists(t => t.started && ! t.profited)) {
+        tech()
+      }
       army()
       get(Protoss.DragoonRange)
     }
@@ -271,7 +273,9 @@ class ProtossVsTerran extends PvTOpeners {
     // Spend //
     ///////////
 
-    doNextTech()
+    maintainMiningBases(4)
+    recordRequestedBases()
+    tech()
     army()
     get(?(armySizeLow, gatewayWant, gatewayNeed), Protoss.Gateway)
     approachMiningBases(3)

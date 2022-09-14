@@ -9,32 +9,76 @@ import Utilities.LightYear
 import bwapi.Race
 
 abstract class Strategy extends SimpleString {
-  
   override val toString: String = ToString(this)
-  
   def gameplan: Option[Plan] = { None }
+
+  private var _islandMaps             : Boolean             = false
+  private var _groundMaps             : Boolean             = true
+  private var _entranceRamped         : Boolean             = true
+  private var _entranceFlat           : Boolean             = true
+  private var _entranceInverted       : Boolean             = true
+  private var _ffa                    : Boolean             = false
+  private var _allowedVsHuman         : Boolean             = true
+  private var _rushTilesMinimum       : Int                 = - LightYear()
+  private var _rushTilesMaximum       : Int                 =   LightYear()
+  private var _startLocationsMin      : Int                 = 2
+  private var _startLocationsMax      : Int                 = 16
+  private var _minimumGamesVsOpponent : Int                 = 0
+  private var _workerDelta            : Int                 = 0
+  private var _ourRaces               : Seq[Race]           = Seq(Race.Terran, Race.Protoss, Race.Zerg)
+  private var _enemyRaces             : Seq[Race]           = Seq(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
+  private var _mapsBlacklisted        : Seq[StarCraftMap]   = Seq.empty
+  private var _mapsWhitelisted        : Seq[StarCraftMap]   = Seq.empty
+  private var _responsesBlacklisted   : Seq[Fingerprint]    = Seq.empty
+  private var _responsesWhitelisted   : Seq[Fingerprint]    = Seq.empty
+  private var _choices                : Seq[Seq[Strategy]]  = Seq.empty
   
-  def choices                 : Iterable[Iterable[Strategy]]    = Iterable.empty
-  def islandMaps              : Boolean                         = false
-  def groundMaps              : Boolean                         = true
-  def entranceRamped          : Boolean                         = true
-  def entranceFlat            : Boolean                         = true
-  def entranceInverted        : Boolean                         = true
-  def rushTilesMinimum        : Int                             = - LightYear()
-  def rushTilesMaximum        : Int                             =   LightYear()
-  def multipleEntrances       : Boolean                         = true
-  def ourRaces                : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg)
-  def enemyRaces              : Iterable[Race]                  = Vector(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
-  def startLocationsMin       : Int                             = 2
-  def startLocationsMax       : Int                             = 1000
-  def ffa                     : Boolean                         = false
-  def mapsBlacklisted         : Iterable[StarCraftMap]          = Vector.empty
-  def mapsWhitelisted         : Option[Iterable[StarCraftMap]]  = None
-  def responsesBlacklisted    : Iterable[Fingerprint]           = Vector.empty
-  def responsesWhitelisted    : Iterable[Fingerprint]           = Vector.empty
-  def allowedVsHuman          : Boolean                         = false
-  def minimumGamesVsOpponent  : Int                             = 0
-  def workerDelta             : Int                             = 0
+  def islandMaps              : Boolean             = _islandMaps
+  def groundMaps              : Boolean             = _groundMaps
+  def entranceRamped          : Boolean             = _entranceRamped
+  def entranceFlat            : Boolean             = _entranceFlat
+  def entranceInverted        : Boolean             = _entranceInverted
+  def ffa                     : Boolean             = _ffa
+  def allowedVsHuman          : Boolean             = _allowedVsHuman
+  def rushTilesMinimum        : Int                 = _rushTilesMinimum
+  def rushTilesMaximum        : Int                 = _rushTilesMaximum
+  def startLocationsMin       : Int                 = _startLocationsMin
+  def startLocationsMax       : Int                 = _startLocationsMax
+  def minimumGamesVsOpponent  : Int                 = _minimumGamesVsOpponent
+  def workerDelta             : Int                 = _workerDelta
+  def ourRaces                : Seq[Race]           = _ourRaces
+  def enemyRaces              : Seq[Race]           = _enemyRaces
+  def mapsBlacklisted         : Seq[StarCraftMap]   = _mapsBlacklisted
+  def mapsWhitelisted         : Seq[StarCraftMap]   = _mapsWhitelisted
+  def responsesBlacklisted    : Seq[Fingerprint]    = _responsesBlacklisted
+  def responsesWhitelisted    : Seq[Fingerprint]    = _responsesWhitelisted
+  def choices                 : Seq[Seq[Strategy]]  = _choices
+
+
+  /////////////////////////////////////////////////////
+  // 2022 style of implementing strategies: Mutators //
+  /////////////////////////////////////////////////////
+
+  def setIslandMaps(value: Boolean): Unit = { _islandMaps = value }
+  def setGroundMaps(value: Boolean): Unit = { _groundMaps = value }
+  def setEntranceRamped(value: Boolean): Unit = { _entranceRamped = value }
+  def setEntranceFlat(value: Boolean): Unit = { _entranceFlat = value }
+  def setEntranceInverted(value: Boolean): Unit = { _entranceInverted = value }
+  def setFFA(value: Boolean): Unit = { _ffa = value }
+  def setAllowedVsHuman(value: Boolean): Unit = { _allowedVsHuman = value }
+  def setRushTilesMinimum(value: Int): Unit = { _rushTilesMinimum = value }
+  def setRushTilesMaximum(value: Int): Unit = { _rushTilesMaximum = value }
+  def setStartLocationsMin(value: Int): Unit = { _startLocationsMin = value }
+  def setStartLocationsMax(value: Int): Unit = { _startLocationsMax = value }
+  def setMinimumGamesPerOpponent(value: Int): Unit = { _minimumGamesVsOpponent = value }
+  def setWorkerDelta(value: Int): Unit = { _workerDelta = value }
+  def setOurRace(values: Race*): Unit = { _ourRaces = values }
+  def setEnemyRace(values: Race*): Unit = { _enemyRaces = values }
+  def whitelistMaps(maps: StarCraftMap*): Unit = { _mapsWhitelisted ++= maps }
+  def blacklistMaps(maps: StarCraftMap*): Unit = { _mapsBlacklisted ++= maps }
+  def whitelistVs(fingerprints: Fingerprint*): Unit = { _responsesWhitelisted ++= fingerprints }
+  def blacklistVs(fingerprints: Fingerprint*): Unit = { _responsesBlacklisted ++= fingerprints }
+  def choice(strategies: Strategy*): Unit = { _choices = _choices :+ strategies }
 
   /**
     * Flag a strategy as being salient to the gameplay.

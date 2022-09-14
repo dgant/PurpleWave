@@ -7,19 +7,19 @@ import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class TvTStrategy extends Strategy {
-  override def ourRaces    : Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces  : Iterable[Race] = Vector(Race.Terran)
+  override def ourRaces    : Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces  : Seq[Race] = Seq(Race.Terran)
 }
 
 abstract class TvTOpening extends TvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+  override def choices: Seq[Seq[Strategy]] = Seq(Seq(
     TvT5Fac, TvT2Base2Port, TvT2BaseBC
   ))
 }
 
 object TvTProxy5Rax extends TvTStrategy {
   override def gameplan: Option[Plan] = Some(new TvTProxy5Rax)
-  override def mapsBlacklisted: Vector[StarCraftMap] = MapGroups.badForProxying
+  override def mapsBlacklisted: Seq[StarCraftMap] = MapGroups.badForProxying
 }
 
 
@@ -29,12 +29,12 @@ object TvT1FacFE extends TvTOpening
 object TvT1FacPort extends TvTOpening
 object TvT2FacTanks extends TvTOpening
 object TvT2Port extends TvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+  override def choices: Seq[Seq[Strategy]] = Seq(Seq(
     TvT2Base2Port, TvT2BaseBC
   ))
 }
 object TvT2Base2Port extends TvTStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+  override def choices: Seq[Seq[Strategy]] = Seq(Seq(
     TvT2BaseBC
   ))
 }

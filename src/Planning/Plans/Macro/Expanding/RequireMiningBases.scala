@@ -1,11 +1,14 @@
 package Planning.Plans.Macro.Expanding
 
 import Debugging.English
-import Planning.Predicates.MacroFacts
+import Planning.Plan
+import Planning.Plans.GamePlans.All.MacroActions
 
-class RequireMiningBases(basesInitial: Int = 1) extends RequireBases(basesInitial) {
+class RequireMiningBases(bases: Int = 1) extends Plan with MacroActions {
 
-  override protected def basesNow: Int = MacroFacts.miningBases
+  override def onUpdate(): Unit = {
+    requireMiningBases(bases)
+  }
 
-  override def toString: String = f"Require $basesInitial ${English.pluralize("mining base", basesInitial)}"
+  override def toString: String = f"Require $bases ${English.pluralize("mining base", bases)}"
 }

@@ -259,13 +259,15 @@ class PvZ2Gate extends GameplanImperative {
       status("ExpandUnlocked")
       expand()
     }
+    maintainMiningBases(3)
+    recordRequestedBases()
     if (enemyLurkersLikely) {
       techRobo()
     }
     upgrades()
     trainCorsairs()
     val minCannons = Maff.fromBoolean(With.fingerprints.twoHatchGas()) + enemiesComplete(Zerg.Spire)
-    var mutaCannons = Maff.clamp(enemies(Zerg.Mutalisk) / 3, minCannons, 3)
+    val mutaCannons = Maff.clamp(enemies(Zerg.Mutalisk) / 3, minCannons, 3)
     if (mutaCannons > 0) {
       buildCannonsAtBases(mutaCannons, DefendHall)
     }
@@ -369,11 +371,6 @@ class PvZ2Gate extends GameplanImperative {
   }
 
   def doExpand(): Unit = {
-    if (With.units.ours.filter(Protoss.Nexus).forall(_.complete)) {
-      requireMiningBases(
-        Math.min(
-          miningBases + 1,
-          2 + Math.min(unitsComplete(IsWarrior) / 20, 2)))
-    }
+    approachMiningBases(2 + Math.min(unitsComplete(IsWarrior) / 20, 2))
   }
 }

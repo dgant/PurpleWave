@@ -164,7 +164,6 @@ class PvPLateGame extends GameplanImperative {
     val addProduction = new DoQueue(doAddProduction)
     val tech1         = new DoQueue(doPrimaryTech)
     val tech2         = new DoQueue(doSecondaryTech)
-    val expand        = new DoQueue(doExpand)
     val cannons       = new DoQueue(doCannons)
 
     get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
@@ -172,8 +171,12 @@ class PvPLateGame extends GameplanImperative {
     get(Protoss.DragoonRange)
 
     if (shouldExpand) {
-      expand()
+      expandOnce()
     }
+    if (With.scouting.enemyProximity < 0.65) {
+      maintainMiningBases()
+    }
+    recordRequestedBases()
     if (saturated) {
       buildGasPumps()
     }
@@ -191,7 +194,7 @@ class PvPLateGame extends GameplanImperative {
     }
     trainArmy()
     addProduction()
-    expand()
+    expandOnce()
     tech2()
   }
 
@@ -257,10 +260,6 @@ class PvPLateGame extends GameplanImperative {
     } else if (primaryTech.contains(TemplarTech)) {
       doRobo()
     }
-  }
-
-  private def doExpand(): Unit = {
-    get(unitsComplete(Protoss.Nexus) + 1, Protoss.Nexus)
   }
 
   private def doRobo(): Unit = {

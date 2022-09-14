@@ -30,7 +30,7 @@ class StrategyLegality(strategy: Strategy) {
   val rushOkay                = With.strategy.rushDistanceMean > strategy.rushTilesMinimum && With.strategy.rushDistanceMean < strategy.rushTilesMaximum
   val startLocations          = With.geography.startLocations.size
   val disabledInPlaybook      = With.configuration.playbook.disabled.contains(strategy)
-  val disabledOnMap           = strategy.mapsBlacklisted.exists(_()) || ! strategy.mapsWhitelisted.forall(_.exists(_()))
+  val disabledOnMap           = strategy.mapsBlacklisted.exists(_()) || (strategy.mapsWhitelisted.nonEmpty && ! strategy.mapsWhitelisted.exists(_()))
   val appropriateForOurRace   = strategy.ourRaces.exists(ourRace==)
   val appropriateForEnemyRace = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
   val allowedGivenHumanity    = strategy.allowedVsHuman || ! With.configuration.humanMode

@@ -4,12 +4,12 @@ import Strategery.Strategies.Strategy
 import bwapi.Race
 
 abstract class TvPStrategy extends Strategy {
-  override def ourRaces: Iterable[Race] = Vector(Race.Terran)
-  override def enemyRaces: Iterable[Race] = Vector(Race.Protoss)
+  override def ourRaces: Seq[Race] = Seq(Race.Terran)
+  override def enemyRaces: Seq[Race] = Seq(Race.Protoss)
 }
 
 abstract class TvPOpening extends TvPStrategy {
-  override def choices: Iterable[Iterable[Strategy]] = Vector(Vector(
+  override def choices: Seq[Seq[Strategy]] = Seq(Seq(
     TvP6Fac,
     TvPDeep4,
     TvP2Armory

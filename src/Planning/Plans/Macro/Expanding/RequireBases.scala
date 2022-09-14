@@ -1,20 +1,15 @@
 package Planning.Plans.Macro.Expanding
 
-import Lifecycle.With
-import Macro.Requests.Get
+import Debugging.English
 import Planning.Plan
+import Planning.Plans.GamePlans.All.MacroActions
 
-class RequireBases(basesDesired: Int = 1) extends Plan {
+class RequireBases(bases: Int = 1) extends Plan with MacroActions {
 
-  protected def basesNow: Int = With.geography.ourBases.size
-  
   override def onUpdate(): Unit = {
-    val basesAll  = With.geography.ourBases.size
-    val goal      = basesDesired + basesAll - basesNow
-    
-    if (goal > 0) {
-      With.scheduler.request(this, Get(goal, With.self.townHallClass))
-    }
+    requireBases(bases)
   }
+
+  override def toString: String = f"Require $bases ${English.pluralize("base", bases)}"
 }
 

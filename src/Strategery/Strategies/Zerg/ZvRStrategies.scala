@@ -5,7 +5,7 @@ import Planning.Plans.GamePlans.Zerg.ZvE.ZvR9Pool
 import bwapi.Race
 
 abstract class ZvRStrategy extends ZergStrategy {
-  override def enemyRaces: Iterable[Race] = Vector(Race.Unknown)
+  override def enemyRaces: Seq[Race] = Seq(Race.Unknown)
 }
 
 object ZvR9Pool extends ZvRStrategy {

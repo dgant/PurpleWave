@@ -179,30 +179,34 @@ object Templates {
       .forMineralDirection(Directions.Right)
       .forGasDirection(Directions.Up)
       .from(
-        "-TxxGxxxCMx",
-        "-xxxxxxxxxx",
-        "SIxxPM--CMU",
-        "xxxxxx--xx-",
-        "xxxx-------",
-        "SIxxHxxx---",
-        "xxxxxxxxCMI",
-        "xxxxxxxxxx-"),
+        "x---xxxxxxxxx",
+        "x-TxxGxxxCMx",
+        "--xxxxxxxxxx",
+        "-SIxxPM--CMU",
+        "-xxxxxx--xx-",
+        "-xxxx-------",
+        "-SIxxHxxx---",
+        "-xxxxxxxxCMI",
+        "-xxxxxxxxxx-",
+        "----xxxxxxxx"),
     // This one is adapted from ASL13 RO8 Rain vs. Soulkey game 2 @ 7:47 (36:48 on Tastosis VOD).
     new Template()
       .forRaces(Race.Protoss)
       .forMineralDirection(Directions.Left)
       .forGasDirection(Directions.Up)
       .from(
-        "CMIxxxSIxx",
-        "xxxxxxxxxx",
-        "x-----xxxx",
-        "x-PM--SIxx",
-        "x-xx--xxxx",
-        "--Hxxxxxxx",
-        "CMxxxxTxxx",
-        "xxxxxxxxxx",
-        "--CM2UTxxx",
-        "--xxxxxxxx")) ++ bases // Default to generic base layouts if needed
+        "xxxxxxxx---",
+        "CMIxxxSIxx-",
+        "xxxxxxxxxx-",
+        "x-----xxxx-",
+        "x-PM--SIxx-",
+        "x-xx--xxxx-",
+        "--Hxxxxxxx-",
+        "CMxxxxTxxx-",
+        "xxxxxxxxxx-",
+        "--CM2UTxxx-",
+        "--xxxxxxxx-",
+        "xxxxxxx----")) ++ bases // Default to generic base layouts if needed
 
   val initialLayouts = Seq(
     // It's critical that the Gateways not have tech buildings below them.

@@ -52,7 +52,7 @@ trait Expansions {
     _safeExpansions = _preferredOurs.filter(_safeExpansions.contains)
   }
 
-  private def distanceToMultiplier(value: Double): Double = 1.0 - Maff.clamp(value / 256.0, 0.0, 0.9)
+  private def distanceToMultiplier(value: Double): Double = 1.0 - Maff.clamp(value / 256.0, 0.0, 0.75)
   private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
@@ -82,7 +82,7 @@ trait Expansions {
       val nearEnemy         = distanceToMultiplier(distanceEnemy)
       val nearStrength      = distanceToMultiplier(distanceStrength)
       val nearThreat        = distanceToMultiplier(distanceThreat)
-      val factorNatural     = ?(base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player), 100.0, 1.0)
+      val factorNatural     = ?(base.naturalOf.exists(_.owner == player) || base.natural.exists(_.owner == player), 1000.0, 1.0)
       val factorGas         = ?(adequateGas(base) || gasBases > gasBasesNeeded || player.gas > 800, 1.0, ?(gasBases == gasBasesNeeded, 0.75, 0.1))
       val factorSafe        = ?(_safeExpansions.contains(base) || player.isEnemy, 1.0, 0.2)
       val factorFullness    = ?(MacroFacts.isMiningBase(base), 1.0, 0.1)

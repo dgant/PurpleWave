@@ -86,7 +86,9 @@ class Fingerprints {
   lazy val rampBlock            = addFingerprint(new FingerprintRampBlock)
   // Terran
   lazy val bunkerRush           = addFingerprint(new FingerprintBunkerRush)
+  lazy val proxyRax             = addFingerprint(new FingerprintProxyRax)
   lazy val fiveRax              = addFingerprint(new Fingerprint5Rax)
+  lazy val eightRax             = addFingerprint(new Fingerprint8Rax)
   lazy val bbs                  = addFingerprint(new FingerprintBBS)
   lazy val twoRax1113           = addFingerprint(new Fingerprint2Rax1113)
   lazy val twoRaxAcad           = addFingerprint(new Fingerprint2RaxAcad)

@@ -722,7 +722,7 @@ class PvPOpening extends GameplanImperative {
         once(Protoss.Shuttle)
       }
       get(Protoss.DragoonRange)
-      if (shouldExpand && (With.scouting.weControlOurNatural || unitsComplete(Protoss.Reaver) > 1)) {
+      if (shouldExpand && (With.scouting.weControlOurNatural || units(Protoss.Reaver) > 1)) {
         expand()
       }
       trainRoboUnits()

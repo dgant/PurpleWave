@@ -44,7 +44,9 @@ object PvTZZCoreZ extends PvTOpener
 object PVT910 extends PvTOpener {
   whitelistVs(
     With.fingerprints.workerRush,
+    With.fingerprints.proxyRax,
     With.fingerprints.fiveRax,
+    With.fingerprints.eightRax,
     With.fingerprints.bbs,
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE)

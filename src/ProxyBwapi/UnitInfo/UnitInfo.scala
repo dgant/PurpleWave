@@ -21,6 +21,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
 import bwapi.Color
 
@@ -168,6 +169,12 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
         (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutVisionRange))     ||
         (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.OverlordVisionRange)))
       64 else 0))
+
+  @inline final def formationRangePixels: Double = Math.max(
+      0,
+      ?(unitClass == Terran.SiegeTankUnsieged && Terran.SiegeMode(player), Terran.SiegeTankSieged.effectiveRangePixels, effectiveRangePixels)
+    - ?(unitClass == Protoss.Reaver, ?(friendly.exists(_.agent.ride.isDefined), 64, 32), 0)
+    - 32)
 
   @inline final def altitude: Double = tile.altitude
 

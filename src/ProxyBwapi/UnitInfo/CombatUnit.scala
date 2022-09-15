@@ -1,8 +1,8 @@
 package ProxyBwapi.UnitInfo
 
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Maff
+import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
 import ProxyBwapi.Engine.Damage
 import ProxyBwapi.Players.PlayerInfo
@@ -87,14 +87,13 @@ trait CombatUnit {
   @inline final def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   @inline final def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
 
+  @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
   @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
   @inline final def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
   @inline final def cooldownMaxAirGround: Int = Math.max(if (unitClass.attacksAir) cooldownMaxAir else 0, if (unitClass.attacksGround)  cooldownMaxGround else 0)
   @inline final def cooldownMaxAgainst(enemy: CombatUnit): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
   @inline final def pixelRangeAgainst(enemy: CombatUnit): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
-  @inline final def formationRangePixels: Double = Math.max(0, Math.max(effectiveRangePixels, if (unitClass == Terran.SiegeTankUnsieged && Terran.SiegeMode(player)) Terran.SiegeTankSieged.effectiveRangePixels else 0) - (if (unitClass == Protoss.Reaver) 80 else 32))
-  @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
 
   @inline final def x           : Int   = pixel.x
   @inline final def y           : Int   = pixel.y

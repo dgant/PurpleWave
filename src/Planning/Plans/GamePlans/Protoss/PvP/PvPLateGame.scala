@@ -78,7 +78,7 @@ class PvPLateGame extends GameplanImperative {
     shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
     shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
-    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 20
+    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 18
     shouldExpand ||= miningBases < 2 && frame > Minutes(10)()
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2

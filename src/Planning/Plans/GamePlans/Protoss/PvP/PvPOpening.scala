@@ -545,6 +545,7 @@ class PvPOpening extends GameplanImperative {
       ///////////
 
       if (PvP1015()) {
+        once(Protoss.CyberneticsCore)
         once(15, Protoss.Probe)
         once(2, Protoss.Gateway)
         // Liquipedia offers three variations; Namu offers a fourth. This is the Namu variation.
@@ -727,7 +728,7 @@ class PvPOpening extends GameplanImperative {
       }
       trainRoboUnits()
       trainGatewayUnits()
-      get(3, Protoss.Gateway)
+      get(?(getReavers && ! With.fingerprints.fourGateGoon(), 2, 3), Protoss.Gateway)
     } else if (PvPDT()) {
       if (cannonExpand) {
         expand()

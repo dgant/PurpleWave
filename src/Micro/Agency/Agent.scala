@@ -41,6 +41,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toRepair      : Option[UnitInfo]          = None
   var shouldEngage  : Boolean                   = false
   var commit        : Boolean                   = false
+  var wantsUnload   : Boolean                   = false
   val forces        : ForceMap                  = new ForceMap
 
   /////////////////
@@ -72,9 +73,9 @@ class Agent(val unit: FriendlyUnitInfo) {
     .getOrElse(With.geography.home.center))
 
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
-  def safetyMarginPixels: Int = _safetyMarginPixels()
+
   private val _safetyMarginPixels = new Cache(() => if (unit.flying && unit.topSpeed > Maff.max(unit.matchups.threats.view.map(_.topSpeed)).getOrElse(0.0)) -32 else -128)
-  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement <= safetyMarginPixels
+  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement <= _safetyMarginPixels()
 
   /////////////////
   // Diagnostics //
@@ -95,23 +96,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   def execute(): Unit = {
     if ( ! unit.isFriendly) return // Mind Control
     lastFrame = With.frame
-    resetState()
-    followIntent()
-    updateRiding()
-    unit.intent.action.consider(unit)
-  }
-  private def resetState(): Unit = {
-    forces.clear()
-    lastPath = None
-    unit.agent.priority = TrafficPriorities.None
-    fightReason = ""
-    tryingToMove = false
-    actionsPerformed.clear()
-    _rideGoal = None
-    unit.orderTarget.foreach(_.removeDamage(unit))
-  }
 
-  private def followIntent(): Unit = {
     toTravel  = unit.intent.toTravel
     toReturn  = unit.intent.toReturn
     toAttack  = unit.intent.toAttack
@@ -119,6 +104,22 @@ class Agent(val unit: FriendlyUnitInfo) {
     toRepair  = unit.intent.toRepair
     toBoard   = unit.intent.toBoard.orElse(toBoard)
     toNuke    = unit.intent.toNuke
+
+    forces.clear()
+    lastPath      = None
+    priority      = TrafficPriorities.None
+    fightReason   = ""
+    tryingToMove  = false
+    wantsUnload   = false
+    actionsPerformed.clear()
+    unit.orderTarget.foreach(_.removeDamage(unit))
+
+    _rideGoal = None
+    ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))
+    passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
+    unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
+
+    unit.intent.action.consider(unit)
   }
 
   /////////////
@@ -168,14 +169,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     val all = passengers.toVector
     all.foreach(removePassenger)
   }
-  //def wantsPickup: Boolean = _wantsPickup
-  //def requestPickup: Unit = { _wantsPickup = true }
   def rideGoal: Option[Pixel] = _rideGoal
   def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
-
-  def updateRiding(): Unit = {
-    ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))
-    passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
-    unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
-  }
 }

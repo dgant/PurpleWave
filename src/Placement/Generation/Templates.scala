@@ -1,7 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
-import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, Defensive}
+import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, Defensive, ProxyGround}
 import Placement.Templating.Template
 import bwapi.Race
 
@@ -452,4 +452,98 @@ object Templates {
         "xx-",
         "---"))
     .map(_.addLabels(Defensive, DefendEntrance, DefendGround))
+
+  val protossProxy4 = Seq(
+    new Template()
+      .from(
+        "x----------x",
+        "x-4xxx4xxx-x",
+        "x-xxxxxxxx-x",
+        "--xxxxxxxx--",
+        "-4xxxPI4xxx-",
+        "-xxxxxxxxxx-",
+        "-xxxx--xxxx-",
+        "------------"),
+    new Template()
+      .from(
+        "xxxx------xx",
+        "xxxx-4xxx-xx",
+        "-----xxxx-xx",
+        "-4xxxxxxxx--",
+        "-xxxxPI4xxx-",
+        "-xxxxxxxxxx-",
+        "---4xxxxxxx-",
+        "xx-xxxx-----",
+        "xx-xxxx-xxxx",
+        "xx------xxxx"),
+    new Template()
+      .from(
+        "------------------",
+        "-4xxx4xxx4xxx4xxx-",
+        "-xxxxxxxxxxxxxxxx-",
+        "-xxxxxxxxxxxxxxxx-",
+        "--------Px--------",
+        "xxxxxxx-xx-xxxxxxx",
+        "xxxxxxx----xxxxxxxx"))
+    .map(_.addLabels(AnyProxy, ProxyGround))
+
+  val protossProxy2 = Seq(
+    new Template()
+      .from(
+        "------xx",
+        "-4xxx-xx",
+        "-xxxx-xx",
+        "-xxxx---",
+        "-Px4xxx-",
+        "-xxxxxx-",
+        "---xxxx-",
+        "x-------"),
+    new Template()
+      .from(
+        "xx------",
+        "xx-4xxx-",
+        "xx-xxxx-",
+        "---xxxx-",
+        "-4xxxPx-",
+        "-xxxxxx-",
+        "-xxxx---",
+        "------xx"),
+    new Template()
+      .from(
+        "------xx",
+        "-4xxx---",
+        "-xxxxPx-",
+        "-xxxxxx-",
+        "--4xxx--",
+        "x-xxxx-x",
+        "x-xxxx-x",
+        "x------x"),
+    new Template()
+      .from(
+        "xx------",
+        "---4xxx-",
+        "-Pxxxxx-",
+        "-xxxxxx-",
+        "--4xxx--",
+        "x-xxxx-x",
+        "x-xxxx-x",
+        "xx-----x"),
+    new Template()
+      .from(
+        "------------",
+        "-Px4xxx4xxx-",
+        "-xxxxxxxxxx-",
+        "---xxxxxxxx-",
+        "xx----------"),
+    new Template()
+      .from(
+        "------",
+        "-4xxx-",
+        "-xxxx-",
+        "--Px--",
+        "-4xxx-",
+        "-xxxx-",
+        "-xxxx-",
+        "------"))
+    .map(_.addLabels(AnyProxy, ProxyGround))
 }

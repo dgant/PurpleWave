@@ -265,6 +265,24 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def enemyVulnerabilityGround: Int = {
     With.grids.enemyVulnerabilityGround(this)
   }
+  @inline def enemyDpfGround: Double = {
+    With.grids.enemyRangeGround.dpfGround(this)
+  }
+  @inline def enemyDpfAir: Double = {
+    With.grids.enemyRangeAir.dpfAir(this)
+  }
+  @inline def enemyDamageGround: Double = {
+    With.grids.enemyRangeGround.damageGround(this)
+  }
+  @inline def enemyDamageAir: Double = {
+    With.grids.enemyRangeAir.damageAir(this)
+  }
+  @inline def friendlyDpfGround: Double = {
+    With.grids.enemyVulnerabilityGround.dpfGround(this)
+  }
+  @inline def friendlyDamageGround: Double = {
+    With.grids.enemyVulnerabilityGround.damageGround(this)
+  }
   @inline def lastSeen: Int = {
     With.grids.lastSeen(this)
   }

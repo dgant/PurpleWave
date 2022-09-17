@@ -26,6 +26,9 @@ class Placement extends Fitter {
 
     basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
     //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
+    if (With.self.isProtoss && With.enemies.exists(_.isZerg)) {
+      preplaceWalls(With.geography.ourNatural.zone)
+    }
     basesSorted.foreach(base => fitAndIndexConstrained(5, 1, if (base.isStartLocation) Templates.mainBases else Templates.bases, base))
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)

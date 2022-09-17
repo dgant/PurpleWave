@@ -41,7 +41,7 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
     // Use both the initial projection and the up-to-date projection
     // We can't always trust the most up-to-date projection in case the unit has taken damage
     val remainingNow      = remainingFrames(hitPoints, shieldPoints, lastSeen)
-    val remainingInitial  = remainingFrames(initialHitPoints, initialShields, frameDiscovered)
+    val remainingInitial  = remainingFrames(lastClassChangeHealth, lastClassChangeShields, frameDiscovered)
     val output            = Math.min(remainingNow, remainingInitial)
     output
   }

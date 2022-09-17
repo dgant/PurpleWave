@@ -8,7 +8,6 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object BeArbiter extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Arbiter(unit)

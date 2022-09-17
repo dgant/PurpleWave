@@ -4,6 +4,8 @@ import Debugging.SimpleString
 
 object PlaceLabels {
   trait PlaceLabel extends SimpleString
+  object Important            extends PlaceLabel
+  object Unimportant          extends PlaceLabel
   object TownHall             extends PlaceLabel
   object Gas                  extends PlaceLabel
   object GroundProduction     extends PlaceLabel
@@ -15,6 +17,7 @@ object PlaceLabels {
   object DefendAir            extends PlaceLabel
   object DefendGround         extends PlaceLabel
   object Wall                 extends PlaceLabel
-  object Important            extends PlaceLabel
-  object Unimportant          extends PlaceLabel
+  object AnyProxy             extends PlaceLabel
+  object ProxyGround          extends PlaceLabel
+  object ProxyAir             extends PlaceLabel
 }

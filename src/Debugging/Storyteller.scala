@@ -35,7 +35,7 @@ class Storyteller {
           tell(f"$label is ${stringify(valueNew)}")
         } else if (expand) {
           tell(f"$label was ${stringify(valueLast)}")
-          tell(f"$label now ${stringify(valueNew)}}")
+          tell(f"$label now ${stringify(valueNew)}")
         } else {
           tell(f"$label changed from ${stringify(valueLast)} to ${stringify(valueNew)}")
         }
@@ -130,19 +130,19 @@ class Storyteller {
     val enemyUnitsAfter = With.enemies.flatMap(With.unitsShown.all(_).view).filter(_._2.nonEmpty).map(_._1).toSet
     val enemyUnitsDiff = enemyUnitsAfter -- enemyUnitsBefore
     enemyUnitsDiff.foreach(newType => {
-      tell("Discovered novel enemy unit: " + newType)
+      tell(f"Discovered first $newType")
       With.units.enemy.withFilter(newType).foreach(unit => {
         if (newType.isBuilding) {
           if (unit.complete) {
-            tell(unit + " is already complete")
+            tell(f"$unit is already complete")
           } else {
             val remainingFrames = unit.completionFrame - With.frame
-            tell(unit + " projects to complete in " + remainingFrames + " frames at " + Frames(unit.completionFrame) + "")
+            tell(f"$unit projects to complete in $remainingFrames frames at ${Frames(unit.completionFrame)}")
           }
         } else {
           val arrivalFrame = unit.arrivalFrame()
           val arrivalFramesAhead = arrivalFrame - With.frame
-          tell(unit + " projects to arrive in " + arrivalFramesAhead + " frames at " + Frames(arrivalFrame))
+          tell(f"$unit projects to arrive in $arrivalFramesAhead frames at ${Frames(arrivalFrame)}")
         }
       })
     })

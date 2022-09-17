@@ -83,7 +83,7 @@ object Commander {
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (Protoss.Reaver(unit)) With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
     if (unit.unready) return
-    if (unit.transport.exists(_.flying)) { unload(unit.transport.get, unit); return }
+    if (unit.transport.exists(_.flying)) { getUnloaded(unit); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
     if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
@@ -432,6 +432,10 @@ object Commander {
     unit.lastSetRally = With.frame
     sleep(unit)
   }
+
+  def getUnloaded(passenger: FriendlyUnitInfo): Unit = {
+    passenger.agent.wantsUnload = true
+  }
   
   def unload(transport: FriendlyUnitInfo, passenger: UnitInfo): Unit = {
     // No sleeping required
@@ -499,7 +503,7 @@ object Commander {
   private def autoUnload(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
     if (unit.transport.isEmpty) return false
-    unload(unit.transport.get, unit)
+    getUnloaded(unit)
     true
   }
 

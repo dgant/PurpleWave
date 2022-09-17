@@ -94,8 +94,7 @@ object Target {
     dpf: Double = 1.0): Double = (
     baseTargetValue * dpf / (Math.max(1.0, totalHealth) * Math.max(6.0, framesOutOfTheWay)))
 
-  // TODO: Re-inline
-  def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
+  @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     val _framesOutOfWay = framesOutOfTheWay(attacker, target)
     val scoreBasic = baseAttackerToTargetValueRaw(
       baseTargetValue = target.targetBaseValue(),
@@ -125,7 +124,7 @@ object Target {
     if (attacker.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.Lurker)) {
       splashBonus = Math.max(splashBonus, target.tile.adjacent9.view
         .filter(_.valid)
-        .map(t => With.grids.units(t).count(u => attacker.canAttack(u) && u.isEnemy))
+        .map(t => t.units.count(u => attacker.canAttack(u) && u.isEnemy))
         .sum)
     }
     val output = splashBonus * scoreBasic * preferenceBonus / threatPenalty / threatPenalty

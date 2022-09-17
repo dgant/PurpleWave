@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Mathematics.Shapes.Ring
 import ProxyBwapi.UnitInfo.UnitInfo
-import ProxyBwapi.UnitTracking.UnorderedBuffer
 
 import scala.collection.mutable
 
@@ -17,20 +16,19 @@ import scala.collection.mutable
   */
 abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
   final override val defaultValue: Int = 0
-  @inline final def getUnchecked(i: Int): Int = maxValues(i)
+  @inline final def getUnchecked(i: Int): Int = tiles(i).maxDepth
   @inline final def inRange(tile: Tile): Boolean = inRange(tile.i)
   @inline final def inRange(i: Int): Boolean = if (valid(i)) inRangeUnchecked(i) else false
   @inline final def inRangeUnchecked(tile: Tile): Boolean = inRangeUnchecked(tile.i)
-  @inline final def inRangeUnchecked(i: Int): Boolean = maxValues(i) > margin
-
-  final val units = new mutable.HashMap[UnitInfo, FloodyUnit]()
-  final val tiles = Array.fill(length)(new UnorderedBuffer[FloodyTile](12))
-  final val maxValues = Array.fill(length)(defaultValue)
+  @inline final def inRangeUnchecked(i: Int): Boolean = tiles(i).maxDepth > margin
 
   /**
    * How far out of a unit's radius to continue flooding
    */
   val margin: Int
+
+  final val units = new mutable.HashMap[UnitInfo, FloodyUnit]()
+  final val tiles: Array[FloodyTile] = (0 until length).map(new FloodyTile(_, margin)).toArray
 
   /**
     * Whether a unit should be considered in the grid at all
@@ -42,19 +40,23 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     */
   protected def range(unit: UnitInfo): Int
 
-  def floodiesNear(i: Int)      : Seq[FloodyTile] = if (valid(i))   tiles(i)      .view else Seq.empty
-  def floodiesNear(tile: Tile)  : Seq[FloodyTile] = if (tile.valid) tiles(tile.i) .view else Seq.empty
-  def unitsNear(i: Int)         : Seq[UnitInfo]   = floodiesNear(i)   .map(_.unit.unit)
-  def unitsNear(tile: Tile)     : Seq[UnitInfo]   = floodiesNear(tile).map(_.unit.unit)
-  def unitsOn(i: Int)           : Seq[UnitInfo]   = floodiesNear(i)   .filter(_.value >= margin).map(_.unit.unit)
-  def unitsOn(tile: Tile)       : Seq[UnitInfo]   = floodiesNear(tile).filter(_.value >= margin).map(_.unit.unit)
+  @inline final def floodiesNear(i: Int)      : Seq[FloodyUnitDepth]  = if (valid(i))   tiles(i)      .depths.view else Seq.empty
+  @inline final def floodiesNear(tile: Tile)  : Seq[FloodyUnitDepth]  = if (tile.valid) tiles(tile.i) .depths.view else Seq.empty
+  @inline final def unitsNear(i: Int)         : Seq[UnitInfo]         = floodiesNear(i)   .map(_.unit.unit)
+  @inline final def unitsNear(tile: Tile)     : Seq[UnitInfo]         = floodiesNear(tile).map(_.unit.unit)
+  @inline final def unitsOn(i: Int)           : Seq[UnitInfo]         = floodiesNear(i)   .filter(_.value >= margin).map(_.unit.unit)
+  @inline final def unitsOn(tile: Tile)       : Seq[UnitInfo]         = floodiesNear(tile).filter(_.value >= margin).map(_.unit.unit)
+  @inline final def dpfGround(tile: Tile)     : Double                = if (tile.valid) tiles(tile.i).dpfGround     else 0.0
+  @inline final def dpfAir(tile: Tile)        : Double                = if (tile.valid) tiles(tile.i).dpfAir        else 0.0
+  @inline final def damageGround(tile: Tile)  : Double                = if (tile.valid) tiles(tile.i).damageGround  else 0.0
+  @inline final def damageAir(tile: Tile)     : Double                = if (tile.valid) tiles(tile.i).damageAir     else 0.0
 
   override def update(): Unit = {
     units.view.filterNot(f => shouldInclude(f._1)).toVector.foreach(f => removeUnit(f._2))
     With.units.all.foreach(updateUnit)
   }
 
-  private final def shouldInclude(unit: UnitInfo): Boolean = unit.likelyStillThere && include(unit)
+  @inline private final def shouldInclude(unit: UnitInfo): Boolean = unit.likelyStillThere && include(unit)
 
   @inline private final def updateUnit(unit: UnitInfo): Unit = {
     if (shouldInclude(unit)) {
@@ -76,22 +78,23 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] {
     units(floody.unit) = floody
     flood(floody).foreach {
       case (tile, value) =>
-        tiles(tile.i).add(FloodyTile(floody, value))
-        maxValues(tile.i) = Math.max(maxValues(tile.i), value) }
+        val floodyTile = tiles(tile.i)
+        floodyTile.depths.add(FloodyUnitDepth(floody, value))
+        floodyTile.maxDepth = Math.max(floodyTile.maxDepth, value) }
   }
 
   private final def removeUnit(floody: FloodyUnit): Unit = {
     units.remove(floody.unit)
     flood(floody).foreach {
       case (tile, value) =>
-        val i = tile.i
-        tiles(i).removeIf(_.unit.unit == floody.unit)
-        if (value >= maxValues(i)) {
+        val floodyTile = tiles(tile.i)
+        floodyTile.depths.removeIf(_.unit.unit == floody.unit)
+        if (value >= floodyTile.maxDepth) {
           var j = 0
-          val size = tiles(i).size
-          maxValues(i) = defaultValue
+          val size = floodyTile.depths.size
+          floodyTile.maxDepth = defaultValue
           while (j < size) {
-            maxValues(i) = Math.max(maxValues(i), tiles(i)(j).value)
+            floodyTile.maxDepth = Math.max(floodyTile.maxDepth, floodyTile.depths(j).value)
             j += 1
           }
         }

@@ -285,6 +285,7 @@ object DefaultCombat extends Action {
         || (unit.team.exists(_.engagedUpon) && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))
         // Break if we are closer to range than the formation, and already pretty close
         || (targetDistanceHere < Math.min(targetDistanceThere, 32 * 8) && Maff.isTowards(unit.pixel, target.get.pixel, unit.pixel.radiansTo(unit.agent.destination)))))
+
     if (goalEngage && breakFormationToAttack && attackIfReady(unit)) {
       unit.agent.lastAction = Some(if (formations.nonEmpty) "Break" else "Charge")
       return
@@ -295,28 +296,25 @@ object DefaultCombat extends Action {
       return
     }
 
-    lazy val nudged                   = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
-    lazy val nudgeAngle               = unit.agent.receivedPushForce().radians
-    lazy val nudgedTowards            = Maff.isTowards(unit.pixel, unit.agent.destination, nudgeAngle)
-    lazy val targetFleeing            = target.get.canMove && Maff.isTowards(unit.pixel, target.get.pixel, target.get.angleRadians)
-    lazy val nearestExtraneousThreat  = Maff.minBy(unit.matchups.threats.filterNot(target.contains))(t => t.pixelDistanceEdge(unit) - t.pixelRangeAgainst(unit))
-    lazy val framesToFaceTarget       = unit.framesToTurnTo(target.get)
-    lazy val framesToReadyFire        = framesToFaceTarget + unit.framesToGetInRange(target.get) + With.latency.framesRemaining
+    lazy val nudged         = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
+    lazy val nudgedTowards  = Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
+    lazy val targetFleeing  = target.get.canMove && Maff.isTowards(unit.pixel, target.get.pixel, target.get.angleRadians)
 
     // If we have an attack formation
-    if (formations.size > 1) {
-      if ((confidentToChase && formationHelpsChase && targetFleeing) || (nudged && nudgedTowards)) {
-        unit.agent.act("Slide")
-        Commander.move(unit)
-        return
-      }
+    if (formations.size > 1
+      && ! unit.flying
+      && ((confidentToChase && formationHelpsChase && targetFleeing) || (nudged && nudgedTowards && ! unit.flying))) {
+      unit.agent.act("Slide")
+      Commander.move(unit)
+      return
     }
     val distanceIdeal   = idealTargetDistance(unit, target.get)
     val distanceCurrent = unit.pixelDistanceEdge(target.get)
     val distanceTowards = distanceCurrent - distanceIdeal
-    if (distanceTowards >= 0) {
-      if (breakFormationToAttack) {
-        if (distanceTowards >= 32) {
+    val dogfight        = unit.flying && target.get.flying && (distanceCurrent > unit.pixelRangeAir - 32 || target.get.topSpeed >= unit.topSpeed)
+    if (dogfight || distanceTowards >= 0) {
+      if (dogfight || breakFormationToAttack) {
+        if (dogfight || distanceTowards >= 32) {
           unit.agent.act("Chase")
           val to                  = target.get.pixel
           val step                = target.get.presumptiveStep

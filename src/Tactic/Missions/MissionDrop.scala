@@ -171,7 +171,10 @@ abstract class MissionDrop extends Mission {
     transports.foreach(t => {
       t.agent.removeAllPassengers()
       passengers.foreach(t.agent.addPassenger)
-      t.loadedUnits.view.filterNot(passengers.contains).foreach(Commander.unload(t, _))
+      t.loadedUnits.view.filterNot(passengers.contains).foreach(p => {
+        With.logger.micro(f"Drop transport $t ditching rider $p")
+        Commander.unload(t, p)
+      })
     })
     state match {
       case Assembling => assemble()

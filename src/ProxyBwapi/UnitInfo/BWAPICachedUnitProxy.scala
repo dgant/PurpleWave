@@ -54,7 +54,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   private var _hasNuke                : Boolean = _
   private var _loaded                 : Boolean = _
   private var _lastSeen               : Int = _
-  private var _lastTypeChange         : Int = _
+  private var _lastClassChange        : Int = _
+  private var _lastClassChangeHealth  : Int = _
+  private var _lastClassChangeShields : Int = _
   private var _resourcesInitial       : Int = _
   private var _resourcesLeft          : Int = _
   private var _hitPoints              : Int = _
@@ -127,7 +129,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def hasNuke                 : Boolean           = _hasNuke
   @inline final def loaded                  : Boolean           = _loaded
   @inline final def lastSeen                : Int               = _lastSeen
-  @inline final def lastClassChange         : Int               = _lastTypeChange
+  @inline final def lastClassChange         : Int               = _lastClassChange
+  @inline final def lastClassChangeHealth   : Int               = _lastClassChangeHealth
+  @inline final def lastClassChangeShields  : Int               = _lastClassChangeShields
   @inline final def initialResources        : Int               = _resourcesInitial
   @inline final def resourcesLeft           : Int               = _resourcesLeft
   @inline final def hitPoints               : Int               = _hitPoints
@@ -160,7 +164,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def interceptors            : Seq[UnitInfo]     = _interceptors
   @inline final def interceptorCount        : Int               = _interceptorCount
   @inline final def transport               : Option[FriendlyUnitInfo] = _transport
-  def readProxy(): Unit = {
+  @inline final def readProxy(): Unit = {
     if (With.frame == 0 || bwapiUnit.exists()) {
       changeUnitType(UnitClasses.get(bwapiUnit.getType))
       changeVisibility(Visibility.Visible)
@@ -256,7 +260,9 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
 
   @inline final def changeUnitType(unitClassNew: UnitClass): Unit = {
     if (unitClassNew != _unitClass) {
-      _lastTypeChange = With.frame
+      _lastClassChange = With.frame
+      _lastClassChangeHealth = hitPoints
+      _lastClassChangeShields = shieldPoints
       _unitClass = unitClassNew
     }
   }

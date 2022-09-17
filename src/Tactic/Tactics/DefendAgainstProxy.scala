@@ -14,6 +14,8 @@ import scala.collection.mutable
 
 class DefendAgainstProxy extends Tactic {
 
+  // TODO: Vs. bunker rush, exactly 5 probes per https://youtu.be/PqsXjzC0eFk?t=1271
+
   val defenders = new LockUnits(this)
   
   def launch(): Unit = {

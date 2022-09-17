@@ -3,36 +3,52 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2Gate
+import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2021
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
 
 abstract class PvZStrategy extends Strategy {
-  override def ourRaces: Seq[Race] = Vector(Race.Protoss)
-  override def enemyRaces: Seq[Race] = Vector(Race.Zerg)
+  setOurRace(Race.Protoss)
+  setEnemyRace(Race.Zerg)
 }
 
 abstract class PvZFFEOpening extends PvZStrategy {
-  override def rushTilesMinimum: Int = 160
-  override def choices: Seq[Seq[Strategy]] = Vector(ProtossChoices.pvzMidgameTransitioningFromTwoBases)
+  setRushTilesMinimum(160)
+  addChoice(ProtossChoices.pvzMidgameTransitioningFromTwoBases: _*)
 }
 
-object PvZ1Base extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ2Gate)
-  override def choices: Seq[Seq[Strategy]] = Seq(
-    Seq(PvZ910, PvZ1012, PvZZZCoreZ),
-    Seq(PvZ1BaseCorsair, PvZ4GateGoon))
+object PvZ2021 extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ2021)
+  addChoice(PvZ910, PvZ1012, PvZZZCoreZ, PvZGateNexus, PvZCruddyFFE)
 }
-object PvZ910 extends PvZStrategy
+object PvZ910 extends PvZStrategy {
+  addChoice(PvZ1BaseCorsair, PvZ4GateGoon, PvZFE)
+}
 object PvZ1012 extends PvZStrategy {
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(With.fingerprints.fourPool)
+  addChoice(PvZ1BaseCorsair, PvZ4GateGoon, PvZFE)
+  blacklistVs(With.fingerprints.fourPool)
 }
 object PvZZZCoreZ extends PvZStrategy {
-  override def responsesBlacklisted: Seq[Fingerprint] = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)
+  addChoice(PvZ1BaseCorsair, PvZ4GateGoon)
+  blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)
+}
+object PvZGateNexus extends PvZStrategy {
+  addChoice(PvZFE)
+  whitelistVs(With.fingerprints.tenHatch, With.fingerprints.twelveHatch)
+  blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.overpool)
+}
+object PvZCruddyFFE extends PvZStrategy {
+  addChoice(PvZFE)
+  whitelistVs(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.twelveHatch)
+  blacklistVs(With.fingerprints.ninePoolGas, With.fingerprints.overpoolGas, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
 }
 object PvZ1BaseCorsair extends PvZStrategy
 object PvZ4GateGoon extends PvZStrategy
+object PvZFE extends PvZStrategy {
+  blacklistVs(With.fingerprints.ninePoolGas, With.fingerprints.overpoolGas, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
+}
+
 
 object PvZ1BaseForgeTech extends PvZStrategy {
   override def allowedVsHuman: Boolean = false

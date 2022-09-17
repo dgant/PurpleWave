@@ -6,6 +6,6 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object FewShot {
 
   def apply(unit: FriendlyUnitInfo, targetType: UnitClass, maxShots: Int): Unit = {
-    // TODO
+
   }
 }

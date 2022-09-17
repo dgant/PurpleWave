@@ -218,7 +218,7 @@ class ProtossVsTerran extends PvTOpeners {
     shouldAttack      &&= ! vultureContain
     shouldAttack      &&= ! vultureRush
     shouldAttack      &&= ! consolidatingFE
-    shouldAttack      &&= ! nascentCarriers
+    shouldAttack      &&= ! nascentCarriers && (enemies(Terran.Vulture) > 2 || enemyHasTech(Terran.SiegeMode))
     shouldAttack      ||= zealotAggro
     shouldAttack      ||= bases > 2
     shouldAttack      ||= enemyMiningBases > miningBases

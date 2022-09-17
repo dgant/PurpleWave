@@ -17,15 +17,14 @@ object BeFlier extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val scourge = unit.matchups.threats
-      .filter(t =>
-        t.is(Zerg.Scourge)
-        && t.pixelDistanceEdge(unit) < Math.max(96, if (unit.canAttackAir) 32 + unit.pixelRangeAir else 9))
+      .filter(Zerg.Scourge)
+      .filter(_.pixelDistanceEdge(unit) < Math.max(96, if (unit.canAttackAir) 32 + unit.pixelRangeAir else 9))
       .toVector
 
     if (scourge.nonEmpty) {
 
-      if ( ! unit.is(Terran.Valkyrie) && (unit.unitClass.dealsRadialSplashDamage || scourge.length == 1)) {
-        // May not actually be implemented yet
+      if ( ! Terran.Valkyrie(unit) && (unit.unitClass.dealsRadialSplashDamage || scourge.length == 1)) {
+        // Not actually be implemented yet
         FewShot(unit, Zerg.Scourge, 1)
       }
 

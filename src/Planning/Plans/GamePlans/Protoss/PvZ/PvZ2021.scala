@@ -2,18 +2,18 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.DefendHall
+import Placement.Access.PlaceLabels.{DefendEntrance, DefendHall, Defensive, Wall}
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZ1012, PvZ1BaseCorsair, PvZ4GateGoon, PvZ910, PvZZZCoreZ}
-import Utilities.{?, DoQueue}
+import Strategery.Strategies.Protoss._
 import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.{IsAll, IsAntiAir, IsWarrior}
+import Utilities.{?, DoQueue}
 
-class PvZ2Gate extends GameplanImperative {
+class PvZ2021 extends GameplanImperative {
 
   var anticipateSpeedlings: Boolean = false
   var goGoons     : Boolean = false
@@ -96,6 +96,83 @@ class PvZ2Gate extends GameplanImperative {
     once(18, Protoss.Probe)
     once(3, Protoss.Pylon)
   }
+  private def openGateNexus(): Unit = {
+    once(8,  Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(2,  Protoss.Nexus)
+    scoutOn(Protoss.Nexus, quantity = 2)
+    once(Protoss.Zealot)
+    once(15, Protoss.Probe)
+    once(2,  Protoss.Gateway)
+  }
+  private def ffeQuery: PlacementQuery = {
+    new PlacementQuery(Protoss.Pylon)
+      .preferBase(With.geography.ourNatural)
+      .preferLabelYes(Wall, Defensive, DefendEntrance)
+      .preferTile(With.geography.ourNatural.zone.exitNowOrHeart)
+  }
+  private def openCruddyFFE(): Unit = {
+    val o12hh = With.fingerprints.twelveHatchHatch()
+    val o12h = With.fingerprints.twelveHatch() || o12hh
+    val o10h = With.fingerprints.tenHatch() || o12h
+    val op12 = With.fingerprints.twelvePool() || o10h
+    val op9 = With.fingerprints.overpool() || op12
+    val p9 = With.fingerprints.ninePool() || op9
+    once(8,  Protoss.Probe)
+    get(Protoss.Pylon, ffeQuery)
+    scoutOn(Protoss.Pylon)
+    once(11, Protoss.Probe)
+    if (o12h) {
+      once(13, Protoss.Probe)
+      once(2, Protoss.Nexus)
+      once(14, Protoss.Probe)
+      if (o12hh) {
+        get(Protoss.Gateway, ffeQuery)
+        once(15, Protoss.Probe)
+        once(2, Protoss.Pylon)
+        once(16, Protoss.Probe)
+        once(Protoss.Assimilator)
+        once(17, Protoss.Probe)
+        once(Protoss.CyberneticsCore)
+        once(18, Protoss.Probe)
+        once(Protoss.Zealot)
+        once(19, Protoss.Probe)
+        once(Protoss.Forge)
+      } else {
+        once(15, Protoss.Probe)
+        get(2, Protoss.Pylon)
+        once(16, Protoss.Probe)
+        get(Protoss.Forge, ffeQuery)
+        once(17, Protoss.Probe)
+        get(2, Protoss.PhotonCannon, ffeQuery)
+        once(18, Protoss.Probe)
+        get(Protoss.Gateway, ffeQuery)
+        once(19, Protoss.Probe)
+      }
+    } else {
+      once(Protoss.Forge)
+      once(13, Protoss.Probe)
+      get(?(anticipateSpeedlings, 5, ?(op9, 1, 2)), Protoss.PhotonCannon, ffeQuery)
+      once(2, Protoss.Nexus)
+      if (op12) {
+        once(15, Protoss.Probe)
+      }
+      get(2, Protoss.PhotonCannon, ffeQuery)
+    }
+    once(15, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    once(16, Protoss.Probe)
+    get(Protoss.Gateway, ffeQuery)
+    once(17, Protoss.Probe)
+    once(Protoss.Assimilator)
+    once(18, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(19, Protoss.Probe)
+    once(Protoss.Zealot)
+  }
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
@@ -103,6 +180,8 @@ class PvZ2Gate extends GameplanImperative {
     if (PvZ910()) open910()
     if (PvZ1012()) open1012()
     if (PvZZZCoreZ()) openZZCoreZ()
+    if (PvZGateNexus()) openGateNexus()
+    if (PvZCruddyFFE()) openCruddyFFE()
     if (anticipateSpeedlings && PvZ1BaseCorsair()) {
       get(Protoss.Forge)
       once(19, Protoss.Probe)
@@ -163,6 +242,7 @@ class PvZ2Gate extends GameplanImperative {
     val mutaFrame       = (if (enemyStrategy(With.fingerprints.threeHatchGas)) GameTime(6, 10) else GameTime(5, 40))()
     var shouldExpand    = frame > mutaFrame
     shouldExpand      ||= enemiesComplete(Zerg.SunkenColony) > 1
+    shouldExpand      ||= PvZFE()
     shouldExpand      &&= safeToExpand
     val shouldAttack    = safeOutside
 

@@ -23,9 +23,12 @@ abstract class PvTOpener extends PvTStrategy {
   setChoice(PvTMidgameCarrier, PvTMidgameReaver, PvTMidgameStorm, PvTMidgameOpen)
 }
 abstract class PvTOpenerNoZealot extends PvTOpener {
+  setMinimumGamesVsOpponent(1)
   blacklistVs(
     With.fingerprints.workerRush,
+    With.fingerprints.proxyRax,
     With.fingerprints.fiveRax,
+    With.fingerprints.eightRax,
     With.fingerprints.bbs)
 }
 abstract class PvTOpenerNoZealotNoRange extends PvTOpenerNoZealot {

@@ -6,7 +6,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterStayCloaked extends TargetFilter {
   simulationSafe = true
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.cloaked && ! actor.matchups.arbiterCovering()
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.cloaked && ! actor.matchups.groupOf.arbiters.exists(_.pixelDistanceEdge(actor) < 160)
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     lazy val cloaked  = actor.effectivelyCloaked
     lazy val pixel    = actor.pixelToFireAt(target)

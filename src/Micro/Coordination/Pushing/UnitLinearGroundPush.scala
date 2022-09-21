@@ -12,7 +12,7 @@ class UnitLinearGroundPush(val priority: TrafficPriority, val pusher: FriendlyUn
       recipient == pusher
       || recipient.flying
       || recipient.agent.priority >= pusher.agent.priority
-      || recipient.matchups.pixelsOfEntanglement > pusher.matchups.pixelsOfEntanglement)
+      || recipient.matchups.pixelsEntangled > pusher.matchups.pixelsEntangled)
       None
     else
       super.force(recipient)

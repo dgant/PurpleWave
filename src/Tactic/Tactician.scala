@@ -142,7 +142,7 @@ class Tactician extends TimedTask {
       .filterNot(d =>
         // TODO: Old checks which we should probably generalize better
         (d.enemies.size < 3 && d.enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && ! e.isTransport))
-        || d.enemies.forall(e => Protoss.Observer(e) && ! e.matchups.enemyDetectors.exists(_.canMove)))
+        || d.enemies.forall(e => Protoss.Observer(e) && e.matchups.groupVs.mobileDetectors.isEmpty))
       .sortBy(d => - ?(d.attackers.nonEmpty, d.attackCentroidGround, d.centroidGround).walkablePixel.groundPixels(With.geography.home))
 
     // Pick a squad for each

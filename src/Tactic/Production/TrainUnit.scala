@@ -5,7 +5,7 @@ import Macro.Requests.{RequestBuildable, RequestUnit}
 import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.{PreferAll, PreferTrainerFor}
+import Utilities.UnitPreferences.{PreferTiers, PreferTrainerFor}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -20,7 +20,7 @@ class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
   val trainerLock     : LockUnits           = new LockUnits(this)
   val requestUnit     : Option[RequestUnit] = Try(requestArg.asInstanceOf[RequestUnit]).toOption
   trainerLock.counter     = CountOne
-  trainerLock.preference  = requestUnit.flatMap(_.parentPreference).map(p => PreferAll(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass))
+  trainerLock.preference  = requestUnit.flatMap(_.parentPreference).map(p => PreferTiers(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass))
   trainerLock.matcher     = u => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r)))
 
   var finalTrainer: Option[FriendlyUnitInfo] = None

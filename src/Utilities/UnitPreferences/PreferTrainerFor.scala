@@ -13,9 +13,9 @@ case class PreferTrainerFor(traineeClass: UnitClass) extends UnitPreference {
   override def apply(trainer: FriendlyUnitInfo): Double = {
     if (trainer.unitClass.race == Race.Zerg) {
       if (traineeClass.isWorker) {
-        return PreferAll(PreferHatcheryWithThreeLarva, PreferBaseWithFewerWorkers)(trainer)
+        return PreferTiers(PreferHatcheryWithThreeLarva, PreferBaseWithFewerWorkers)(trainer)
       } else if (traineeClass.whatBuilds._1 == Zerg.Larva) {
-        return PreferAll(PreferHatcheryWithThreeLarva, PreferBaseWithMoreWorkers)(trainer)
+        return PreferTiers(PreferHatcheryWithThreeLarva, PreferBaseWithMoreWorkers)(trainer)
       }
     }
 

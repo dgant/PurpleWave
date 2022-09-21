@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.?
-import Utilities.Time._
+import Utilities.Time.{GameTime, _}
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
@@ -186,6 +186,7 @@ class PvPOpening extends GameplanImperative {
         PvPCoreExpand.swapIn()
       }
     }
+
     // If we catch them going Robo or Forge against our DT, abandon ship
     lazy val earlyForge = enemyStrategy(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     if (PvPDT() && unitsComplete(Protoss.TemplarArchives) == 0 && (enemyRobo || earlyForge)) {
@@ -269,7 +270,7 @@ class PvPOpening extends GameplanImperative {
           getObservers    = false
         } else if (With.strategy.isFixedOpponent) {
           // Obs is probably what we're here for, so let's not get too cute
-        } else if (With.frame > GameTime(5, 15)() && ! With.fingerprints.dragoonRange()) {
+        } else if ( ! With.fingerprints.dragoonRange() && With.units.enemy.exists(e => Protoss.Dragoon(e) && e.lastSeen > GameTime(5, 15)())) {
           // If Dragoon range is supiciously absent we should prepare for DT
         } else if (trackRecordLacks(With.fingerprints.dtRush)) {
           getObservatory  = false
@@ -366,6 +367,7 @@ class PvPOpening extends GameplanImperative {
     if (shuttleSpeed)   status("ShuttleSpeed")
     if (getObservers)   status("Obs")
     if (getObservatory) status("Observatory")
+    if (getReavers)     status("Reaver")
     if (greedyDT)       status("GreedyDT")
     if (shouldAttack)   status("Attack")
     if (shouldHarass)   status("Harass")
@@ -458,6 +460,7 @@ class PvPOpening extends GameplanImperative {
       pumpWorkers(oversaturate = true)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
+      get(Protoss.ShieldBattery)
       get(Protoss.Assimilator)
       get(Protoss.CyberneticsCore)
       get(3, Protoss.Gateway)
@@ -727,6 +730,7 @@ class PvPOpening extends GameplanImperative {
         expand()
       }
       trainRoboUnits()
+      pumpWorkers(oversaturate = true) // Need to keep worker production up in case they just expand
       trainGatewayUnits()
       get(?(getReavers && ! With.fingerprints.fourGateGoon(), 2, 3), Protoss.Gateway)
     } else if (PvPDT()) {

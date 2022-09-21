@@ -98,7 +98,7 @@ object JudgmentModifiers {
   // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
   private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
   def hysteresis(battleLocal: Battle): Option[JudgmentModifier] = {
-    val commitmentRaw             = Maff.mean(battleLocal.us.attackers.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsOfEntanglement) / 96d), 0, 1)))
+    val commitmentRaw             = Maff.mean(battleLocal.us.attackers.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d), 0, 1)))
     val commitment                = commitmentFloor(commitmentRaw)
     lazy val enemyAttackers       = battleLocal.enemy.attackers.size.toDouble
     lazy val hesitanceVisibility  = 0.08 / enemyAttackers * battleLocal.enemy.attackers.count( ! _.visible)

@@ -39,7 +39,7 @@ object Detect extends Action {
     val ghostbuster = ghostbusters.flatMap(g => Maff.minBy(g)(_.framesBeforeAttacking(spookiestSpooky.get)))
 
     val idealDistance = Maff.clamp(
-      if ( ! unit.cloaked || unit.matchups.enemyDetectors.nonEmpty ||With.enemies.exists(_.isTerran)) unit.matchups.pixelsOfEntanglement else 0,
+      if ( ! unit.cloaked || unit.matchups.groupVs.detectors.nonEmpty ||With.enemies.exists(_.isTerran)) unit.matchups.pixelsEntangled else 0,
       unit.sightPixels / 2,
       unit.sightPixels - 24)
 
@@ -47,7 +47,7 @@ object Detect extends Action {
     unit.agent.toTravel = Some(spookiestPixel.get.project(center, idealDistance))
 
     val safetyPixels = if (unit.is(Protoss.Observer)) -48 else -32 * 5
-    if (unit.matchups.pixelsOfEntanglement > safetyPixels) {
+    if (unit.matchups.pixelsEntangled > safetyPixels) {
       Retreat.delegate(unit)
     } else {
       Commander.move(unit)

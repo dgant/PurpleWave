@@ -46,6 +46,14 @@ trait Reduce {
     if (values.isEmpty) 1.0 else Math.pow(values.product, 1.0 / values.size)
   }
 
+  @inline final def vmin[A](values: A*)(implicit cmp: scala.Ordering[A]): A = {
+    values.min(cmp)
+  }
+
+  @inline final def vmax[A](values: A*)(implicit cmp: scala.Ordering[A]): A = {
+    values.max(cmp)
+  }
+
   @inline final def min[A](values: TraversableOnce[A])(implicit cmp: scala.Ordering[A]): Option[A] = {
     if (values.isEmpty) None else Some(values.min(cmp))
   }

@@ -42,7 +42,7 @@ object MicroPathing {
     val pathfindProfile               = new PathfindProfile(unit.tile)
     pathfindProfile.end               = if (preferHome) Some(unit.agent.safety.tile) else None
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
-    pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsOfEntanglement + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
+    pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsEntangled + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
     pathfindProfile.employGroundDist  = true
     pathfindProfile.costOccupancy     = if (unit.flying) 0 else 3
@@ -96,7 +96,7 @@ object MicroPathing {
 
     if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) return mustApproach
 
-    val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + unit.matchups.pixelsOfEntanglement else 0)
+    val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + unit.matchups.pixelsEntangled else 0)
     val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
     val terminus = rayRadians
       .indices

@@ -3,7 +3,7 @@ package Planning.ResourceLocks
 import Lifecycle.With
 import Macro.Allocation.Prioritized
 import Mathematics.Maff
-import Utilities.UnitCounters.{CountEverything, CountUpTo, UnitCounter}
+import Utilities.UnitCounters.{CountEverything, CountExactly, CountUpTo, UnitCounter}
 import Utilities.UnitFilters.{IsAnything, UnitFilter}
 import Utilities.UnitPreferences.{PreferAnything, UnitPreference}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -58,7 +58,7 @@ class LockUnits(val owner: Prioritized) {
       } else {
         candidates.filter(matcher).toSeq
       }
-    } else if (counter == CountUpTo(1)) {
+    } else if (counter == CountUpTo(1) || counter == CountExactly(1)) {
       findSingleFinalist(candidates)
     } else {
       findMultipleFinalists(candidates)

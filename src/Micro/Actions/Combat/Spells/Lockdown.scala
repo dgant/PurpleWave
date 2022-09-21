@@ -20,7 +20,7 @@ object Lockdown extends TargetedSpell {
     if (target.lockedDown)                return 0.0
     
     val reach = caster.pixelDistanceEdge(target) - 32 * castRangeTiles
-    val output = target.subjectiveValue / Math.max(1.0, reach + caster.matchups.pixelsOfEntanglement)
+    val output = target.subjectiveValue / Math.max(1.0, reach + caster.matchups.pixelsEntangled)
     output
   }
 }

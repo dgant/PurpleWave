@@ -21,7 +21,7 @@ object BeArbiter extends Action {
 
   val cloakRadiusPixels: Int = 32 * 7
   override protected def perform(arbiter: FriendlyUnitInfo): Unit = {
-    if (arbiter.matchups.pixelsOfEntanglement > -16) {
+    if (arbiter.matchups.pixelsEntangled > -16) {
       Retreat.delegate(arbiter)
       return
     }

@@ -15,7 +15,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Forever
 import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.PreferClose
+import Utilities.UnitPreferences.{PreferAll, PreferClose, PreferIf}
 
 class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
@@ -123,7 +123,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.preference = PreferClose(desiredTile.get.center)
+    builderLock.preference = PreferAll(PreferIf(builder.contains), PreferClose(desiredTile.get.center))
     builderLock.acquire()
     
     if (intendAfter.isDefined) {

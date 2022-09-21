@@ -13,11 +13,14 @@ import Utilities.LightYear
 import Utilities.Time.Forever
 
 import scala.collection.mutable
+import scala.util.Try
 
 /**
   * Shared base type for units which could either be real or simulated
   */
 trait CombatUnit {
+  def unitInfo: Option[UnitInfo] = Try(asInstanceOf[UnitInfo]).toOption
+
   def visibility                : Visibility.Value
   def player                    : PlayerInfo
   def unitClass                 : UnitClass
@@ -199,7 +202,7 @@ trait CombatUnit {
     override def toString: String = f"$damageTotal from $source in ${With.framesUntil(onFrame)} frames ${if(guaranteed) "(Guaranteed)" else if (committed) "(Committed)" else ""}"
   }
   val damageQueue = new mutable.ArrayBuffer[DamageSource]()
-  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean) {
+  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean): Unit = {
     val damagePrevious = damageQueue.find(_.source == source)
     val damageNew = DamageSource(
       source      = source,
@@ -217,13 +220,16 @@ trait CombatUnit {
       source.framesToConnectDamage(this),
       committed = source.isOurs && source.inRangeToAttack(this))
   }
+  def framesToLaunchAttack(target: CombatUnit): Int = {
+    Maff.vmax(unitInfo.map(_.remainingOccupationFrames).getOrElse(0), cooldownLeft, framesToGetInRange(target))
+  }
   def framesToConnectDamage(target: CombatUnit): Int = {
     // All of the math below here is approximate.
     // - Melee units without bullets (seem to) deal damage instantly
     // - Ranged units with instant-speed bullets (seem to) deal damage at the end of their attack animation
     // - Ranged units with projectile bullets deal damage after the bullet has arrived, and bullet travel time varies on bullet type/distance
     // As long as we don't overestimate the amount of damage actually done, and prefer underestimating time before attacks, we'll be okay
-    Math.max(cooldownLeft, framesToGetInRange(target)) + expectedProjectileFrames(target)
+    framesToLaunchAttack(target) + expectedProjectileFrames(target)
   }
   /**
    * For the very small number of units with substantial stop frames

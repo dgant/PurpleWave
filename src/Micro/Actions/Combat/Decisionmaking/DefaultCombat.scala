@@ -31,9 +31,10 @@ object DefaultCombat extends Action {
   private object Walk       extends Technique(Dodge, Excuse) // Just go on our merry way
   private object Dance      extends Technique(Dodge, Excuse) // Stay in fight with better position
   private object Abuse      extends Technique(Dodge, Excuse) // Pick fights from range
+  private object Scavenge   extends Technique(Dodge, Excuse) // Eat around the edge of the fight
   private object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
   private object Flee       extends Technique(Dodge, Abuse, Fallback) // Get out of fight
-  private object Fight      extends Technique(Dodge, Abuse, Excuse, Dance, Flee) // Pick fight ASAP
+  private object Fight      extends Technique(Dodge, Abuse, Excuse, Flee, Scavenge, Dance) // Pick fight ASAP
 
   def potshot(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
@@ -78,42 +79,6 @@ object DefaultCombat extends Action {
   def attackIfReady(unit: FriendlyUnitInfo): Boolean = {
     if (readyToAttackTarget(unit)) { Commander.attack(unit) }
     unit.unready
-  }
-  def retreat(unit: FriendlyUnitInfo): Boolean = {
-    // Retreat, but potshot if we're trapped
-    val retreat = Retreat.getRetreat(unit)
-    if (unit.unitClass.fallbackAllowed && ! unit.loaded) {
-      lazy val retreatDistance = unit.pixelDistanceCenter(retreat.to)
-      lazy val retreatStep = unit.pixel.project(retreat.to, Math.min(retreatDistance, 40 + Math.max(0, unit.matchups.pixelsOfEntanglement)))
-      // Reavers always potshot because their attacks are too valuable to not get off
-      if (Protoss.Reaver(unit)) {
-        if (potshot(unit)) return true
-      } else if (unit.matchups.threats.exists(_.inRangeToAttack(unit, retreatStep))) {
-        if (potshot(unit)) return true
-      }
-      // If we're a strong potshotter and are just going to bump into an ally while retreating, potshot
-      else if (unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Dragoon)) {
-        val babyStepSize = 8
-        val retreatBabyStep = unit.pixel.project(retreatStep, Math.min(babyStepSize, unit.pixelDistanceCenter(retreatStep)))
-        val delta = retreatBabyStep.subtract(unit.pixel)
-        if (retreatBabyStep.tile.toRectangle.expand(1, 1).tiles.exists(_.units.exists(n =>
-          ! n.flying
-          && n.pixelDistanceEdge(unit) < babyStepSize
-          && Maff.rectanglesIntersect(
-            unit.topLeft.x      + delta.x,
-            unit.topLeft.y      + delta.y,
-            unit.bottomRight.x  + delta.x,
-            unit.bottomRight.y  + delta.y,
-            n.topLeft.x,
-            n.topLeft.y,
-            n.bottomRight.x,
-            n.bottomRight.y)))) {
-          if (potshot(unit)) return true
-        }
-      }
-    }
-    Retreat.applyRetreat(retreat)
-    true
   }
 
   val confidenceChaseThreshold = 0.25
@@ -191,9 +156,9 @@ object DefaultCombat extends Action {
 
     if (target.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
     if ( ! unit.agent.shouldEngage) {
-      if (unit.matchups.pixelsOfEntanglement > -96) {
+      if (unit.matchups.pixelsEntangled > -96) {
         unit.agent.escalatePriority(TrafficPriorities.Shove)
-      } else if (unit.matchups.pixelsOfEntanglement > -160) {
+      } else if (unit.matchups.pixelsEntangled > -160) {
         unit.agent.escalatePriority(TrafficPriorities.Bump)
       }
     }
@@ -203,7 +168,7 @@ object DefaultCombat extends Action {
     //////////////////////
 
     val formations = unit.squad.map(_.formations).getOrElse(Seq.empty)
-    val ignorant = unit.battle.isEmpty || unit.agent.withinSafetyMargin || unit.matchups.threatsInFrames(48).forall(IsWorker)
+    val ignorant = unit.battle.isEmpty || unit.agent.withinSafetyMargin || unit.matchups.threatsInRangeFrames(48).forall(IsWorker)
     lazy val shouldEngageDeferringToSquad = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldEngage)
 
     var technique: Technique =
@@ -234,13 +199,12 @@ object DefaultCombat extends Action {
     transition(Dodge,     () => unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge, () => dodge(unit))
     transition(Aim,       () => purring, () => aim(unit))
     transition(Abuse,     () => unit.unitClass.abuseAllowed && canAbuseTarget && hasSpacetimeToPoke)
-    transition(Fallback,  () => unit.unitClass.fallbackAllowed && (
-      // Only Fallback if our shots are too valuable to waste or we can do it without endangering allies
+    transition(Fallback,  () =>
       unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver)
-      || (
-        unit.agent.receivedPushPriority() < TrafficPriorities.Shove
-        && unit.matchups.threatsInFrames(unit.unitClass.framesToPotshot + 9).forall(_.topSpeed > unit.topSpeed))))
-    transition(Dance, () => unit.agent.shouldEngage && unit.unitClass.danceAllowed && target.map(unit.pixelRangeAgainst).exists(_ > 64))
+      || (Protoss.Dragoon(unit)
+        && unit.agent.receivedPushPriority() < TrafficPriorities.Shove
+        && target.exists(t => unit.inRangeToAttack(t) && unit.matchups.threatsInRangeFrames(unit.unitClass.framesToPotshot + 9).forall(_.isAny(Terran.Vulture, Zerg.Zergling)))))
+    transition(Dance, () => unit.unitClass.danceAllowed && unit.agent.shouldEngage && target.map(unit.pixelRangeAgainst).exists(_ > 64))
 
     if (unit.unready) return
 
@@ -262,12 +226,11 @@ object DefaultCombat extends Action {
     // Execute //
     /////////////
 
-    if (technique == Walk) return
-    if (goalRetreat && retreat(unit)) return
-    if (goalEngage && Brawl.consider(unit)) return
-    if (goalPotshot && potshot(unit)) return
+    if (technique == Walk)                      return
+    if (goalRetreat && Retreat.consider(unit))  return
+    if (goalEngage  && Brawl.consider(unit))    return
+    if (goalPotshot && potshot(unit))           return
 
-    val breakThreshold        = 64
     val targetDistanceHere    = target.map(unit.pixelDistanceEdge).getOrElse(0d)
     val targetDistanceThere   = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
     val formationHelpsEngage  = targetDistanceThere <= Math.min(targetDistanceHere, target.map(unit.pixelRangeAgainst).getOrElse(0d))
@@ -291,10 +254,7 @@ object DefaultCombat extends Action {
       return
     }
 
-    if ( ! goalDance) {
-      move(unit)
-      return
-    }
+    if ( ! goalDance && move(unit)) return
 
     lazy val nudged         = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
     lazy val nudgedTowards  = Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
@@ -335,15 +295,15 @@ object DefaultCombat extends Action {
     } else {
       unit.agent.forces(Forces.threat) = Potential.avoidThreats(unit)
       unit.agent.forces(Forces.spacing) = unit.agent.receivedPushForce()
-      retreat(unit)
+      Retreat.getRetreat(unit)(unit)
       unit.agent.act(unit.agent.lastAction.map(_.replaceAll("Retreat", "Kite")).getOrElse("Kite"))
       return
     }
   }
 
   val pickupCutoff = 64
-  def move(unit: FriendlyUnitInfo): Unit = {
-    if ( ! unit.canMove) return
+  def move(unit: FriendlyUnitInfo): Boolean = {
+    if ( ! unit.canMove) return false
     if (Protoss.Reaver(unit) && unit.agent.ride.isDefined && ! unit.agent.commit && ! unit.loaded) {
       val destination = unit.agent.destination
       if (unit.agent.toAttack.forall(unit.pixelsToGetInRange(_) > pickupCutoff)) {
@@ -351,5 +311,6 @@ object DefaultCombat extends Action {
       }
     }
     Commander.move(unit)
+    unit.unready
   }
 }

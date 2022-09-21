@@ -15,7 +15,7 @@ abstract class PvZStrategy extends Strategy {
 
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
-  addChoice(ProtossChoices.pvzMidgameTransitioningFromTwoBases: _*)
+  addChoice(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver, PvZMidgameCorsairReaverGoon, PvZMidgameBisu)
 }
 
 object PvZ2021 extends PvZStrategy {

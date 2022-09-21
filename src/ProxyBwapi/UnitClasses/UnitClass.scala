@@ -626,18 +626,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     Protoss.Dragoon,
     Zerg.Hydralisk).contains(this)
 
-  lazy val fallbackAllowed: Boolean = Vector(
-    Terran.Marine,
-    Terran.Firebat,
-    Terran.Vulture,
-    Terran.SiegeTankUnsieged,
-    Terran.Goliath,
-    Protoss.Archon,
-    Protoss.Dragoon,
-    Protoss.Reaver,
-    Protoss.Scout,
-    Zerg.Hydralisk).contains(this)
-
   lazy val danceAllowed: Boolean = Vector(
     Terran.Marine,
     Terran.Vulture,

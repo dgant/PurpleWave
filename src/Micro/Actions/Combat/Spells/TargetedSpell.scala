@@ -33,7 +33,7 @@ abstract class TargetedSpell extends Action {
   protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = true
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val safeDistance  = Math.max(0, -unit.matchups.pixelsOfEntanglement)
+    val safeDistance  = Math.max(0, -unit.matchups.pixelsEntangled)
     val totalRange    = safeDistance + 32.0 * castRangeTiles + bonusSearchPixels // The margin is just some encouragement
     
     if (aoe) {

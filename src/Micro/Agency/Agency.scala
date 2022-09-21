@@ -34,7 +34,7 @@ class Agency extends TimedTask {
         .map(_.agent)
         .toVector
         .sortBy(_.unit.frameDiscovered) // Start with a stable order
-        .sortBy(- _.unit.matchups.pixelsOfEntanglement) // Units in trouble get first dibs on things
+        .sortBy(- _.unit.matchups.pixelsEntangled) // Units in trouble get first dibs on things
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
 

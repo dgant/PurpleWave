@@ -75,7 +75,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
 
   private val _safetyMarginPixels = new Cache(() => if (unit.flying && unit.topSpeed > Maff.max(unit.matchups.threats.view.map(_.topSpeed)).getOrElse(0.0)) -32 else -128)
-  def withinSafetyMargin: Boolean = unit.matchups.pixelsOfEntanglement <= _safetyMarginPixels()
+  def withinSafetyMargin: Boolean = unit.matchups.pixelsEntangled <= _safetyMarginPixels()
 
   /////////////////
   // Diagnostics //

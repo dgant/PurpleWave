@@ -11,7 +11,7 @@ object Follow extends Action {
     unit.unitClass.followingAllowed
     && unit.canMove
     && ! unit.agent.leader().contains(unit)
-    && ! unit.matchups.groupEnemy.splashesAir)
+    && ! unit.matchups.groupVs.splashesAir)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()

@@ -303,7 +303,7 @@ abstract class MissionDrop extends Mission {
         With.logger.debug(f"$this: No path available to $vicinity")
         transport.agent.toTravel = Some(vicinity)
         transport.agent.toReturn = Some(vicinity)
-        if (transport.matchups.pixelsOfEntanglement > -64) {
+        if (transport.matchups.pixelsEntangled > -64) {
           Retreat.delegate(transport)
         }
         Move.delegate(transport)

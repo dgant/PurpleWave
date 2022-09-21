@@ -15,7 +15,7 @@ object Spot extends Action {
     && ! unit.unitClass.isTransport
     && ! unit.canAttack
     && unit.alliesSquad.exists(_.canAttack)
-    && (unit.matchups.pixelsOfEntanglement > -58 || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.enemyDetectors.isEmpty))
+    && (unit.matchups.pixelsEntangled > -58 || unit.totalHealth > 500 || (unit.cloaked && unit.matchups.groupVs.detectors.isEmpty))
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {

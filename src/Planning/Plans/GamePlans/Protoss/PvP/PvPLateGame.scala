@@ -285,7 +285,7 @@ class PvPLateGame extends GameplanImperative {
     if (shouldReaver || Protoss.PsionicStorm()) {
       get(Protoss.RoboticsSupportBay)
     }
-    if ( ! fearDeath && units(Protoss.Shuttle) > 0 && (units(Protoss.Reaver) > 1 || Protoss.PsionicStorm())) {
+    if (units(Protoss.Shuttle) >= ?(fearDeath, 1, 2) && (units(Protoss.Reaver) >= ?(fearDeath, 2, 3) || Protoss.PsionicStorm())) {
       get(Protoss.ShuttleSpeed)
     }
     if (shouldReaver) {
@@ -297,7 +297,10 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doTemplar(): Unit = {
-    get(Protoss.Forge, Protoss.CitadelOfAdun, Protoss.TemplarArchives)
+    if (units(Protoss.Observer, Protoss.Observatory) == 0) {
+      get(Protoss.Forge)
+    }
+    get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
     val gasThreshold = 250
     if (gas < gasThreshold) {
       buildGasPumps()

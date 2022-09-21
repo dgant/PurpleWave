@@ -17,10 +17,21 @@ object Retreat extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.matchups.threats.nonEmpty
 
-  case class RetreatPlan(unit: FriendlyUnitInfo, to: Pixel, name: String)
+  case class RetreatPlan(unit: FriendlyUnitInfo, to: Pixel, name: String) {
+    def apply(unit: FriendlyUnitInfo): Boolean = {
+      if (unit.ready) {
+        unit.agent.toTravel = Some(to)
+        if (With.configuration.debugging) {
+          unit.agent.act(f"Retreat$name")
+        }
+        Commander.move(unit)
+      }
+      unit.unready
+    }
+  }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
-    applyRetreat(getRetreat(unit))
+    getRetreat(unit)(unit)
   }
 
   def getRetreat(unit: FriendlyUnitInfo): RetreatPlan = {
@@ -58,9 +69,9 @@ object Retreat extends Action {
     // Ground units: Shove your way through
     if ( ! unit.airborne) {
       unit.agent.escalatePriority(TrafficPriorities.Pardon)
-      if (unit.matchups.pixelsOfEntanglement > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
-      if (unit.matchups.pixelsOfEntanglement > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
-      if (unit.matchups.pixelsOfEntanglement > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
+      if (unit.matchups.pixelsEntangled > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.pixelsEntangled > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.pixelsEntangled > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
 
     // Against melee rush: Retreat directly to heart so workers can help
     if (With.frame < Minutes(6)() && unit.isAny(Terran.Marine, Protoss.Zealot) && unit.squad.forall(_.units.size < 5) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
@@ -81,14 +92,5 @@ object Retreat extends Action {
     lazy val tilePath         = MicroPathing.getThreatAwarePath(unit, preferHome = goalOrigin)
     val waypoint              = waypointSimple.orElse(waypointPath).orElse(waypointForces).getOrElse(waypointOrigin)
     RetreatPlan(unit, waypoint._1, waypoint._2)
-  }
-
-  def applyRetreat(retreat: RetreatPlan): Unit = {
-    if (retreat.unit.unready) return
-    retreat.unit.agent.toTravel = Some(retreat.to)
-    if (With.configuration.debugging) {
-      retreat.unit.agent.act("Retreat" + retreat.name)
-    }
-    Commander.move(retreat.unit)
   }
 }

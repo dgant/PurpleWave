@@ -62,7 +62,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
-      profile.costOccupancy * 0.5 * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costOccupancy * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
     val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costRepulsion
@@ -70,7 +70,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5 * (Maff.fastSigmoid(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum(diff))
     }
     val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
     val output = costSoFar + costDistance + costEnemyVision + costImmobility + costOccupancy + costRepulsion + costThreat
@@ -92,7 +92,7 @@ trait TilePathfinder {
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
     val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0)
-    val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
+    val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid01(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
     val costOutOfThreat     : Double = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)

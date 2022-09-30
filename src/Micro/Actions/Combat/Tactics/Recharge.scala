@@ -17,7 +17,7 @@ object Recharge extends Action {
     && With.units.countOurs(Protoss.ShieldBattery) > 0
     && (unit.agent.toReturn.isEmpty || unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
     && unit.shieldPoints < unit.unitClass.maxShields / 3
-    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldEngage)
+    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight)
   )
   
   protected def validBattery(unit: UnitInfo): Boolean = (

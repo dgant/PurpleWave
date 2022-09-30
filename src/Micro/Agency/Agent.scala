@@ -8,6 +8,7 @@ import Mathematics.Maff
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Actions.Combat.Decisionmaking.Combat
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -20,29 +21,28 @@ class Agent(val unit: FriendlyUnitInfo) {
   // History //
   /////////////
 
-  var lastFrame             : Int = 0
-  var lastStim              : Int = 0
-  var lastCloak             : Int = 0
-  var impatience            : Int = 0
-
-  var tryingToMove: Boolean = false
+  var lastFrame     : Int = 0
+  var lastStim      : Int = 0
+  var lastCloak     : Int  = 0
+  var tryingToMove  : Boolean = false
 
   ///////////////
   // Decisions //
   ///////////////
 
-  var priority      : TrafficPriority           = TrafficPriorities.None
   var toTravel      : Option[Pixel]             = None
   var toReturn      : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
   var toGather      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var toNuke        : Option[Pixel]             = None
-  var toRepair      : Option[UnitInfo]          = None
-  var shouldEngage  : Boolean                   = false
-  var commit        : Boolean                   = false
+  var toRepair   : Option[UnitInfo] = None
+  var shouldFight: Boolean          = false
+  var commit     : Boolean          = false
   var wantsUnload   : Boolean                   = false
+  var priority      : TrafficPriority           = TrafficPriorities.None
   val forces        : ForceMap                  = new ForceMap
+  val combat        : Combat                    = new Combat(unit)
 
   /////////////////
   // Suggestions //
@@ -74,9 +74,6 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
 
-  private val _safetyMarginPixels = new Cache(() => if (unit.flying && unit.topSpeed > Maff.max(unit.matchups.threats.view.map(_.topSpeed)).getOrElse(0.0)) -32 else -128)
-  def withinSafetyMargin: Boolean = unit.matchups.pixelsEntangled <= _safetyMarginPixels()
-
   /////////////////
   // Diagnostics //
   /////////////////
@@ -95,15 +92,14 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def execute(): Unit = {
     if ( ! unit.isFriendly) return // Mind Control
-    lastFrame = With.frame
 
-    toTravel  = unit.intent.toTravel
-    toReturn  = unit.intent.toReturn
-    toAttack  = unit.intent.toAttack
-    toGather  = unit.intent.toGather
-    toRepair  = unit.intent.toRepair
-    toBoard   = unit.intent.toBoard.orElse(toBoard)
-    toNuke    = unit.intent.toNuke
+    toTravel    = unit.intent.toTravel
+    toReturn    = unit.intent.toReturn
+    toAttack    = unit.intent.toAttack
+    toGather    = unit.intent.toGather
+    toRepair    = unit.intent.toRepair
+    toBoard     = unit.intent.toBoard.orElse(toBoard)
+    toNuke      = unit.intent.toNuke
 
     forces.clear()
     lastPath      = None
@@ -119,7 +115,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
     unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
 
-    unit.intent.action.consider(unit)
+    unit.intent.action.apply(unit)
+    lastFrame = With.frame
   }
 
   /////////////

@@ -70,7 +70,7 @@ object ShowUnitsFriendly extends DebugView {
     }
 
     if (showDesire && unit.battle.isDefined && (unit.canMove || unit.canAttack)) {
-      val color = if (agent.shouldEngage) Colors.NeonGreen else Colors.NeonRed
+      val color = if (agent.shouldFight) Colors.NeonGreen else Colors.NeonRed
       val pixel = origin.subtract(0, 6 + unit.unitClass.height / 2)
       DrawMap.box(pixel.subtract(4, 4), pixel.add(4, 4), Color.Black, solid = true)
       DrawMap.box(pixel.subtract(3, 3), pixel.add(3, 3), color,       solid = true)

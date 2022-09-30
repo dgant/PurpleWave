@@ -15,7 +15,7 @@ object Brawl extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     lazy val brawlers = unit.matchups.threats.filter(t => ! t.flying && t.unitClass.melee && inBrawlRange(unit, t))
-    (unit.agent.shouldEngage
+    (unit.agent.shouldFight
       && unit.canMove
       && (unit.is(Zerg.Zergling) || (unit.unitClass.melee && unit.matchups.threats.exists(Zerg.Zergling)))
       && unit.matchups.targets.exists(t => ! t.flying && t.unitClass.melee)

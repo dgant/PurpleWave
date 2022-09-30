@@ -11,13 +11,13 @@ object Scout extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo) {
-    SabotageProxy.consider(unit)
-    KnockKnock.consider(unit)
-    PreserveScout.consider(unit)
-    AttackBuilder.consider(unit)
-    BlockConstruction.consider(unit)
-    Search.consider(unit)
-    SearchWhenBored.consider(unit)
+    SabotageProxy.apply(unit)
+    KnockKnock.apply(unit)
+    PreserveScout.apply(unit)
+    AttackBuilder.apply(unit)
+    BlockConstruction.apply(unit)
+    Search.apply(unit)
+    SearchWhenBored.apply(unit)
     Commander.move(unit)
   }
 }

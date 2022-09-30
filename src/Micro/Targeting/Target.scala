@@ -188,7 +188,7 @@ object Target {
 
     // Detection bonus
     val aggressivelyDenyDetection = With.reaction.sluggishness > 0
-    val weHaveCloakedThreat = if (aggressivelyDenyDetection) target.matchups.isCloakedAttacker() && target.matchups.groupOf.arbiters.nonEmpty
+    val weHaveCloakedThreat = if (aggressivelyDenyDetection) target.matchups.isCloakedAttacker && target.matchups.groupOf.arbiters.nonEmpty
     else (
       With.self.hasTech(Terran.WraithCloak)
       || With.self.hasTech(Zerg.LurkerMorph)

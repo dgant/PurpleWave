@@ -27,7 +27,7 @@ object BeReaver extends Action {
     if ( ! unit.agent.commit && (needlesslyEndangered || needlesslyDoomed)) {
       unit.agent.act("Hop")
       demandPickup(unit)
-      Retreat.consider(unit)
+      Retreat.apply(unit)
     } else if (needRefresh) {
       unit.agent.act("Refresh")
       demandPickup(unit)

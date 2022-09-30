@@ -55,7 +55,7 @@ object FightOrFlee extends Action {
         && ally.energy > 20
         && ally.pixelDistanceEdge(unit, otherAt = Maff.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
     if (decision.isDefined) {
-      unit.agent.shouldEngage = decision.get
+      unit.agent.shouldFight = decision.get
     } else {
       applyEstimation(unit)
     }
@@ -64,11 +64,11 @@ object FightOrFlee extends Action {
   private def applyEstimation(unit: FriendlyUnitInfo): Unit = {
     if (unit.battle.isEmpty) {
       // Important for things which care about unit willingness to trot around
-      unit.agent.shouldEngage = true
+      unit.agent.shouldFight = true
       unit.agent.fightReason = ""
     } else {
-      unit.agent.shouldEngage = unit.battle.get.judgement.get.unitShouldFight(unit)
-      unit.agent.fightReason = if (unit.agent.shouldEngage) "Yes" else "No"
+      unit.agent.shouldFight = unit.battle.get.judgement.get.unitShouldFight(unit)
+      unit.agent.fightReason = if (unit.agent.shouldFight) "Yes" else "No"
     }
   }
 }

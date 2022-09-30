@@ -85,7 +85,7 @@ class SquadScoutExpansions extends Squad {
   }
 
   def run(): Unit = {
-    val harassers = units.filter(u => u.canAttackGround && u.base.exists(_.isEnemy) && u.agent.shouldEngage)
+    val harassers = units.filter(u => u.canAttackGround && u.base.exists(_.isEnemy) && u.agent.shouldFight)
     val scouts = units.filterNot(harassers.contains)
     SquadAutomation.sendUnits(this, scouts)
     scouts.foreach(u => u.intent.canFight = u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty)

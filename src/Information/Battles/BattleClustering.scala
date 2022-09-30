@@ -31,7 +31,7 @@ class BattleClustering {
     }
   }
 
-  def recalculate() {
+  def recalculate(): Unit = {
     // Cluster units, as fixed-radius nearest neighbors.
     // This solution is not optimal but is faster to implement than a KD tree
 

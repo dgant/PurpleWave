@@ -53,7 +53,7 @@ object BeCarrier extends Action {
       // We can't kite Goliaths, but we should only take shots from them when launching interceptors
       // and if we can afford to take some damage
       if ( ! threat.flying && (interceptorsActive || unit.totalHealth < unit.unitClass.maxHitPoints)) return true
-      if (unit.agent.shouldEngage && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
+      if (unit.agent.shouldFight && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
       
       true
     }
@@ -65,7 +65,7 @@ object BeCarrier extends Action {
     lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
     lazy val inRangeNeedlessly  = unit.matchups.threats.exists(threat => shouldNeverHitUs(threat) && unit.pixelsOfEntanglement(threat) > - 32)
     lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32 && ! threat.is(Protoss.Carrier)) // Protect interceptors!
-    lazy val shouldFight        = interceptorsDone.nonEmpty && ! inRangeNeedlessly && (unit.agent.shouldEngage || safeFromThreats || (interceptorsDone.nonEmpty && ! canLeave))
+    lazy val shouldFight        = interceptorsDone.nonEmpty && ! inRangeNeedlessly && (unit.agent.shouldFight || safeFromThreats || (interceptorsDone.nonEmpty && ! canLeave))
 
     if (shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)
@@ -76,19 +76,19 @@ object BeCarrier extends Action {
       if (safeFromThreats && targetDistance.exists(_ < 32.0 * 9.5)) {
         unit.agent.toAttack = targetNow
         if (unit.interceptors.forall(interceptorActive) || targetDistance.exists(_ < 32.0 * 8.0)) {
-          CarrierOpenLeash.consider(unit)
+          CarrierOpenLeash.apply(unit)
         } else {
-          CarrierHoldLeash.consider(unit)
+          CarrierHoldLeash.apply(unit)
         }
       }
       else {
         Target.choose(unit)
         if (safeFromThreats && interceptorsActive) {
-          CarrierChase.consider(unit)
+          CarrierChase.apply(unit)
         }
         Commander.attack(unit)
       }
-      WarmUpInterceptors.consider(unit)
+      WarmUpInterceptors.apply(unit)
       if (unit.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Interceptor))) {
         unit.agent.toAttack = unit.agent.toAttack
           .orElse(Maff.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(u => u.totalHealth / (1 + u.subjectiveValue)))
@@ -97,7 +97,7 @@ object BeCarrier extends Action {
       }
       Commander.attackMove(unit)
     } else {
-      Retreat.consider(unit)
+      Retreat.apply(unit)
     }
   }
 }

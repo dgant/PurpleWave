@@ -16,7 +16,7 @@ object Idle extends Action {
   final override def allowed(unit: FriendlyUnitInfo): Boolean = true
 
   @inline
-  final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.consider(unit))
+  final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.apply(unit))
   
   private val actions = Vector(
     Cancel,

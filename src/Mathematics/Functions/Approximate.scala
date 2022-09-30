@@ -48,11 +48,11 @@ trait Approximate {
       else                0
   }
 
-  @inline final def fastSigmoid(x: Double): Double = {
-    0.5 + fastTanh(x) / 2.0
+  @inline final def fastSigmoid01(x: Double): Double = {
+    0.5 + fastTanh11(x) / 2.0
   }
 
-  @inline final def fastTanh(x: Double): Double = {
+  @inline final def fastTanh11(x: Double): Double = {
     if (x.isPosInfinity) return 1.0
     if (x.isNegInfinity) return -1.0
     x / (1.0 + Math.abs(x))

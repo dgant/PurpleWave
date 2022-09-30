@@ -16,7 +16,7 @@ object PsionicStorm extends TargetedSpell {
   override protected def castRangeTiles   : Int       = 9
   override protected def thresholdValue   : Double    = 1.0
   override protected def lookaheadPixels  : Int       = 12
-  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldEngage || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isEnemy)
+  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldFight || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isEnemy)
 
   val castFrames = 4 // Derived from iScript; observed empirically by McRave
 
@@ -35,7 +35,7 @@ object PsionicStorm extends TargetedSpell {
     lazy val exposedFrames  = With.latency.latencyFrames + castFrames + travelDistance / caster.unitClass.topSpeed
     lazy val castTile       = target.pixel.project(caster.pixel, Math.min(castRangePixels, distance)).tile
     if (target.player.isTerran
-      && (caster.transport.isDefined || ! caster.matchups.inTankRange())
+      && (caster.transport.isDefined || ! caster.matchups.inTankRange)
       && travelDistance > 0
       && castTile.enemiesAttackingGround.exists(t => Terran.SiegeTankSieged(t) && t.cooldownLeft < exposedFrames && ! t.inRangeToAttack(caster))) {
       return 0.0

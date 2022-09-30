@@ -9,7 +9,7 @@ import Utilities.UnitFilters._
 
 object Skimulator {
 
-  def durabilityFrames(team: Team): Double = team.meanTotalHealth / team.opponent.meanDpf
+  def durabilityFrames(team: Team): Double = team.meanAttackerHealth / team.opponent.meanDpf
 
   def predict(battle: Battle): Unit = {
 
@@ -36,7 +36,7 @@ object Skimulator {
       val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed / 4)
       val delayFrames           = Math.max(unit.cooldownLeft, Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / speed / (if (unit.isFriendly) battle.speedMultiplier else 1.0)))
       val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
-      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanTotalHealth / team.opponent.meanDpf), 12, 120)
+      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanAttackerHealth / team.opponent.meanDpf), 12, 120)
       unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
       unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames / teamDurabilityFrames), 0.0, 0.75)
       unit.skimPresence         = 1.0 - Math.max(unit.skimDelay, unit.skimExtension)

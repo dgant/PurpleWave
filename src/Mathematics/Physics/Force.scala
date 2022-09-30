@@ -44,7 +44,7 @@ final case class Force(x: Double, y: Double) {
 
   override def toString: String =
     if (lengthSquared > 0)
-      f"Force[${degrees.toInt}*,  $lengthSlow%1.3f]($x%1.3f, $y%1.3f)"
+      f"Force[${degrees.toInt}*, $lengthSlow%1.3f]($x%1.3f, $y%1.3f)"
     else
       "Force[Zero]"
 }

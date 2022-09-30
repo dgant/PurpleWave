@@ -11,15 +11,16 @@ import Utilities.Time.Minutes
 import scala.collection.mutable
 
 class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = Vector.empty, val isGlobal: Boolean) {
-  lazy val frameCreated: Int = With.frame
-  lazy val us     = new Team(this, unitsUs)
-  lazy val enemy  = new Team(this, unitsEnemy)
-  lazy val teams: Vector[Team] = Vector(us, enemy)
-  lazy val focus: Pixel = Maff.centroid(teams.map(_.vanguardAll()))
+  lazy val frameCreated : Int           = With.frame
+  lazy val us           : FriendlyTeam  = new FriendlyTeam(this, unitsUs.flatMap(_.friendly))
+  lazy val enemy        : EnemyTeam     = new EnemyTeam(this, unitsEnemy)
+  lazy val teams        : Vector[Team]  = Vector(us, enemy)
+  lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
   var simulationComplete  : Boolean = false
   var skimulationComplete : Boolean = false
-  def predictionComplete  : Boolean = simulationComplete && skimulationComplete
+
+  def predictionComplete: Boolean = simulationComplete && skimulationComplete
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
 

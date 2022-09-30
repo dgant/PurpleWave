@@ -250,7 +250,7 @@ abstract class MissionDrop extends Mission {
         Idle.delegate(transport)
       } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
-        if (transport.agent.withinSafetyMargin) {
+        if (transport.matchups.withinSafetyMargin) {
           val toPickup = unloaded.minBy(_.pixelDistanceSquared(centroid))
           if (transport.pixelDistanceCenter(toPickup) < Shuttling.pickupRadius) {
             Commander.rightClick(transport, toPickup)

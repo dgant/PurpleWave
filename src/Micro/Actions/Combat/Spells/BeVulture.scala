@@ -45,7 +45,7 @@ object BeVulture extends Action {
     
     lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(Terran.SpiderMine))
-    lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldEngage
+    lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldFight
     lazy val timeToMine  = unit.matchups.framesOfSafety > Seconds(2)()
     lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tile))
     if (mineSpace
@@ -62,7 +62,7 @@ object BeVulture extends Action {
   
   protected def sabotage(vulture: FriendlyUnitInfo) {
     // TODO: Do it if we have enough Vultures with mines
-    if ( ! vulture.agent.shouldEngage && ! vulture.matchups.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
+    if ( ! vulture.agent.shouldFight && ! vulture.matchups.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
 
     val victims = vulture.matchups.enemies.filter(e =>
       e.unitClass.triggersSpiderMines

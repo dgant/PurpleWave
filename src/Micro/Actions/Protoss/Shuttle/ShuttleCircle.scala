@@ -27,7 +27,7 @@ object ShuttleCircle extends Action {
 
       // Protect the Shuttle unless it's imminently needed to rescue a Reaver
       if (shuttle.matchups.framesOfSafety < 48 && (framesToRobotics < framesToReaver || robo.matchups.enemies.isEmpty)) {
-        Retreat.consider(shuttle)
+        Retreat.apply(shuttle)
       } else {
         Commander.move(shuttle)
       }

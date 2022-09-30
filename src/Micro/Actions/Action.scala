@@ -13,7 +13,7 @@ abstract class Action {
   def allowed(unit: FriendlyUnitInfo): Boolean = true
   protected def perform(unit: FriendlyUnitInfo): Unit
   
-  final def consider(unit: FriendlyUnitInfo): Boolean = {
+  final def apply(unit: FriendlyUnitInfo): Boolean = {
     act(unit, giveCredit = true)
   }
   

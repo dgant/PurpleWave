@@ -8,6 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.{GenericUnitGroup, UnitGroup}
 import Utilities.?
+import Utilities.UnitFilters.IsWorker
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
@@ -40,26 +41,36 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threats                     : Seq[UnitInfo]     = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                     : Seq[UnitInfo]     = enemies.filter(threatens(me, _))
   def threatsInRange              : Seq[UnitInfo]     = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
-  def threatsInRangeFrames(f: Int): Seq[UnitInfo]     = threats.filter(_.framesToGetInRange(me) < f)
+  def threatsInPixels(p: Double)  : Seq[UnitInfo]     = threats.filter(_.pixelsToGetInRange(me) <= p)
+  def threatsInFrames(f: Int)     : Seq[UnitInfo]     = threats.filter(_.framesToGetInRange(me) <= f)
   def threatDeepest               : Option[UnitInfo]  = _threatDeepest()
   def threatSoonest               : Option[UnitInfo]  = _threatSoonest()
   def threatNearest               : Option[UnitInfo]  = _threatNearest()
   def targetsInRange              : Seq[UnitInfo]     = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   def targetNearest               : Option[UnitInfo]  = _targetNearest()
   def wantsToVolley               : Option[Boolean]   = _wantsToVolley() // None means no opinion
-  lazy val dpfReceiving           : Cache[Double]     = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
-  lazy val isCloakedAttacker      : Cache[Boolean]    = new Cache(() => me.cloaked && targets.nonEmpty)
-  lazy val inTankRange            : Cache[Boolean]    = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
-  lazy val framesToLive           : Double            = _framesToLive()
-  lazy val framesOfSafety         : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsEntangled / me.topSpeed)
-  lazy val pixelsEntangled        : Double            = _pixelsEntangled()
-  private val _threatDeepest    = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
-  private val _threatSoonest    = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
-  private val _threatNearest    = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
-  private val _targetNearest    = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
-  private val _framesToLive     = new Cache(() => me.likelyDoomedInFrames)
-  private val _pixelsEntangled  = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
-  private val _wantsToVolley    = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated
+  def dpfReceiving                : Double            = _dpfReceiving()
+  val safetyMargin                : Double            = 160
+  def isCloakedAttacker           : Boolean           = me.cloaked && targetNearest.isDefined
+  def inTankRange                 : Boolean           = _inTankRange()
+  def withinSafetyMargin          : Boolean           = pixelsEntangled <= ?(me.flying && me.topSpeed > Maff.max(threats.map(_.topSpeed)).getOrElse(0.0), -64, -safetyMargin)
+  def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin || threatsInFrames(48).forall(IsWorker)
+  def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
+  def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
+  def framesToLive                : Double            = _framesToLive()
+  def framesOfSafety              : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsEntangled / me.topSpeed)
+  def pixelsEntangled             : Double            = _pixelsEntangled()
+  def pixelsToTargetRange         : Option[Double]    = targetNearest.map(me.pixelsToGetInRange)
+  def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(_.pixelsToGetInRange(me))
+  private val _threatDeepest      = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
+  private val _threatSoonest      = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
+  private val _threatNearest      = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
+  private val _targetNearest      = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
+  private val _pixelsEntangled    = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
+  private val _dpfReceiving       = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
+  private val _inTankRange        = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
+  private val _framesToLive       = new Cache(() => me.likelyDoomedInFrames)
+  private val _wantsToVolley      = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated
     targetNearest.flatMap(target =>
       threatDeepest.flatMap(deepest =>
         threatNearest.flatMap(nearest =>

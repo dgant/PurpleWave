@@ -16,9 +16,9 @@ class BattleJudgment(battle: Battle) {
   val confidence11Total   : Double  = calculateConfidence11(scoreTotal, scoreTarget)
   val confidence11Air     : Double  = Math.max(confidence11Total, calculateConfidence11(scoreAir, scoreTarget))
   val confidence11Ground  : Double  = Math.max(confidence11Total, calculateConfidence11(scoreGround, scoreTarget))
-  val confidence01Total   : Double  = confidence11Total / 2 + 1
-  val confidence01Air     : Double  = confidence11Air / 2 + 1
-  val confidence01Ground  : Double  = confidence11Ground / 2 + 1
+  val confidence01Total   : Double  = confidence11Total   / 2 + 1
+  val confidence01Air     : Double  = confidence11Air     / 2 + 1
+  val confidence01Ground  : Double  = confidence11Ground  / 2 + 1
 
   private def weigh(skimUs: => Double, skimEnemy: => Double): Double = {
     lazy val scoreSkim = Maff.nanToOne((skimUs - skimEnemy) / (skimUs + skimEnemy))

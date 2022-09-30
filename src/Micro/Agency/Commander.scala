@@ -220,12 +220,12 @@ object Commander {
     if (unit.unready) return
     if (autoUnburrow(unit)) return
     val to = getAdjustedDestination(unit, destination)
-    if (Terran.Medic(unit) && unit.agent.shouldEngage) {
+    if (Terran.Medic(unit) && unit.agent.shouldFight) {
       attackMove(unit, to)
     } else if (unit.pixelDistanceCenter(to) > 3) {
       // When bot is sluggish, use attack-move
       if (  ! unit.unitClass.isWorker
-        && unit.agent.shouldEngage
+        && unit.agent.shouldFight
         && With.reaction.sluggishness >= 3
         && unit.canAttack) {
         attackMove(unit, to)

@@ -6,7 +6,7 @@ case class PreferTiers(preferences: Function[FriendlyUnitInfo, Double]*) extends
   override def apply(unit: FriendlyUnitInfo): Double = {
     preferences
       .zipWithIndex
-      .map(pair => Maff.fastSigmoid(pair._1.apply(unit)) * Math.pow(10, -pair._2))
+      .map(pair => Maff.fastSigmoid01(pair._1.apply(unit)) * Math.pow(10, -pair._2))
       .sum
   }
 }

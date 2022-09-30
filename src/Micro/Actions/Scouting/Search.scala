@@ -28,7 +28,7 @@ abstract class AbstractSearch extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.matchups.threats.isEmpty && ! unit.intent.toScoutTiles.exists(_.explored)) {
-      Move.consider(unit)
+      Move.apply(unit)
       return
     }
 

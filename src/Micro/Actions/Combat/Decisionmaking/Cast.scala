@@ -12,7 +12,7 @@ object Cast extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.cooldownSpell < With.latency.framesRemaining) {
-      spells.foreach(_.consider(unit))
+      spells.foreach(_.apply(unit))
     }
     if (unit.ready && unit.isAny(
       Terran.ScienceVessel,
@@ -21,7 +21,7 @@ object Cast extends Action {
       Protoss.HighTemplar,
       Zerg.Defiler,
       Zerg.Queen)) {
-      unit.agent.shouldEngage = false
+      unit.agent.shouldFight = false
     }
   }
   

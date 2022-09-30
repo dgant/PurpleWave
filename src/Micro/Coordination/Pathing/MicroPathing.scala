@@ -62,8 +62,9 @@ object MicroPathing {
     Circle(5).view.map(p => from.add(p.x * 32, p.y * 32)).filter(_.valid)
   }
 
-  def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
-    if (unit.flying) return goal
+  def getWaypointToPixel(unit: UnitInfo, rawGoal: Pixel): Pixel = {
+    if (unit.flying) return rawGoal
+    val goal              = rawGoal.nearestTraversablePixel(unit)
     val lineWaypoint      = if (Shapes.Ray(unit.pixel, goal).forall(_.walkable)) Some(unit.pixel.project(goal, Math.min(unit.pixelDistanceCenter(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(unit.tile, goal.tile)
     lazy val hillWaypoint = hillPath.map(path => path.last.center.add(unit.pixel.offsetFromTileCenter))
@@ -134,10 +135,10 @@ object MicroPathing {
 
     // Where to go
     unit.agent.forces(Forces.sneaking)  = Potential.detectionRepulsion(unit)
-    unit.agent.forces(Forces.travel)    = Potential.preferTravel(unit, to) * 1 * Maff.toInt(goalOrigin)
-    unit.agent.forces(Forces.threat)    = Potential.avoidThreats(unit)     * 2 * Maff.toInt(goalSafety)
+    unit.agent.forces(Forces.travel)    = Potential.towards(unit, to) * 1 * Maff.toInt(goalOrigin)
+    unit.agent.forces(Forces.threat)    = Potential.softAvoidThreatRange(unit)     * 2 * Maff.toInt(goalSafety)
     if (unit.agent.forces.forall(_._2.lengthSquared == 0)) {
-      unit.agent.forces(Forces.travel)  = Potential.preferTravel(unit, unit.agent.destination)
+      unit.agent.forces(Forces.travel)  = Potential.towards(unit, unit.agent.destination)
     }
 
     // How to get there

@@ -16,7 +16,7 @@ object TacticalNuke extends TargetedSpell {
   override protected def thresholdValue : Double    = Terran.NuclearMissile.subjectiveValue * 1.5
   
   override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = (
-    (unit.cloaked || unit.agent.shouldEngage)
+    (unit.cloaked || unit.agent.shouldFight)
     && With.units.existsOurs(IsAll(Terran.NuclearMissile, IsComplete))
   )
 

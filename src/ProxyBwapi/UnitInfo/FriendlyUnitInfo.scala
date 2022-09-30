@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Information.Battles.Types.FriendlyTeam
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Micro.Agency.{Agent, Intention}
@@ -11,6 +12,7 @@ import Tactic.Squads.Squad
 import Utilities.Time.Forever
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) {
   
@@ -57,6 +59,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _squad: Option[Squad] = None
   private var _lastSquadChange: Int = 0
   def lock: Option[LockUnits] = With.recruiter.lockOf(this)
+  def friendlyTeam: Option[FriendlyTeam] = team.flatMap(t => Try(t.asInstanceOf[FriendlyTeam]).toOption)
   def squad: Option[Squad] = _squad
   def squadAge: Int = With.framesSince(_lastSquadChange)
   def setSquad(newSquad: Option[Squad]): Unit = {

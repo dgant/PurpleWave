@@ -13,7 +13,7 @@ object Stasis extends TargetedSpell {
   override protected def aoe            : Boolean   = true
   override protected def castRangeTiles : Int       = 9
   override protected def thresholdValue : Double    = casterClass.subjectiveValue
-  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldEngage
+  override protected def additionalConditions(unit: FriendlyUnitInfo): Boolean = unit.agent.shouldFight
   
   override protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double = {
     if (With.grids.psionicStorm.isSet(target.tile)) return 0.0
@@ -41,7 +41,7 @@ object Stasis extends TargetedSpell {
           + (if (target.is(Terran.SiegeTankSieged)) 0.5 else if (target.is(Terran.SiegeTankUnsieged)) 0.25 else 0.0)
         )
       else 0.0))
-    val fightValue = if (caster.agent.shouldEngage) 1.0 else 0.25
+    val fightValue = if (caster.agent.shouldFight) 1.0 else 0.25
     
     val output = target.subjectiveValue * teamValue * fightValue
     output

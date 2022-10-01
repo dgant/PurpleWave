@@ -7,7 +7,6 @@ import Micro.Actions.Action
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Minutes
@@ -66,13 +65,6 @@ object Retreat extends Action {
       unit.agent.toReturn = None
     }
 
-    // Ground units: Shove your way through
-    if ( ! unit.airborne) {
-      unit.agent.escalatePriority(TrafficPriorities.Pardon)
-      if (unit.matchups.pixelsEntangled > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
-      if (unit.matchups.pixelsEntangled > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
-      if (unit.matchups.pixelsEntangled > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
-
     // Against melee rush: Retreat directly to heart so workers can help
     if (With.frame < Minutes(6)() && unit.isAny(Terran.Marine, Protoss.Zealot) && unit.squad.forall(_.units.size < 5) && unit.metro.contains(With.geography.ourMetro) && unit.matchups.threats.forall(_.pixelRangeAgainst(unit) < 64)) {
       val baseToRunTo = Maff.orElse(With.geography.ourBases, Seq(With.geography.ourMain)).minBy(_.heart.groundTiles(With.scouting.enemyThreatOrigin))
@@ -83,7 +75,7 @@ object Retreat extends Action {
     val leadPassenger = unit.agent.ride.flatMap(_.agent.passengersPrioritized.headOption)
     if (leadPassenger.isDefined && ! leadPassenger.contains(unit)) {
       return RetreatPlan(unit, leadPassenger.get.pixel.add(forceVector.normalize(32).toPoint.asPixel.walkablePixel), "Shotgun")
-    }}
+    }
 
     lazy val waypointSimple   = MicroPathing.getWaypointInDirection(unit, force, if (goalOrigin) Some(unit.agent.safety) else None, requireSafety = goalSafety && safetyIsSafe).map((_, "Simple"))
     lazy val waypointPath     = MicroPathing.getWaypointAlongTilePath(unit, tilePath).map(_.add(unit.pixel.offsetFromTileCenter)).map((_, "Path"))

@@ -28,7 +28,7 @@ class Monitor extends Tactic {
     scouts.preference = PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center))
     scouts.acquire()
     val cloaked = scouts.units.exists(_.cloaked)
-    val naturals = bases.flatMap(_.natural.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(45)()))
+    val naturals = bases.flatMap(_.natural.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(25)()))
     bases = Maff.orElse(naturals, bases).toVector
     scouts.units.foreach(scout => scout.intend(this, new Intention {
       toTravel = Some(With.geography.home.center)

@@ -4,12 +4,13 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.{TrafficPriorities, UnitLinearGroundPush}
+import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority, UnitLinearGroundPush}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.?
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully,
@@ -81,9 +82,13 @@ object Commander {
     //unit.agent.setRideGoal(target.pixel)
     leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
-    if (Protoss.Reaver(unit)) With.coordinator.pushes.put(new UnitLinearGroundPush(TrafficPriorities.Bump, unit, target.pixel))
+    if (Protoss.Reaver(unit)) {
+      pushTowards(unit, target.pixel, TrafficPriorities.Bump)
+    } else if ( ! unit.flying && ! target.visible || ! unit.inRangeToAttack(target)) {
+      pushTowards(unit, target.pixel, TrafficPriorities.Nudge)
+    }
     if (unit.unready) return
-    if (unit.transport.exists(_.flying)) { getUnloaded(unit); return }
+    if (unit.transport.exists(_.flying)) { requestUnload(unit); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     if ( ! unit.readyForAttackOrder) { sleep(unit); return }
     if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
@@ -232,16 +237,13 @@ object Commander {
       } else {
         unit.bwapiUnit.move(to.bwapi)
       }
-      if (unit.agent.priority > TrafficPriorities.None) {
-        With.coordinator.pushes.put(new UnitLinearGroundPush(
-          unit.agent.priority,
-          unit,
-          unit.pixel.project(to, Math.min(unit.pixelDistanceCenter(to), 80))))
+      if ( ! unit.flying) {
+        pushTowards(unit, to, TrafficPriorities.Pardon)
       }
     }
     sleep(unit)
   }
-  
+
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, rightClick(_, target))
     if ( ! unit.agent.ride.contains(target)) {
@@ -252,7 +254,7 @@ object Commander {
     unit.bwapiUnit.rightClick(target.bwapiUnit)
     sleepAttack(unit)
   }
-  
+
   def useTech(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     if (tech == Terran.Stim) {
       if (With.framesSince(unit.agent.lastStim) < 24) return
@@ -264,7 +266,7 @@ object Commander {
     unit.bwapiUnit.useTech(tech.bwapiTech)
     sleep(unit)
   }
-  
+
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
     if (unit.unready) return
@@ -277,7 +279,7 @@ object Commander {
       sleep(unit)
     }
   }
-  
+
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel): Unit = {
     unit.agent.setRideGoal(target)
     if (unit.unready) return
@@ -290,7 +292,7 @@ object Commander {
       sleepAttack(unit)
     }
   }
-  
+
   def repair(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
     if (unit.unready) return
@@ -299,7 +301,7 @@ object Commander {
     unit.bwapiUnit.repair(target.bwapiUnit)
     sleep(unit, 24)
   }
-  
+
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     if (autoUnburrow(unit)) return
@@ -386,7 +388,7 @@ object Commander {
     unit.bwapiUnit.build(unitClass.bwapiType)
     sleepBuild(unit)
   }
-  
+
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile): Unit = {
     unit.agent.setRideGoal(tile.center)
     if (unit.unready) return
@@ -405,13 +407,13 @@ object Commander {
     unit.bwapiUnit.research(tech.bwapiTech)
     sleep(unit)
   }
-  
+
   def upgrade(unit: FriendlyUnitInfo, upgrade: Upgrade): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.upgrade(upgrade.bwapiType)
     sleep(unit)
   }
-  
+
   def cancel(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     if (unit.teching) {
@@ -425,7 +427,7 @@ object Commander {
     }
     sleep(unit)
   }
-  
+
   def rally(unit: FriendlyUnitInfo, pixel: Pixel): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.setRallyPoint(pixel.bwapi)
@@ -433,33 +435,33 @@ object Commander {
     sleep(unit)
   }
 
-  def getUnloaded(passenger: FriendlyUnitInfo): Unit = {
+  def requestUnload(passenger: FriendlyUnitInfo): Unit = {
     passenger.agent.wantsUnload = true
   }
-  
+
   def unload(transport: FriendlyUnitInfo, passenger: UnitInfo): Unit = {
     // No sleeping required
     transport.bwapiUnit.unload(passenger.bwapiUnit)
   }
-  
+
   def addon(unit: FriendlyUnitInfo, unitClass: UnitClass): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.buildAddon(unitClass.bwapiType)
     sleep(unit)
   }
-  
+
   def buildScarab(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.build(Protoss.Scarab.bwapiType)
     sleep(unit)
   }
-  
+
   def buildInterceptor(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.build(Protoss.Interceptor.bwapiType)
     sleep(unit)
   }
-  
+
   def cloak(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     leadFollower(unit, cloak(_, tech))
     if (unit.unready) return
@@ -467,32 +469,46 @@ object Commander {
     unit.bwapiUnit.cloak()
     sleep(unit)
   }
-  
+
   def decloak(unit: FriendlyUnitInfo, tech: Tech): Unit = {
     leadFollower(unit, decloak(_, tech))
     if (unit.unready) return
     unit.bwapiUnit.decloak()
     sleep(unit)
   }
-  
+
   def burrow(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.burrow()
     sleep(unit)
   }
-  
+
   def unburrow(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.unburrow()
     sleep(unit)
   }
-  
+
   def lift(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
     unit.bwapiUnit.lift()
     sleep(unit)
   }
-  
+
+  def pushTowards(unit: FriendlyUnitInfo, to: Pixel, minimumPriority: TrafficPriority, maxDistance: Double = 96): Unit = {
+    if (unit.flying) return
+    unit.agent.escalatePriority(minimumPriority)
+    if (unit.battle.isDefined && ! unit.agent.shouldFight) {
+      unit.agent.escalatePriority(TrafficPriorities.Pardon)
+      if (unit.matchups.pixelsEntangled > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.pixelsEntangled > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.pixelsEntangled > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
+    }
+    if (unit.agent.priority > TrafficPriorities.None) {
+      With.coordinator.pushes.put(new UnitLinearGroundPush(unit.agent.priority, unit, ?(unit.pixelDistanceCenter(to) > maxDistance, unit.pixel.project(to, maxDistance), to)))
+    }
+  }
+
   private def autoUnburrow(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
     if ( ! unit.burrowed) return false
@@ -503,7 +519,7 @@ object Commander {
   private def autoUnload(unit: FriendlyUnitInfo): Boolean = {
     if (unit.unready) return false
     if (unit.transport.isEmpty) return false
-    getUnloaded(unit)
+    requestUnload(unit)
     true
   }
 

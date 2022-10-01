@@ -75,7 +75,7 @@ object Build extends Action {
 
     val pushPixel = buildArea.center
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
-    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.dimensionMax, unit))
+    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.radialHypotenuse, unit))
 
     var movePixel = buildTile.topLeftPixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16)
 

@@ -54,7 +54,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def isCloakedAttacker           : Boolean           = me.cloaked && targetNearest.isDefined
   def inTankRange                 : Boolean           = _inTankRange()
   def withinSafetyMargin          : Boolean           = pixelsEntangled <= ?(me.flying && me.topSpeed > Maff.max(threats.map(_.topSpeed)).getOrElse(0.0), -64, -safetyMargin)
-  def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin || threatsInFrames(48).forall(IsWorker)
+  def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin || threatsInPixels(160).forall(IsWorker)
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
   def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
   def framesToLive                : Double            = _framesToLive()

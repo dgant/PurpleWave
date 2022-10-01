@@ -31,8 +31,9 @@ class PvPOpening extends GameplanImperative {
   // Robo
   var getObservers      : Boolean = false
   var getObservatory    : Boolean = false
-  var getReavers        : Boolean = false
-  var shuttleFirst      : Boolean = false
+  var getReavers  : Boolean = false
+  var reaverAllIn : Boolean = false
+  var shuttleFirst: Boolean = false
   var shuttleSpeed      : Boolean = false
   // DT
   var greedyDT          : Boolean = false
@@ -186,7 +187,6 @@ class PvPOpening extends GameplanImperative {
         PvPCoreExpand.swapIn()
       }
     }
-
     // If we catch them going Robo or Forge against our DT, abandon ship
     lazy val earlyForge = enemyStrategy(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     if (PvPDT() && unitsComplete(Protoss.TemplarArchives) == 0 && (enemyRobo || earlyForge)) {
@@ -248,7 +248,7 @@ class PvPOpening extends GameplanImperative {
     /////////////////////////////
 
     if (PvPRobo()) {
-      getReavers = PvPReaver() || units(Protoss.RoboticsSupportBay, Protoss.Shuttle) > 0
+      getReavers = PvPReaver() || units(Protoss.RoboticsSupportBay, Protoss.Shuttle) > 0 || enemyStrategy(With.fingerprints.fourGateGoon)
       getObservatory = true
       getObservers = true
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
@@ -256,7 +256,15 @@ class PvPOpening extends GameplanImperative {
       }
       if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
         shuttleFirst = false
-      } else if ( ! PvPObs()) {
+      } else if (PvPObs()) {
+        reaverAllIn ||= enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
+        reaverAllIn ||= enemyBases > 1 && With.fingerprints.twoGate()
+        // TODO: Also all-in 1 Gate Core Expand
+        getReavers ||= reaverAllIn
+        getReavers ||= enemyStrategy(With.fingerprints.fourGateGoon)
+        getObservatory &&= ! reaverAllIn
+        getObservers &&= ! reaverAllIn
+      } else {
         // Look for reasons to avoid making an Observer.
         // Don't stop to check if we already started an Observatory or Observers
         // because we can cancel and switch out of them at any time.
@@ -317,13 +325,15 @@ class PvPOpening extends GameplanImperative {
     shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
-    if (PvPRobo()) {
-      shouldExpand = unitsComplete(Protoss.Reaver) > 0 || ( ! getReavers && unitsComplete(IsWarrior) >= 6)
+    if (reaverAllIn) {
+      shouldExpand = units(Protoss.Reaver) >= 2 && units(Protoss.Shuttle) >= 1
+    } else if (PvPRobo()) {
+      shouldExpand = unitsComplete(Protoss.Reaver) > 0
+      shouldExpand ||= ! getReavers && unitsComplete(IsWarrior) >= ?(enemyBases > 1, 6, 12)
       shouldExpand &&= PvPIdeas.pvpSafeToMoveOut
       shouldExpand &&= ! shuttleSpeed
       shouldExpand &&= Protoss.DragoonRange()
       shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
-      shouldExpand ||= unitsComplete(IsWarrior) >= 12 && safeToMoveOut
     } else if (PvPDT()) {
       shouldExpand = atMainTiming
       shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (PvPIdeas.pvpSafeAtHome || With.scouting.enemyProximity < 0.75)
@@ -336,6 +346,8 @@ class PvPOpening extends GameplanImperative {
       shouldExpand = atMainTiming && ! mainTimingClosed
       shouldExpand || unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
+    shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
+
     // If we want to expand, make sure we control our natural
     if (shouldAttack || shouldExpand || (safeAtHome && ! PvPDT())) {
       holdNatural()
@@ -368,6 +380,7 @@ class PvPOpening extends GameplanImperative {
     if (getObservers)   status("Obs")
     if (getObservatory) status("Observatory")
     if (getReavers)     status("Reaver")
+    if (reaverAllIn)    status("ReaverAllIn")
     if (greedyDT)       status("GreedyDT")
     if (shouldAttack)   status("Attack")
     if (shouldHarass)   status("Harass")
@@ -783,13 +796,16 @@ class PvPOpening extends GameplanImperative {
   }
 
   private def trainRoboUnits(): Unit = {
-    if (getObservers) {
-      once(Protoss.Observer)
-      if (With.fingerprints.dtRush()) pump(Protoss.Observer, 2)
-    }
-    // Disabling Shuttles until we get better at ferrying units into our natural
-    //if (units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
-    pump(Protoss.Reaver)
+    var pumpObs = getObservers
+    pumpObs &&= ! With.fingerprints.fourGateGoon()
+    pumpObs &&= ! enemyRobo
+    pumpObs &&= enemyBases < 2
+    pumpObs &&= ! reaverAllIn
+    pumpObs ||= With.fingerprints.dtRush()
+    if (getObservers) once(Protoss.Observer)
+    if (pumpObs) pump(Protoss.Observer, 1)
+    if (reaverAllIn || units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+    if (pumpObs) pump(Protoss.Observer, 2) else if (units(Protoss.Observer) > 1) cancel(Protoss.Observer)
   }
 
   private def trainGatewayUnits(): Unit = {

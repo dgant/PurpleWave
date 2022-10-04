@@ -50,7 +50,7 @@ trait Polygons {
     signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
-  @inline final def convexHull[C <: Seq[Pixel]](points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
+  @inline final def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)
   final def convexHull[T](points: Seq[T], extract: T => Pixel): Seq[T] = {
     // See https://en.wikipedia.org/wiki/Graham_scan
     if (points.size <= 2) return points
@@ -81,7 +81,7 @@ trait Polygons {
     output
   }
 
-  @inline final def convexPolygonContains[T](points: Seq[AbstractPoint], point: AbstractPoint): Boolean = {
+  @inline final def convexPolygonContains(points: Seq[AbstractPoint], point: AbstractPoint): Boolean = {
     // A point is inside a convex polygon if it is on the same side of each segment
     if (points.length < 2) return false
     var consensusSide: Option[Boolean] = None

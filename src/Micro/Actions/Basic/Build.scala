@@ -19,7 +19,7 @@ object Build extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.toBuild.isDefined && unit.intent.toBuildTile.isDefined
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     
     val ourBuilding = With.grids.units.get(unit.intent.toBuildTile.get).find(_.unitClass == unit.intent.toBuild.get)
     
@@ -74,8 +74,9 @@ object Build extends Action {
     val buildTile = unit.intent.toBuildTile.get
 
     val pushPixel = buildArea.center
+    Commander.defaultEscalation(unit)
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
-    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + buildClass.radialHypotenuse, unit))
+    With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + buildClass.radialHypotenuse, unit))
 
     var movePixel = buildTile.topLeftPixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16)
 

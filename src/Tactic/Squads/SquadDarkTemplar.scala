@@ -23,6 +23,7 @@ class SquadDarkTemplar extends Squad {
   override def launch(): Unit = {
     bases.clear()
     bases ++= With.geography.bases
+      .filterNot(_.zone.island)
       .filterNot(_.owner.isUs)
       .filterNot(_.metro.units.exists(u => u.isEnemy && IsMobileDetector(u)))
       .filterNot(_.enemies.exists(u =>

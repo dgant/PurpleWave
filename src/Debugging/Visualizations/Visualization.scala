@@ -127,11 +127,9 @@ class Visualization extends TimedTask {
     
     if (happy) {
       ShowHappyVision.render()
-    }
-    else if (textOnly) {
+    } else if (textOnly) {
       ShowTextOnly.render()
-    }
-    else {
+    }  else {
       if (map) {
         views.foreach(_.renderMap())
       }
@@ -159,8 +157,7 @@ class Visualization extends TimedTask {
     random -= With.configuration.visualizationProbabilityHappyVision
     if (random < 0) {
       happy = true
-    }
-    else {
+    } else {
       random -= With.configuration.visualizationProbabilityTextOnly
       if (random < 0) {
         textOnly = true

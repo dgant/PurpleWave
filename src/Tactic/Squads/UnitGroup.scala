@@ -98,7 +98,7 @@ trait UnitGroup {
   private val _maxAttackerSpeedVsGround   = new Cache(() => Maff.max(attackers.filter(_.canAttackGround).map(_.topSpeed)).getOrElse(0.0))
   private val _maxAttackerSpeedVsAir      = new Cache(() => Maff.max(attackers.filter(_.canAttackAir).map(_.topSpeed)).getOrElse(0.0))
   private val _maxRangeGround             = new Cache(() => Maff.max(attackers.view.filter(_.canAttackGround).map(_.pixelRangeGround)).getOrElse(0.0))
-  private val _pace01                     = new Cache(() => Maff.clamp(groupOrderable.view.map(u => (u.pixel - u.previousPixel(_paceAge)) / Math.max(0.01, u.topSpeed)).foldLeft(Pixel(0, 0))(_ + _).length / _paceAge, -1, 1))
+  private val _pace01                     = new Cache(() => Maff.clamp(groupOrderable.view.map(u => (u.pixel - u.previousPixel(_paceAge)) / Math.max(0.01, u.topSpeed)).foldLeft(Pixel(0, 0))(_ + _).length / _paceAge / groupOrderable.length, -1, 1))
   private val _combatValueAir             = new Cache(() => attackersCasters.filter(_.flying).map(_.subjectiveValue).sum)
   private val _combatValueGround          = new Cache(() => attackersCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))

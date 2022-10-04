@@ -7,7 +7,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Physics.ForceMath
 import Mathematics.Points.Pixel
-import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Combat
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
@@ -55,9 +54,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     .orElse(unit.intent.toBuildTile.map(_.center))
     .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
     .getOrElse(safety)
-  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel)
-    .orElse(toReturn)
-    .getOrElse(home)
+  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel).orElse(toReturn).getOrElse(home)
   def home: Pixel = homeCache()
   private val homeCache = new Cache[Pixel](() =>
     Maff.minBy(
@@ -78,13 +75,15 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Diagnostics //
   /////////////////
 
+  var fightReason : String              = ""
   var lastPath    : Option[TilePath]    = None
   var lastAction  : Option[String]      = None
-  var fightReason : String              = ""
+  val actions     : ArrayBuffer[String] = new ArrayBuffer[String]()
 
-  def act(value: String): Unit = { lastAction = Some(value) }
-
-  val actionsPerformed: ArrayBuffer[Action] = new ArrayBuffer[Action]()
+  def act(value: String): Unit = {
+    actions += value
+    lastAction = Some(value)
+  }
 
   ///////////////
   // Execution //
@@ -107,7 +106,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     fightReason   = ""
     tryingToMove  = false
     wantsUnload   = false
-    actionsPerformed.clear()
+    actions.clear()
     unit.orderTarget.foreach(_.removeDamage(unit))
 
     _rideGoal = None
@@ -130,7 +129,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     .filter(_._2.exists(_.lengthSquared > 0))
     .map(p => (p._1, p._2.get))
     .toVector)
-  val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.map(_._2)), () => priority)
+  val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.filter(_._1.priority > priority).map(_._2)), () => priority)
   val receivedPushPriority = new Cache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None))
 
   /////////////

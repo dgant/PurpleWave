@@ -10,8 +10,7 @@ object Meld extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.intent.shouldMeld
     && unit.isAny(Protoss.HighTemplar, Protoss.DarkTemplar)
-    && ( ! unit.visibleToOpponents || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isUs))
-  )
+    && ( ! unit.visibleToOpponents || unit.matchups.threatsInRange.nonEmpty || unit.base.exists(_.owner.isUs)))
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val besties = unit

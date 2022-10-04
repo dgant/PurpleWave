@@ -4,7 +4,7 @@ import Debugging.Visualizations.Forces
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
-import Mathematics.Physics.{Force, ForceMath}
+import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Shapes.Circle
 import Mathematics.{Maff, Shapes}
@@ -131,21 +131,14 @@ object MicroPathing {
   }
 
   def setDefaultForces(unit: FriendlyUnitInfo, goalSafety: Boolean, goalOrigin: Boolean): Unit = {
-    val to = unit.agent.safety
-
-    // Where to go
-    unit.agent.forces(Forces.sneaking)  = Potential.detectionRepulsion(unit)
-    unit.agent.forces(Forces.travel)    = Potential.towards(unit, to) * 1 * Maff.toInt(goalOrigin)
-    unit.agent.forces(Forces.threat)    = Potential.softAvoidThreatRange(unit)     * 2 * Maff.toInt(goalSafety)
+    unit.agent.forces(Forces.sneaking)  = Potential.avoidDetection(unit)
+    unit.agent.forces(Forces.travel)    = Potential.towards(unit, unit.agent.safety)  * Maff.toInt(goalOrigin)
+    unit.agent.forces(Forces.threat)    = Potential.hardAvoidThreatRange(unit)        * Maff.toInt(goalSafety)
     if (unit.agent.forces.forall(_._2.lengthSquared == 0)) {
       unit.agent.forces(Forces.travel)  = Potential.towards(unit, unit.agent.destination)
     }
-
-    // How to get there
-    unit.agent.forces(Forces.spreading)   = (Potential.preferSpreading(unit)  * Maff.toInt(goalSafety))
-    unit.agent.forces(Forces.spacing)     = unit.agent.receivedPushForce()
-
-    ForceMath.rebalance(unit.agent.forces, 1.5, Forces.threat, Forces.travel, Forces.sneaking)
+    unit.agent.forces(Forces.spacing) = Potential.preferSpacing(unit)
+    unit.agent.forces(Forces.pushing) = Potential.followPushes(unit)
   }
 
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {

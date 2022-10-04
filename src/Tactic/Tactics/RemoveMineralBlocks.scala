@@ -1,9 +1,7 @@
 package Tactic.Tactics
 
 import Lifecycle.With
-import Mathematics.Maff
 import Micro.Agency.Intention
-import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Utilities.?
 import Utilities.UnitCounters.{CountOne, CountUpTo}
@@ -23,14 +21,17 @@ class RemoveMineralBlocks extends Tactic {
       .filter(unit => unit.unitClass.isMinerals && unit.isBlocker)
       .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixel) || edge.pixelCenter.pixelDistanceSquared(unit.pixel) < Math.pow(32.0 * 3, 2)))
       .toVector
-
-    if (With.units.countOurs(IsWorker) < ?(With.blackboard.wantToAttack(), 32, 39)) return
     if (ourMineralBlocks.isEmpty) return
-    
-    val mineral = ourMineralBlocks.head
-    miners.preference = PreferClose(mineral.pixel)
-    miners.counter = CountUpTo(Maff.clamp(ourMineralBlocks.size, 1, MacroFacts.unitsComplete(IsWorker) - With.geography.ourBases.map(b => 2 * b.minerals.size + 3 * b.gas.count(_.isOurs)).sum))
+
+    val workersTotal  = With.units.countOurs(IsWorker)
+    val workersUsed   = With.geography.ourBases.map(b => 1 + 2 * b.minerals.length + 3 * b.gas.length).sum
+    val workersFree   = workersTotal - workersUsed
+    if (workersFree == 0 && workersTotal < ?(With.blackboard.wantToAttack(), 32, 39)) return
+
+    val workersToUse = Math.max(1, Math.min(ourMineralBlocks.size, workersFree))
+    miners.preference = PreferClose(ourMineralBlocks.head.pixel)
+    miners.counter = CountUpTo(workersToUse)
     miners.acquire()
-    miners.units.foreach(_.intend(this, new Intention { toGather = Some(mineral) }))
+    miners.units.zipWithIndex.foreach(p => p._1.intend(this, new Intention { toGather = Some(ourMineralBlocks(p._2 % ourMineralBlocks.length)) }))
   }
 }

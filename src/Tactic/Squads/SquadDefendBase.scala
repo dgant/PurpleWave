@@ -4,10 +4,11 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
+import Micro.Actions.Action
+import Micro.Agency.{Commander, Intention}
 import Micro.Formation._
 import Performance.Cache
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.Time.Minutes
@@ -59,6 +60,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def run(): Unit = {
     if (units.isEmpty) return
+    if (emergencyDTHugs()) return
 
     val canWander         = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
     val scourables        = enemies.filter(isScourable)
@@ -171,5 +173,25 @@ class SquadDefendBase(base: Base) extends Squad {
     // If they can assault our base from outside it
     if (enemyHasVision() && base.zone.units.view.filter(enemy.inRangeToAttack).exists(u => u.unitClass.melee || ! base.zone.edges.exists(_.contains(u.pixel)))) return true
     false
+  }
+
+  private def emergencyDTHugs(): Boolean = {
+    val dts = enemies.filter(Protoss.DarkTemplar)
+    if (dts.nonEmpty && ! With.units.ours.exists(u => u.unitClass.isDetector && u.complete)) {
+      val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
+      val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourNatural.zone.exitNowOrHeart.center)
+      units.foreach(_.intend(this, new Intention {
+        action = new HugAt(target)
+      }))
+      return true
+    }
+    false
+  }
+
+  private class HugAt(pixel: Pixel) extends Action {
+    override def perform(unit: FriendlyUnitInfo): Unit = {
+      unit.agent.toTravel = Some(pixel)
+      Commander.move(unit)
+    }
   }
 }

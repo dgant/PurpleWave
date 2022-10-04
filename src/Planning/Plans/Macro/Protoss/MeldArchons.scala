@@ -17,7 +17,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
   templar.matcher = Protoss.HighTemplar
   templar.preference = PreferLowEnergy
   
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     // Fast check for performance
     val proceed = With.self.isProtoss && With.units.existsOurs(Protoss.HighTemplar)
     if ( ! proceed) return

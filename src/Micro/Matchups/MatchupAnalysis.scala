@@ -8,7 +8,6 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.{GenericUnitGroup, UnitGroup}
 import Utilities.?
-import Utilities.UnitFilters.IsWorker
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
@@ -54,7 +53,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def isCloakedAttacker           : Boolean           = me.cloaked && targetNearest.isDefined
   def inTankRange                 : Boolean           = _inTankRange()
   def withinSafetyMargin          : Boolean           = pixelsEntangled <= ?(me.flying && me.topSpeed > Maff.max(threats.map(_.topSpeed)).getOrElse(0.0), -64, -safetyMargin)
-  def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin || threatsInPixels(160).forall(IsWorker)
+  def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
   def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
   def framesToLive                : Double            = _framesToLive()
@@ -74,10 +73,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     targetNearest.flatMap(target =>
       threatDeepest.flatMap(deepest =>
         threatNearest.flatMap(nearest =>
-          // If we have time to volley before being engaged, we're unopinionated
-          // The speed multiplier accounts for threat approaching us while we approach target
           threatSoonest
-            .filter(soonest => (soonest.topSpeed + me.topSpeed) / me.topSpeed * me.framesToLaunchAttack(target) + me.unitClass.framesToPotshot < soonest.framesToLaunchAttack(me))
             .map(soonest =>
               // Volleying must not decrease our DPS relative to theirs.
               // Dragoon vs. anyone: Yes

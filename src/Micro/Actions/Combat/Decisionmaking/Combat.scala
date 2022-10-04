@@ -13,7 +13,7 @@ import Micro.Actions.Protoss.BeReaver
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Micro.Formation.Formation
+import Micro.Formation.{Formation, FormationStyleEngage}
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
@@ -21,14 +21,20 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.{GenericFriendlyUnitGroup, TFriendlyUnitGroup, UnitGroup}
 import Utilities.?
-import Utilities.Time.Forever
+import Utilities.Time.{Forever, Seconds}
 import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot, IsWorker}
 
 final class Combat(unit: FriendlyUnitInfo) extends Action {
 
-  var bloodlustFrames : Double            = 0.0
-  var restraining     : Boolean           = false
-  var technique       : Technique         = Fight
+  var restrained            : Boolean = false
+  var restrainedFrames      : Double  = 0.0
+  var technique             : Technique = Fight
+  var firingPixel           : Option[Pixel] = None
+  var framesToPokeTarget    : Option[Int] = None
+  var idealTargetDistance   : Double = _
+  var hasSpacetimeToPoke    : Boolean = _
+  var breakFormationToAttack: Boolean = _
+  var trapped               : Boolean = _
 
   protected def group                 : UnitGroup with TFriendlyUnitGroup = unit.squad.orElse(unit.friendlyTeam).getOrElse(new GenericFriendlyUnitGroup(unit))
   protected def target                : Option[UnitInfo]  = unit.agent.toAttack
@@ -36,7 +42,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def engageFormation       : Option[Formation] = formations.dropRight(1).headOption.filter(_.placements.contains(unit))
   protected def squadEngaged          : Boolean = unit.squad.map(_.engagedUpon).getOrElse(unit.matchups.engagedUpon)
   protected def fightConsensus        : Boolean = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldFight)
-  protected def assembling            : Boolean = engageFormation.isDefined
+  protected def assembling            : Boolean = engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.25 * group.restrainedFrames / Seconds(10)()
   protected def targetFleeing         : Boolean = target.exists(t => t.canMove && Maff.isTowards(unit.pixel, t.pixel, t.angleRadians))
   protected def targetDistanceHere    : Double  = target.map(unit.pixelDistanceEdge).getOrElse(0d)
   protected def targetDistanceThere   : Double  = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
@@ -49,29 +55,29 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def nudged                : Boolean = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
   protected def nudgedTowards         : Boolean = nudged && Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
   protected def pushThrough           : Boolean = shouldEngage && engageFormation.isDefined && nudged && nudgedTowards && ! unit.flying && ! trapped
+  protected def ground10              : Double  = ?(unit.flying, 0, 1)
+  protected def abroad10              : Double  = ?(unit.zone.owner.isUs, 0, 1)
   protected def shouldRetreat         : Boolean = techniqueIs(Fallback, Flee, Excuse)
   protected def shouldEngage          : Boolean = techniqueIs(Fight, Abuse, Scavenge)
-
-  protected def canAbuse(t: UnitInfo): Boolean = unit.canAttack(t) && ( ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
-
-  var firingPixel           : Option[Pixel] = None
-  var framesToPokeTarget    : Option[Int] = None
-  var idealTargetDistance   : Double = _
-  var hasSpacetimeToPoke    : Boolean = _
-  var breakFormationToAttack: Boolean = _
-  var trapped               : Boolean = _
+  protected def canAbuse(t: UnitInfo) : Boolean = unit.canAttack(t) && ( ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.intent.canFight
-
   override def perform(unused: FriendlyUnitInfo = null): Unit = {
+    restrained = false
+    innerPerform()
+    restrainedFrames += ?(restrained, 1, -1) * With.framesSince(unit.agent.lastFrame)
+    restrainedFrames = Math.max(0, restrainedFrames)
+  }
+  def innerPerform(): Unit = {
     Target.choose(unit)
-    unit.agent.shouldFight &&= target.nonEmpty || unit.matchups.ignorant
+    unit.agent.shouldFight &&= target.nonEmpty || unit.matchups.ignorant || unit.matchups.threatsInPixels(160).forall(IsWorker)
+    Commander.defaultEscalation(unit)
 
-    trapped               = ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
-    firingPixel           = target.map(unit.pixelToFireAt)
-    framesToPokeTarget    = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
-    idealTargetDistance   = getIdealTargetDistance
-    hasSpacetimeToPoke    =
+    trapped             = ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
+    firingPixel         = target.map(unit.pixelToFireAt)
+    framesToPokeTarget  = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
+    idealTargetDistance = getIdealTargetDistance
+    hasSpacetimeToPoke  =
       firingPixel.exists(theFiringPixel =>
         framesToPokeTarget.exists(framesToPoke =>
           unit.matchups.threats.forall(threat =>
@@ -81,18 +87,18 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
             && ! threat.inRangeToAttack(unit, theFiringPixel.project(threat.pixel, 16)))))
 
     technique =
-      if ( ! unit.canMove)                                Fight
-      else if (unit.agent.shouldFight && target.isEmpty)  ?(unit.matchups.ignorant, Walk, Flee)
-      else if (unit.agent.shouldFight)                    Fight
-      else                                                Flee
+      if ( ! unit.canMove)              Fight
+      else if (unit.agent.shouldFight)  ?(target.isDefined, Fight, Walk)
+      else if (unit.matchups.ignorant)  Walk
+      else                              Flee
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
     transition(Abuse,     unit.unitClass.abuseAllowed && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable))
     transition(Scavenge,
-      target.isDefined
+      target.exists(_.matchups.framesToLive > unit.matchups.framesToLive)
       && unit.matchups.threatDeepest.exists(t => unit.canAttack(t) && unit.pixelRangeAgainst(t) >= t.pixelRangeAgainst(unit))
       && unit.totalHealth * 2.0 <= group.meanAttackerHealth
-      && unit.totalHealth * 2.0 <= unit.matchups.threatsInPixels(64).map(_.damageOnNextHitAgainst(unit)).sum)
+      && unit.totalHealth * 3.0 <= unit.matchups.threatsInPixels(96).map(_.damageOnNextHitAgainst(unit)).sum)
     transition(Fallback,  unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver))
     transition(Fallback,
       Protoss.Dragoon(unit)
@@ -105,7 +111,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.agent.shouldFight ||= shouldEngage
     if (shouldRetreat) unit.agent.toTravel = Some(unit.agent.safety)
 
-    if (technique == Walk     && move())        return
+    if (technique == Walk     && walk())        return
     if (technique == Aim      && aim())         return
     if (technique == Dodge    && dodge())       return
     if (technique == Fallback && potshot())     return
@@ -132,16 +138,23 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   ///////////////
 
   protected def applyForce(label: ForceLabel, force: Force): Unit = {
-    unit.agent.forces.put(label, force)
+    if (force.lengthFast > 0) {
+      unit.agent.forces.put(label, force)
+    }
   }
-  protected def moveForcefully(): Unit = {
+  protected def applySeparationForces(): Unit = {
+    applyForce(Forces.spacing,  Potential.preferSpacing(unit))
+    applyForce(Forces.pushing,  Potential.followPushes(unit))
+  }
+  protected def moveForcefully(): Boolean = {
+    applySeparationForces()
     val radians         = unit.agent.forces.sum.radians
     val forceGoal       = MicroPathing.getWaypointInDirection(unit, radians).orElse(unit.agent.toTravel)
     unit.agent.toTravel = forceGoal.orElse(unit.agent.toTravel)
     if (forceGoal.isEmpty) {
       With.logger.micro(f"$unit found no waypoint towards ${Math.toDegrees(radians)} degrees.")
     }
-    Commander.move(unit)
+    move()
   }
 
   ////////////////////
@@ -173,48 +186,34 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     lazy val sameThreatsChasing = unit.matchups.threats.forall(t => t.inRangeToAttack(unit) == t.inRangeToAttack(unit, projectedUs))
     lazy val obiwanned          = ! unit.flying && ! t.flying && ! unit.unitClass.melee && t.altitude > unit.altitude
     lazy val chaseDistance      = rangeAgainstUs.filter(_ < range).map(r => Math.max(24, (range - r) / 2)).getOrElse(0d)
-
-    if ( ! t.canMove && ! t.canAttack(unit)) return ?(inChoke && nudgedTowards, 0, range)
-
+    // Push through choke
+    if ( ! unit.flying && ! t.canMove && ! t.canAttack(unit)) return ?(inChoke && nudgedTowards, 0, range)
     // Some units shouldn't even try to chase
     if (unit.isAny(Terran.SiegeTankUnsieged, Protoss.Reaver)) return range
-
     // If we're safe, why not chase
     if (unit.matchups.threatDeepest.isEmpty) return 0
-
     // Some units should usually chase flying targets
-    if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk) && t.flying && ! scourgeApproaching && ! Zerg.Overlord(t)) return 0
-
+    if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk) && t.flying && ! scourgeApproaching && ( ! Zerg.Overlord(t) || unit.matchups.pixelsEntangled < -64)) return 0
     // Chase if they outrange us
     if (pixelsOutranged.isDefined) return chaseDistance
-
     // Chase if we're in a choke and being nudged towards them
     if (inChoke && nudgedTowards) return chaseDistance
-
     // Chase if we're confident and fighting up high ground
     if (obiwanned) return chaseDistance
-
     // Chase if we're confident and being nudged towards them
     if (confidentEnoughToChase && nudgedTowards) return chaseDistance
-
     // Chase if we're confident and they're about to escape us
     if (confidentEnoughToChase && targetEscaping) return chaseDistance
-
     // Chase if they're escaping out of our ideal range and chasing won't bring us into range of anyone new
     if (targetEscaping && sameThreatsChasing) return chaseDistance
-
     // Breathe if range is equal and they shoot first
     if (rangeEqual && t.cooldownLeft < unit.cooldownLeft) return range + unit.topSpeed * Math.max(0, unit.cooldownLeft - With.latency.latencyFrames - unit.framesToTurnTo(t))
-
     // Maintain maximum range if chasing puts us in range of anyone new
     if ( ! sameThreatsChasing) return range
-
     // Maintain maximum range if they're a threat coming towards us
     if (targetApproaching) return range
-
     // Maintain just enough range if we're being nudged
     if (nudgedTowards) return chaseDistance
-
     // Otherwise, stay near max range. Get a little closer if we can in case they try to flee
     rangeAgainstUs.map(rangeAgainst => Maff.clamp(rangeAgainst + 64, range - 16, range)).getOrElse(range - 16)
   }
@@ -232,6 +231,16 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         }
       }
       Commander.move(unit)
+    }
+    unit.unready
+  }
+
+  protected def walk(): Boolean = {
+    if (unit.agent.receivedPushPriority() > unit.agent.priority) {
+      applyForce(Forces.travel, Potential.towardsDestination(unit))
+      moveForcefully()
+    } else {
+      move()
     }
     unit.unready
   }
@@ -286,7 +295,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         unit.agent.act("Slide")
         Commander.move(unit)
       } else if (breakFormationToAttack) {
-        if (idealDistanceForward >= 32) {
+        if (shouldChase && idealDistanceForward >= 32) {
           chase()
         } else {
           unit.agent.act("Approach")
@@ -315,10 +324,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def abuse(): Boolean = {
     if (idealDistanceForward < - Math.min(32, unit.topSpeed * (unit.cooldownLeft + With.latency.latencyFrames)) || ! attackIfReady()) {
-      applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, 64.0))
-      applyForce(Forces.spacing,  Potential.avoidCollision(unit)) // Regroup if we have enough distance?
-      applyForce(Forces.travel,   Potential.towardsTarget(unit))
-      moveForcefully()
+      Retreat(unit)
     }
     unit.unready
   }
@@ -340,25 +346,27 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
       if (pushThrough) {
         unit.agent.act("Push")
-        // Move towards destination and target; away from allies, centroid, threat
-        applyForce(Forces.travel,     Potential.towards(unit, engageFormation.flatMap(_(unit)).orElse(firingPixel).getOrElse(unit.agent.destination)))
-        applyForce(Forces.target,     Potential.towards(unit, firingPixel.getOrElse(unit.agent.destination)))
-        applyForce(Forces.spacing,    Potential.avoidCollision(unit)) // Regroup if we have enough distance?
-        applyForce(Forces.spreading,  Potential.towards(unit, group.centroidGround) * ?(unit.flying, 0, -1))
-        applyForce(Forces.threat,     Potential.softAvoidThreatRange(unit))
-        if (unit.agent.forces(Forces.spacing).lengthFast > 0 || ! attackIfReady()) moveForcefully()
+        applySeparationForces()
+        if (unit.agent.forces(Forces.spacing).lengthFast > 0 || ! attackIfReady()) {
+          applyForce(Forces.travel, Potential.towards(unit, engageFormation.flatMap(_(unit)).orElse(firingPixel).getOrElse(unit.agent.destination)))
+          applyForce(Forces.target, Potential.towards(unit, firingPixel.getOrElse(unit.agent.destination)))
+          applyForce(Forces.threat, Potential.softAvoidThreatRange(unit) * 1.5)
+          moveForcefully()
+        }
       } else if (squadEngaged) {
         if (techniqueIs(Scavenge)) {
-          val framesFree = unit.matchups.threatSoonest.map(_.framesToLaunchAttack(unit)).getOrElse(Forever())
-          val framesToAttack = target.map(unit.framesToLaunchAttack).getOrElse(0)
-          unit.agent.act("Snipe")
-          if (framesToAttack >= framesFree || ! attackIfReady()) {
-            unit.agent.act("Lurk")
-            applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, 64.0))
-            applyForce(Forces.spacing,  Potential.avoidCollision(unit)) // Regroup if we have enough distance?
-            applyForce(Forces.travel,   Potential.towardsTarget(unit))
-            applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.home))
-            moveForcefully()
+          if ( ! potshot()) {
+            val framesSafe = unit.matchups.threatSoonest.map(_.framesToLaunchAttack(unit)).getOrElse(Forever())
+            val framesToAttack = target.map(unit.framesToLaunchAttack).getOrElse(0)
+            unit.agent.act("Snipe")
+            if (framesToAttack >= framesSafe || ! attackIfReady()) {
+              unit.agent.act("Lurk")
+              unit.agent.escalatePriority(TrafficPriorities.Bump) // Stronger than attackers, less than full retreaters
+              applyForce(Forces.travel,   Potential.towardsTarget(unit))
+              applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, Math.max(unit.topSpeed * framesToAttack, 64.0)))
+              applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10)
+              moveForcefully()
+            }
           }
         } else if (readyToApproachTarget || unit.unitClass.melee || ! unit.matchups.wantsToVolley.contains(true) || shouldChase) {
           unit.agent.act("Engage")
@@ -366,21 +374,20 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         } else {
           unit.agent.act("Reposition")
           val urgency01 = Math.max(0.0, (unit.cooldownMaxAirGround - unit.cooldownLeft) / (unit.cooldownMaxAirGround))
-          applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, 32.0))
-          applyForce(Forces.spacing,  Potential.avoidCollision(unit)) // Regroup if we have enough distance?
           applyForce(Forces.travel,   Potential.towardsTarget(unit) * urgency01)
-          applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.home) * ?(unit.flying, 0, (1 - urgency01)))
+          applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, 32.0))
+          applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
           moveForcefully()
         }
       } else if (assembling && formations.nonEmpty && group.groupUnits.size > 1) {
         unit.agent.act("Assemble")
         val targetRangeDelta  = unit.matchups.pixelsToTargetRange.getOrElse(unit.sightPixels.toDouble) - group.meanAttackerTargetDistance
         val forwardness       = if (unit.flying) 0.0 else Maff.fastTanh11(targetRangeDelta / 96.0)
-        applyForce(Forces.threat,     Potential.hardAvoidThreatRange(unit, 96.0))
-        applyForce(Forces.spacing,    Potential.avoidCollision(unit)) // Regroup if we have enough distance?
         applyForce(Forces.travel,     Potential.towards(unit, unit.agent.destination))
-        applyForce(Forces.spreading,  Potential.towards(unit, unit.squad.get.centroidGround) * ?(unit.flying, 0, - forwardness))
+        applyForce(Forces.threat,     Potential.hardAvoidThreatRange(unit, 96.0))
+        applyForce(Forces.regrouping, Potential.regroup(unit))
         moveForcefully()
+        restrained = engageFormation.exists(_.style == FormationStyleEngage)
       } else {
         unit.agent.act("Attack")
         charge()

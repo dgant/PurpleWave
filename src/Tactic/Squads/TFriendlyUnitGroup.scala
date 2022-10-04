@@ -11,12 +11,12 @@ trait TFriendlyUnitGroup {
   def groupFriendlyOrderable  : Seq[FriendlyUnitInfo] = groupFriendlyUnits.view.filter(_.unitClass.orderable)
   def groupFriendlyAttackers  : Seq[FriendlyUnitInfo] = groupFriendlyOrderable.view.filter(u => u.unitClass.canAttack && ! u.unitClass.isWorker)
 
-  def bloodlustFrames : Double  = _bloodlustFrames()
-  def confidence11    : Double  = _confidence11()
-  def fightConsensus  : Boolean = _fightConsensus()
-  def homeConsensus   : Pixel   = _homeConsensus()
+  def restrainedFrames  : Double  = _restrainedFrames()
+  def confidence11      : Double  = _confidence11()
+  def fightConsensus    : Boolean = _fightConsensus()
+  def homeConsensus     : Pixel   = _homeConsensus()
 
-  private val _bloodlustFrames  = new Cache(() => Maff.mean(groupFriendlyAttackers.filter(_.battle.isDefined).map(_.agent.combat.bloodlustFrames)))
+  private val _restrainedFrames = new Cache(() => Maff.mean(groupFriendlyAttackers.filter(_.battle.isDefined).map(_.agent.combat.restrainedFrames)))
   private val _confidence11     = new Cache(() => Maff.mean(Maff.orElse(groupFriendlyOrderable.filter(_.battle.isDefined), groupFriendlyOrderable).map(_.confidence11)))
   private val _fightConsensus   = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldFight || u.battle.forall(_.judgement.exists(_.unitShouldFight(u))))).getOrElse(true))
   private val _homeConsensus    = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.home)).getOrElse(With.geography.home.center))

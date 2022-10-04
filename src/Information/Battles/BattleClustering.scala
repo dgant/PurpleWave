@@ -26,9 +26,10 @@ class BattleClustering {
       hullCentroid = None
       units ++= other.units
     }
-    def intersects(other: Cluster): Boolean = {
+    def intersects(other: Cluster): Boolean = (
       hull.exists(u => Maff.convexPolygonContains(other.hullExpanded, u.pixel))
-    }
+      || other.hull.exists(u => Maff.convexPolygonContains(hullExpanded, u.pixel))
+    )
   }
 
   def recalculate(): Unit = {

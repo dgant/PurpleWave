@@ -198,6 +198,11 @@ final class MacroSim {
     // Find a state where we can fulfill the request
     val step = steps(i)
     var cant = false
+    lazy val atFrame = {
+      val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / With.accounting.ourIncomePerFrameMinerals))
+      val gasFrames     = Math.max(0, Maff.nanToInfinity((request.gasCost     - step.state.gas)       / With.accounting.ourIncomePerFrameGas))
+      step.event.dFrames + Math.max(mineralFrames, gasFrames)
+    }
     cant ||= exceedsMinInsert(request, i + 1)
     cant ||= request.mineralCost > Math.max(0, step.state.minerals) && With.accounting.ourIncomePerFrameMinerals == 0
     // TODO: Restore once we update income per-state
@@ -208,7 +213,7 @@ final class MacroSim {
     cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
     cant ||= step.state.producers(request.producerRequired) < request.producersRequired
     cant ||= request.unitsRequired.exists(_.withMacroSubstitutes.map(step.state.unitsComplete).sum == 0)
-    cant ||= ! canInsertBefore(request, i + 1)
+    cant ||= ! canInsertBefore(request, i + 1, atFrame.toInt)
     // TODO: Treat addons as producers
     if (cant) {
       minInsert(request) = Math.max(i, minInsert.getOrElse(request, i))
@@ -216,13 +221,14 @@ final class MacroSim {
     ! cant
   }
 
-  private def canInsertBefore(request: RequestBuildable, i: Int): Boolean = {
+  private def canInsertBefore(request: RequestBuildable, i: Int, atFrame: Int): Boolean = {
     // Ensure no future states would be rendered impossible by inserting the request
     var j = i
     var cant = false
     while(j < steps.length && ! cant) {
-      val state = steps(j).state
-      cant ||= request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired
+      val step = steps(j)
+      val state = step.state
+      cant ||= request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired && step.event.dFrames < atFrame + request.buildFrames
       cant ||= request.mineralCost      > Math.max(0, state.minerals)
       cant ||= request.gasCost          > Math.max(0, state.gas)
       cant ||= request.supplyRequired   > Math.max(0, state.supplyAvailable - state.supplyUsed)

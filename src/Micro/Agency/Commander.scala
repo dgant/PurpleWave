@@ -495,15 +495,25 @@ object Commander {
     sleep(unit)
   }
 
+  def defaultEscalation(unit: FriendlyUnitInfo): Unit = {
+    lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuild.get.tileArea.add(unit.intent.toBuildTile.get).center)
+    if (unit.flying) return
+    if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
+    if (unit.intent.toFinishConstruction.isDefined)             unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toRepair.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toBuildTile.isDefined)                      unit.agent.escalatePriority(?(buildDistance < 128, TrafficPriorities.Shove, TrafficPriorities.Bump))
+    if (unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
+    if (unit.battle.isDefined && ! unit.agent.shouldFight) {    unit.agent.escalatePriority(TrafficPriorities.Pardon)
+      if (unit.matchups.pixelsEntangled > -80)                  unit.agent.escalatePriority(TrafficPriorities.Nudge)
+      if (unit.matchups.pixelsEntangled > -48)                  unit.agent.escalatePriority(TrafficPriorities.Bump)
+      if (unit.matchups.pixelsEntangled > -16)                  unit.agent.escalatePriority(TrafficPriorities.Shove)
+    }
+  }
+
   def pushTowards(unit: FriendlyUnitInfo, to: Pixel, minimumPriority: TrafficPriority, maxDistance: Double = 96): Unit = {
     if (unit.flying) return
     unit.agent.escalatePriority(minimumPriority)
-    if (unit.battle.isDefined && ! unit.agent.shouldFight) {
-      unit.agent.escalatePriority(TrafficPriorities.Pardon)
-      if (unit.matchups.pixelsEntangled > -80) unit.agent.escalatePriority(TrafficPriorities.Nudge)
-      if (unit.matchups.pixelsEntangled > -48) unit.agent.escalatePriority(TrafficPriorities.Bump)
-      if (unit.matchups.pixelsEntangled > -16) unit.agent.escalatePriority(TrafficPriorities.Shove)
-    }
+    defaultEscalation(unit)
     if (unit.agent.priority > TrafficPriorities.None) {
       With.coordinator.pushes.put(new UnitLinearGroundPush(unit.agent.priority, unit, ?(unit.pixelDistanceCenter(to) > maxDistance, unit.pixel.project(to, maxDistance), to)))
     }

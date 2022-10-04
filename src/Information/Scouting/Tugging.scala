@@ -12,6 +12,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 trait Tugging {
   def tugStart                                  : Tile        = _tugStart()
   def tugEnd                                    : Tile        = _tugEnd()
+  def tugLength                                 : Double      = tugStart.groundPixels(tugEnd)
   def tugDistanceGroundUs     (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugStart)
   def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugEnd)
   def proximity               (pixel  : Pixel)  : Double      = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
@@ -19,8 +20,8 @@ trait Tugging {
   def proximity               (base   : Base)   : Double      = proximity(base.townHallArea.center)
   def ourProximity                              : Double      = _ourProximity()
   def enemyProximity                            : Double      = _enemyProximity()
-  def weControl               (pixel  : Pixel)  : Boolean     = ourProximity    < proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut)
-  def enemyControls           (pixel  : Pixel)  : Boolean     = enemyProximity  > proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut)
+  def weControl               (pixel  : Pixel)  : Boolean     = deltaMuscle11(pixel) >   0.75 || (ourProximity    <= proximity(pixel) && (enemyProximity < proximity(pixel) ||   MacroFacts.safeToMoveOut))
+  def enemyControls           (pixel  : Pixel)  : Boolean     = deltaMuscle11(pixel) < - 0.75 || (enemyProximity  >= proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safeToMoveOut))
   def weControl               (tile   : Tile)   : Boolean     = weControl(tile.center)
   def enemyControls           (tile   : Tile)   : Boolean     = enemyControls(tile.center)
   def weControlOurNatural                       : Boolean     = _weControlOurNatural()
@@ -28,6 +29,9 @@ trait Tugging {
   def weControl               (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) > controlPoints(zone).count(enemyControls)
   def enemyControls           (base   : Base)   : Boolean     = controlPoints(base).count(weControl) < controlPoints(base).count(enemyControls)
   def enemyControls           (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) < controlPoints(zone).count(enemyControls)
+  def ourMuscleDistance       (pixel  : Pixel)  : Double      = ourMuscleOrigin.walkableTile.groundPixels(pixel)
+  def enemyMuscleDistance     (pixel  : Pixel)  : Double      = enemyMuscleOrigin.walkableTile.groundPixels(pixel)
+  def deltaMuscle11           (pixel  : Pixel)  : Double      = (enemyMuscleDistance(pixel) - ourMuscleDistance(pixel)) / Math.max(13 * 32, enemyMuscleDistance(pixel) + ourMuscleDistance(pixel)) // Floor distance is to avoid wild swings when both players are close
   private def controlPoints   (base   : Base)   : Seq[Pixel]  = Seq(Some(base.townHallArea.center), Some(base.centroid.center), base.zone.entranceNow.map(_.pixelCenter), base.zone.exitNow.map(_.pixelCenter)).flatten
   private def controlPoints   (zone   : Zone)   : Seq[Pixel]  = (zone.bases.flatMap(controlPoints) ++ Seq(Some(zone.centroid.center), zone.entranceNow.map(_.pixelCenter), zone.exitNow.map(_.pixelCenter)).flatten).distinct
 

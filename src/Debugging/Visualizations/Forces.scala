@@ -7,7 +7,7 @@ object Forces {
   lazy val sneaking   : ForceLabel = ForceLabel("Sneaking",   Colors.NeonYellow)
   lazy val target     : ForceLabel = ForceLabel("Target",     Colors.NeonGreen)
   lazy val spacing    : ForceLabel = ForceLabel("Spacing",    Colors.NeonTeal)
-  lazy val regrouping : ForceLabel = ForceLabel("Regrouping", Colors.NeonIndigo)
-  lazy val spreading  : ForceLabel = ForceLabel("Spreading",  Colors.NeonViolet)
-  lazy val sum        : ForceLabel = ForceLabel("Sum",        Colors.White)
+  lazy val regrouping: ForceLabel = ForceLabel("Regrouping", Colors.NeonIndigo)
+  lazy val pushing   : ForceLabel = ForceLabel("Spreading",  Colors.NeonViolet)
+  lazy val sum       : ForceLabel = ForceLabel("Sum",        Colors.White)
 }

@@ -31,9 +31,9 @@ class PvPOpening extends GameplanImperative {
   // Robo
   var getObservers      : Boolean = false
   var getObservatory    : Boolean = false
-  var getReavers  : Boolean = false
-  var reaverAllIn : Boolean = false
-  var shuttleFirst: Boolean = false
+  var getReavers        : Boolean = false
+  var reaverAllIn       : Boolean = false
+  var shuttleFirst      : Boolean = false
   var shuttleSpeed      : Boolean = false
   // DT
   var greedyDT          : Boolean = false
@@ -248,22 +248,27 @@ class PvPOpening extends GameplanImperative {
     /////////////////////////////
 
     if (PvPRobo()) {
+      val enemyCitadel = enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0
       getReavers = PvPReaver() || units(Protoss.RoboticsSupportBay, Protoss.Shuttle) > 0 || enemyStrategy(With.fingerprints.fourGateGoon)
       getObservatory = true
       getObservers = true
+      if (PvPObs()) {
+        reaverAllIn ||= enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)
+        reaverAllIn ||= With.fingerprints.twoGate() && enemyBases > 1
+        reaverAllIn ||= With.fingerprints.twoGate() && (enemies(Protoss.CitadelOfAdun) > 0 || enemyHasUpgrade(Protoss.ZealotSpeed))
+        // TODO: Also all-in vs. 1 Gate Core Expand
+        getReavers ||= reaverAllIn
+        getReavers ||= enemyStrategy(With.fingerprints.fourGateGoon)
+        if (reaverAllIn) {
+          getObservatory  &&= enemyCitadel
+          getObservers    &&= enemyCitadel
+        }
+      }
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
         shuttleFirst = getReavers && (enemyBases > 1 || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst, With.fingerprints.robo))
       }
-      if (enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0) {
+      if (enemyCitadel) {
         shuttleFirst = false
-      } else if (PvPObs()) {
-        reaverAllIn ||= enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
-        reaverAllIn ||= enemyBases > 1 && With.fingerprints.twoGate()
-        // TODO: Also all-in 1 Gate Core Expand
-        getReavers ||= reaverAllIn
-        getReavers ||= enemyStrategy(With.fingerprints.fourGateGoon)
-        getObservatory &&= ! reaverAllIn
-        getObservers &&= ! reaverAllIn
       } else {
         // Look for reasons to avoid making an Observer.
         // Don't stop to check if we already started an Observatory or Observers
@@ -343,7 +348,7 @@ class PvPOpening extends GameplanImperative {
       shouldExpand &&= unitsComplete(IsWarrior) >= 6
       shouldExpand &&= PvPIdeas.pvpSafeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = atMainTiming && ! mainTimingClosed
+      shouldExpand = atMainTiming && ! mainTimingClosed && unitsEver(IsWarrior) >= 20
       shouldExpand || unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long

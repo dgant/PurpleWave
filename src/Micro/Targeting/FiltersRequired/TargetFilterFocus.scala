@@ -11,8 +11,8 @@ object TargetFilterFocus extends TargetFilter {
     if (actor.agent.commit) return true
     if (With.yolo.active) return true
     if (actor.inRangeToAttack(target)
-      && target.unitClass.attacksOrCastsOrDetectsOrTransports
-      && actor.readyForAttackOrder) return true
+      && actor.readyForAttackOrder
+      && (target.unitClass.attacksOrCastsOrDetectsOrTransports || ! actor.squad.exists(_.engagedUpon))) return true
     actor.targetsAssigned.forall(_.contains(target))
   }
 }

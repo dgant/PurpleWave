@@ -38,7 +38,7 @@ object BeCarrier extends Action {
     || interceptor.order == Orders.InterceptorAttack
     || With.framesSince(interceptor.lastFrameStartingAttack) < 72
   )
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
 
     def airToAirSupply(units: Seq[UnitInfo]): Double = {
       units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum

@@ -64,16 +64,16 @@ class Pushes {
       if (unit.irradiated) {
         put(new ExplosionIrradiateSplash(unit))
       }
-      if (unit.is(Terran.SpiderMine) && unit.visible && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > Minutes(3)())) {
+      if (Terran.SpiderMine(unit) && unit.visible && (unit.isEnemy || ! unit.burrowed && With.framesSince(unit.frameDiscovered) > Minutes(3)())) {
         put(new ExplosionSpiderMineBlast(unit))
       }
-      if (unit.is(Zerg.InfestedTerran)) {
+      if (Zerg.InfestedTerran(unit)) {
         put(new ExplosionInfestedTerran(unit))
       }
-      if (unit.is(Protoss.Scarab) && unit.visible && ! unit.isOurs) {
+      if (Protoss.Scarab(unit) && unit.visible && ! unit.isOurs) {
         put(new ExplosionScarab(unit))
       }
-      if (unit.is(Terran.NuclearMissile)) {
+      if (Terran.NuclearMissile(unit)) {
         put(new ExplosionNuke(unit.targetPixel.getOrElse(unit.pixel)))
       }
     })

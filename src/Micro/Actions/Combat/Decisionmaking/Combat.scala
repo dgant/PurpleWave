@@ -13,7 +13,7 @@ import Micro.Actions.Protoss.BeReaver
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
-import Micro.Formation.{Formation, FormationStyleEngage}
+import Micro.Formation.Formation
 import Micro.Heuristics.Potential
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
@@ -42,7 +42,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def engageFormation       : Option[Formation] = formations.dropRight(1).headOption.filter(_.placements.contains(unit))
   protected def squadEngaged          : Boolean = unit.squad.map(_.engagedUpon).getOrElse(unit.matchups.engagedUpon)
   protected def fightConsensus        : Boolean = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldFight)
-  protected def assembling            : Boolean = engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.25 * group.restrainedFrames / Seconds(10)()
+  protected def assembling            : Boolean = engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.95 - group.restrainedFrames / Seconds(10)()
   protected def targetFleeing         : Boolean = target.exists(t => t.canMove && Maff.isTowards(unit.pixel, t.pixel, t.angleRadians))
   protected def targetDistanceHere    : Double  = target.map(unit.pixelDistanceEdge).getOrElse(0d)
   protected def targetDistanceThere   : Double  = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
@@ -65,7 +65,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   override def perform(unused: FriendlyUnitInfo = null): Unit = {
     restrained = false
     innerPerform()
-    restrainedFrames += ?(restrained, 1, -1) * With.framesSince(unit.agent.lastFrame)
+    restrainedFrames += ?(restrained, 1.0, -0.5) * With.framesSince(unit.agent.lastFrame)
     restrainedFrames = Math.max(0, restrainedFrames)
   }
   def innerPerform(): Unit = {
@@ -373,9 +373,9 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
           charge()
         } else {
           unit.agent.act("Reposition")
-          val urgency01 = Math.max(0.0, (unit.cooldownMaxAirGround - unit.cooldownLeft) / (unit.cooldownMaxAirGround))
+          val urgency01 = Math.max(0.0, (unit.cooldownMaxAirGround - unit.cooldownLeft).toDouble / (unit.cooldownMaxAirGround))
           applyForce(Forces.travel,   Potential.towardsTarget(unit) * urgency01)
-          applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, 32.0))
+          applyForce(Forces.threat,   Potential.softAvoidThreatRange(unit))
           applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
           moveForcefully()
         }
@@ -387,7 +387,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         applyForce(Forces.threat,     Potential.hardAvoidThreatRange(unit, 96.0))
         applyForce(Forces.regrouping, Potential.regroup(unit))
         moveForcefully()
-        restrained = engageFormation.exists(_.style == FormationStyleEngage)
+        restrained = target.forall(t => unit.pixelsToGetInRange(t) < unit.pixelsToGetInRangeFrom(t, unit.agent.destination))
+        restrained ||= unit.intent.toTravel.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destination, p))
       } else {
         unit.agent.act("Attack")
         charge()

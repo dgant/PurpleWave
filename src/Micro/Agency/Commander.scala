@@ -496,7 +496,7 @@ object Commander {
   }
 
   def defaultEscalation(unit: FriendlyUnitInfo): Unit = {
-    lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuild.get.tileArea.add(unit.intent.toBuildTile.get).center)
+    lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuild.map(_.tileArea.add(unit.intent.toBuildTile.get).center).getOrElse(unit.intent.toBuildTile.get.center))
     if (unit.flying) return
     if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
     if (unit.intent.toFinishConstruction.isDefined)             unit.agent.escalatePriority(TrafficPriorities.Bump)

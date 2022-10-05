@@ -4,7 +4,7 @@ import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.LightYear
+import Utilities.{?, LightYear}
 import Utilities.UnitFilters._
 
 object Skimulator {
@@ -18,10 +18,11 @@ object Skimulator {
       unit.skimDistanceToEngage = if (battle.isGlobal) 32 * 13 else Math.max(0d,
         Maff.min(
           team.opponent.units.map(e =>
-            (if (unit.isEnemy || unit.inRangeToAttack(e)) unit.pixelDistanceEdge(e) else Math.max(0, unit.pixelDistanceTravelling(e.pixel) - unit.pixelRangeAgainst(e)))
+            // Ideally this checks pixelDistanceTraveling but that's very slow; observed as 5% CPU usage
+            ?(unit.isEnemy || unit.inRangeToAttack(e), unit.pixelDistanceEdge(e), Math.max(0, unit.pixelDistanceEdge(e.pixel) - unit.pixelRangeAgainst(e)))
               - Math.max(
-              if (e.canAttack(unit)) e.pixelRangeAgainst(unit) else 0,
-              if (unit.canAttack(e)) unit.pixelRangeAgainst(e) else 0))).getOrElse(0d))}))
+              ?(e.canAttack(unit), e.pixelRangeAgainst(unit), 0),
+              ?(unit.canAttack(e), unit.pixelRangeAgainst(e), 0)))).getOrElse(0d))}))
 
     // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
     // Note that this can significantly swing our perception of hidden army strength
@@ -36,7 +37,7 @@ object Skimulator {
       val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed / 4)
       val delayFrames           = Math.max(unit.cooldownLeft, Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / speed / (if (unit.isFriendly) battle.speedMultiplier else 1.0)))
       val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
-      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanAttackerHealth / team.opponent.meanDpf), 12, 120)
+      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanAttackerHealth / team.opponent.meanDpf), 12, 240)
       unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
       unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames / teamDurabilityFrames), 0.0, 0.75)
       unit.skimPresence         = 1.0 - Math.max(unit.skimDelay, unit.skimExtension)
@@ -55,9 +56,9 @@ object Skimulator {
       // Count basic upgrades
       unit.skimStrength *= 1.0 + 0.15 * (unit.armorHealth - unit.unitClass.armor)
       if (unit.unitClass.effectiveAirDamage > 0)
-        unit.skimStrength *= unit.damageOnHitAir / unit.unitClass.effectiveAirDamage
-      else if (unit.unitClass.effectiveGroundDamage> 0)
-        unit.skimStrength *= unit.damageOnHitGround / unit.unitClass.effectiveGroundDamage
+        unit.skimStrength *= unit.damageOnHitAir.toDouble / unit.unitClass.effectiveAirDamage
+      else if (unit.unitClass.effectiveGroundDamage > 0)
+        unit.skimStrength *= unit.damageOnHitGround.toDouble / unit.unitClass.effectiveGroundDamage
 
       // Consider high ground advantage
       if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {

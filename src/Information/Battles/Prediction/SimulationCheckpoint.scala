@@ -73,5 +73,5 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
     localHealthDecisiveness,
     localHealthValueDecisiveness
   ))
-  val cumulativeTotalDecisiveness: Double = previous.map(_.cumulativeTotalDecisiveness).sum + localTotalDecisiveness
+  val cumulativeTotalDecisiveness: Double = previous.view.map(_.cumulativeTotalDecisiveness).sum + localTotalDecisiveness
 }

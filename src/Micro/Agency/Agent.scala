@@ -129,8 +129,8 @@ class Agent(val unit: FriendlyUnitInfo) {
     .filter(_._2.exists(_.lengthSquared > 0))
     .map(p => (p._1, p._2.get))
     .toVector)
-  val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.filter(_._1.priority > priority).map(_._2)), () => priority)
-  val receivedPushPriority = new Cache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None))
+  val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.filter(_._1.priority >= priority).map(_._2)), () => priority)
+  val receivedPushPriority = new KeyedCache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None), () => priority)
 
   /////////////
   // Leading //

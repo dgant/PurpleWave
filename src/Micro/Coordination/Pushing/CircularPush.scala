@@ -4,6 +4,7 @@ import Mathematics.Physics.{Force, ForceMath}
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Maff
 import Mathematics.Shapes.Circle
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double, originators: FriendlyUnitInfo*) extends Push {
@@ -12,6 +13,7 @@ class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double,
     if (originators.contains(recipient)) return None
     val target = recipient.pixel
     val distance = target.pixelDistance(center)
+    if (center == target) return Some(Potential.towards(recipient, recipient.agent.safety))
     val magnitude = Maff.nanToZero((radius - distance) / radius)
     val magnitudeClamped = Maff.clamp(magnitude, 0, 1)
     if (magnitudeClamped <= 0) None else Some(ForceMath.fromPixels(center, target, magnitudeClamped))

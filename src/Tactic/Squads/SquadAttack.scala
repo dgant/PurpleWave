@@ -19,7 +19,7 @@ class SquadAttack extends Squad {
     SquadAutomation.targetFormAndSend(this)
   }
 
-  private def isNonTrolly(u: UnitInfo): Boolean = u.likelyStillThere && ! u.flying && IsWarrior(u) && ! u.isAny(Terran.Vulture, Zerg.Zergling) && ( ! u.effectivelyCloaked || With.units.existsOurs(IsMobileDetector) || With.units.existsOurs(Terran.Comsat))
+  private def isNonTrolly(u: UnitInfo): Boolean = u.likelyStillThere && ! u.flying && IsWarrior(u) && ! u.isAny(Terran.Vulture, Zerg.Zergling) && ( ! u.effectivelyCloaked || units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat))
   protected def getVicinity: Pixel = {
     lazy val weHaveDetector   = units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)
     lazy val nonTrollyThreats = With.units.enemy.count(isNonTrolly)

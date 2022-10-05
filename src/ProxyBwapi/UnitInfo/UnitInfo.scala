@@ -269,10 +269,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
   @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
     val speedTowardsThreat    = speedApproaching(threat)
-    val framesToStopMe        = if(speedTowardsThreat <= 0) 0.0 else framesToStopRightNow
+    val framesToStopMe        = ?(speedTowardsThreat <= 0, 0.0, framesToStopRightNow)
     val framesToFlee          = framesToStopMe + unitClass.framesToTurn180 + With.latency.framesRemaining + With.reaction.agencyAverage
     val distanceClosedByMe    = speedTowardsThreat * framesToFlee
-    val distanceClosedByEnemy = if (threat.is(Protoss.Interceptor)) 0.0 else (threat.topSpeed * framesToFlee)
+    val distanceClosedByEnemy = ?(Protoss.Interceptor(threat), 0.0, threat.topSpeed * framesToFlee)
     val distanceEntangled     = threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)
     val output                = distanceEntangled + distanceClosedByEnemy
     output

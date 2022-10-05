@@ -41,7 +41,7 @@ object ShowBattles extends DebugView {
     val us = battle.us
     val enemy = battle.enemy
     val judge = battle.judgement.get
-    DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
+    DrawScreen.table(x, 17 * With.visualization.lineHeightSmall, Vector(
       Vector("",          "Us",                            "Enemy",                             "Score",                    "Target",                   "Fight?"),
       Vector("Total",     format(us.skimStrengthTotal),    format(enemy.skimStrengthTotal),     format(judge.scoreTotal),   format(judge.scoreTarget),  if (judge.shouldFight)        "YES" else ""),
       Vector("Ground",    format(us.skimStrengthGround),   format(enemy.skimStrengthGround)     format(judge.scoreGround),  format(judge.scoreTarget),  if (judge.shouldFightGround)  "YES" else ""),
@@ -72,7 +72,7 @@ object ShowBattles extends DebugView {
 
     val graphWidth = 82
     DrawScreen.graph(
-      Pixel(1, 218),
+      Pixel(1, 226),
       "Score",
       Seq(
         GraphCurve(Color.Black,         battle.simulationCheckpoints.map(unused =>  1.0)),

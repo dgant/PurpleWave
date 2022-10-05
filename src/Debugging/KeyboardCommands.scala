@@ -40,7 +40,7 @@ object KeyboardCommands {
       case "3"          => With.game.setLocalSpeed(24)      ; With.configuration.camera = false
       case "4"          => With.game.setLocalSpeed(0)       ; With.configuration.camera = false
       case "pm"         => With.logger.debug(PurpleBWClient.getPerformanceMetrics.toString)
-      case "track"      => With.configuration.trackUnit = ! With.configuration.trackUnit
+      case "t"          => With.configuration.trackUnit = ! With.configuration.trackUnit
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
 
       case _            => With.grids.select(text) || With.visualization.tryToggle(text)

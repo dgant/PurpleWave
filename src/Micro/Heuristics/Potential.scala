@@ -107,7 +107,7 @@ object Potential {
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
     val repulsions = unit.inTileRadius(3).filterNot(unit==).map(collisionRepulsion(unit, _))
-    ForceMath.mean(repulsions).clipAtLeast(1.0)
+    ForceMath.mean(repulsions).clipAtMost(1.0)
   }
 
   def avoidSplash(unit: FriendlyUnitInfo): Force = {
@@ -133,7 +133,7 @@ object Potential {
   }
 
   def followPushes(unit: FriendlyUnitInfo): Force = {
-    unit.agent.receivedPushForce().clipAtMost(2.0)
+    unit.agent.receivedPushForce().clipAtMost(1.0)
   }
 }
 

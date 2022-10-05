@@ -20,9 +20,9 @@ object Target {
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    val assigned = attacker.targetsAssigned.getOrElse(Seq.empty)
-    val matchups = attacker.matchups.targets
-    val engaged = attacker.team.exists(_.engagedUpon)
+    val assigned  = attacker.targetsAssigned.getOrElse(Seq.empty)
+    val matchups  = attacker.matchups.targets
+    val engaged   = attacker.team.exists(_.engagedUpon)
     val strataUnfiltered = Seq(
       (true, assigned.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
       (true, matchups.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
@@ -96,14 +96,14 @@ object Target {
 
   @inline final def score(attacker: FriendlyUnitInfo, target: UnitInfo): Double = {
     val _framesOutOfWay = framesOutOfTheWay(attacker, target)
-    val scoreBasic = baseAttackerToTargetValueRaw(
-      baseTargetValue = target.targetBaseValue(),
-      totalHealth = target.totalHealth,
+    val scoreBasic      = baseAttackerToTargetValueRaw(
+      baseTargetValue   = target.targetBaseValue(),
+      totalHealth       = target.totalHealth,
       framesOutOfTheWay = _framesOutOfWay,
-      dpf = attacker.dpfOnNextHitAgainst(target))
-    val preferences = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
+      dpf               = attacker.dpfOnNextHitAgainst(target))
+    val preferences     = TargetFilterGroups.filtersPreferred.view.filter(_.appliesTo(attacker)).count(_.legal(attacker, target))
     val preferenceBonus = Math.pow(100, preferences)
-    val threatPenalty = if (With.reaction.sluggishness > 1) _framesOutOfWay else {
+    val threatPenalty   = if (With.reaction.sluggishness > 1) _framesOutOfWay else {
       val firingPixel = attacker.pixelToFireAt(target)
       // TODO: Do it through argument to pixelToFireAt
       val firingPixelSafer = target.pixel.project(attacker.pixel, attacker.pixelRangeAgainst(target) + attacker.unitClass.dimensionMin + target.unitClass.dimensionMin)

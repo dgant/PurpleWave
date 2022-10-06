@@ -8,19 +8,16 @@ import Utilities.?
 import scala.collection.mutable
 
 trait ZonePathfinder {
-
-  private var pathfindId: Long = Long.MinValue
   private val paths = new mutable.HashMap[(Zone, Zone, Seq[Edge]), Option[ZonePath]]
 
   def zonePath(from: Zone, to: Zone, through: Seq[Edge] = Seq.empty): Option[ZonePath] = {
-    paths((from, to, through)) = paths.getOrElse((from, to, through), { pathfindId += 1; zonePathfind(from, to, through) })
+    paths((from, to, through)) = paths.getOrElse((from, to, through), zonePathfind(from, to, through))
     paths((from, to, through))
   }
 
   // Note that this has the weakness of assuming the path is always from the center of the zone
   // The shortest path from other points of the zone may be different.
   private def zonePathfind(from: Zone, to: Zone, through: Seq[Edge], pathHere: Vector[ZonePathNode] = Vector.empty): Option[ZonePath] = {
-    pathHere.lastOption.foreach(_.edge.lastPathfindId = pathfindId)
     val tileFrom  = from.centroid.walkableTile
     val tileTo    = to.centroid.walkableTile
     if (from == to) {
@@ -30,7 +27,7 @@ trait ZonePathfinder {
       return None
     }
 
-    val edges = from.edges.filter(_.lastPathfindId != pathfindId).sortBy(_.distanceGrid.get(tileTo))
+    val edges = from.edges.filter(e => ! pathHere.exists(_.from == e.otherSideof(from))).sortBy(_.distanceGrid.get(tileTo))
     edges.view.map(edge => zonePathfind(edge.otherSideof(from), to, through, pathHere :+ ZonePathNode(from, edge))).find(_.isDefined).flatten
   }
 }

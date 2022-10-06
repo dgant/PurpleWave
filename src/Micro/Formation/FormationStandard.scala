@@ -12,7 +12,7 @@ import Micro.Coordination.Pushing.TrafficPriorities
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Tactic.Squads.FriendlyUnitGroup
+import Tactic.Squads.{FriendlyUnitGroup, UnitGroup}
 import Utilities.LightYear
 import Utilities.Time.Minutes
 
@@ -29,58 +29,73 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   // target:           Enemies we are likely to fight en route to our goal
   // apex:             The starting point from which we build the formation
   // face:             The point the formation should be facing
-  val knownRangeTiles   : Int                   = Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels.toInt / 32)).getOrElse(0)
-  val raceRangeTiles    : Int                   = if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6 else if (With.enemies.exists(_.isTerran)) 4 else 1
-  val expectRangeTiles  : Int                   = Math.max(knownRangeTiles, raceRangeTiles)
-  val targetsNear       : Seq[UnitInfo]         = group.groupUnits.flatMap(_.battle).distinct.flatMap(_.enemy.units).filter(e => e.canAttack && group.groupUnits.exists(_.pixelsToGetInRangeTraveling(e) < 32 * 5))
-  val targetsTowards    : Seq[UnitInfo]         = targetsNear.filter(_.pixelDistanceTravelling(goal) < group.centroidGround.groundPixels(goal))
-  val targetNear        : Option[UnitInfo]      = Maff.minBy(targetsNear)(_.pixelDistanceTravelling(group.centroidGround))
-  val targetTowards     : Option[UnitInfo]      = Maff.minBy(targetsTowards)(_.pixelDistanceTravelling(group.centroidGround))
-  val target            : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(goal)
-  val vanguardTarget    : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(With.scouting.enemyThreatOrigin.center)
-  val vanguardOrigin    : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) vanguardTarget else goal
-  val vanguardUnits     : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
-  val centroid          : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
-  val goalPath          : TilePath              = findGoalPath
-  val targetPath        : TilePath              = findTargetPath
-  val goalPathTiles     : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
-  val targetPathTiles   : Seq[Tile]             = targetPath.tiles.getOrElse(Seq.empty).view
-  val goalPath5         : Tile                  = goalPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(goal.walkableTile)
-  val targetPath5       : Tile                  = targetPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(target.walkableTile)
-  val goalTowardsTarget : Boolean               = targetPath.pathExists && goalPath.pathExists && goalPath5.tileDistanceFast(targetPath5) < 6
-  if (style == FormationStyleMarch && goalTowardsTarget && targetTowards.exists(t => units.exists(u => u.pixelsToGetInRange(t) < 32 * 6 && u.targetsAssigned.forall(_.contains(t))))) {
+  val knownRangeTiles     : Int                   = Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels.toInt / 32)).getOrElse(0)
+  val raceRangeTiles      : Int                   = if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6 else if (With.enemies.exists(_.isTerran)) 4 else 1
+  val expectRangeTiles    : Int                   = Math.max(knownRangeTiles, raceRangeTiles)
+  val foes                : UnitGroup             = group.consensusPrimaryFoes
+  val foeAttackersTowards : Seq[UnitInfo]         = foes.attackers.filter(_.pixelDistanceTravelling(goal) < group.centroidGround.groundPixels(goal))
+  val foeAttackerTowards  : Option[UnitInfo]      = Maff.minBy(foeAttackersTowards)(_.pixelDistanceTravelling(group.centroidGround))
+  val foeCentroid         : Pixel                 = foeAttackerTowards.map(_.pixel).getOrElse(foes.attackCentroidGround)
+  val vanguardOrigin      : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) foeCentroid else goal
+  val vanguardUnits       : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
+  val vanguardCentroid    : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
+  val goalPath            : TilePath              = findGoalPath
+  val targetPath          : TilePath              = findTargetPath
+  val goalPathTiles       : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
+  val targetPathTiles     : Seq[Tile]             = targetPath.tiles.getOrElse(Seq.empty).view
+  val goalPath5           : Tile                  = goalPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(goal.walkableTile)
+  val targetPath5         : Tile                  = targetPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(foeCentroid.walkableTile)
+  val goalTowardsTarget   : Boolean               = targetPath.pathExists && goalPath.pathExists && goalPath5.tileDistanceFast(targetPath5) < 6
+  if (style == FormationStyleMarch && goalTowardsTarget && foeAttackerTowards.exists(t => units.exists(u => u.pixelsToGetInRange(t) < 32 * 6 && u.targetsAssigned.forall(_.contains(t))))) {
     style = FormationStyleEngage
   }
-  val groupWidthPixels  : Int                   = groundUnits.map(_.unitClass.dimensionMax).sum
-  val groupWidthTiles   : Int                   = Math.max(1, (16 + groupWidthPixels) / 32)
-  val firstEdgeIndex    : Option[Int]           = goalPathTiles.indices.find(i => goalPathTiles(i).zone.edges.exists(_.contains(goalPathTiles(i))))
-  val firstEdge         : Option[Edge]          = firstEdgeIndex.flatMap(i => goalPathTiles(i).zone.edges.find(_.contains(goalPathTiles(i))))
-  val zone              : Zone                  = argZone.getOrElse(centroid.zone)
-  val edge              : Option[Edge]          = Maff.minBy(zone.edges)(_.pixelCenter.groundPixels(goal))
-  val altitudeInside    : Int                   = zone.centroid.altitude
-  val altitudeOutside   : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
-  val altitudeRequired  : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
-  val maxThreat         : Int                   = if (style == FormationStyleEngage) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
-  var face              : Pixel                 = if (style == FormationStyleGuard) goal else if (style == FormationStyleEngage) target else goalPath5.center
-  var apex              : Pixel                 = goal
-  var stepTilesPace     : Int                   = 0
-  var stepTilesEngage   : Int                   = 0
-  var stepTilesAssemble : Int                   = 0
-  var stepTilesEvade    : Int                   = 0
-  var stepTilesCross    : Int                   = 0
-  var stepTiles         : Int                   = 0
-  var minAltitude       : Int                   = -1
+  val groupWidthPixels    : Int                   = groundUnits.map(_.unitClass.dimensionMax).sum
+  val groupWidthTiles     : Int                   = Math.max(1, (16 + groupWidthPixels) / 32)
+  val firstEdgeIndex      : Option[Int]           = goalPathTiles.indices.find(i => goalPathTiles(i).zone.edges.exists(_.contains(goalPathTiles(i))))
+  val firstEdge           : Option[Edge]          = firstEdgeIndex.flatMap(i => goalPathTiles(i).zone.edges.find(_.contains(goalPathTiles(i))))
+  val zone                : Zone                  = argZone.getOrElse(vanguardCentroid.zone)
+  val edge                : Option[Edge]          = Maff.minBy(zone.edges)(_.pixelCenter.groundPixels(goal))
+  val altitudeInside      : Int                   = zone.centroid.altitude
+  val altitudeOutside     : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
+  val altitudeRequired    : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
+  val maxThreat           : Int                   = if (style == FormationStyleEngage) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
+  var face                : Pixel                 = if (style == FormationStyleEngage) foeCentroid else if (style == FormationStyleGuard) goal else goalPath5.center
+  var apex                : Pixel                 = goal
+  var stepTilesPace       : Int                   = 0
+  var stepTilesEngage     : Int                   = 0
+  var stepTilesAssemble   : Int                   = 0
+  var stepTilesEvade      : Int                   = 0
+  var stepTilesCross      : Int                   = 0
+  var stepTiles           : Int                   = 0
+  var minAltitude         : Int                   = -1
 
   val slots       : Map[UnitClass, Seq[Pixel]]    = slotsByClass()
   val unassigned  : UnassignedFormation           = UnassignedFormation(style, slots, group)
   val placements  : Map[FriendlyUnitInfo, Pixel]  = unassigned.outwardFromCentroid
 
   private def findGoalPath: TilePath = {
-    new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile),   lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+    val pathStart   = vanguardCentroid.zone
+    val pathEnd     = goal.zone
+    val pathToGoal  = With.paths.zonePath(pathStart, pathEnd)
+    var pathToMarch = pathToGoal
+    val choke       = pathToGoal.flatMap(_.steps.find(_.to == foeCentroid.zone))
+    // Prefer flanking the enemy to attacking them through a nasty choke
+    if (choke.exists(_.edge.badness(group, vanguardCentroid.zone) > 1.5)) {
+      val paths = foeCentroid.zone.edges.flatMap(e => With.paths.zonePath(pathStart, pathEnd, Seq(e))).filter(_.steps.nonEmpty)
+      pathToMarch = Maff.minBy(paths)(p => p.length * p.steps.last.edge.badness(group, p.steps.last.from))
+    }
+    val waypoint = pathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
+    new PathfindProfile(
+      vanguardCentroid.walkableTile,
+      Some(waypoint),
+      lengthMaximum = Some(20),
+      employGroundDist = true,
+      costImmobility = 1.5,
+      repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
   }
   private def findTargetPath: TilePath = {
-    if (goal == target) return goalPath
-    new PathfindProfile(centroid.walkableTile, Some(target.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+    if (goal == foeCentroid) return goalPath
+    new PathfindProfile(vanguardCentroid.walkableTile, Some(foeCentroid.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
   }
 
   private def parameterize(): Unit = {
@@ -97,14 +112,14 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       stepTilesPace   = Maff.clamp(group.meanTopSpeed * 24 / 32 + 6 * Math.max(0.0, 1 - 2.0 * group.pace01), 1, 8).toInt
       stepTilesCross  = firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0)
       stepTilesEngage = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= With.grids.enemyVulnerabilityGround.margin)).getOrElse(LightYear())
-      stepTilesEvade  = 1 + groupWidthTiles + centroid.tile.enemyRangeGround
+      stepTilesEvade  = 1 + groupWidthTiles + vanguardCentroid.tile.enemyRangeGround
       stepTiles       = Math.max(stepTilesPace, stepTilesCross)
       if (style == FormationStyleDisengage) {
         stepTiles = Math.max(stepTiles, stepTilesEvade) // Make sure we go far enough to evade
       } else if (goalTowardsTarget) {
         stepTiles = Math.min(stepTiles, Math.max(1, stepTilesEngage)) // Don't try to move past the enemy
       }
-      val maxTilesToGoal = centroid.tile.groundTiles(goal) - 1
+      val maxTilesToGoal = vanguardCentroid.tile.groundTiles(goal) - 1
       val minTilesToGoal = maxTilesToGoal - stepTiles
       def scoreApex(tile: Tile): Double = {
         val distance = tile.groundTiles(goal)
@@ -125,7 +140,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     With.groundskeeper.reserved.foreach(With.grids.formationSlots.block)
     With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(With.grids.formationSlots.block))
     if (style == FormationStyleGuard && groundUnits.exists(Protoss.Reaver)) {
-      Shapes.Ray(target, centroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
+      Shapes.Ray(face, vanguardCentroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
     }
     val classCount = groundUnits
       .groupBy(_.unitClass)
@@ -232,7 +247,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     goalPath.renderMap(Colors.brighten(style.color), customOffset = Point(-3, -3))
     targetPath.renderMap(Colors.darken(style.color), customOffset = Point(3, 3))
     DrawMap.polygon(Maff.convexHull(vanguardUnits.view.flatMap(_.corners)), Colors.DarkGray)
-    Seq(("Goal", goal), ("Target", target), ("Face", face), ("Apex", apex), ("Centroid", centroid))
+    Seq(("Goal", goal), ("Target", foeCentroid), ("Face", face), ("Apex", apex), ("Centroid", vanguardCentroid))
       .groupBy(_._2)
       .foreach(p => DrawMap.label(p._2.map(_._1).mkString(" & "), p._1, drawBackground = true, style.color))
     if (placements.nonEmpty) {

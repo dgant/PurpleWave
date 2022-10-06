@@ -4,17 +4,19 @@ import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Points.{Direction, Pixel, Tile}
 import Mathematics.{Maff, Shapes}
+import Tactic.Squads.UnitGroup
+import Utilities.?
 import bwta.Chokepoint
 
 final class Edge(choke: Chokepoint) {
 
   // On Pathfinder BWTA found an edge with the same zone on both sides
   def otherSideof(zone: Zone): Zone = zones.find(_ != zone).getOrElse(zones.head)
-  lazy val pixelCenter  : Pixel = new Pixel(choke.getCenter)
-  lazy val radiusPixels : Double = choke.getWidth / 2
-  lazy val tiles        : Vector[Tile] = Shapes.Ray(sidePixels.head, sidePixels.last).toVector
-  lazy val sidePixels   : Seq[Pixel] = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
-  lazy val direction    : Direction = new Direction(sidePixels.head, sidePixels.last)
+  lazy val pixelCenter  : Pixel         = new Pixel(choke.getCenter)
+  lazy val radiusPixels : Double        = choke.getWidth / 2
+  lazy val tiles        : Vector[Tile]  = Maff.orElse(Shapes.Ray(sidePixels.head, sidePixels.last), Vector(pixelCenter.tile)).toVector
+  lazy val sidePixels   : Seq[Pixel]    = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
+  lazy val direction    : Direction     = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
       .radiateRadians(
@@ -32,13 +34,17 @@ final class Edge(choke: Chokepoint) {
         new Pixel(region.getCenter))))
   val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
 
-  var lastPathfindId: Long = Long.MinValue
-
   private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)
   def pixelTowards(zone: Zone): Pixel = endPixels.minBy(p => if (endsWalkable) zone.distanceGrid.get(p.tile) else p.pixelDistanceSquared(zone.centroid.center))
   def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
   def contains(tile: Tile): Boolean = contains(tile.center)
   def diameterPixels: Double = 2 * radiusPixels
+
+  def badness(group: UnitGroup, from: Zone): Double = {
+    val ranks = Math.max(1.0, group.widthPixels / Math.max(1.0, diameterPixels))
+    val altitudeDelta = pixelTowards(otherSideof(from)).altitude - pixelTowards(from).altitude
+    ranks * ?(altitudeDelta > 0, 2.0, ?(altitudeDelta < 0, 0.75, 1.0))
+  }
 
   override def toString: String = f"Edge @ $pixelCenter (${radiusPixels.toInt}px)"
 }

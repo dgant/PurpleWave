@@ -114,9 +114,10 @@ object JudgmentModifiers {
     if (edge.isEmpty) return None
     if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
     if (pFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < battleLocal.us.maxRangeGround) return None
-    val ranks     = Math.max(1.0, battleLocal.us.widthPixels / Math.max(1.0, edge.get.diameterPixels))
-    val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / ranks)
-    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((ranks - 1)* 0.0175, 0.0, 0.3)
+    val badness   = edge.get.badness(battleLocal.us, pUs.zone)
+    if (badness <= 1) return None
+    val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / badness)
+    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((badness - 1)* 0.0175, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
   }
 

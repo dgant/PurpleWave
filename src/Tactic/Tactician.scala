@@ -54,9 +54,9 @@ class Tactician extends TimedTask {
   private val mindControl               = addPriorityTactic(new SquadMindControl)
           val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
   private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
+          val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
           val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
           val monitorWithObserver       = addPriorityTactic(new Monitor)
-          val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
 
   //////////////////
   // Basic squads //

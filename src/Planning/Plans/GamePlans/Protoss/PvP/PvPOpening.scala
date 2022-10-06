@@ -434,6 +434,7 @@ class PvPOpening extends GameplanImperative {
         || enemies(Protoss.Zealot) > Math.min(unitsComplete(Protoss.Zealot), 2)) {
         //With.blackboard.pushKiters.set(false)
         With.units.ours.foreach(_.agent.commit = false)
+        commitZealots = false
       } else if (frame < GameTime(4, 15)() && enemiesComplete(Protoss.PhotonCannon) == 0) {
         // Wait until we have at least three Zealots together; then go in hard
         aggression(0.75)

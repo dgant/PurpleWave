@@ -333,16 +333,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (unit.ready) {
       breakFormationToAttack  = engageFormation.isEmpty || target.exists(targ =>
         // If we're not ready to attack yet, just slide into formation
-        (readyToApproachTarget || unit.unitClass.melee) && (
+        (readyToApproachTarget || unit.unitClass.melee)
+        && ! engageFormation.exists(_.flanking)
+        && (
           // Break if we are already in range
           unit.inRangeToAttack(targ)
             // Break if we're just pillaging
-            || confidentEnoughToChase
-            || unit.matchups.threats.forall(IsWorker)
+            || unit.confidence11 > 0.75
             // Break if the fight has already begun and the formation isn't helping us
-            || (squadEngaged && ! formationHelpsEngage && ! unit.transport.exists(_.loaded))
+            || (squadEngaged && ! formationHelpsEngage)
             // Break if we are closer to range than the formation, and already pretty close
-            || (targetDistanceHere < Math.min(targetDistanceThere, 32 * 8) && Maff.isTowards(unit.pixel, targ.pixel, unit.pixel.radiansTo(unit.agent.destination)))))
+            || (targetDistanceHere < 32 + Math.min(targetDistanceThere, 32 * 8) && Maff.isTowards(unit.pixel, targ.pixel, unit.pixel.radiansTo(unit.agent.destination)))))
 
       if (pushThrough) {
         unit.agent.act("Push")

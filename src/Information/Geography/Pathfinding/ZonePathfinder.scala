@@ -17,17 +17,29 @@ trait ZonePathfinder {
 
   // Note that this has the weakness of assuming the path is always from the center of the zone
   // The shortest path from other points of the zone may be different.
-  private def zonePathfind(from: Zone, to: Zone, through: Seq[Edge], pathHere: Vector[ZonePathNode] = Vector.empty): Option[ZonePath] = {
-    val tileFrom  = from.centroid.walkableTile
-    val tileTo    = to.centroid.walkableTile
-    if (from == to) {
-      return ?(through.forall(throughEdge => pathHere.exists(_.edge == throughEdge)), Some(Types.ZonePath(from, to, pathHere)), None)
+  private def zonePathfind(from: Zone, goal: Zone, through: Seq[Edge], pathHere: Vector[ZonePathNode] = Vector.empty): Option[ZonePath] = {
+    if (from == goal) {
+      return ?(
+        through.forall(throughEdge => pathHere.exists(_.edge == throughEdge)),
+        Some(ZonePath(pathHere.headOption.map(_.from).getOrElse(goal), goal, pathHere)),
+        None)
     }
+
+    val tileFrom  = from.centroid.walkableTile
+    val tileTo    = goal.centroid.walkableTile
     if ( ! With.paths.groundPathExists(tileFrom, tileTo)) {
       return None
     }
 
-    val edges = from.edges.filter(e => ! pathHere.exists(_.from == e.otherSideof(from))).sortBy(_.distanceGrid.get(tileTo))
-    edges.view.map(edge => zonePathfind(edge.otherSideof(from), to, through, pathHere :+ ZonePathNode(from, edge))).find(_.isDefined).flatten
+    val edges = from.edges
+      .filterNot(e => pathHere.exists(_.from == e.otherSideof(from)))
+      .sortBy(_.distanceGrid.get(tileTo))
+
+    edges.view.map(edge =>
+      zonePathfind(
+        edge.otherSideof(from),
+        goal,
+        through,
+        pathHere :+ ZonePathNode(from, edge))).find(_.isDefined).flatten
   }
 }

@@ -2,6 +2,7 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
+import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{GameTime, Seconds}
@@ -89,5 +90,6 @@ class SquadScoutExpansions extends Squad {
     val scouts = units.filterNot(harassers.contains)
     SquadAutomation.sendUnits(this, scouts)
     scouts.foreach(u => u.intent.canFight = u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty)
+    harassers.foreach(u => u.intend(this, new Intention { toTravel = u.base.map(_.heart.center) }))
   }
 }

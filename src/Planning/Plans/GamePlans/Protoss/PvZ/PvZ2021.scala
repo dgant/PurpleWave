@@ -330,6 +330,11 @@ class PvZ2021 extends GameplanImperative {
     val endgame       = new DoQueue(doEndgame)
     val expand        = new DoQueue(doExpand)
 
+    if (With.fingerprints.threeHatchHydra() && unitsComplete(IsWarrior) < 12) {
+      buildCannonsAtNatural(5, PlaceLabels.DefendEntrance)
+      trainMainArmy()
+    }
+
     get(Protoss.Gateway, Protoss.Assimilator); get(3, Protoss.Gateway); get(Protoss.Stargate)
     if (saturated || (gas < 200 && units(Protoss.Gateway, Protoss.Stargate) >= 4)) buildGasPumps()
 

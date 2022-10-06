@@ -1,11 +1,13 @@
 package Tactic.Squads
 
 import Information.Battles.Types.GroupCentroid
+import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.UnitFilters.UnitFilter
 
 import scala.collection.mutable
@@ -19,41 +21,42 @@ trait UnitGroup {
   def arbiters          : Seq[UnitInfo] = _arbiters().view
   def attackersCasters  : Seq[UnitInfo] = groupOrderable.view.filter(_.unitClass.attacksOrCasts)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
-  def attackersCastersCount     : Int     = _attackersCastersCount()
-  def attackersBioCount         : Int     = _attackersBioCount()
-  def stormCount                : Int     = _stormCount()
-  def attacksAir                : Boolean = _attacksAir()
-  def attacksGround             : Boolean = _attacksGround()
-  def catchesAir                : Boolean = _catchesAir()
-  def catchesGround             : Boolean = _catchesGround()
-  def splashesAir               : Boolean = _splashesAir()
-  def splashesGround            : Boolean =  _splashesGround()
-  def hasGround                 : Boolean = _hasGround()
-  def hasAir                    : Boolean = _hasAir()
-  def engagingOn                : Boolean = _engagingOn()
-  def engagedUpon               : Boolean = _engagedUpon()
-  def volleyConsensus           : Boolean = _volleyConsensus()
-  def centroidAir               : Pixel   = _centroidAir()
-  def centroidGround            : Pixel   = _centroidGround()
-  def centroidKey               : Pixel   = _centroidKey()
-  def attackCentroidAir         : Pixel   = _attackCentroidAir()
-  def attackCentroidGround      : Pixel   = _attackCentroidGround()
-  def attackCentroidKey         : Pixel   = _attackCentroidKey()
-  def widthPixels               : Double  = _widthPixels()
-  def meanTopSpeed              : Double  = _meanTopSpeed()
-  def meanAttackerSpeed         : Double  = _meanAttackerSpeed()
-  def meanAttackerRange         : Double  = _meanAttackerRange()
-  def meanAttackerTargetDistance: Double  = _meanAttackerTargetDistance()
-  def meanAttackerHealth        : Double  = _meanAttackerHealth()
-  def meanDpf                   : Double  = _meanDpf()
-  def meanDistanceTarget        : Double  = _meanDistanceTarget()
-  def maxAttackerSpeedVsGround  : Double  = _maxAttackerSpeedVsGround()
-  def maxAttackerSpeedVsAir     : Double  = _maxAttackerSpeedVsAir()
-  def maxRangeGround            : Double  = _maxRangeGround()
-  def engagingOn01              : Double  = _engagingOn01()
-  def engagedUpon01             : Double  = _engagedUpon01()
-  def pace01                    : Double  = _pace01()
-  def combatGroundFraction      : Double  = _combatGroundFraction()
+  def attackersCastersCount     : Int       = _attackersCastersCount()
+  def attackersBioCount         : Int       = _attackersBioCount()
+  def stormCount                : Int       = _stormCount()
+  def attacksAir                : Boolean   = _attacksAir()
+  def attacksGround             : Boolean   = _attacksGround()
+  def catchesAir                : Boolean   = _catchesAir()
+  def catchesGround             : Boolean   = _catchesGround()
+  def splashesAir               : Boolean   = _splashesAir()
+  def splashesGround            : Boolean   = _splashesGround()
+  def hasGround                 : Boolean   = _hasGround()
+  def hasAir                    : Boolean   = _hasAir()
+  def engagingOn                : Boolean   = _engagingOn()
+  def engagedUpon               : Boolean   = _engagedUpon()
+  def volleyConsensus           : Boolean   = _volleyConsensus()
+  def centroidAir               : Pixel     = _centroidAir()
+  def centroidGround            : Pixel     = _centroidGround()
+  def centroidKey               : Pixel     = _centroidKey()
+  def attackCentroidAir         : Pixel     = _attackCentroidAir()
+  def attackCentroidGround      : Pixel     = _attackCentroidGround()
+  def attackCentroidKey         : Pixel     = _attackCentroidKey()
+  def widthPixels               : Double    = _widthPixels()
+  def meanTopSpeed              : Double    = _meanTopSpeed()
+  def meanAttackerSpeed         : Double    = _meanAttackerSpeed()
+  def meanAttackerRange         : Double    = _meanAttackerRange()
+  def meanAttackerTargetDistance: Double    = _meanAttackerTargetDistance()
+  def meanAttackerHealth        : Double    = _meanAttackerHealth()
+  def meanDpf                   : Double    = _meanDpf()
+  def meanDistanceTarget        : Double    = _meanDistanceTarget()
+  def maxAttackerSpeedVsGround  : Double    = _maxAttackerSpeedVsGround()
+  def maxAttackerSpeedVsAir     : Double    = _maxAttackerSpeedVsAir()
+  def maxRangeGround            : Double    = _maxRangeGround()
+  def engagingOn01              : Double    = _engagingOn01()
+  def engagedUpon01             : Double    = _engagedUpon01()
+  def pace01                    : Double    = _pace01()
+  def combatGroundFraction      : Double    = _combatGroundFraction()
+  def consensusPrimaryFoes      : UnitGroup = _consensusPrimaryFoes()
   def keyDistanceTo       (pixel: Pixel): Double = if (hasGround) centroidKey       .groundPixels(pixel.walkablePixel) else centroidKey       .pixelDistance(pixel)
   def attackKeyDistanceTo (pixel: Pixel): Double = if (hasGround) attackCentroidKey .groundPixels(pixel.walkablePixel) else attackCentroidKey .pixelDistance(pixel)
   def canBeAttackedBy(unit: UnitInfo): Boolean = unit.canAttackGround && hasGround || unit.canAttackAir && hasAir
@@ -106,6 +109,7 @@ trait UnitGroup {
   private val _combatValueAir             = new Cache(() => attackersCasters.filter(_.flying).map(_.subjectiveValue).sum)
   private val _combatValueGround          = new Cache(() => attackersCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
+  private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.attackersCastersCount * 4 >= With.units.groupVs(u).attackersCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker
   protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)

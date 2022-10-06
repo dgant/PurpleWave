@@ -5,52 +5,47 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
+import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-
+import Utilities.?
 
 object Detect extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.canMove && unit.unitClass.isDetector
 
-  private def canEventuallyCloak(unit: UnitInfo): Boolean = {
-    unit.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Zerg.Lurker)
-  }
+  private def canEventuallyCloak(unit: UnitInfo): Boolean = unit.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Zerg.Lurker)
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val spookiestSpooky =
-      pickBestSpooky(unit, unit.enemiesSquad.filter(_.effectivelyCloaked)).orElse(
-      pickBestSpooky(unit, unit.enemiesSquad.filter(_.cloakedOrBurrowed))).orElse(
-      pickBestSpooky(unit, unit.enemiesSquad.filter(canEventuallyCloak))).orElse(
-      pickBestSpooky(unit, unit.enemiesBattle.filter(_.effectivelyCloaked))).orElse(
-      pickBestSpooky(unit, unit.enemiesBattle.filter(_.cloakedOrBurrowed))).orElse(
-      pickBestSpooky(unit, unit.enemiesBattle.filter(canEventuallyCloak)))
+    lazy val otherDetectors = unit.squad.map(_.mobileDetectors).getOrElse(Seq.empty).filter(_.canMove).filterNot(unit==)
+    val enemySources = Seq(unit.enemiesSquad, unit.enemiesBattle)
+    val enemyFilters: Seq[UnitInfo => Boolean] = Seq(
+      (u: UnitInfo) => u.effectivelyCloaked,
+      (u: UnitInfo) => u.cloakedOrBurrowed,
+      canEventuallyCloak)
+    val spookiestSpooky = enemySources
+      .map(_.filterNot(s => otherDetectors.exists(_.pixelsToSightRange(s) < unit.pixelsToSightRange(s))))
+      .view
+      .flatMap(source => enemyFilters.map(source.filter))
+      .map(pickBestSpooky(unit, _))
+      .find(_.nonEmpty)
+      .flatten
 
-    lazy val minesweepingNeeded = With.unitsShown.any(Terran.SpiderMine, Terran.Vulture, Terran.Factory, Terran.Goliath, Terran.SiegeTankUnsieged, Terran.SiegeTankUnsieged, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker)
-    lazy val minesweepPoint = if (minesweepingNeeded) Maff
-      .minBy(unit.alliesSquad.view.filter(_.canAttack))(_.pixelDistanceTravelling(unit.agent.destination))
-      .map(_.pixel.project(unit.agent.destination, unit.sightPixels)) else None
+    lazy val minesweepingNeeded = MacroFacts.enemyHasShown(Terran.SpiderMine, Terran.Vulture, Terran.Factory, Terran.Goliath, Terran.SiegeTankUnsieged, Terran.SiegeTankUnsieged, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker)
+    lazy val minesweepTarget = unit.squad.map(_.vicinity).getOrElse(With.scouting.enemyMuscleOrigin.center)
+    lazy val minesweepPoint = MicroPathing.getGroundWaypointToPixel(unit.agent.destination, minesweepTarget)
 
-    val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(minesweepPoint)
-
+    val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(?(minesweepingNeeded, Some(minesweepPoint), None))
     if (spookiestPixel.isEmpty) return
 
-    val ghostbusters = spookiestSpooky.map(s => s.matchups.enemies.filter(e => e.canMove && e.attacksAgainst(s) > 0))
-    val ghostbuster = ghostbusters.flatMap(g => Maff.minBy(g)(_.framesBeforeAttacking(spookiestSpooky.get)))
-
-    val idealDistance = Maff.clamp(
-      if ( ! unit.cloaked || unit.matchups.groupVs.detectors.nonEmpty ||With.enemies.exists(_.isTerran)) unit.matchups.pixelsEntangled else 0,
-      unit.sightPixels / 2,
-      unit.sightPixels - 24)
-
-    val center = ghostbuster.map(_.pixel).getOrElse(unit.agent.safety)
-    unit.agent.toTravel = Some(spookiestPixel.get.project(center, idealDistance))
-
-    val safetyPixels = if (unit.is(Protoss.Observer)) -48 else -32 * 5
-    if (unit.matchups.pixelsEntangled > safetyPixels) {
-      Retreat.delegate(unit)
-    } else {
+    if (unit.matchups.pixelsEntangled < -64
+      || (unit.cloaked
+        && ! MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)
+        && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) < 96))) {
       Commander.move(unit)
+    } else {
+      Retreat.delegate(unit)
     }
   }
 

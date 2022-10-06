@@ -3,9 +3,11 @@ package ProxyBwapi.UnitTracking
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
-import Performance.TotalUnitCounter
-import Utilities.UnitFilters.UnitFilter
+import Performance.{Cache, TotalUnitCounter}
 import ProxyBwapi.UnitInfo._
+import Tactic.Squads.{GenericFriendlyUnitGroup, GenericUnitGroup, UnitGroup}
+import Utilities.?
+import Utilities.UnitFilters.UnitFilter
 
 import scala.collection.JavaConverters._
 
@@ -68,8 +70,8 @@ final class UnitTracker {
   // Access //
   ////////////
 
-  @inline def ours        : Iterable[FriendlyUnitInfo]  = With.units.bufferFriendly.all.filterNot(GhostUnit(_))
-  @inline def enemy       : Iterable[ForeignUnitInfo]   = With.units.bufferEnemy.all.filterNot(GhostUnit(_))
+  @inline def ours        : Iterable[FriendlyUnitInfo]  = _ours
+  @inline def enemy       : Iterable[ForeignUnitInfo]   = _enemy
   @inline def neutral     : Iterable[ForeignUnitInfo]   = With.units.bufferNeutral.all.filterNot(GhostUnit(_))
   @inline def playerOwned : Iterable[UnitInfo]          = ours ++ enemy
   @inline def foreign     : Iterable[UnitInfo]          = enemy ++ neutral
@@ -81,6 +83,9 @@ final class UnitTracker {
   @inline def everOurs    : Iterable[UnitInfo]          = ours ++ dead.filter(_.isOurs)
   @inline def everEnemy   : Iterable[UnitInfo]          = enemy ++ dead.filter(_.isEnemy)
   @inline def selected    : Iterable[UnitInfo]          = all.filter(_.selected)
+
+  private def _ours   : Seq[FriendlyUnitInfo] = With.units.bufferFriendly.all.filterNot(GhostUnit(_))
+  private def _enemy  : Seq[ForeignUnitInfo]  = With.units.bufferEnemy.all.filterNot(GhostUnit(_))
 
   def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)
@@ -122,4 +127,15 @@ final class UnitTracker {
   @inline def existsEverEnemy(matcher: UnitFilter*): Boolean = counterEverEnemy(matcher: _*) > 0
   @inline def countEverEnemy(matcher: UnitFilter*): Int = counterEverEnemy(matcher: _*)
   @inline def countEverEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEverEnemy.p(predicate)
+
+  ////////////
+  // Groups //
+  ////////////
+
+  @inline def ourGroup    : GenericFriendlyUnitGroup  = _friendlyGroup()
+  @inline def enemyGroup  : UnitGroup                 = _enemyGroup()
+  @inline def groupOf(unit: UnitInfo): UnitGroup = ?(unit.isFriendly, ourGroup, enemyGroup)
+  @inline def groupVs(unit: UnitInfo): UnitGroup = ?(unit.isFriendly, enemyGroup, ourGroup)
+  private val _friendlyGroup  = new Cache(() => GenericFriendlyUnitGroup(_ours))
+  private val _enemyGroup     = new Cache(() => GenericUnitGroup(_enemy))
 }

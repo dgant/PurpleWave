@@ -37,7 +37,6 @@ class MissionStormDrop extends MissionDrop {
     zealotLock.counter = CountUpTo(4 - stormLock.units.size)
     zealotLock.preference = PreferClose(transportPixel)
     zealotLock.acquire()
-
     transports ++= transportLock.units
     passengers ++= stormLock.units
     passengers ++= zealotLock.units

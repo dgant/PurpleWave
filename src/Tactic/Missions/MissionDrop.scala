@@ -64,7 +64,7 @@ abstract class MissionDrop extends Mission {
   }
 
   final override protected def shouldForm: Boolean = {
-    With.blackboard.wantToHarass() && With.recruiter.available.exists(transportLock.matcher) && additionalFormationConditions
+    With.blackboard.wantToHarass() && With.recruiter.available.exists(transportLock.matcher) && additionalFormationConditions && { populateItinerary(); itinerary.nonEmpty }
   }
 
   final private def transition(newState: DropState): Unit = {
@@ -85,7 +85,6 @@ abstract class MissionDrop extends Mission {
   private def scoutTactics = Vector(With.tactics.scoutExpansions, With.tactics.acePilots, With.tactics.scoutWithOverlord, With.tactics.monitorWithObserver, With.tactics.darkTemplar)
 
   final private def skipBase(base: Base): Boolean = {
-
     if (ignore(base)) return true
     if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
     if (base.isNeutral && itinerary.size > 1 && With.frame < Minutes(10)()) return true
@@ -124,6 +123,7 @@ abstract class MissionDrop extends Mission {
         With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
       .sortBy(_.size)
       .sortBy(_.count(_.owner.isEnemy))
+    itinerary.clear()
     itinerary ++= itineraries.head.filter(bases.contains)
     With.logger.debug(f"$this itinerary: ${itinerary.view.map(_.toString).mkString(" -> ")}")
   }

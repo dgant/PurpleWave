@@ -26,7 +26,7 @@ class RemoveMineralBlocks extends Tactic {
     val workersTotal  = With.units.countOurs(IsWorker)
     val workersUsed   = With.geography.ourBases.map(b => 1 + 2 * b.minerals.length + 3 * b.gas.length).sum
     val workersFree   = workersTotal - workersUsed
-    if (workersFree == 0 && workersTotal < ?(With.blackboard.wantToAttack(), 32, 39)) return
+    if (workersFree <= 0 && workersTotal < ?(With.blackboard.wantToAttack(), 32, 39)) return
 
     val workersToUse = Math.max(1, Math.min(ourMineralBlocks.size, workersFree))
     miners.preference = PreferClose(ourMineralBlocks.head.pixel)

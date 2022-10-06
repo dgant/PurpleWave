@@ -47,11 +47,13 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatNearest               : Option[UnitInfo]  = _threatNearest()
   def targetsInRange              : Seq[UnitInfo]     = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   def targetNearest               : Option[UnitInfo]  = _targetNearest()
+  def enemyDetectorDeepest        : Option[UnitInfo]  = _enemyDetectorDeepest()
   def wantsToVolley               : Option[Boolean]   = _wantsToVolley() // None means no opinion
   def dpfReceiving                : Double            = _dpfReceiving()
   val safetyMargin                : Double            = 160
   def isCloakedAttacker           : Boolean           = me.cloaked && targetNearest.isDefined
   def inTankRange                 : Boolean           = _inTankRange()
+  def targetedByScarab            : Boolean           = _targetedByScarab()
   def withinSafetyMargin          : Boolean           = pixelsEntangled <= ?(me.flying && me.topSpeed > Maff.max(threats.map(_.topSpeed)).getOrElse(0.0), -64, -safetyMargin)
   def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
@@ -61,15 +63,17 @@ case class MatchupAnalysis(me: UnitInfo) {
   def pixelsEntangled             : Double            = _pixelsEntangled()
   def pixelsToTargetRange         : Option[Double]    = targetNearest.map(me.pixelsToGetInRange)
   def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(_.pixelsToGetInRange(me))
-  private val _threatDeepest      = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
-  private val _threatSoonest      = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
-  private val _threatNearest      = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
-  private val _targetNearest      = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
-  private val _pixelsEntangled    = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
-  private val _dpfReceiving       = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
-  private val _inTankRange        = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
-  private val _framesToLive       = new Cache(() => me.likelyDoomedInFrames)
-  private val _wantsToVolley      = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated
+  private val _threatDeepest        = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
+  private val _threatSoonest        = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
+  private val _threatNearest        = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
+  private val _targetNearest        = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
+  private val _enemyDetectorDeepest = new Cache(() => Maff.minBy(groupVs.detectors.filter(_.complete))(e => e.sightPixels - e.pixelDistanceCenter(me.pixel)))
+  private val _pixelsEntangled      = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse(-With.mapPixelWidth.toDouble))
+  private val _dpfReceiving         = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
+  private val _inTankRange          = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
+  private val _targetedByScarab     = new Cache(() => me.battle.exists(_.scarabTargets.exists(_._2 == me)))
+  private val _framesToLive         = new Cache(() => me.likelyDoomedInFrames)
+  private val _wantsToVolley        = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated
     targetNearest.flatMap(target =>
       threatDeepest.flatMap(deepest =>
         threatNearest.flatMap(nearest =>

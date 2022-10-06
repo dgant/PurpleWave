@@ -11,7 +11,7 @@ import bwta.Region
 
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) {
         val boundary          : TileRectangle       = new TileRectangle(tiles)
-        val centroid          : Tile                = if (tiles.isEmpty) new Pixel(bwemRegion.getCenter).tile else Maff.centroidTiles(Maff.orElse(tiles, tiles.view.filter(_.walkableUnchecked)))
+        val centroid          : Tile                = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles, Seq(new Pixel(bwemRegion.getCenter).tile)))
         val border            : Set[Tile]           = tiles.filter( ! _.adjacent8.forall(tiles.contains))
   lazy  val island            : Boolean             = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
@@ -28,7 +28,6 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   var walledIn        : Boolean           = false
   var exitNow         : Option[Edge]      = None
   var entranceNow     : Option[Edge]      = None
-  var lastPathfindId  : Long              = Long.MinValue
 
   def isOurs    : Boolean = owner.isUs
   def isAlly    : Boolean = owner.isAlly

@@ -10,7 +10,7 @@ object BeShuttle extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     ShuttleDitchPassengers.apply(shuttle)
-    ShuttleChoosePassenger.apply(shuttle)
+    ShuttleAdoptPassenger.apply(shuttle)
     ShuttlePickup.apply(shuttle)
     ShuttleCarry.apply(shuttle)
     ShuttlePark.apply(shuttle)

@@ -2,9 +2,12 @@ package Information.Battles.Types
 
 import Information.Battles.Prediction.Simulation.{ReportCard, SimulationEvent}
 import Information.Battles.Prediction.SimulationCheckpoint
+import Information.Geography.Types.Edge
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
+import Performance.Cache
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.Minutes
 
@@ -52,4 +55,27 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   var simulationReport = new mutable.HashMap[UnitInfo, ReportCard]
   var simulationEvents: Iterable[SimulationEvent] = Iterable.empty
   val simulationCheckpoints: mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
+
+  //////////////
+  // Features //
+  //////////////
+
+  def choke: Option[Edge] = _choke()
+  def scarabTargets: Seq[(UnitInfo, UnitInfo)] = _scarabTargets()
+
+  private val _choke = new Cache[Option[Edge]](() => {
+    val pUs   = us.attackCentroidGround
+    val pFoe  = enemy.vanguardGround()
+    val edge  = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
+    if (pUs.zone == pFoe.zone) None
+    else if (edge.isEmpty) None
+    else if (pFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < us.maxRangeGround) None
+    else edge
+  })
+  private val _scarabTargets = new Cache[Seq[(UnitInfo, UnitInfo)]](() =>
+    teams.flatMap(t =>
+      t.units
+      .filter(Protoss.Scarab)
+      .filter(_.orderTarget.isDefined)
+      .map(s => (s, s.orderTarget.get))))
 }

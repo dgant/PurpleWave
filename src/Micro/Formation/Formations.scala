@@ -15,10 +15,6 @@ object Formations {
       .getOrElse(new FormationStandard(group, FormationStyleGuard, group.homeConsensus))
   }
 
-  def engage(group: FriendlyUnitGroup, towards: Pixel): Formation = {
-    new FormationStandard(group, FormationStyleMarch, towards)
-  }
-
   def disengage(group: FriendlyUnitGroup, towards: Option[Pixel] = None): Formation = {
     new FormationStandard(group, FormationStyleDisengage, towards.getOrElse(group.homeConsensus))
   }

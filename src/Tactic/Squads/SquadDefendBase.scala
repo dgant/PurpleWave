@@ -12,6 +12,7 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsWorker
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -73,7 +74,7 @@ class SquadDefendBase(base: Base) extends Squad {
       && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
-    lazy val formationScour     = Formations.engage(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
+    lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
     lazy val formationBastion   = Formations.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
 
@@ -134,7 +135,7 @@ class SquadDefendBase(base: Base) extends Squad {
         // Send all follower units, like Carriers, to the most urgent target, because otherwise they'll just follow the leader
         // SquadAcePilots will often preempt this logic due to substantial overlap between followers/aces
         val antiTargetFollowers = antiTarget.view.filter(_.unitClass.followingAllowed)
-        val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target)))
+        val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target))).toVector // toVector necessary because we're about to modify the underlying collection
         assigned.addAll(next)
         antiAir.removeAll(next)
         antiGround.removeAll(next)
@@ -177,7 +178,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private def emergencyDTHugs(): Boolean = {
     val dts = enemies.filter(Protoss.DarkTemplar)
-    if (dts.nonEmpty && ! With.units.ours.exists(u => u.unitClass.isDetector && u.complete)) {
+    if (dts.nonEmpty && ! With.units.ours.exists(u => u.unitClass.isDetector && u.complete) && enemies.forall(e => Protoss.DarkTemplar(e) || IsWorker(e) || ! e.canAttackGround)) {
       val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
       val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourNatural.zone.exitNowOrHeart.center)
       units.foreach(_.intend(this, new Intention {

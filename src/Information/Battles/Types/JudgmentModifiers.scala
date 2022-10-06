@@ -110,8 +110,7 @@ object JudgmentModifiers {
   def choke(battleLocal: Battle): Option[JudgmentModifier] = {
     val pUs       = battleLocal.us.attackCentroidGround
     val pFoe      = battleLocal.enemy.vanguardGround()
-    val edge      = Maff.minBy(pUs.zone.edges.filter(_.otherSideof(pUs.zone) == pFoe.zone))(e => e.pixelCenter.pixelDistanceSquared(pUs) + e.pixelCenter.pixelDistanceSquared(pFoe))
-    if (pUs.zone == pFoe.zone) return None
+    val edge      = battleLocal.choke
     if (edge.isEmpty) return None
     if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
     if (pFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < battleLocal.us.maxRangeGround) return None

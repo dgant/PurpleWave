@@ -16,7 +16,7 @@ object PvTEndgameStorm    extends PvTStrategy
 
 object PvTMidgameCarrier  extends PvTStrategy { setChoice(PvTEndgameCarrier); blacklistVs(With.fingerprints.bio) }
 object PvTMidgameReaver   extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
-object PvTMidgameStorm    extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
+object PvTMidgameStorm    extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm); whitelistVs(With.fingerprints.bio) }
 object PvTMidgameOpen     extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
 
 abstract class PvTOpener extends PvTStrategy {
@@ -40,11 +40,11 @@ object PvT13Nexus extends PvTOpenerNoZealotNoRange {
   setStartLocationsMin(4)
   setRushTilesMinimum(180)
 }
-object PvTRangeless extends PvTOpenerNoZealotNoRange
-object PvT28Nexus extends PvTOpenerNoZealot
-object PvTZealotExpand extends PvTOpener
-object PvTZZCoreZ extends PvTOpener
-object PVT910 extends PvTOpener {
+object PvTRangeless     extends PvTOpenerNoZealotNoRange
+object PvT28Nexus       extends PvTOpenerNoZealot
+object PvTZealotExpand  extends PvTOpener
+object PvTZZCoreZ       extends PvTOpener
+object PVT910           extends PvTOpener {
   whitelistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,

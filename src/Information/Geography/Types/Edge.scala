@@ -2,9 +2,8 @@ package Information.Geography.Types
 
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
-import Mathematics.{Maff, Shapes}
 import Mathematics.Points.{Direction, Pixel, Tile}
-import Mathematics.Shapes.Ray
+import Mathematics.{Maff, Shapes}
 import bwta.Chokepoint
 
 final class Edge(choke: Chokepoint) {
@@ -31,15 +30,14 @@ final class Edge(choke: Chokepoint) {
     .map(region => With.geography.zones.minBy(
       _.centroid.center.pixelDistanceSquared(
         new Pixel(region.getCenter))))
-  
   val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
-  
-  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
-  def contains(tile: Tile): Boolean = contains(tile.center)
+
+  var lastPathfindId: Long = Long.MinValue
 
   private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)
   def pixelTowards(zone: Zone): Pixel = endPixels.minBy(p => if (endsWalkable) zone.distanceGrid.get(p.tile) else p.pixelDistanceSquared(zone.centroid.center))
-
+  def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
+  def contains(tile: Tile): Boolean = contains(tile.center)
   def diameterPixels: Double = 2 * radiusPixels
 
   override def toString: String = f"Edge @ $pixelCenter (${radiusPixels.toInt}px)"

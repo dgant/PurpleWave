@@ -331,10 +331,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       .map(_.center)
       .getOrElse(enemy.pixel.traversiblePixel(this))
   }
-  @inline final def canSee(other: UnitInfo): Boolean = (
-    (sightPixels >= pixelDistanceEdge(other) && (flying|| altitude >= other.altitude))
-    || (tile.tileDistanceSquared(other.tile) < 4 && tile.adjacent9.contains(other.tile)))
-
+  @inline final def pixelsToSightRange(other: UnitInfo): Double = pixelDistanceEdge(other) - sightPixels
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0

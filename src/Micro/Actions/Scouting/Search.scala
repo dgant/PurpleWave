@@ -1,5 +1,6 @@
 package Micro.Actions.Scouting
 
+import Debugging.Visualizations.Forces
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -8,6 +9,7 @@ import Micro.Actions.Action
 import Micro.Actions.Commands.Move
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
+import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Search extends AbstractSearch {
@@ -61,10 +63,10 @@ abstract class AbstractSearch extends Action {
     val force = tilesToScout.view.map(tile => Gravity(tile.center, With.grids.lastSeen.framesSince(tile))).map(_.apply(unit.pixel)).reduce(_ + _)
 
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
-    val tileToScout = tilesToScout.minBy(_.center.pixelDistance(target))
+    unit.agent.toTravel = Some(tilesToScout.minBy(_.center.pixelDistance(target)).center)
 
     val profile = new PathfindProfile(unit.tile)
-    profile.end               = Some(tileToScout)
+    profile.end               = Some(unit.agent.destination.tile)
     profile.employGroundDist  = true
     profile.costOccupancy     = 0.01
     profile.costRepulsion     = 5
@@ -73,8 +75,14 @@ abstract class AbstractSearch extends Action {
     profile.unit              = Some(unit)
     profile.alsoUnwalkable    = bannedTiles
     val path = profile.find
-    unit.agent.toTravel = Some(tileToScout.center)
-    MicroPathing.tryMovingAlongTilePath(unit, path)
+
+    if (unit.zone == unit.agent.destination.zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {
+      unit.agent.forces(Forces.travel) = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destination))
+      unit.agent.forces(Forces.threat) = Potential.hardAvoidThreatRange(unit)
+      unit.agent.toTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians).orElse(unit.agent.toTravel)
+    } else {
+      MicroPathing.tryMovingAlongTilePath(unit, path)
+    }
     Commander.move(unit)
   }
 }

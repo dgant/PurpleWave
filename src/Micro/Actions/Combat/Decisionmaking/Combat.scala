@@ -42,7 +42,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def engageFormation       : Option[Formation] = formations.dropRight(1).headOption.filter(_.placements.contains(unit))
   protected def squadEngaged          : Boolean = unit.squad.map(_.engagedUpon).getOrElse(unit.matchups.engagedUpon)
   protected def fightConsensus        : Boolean = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldFight)
-  protected def assembling            : Boolean = engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.95 - group.restrainedFrames / Seconds(10)()
+  protected def assembling            : Boolean = false && engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.95 - group.restrainedFrames / Seconds(10)()
   protected def targetFleeing         : Boolean = target.exists(t => t.canMove && Maff.isTowards(unit.pixel, t.pixel, t.angleRadians))
   protected def targetDistanceHere    : Double  = target.map(unit.pixelDistanceEdge).getOrElse(0d)
   protected def targetDistanceThere   : Double  = target.map(unit.pixelDistanceEdgeFrom(_, unit.agent.destination)).getOrElse(0d)
@@ -73,7 +73,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.agent.shouldFight &&= target.nonEmpty || unit.matchups.ignorant || unit.matchups.threatsInPixels(160).forall(IsWorker)
     Commander.defaultEscalation(unit)
 
-    trapped             = ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
+    trapped             = false && ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
     firingPixel         = target.map(unit.pixelToFireAt)
     framesToPokeTarget  = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
     idealTargetDistance = getIdealTargetDistance

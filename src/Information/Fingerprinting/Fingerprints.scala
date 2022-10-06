@@ -146,4 +146,5 @@ class Fingerprints {
   lazy val twoHatchGas          = addFingerprint(new Fingerprint2HatchGas)
   lazy val threeHatchGas        = addFingerprint(new Fingerprint3HatchGas)
   lazy val twoHatchMain         = addFingerprint(new Fingerprint2HatchMain)
+  lazy val threeHatchHydra      = addFingerprint(new Fingerprint3HatchHydra)
 }

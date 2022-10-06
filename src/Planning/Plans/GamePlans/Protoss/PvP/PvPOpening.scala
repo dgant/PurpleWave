@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.?
-import Utilities.Time.{GameTime, _}
+import Utilities.Time._
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
@@ -288,8 +288,11 @@ class PvPOpening extends GameplanImperative {
         } else if (trackRecordLacks(With.fingerprints.dtRush)) {
           getObservatory  = false
           getObservers    = false
-        } else if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) && ! enemyRecentStrategy(With.fingerprints.dtRush)) {
-          getObservatory  = roll("SpeculativeObservatory",  0.2)
+        } else if (enemyRecentStrategy(With.fingerprints.dtRush)) {
+          getObservatory = true
+          getObservers = true
+        } else if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)) {
+          getObservatory  = roll("SpeculativeObservatory",  0.25)
           getObservers    = getObservatory
         } else {
           getObservatory  =                   roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
@@ -307,6 +310,7 @@ class PvPOpening extends GameplanImperative {
     atEarlyTiming ||= PvPGateCoreGate()  && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
     atEarlyTiming ||= PvP1015()          && unitsComplete(Protoss.Dragoon) > 2
     atEarlyTiming ||=                       unitsComplete(Protoss.Dragoon) > 0 && With.fingerprints.proxyGateway()
+    atEarlyTiming ||= PvPDT()            && upgradeComplete(Protoss.DragoonRange, Seconds(30)()) && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
     atMainTiming  ||= PvP3GateGoon()     && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
     atMainTiming  ||= PvP4GateGoon()     && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
     atMainTiming  ||= PvPRobo()          && upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
@@ -320,6 +324,7 @@ class PvPOpening extends GameplanImperative {
     earlyTimingClosed ||= PvP1012()         && With.fingerprints.twoGate()
     earlyTimingClosed ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! upgradeComplete(Protoss.DragoonRange)
     earlyTimingClosed ||= PvPGateCoreGate() && enemyHasUpgrade(Protoss.DragoonRange) && ! safeToMoveOut && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    atEarlyTiming     ||= PvPDT()           && enemyHasUpgrade(Protoss.DragoonRange)
     mainTimingClosed  ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
     mainTimingClosed  ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
     mainTimingClosed  ||= PvPDT()           && enemiesComplete(Protoss.Observer, Protoss.PhotonCannon) > 0

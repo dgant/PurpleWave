@@ -70,9 +70,14 @@ object PvPIdeas extends MacroActions with MacroCounting {
       if ( ! auditing) { makeObservers() }
       return true
     }
+    var expectEarliestArrival = enemyDarkTemplarLikely || With.fingerprints.rampBlock()
+    if (units(Protoss.Forge) > 0) {
+      expectEarliestArrival ||= enemyRecentStrategy(With.fingerprints.dtRush)
+      expectEarliestArrival ||= ! With.fingerprints.dragoonRange()
+    }
     lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
     lazy val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
-    lazy val expectedArrival     = if (enemyDarkTemplarLikely || With.fingerprints.rampBlock()) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
+    lazy val expectedArrival     = if (expectEarliestArrival) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame
     lazy val framesUntilObserver = framesUntilUnit(Protoss.Observer)
     lazy val dtPrecedesCannon    = framesUntilArrival - cannonSafetyFrames  < framesUntilUnit(Protoss.PhotonCannon)
@@ -94,7 +99,6 @@ object PvPIdeas extends MacroActions with MacroCounting {
         || (cannonsAreReady && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base sooner rather than later
 
     if (auditing) return goObserver
-
     if (enemyContained) status(f"Containing")
     if (enemyDarkTemplarLikely) status(f"ExpectDT@${Frames(expectedArrival)}")
 

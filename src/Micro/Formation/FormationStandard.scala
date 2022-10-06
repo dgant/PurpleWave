@@ -20,10 +20,9 @@ import Utilities.Time.Minutes
 //Disabling spurious IntelliJ warnings
 class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
-  private def units = group.groupFriendlyOrderable
-  private def airUnits = units.filter(_.flying)
+  private def units       = group.groupFriendlyOrderable
+  private def airUnits    = units.filter(_.flying)
   private def groundUnits = units.filterNot(_.flying)
-  private val paceAge = 48
 
   // + Glossary +
   // goal:             Where the group is trying to move. Travel formations (March/Disengage) want to pull the group towards this.
@@ -42,8 +41,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val vanguardOrigin    : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) vanguardTarget else goal
   val vanguardUnits     : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
   val centroid          : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
-  val goalPath          : TilePath              =                                   new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile),   lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
-  val targetPath        : TilePath              = if (goal == target) goalPath else new PathfindProfile(centroid.walkableTile, Some(target.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+  val goalPath          : TilePath              = findGoalPath
+  val targetPath        : TilePath              = findTargetPath
   val goalPathTiles     : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
   val targetPathTiles   : Seq[Tile]             = targetPath.tiles.getOrElse(Seq.empty).view
   val goalPath5         : Tile                  = goalPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(goal.walkableTile)
@@ -72,9 +71,17 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   var stepTiles         : Int                   = 0
   var minAltitude       : Int                   = -1
 
-  val slots       : Map[UnitClass,        Seq[Pixel]] = slotsByClass()
-  val unassigned  : UnassignedFormation               = UnassignedFormation(style, slots, group)
-  val placements  : Map[FriendlyUnitInfo, Pixel]      = unassigned.outwardFromCentroid
+  val slots       : Map[UnitClass, Seq[Pixel]]    = slotsByClass()
+  val unassigned  : UnassignedFormation           = UnassignedFormation(style, slots, group)
+  val placements  : Map[FriendlyUnitInfo, Pixel]  = unassigned.outwardFromCentroid
+
+  private def findGoalPath: TilePath = {
+    new PathfindProfile(centroid.walkableTile, Some(goal.walkableTile),   lengthMaximum = Some(20), employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+  }
+  private def findTargetPath: TilePath = {
+    if (goal == target) return goalPath
+    new PathfindProfile(centroid.walkableTile, Some(target.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+  }
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {

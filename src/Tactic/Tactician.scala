@@ -120,13 +120,12 @@ class Tactician extends TimedTask {
       Maff.sortStablyInPlaceBy(freelancersSorted)(_.framesToTravelTo(squad.vicinity))
       var hired: Option[FriendlyUnitInfo] = None
       do {
-        freelancersSorted
-          .find(u => freelancersAvailable.contains(u) && squad.candidateValue(u) > minimumValue)
-          .foreach(hired => {
-            freelancersAvailable -= hired
-            freelancers -= hired
-            squad.addUnit(hired)
-            With.recruiter.lockTo(squad.lock, hired)
+        hired = freelancersSorted.find(u => freelancersAvailable.contains(u) && squad.candidateValue(u) > minimumValue)
+        hired.foreach(h => {
+            freelancersAvailable -= h
+            freelancers -= h
+            squad.addUnit(h)
+            With.recruiter.lockTo(squad.lock, h)
           })
       } while (hired.isDefined)
     })

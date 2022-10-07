@@ -59,7 +59,7 @@ trait Expansions {
     val tileHome        = if (player.isFriendly)  With.geography.home     else With.scouting.enemyHome
     val tileEnemy       = if (player.isEnemy)     With.scouting.enemyHome else With.geography.home
     val friendlyPlayers = if (player.isFriendly)  Vector(player)          else With.enemies
-    val opposingPlayers = if (player.isEnemy)     With.enemies            else With.friendlies
+    val opposingPlayers = if (player.isEnemy)     Vector(player)          else With.enemies
     val friendlyBases   = With.geography.bases.filter(b => friendlyPlayers.contains(b.owner))
     val opposingBases   = With.geography.bases.filter(b => opposingPlayers.contains(b.owner))
     val friendlyTiles   = Maff.orElse(friendlyBases.map(_.heart), Seq(tileHome))

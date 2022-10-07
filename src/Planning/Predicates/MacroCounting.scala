@@ -55,7 +55,7 @@ trait MacroCounting {
   }
 
   def upgradeStarted(upgrade: Upgrade, level: Int = 1): Boolean = {
-    upgradeComplete(upgrade, level, upgrade.upgradeFrames(level))
+    upgradeComplete(upgrade, level, upgrade.upgradeFrames.getOrElse(level, upgrade.upgradeFrames.values.last))
   }
 
   def upgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0): Boolean = {

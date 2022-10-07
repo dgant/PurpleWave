@@ -46,27 +46,37 @@ class PvZ2022 extends PvZ2022Openings {
   override def executeMain(): Unit = {
     scoutOn(Protoss.Pylon)
     new MeldArchons(49).update()
-    if (enemyHydralisksLikely) status("Hydras")
-    if (enemyMutalisksLikely) status("Mutas")
-    if (enemyLurkersLikely) status("Lurkers")
-    if (anticipateSpeedlings) status("Speedlings")
 
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
     targetMiningBases = Maff.clamp(targetMiningBases, 1, 4)
-    if (safeToMoveOut || miningBases < targetMiningBases) attack() else harass()
+    if (enemies(Zerg.SunkenColony) > 0 && safeToMoveOut && unitsComplete(IsWarrior) >= 5) {
+      targetMiningBases = Math.max(targetMiningBases, 2)
+    }
+    var shouldAttack = safeToMoveOut || miningBases < targetMiningBases
+    if (enemies(Zerg.Mutalisk) > 0 || (enemyMutalisksLikely && enemiesComplete(Zerg.Spire) > 0)) {
+      shouldAttack &&= unitsComplete(Protoss.PhotonCannon) >= 2 * bases || unitsComplete(Protoss.Corsair) >= 4 || unitsComplete(Protoss.Dragoon) >= 16
+    }
+    if (shouldAttack) attack() else harass()
     requireMiningBases(targetMiningBases)
+
+    if (enemyHydralisksLikely) status("Hydras")
+    if (enemyMutalisksLikely) status("Mutas")
+    if (enemyLurkersLikely) status("Lurkers")
+    if (anticipateSpeedlings) status("Speedlings")
+    status(f"${targetMiningBases}base")
 
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 7, 12)) techStage1()
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 12, 18) && miningBases > 1)  techStage2()
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 18, 24) && miningBases > 1)  techStage3()
 
     pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 3, 1))
+    if (enemyMutalisksLikely) get(Protoss.Stargate)
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
     if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0)))
-    if (enemyMutalisksLikely) buildCannonsAtNatural(?(enemies(Zerg.Mutalisk) < 9, 2, 3), DefendHall)
+    if (enemyMutalisksLikely) buildCannonsAtBases(?(enemies(Zerg.Mutalisk) < 9, 2, 3), DefendHall)
     if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       buildCannonsAtOpenings(1)

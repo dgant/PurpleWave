@@ -15,5 +15,4 @@ object Techniques {
   object Fallback   extends Technique(Dodge) // Get out of fight while landing shots
   object Flee       extends Technique(Dodge, Abuse, Fallback) // Get out of fight
   object Fight      extends Technique(Dodge, Abuse, Excuse, Flee, Scavenge) // Pick fight ASAP
-
 }

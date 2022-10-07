@@ -70,7 +70,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
   def innerPerform(): Unit = {
     Target.choose(unit)
-    unit.agent.shouldFight &&= target.nonEmpty || unit.matchups.ignorant || unit.matchups.threatsInPixels(160).forall(IsWorker)
+    val canBypass = unit.matchups.ignorant || (unit.agent.shouldFight && unit.matchups.threatsInPixels(96).forall(IsWorker))
+    unit.agent.shouldFight &&= target.nonEmpty
     Commander.defaultEscalation(unit)
 
     trapped             = false && ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
@@ -88,8 +89,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
     technique =
       if ( ! unit.canMove)              Fight
-      else if (unit.agent.shouldFight)  ?(target.isDefined, Fight, Walk)
-      else if (unit.matchups.ignorant)  Walk
+      else if (unit.agent.shouldFight)  Fight
+      else if (canBypass)               Walk
       else                              Flee
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
@@ -236,6 +237,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def walk(): Boolean = {
+    unit.agent.shouldFight = true // This encourages the unit to use its forward formation rather than its retreat formation
     if (unit.agent.receivedPushPriority() > unit.agent.priority) {
       applyForce(Forces.travel, Potential.towardsDestination(unit))
       moveForcefully()

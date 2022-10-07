@@ -5,11 +5,11 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
-import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsWorker
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -111,13 +111,15 @@ object SquadAutomation {
 
   def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] =
     // Rush scenarios: Send army directly to vicinity
-    if (With.frame < Minutes(5)() && ! With.units.existsEnemy(IsWarrior) && unit.pixelDistanceTravelling(squad.vicinity) > 32 * 30) Some(squad.vicinity) else
-    squad
-    .formations
-    .headOption
-    .find(_.placements.contains(unit))
-    .map(_.placements(unit))
-    .orElse(if (squad.fightConsensus) Some(squad.vicinity) else getReturn(unit, squad, defaultReturn).orElse(Some(squad.homeConsensus)))
+    Some(squad.vicinity)
+      .filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
+      .orElse(
+        squad
+        .formations
+        .headOption
+        .find(_.placements.contains(unit))
+        .map(_.placements(unit)))
+      .orElse(if (squad.fightConsensus) Some(squad.vicinity) else getReturn(unit, squad, defaultReturn).orElse(Some(squad.homeConsensus)))
 
   //////////////////////
   // Full automation! //

@@ -238,7 +238,7 @@ object Commander {
         unit.bwapiUnit.move(to.bwapi)
       }
       if ( ! unit.flying) {
-        pushTowards(unit, to, TrafficPriorities.Pardon)
+        pushTowards(unit, to, TrafficPriorities.None)
       }
     }
     sleep(unit)

@@ -1,10 +1,8 @@
 package Lifecycle.Configure
 
 import Lifecycle.With
-import Mathematics.Maff
-import Strategery.Selection.{ExpandStrategy, StrategySelectionGreedy, StrategySelectionPolicy}
-import Strategery.Strategies.{AllChoices, Strategy}
-import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
+import Strategery.Strategies.Strategy
+import Strategery.{HumanPlaybook, PretrainingPlaybook, TournamentPlaybook}
 import mjson.Json
 
 import java.io.File
@@ -55,8 +53,8 @@ object ConfigurationLoader {
       val logstd        = getOrDefault(config, "logstd",        false)
       val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
       val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameLimitMs)
-      val fixedbuilds   = new FileFlag("fixedbuilds.txt").contents
 
+      With.configuration.fixedBuilds = new FileFlag("fixedbuilds.txt").contents
       With.configuration.frameTargetMs = frameMsTarget
       With.configuration.frameLimitMs = frameMsLimit
 
@@ -78,7 +76,6 @@ object ConfigurationLoader {
       if (debugging)            { setDebugMode() }
       if (debugginglive)        { setDebugLiveMode() }
       if (logstd)               { With.configuration.logstd = true }
-      if (fixedbuilds.nonEmpty) { setFixedBuild(fixedbuilds) }
 
       Seq(
         ("Human",           human.toString),
@@ -93,7 +90,7 @@ object ConfigurationLoader {
         ("Log stdout",      logstd.toString),
         ("Frame MS target", frameMsTarget),
         ("Frame MS limit",  frameMsLimit),
-        ("Fixed build",     fixedbuilds)
+        ("Fixed build",     With.configuration.fixedBuilds)
       )
       .foreach(pair => With.logger.debug(pair._1 + ": " + pair._2))
     } catch { case exception: Exception => With.logger.onException(exception) }
@@ -150,26 +147,6 @@ object ConfigurationLoader {
 
   def matchNames(names: Seq[String], branches: Seq[Seq[Strategy]]): Seq[Seq[Strategy]] = {
     branches.filter(branch => names.forall(name => branch.exists(_.toString == name)))
-  }
-
-  private def setFixedBuild(strategyNamesText: String): Unit = {
-    // The implementation of this is a little tricky because we have to call this before the Strategist has been instantiated
-
-    // Get all the strategy names
-    val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
-    val strategyNames = Maff.sample(strategyNamesLines).split(" ")
-
-    // Get all the mapped strategy objects
-    var matchingBranches = matchNames(strategyNames, AllChoices.tree.flatMap(ExpandStrategy.apply).distinct)
-    if (matchingBranches.isEmpty) {
-      With.logger.warn("Tried to use fixed build but failed to match " + strategyNamesText)
-    }
-    if (matchingBranches.nonEmpty) {
-      With.logger.debug("Using fixed build: " + strategyNamesText)
-      config.forcedPlaybook = Some(new TestingPlaybook {
-        override def policy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
-      })
-    }
   }
 
   private def config: Configuration = With.configuration

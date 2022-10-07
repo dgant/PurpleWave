@@ -153,8 +153,8 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private def isBreaching(enemy: UnitInfo): Boolean = (
     enemy.canAttackGround
-      && enemy.base.exists(_.owner.isUs)
-      && ! enemy.unitClass.isWorker
+      && (enemy.base.exists(_.owner.isUs) || guardChoke.exists(c => enemy.metro.exists(_.bases.contains(base)) && enemy.pixel.walkableTile.groundPixels(base.heart) < c.pixelCenter.walkableTile.groundPixels(base.heart)))
+      && (With.fingerprints.workerRush() || ! IsWorker(enemy))
       && ! guardZone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
   private def isScourable(enemy: UnitInfo): Boolean = (

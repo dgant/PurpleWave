@@ -1,12 +1,13 @@
 package Strategery
 
+import Lifecycle.Configure.ConfigurationLoader.matchNames
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
 import Planning.Plans.GamePlans.All.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
-import Strategery.Selection.{ExpandStrategy, StrategySelectionFixed, WinProbability}
+import Strategery.Selection._
 import Strategery.Strategies.{AllChoices, Strategy}
 import bwapi.{GameType, Race}
 
@@ -26,6 +27,9 @@ class Strategist {
   def update(): Unit = {
     val enemyRaceNow = With.enemy.raceCurrent
     if (_selected.isEmpty) {
+      if (With.configuration.fixedBuilds.nonEmpty) {
+        setFixedBuild(With.configuration.fixedBuilds)
+      }
       _selected ++= selectedInitially
     } else if (_lastEnemyRace != enemyRaceNow) {
       val toRemove = _selected.filter(_.enemyRaces.forall(r => r != Race.Unknown && r != enemyRaceNow))
@@ -135,6 +139,26 @@ class Strategist {
       rolls(key) = success
     }
     rolls(key)
+  }
+
+  private def setFixedBuild(strategyNamesText: String): Unit = {
+    // The implementation of this is a little tricky because we have to call this before the Strategist has been instantiated
+
+    // Get all the strategy names
+    val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
+    val strategyNames = Maff.sample(strategyNamesLines).split(" ")
+
+    // Get all the mapped strategy objects
+    var matchingBranches = matchNames(strategyNames, AllChoices.tree.flatMap(ExpandStrategy.apply).distinct)
+    if (matchingBranches.isEmpty) {
+      With.logger.warn("Tried to use fixed build but failed to match " + strategyNamesText)
+    }
+    if (matchingBranches.nonEmpty) {
+      With.logger.debug("Using fixed build: " + strategyNamesText)
+      With.configuration.forcedPlaybook = Some(new TestingPlaybook {
+        override def policy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
+      })
+    }
   }
 }
 

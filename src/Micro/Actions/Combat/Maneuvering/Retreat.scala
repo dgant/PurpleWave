@@ -19,6 +19,7 @@ object Retreat extends Action {
   case class RetreatPlan(unit: FriendlyUnitInfo, to: Pixel, name: String) {
     def apply(unit: FriendlyUnitInfo): Boolean = {
       if (unit.ready) {
+        unit.agent.toAttack = None // Affects traffic prioritization
         unit.agent.toTravel = Some(to)
         if (With.configuration.debugging) {
           unit.agent.act(f"Retreat$name")

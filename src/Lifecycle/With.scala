@@ -165,8 +165,6 @@ object With {
     // Normal systems //
     ////////////////////
 
-    With.logger.debug(f"${game.getGameType.toString.replace("_", " ")} on ${game.mapName} at ${game.mapFileName()} as ${self.fullDescription} with ${(self.allies ++ self.enemies).map(_.fullDescription).mkString(", ")}")
-
     //geo = new NeoGeo(game)
     if (With.configuration.visualizeDebug) {
       //NeoRender(geo)
@@ -177,7 +175,6 @@ object With {
     // Order-dependent initialization:
     // PerformanceMonitor must exist when creating any task
     performance       = new PerformanceMonitor
-
     agents            = new Agency
     animations        = new Animations
     architecture      = new Architecture
@@ -225,6 +222,8 @@ object With {
     // Order-dependent initialization:
     // TaskQueue comes last because it references other systems
     tasks             = new TaskQueueGlobal
+
+    With.logger.debug(f"${game.getGameType.toString.replace("_", " ")} on ${game.mapName} at ${game.mapFileName()} as ${self.fullDescription} with ${(self.allies ++ self.enemies).map(_.fullDescription).mkString(", ")}")
   }
   
   private def analyzeTerrain(): Unit = {

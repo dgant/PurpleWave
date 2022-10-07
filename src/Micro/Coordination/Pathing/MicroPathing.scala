@@ -6,7 +6,7 @@ import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.Force
 import Mathematics.Points.{Pixel, Tile}
-import Mathematics.Shapes.Circle
+import Mathematics.Shapes.{Circle, Ray}
 import Mathematics.{Maff, Shapes}
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
 import Micro.Agency.Commander
@@ -68,7 +68,7 @@ object MicroPathing {
 
   def getGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Pixel = {
     val goal              = rawGoal.walkablePixel
-    val lineWaypoint      = if (Shapes.Ray(from, goal).forall(_.walkable)) Some(from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels))) else None
+    val lineWaypoint      = if (Ray(from, goal).forall(_.walkable)) Some(from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(from.tile, goal.tile)
     lazy val hillWaypoint = hillPath.map(path => path.last.center.add(from.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)

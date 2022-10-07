@@ -21,7 +21,7 @@ object ProtossChoices {
   /////////
   
   val pvtOpenersTransitioningFromNothing = Vector(
-    PvTProxy2Gate,
+    //PvTProxy2Gate,
     PvT13Nexus,
     PvTZealotExpand
   )

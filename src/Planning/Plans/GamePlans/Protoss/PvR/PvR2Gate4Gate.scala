@@ -1,36 +1,26 @@
 package Planning.Plans.GamePlans.Protoss.PvR
 
-import Macro.Requests.{RequestBuildable, Get}
-import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
+import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
-import Planning.Plans.Macro.BuildOrders.Build
-import Planning.Predicates.Milestones.UpgradeComplete
-import Planning.Predicates.Strategy.Employing
-import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR2Gate4Gate
+import Utilities.UnitFilters.IsWarrior
 
-class PvR2Gate4Gate extends GameplanTemplate {
+class PvR2Gate4Gate extends GameplanImperative {
 
-  override val activationCriteria: Predicate = Employing(PvR2Gate4Gate)
+  override def executeBuild(): Unit = {
+    buildOrder(ProtossBuilds.TwoGate910: _*)
+  }
 
-  override def attackPlan: Plan = new Trigger(
-    UpgradeComplete(Protoss.DragoonRange),
-    new AttackAndHarass)
-
-  override val buildOrder: Vector[RequestBuildable] = ProtossBuilds.TwoGate910
-
-  override def buildPlans = Vector(
-    new CapGasAt(250),
-    new Pump(Protoss.Dragoon),
-    new Pump(Protoss.Zealot),
-    new Build(
-      Get(Protoss.Assimilator),
-      Get(Protoss.CyberneticsCore),
-      Get(Protoss.DragoonRange),
-      Get(4, Protoss.Gateway)))
+  override def executeMain(): Unit = {
+    if (safeToMoveOut && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24)) attack()
+    if (units(Protoss.Dragoon) >= 4) get(Protoss.DragoonRange)
+    maintainMiningBases(1)
+    pump(Protoss.Dragoon)
+    pump(Protoss.Zealot)
+    get(Protoss.Assimilator, Protoss.CyberneticsCore)
+    get(Protoss.DragoonRange)
+    get(4, Protoss.Gateway)
+    buildGasPumps()
+  }
 }

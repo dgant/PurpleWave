@@ -85,22 +85,16 @@ object Potential {
       .getOrElse(new Force)
   }
 
-  private val tts = 1d / 32d / 32d
-  private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo, margin: Double = 8.0): Double = {
+  private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo, margin: Double): Double = {
     if (unit.flying) return 0.0
     if (other.flying) return 0.0
     if (other.velocity.lengthSquared < 0.01) return 0.0
     if (other.topSpeed >= unit.topSpeed && other.speedApproaching(unit) < 0) return 0.0
-    val maximumDistance   = Math.max(unit.unitClass.dimensionMax, other.unitClass.dimensionMax)
-    val blockerDistance   = other.pixelDistanceEdge(unit)
-    val magnitudeDistance = 1.0 - Maff.clamp(blockerDistance / (1.0 + maximumDistance), 0.0, 1.0)
-    val magnitudeSize     = unit.unitClass.dimensionMax * other.unitClass.dimensionMax * tts
-    val output            = magnitudeSize * magnitudeDistance
+    val output = 1.0 - Maff.clamp(other.pixelDistanceEdge(unit) / margin, 0.0, 1.0)
     output
   }
-
   def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
-    val magnitude = collisionRepulsionMagnitude(unit, other)
+    val magnitude = collisionRepulsionMagnitude(unit, other, 12.0)
     if (magnitude == 0) new Force else towardsUnit(unit, other, -magnitude)
   }
   

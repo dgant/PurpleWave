@@ -12,6 +12,7 @@ object TargetFilterFocus extends TargetFilter {
     if (With.yolo.active) return true
     if (actor.inRangeToAttack(target)
       && actor.readyForAttackOrder
+      && actor.framesToFace(target) <= 2
       && (target.unitClass.attacksOrCastsOrDetectsOrTransports || ! actor.squad.exists(_.engagedUpon))) return true
     actor.targetsAssigned.forall(_.contains(target))
   }

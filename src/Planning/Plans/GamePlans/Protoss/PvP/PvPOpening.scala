@@ -180,11 +180,11 @@ class PvPOpening extends GameplanImperative {
       if ( ! With.strategy.isFixedOpponent
         && With.fingerprints.robo.recently
         && (With.fingerprints.robo() || ! With.fingerprints.dtRush.recently)
-        && roll("SwapRoboIntoCoreExpand", ?(With.fingerprints.robo(), 0.6, 0.25))) {
+        && roll("SwapRoboIntoExpand", ?(With.fingerprints.robo(), 0.6, 0.25))) {
         PvPRobo.swapOut()
         PvPObs.swapOut()
         PvPReaver.swapOut()
-        PvPCoreExpand.swapIn()
+        ?(units(Protoss.Gateway) > 1, PvP3GateGoon, PvPCoreExpand).swapIn()
       }
     }
     // If we catch them going Robo or Forge against our DT, abandon ship

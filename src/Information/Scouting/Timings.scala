@@ -71,6 +71,18 @@ trait Timings {
       val toryCompletionFrame = Math.min(roboCompletionFrame  + Protoss.Observatory.buildFramesFull,      enemyCompletions(Protoss.Observatory))
       earliestCompletionFrame = Math.min(toryCompletionFrame  + Protoss.Observer.buildFramesFull,         enemyCompletions(Protoss.Observer))
     }
+    if (unitClass == Zerg.Mutalisk) {
+      // Extreme earliness
+      if (With.fingerprints.ninePoolGas()) {
+        earliestCompletionFrame = GameTime(5, 5)() // Estimated, not observed
+      } else if (With.fingerprints.overpoolGas() || With.fingerprints.twelvePoolGas()) {
+        earliestCompletionFrame = GameTime(5, 35)() // Estimated, not observed
+      } else if (With.fingerprints.threeHatchGas()) {
+        earliestCompletionFrame = GameTime(6, 15)() // Estimated, not observed
+      } else {
+        earliestCompletionFrame = GameTime(5, 55)() // Observed via McRaveZ
+      }
+    }
     // TODO: Support other unit types (and support current types less maually)
     earliestCompletionFrame
   }

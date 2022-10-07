@@ -101,8 +101,8 @@ object JudgmentModifiers {
     val commitmentRaw             = Maff.mean(battleLocal.us.attackers.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d), 0, 1)))
     val commitment                = commitmentFloor(commitmentRaw)
     lazy val enemyAttackers       = battleLocal.enemy.attackers.size.toDouble
-    lazy val hesitanceVisibility  = 0.08 / enemyAttackers * battleLocal.enemy.attackers.count( ! _.visible)
-    lazy val hesitanceTanks       = 0.12 / enemyAttackers * battleLocal.enemy.attackers.count(t => Terran.SiegeTankSieged(t) || (Terran.SiegeTankUnsieged(t) && With.framesSince(t.lastSeen) > 24))
+    lazy val hesitanceVisibility  = 0.08 / Math.max(1.0, enemyAttackers) * battleLocal.enemy.attackers.count( ! _.visible)
+    lazy val hesitanceTanks       = 0.12 / Math.max(1.0, enemyAttackers) * battleLocal.enemy.attackers.count(t => Terran.SiegeTankSieged(t) || (Terran.SiegeTankUnsieged(t) && With.framesSince(t.lastSeen) > 24))
     Some(JudgmentModifier(targetDelta = ?(commitment > 0, -commitment * 0.15, hesitanceVisibility + hesitanceTanks)))
   }
 

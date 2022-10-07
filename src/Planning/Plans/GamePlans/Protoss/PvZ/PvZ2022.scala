@@ -66,6 +66,22 @@ class PvZ2022 extends PvZ2022Openings {
     if (anticipateSpeedlings) status("Speedlings")
     status(f"${targetMiningBases}base")
 
+    if (enemyMutalisksLikely || (
+      safeAtHome
+        && miningBases > 1
+        && frame > With.scouting.earliestArrival(Zerg.Mutalisk) - Protoss.Forge.buildFrames - Protoss.PhotonCannon.buildFrames
+        && ! enemyHydralisksLikely
+        && ! enemyLurkersLikely)) {
+      get(Protoss.Forge)
+      With.geography.ourMiningBases.foreach(b => {
+        val query = new PlacementQuery(Protoss.PhotonCannon)
+          .requireBase(b)
+          .requireLabelYes(DefendHall)
+        get(1, Protoss.Pylon, query)
+        get(?(enemies(Zerg.Mutalisk) < 9, 2, 3), Protoss.PhotonCannon, query)
+      })
+    }
+
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 7, 12)) techStage1()
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 12, 18) && miningBases > 1)  techStage2()
     if (unitsComplete(IsWarrior) >= ?(safeAtHome, 18, 24) && miningBases > 1)  techStage3()
@@ -76,7 +92,6 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0)))
-    if (enemyMutalisksLikely) buildCannonsAtBases(?(enemies(Zerg.Mutalisk) < 9, 2, 3), DefendHall)
     if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       buildCannonsAtOpenings(1)
@@ -117,7 +132,7 @@ class PvZ2022 extends PvZ2022Openings {
   }
 
   private def techStage2(): Unit = {
-    get(Protoss.Forge, Protoss.CitadelOfAdun)
+    get(Protoss.Forge, Protoss.Stargate, Protoss.CitadelOfAdun)
     get(Protoss.ZealotSpeed)
     if (gas < 300) buildGasPumps()
   }

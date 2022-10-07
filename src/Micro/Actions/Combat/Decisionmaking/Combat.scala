@@ -296,6 +296,12 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       if (engageFormation.isDefined && ! unit.flying && shouldChase && formationHelpsChase) {
         unit.agent.act("Slide")
         Commander.move(unit)
+      } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
+        t.flying
+        && unit.pixelDistanceEdge(t) > 0.25 * unit.pixelRangeAgainst(t)
+        && unit.speedApproachingEachOther(t) < 0
+        && unit.speedApproaching(t) < 0.9 * unit.topSpeed)) {
+        chase()
       } else if (breakFormationToAttack) {
         if (shouldChase && idealDistanceForward >= 32) {
           chase()

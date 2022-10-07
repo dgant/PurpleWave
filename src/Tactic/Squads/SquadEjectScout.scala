@@ -13,7 +13,8 @@ import Utilities.UnitPreferences.PreferClose
 class SquadEjectScout extends Squad {
   override def toString: String = "Eject"
 
-  val targetScout = new Cache(() => Maff.minBy(With.scouting.enemyScouts())(_.frameDiscovered))
+  val legalScouts = new Cache(() => With.scouting.enemyScouts().filter(u => u.visible || ! u.flying || ! u.tile.zone.island))
+  val targetScout = new Cache(() => Maff.minBy(legalScouts())(_.frameDiscovered))
   private val tilesToConsider = new Cache(() => With.scouting.zonesToLookForEnemyScouts().view.flatMap(_.tiles).toSeq)
   private val destination = new Cache(() => targetScout()
     .map(_.pixel)

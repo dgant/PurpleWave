@@ -103,7 +103,7 @@ object Imagination {
     lazy val friendsNearby = unit.team.exists(_.units.exists(f => f.visible && f.pixelDistanceEdge(unit) < 32 * 5 + unit.effectiveRangePixels))
     lazy val outrangesVision = unit.matchups.targets.nonEmpty && unit.matchups.enemies.forall(_.sightPixels <= unit.effectiveRangePixels)
     lazy val inferProximityFrames = Seconds(10 + 20 * Maff.fromBoolean(friendsNearby) + 20 * Maff.fromBoolean(outrangesVision))()
-    if ( ! unit.base.exists(_.owner.isPlayer) && With.framesSince(unit.lastSeen) > inferProximityFrames) {
+    if ( ! unit.base.exists(_.owner == unit.player) && With.framesSince(unit.lastSeen) > inferProximityFrames) {
       unit.changeVisibility(Visibility.InvisibleMissing)
       return
     }

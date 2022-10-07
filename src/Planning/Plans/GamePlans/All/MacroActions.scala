@@ -100,8 +100,9 @@ trait MacroActions {
   def pylonBlock(): Unit = {
     new PylonBlock().update()
   }
-  def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Unit = {
+  def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Boolean = {
     new UpgradeContinuously(upgrade, maxLevel).update()
+    MacroFacts.upgradeStarted(upgrade, maxLevel)
   }
   def extractorTrick(): Unit = {
     new ExtractorTrick().update()

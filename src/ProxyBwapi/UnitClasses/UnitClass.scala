@@ -422,9 +422,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Terran.Ghost) 0.15
     else if (this == Terran.Medic) 1
     else if (this == Terran.SpiderMine) 0.25
-    else if (this == Terran.Vulture) 0.75
+    else if (this == Terran.Vulture) 0.65
     else if (this == Terran.Goliath) 1
-    else if (this == Terran.SiegeTankUnsieged) 1.75
+    else if (this == Terran.SiegeTankUnsieged) 1.25
     else if (this == Terran.SiegeTankSieged) 2.5
     else if (this == Terran.Valkyrie) 1.75
     else if (this == Terran.Wraith) 1.25

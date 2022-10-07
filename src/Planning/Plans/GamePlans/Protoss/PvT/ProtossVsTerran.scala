@@ -83,7 +83,11 @@ class ProtossVsTerran extends PvTOpeners {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       get(Protoss.DragoonRange)
       requireGas()
-      if (unitsComplete(IsWarrior) > 12 && safeAtHome && (enemyHasShown(Terran.SpiderMine) || enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1 || gasPumps > 2)) {
+      val observersForVultures = enemyHasShown(Terran.SpiderMine) || gasPumps > 2
+      val observersForWraiths   = enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1
+      val observersForSomething = observersForVultures || observersForWraiths
+      val safeForUpgrades       = unitsComplete(IsWarrior) > 12 && safeAtHome
+      if ((observersForWraiths && TechCarrier.profited) || (observersForSomething && safeForUpgrades)) {
         get(?(upgradeStarted(Protoss.ObserverSpeed), Protoss.ObserverVisionRange, Protoss.ObserverSpeed))
       }
     }
@@ -143,12 +147,14 @@ class ProtossVsTerran extends PvTOpeners {
       get(miningBases, Protoss.Stargate)
       requireGas()
       get(Protoss.FleetBeacon)
-      once(4, Protoss.Carrier)
-      get(Protoss.DragoonRange)
-      if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
+      once(2, Protoss.Carrier)
       get(Protoss.CarrierCapacity)
+      once(4, Protoss.Carrier)
+      get(Protoss.DragoonRange) // Make sure we get it before we start air upgrades
+      if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirArmor, 3))  upgradeContinuously(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirDamage, 3))  upgradeContinuously(Protoss.AirArmor)
+      buildCannonsAtExpansions(2)
     }
   }
   object TechArbiter extends TechTransition {
@@ -198,7 +204,7 @@ class ProtossVsTerran extends PvTOpeners {
     val armySizeEnemy   = With.units.enemy.filter(IsWarrior).map(u => ?(Terran.Vulture(u), 1.5, ?(IsTank(u), 2.5, u.unitClass.supplyRequired / 4.0))).sum
     val armySizeUd      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
     var armySizeMinimum = 1.2 * armySizeEnemy
-    armySizeMinimum     = Math.max(armySizeMinimum, 12 * techsComplete)
+    armySizeMinimum     = Math.max(armySizeMinimum, 12 + 6 * techsComplete)
     armySizeMinimum     = Math.max(armySizeMinimum, 6 * Math.max(1, miningBases - 1))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.siegeExpand(),  4, 0))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoRaxAcad(),   8, 0))
@@ -215,7 +221,8 @@ class ProtossVsTerran extends PvTOpeners {
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
     val nascentCarriers = TechCarrier.started && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
     val encroaching     = With.scouting.enemyProximity > 0.65
-    var shouldAttack    = ! barracksCheese || unitsComplete(IsWarrior) >= 7
+    var shouldAttack    = unitsComplete(IsWarrior) >= 7
+    shouldAttack      ||= ! barracksCheese
     shouldAttack      &&= ! mineContain
     shouldAttack      &&= ! vultureContain
     shouldAttack      &&= ! vultureRush
@@ -305,6 +312,9 @@ class ProtossVsTerran extends PvTOpeners {
     pump(Protoss.Carrier, 4)
     pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
     pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 1, 2), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
+    if (TechCarrier.started && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1)) {
+      pump(Protoss.Observer, 8)
+    }
     if (techStarted(Protoss.PsionicStorm)) {
       pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
     }
@@ -313,7 +323,9 @@ class ProtossVsTerran extends PvTOpeners {
     }
     pump(Protoss.Carrier, 12)
     pumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(IsTank, 0.5)))
-    pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+    if (units(Protoss.HighTemplar) > 0) {
+      pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+    }
     if ( ! upgradeStarted(Protoss.ZealotSpeed)) {
       pump(Protoss.Dragoon, 24)
     }

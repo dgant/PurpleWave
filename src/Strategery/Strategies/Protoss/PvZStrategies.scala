@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2021
+import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2022
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race
@@ -18,9 +18,9 @@ abstract class PvZFFEOpening extends PvZStrategy {
   addChoice(PvZMidgame5GateGoon, PvZMidgame5GateGoonReaver, PvZMidgameCorsairReaverGoon, PvZMidgameBisu)
 }
 
-object PvZ2021 extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ2021)
-  addChoice(PvZ910, PvZ1012, PvZZZCoreZ, PvZGateNexus, PvZCruddyFFE)
+object PvZ2022 extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ2022)
+  //addChoice(PvZ910, PvZ1012, PvZZZCoreZ, PvZGateNexus, PvZCruddyFFE)
 }
 object PvZ910 extends PvZStrategy {
   addChoice(PvZ1BaseCorsair, PvZ4GateGoon, PvZFE)

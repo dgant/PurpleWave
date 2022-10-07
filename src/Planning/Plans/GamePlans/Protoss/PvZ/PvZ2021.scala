@@ -26,13 +26,19 @@ class PvZ2021 extends GameplanImperative {
       once(8, Protoss.Probe)
       once(Protoss.Pylon)
       once(9, Protoss.Probe)
+      if (units(Protoss.Forge) > 0) {
+        get(3, Protoss.PhotonCannon)
+      }
       once(Protoss.Gateway)
       pumpSupply()
       pumpWorkers()
       pump(Protoss.Zealot)
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
     }
   }
   private def open910(): Unit = {
+    once(8,  Protoss.Probe)
+    once(Protoss.Pylon)
     once(9, Protoss.Probe)
     once(Protoss.Gateway)
     once(10, Protoss.Probe)
@@ -59,6 +65,9 @@ class PvZ2021 extends GameplanImperative {
     once(19, Protoss.Probe)
   }
   private def open1012(): Unit = {
+    reactVs4Pool()
+    once(8,  Protoss.Probe)
+    once(Protoss.Pylon)
     once(10, Protoss.Probe)
     once(Protoss.Gateway)
     once(12, Protoss.Probe)
@@ -76,6 +85,7 @@ class PvZ2021 extends GameplanImperative {
     once(18, Protoss.Probe)
   }
   private def openZZCoreZ(): Unit = {
+    reactVs4Pool()
     once(8,  Protoss.Probe)
     once(Protoss.Pylon)
     once(10, Protoss.Probe)
@@ -97,6 +107,7 @@ class PvZ2021 extends GameplanImperative {
     once(3, Protoss.Pylon)
   }
   private def openGateNexus(): Unit = {
+    reactVs4Pool()
     once(8,  Protoss.Probe)
     once(Protoss.Pylon)
     once(10, Protoss.Probe)
@@ -175,8 +186,6 @@ class PvZ2021 extends GameplanImperative {
   }
 
   override def executeBuild(): Unit = {
-    once(8, Protoss.Probe)
-    once(Protoss.Pylon)
     if (PvZ910()) open910()
     if (PvZ1012()) open1012()
     if (PvZZZCoreZ()) openZZCoreZ()

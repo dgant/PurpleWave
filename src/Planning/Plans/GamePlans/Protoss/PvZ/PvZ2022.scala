@@ -74,10 +74,10 @@ class PvZ2022 extends PvZ2022Openings {
         && ! enemyLurkersLikely)) {
       get(Protoss.Forge)
       With.geography.ourMiningBases.foreach(b => {
-        val query = new PlacementQuery(Protoss.PhotonCannon)
+        def query = new PlacementQuery(Protoss.PhotonCannon)
           .requireBase(b)
           .requireLabelYes(DefendHall)
-        get(1, Protoss.Pylon, query)
+        get(1, Protoss.Pylon, query.preferBuilding(Protoss.Pylon))
         get(?(enemies(Zerg.Mutalisk) < 9, 2, 3), Protoss.PhotonCannon, query)
       })
     }

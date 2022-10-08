@@ -12,7 +12,7 @@ final class GridBuildableWH(w: Int, h: Int) extends AbstractGridArrayBoolean {
     var x, y, clearance = 0
 
     // Verify horizontal clearance
-    y =  With.mapTileHeight - 1
+    y = With.mapTileHeight - 1
     while (y >= 0) {
       x = With.mapTileWidth - 1
       while (x >= 0) {
@@ -29,7 +29,7 @@ final class GridBuildableWH(w: Int, h: Int) extends AbstractGridArrayBoolean {
     // Verify vertical clearance
     x =  With.mapTileWidth - 1
     while (x >= 0) {
-      y = With.mapTileWidth - 1
+      y = With.mapTileHeight - 1
       while (y >= 0) {
         if (With.game.isBuildable(x, y)) clearance += 1 else clearance = 0
         if (clearance < h) {

@@ -45,7 +45,6 @@ object PvT28Nexus       extends PvTOpenerNoZealot
 object PvTZealotExpand  extends PvTOpener
 object PvTZZCoreZ       extends PvTOpener
 object PVT910           extends PvTOpener {
-  /*
   whitelistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,
@@ -54,7 +53,6 @@ object PVT910           extends PvTOpener {
     With.fingerprints.bbs,
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE)
-    */
 }
 object PvT1015 extends PvTOpenerNoZealot {
   setRushTilesMaximum(200)

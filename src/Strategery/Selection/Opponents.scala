@@ -34,7 +34,7 @@ object Opponents {
   // Aliases
   val bryanweber        : Opponent = add("Bryan Weber",         cunybot.policy)
   val mcravez           : Opponent = add("McRaveZ",             mcrave.policy)
-  val styxz             : Opponent = add("StyxZ",               styxz.policy)
+  val styxz             : Opponent = add("StyxZ",               styx.policy)
   //val chriscoxe         : Opponent = add("Chris Coxe",          zzzkbot.policy)
   val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
   //val saida             : Opponent = add("SAIDA",               adias.policy)

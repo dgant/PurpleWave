@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Micro.Agency.Intention
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.Time.{GameTime, Seconds}
+import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters._
 import Utilities.UnitPreferences.PreferClose
@@ -41,7 +41,9 @@ class SquadScoutExpansions extends Squad {
     Zerg.Zergling,
     Zerg.Hydralisk,
     Zerg.Overlord,
-    Zerg.Scourge)
+    Zerg.Scourge,
+    Is(scoutZergThird && IsWorker(_)))
+
   val matchFlying: UnitFilter = IsAny(
     Terran.Wraith,
     Protoss.Observer,
@@ -64,10 +66,14 @@ class SquadScoutExpansions extends Squad {
       .sortBy(base => -With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy(b => lock.units.exists(_.flying) || b.zone.island))
 
+  val scoutZergCutoff: Int = Minutes(4)()
+  def scoutZergThird: Boolean = With.frame < scoutZergCutoff && ! With.self.isZerg && With.enemies.exists(_.isZerg) && With.tactics.scoutWithWorkers.abandonScouting
+
   def launch(): Unit = {
-    if (With.frame < frameToScout()) return
-    if (With.geography.ourBases.size < 2) return
-    if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return
+    if ( ! scoutZergThird) {
+      if (With.frame < frameToScout()) return
+      if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return
+    }
     if (scoutableBases().isEmpty) return
     lock.matcher = if (With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65) matchAll else matchFlying
 

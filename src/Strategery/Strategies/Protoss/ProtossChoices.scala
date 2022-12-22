@@ -76,8 +76,6 @@ object ProtossChoices {
   val pvzOpenersWithoutTransitions = Vector(
     PvZFFE,
     PvZGatewayFE,
-    PvZProxy2Gate,
-    PvZ1BaseForgeTech,
   )
 
   val pvzOpenersTransitioningFrom1GateCore = Vector(

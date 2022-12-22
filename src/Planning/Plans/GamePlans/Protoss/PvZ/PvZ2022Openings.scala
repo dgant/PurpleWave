@@ -103,15 +103,20 @@ abstract class PvZ2022Openings extends GameplanImperative {
   }
 
   private val speedlingStrategies = Vector(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
+  private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
-    var output = enemyStrategy(speedlingStrategies: _*)
-    output ||= enemyRecentStrategy(speedlingStrategies: _*) && ! With.scouting.enemyMainFullyScouted
+    var output = enemyRecentStrategy(speedlingStrategies: _*)
+    output &&= ! With.scouting.enemyMainFullyScouted
+    output &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
+    output ||= enemyStrategy(speedlingStrategies: _*)
     output ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()
     output ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(4, 30)()
     output ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
     output &&= ! enemyHydralisksLikely
     output &&= ! enemyMutalisksLikely
     output &&= ! enemyLurkersLikely
+    output &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway) + units(Protoss.CyberneticsCore) < 3) // At some point, stop reacting to speedlings
+    _previouslyAnticipatedSpeedlings = output
     output
   }
 }

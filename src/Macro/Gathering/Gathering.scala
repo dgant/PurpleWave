@@ -7,6 +7,7 @@ import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 import Utilities.Time.Forever
 
 import scala.collection.mutable
@@ -91,7 +92,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         && With.scouting.enemyProximity < 0.6
         && (With.scouting.weControlOurNatural || p._1.townHall.exists(_.isOurs))))
       .toVector
-      .sortBy(_._3) // sort the closest
+      .sortBy(m => m._3 * ?(m._1.townHall.exists(_.remainingCompletionFrames < 30 * 24), 1.0, 10.0)) // Sort the closest, preferring bases likely to complete soon anyway
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
     longDistanceBases = distanceMineralBases.view.take(distanceMineralBasesNeeded).map(_._1)
 

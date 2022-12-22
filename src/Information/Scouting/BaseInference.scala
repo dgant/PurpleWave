@@ -82,13 +82,13 @@ trait BaseInference {
   if (_firstEnemyMain.isDefined && ! _enemyMainScouted) {
     val main = _firstEnemyMain.get
     val scoutableTiles = main.zone.tiles.view
-      .filter(With.grids.buildableTerrain.get)
+      .filter(_.buildable)
       .filter(t =>
         ! main.owner.isZerg
-        || main.townHallTile.x - t.x < 8
-        || main.townHallTile.x - t.x > -11
-        || main.townHallTile.y - t.y < 5
-        || main.townHallTile.y - t.y > -7)
+        || main.townHallTile.x - t.x < 7 // Extends 8 to the left; seeing this far implies absence of building on the 8th tile
+        || main.townHallTile.x - t.x > -10 // Extends 11 to the right; ditto
+        || main.townHallTile.y - t.y < 4 // Extends 5 up; ditto
+        || main.townHallTile.y - t.y > -6) // Extends 7 down; ditto
     val tilesSeen = scoutableTiles.count(_.explored)
     _enemyMainScouted = tilesSeen >= scoutableTiles.size * 0.9
   }

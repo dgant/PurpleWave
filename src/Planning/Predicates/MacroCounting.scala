@@ -32,9 +32,9 @@ trait MacroCounting {
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
   def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
-  // Mineout thresold is is "how much we can mine from a patch in the time it takes to build a new town hall"
-  // 7 patch/base * (158mins/patch = 75secs/base * 24frames/sec * 0.044minerals/worker * 2workers/patch)
-  private val minedOutThreshold = 7 * 158
+  // Mineout threshold is  "how much we can mine from a patch in the time it takes to build a new town hall"
+  // 7 patch/base * (200mins/patch = (75secs building + 20secs travel)/base * 24frames/sec * 0.044minerals/worker * 2workers/patch)
+  private val minedOutThreshold = 7 * 200
   def bases: Int = With.geography.ourBases.size
   def miningBases: Int = With.geography.ourMiningBases.size
   def ourBaseTownHalls: Iterable[FriendlyUnitInfo] = With.units.ours.filter(IsTownHall).filter(u => u.base.map(_.townHallTile).exists(u.tileTopLeft.tileDistanceManhattan(_) <= 3))

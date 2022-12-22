@@ -13,5 +13,5 @@ class Fingerprint12Hatch extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.tenHatch),
   new FingerprintNot(With.fingerprints.twelvePool),
   new FingerprintCompleteBy(
-    unit=> unit.unitClass.isTownHall && ! unit.base.exists(b => b.isStartLocation && b.townHallTile == unit.tileTopLeft),
+    unit => unit.unitClass.isTownHall && ! unit.base.exists(b => b.isStartLocation && b.townHallTile == unit.tileTopLeft),
     GameTime(3, 10)))

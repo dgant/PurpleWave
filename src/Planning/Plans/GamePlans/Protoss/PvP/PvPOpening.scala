@@ -204,13 +204,13 @@ class PvPOpening extends GameplanImperative {
         PvP3GateGoon.swapIn()
       }
     }
-    // Oops. We let them scout our DT rush. Maybe we switch tech advantageously
+    // Consider swapping out of DT if we've been caught, or if we scout them going DT first
     if (PvPDT() && scoutCleared && unitsComplete(Protoss.Dragoon) > 0) {
       val caught            = With.units.ours.filter(u => u.isAny(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && u.knownToOpponents && ! u.visibleToOpponents).toVector
       val archivesComplete  = caught.exists(c => Protoss.TemplarArchives(c) &&    c.complete)
       val archivesStarted   = caught.exists(c => Protoss.TemplarArchives(c) &&  ! c.complete)
       val citadelComplete   = caught.exists(c => Protoss.CitadelOfAdun(c)   &&    c.complete)
-      val maybeMirror       = enemyRecentStrategy(With.fingerprints.dtRush) &&  ! With.fingerprints.robo()
+      val maybeMirror       = (enemyDarkTemplarLikely || enemyRecentStrategy(With.fingerprints.dtRush)) &&  ! With.fingerprints.robo()
       val mirrorMultiplier  = ?(maybeMirror, 0.25, 1.0)
       var swapOutOfDT       = false
       if (archivesComplete) {
@@ -221,6 +221,8 @@ class PvPOpening extends GameplanImperative {
         swapOutOfDT = roll("DTSwap", 0.75 * mirrorMultiplier)
       } else if (caught.nonEmpty) {
         swapOutOfDT = roll("DTSwap", 0.85 * mirrorMultiplier)
+      } else if (maybeMirror && enemyDarkTemplarLikely && unitsComplete(Protoss.CitadelOfAdun) < 0 && units(Protoss.Forge) == 0) {
+        swapOutOfDT = roll("DTSwap", 0.75)
       }
       if (swapOutOfDT) {
         PvPDT.swapOut()
@@ -814,9 +816,8 @@ class PvPOpening extends GameplanImperative {
     pumpObs &&= ! reaverAllIn
     pumpObs ||= With.fingerprints.dtRush()
     if (getObservers) once(Protoss.Observer)
-    if (pumpObs) pump(Protoss.Observer, 1)
-    if (reaverAllIn || units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
     if (pumpObs) pump(Protoss.Observer, 2) else if (units(Protoss.Observer) > 1) cancel(Protoss.Observer)
+    if (reaverAllIn || units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
   }
 
   private def trainGatewayUnits(): Unit = {

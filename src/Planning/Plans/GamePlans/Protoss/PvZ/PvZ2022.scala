@@ -10,7 +10,7 @@ import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.?
 import Utilities.Time.GameTime
-import Utilities.UnitFilters.IsWarrior
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvZ2022 extends PvZ2022Openings {
 
@@ -22,12 +22,12 @@ class PvZ2022 extends PvZ2022Openings {
   private var opening: Opening = Open1012
 
   override def executeBuild(): Unit = {
-    if (units(Protoss.Gateway) < 2) {
+    if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && units(Protoss.Assimilator) == 0) {
       if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
         opening = Open910
-      } else if (With.fingerprints.twelveHatch()) {
+      } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && roll("SwapGateNexus", 0.65)) {
         opening = OpenGateNexus
-      } else if (With.fingerprints.overpool()) {
+      } else if (With.fingerprints.overpool() && roll("SwapZZCoreZ", 0.65)) {
         opening = OpenZZCoreZ
       }
     }
@@ -38,7 +38,9 @@ class PvZ2022 extends PvZ2022Openings {
       case _ => openGateNexus()
     }
     if (bases <= 1 && anticipateSpeedlings) {
+      get(3, Protoss.Zealot)
       get(Protoss.Forge)
+      get(7, Protoss.Zealot)
       get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
     }
   }
@@ -53,12 +55,20 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemies(Zerg.SunkenColony) > 0 && safeToMoveOut && unitsComplete(IsWarrior) >= 5) {
       targetMiningBases = Math.max(targetMiningBases, 2)
     }
-    var shouldAttack = safeToMoveOut || miningBases < targetMiningBases
+    var shouldAttack = safeToMoveOut
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 3
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 5 || ! enemyStrategy(With.fingerprints.ninePool)
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 7 || ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
+    shouldAttack ||= miningBases < targetMiningBases
+    shouldAttack ||= targetMiningBases > 2
+    shouldAttack ||= bases > 2
     if (enemies(Zerg.Mutalisk) > 0 || (enemyMutalisksLikely && enemiesComplete(Zerg.Spire) > 0)) {
       shouldAttack &&= unitsComplete(Protoss.PhotonCannon) >= 2 * bases || unitsComplete(Protoss.Corsair) >= 4 || unitsComplete(Protoss.Dragoon) >= 16
     }
     if (shouldAttack) attack() else harass()
-    requireMiningBases(targetMiningBases)
+    if (miningBases < targetMiningBases) {
+      expandOnce()
+    }
 
     if (enemyHydralisksLikely) status("Hydras")
     if (enemyMutalisksLikely) status("Mutas")
@@ -78,20 +88,23 @@ class PvZ2022 extends PvZ2022Openings {
           .requireBase(b)
           .requireLabelYes(DefendHall)
         get(1, Protoss.Pylon, query.preferBuilding(Protoss.Pylon))
-        get(?(enemies(Zerg.Mutalisk) < 9, 2, 3), Protoss.PhotonCannon, query)
+        get(Maff.clamp((2 + Math.max(6, enemies(Zerg.Mutalisk)) / 3), 3, 5), Protoss.PhotonCannon, query)
       })
     }
 
-    if (unitsComplete(IsWarrior) >= ?(safeAtHome, 7, 12)) techStage1()
-    if (unitsComplete(IsWarrior) >= ?(safeAtHome, 12, 18) && miningBases > 1)  techStage2()
-    if (unitsComplete(IsWarrior) >= ?(safeAtHome, 18, 24) && miningBases > 1)  techStage3()
+    val safeVsMutalisk = 0.75 * units(Protoss.Dragoon) + 1.5 * units(Protoss.Corsair) > Math.max(enemies(Zerg.Mutalisk), ?(enemyMutalisksLikely, 6, 0))
 
-    pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 3, 1))
+    if (                  unitsComplete(IsWarrior) >= ?(safeAtHome, 7, 12)) techStage1()
+    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeAtHome, 12, 18) && miningBases > 1)  techStage2()
+    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeAtHome, 18, 24) && miningBases > 1)  techStage3()
+
+    pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 5, 1))
     if (enemyMutalisksLikely) get(Protoss.Stargate)
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
     if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
-    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5)))
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
     if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       buildCannonsAtOpenings(1)
@@ -108,9 +121,9 @@ class PvZ2022 extends PvZ2022Openings {
     }
     pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Friendly(IsWarrior, 1.0 / 6.0)))
     pumpRatio(Protoss.DarkTemplar, ?(enemyHasUpgrade(Zerg.OverlordSpeed) || enemyHasUpgrade(Zerg.OverlordVisionRange), 0, 1), 4, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
+    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Hydralisk, 0.5), Enemy(Zerg.Zergling, 0.35)))
     pumpRatio(Protoss.Zealot, 0, 24, Seq(Flat(-8), Friendly(Protoss.Dragoon, 1.0)))
-    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     pump(Protoss.Dragoon)
     pump(Protoss.Zealot)
 
@@ -132,7 +145,11 @@ class PvZ2022 extends PvZ2022Openings {
   }
 
   private def techStage2(): Unit = {
-    get(Protoss.Forge, Protoss.Stargate, Protoss.CitadelOfAdun)
+    get(Protoss.Forge)
+    if (enemyMutalisksLikely || ! enemyHydralisksLikely) {
+      get(Protoss.Stargate)
+    }
+    get(Protoss.CitadelOfAdun)
     get(Protoss.ZealotSpeed)
     if (gas < 300) buildGasPumps()
   }

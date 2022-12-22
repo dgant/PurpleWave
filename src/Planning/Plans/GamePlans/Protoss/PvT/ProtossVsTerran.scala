@@ -125,7 +125,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechStorm extends TechTransition {
     def started: Boolean = profited || unitsEver(Protoss.HighTemplar) > 0
-    def profited: Boolean = techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
+    def profited: Boolean = unitsEver(Protoss.HighTemplar) >= 2 && techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -142,9 +142,9 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechCarrier extends TechTransition {
     def started: Boolean = profited || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
-    def profited: Boolean = unitsEver(Protoss.Carrier) >= 4
+    def profited: Boolean = unitsEver(Protoss.Carrier) >= 4 && upgradeStarted(Protoss.CarrierCapacity)
     def perform(): Unit = {
-      get(miningBases, Protoss.Stargate)
+      get(Math.min(4, miningBases), Protoss.Stargate)
       requireGas()
       get(Protoss.FleetBeacon)
       once(2, Protoss.Carrier)
@@ -159,7 +159,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechArbiter extends TechTransition {
     def started: Boolean = profited || units(Protoss.ArbiterTribunal) > 0
-    def profited: Boolean = unitsEver(Protoss.Arbiter) > 0
+    def profited: Boolean = unitsEver(Protoss.Arbiter) > 0 && techStarted(Protoss.Stasis)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -227,7 +227,6 @@ class ProtossVsTerran extends PvTOpeners {
     shouldAttack      &&= ! vultureContain
     shouldAttack      &&= ! vultureRush
     shouldAttack      &&= ! consolidatingFE
-    shouldAttack      &&= ! (nascentCarriers && (enemies(Terran.Vulture) > 2 || enemyHasTech(Terran.SiegeMode)))
     shouldAttack      ||= zealotAggro
     shouldAttack      ||= bases > 2
     shouldAttack      ||= enemyMiningBases > miningBases
@@ -250,7 +249,7 @@ class ProtossVsTerran extends PvTOpeners {
     harass()
     With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
 
-    val army = new DoQueue(doArmy)
+    val army = new DoQueue(doArmyNormalPriority)
     val tech = new DoQueue(doNextTech)
 
     ////////////////
@@ -258,6 +257,8 @@ class ProtossVsTerran extends PvTOpeners {
     ////////////////
 
     get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    doArmyHighPriority()
+
     if (armySizeLow) {
       if (miningBases > 1 && gasPumps > 1 && techs.exists(t => t.started && ! t.profited)) {
         tech()
@@ -291,6 +292,10 @@ class ProtossVsTerran extends PvTOpeners {
     approachMiningBases(3)
     requireGas()
     get(gatewayWant, Protoss.Gateway)
+    buildCannonsAtExpansions(2)
+    if (isMiningBase(With.geography.ourNatural)) {
+      buildCannonsAtNatural(2)
+    }
     approachMiningBases(4)
     techs.foreach(_.perform())
     approachMiningBases(5)
@@ -301,8 +306,9 @@ class ProtossVsTerran extends PvTOpeners {
     if (With.self.gas < 500) buildGasPumps()
   }
 
-  def doArmy(): Unit = {
+  def doArmyHighPriority(): Unit = {
     if (units(Protoss.TemplarArchives) > 0
+      && ( ! With.fingerprints.bio() || ! enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)) // Vs. mech we can spam DT and slow a push; bio can just walk over us
       && 0 == units(Protoss.FleetBeacon, Protoss.Arbiter) + unitsComplete(Protoss.ArbiterTribunal) + enemies(Terran.ScienceVessel)
       && ( ! enemyHasShown(Terran.SpiderMine) || With.scouting.enemyProximity > 0.7))  {
       once(2, Protoss.DarkTemplar)
@@ -310,6 +316,9 @@ class ProtossVsTerran extends PvTOpeners {
     }
     if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = TechReavers.order < TechObservers.order)
     pump(Protoss.Carrier, 4)
+  }
+
+  def doArmyNormalPriority(): Unit = {
     pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
     pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 1, 2), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
     if (TechCarrier.started && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1)) {
@@ -324,7 +333,7 @@ class ProtossVsTerran extends PvTOpeners {
     pump(Protoss.Carrier, 12)
     pumpRatio(Protoss.Arbiter, 2, 8, Seq(Enemy(IsTank, 0.5)))
     if (units(Protoss.HighTemplar) > 0) {
-      pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+      pumpRatio(Protoss.Shuttle, 1, 3, Seq(Friendly(Protoss.Reaver, 0.5), Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
     }
     if ( ! upgradeStarted(Protoss.ZealotSpeed)) {
       pump(Protoss.Dragoon, 24)

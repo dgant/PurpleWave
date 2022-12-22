@@ -71,6 +71,7 @@ class PvPLateGame extends GameplanImperative {
     fearDeath   ||= unitsComplete(IsWarrior) < 8
     fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
     fearDeath   &&= ! dtBraveryHome
+    fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
     fearContain ||= enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
@@ -221,6 +222,7 @@ class PvPLateGame extends GameplanImperative {
         pump(Protoss.Shuttle, 1)
       }
     }
+    pump(Protoss.Observer, Math.min(3, enemies(Protoss.DarkTemplar)))
     if (shouldReaver) {
       pumpShuttleAndReavers(2, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
     }

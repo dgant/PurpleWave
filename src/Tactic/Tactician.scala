@@ -177,7 +177,7 @@ class Tactician extends TimedTask {
       freelancersPick(
         freelancers,
         With.geography.ourBases.filter(MacroFacts.isMiningBase).map(baseSquads(_)),
-        filter = (f, s) => Protoss.Archon(f) && s.unitsNext.size == 0)
+        filter = (f, s) => Protoss.Archon(f) && s.unitsNext.isEmpty)
     }
     // Proactive drop/harassment defense
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {

@@ -7,7 +7,6 @@ import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWorker
 
@@ -41,20 +40,21 @@ object SquadAutomation {
       * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! squad.engagedUpon) 1 else 2))
   }
   def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    val combatEnemiesInRoute = With.units.enemy
-      .filterNot(Protoss.Interceptor)
-      .filter(e => if (e.flying) group.attacksAir else group.attacksGround)
-      .filter(_.likelyStillThere)
-      .filter(e => (e.canAttack || e.team.isDefined) && group.groupUnits.exists(u =>
-        e.canAttack(u)
-        && e.pixelsToGetInRange(u) < 32 * ?( ! u.visibleToOpponents || u.pixelDistanceTravelling(to) < e.pixelDistanceTravelling(to), 1, 8)))
+    val combatEnemiesInRoute = With.units.enemy.filter(e =>
+      ! Protoss.Interceptor(e)
+      && e.likelyStillThere
+      && group.canAttack(e)
+      && e.canAttack
+      && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
       .toVector
     val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct
     val output =
       Maff.orElse(
         combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.view.filter(_.team.isEmpty),
         // If there's no battle (defenseless targets) then wipe the zone!
-        to.base.map(_.enemies).getOrElse(to.zone.units.view.filter(e => e.isEnemy && (if (e.flying) group.attacksAir else group.attacksGround)))).toVector
+        to.base
+          .map(_.enemies)
+          .getOrElse(to.zone.units.view.filter(e => e.isEnemy && group.canAttack(e)))).toVector
     output
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {

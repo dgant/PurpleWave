@@ -14,19 +14,24 @@ class SquadBackstabProxy extends Squad {
   lock.preference = PreferClose(vicinity)
 
   override def launch(): Unit = {
-    vicinity = With.scouting.enemyHome.center
-    if ( ! MacroFacts.enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.bbs)) return
-    if (With.units.enemy.exists(IsProxied)) return
+    if ( ! MacroFacts.enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.proxyRax)) return
+    if ( ! With.units.enemy.exists(IsProxied)) return
+
+    val targetBase = With.scouting.enemyMain
+    if (targetBase.isEmpty) return
+
     if (lock.units.isEmpty) {
       if ( ! With.blackboard.wantToAttack()) return
       if (MacroFacts.unitsComplete(IsWarrior) < 7) return
     }
+
+    vicinity = targetBase.get.heart.center
     lock.acquire()
   }
 
   override def run(): Unit = {
     targets = Some(With.units.enemy.filter(IsWorker).toVector)
-    if (targets.isEmpty && With.geography.enemyBases.nonEmpty) targets = None
+    if (targets.isEmpty) targets = None
     units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
   }
 }

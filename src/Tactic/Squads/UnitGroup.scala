@@ -59,6 +59,7 @@ trait UnitGroup {
   def consensusPrimaryFoes      : UnitGroup = _consensusPrimaryFoes()
   def keyDistanceTo       (pixel: Pixel): Double = if (hasGround) centroidKey       .groundPixels(pixel.walkablePixel) else centroidKey       .pixelDistance(pixel)
   def attackKeyDistanceTo (pixel: Pixel): Double = if (hasGround) attackCentroidKey .groundPixels(pixel.walkablePixel) else attackCentroidKey .pixelDistance(pixel)
+  def canAttack(unit: UnitInfo): Boolean = if (unit.flying) attacksAir else attacksGround
   def canBeAttackedBy(unit: UnitInfo): Boolean = unit.canAttackGround && hasGround || unit.canAttackAir && hasAir
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()

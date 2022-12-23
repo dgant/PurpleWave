@@ -32,7 +32,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val knownRangeTiles     : Int                   = Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels.toInt / 32)).getOrElse(0)
   val raceRangeTiles      : Int                   = if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6 else if (With.enemies.exists(_.isTerran)) 4 else 1
   val expectRangeTiles    : Int                   = Math.max(knownRangeTiles, raceRangeTiles)
-  val targetsNear         : Seq[UnitInfo]         = group.groupUnits.flatMap(_.battle).distinct.flatMap(_.enemy.units).filter(e => group.groupUnits.exists(u => u.canAttack(e) && u.pixelsToGetInRangeTraveling(e) < 32 * 5))
+  val targetsNear         : Seq[UnitInfo]         = group.groupUnits.flatMap(_.battle).distinct.flatMap(_.enemy.units).filter(e => group.groupUnits.exists(u => u.canAttack(e) && u.pixelsToGetInRange(e) < 32 * 5))
   val targetsTowards      : Seq[UnitInfo]         = targetsNear.filter(_.pixelDistanceTravelling(goal) < group.centroidGround.groundPixels(goal))
   val targetNear          : Option[UnitInfo]      = Maff.minBy(targetsNear)(_.pixelDistanceTravelling(group.centroidGround))
   val targetTowards       : Option[UnitInfo]      = Maff.minBy(targetsTowards)(_.pixelDistanceTravelling(group.centroidGround))

@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 import Lifecycle.With
 import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.Time.GameTime
+import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.IsWarrior
 
 abstract class PvZ2022Openings extends GameplanImperative {
@@ -106,7 +106,7 @@ abstract class PvZ2022Openings extends GameplanImperative {
   private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
     var output = enemyRecentStrategy(speedlingStrategies: _*)
-    output &&= ! With.scouting.enemyMainFullyScouted
+    output &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
     output &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
     output ||= enemyStrategy(speedlingStrategies: _*)
     output ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()

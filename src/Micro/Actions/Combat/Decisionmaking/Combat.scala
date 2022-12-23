@@ -30,6 +30,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   var restrainedFrames      : Double  = 0.0
   var technique             : Technique = Fight
   var firingPixel           : Option[Pixel] = None
+  var framesUntilShot       : Int = Forever()
   var framesToPokeTarget    : Option[Int] = None
   var idealTargetDistance   : Double = _
   var hasSpacetimeToPoke    : Boolean = _
@@ -54,7 +55,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def allThreatsAbusable    : Boolean = unit.matchups.threats.forall(canAbuse)
   protected def nudged                : Boolean = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
   protected def nudgedTowards         : Boolean = nudged && Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
-  protected def pushThrough           : Boolean = shouldEngage && engageFormation.isDefined && nudged && nudgedTowards && ! unit.flying && ! trapped
+  protected def pushThrough           : Boolean = shouldEngage && engageFormation.isDefined && nudged && nudgedTowards && ! unit.flying
   protected def ground10              : Double  = ?(unit.flying, 0, 1)
   protected def abroad10              : Double  = ?(unit.zone.owner.isUs, 0, 1)
   protected def shouldRetreat         : Boolean = techniqueIs(Fallback, Flee, Excuse)
@@ -74,18 +75,11 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.agent.shouldFight &&= target.nonEmpty
     Commander.defaultEscalation(unit)
 
-    trapped             = false && ! unit.flying && unit.tile.adjacent9.exists(t => ! t.valid || t.units.exists(e => e.isEnemy && ! e.flying && e.canAttack(unit) && e.pixelDistanceTravelling(unit.agent.home) > unit.pixelDistanceTravelling(unit.agent.home)))
     firingPixel         = target.map(unit.pixelToFireAt)
-    framesToPokeTarget  = target.map(unit.framesToGetInRange(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
+    framesUntilShot     = Maff.min((Seq(unit.pixel) ++ firingPixel).view.flatMap(p =>  unit.matchups.threats.map(_.framesToGetInRange(unit, p)))).getOrElse(Forever())
+    framesToPokeTarget  = target.map(unit.framesToLaunchAttack(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
     idealTargetDistance = getIdealTargetDistance
-    hasSpacetimeToPoke  =
-      firingPixel.exists(theFiringPixel =>
-        framesToPokeTarget.exists(framesToPoke =>
-          unit.matchups.threats.forall(threat =>
-            framesToPoke < Math.min(
-              threat.framesToGetInRange(unit),
-              threat.framesToGetInRange(unit, theFiringPixel))
-            && ! threat.inRangeToAttack(unit, theFiringPixel.project(threat.pixel, 16)))))
+    hasSpacetimeToPoke  = framesToPokeTarget.exists(_ < framesUntilShot) && firingPixel.forall(p => ! unit.matchups.threats.exists(t => t.inRangeToAttack(unit, p.project(t.pixel, 16))))
 
     technique =
       if ( ! unit.canMove)              Fight
@@ -94,7 +88,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       else                              Flee
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
-    transition(Abuse,     unit.unitClass.abuseAllowed && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable))
+    transition(Abuse,     unit.unitClass.abuseAllowed && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable) && (shouldRetreat || framesUntilShot < unit.cooldownMaxAirGround))
     transition(Scavenge,
       target.exists(_.matchups.framesToLive > unit.matchups.framesToLive)
       && unit.matchups.threatDeepest.exists(t => unit.canAttack(t) && unit.pixelRangeAgainst(t) >= t.pixelRangeAgainst(unit))
@@ -107,7 +101,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       && unit.matchups.targetNearest.exists(unit.inRangeToAttack)
       && unit.matchups.threatsInFrames(unit.unitClass.framesToPotshot + 9).forall(_.isAny(Terran.Vulture, IsSpeedlot, Zerg.Zergling)))
     transition(Fallback,  unit.isAny(Protoss.Archon, Protoss.Zealot) && unit.matchups.targetsInRange.exists(IsSpeedling))
-    transition(Fallback,  trapped)
 
     unit.agent.shouldFight ||= shouldEngage
     if (shouldRetreat) unit.agent.toTravel = Some(unit.agent.safety)

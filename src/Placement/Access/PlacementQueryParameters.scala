@@ -89,13 +89,13 @@ class PlacementQueryParameters {
   protected def scoreZone(foundation: Foundation): Double = {
     if (zone.isEmpty) return 1.0
     if (zone.contains(foundation.tile.zone)) return 1.0
-    0.25 * Maff.clamp(1 - Maff.nanToOne(zone.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
+    0.25 * Maff.clamp(1 - Maff.nanToOne(zone.view.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
   }
 
   protected def scoreBase(foundation: Foundation): Double = {
     if (base.isEmpty) return 1.0
     if (base.exists(foundation.tile.base.contains)) return 1.0
-    0.25 * Maff.clamp(1 - Maff.nanToOne(base.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
+    0.25 * Maff.clamp(1 - Maff.nanToOne(base.view.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
   }
 
   protected def scoreTile(foundation: Foundation): Double = {
@@ -113,16 +113,17 @@ class PlacementQueryParameters {
   protected def acceptBase      (foundation: Foundation): Boolean = scoreBase(foundation)     > acceptOver
   protected def acceptTile      (foundation: Foundation): Boolean = scoreTile(foundation)     > acceptOver
 
-  def score(foundation: Foundation): Double = Seq(
-    1   * scoreImportance(foundation),
-    1   * scoreWidth(foundation),
-    1   * scoreHeight(foundation),
-    1   * scoreLabelYes(foundation),
-    1   * scoreLabelNo(foundation),
-    5   * scoreZone(foundation),
-    9   * scoreBase(foundation),
-    0.5 * scoreBuilding(foundation),
-    1   * scoreTile(foundation)).sum
+  def score(foundation: Foundation): Double = (
+      1   * scoreImportance(foundation)
+    + 1   * scoreWidth(foundation)
+    + 1   * scoreHeight(foundation)
+    + 1   * scoreLabelYes(foundation)
+    + 1   * scoreLabelNo(foundation)
+    + 5   * scoreZone(foundation)
+    + 9   * scoreBase(foundation)
+    + 0.5 * scoreBuilding(foundation)
+    + 1   * scoreTile(foundation)
+  )
 
   def accept(foundation: Foundation): Boolean = (
     acceptWidth(foundation)

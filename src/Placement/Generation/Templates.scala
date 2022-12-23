@@ -196,14 +196,14 @@ object Templates {
       .forGasDirection(Directions.Up)
       .from(
         "xxxxxxxx---",
-        "CMIxxxSIxx-",
+        "CMUxxxSIxx-",
         "xxxxxxxxxx-",
-        "x-----xxxx-",
-        "x-PM--SIxx-",
-        "x-xx--xxxx-",
-        "--Hxxxxxxx-",
-        "CMxxxxTxxx-",
-        "xxxxxxxxxx-",
+        "CM----xxxx-",
+        "xxPM--SIxx-",
+        "--xx--xxxx-",
+        "CMHxxxxxxx-",
+        "xxxxxxTxxx-",
+        "--Uxxxxxxx-",
         "--CM2UTxxx-",
         "--xxxxxxxx-",
         "xxxxxxx----")) ++ bases // Default to generic base layouts if needed

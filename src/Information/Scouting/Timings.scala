@@ -3,11 +3,12 @@ package Information.Scouting
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
+import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
 import Utilities.{?, CountMap}
-import Utilities.Time.{Forever, GameTime}
+import Utilities.Time.{Forever, GameTime, Minutes}
 import Utilities.UnitFilters.IsLandedBuilding
 
 trait Timings {
@@ -37,7 +38,10 @@ trait Timings {
     producers.minBy(_.groundTiles(With.geography.home.walkableTile))
   }
 
-  def rushTargets: Iterable[Tile] = Maff.orElse(With.units.ours.filter(IsLandedBuilding).map(_.tile.walkableTile), Seq(With.geography.home.walkableTile))
+  private def allRushTargets = Maff.orElse(With.units.ours.filter(IsLandedBuilding).map(_.tile.walkableTile), Seq(With.geography.home.walkableTile))
+  private val cheapRushTarget = new Cache(() => Vector(allRushTargets.minBy(_.tileDistanceSquared(With.scouting.enemyThreatOrigin))))
+
+  def rushTargets: Iterable[Tile] = if (With.frame > Minutes(10)()) cheapRushTarget() else allRushTargets
   def rushTargetAir   (from: Tile)      : Tile    = rushTargets.minBy(_.tileDistanceSquared(from.walkableTile))
   def rushTargetGround(from: Tile)      : Tile    = rushTargets.minBy(_.groundTiles(from.walkableTile))
   def rushTarget      (unit: UnitInfo)  : Tile    = rushTargets.minBy(unit.pixelDistanceTravelling)

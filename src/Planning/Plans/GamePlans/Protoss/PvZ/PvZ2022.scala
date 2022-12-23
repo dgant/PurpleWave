@@ -21,6 +21,7 @@ class PvZ2022 extends PvZ2022Openings {
   private object OpenGateNexus extends Opening
   private var opening: Opening = Open1012
 
+
   override def executeBuild(): Unit = {
     if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && units(Protoss.Assimilator) == 0) {
       if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
@@ -45,9 +46,11 @@ class PvZ2022 extends PvZ2022Openings {
     }
   }
 
+  private def getStorm = With.configuration.humanMode
+
   override def executeMain(): Unit = {
     scoutOn(Protoss.Pylon)
-    new MeldArchons(49).update()
+    new MeldArchons(?(getStorm, 49, 250)).update()
 
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
@@ -62,6 +65,7 @@ class PvZ2022 extends PvZ2022Openings {
     shouldAttack ||= miningBases < targetMiningBases
     shouldAttack ||= targetMiningBases > 2
     shouldAttack ||= bases > 2
+    shouldAttack ||= With.geography.ourBases.exists(b => With.geography.ourMain != b && With.geography.ourNatural != b)
     if (enemies(Zerg.Mutalisk) > 0 || (enemyMutalisksLikely && enemiesComplete(Zerg.Spire) > 0)) {
       shouldAttack &&= unitsComplete(Protoss.PhotonCannon) >= 2 * bases || unitsComplete(Protoss.Corsair) >= 4 || unitsComplete(Protoss.Dragoon) >= 16
     }
@@ -103,7 +107,7 @@ class PvZ2022 extends PvZ2022Openings {
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
     if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
-    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5)))
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5), Friendly(Protoss.Archon, 2.0)))
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
     if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
@@ -112,14 +116,18 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemyLurkersLikely && safeAtHome) {
       upgradeContinuously(Protoss.ObserverSpeed)
     }
-    if (units(Protoss.HighTemplar) > 0) {
+    if (getStorm && units(Protoss.HighTemplar) > 0) {
       get(Protoss.PsionicStorm)
       if (gasPumps > 2) get(Protoss.HighTemplarEnergy)
     }
     if (unitsComplete(Protoss.Zealot) >= 10 && miningBases > 1) {
       techStage2() // Make sure we get Zealot speed
     }
-    pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Friendly(IsWarrior, 1.0 / 6.0)))
+    if (getStorm) {
+      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Friendly(IsWarrior, 1.0 / 6.0)))
+    } else {
+      pump(Protoss.HighTemplar)
+    }
     pumpRatio(Protoss.DarkTemplar, ?(enemyHasUpgrade(Zerg.OverlordSpeed) || enemyHasUpgrade(Zerg.OverlordVisionRange), 0, 1), 4, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
     upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Hydralisk, 0.5), Enemy(Zerg.Zergling, 0.35)))
@@ -130,6 +138,7 @@ class PvZ2022 extends PvZ2022Openings {
     get(2, Protoss.Gateway)
     techStage1()
     get(4, Protoss.Gateway)
+    if (bases == 1) pumpWorkers(oversaturate = true, maximumTotal = 39)
     requireMiningBases(2)
     get(5, Protoss.Gateway)
     techStage2()
@@ -157,9 +166,11 @@ class PvZ2022 extends PvZ2022Openings {
   private def techStage3(): Unit = {
     get(Protoss.TemplarArchives)
     once(2, Protoss.HighTemplar)
-    get(Protoss.PsionicStorm)
+    if (getStorm) {
+      get(Protoss.PsionicStorm)
+    }
     get(Protoss.RoboticsFacility, Protoss.Observatory)
-    once(Protoss.Observer)
+    once(2, Protoss.Observer)
   }
 
   private def addProduction(): Unit = {

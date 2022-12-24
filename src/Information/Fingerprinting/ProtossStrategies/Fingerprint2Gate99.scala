@@ -18,7 +18,7 @@ class Fingerprint2Gate99 extends FingerprintAnd(
     new FingerprintCompleteBy(Protoss.Zealot,   GameTime(3, 10), 4),
     new FingerprintCompleteBy(Protoss.Zealot,   GameTime(3, 15), 5),
 
-    new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 20), 2))) {
+    new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 18), 2))) {
 
   override val sticky: Boolean = With.frame > GameTime(4, 30)()
 }

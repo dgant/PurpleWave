@@ -461,7 +461,11 @@ class PvPOpening extends GameplanImperative {
     // React against 9-9 //
     ///////////////////////
 
-    if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99) && With.frame < Minutes(5)() && unitsComplete(IsWarrior) < 7) {
+    if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)
+      && With.frame < Minutes(5)()
+      && unitsComplete(IsWarrior) < 7
+      // If they just make a few Zealots and stop, we don't want to overreact and die to, say, a DT swap
+      && enemies(Protoss.CyberneticsCore) == 0) {
       status("99Defense")
       gasLimitCeiling(200)
       if (units(Protoss.Gateway) < 2 || unitsComplete(Protoss.Probe) < 15) {

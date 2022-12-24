@@ -120,7 +120,7 @@ class Tactician extends TimedTask {
       Maff.sortStablyInPlaceBy(freelancersSorted)(_.framesToTravelTo(squad.vicinity))
       var hired: Option[FriendlyUnitInfo] = None
       do {
-        hired = freelancersSorted.find(u => freelancersAvailable.contains(u) && squad.candidateValue(u) > minimumValue)
+        hired = freelancersSorted.find(u => freelancersAvailable.contains(u) && squad.candidateValue(u) > minimumValue && filter(u, squad))
         hired.foreach(h => {
             freelancersAvailable -= h
             freelancers -= h
@@ -189,7 +189,7 @@ class Tactician extends TimedTask {
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
       else
         Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
-      squadsPick(
+      freelancersPick(
         freelancers,
         dropVulnerableBases.map(baseSquads(_)),
         filter = (f, s) => f.isAny(qualifiedClasses: _*) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))

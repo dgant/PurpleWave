@@ -21,7 +21,6 @@ class PvZ2022 extends PvZ2022Openings {
   private object OpenGateNexus extends Opening
   private var opening: Opening = Open1012
 
-
   override def executeBuild(): Unit = {
     if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && units(Protoss.Assimilator) == 0) {
       if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
@@ -51,11 +50,10 @@ class PvZ2022 extends PvZ2022Openings {
   override def executeMain(): Unit = {
     scoutOn(Protoss.Pylon)
     new MeldArchons(?(getStorm, 49, 250)).update()
-
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
     targetMiningBases = Maff.clamp(targetMiningBases, 1, 4)
-    if (enemies(Zerg.SunkenColony) > 0 && safeToMoveOut && unitsComplete(IsWarrior) >= 5) {
+    if (enemies(Zerg.SunkenColony) > 0 && unitsComplete(IsWarrior) >= 5 && (safeToMoveOut || (enemies(Zerg.Lair) > 0 && With.scouting.enemyProximity < 0.5))) {
       targetMiningBases = Math.max(targetMiningBases, 2)
     }
     var shouldAttack = safeToMoveOut
@@ -105,17 +103,18 @@ class PvZ2022 extends PvZ2022Openings {
     pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 5, 1))
     if (enemyMutalisksLikely) get(Protoss.Stargate)
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
-    if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
-    if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
-    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5), Friendly(Protoss.Archon, 2.0)))
-    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
     if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       buildCannonsAtOpenings(1)
     }
+    if (enemyMutalisksLikely || units(Protoss.Dragoon) > 1) get(Protoss.DragoonRange)
+    if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5), Friendly(Protoss.Archon, 2.0)))
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
     if (enemyLurkersLikely && safeAtHome) {
       upgradeContinuously(Protoss.ObserverSpeed)
     }
+    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     if (getStorm && units(Protoss.HighTemplar) > 0) {
       get(Protoss.PsionicStorm)
       if (gasPumps > 2) get(Protoss.HighTemplarEnergy)
@@ -129,7 +128,6 @@ class PvZ2022 extends PvZ2022Openings {
       pump(Protoss.HighTemplar)
     }
     pumpRatio(Protoss.DarkTemplar, ?(enemyHasUpgrade(Zerg.OverlordSpeed) || enemyHasUpgrade(Zerg.OverlordVisionRange), 0, 1), 4, Seq(Friendly(IsWarrior, 1.0 / 10.0)))
-    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.0), Enemy(Zerg.Hydralisk, 0.5), Enemy(Zerg.Zergling, 0.35)))
     pumpRatio(Protoss.Zealot, 0, 24, Seq(Flat(-8), Friendly(Protoss.Dragoon, 1.0)))
     pump(Protoss.Dragoon)

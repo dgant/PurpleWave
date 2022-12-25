@@ -208,7 +208,15 @@ final class MacroSim {
     // TODO: Restore once we update income per-state
     //cant ||= request.gasCost > Math.max(0, step.state.gas) && With.accounting.ourIncomePerFrameGas == 0
     cant ||= request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0
-    cant ||= request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed)
+    // Verify that the request doesn't block us on supply.
+    //
+    // Dilemma:
+    // If we're trying to pump High Templar, followed by Zealots, are nearly maxed, and are low on gas,
+    // then we may be reserving a huge buffer of supply for the High Templar that will go unused for a long time.
+    // In the meantime, we could be making Zealots!
+    //
+    // So if an insertion would block us on supply, but put us near the supply cap, allow it.
+    cant ||= request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed) && step.state.supplyUsed < 380
     cant ||= request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)
     cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
     cant ||= step.state.producers(request.producerRequired) < request.producersRequired

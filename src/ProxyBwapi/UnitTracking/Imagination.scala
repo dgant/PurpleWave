@@ -100,8 +100,8 @@ object Imagination {
     }
 
     // Invalidate long-absent units in the middle of the map
-    lazy val friendsNearby = unit.team.exists(_.units.exists(f => f.visible && f.pixelDistanceEdge(unit) < 32 * 5 + unit.effectiveRangePixels))
-    lazy val outrangesVision = unit.matchups.targets.nonEmpty && unit.matchups.enemies.forall(_.sightPixels <= unit.effectiveRangePixels)
+    lazy val friendsNearby        = unit.team.exists(_.units.exists(f => f.visible && f.pixelDistanceEdge(unit) < 32 * 5 + unit.effectiveRangePixels))
+    lazy val outrangesVision      = unit.matchups.targets.nonEmpty && unit.matchups.enemies.forall(_.sightPixels <= unit.effectiveRangePixels)
     lazy val inferProximityFrames = Seconds(10 + 20 * Maff.fromBoolean(friendsNearby) + 20 * Maff.fromBoolean(outrangesVision))()
     if ( ! unit.base.exists(_.owner == unit.player) && With.framesSince(unit.lastSeen) > inferProximityFrames) {
       unit.changeVisibility(Visibility.InvisibleMissing)
@@ -123,24 +123,36 @@ object Imagination {
       return Some(unit.pixel)
     }
 
-    val tileLastSeen = unit.pixelObserved.tile
-    val maxTilesAway = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32)
-    val maxTilesAwaySquared = 2 + maxTilesAway * maxTilesAway
+    val framesUnseen    = With.framesSince(unit.lastSeen)
+    val tileLastSeen    = unit.pixelObserved.tile
+    val maxTilesAway    = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32).toInt
+    val maxTilesAwaySq  = 2 + maxTilesAway * maxTilesAway
+    val friends         = Maff.orElse(
+      unit.team.map(_.units.view.filter(_.unitClass == unit.unitClass).filter(_.visible)).getOrElse(Seq.empty),
+      unit.team.map(_.units.view.filter(_.unitClass == unit.unitClass)).getOrElse(Seq.empty),
+      unit.team.map(_.units.view.filter(_.visible)).getOrElse(Seq.empty),
+      unit.team.map(_.units.view).getOrElse(Seq.empty),
+      With.units.enemy.filter(_.unitClass ==  unit.unitClass),
+      With.units.enemy).map(_.pixel)
+    val friend          = Maff.minBy(friends)(unit.pixelDistanceSquared)
+    val projection      = unit.projectFrames(8)
 
-    val output = (0 to 10).view.map(i =>
-      Maff.minBy(Circle(i)
-        .map(unit.tile.add)
-        .filter(tile =>
-          tile.valid
-          && tile.traversableBy(unit)
-          && ! tile.visibleBwapi
-          && tile.lastSeen < unit.lastSeen
-          && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySquared
-          && (unit.flying || Shapes.Ray(unit.pixel, tile.center).forall(_.traversableBy(unit)))
-        ))(_.center.pixelDistanceSquared(unit.projectFrames(8))))
-      .find(_.nonEmpty)
-      .flatten
+    val possiblePixels = Circle(maxTilesAway)
+      .map(unit.tile.add)
+      .filter(tile =>
+        tile.valid
+        && ! tile.visibleBwapi
+        && tile.traversableBy(unit)
+        && tile.lastSeen < unit.lastSeen
+        && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySq
+        && (unit.flying || Shapes.Ray(unit.pixel, tile.center).forall(_.traversableBy(unit))))
       .map(_.center)
+
+    val output = Maff.minBy(possiblePixels)(p =>
+      p.pixelDistance(unit.pixel)
+      + p.pixelDistance(projection)
+      + friend.map(p.pixelDistance).getOrElse(0d))
+
     output
   }
 }

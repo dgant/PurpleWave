@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
 import Utilities.UnitFilters.UnitFilter
@@ -21,6 +21,7 @@ trait UnitGroup {
   def arbiters          : Seq[UnitInfo] = _arbiters().view
   def attackersCasters  : Seq[UnitInfo] = groupOrderable.view.filter(_.unitClass.attacksOrCasts)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
+  def attackersCloaky   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker))
   def attackersCastersCount     : Int       = _attackersCastersCount()
   def attackersBioCount         : Int       = _attackersBioCount()
   def stormCount                : Int       = _stormCount()

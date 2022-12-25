@@ -98,8 +98,7 @@ case class MatchupAnalysis(me: UnitInfo) {
     || victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
     || (victim.cloaked
       && shooter.unitClass.canAttack(victim)
-      && (shooter.unitClass.isDetector || groupVs.mobileDetectors.nonEmpty)
-      && shooter.framesToBeReadyForAttackOrder <= Maff.nanToInfinity((64 + shooter.pixelRangeAgainst(victim) - shooter.pixelDistanceEdge(victim)) / (shooter.topSpeed + victim.topSpeed))))
+      && shooter.matchups.groupOf.detectors.nonEmpty))
 
   def repairers: Seq[UnitInfo] = {
     allies.view.filter(a => Terran.SCV(a) && a.friendly.map(_.agent.toRepair.contains(me)).getOrElse(a.orderTarget.contains(me)))

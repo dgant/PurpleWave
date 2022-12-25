@@ -7,6 +7,7 @@ import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWorker
 
@@ -33,7 +34,10 @@ object SquadAutomation {
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     targets.sortBy(t =>
       (t.pixelDistanceCenter(squad.centroidKey)
-      + (if (t.totalHealth < t.unitClass.maxTotalHealth) -16.0 else 0)
+      + 0.25 * t.pixelDistanceCenter(squad.vicinity)
+      + ?(t.visible, 0, 32 * 5)
+      + ?(t.pixel == t.pixelObserved, 0, 32 * 5)
+      + ?(t.totalHealth < t.unitClass.maxTotalHealth, -16.0, 0)
       + (16.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth))
       + (if (t.unitClass.isWorker || squad.engagedUpon) 0 else 160)
       + 160)
@@ -43,8 +47,8 @@ object SquadAutomation {
     val combatEnemiesInRoute = With.units.enemy.filter(e =>
       ! Protoss.Interceptor(e)
       && e.likelyStillThere
-      && group.canAttack(e)
       && e.canAttack
+      && group.canAttack(e)
       && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
       .toVector
     val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct

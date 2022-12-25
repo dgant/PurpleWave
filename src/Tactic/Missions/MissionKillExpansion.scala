@@ -3,8 +3,10 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitCounters.CountExactly
-import Utilities.UnitFilters.{IsAll, IsAntiGround, IsWarrior}
+import Utilities.UnitFilters.{IsAll, IsAntiGround, IsMobileDetector, IsWarrior}
 import Utilities.UnitPreferences.PreferClose
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.Minutes
@@ -24,6 +26,10 @@ class MissionKillExpansion extends Mission {
 
   var lastFrameInBase = 0
   lock.matcher = IsAll(IsWarrior, IsAntiGround)
+
+  val detectorLock = new LockUnits(this)
+  detectorLock.matcher = IsMobileDetector
+  detectorLock.counter = CountExactly(1)
 
   override def recruit(): Unit = {
     val targetBase = best
@@ -48,6 +54,11 @@ class MissionKillExpansion extends Mission {
     if (With.framesSince(Math.max(launchFrame, lastFrameInBase)) > Minutes(1)()) { terminate("Left base or never made it in"); return }
     if ( ! vicinity.base.exists(_.isEnemy)) { terminate("Vicinity not an eligible base"); return }
     if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired()} "); return }
+
+    if (With.unitsShown.any(Terran.Wraith, Terran.Ghost, Terran.SpiderMine, Terran.Vulture, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker, Zerg.LurkerEgg) || With.enemies.exists(_.hasTech(Zerg.Burrow))) {
+      detectorLock.preference = PreferClose(vicinity)
+      detectorLock.acquire()
+    }
 
     SquadAutomation.targetRaid(this)
     SquadAutomation.formAndSend(this)

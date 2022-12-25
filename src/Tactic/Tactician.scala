@@ -22,9 +22,9 @@ class Tactician extends TimedTask {
   private val missions = new ArrayBuffer[Mission]()
   private val priorityTactics = new ArrayBuffer[Tactic]()
   private val backgroundTactics = new ArrayBuffer[Tactic]()
-  private def addMission[T <: Mission](mission: T): T = { missions += mission; mission }
-  private def addPriorityTactic[T <: Tactic](job: T): T = { priorityTactics += job; job }
-  private def addBackgroundTactic[T <: Tactic](job: T): T = { backgroundTactics += job; job }
+  private def addMission          [T <: Mission](mission: T): T = { missions          += mission; mission }
+  private def addPriorityTactic   [T <: Tactic] (job: T)    : T = { priorityTactics   += job; job }
+  private def addBackgroundTactic [T <: Tactic] (job: T)    : T = { backgroundTactics += job; job }
 
   //////////////
   // Missions //

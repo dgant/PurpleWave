@@ -16,8 +16,12 @@ object TargetFilterFutility extends TargetFilter {
       actor.flying
       || ! target.flying
       || target.pixel.walkable
-      || With.reaction.sluggishness > 0 // The next check is moderately expensive
-      || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude))
+      || With.reaction.sluggishness > 0
+      // Are they in range of us, and not outranging us? Eg. a Zealot vs. a Zergling
+      || (target.presumptiveTarget.exists(target.inRangeToAttack) && actor.pixelRangeAgainst(target) >= target.pixelRangeMax)
+      // The next check is moderately expensive
+      || Vector(actor.pixelToFireAt(target).tile, target.tile).exists(t => t.walkable && t.altitude >= target.tile.altitude)
+      )
     if ( ! targetReachable) return false
 
     if (target.gathering || (target.unitClass.isWorker && target.base.exists(_.harvestingArea.contains(target.pixel)))) return true

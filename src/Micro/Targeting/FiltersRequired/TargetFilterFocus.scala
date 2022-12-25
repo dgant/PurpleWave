@@ -14,6 +14,10 @@ object TargetFilterFocus extends TargetFilter {
       && actor.readyForAttackOrder
       && actor.framesToFace(target) <= 2
       && (target.unitClass.attacksOrCastsOrDetectsOrTransports || ! actor.squad.exists(_.engagedUpon))) return true
-    actor.targetsAssigned.forall(_.contains(target))
+    // If our focus includes the target
+    if (actor.targetsAssigned.forall(_.contains(target))) return true
+    // If the target is RIGHT IN OUR WAY
+    if ( ! actor.flying && ! target.flying && actor.pixelDistanceEdge(target) < 96) return true
+    false
   }
 }

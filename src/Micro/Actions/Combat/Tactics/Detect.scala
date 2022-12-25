@@ -39,10 +39,10 @@ object Detect extends Action {
     val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(?(minesweepingNeeded, Some(minesweepPoint), None))
     if (spookiestPixel.isEmpty) return
 
-    if (unit.matchups.pixelsEntangled < -64
+    if (unit.matchups.pixelsEntangled < -96
       || (unit.cloaked
         && ! MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)
-        && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) < 96))) {
+        && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) > 96))) {
       Commander.move(unit)
     } else {
       Retreat.delegate(unit)

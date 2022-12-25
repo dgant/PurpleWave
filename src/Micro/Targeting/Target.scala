@@ -234,8 +234,9 @@ object Target {
     output ||= target.unitClass.isDetector
     output ||= Terran.Comsat(target)
     output ||= Protoss.RoboticsFacility(target) && ! With.units.existsEnemy(Protoss.Observer)
-    output ||= Protoss.Forge(target) && ! With.units.existsEnemy(Protoss.PhotonCannon)
-    output ||= Terran.Academy(target) && ! With.units.existsEnemy(Terran.Comsat)
+    output ||= Protoss.Forge(target)            && ! With.units.existsEnemy(Protoss.PhotonCannon)
+    output ||= Terran.EngineeringBay(target)    && ! With.units.existsEnemy(Terran.MissileTurret)
+    output ||= Terran.Academy(target)           && ! With.units.existsEnemy(Terran.Comsat)
     output
   }
 }

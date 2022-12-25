@@ -48,6 +48,7 @@ class Fingerprints {
       nexusFirst,
       forgeFe,
       gatewayFe,
+      robo,
       dtRush,
       coreBeforeZ,
       mannerPylon,

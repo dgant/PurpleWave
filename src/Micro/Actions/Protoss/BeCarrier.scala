@@ -49,10 +49,10 @@ object BeCarrier extends Action {
       
       // We can't always run from faster flying units
       if (threat.flying && threat.topSpeed >= unit.topSpeed) return false
-      
-      // We can't kite Goliaths, but we should only take shots from them when launching interceptors
-      // and if we can afford to take some damage
-      if ( ! threat.flying && (interceptorsActive || unit.totalHealth < unit.unitClass.maxHitPoints)) return true
+
+      // Avoid standing in eg. Goliath range
+      if ( ! threat.flying) return true
+
       if (unit.agent.shouldFight && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
       
       true

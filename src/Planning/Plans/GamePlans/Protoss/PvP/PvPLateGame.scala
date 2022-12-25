@@ -69,7 +69,7 @@ class PvPLateGame extends GameplanImperative {
 
     fearDeath   = ! safeAtHome
     fearDeath   ||= unitsComplete(IsWarrior) < 8
-    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
+    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
     fearDeath   &&= ! dtBraveryHome
     fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
     fearMacro   = miningBases < Math.max(2, enemyBases)
@@ -134,9 +134,8 @@ class PvPLateGame extends GameplanImperative {
       } else {
         get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
         get(4 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
-
       }
-      if ( ! With.scouting.enemyNaturalPossiblyMining) {
+      if ( ! With.scouting.enemyNaturalPossiblyMining && ! With.fingerprints.robo()) {
         pumpSupply()
         doTrainArmy()
         get(3, Protoss.Gateway)

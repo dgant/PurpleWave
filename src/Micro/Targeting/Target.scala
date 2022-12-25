@@ -230,15 +230,12 @@ object Target {
   }
 
   def aidsDetection(target: UnitInfo): Boolean = {
-    if (target.unitClass.isDetector) {
-      return true
-    }
-    if (target.isAny(Terran.Comsat, Terran.ControlTower, Protoss.RoboticsFacility, Terran.EngineeringBay, Protoss.Forge)) {
-      return true
-    }
-    if (target.isAny(Terran.Academy, Terran.ScienceFacility, Protoss.Observatory) && ! target.complete) {
-      return true
-    }
-    false
+    var output = false
+    output ||= target.unitClass.isDetector
+    output ||= Terran.Comsat(target)
+    output ||= Protoss.RoboticsFacility(target) && ! With.units.existsEnemy(Protoss.Observer)
+    output ||= Protoss.Forge(target) && ! With.units.existsEnemy(Protoss.PhotonCannon)
+    output ||= Terran.Academy(target) && ! With.units.existsEnemy(Terran.Comsat)
+    output
   }
 }

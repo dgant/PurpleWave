@@ -25,6 +25,8 @@ object TargetFilterVsTank extends TargetFilter {
       || (target.canAttackAir && actor.matchups.groupOf.count(Protoss.Carrier) > 0)
       // Do target anything that's in the way
       || (actor.readyForAttackOrder && ! target.flying && actor.pixelDistanceEdge(target) < 12)
+      // If we're cloaked it doesn't matter
+      || (actor.effectivelyCloaked && ! firingPixel.tile.enemyDetected)
       // Do target things we can hit without eating tank fire
       || ! With.grids.enemyRangeGround.unitsOn(firingPixel.tile).exists(t =>
         IsTank(t)

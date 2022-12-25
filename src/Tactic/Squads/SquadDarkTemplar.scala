@@ -7,9 +7,10 @@ import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Agency.Intention
 import Micro.Targeting.Target
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.{?, LightYear}
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsMobileDetector, IsWorker}
@@ -60,15 +61,19 @@ class SquadDarkTemplar extends Squad {
   }
 
   private def intendDTToBase(dt: FriendlyUnitInfo, base: Base): Unit = {
-    lazy val engagedDetectors = base.enemies.filter(u => u.unitClass.isDetector && u.matchups.threatsInRange.nonEmpty)
-    lazy val killableDetectors = base.enemies.filter(u => u.unitClass.isDetector && ( ! u.complete || ! u.canAttack(dt)))
-    lazy val detectionMakers = base.enemies.filter(u => Target.aidsDetection(u) && ! u.isAny(Terran.Academy, Terran.ScienceFacility))
-    lazy val workers = base.enemies.filter(IsWorker)
-    lazy val townHall = base.townHall.toVector
+    val bases = (Seq(base) ++ dt.base.filter(_.owner.isEnemy)).distinct
+
+    lazy val engagedDetectors   = bases.flatMap(_.enemies.filter(u => u.unitClass.isDetector && u.matchups.threatsInRange.nonEmpty))
+    lazy val killableDetectors  = bases.flatMap(_.enemies.filter(u => u.unitClass.isDetector && ( ! u.complete || ! u.canAttack(dt))))
+    lazy val detectionMakers    = bases.flatMap(_.enemies.filter(Target.aidsDetection))
+    lazy val workers            = bases.flatMap(_.enemies.filter(IsWorker))
+    lazy val townHall           = bases.flatMap(_.townHall.toVector)
+    lazy val hasMobileDetectors = With.units.existsEnemy(IsMobileDetector)
 
     val baseTargets =
       Maff.orElse(
         Seq(
+          ?(hasMobileDetectors, workers, Seq.empty), // If they already have mobile detection, we just want worker kills
           engagedDetectors,
           killableDetectors,
           detectionMakers,
@@ -79,7 +84,15 @@ class SquadDarkTemplar extends Squad {
           .sortBy(_.pixelDistanceEdge(dt))
           .sortBy(_.remainingCompletionFrames)
 
-    dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(baseTargets) })
+    // Go berserk if we have a shot at workers
+    val nearestWorker   = Maff.min(workers.map(w => dt.pixelDistanceTravelling(w.pixel))).getOrElse(LightYear().toDouble)
+    val nearestDetector = dt.matchups.enemyDetectorDeepest.map(_.pixelsToSightRange(dt)).getOrElse(LightYear().toDouble)
+    val nearestThreat   = dt.matchups.threatDeepest.filterNot(IsWorker).map(_.pixelsToGetInRange(dt)).getOrElse(LightYear().toDouble)
+    val goBerserk       = nearestWorker < 256 || nearestWorker < nearestDetector || nearestWorker < nearestThreat
+    dt.intend(this, new Intention {
+      canFlee   = ! goBerserk
+      toTravel  = Some(base.heart.center)
+      targets   = Some(baseTargets) })
   }
 
   def run(): Unit = {

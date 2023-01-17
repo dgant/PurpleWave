@@ -4,5 +4,6 @@ import Planning.Plans.GamePlans.All.ModalGameplan
 
 class ProtossVsZerg extends ModalGameplan(
   // Openings
-  new PvZNew,
+  //new PvZNew,
+  new PvZ2022
 )

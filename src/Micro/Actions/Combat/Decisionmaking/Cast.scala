@@ -11,7 +11,7 @@ object Cast extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.energyMax > 0
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    if (unit.cooldownSpell < With.latency.framesRemaining) {
+    if (unit.cooldownSpell < With.latency.remainingFrames) {
       spells.foreach(_.apply(unit))
     }
     if (unit.ready && unit.isAny(

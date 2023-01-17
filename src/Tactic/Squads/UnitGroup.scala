@@ -64,10 +64,7 @@ trait UnitGroup {
   def canBeAttackedBy(unit: UnitInfo): Boolean = unit.canAttackGround && hasGround || unit.canAttackAir && hasAir
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()
-  def count(matcher: UnitFilter): Int = {
-    _count(matcher) = _count.getOrElse(matcher, groupUnits.count(matcher))
-    _count(matcher)
-  }
+  def count(matcher: UnitFilter): Int = _count.getOrElseUpdate(matcher, groupUnits.count(matcher))
 
   private val _paceAge = 24
   private def _attackers()                = groupOrderable.view.filter(isAttacker)
@@ -93,7 +90,7 @@ trait UnitGroup {
   private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(groupOrderable)))
   private val _centroidKey                = new Cache(() => if (_hasGround()) centroidGround else centroidAir)
   private val _attackCentroidAir          = new Cache(() => GroupCentroid.air(centroidUnits(attackers)))
-  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(attackers)))
+  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers))))
   private val _attackCentroidKey          = new Cache(() => if (_hasGround()) attackCentroidGround else attackCentroidAir)
   private val _meanTopSpeed               = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerSpeed          = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
@@ -114,5 +111,11 @@ trait UnitGroup {
   private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.attackersCastersCount * 4 >= With.units.groupVs(u).attackersCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker
-  protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(units.view.filter(_.likelyStillThere), units.view)
+  protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(
+    units.view.filter(_.likelyStillThere),
+    units.view,
+    groupOrderable.filter(_.likelyStillThere),
+    units.filter(_.likelyStillThere),
+    groupOrderable,
+    units)
 }

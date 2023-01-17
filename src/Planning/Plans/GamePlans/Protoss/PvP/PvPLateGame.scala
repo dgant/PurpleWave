@@ -178,7 +178,7 @@ class PvPLateGame extends GameplanImperative {
       maintainMiningBases()
     }
     recordRequestedBases()
-    if (saturated) {
+    if (saturated && gas < 500) {
       buildGasPumps()
     }
     if (fearDeath) {

@@ -39,13 +39,16 @@ object Detect extends Action {
     val spookiestPixel = spookiestSpooky.map(_.pixel).orElse(?(minesweepingNeeded, Some(minesweepPoint), None))
     if (spookiestPixel.isEmpty) return
 
-    if (unit.matchups.pixelsEntangled < -96
-      || (unit.cloaked
-        && ! MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)
-        && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) > 96))) {
-      Commander.move(unit)
-    } else {
+    var flee = false
+    flee ||= unit.matchups.pixelsEntangled > -96
+    flee ||= (unit.cloaked
+      && ! MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)
+      && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) > 96))
+
+    if (flee) {
       Retreat.delegate(unit)
+    } else {
+      Commander.move(unit)
     }
   }
 

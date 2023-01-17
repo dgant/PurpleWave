@@ -31,4 +31,5 @@ case class Upgrade(bwapiType: UpgradeType) extends Buildable {
   def apply(player: PlayerInfo, level: Int): Boolean = player.getUpgradeLevel(this) >= level
 
   override val toString: String =  bwapiType.toString.replaceAll("_", " ")
+  override val hashCode: Int = toString.hashCode
 }

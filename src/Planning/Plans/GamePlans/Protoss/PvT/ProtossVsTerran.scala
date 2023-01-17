@@ -1,3 +1,4 @@
+
 package Planning.Plans.GamePlans.Protoss.PvT
 
 import Debugging.SimpleString
@@ -314,6 +315,7 @@ class ProtossVsTerran extends PvTOpeners {
       once(2, Protoss.DarkTemplar)
       pump(Protoss.DarkTemplar, 1)
     }
+    pump(Protoss.Observer, 1)
     if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = TechReavers.order < TechObservers.order)
     pump(Protoss.Carrier, 4)
   }

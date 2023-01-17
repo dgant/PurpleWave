@@ -24,6 +24,7 @@ case class Tech(bwapiTech: TechType) extends Buildable{
   def apply(player: PlayerInfo): Boolean = player.hasTech(this)
   
   override val toString: String = bwapiTech.toString.replaceAll("_", " ")
+  override val hashCode: Int = toString.hashCode
 
   override def productionFrames(quantity: Int)  : Int = researchFrames
   override def mineralCost(quantity: Int)       : Int = mineralPrice

@@ -340,7 +340,7 @@ object Commander {
           }
         } else {
           lazy val coworkers            = With.gathering.getWorkersByResource(resource)
-          lazy val accelerantFrame      = 11 + With.latency.framesRemaining
+          lazy val accelerantFrame      = 11 + With.latency.remainingFrames
           lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
           lazy val accelerantPixel      = With.gathering.getAccelerantPixelSteady(resource)
           lazy val distance             = unit.pixelDistanceEdge(resource)
@@ -354,7 +354,7 @@ object Commander {
           } else if (onAccelerantPixel) {
             doGather()
           // See https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/Workers.cpp#L587
-          } else if (coworkers.exists(w => w != unit && w.order == Orders.MiningMinerals && w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.framesRemaining)) {
+          } else if (coworkers.exists(w => w != unit && w.order == Orders.MiningMinerals && w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.remainingFrames)) {
             doGather()
           } else if (projectedFrames == accelerantFrame) {
             doGather()
@@ -553,10 +553,10 @@ object Commander {
   }
   
   def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
-    val sleepUntil = Array(
+    val sleepUntil = Maff.vmax(
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
-      unit.nextOrderFrame.getOrElse(0)).max
+      unit.nextOrderFrame.getOrElse(0))
 
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
       With.configuration.trackUnit = false

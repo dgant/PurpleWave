@@ -7,6 +7,7 @@ import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 
 class PlacementQuery {
   var requirements  = new PlacementQueryParameters
@@ -26,6 +27,8 @@ class PlacementQuery {
     resetDefaults(building)
   }
 
+  private def defaultPreferenceBases(building: UnitClass) = With.geography.ourBases.filter(b => ! building.isGas || b.townHall.exists(b => b.hasEverBeenCompleteHatch || b.remainingCompletionFrames < Terran.Refinery.buildFrames))
+  private def defaultPreferenceTiles(building: UnitClass) = ?(building.isGas, Seq(With.geography.home), Seq.empty)
   def resetDefaults(building: UnitClass): Unit = {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
@@ -40,9 +43,9 @@ class PlacementQuery {
     preferences.building  = Some(building)
     preferences.labelYes  = Seq.empty
     preferences.labelNo   = Seq.empty
-    preferences.zone      = With.geography.ourZones
-    preferences.base      = With.geography.ourBases.filter(b => ! building.isGas || b.townHall.exists(b => b.hasEverBeenCompleteHatch || b.remainingCompletionFrames < Terran.Refinery.buildFrames))
-    preferences.tile      = if (building.isGas) Seq(With.geography.home) else Seq.empty
+    preferences.zone      = Seq.empty
+    preferences.base      = defaultPreferenceBases(building)
+    preferences.tile      = defaultPreferenceTiles(building)
     if (Seq(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.RoboticsFacility).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.GroundProduction
     }
@@ -95,21 +98,21 @@ class PlacementQuery {
     preferences.score(foundation)
   }
 
-  def tiles: Traversable[Tile] = foundations.view.map(_.tile)
-
   def foundations: Seq[Foundation] = {
+    if (requirements.building.exists(_.isGas)) return gasFoundations
+    if (requirements.labelYes.contains(PlaceLabels.TownHall)) return townHallFoundations
+
     // As a performance optimization, start filtering from the smallest matching collection
-    lazy val foundationSources = IndexedSeq(
+    val foundationSources = IndexedSeq(
       requirements.labelYes.flatMap(With.placement.get),
       requirements.zone.flatMap(With.placement.get),
       requirements.base.flatMap(With.placement.get),
       requirements.building.map(With.placement.get).getOrElse(IndexedSeq.empty),
       requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
       With.placement.foundations)
-    lazy val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
-    if (requirements.building.exists(_.isGas)) gasFoundations
-    else if (requirements.labelYes.contains(PlaceLabels.TownHall)) townHallFoundations
-    else foundationSourceSmallest
+    val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
+
+    foundationSourceSmallest
       .view
       .filter(accept)
       .map(f => (f, score(f))) // Keep the score in the container so we don't need to keep recalculating it as we sort
@@ -131,6 +134,8 @@ class PlacementQuery {
     })
     bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, new PointGas))
   }
+
+  def auditTiles: Vector[Tile] = foundations.view.map(_.tile).toVector
 
   def auditRequirements: Vector[(Foundation, Double, Double, Double, Double, Double, Double, Double, Double, Double, Double)] = {
     With.placement.foundations.map(requirements.audit).toVector.sortBy(-_._2)

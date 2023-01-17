@@ -19,13 +19,16 @@ class SquadAttack extends Squad {
     SquadAutomation.targetFormAndSend(this)
   }
 
-  private def isNonTrolly(u: UnitInfo): Boolean = u.likelyStillThere && ! u.flying && IsWarrior(u) && ! u.isAny(Terran.Vulture, Zerg.Zergling) && ( ! u.effectivelyCloaked || units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat))
+  private def isNonTrolly(u: UnitInfo): Boolean = (
+    u.likelyStillThere
+    && ! u.flying
+    && IsWarrior(u)
+    && ! u.isAny(Terran.Vulture, Zerg.Zergling)
+    && ( ! u.effectivelyCloaked || units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)))
   protected def getVicinity: Pixel = {
-    lazy val weHaveDetector   = units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)
-    lazy val nonTrollyThreats = With.units.enemy.count(isNonTrolly)
-    lazy val airValue         = units.view.filter(_.flying).map(_.subjectiveValue).sum
-    lazy val totalValue       = units.view.map(_.subjectiveValue).sum
-    lazy val baseScores       = With.geography.enemyBases.map(b => {
+    lazy val airValue   = units.view.filter(_.flying).map(_.subjectiveValue).sum
+    lazy val totalValue = units.view.map(_.subjectiveValue).sum
+    lazy val baseScores = With.geography.enemyBases.map(b => {
       val distanceThreat  = With.scouting.enemyThreatOrigin.walkableTile.groundPixels(b.heart.center)
       val distanceArmy    = keyDistanceTo(b.heart.center)
       val distanceHome    = With.geography.home.groundPixels(b.heart)

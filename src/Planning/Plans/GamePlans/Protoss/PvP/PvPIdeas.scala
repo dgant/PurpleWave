@@ -55,7 +55,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
   val cannonSafetyFrames  : Int = Seconds(10)()
 
   private def makeObservers(): Unit = {
-    pump(Protoss.Observer, if (enemyHasShown(Protoss.DarkTemplar) && units(Protoss.TemplarArchives) == 0) 2 else 1)
+    pump(Protoss.Observer, ?(enemyHasShown(Protoss.DarkTemplar), 2, 1))
   }
 
   def preferObserverForDetection: Boolean = {

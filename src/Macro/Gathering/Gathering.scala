@@ -265,6 +265,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     slot.isDefined
   }
 
+  // Known bug: We can only assign two workers to distance mine a given patch because it only has two slots
   private def tryLongDistance(worker: FriendlyUnitInfo): Boolean = {
     val base = nearestBase(worker)
     val slot = longDistanceBases.sortBy(baseCosts(_, base)).view.flatMap(mineralSlots).find(_.free)

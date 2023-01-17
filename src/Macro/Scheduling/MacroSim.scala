@@ -9,7 +9,7 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import Utilities.?
+import Utilities.{?, CloneyCountMap}
 import Utilities.Time.Forever
 
 import scala.collection.mutable
@@ -41,9 +41,9 @@ final class MacroSim {
     initialState.supplyUsed         = With.units.ours.map(_.unitClass.supplyRequired).sum
     initialState.mineralPatches     = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
     initialState.geysers            = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
-    initialState.unitsExtant        = With.macroCounts.oursExtant
-    initialState.unitsComplete      = With.macroCounts.oursComplete
-    initialState.unitsCompleteASAP  = With.macroCounts.oursComplete
+    initialState.unitsExtant        = new CloneyCountMap(With.macroCounts.oursExtant)
+    initialState.unitsComplete      = new CloneyCountMap(With.macroCounts.oursComplete)
+    initialState.unitsCompleteASAP  = new CloneyCountMap(With.macroCounts.oursComplete)
     Upgrades.all.foreach(u => initialState.upgrades(u) = With.self.getUpgradeLevel(u))
     initialState.techs ++= Techs.all.view.filter(With.self.hasTech)
     insert(initialStep)
@@ -277,12 +277,12 @@ final class MacroSim {
       val stateNext = steps(i).state
       val event     = steps(i).event
       val dFrames   = event.dFrames - steps(i - 1).event.dFrames
-      stateNext.minerals          = stateLast.minerals + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
-      stateNext.gas               = stateLast.gas + event.dGas + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
+      stateNext.minerals          = stateLast.minerals        + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
+      stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
       stateNext.supplyAvailable   = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
-      stateNext.supplyUsed        = stateLast.supplyUsed + event.dSupplyUsed
-      stateNext.mineralPatches    = stateLast.mineralPatches + event.dMineralPatches
-      stateNext.geysers           = stateLast.geysers + event.dGeysers
+      stateNext.supplyUsed        = stateLast.supplyUsed      + event.dSupplyUsed
+      stateNext.mineralPatches    = stateLast.mineralPatches  + event.dMineralPatches
+      stateNext.geysers           = stateLast.geysers         + event.dGeysers
       stateNext.techs             = stateLast.techs
       stateNext.upgrades          = stateLast.upgrades
       stateNext.unitsExtant       = stateLast.unitsExtant

@@ -25,7 +25,7 @@ import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
 import bwapi.Color
 
-abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with UnitFilter {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with Target with UnitFilter {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -213,17 +213,23 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def dpfAir    : Double = damageOnHitAir     * attacksAgainstAir     / cooldownMaxAir.toDouble
   @inline final def dpfGround : Double = damageOnHitGround  * attacksAgainstGround  / cooldownMaxGround.toDouble
 
-  @inline final def cooldownLeft : Int = (Math.max(remainingFramesUntilMoving,
-    //TODO: Ensnare
-    Math.max(
-      friendly.filter(_.transport.exists(_.flying)).map(unused => cooldownMaxAirGround / 2).getOrElse(0),
-      Math.max(
+  private val _cooldownLeft: Cache[Int] = new Cache(() => {
+    // Airlifted unit logic: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
+    val airlifted = friendly.exists(_.transport.exists(_.flying))
+    ?(
+      airlifted && Protoss.Reaver(this),
+      30,
+      Maff.vmax(
+        remainingFramesUntilMoving,
         cooldownAir,
-        cooldownGround))
-    + friendly
-      .filter(u => Protoss.Reaver(u) && u.scarabs == 0)
-      .map(_.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
-      .getOrElse(0)))
+        cooldownGround,
+        ?(airlifted, cooldownMaxAirGround, 0),
+        friendly
+          .filter(u => Protoss.Reaver(u) && u.scarabs == 0)
+          .map(_.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Scarab.buildFrames))
+          .getOrElse(0)))
+  })
+  @inline final def cooldownLeft : Int = _cooldownLeft()
 
   @inline final def canDoAnything: Boolean = canDoAnythingCache()
   private val canDoAnythingCache = new Cache(() =>
@@ -265,7 +271,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
-  @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.framesRemaining - With.reaction.agencyMin
+  @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.remainingFrames - With.reaction.agencyMin
   @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
   @inline final def framesToFace(target: UnitInfo): Int = framesToFace(target.pixel)
   @inline final def framesToFace(target: Pixel): Int = framesToFace(pixel.radiansTo(target))
@@ -273,7 +279,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
     val speedTowardsThreat    = speedApproaching(threat)
     val framesToStopMe        = ?(speedTowardsThreat <= 0, 0.0, framesToStopRightNow)
-    val framesToFlee          = framesToStopMe + unitClass.framesToTurn180 + With.latency.framesRemaining + With.reaction.agencyAverage
+    val framesToFlee          = framesToStopMe + unitClass.framesToTurn180 + With.latency.remainingFrames + With.reaction.agencyAverage
     val distanceClosedByMe    = speedTowardsThreat * framesToFlee
     val distanceClosedByEnemy = ?(Protoss.Interceptor(threat), 0.0, threat.topSpeed * framesToFlee)
     val distanceEntangled     = threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)

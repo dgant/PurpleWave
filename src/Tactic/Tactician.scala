@@ -179,6 +179,7 @@ class Tactician extends TimedTask {
         With.geography.ourBases.filter(MacroFacts.isMiningBase).map(baseSquads(_)),
         filter = (f, s) => Protoss.Archon(f) && s.unitsNext.isEmpty)
     }
+
     // Proactive drop/harassment defense
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
@@ -198,7 +199,7 @@ class Tactician extends TimedTask {
     catchDTRunby.launch()
     freelancers --= catchDTRunby.lock.units
 
-    // If we want to attack and engough freelancers remain, populate the attack squad
+    // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .7)) {
       freelancersPick(freelancers, Seq(attackSquad))

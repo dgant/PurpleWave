@@ -3,8 +3,9 @@ package Micro.Actions.Protoss.Carrier
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 
 object WarmUpInterceptors extends Action {

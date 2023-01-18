@@ -3,7 +3,8 @@ package Micro.Actions.Protoss.Carrier
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders}
+import ProxyBwapi.Orders
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 
 object RelaxInterceptors extends Action {

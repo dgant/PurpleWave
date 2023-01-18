@@ -2,8 +2,9 @@ package Information.Fingerprinting.ProtossStrategies
 
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.{Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.UnitInfo
 
 class FingerprintDragoonRange extends Fingerprint {
   override protected def investigate: Boolean = enemyHasRange || enemySpinningCore.isDefined

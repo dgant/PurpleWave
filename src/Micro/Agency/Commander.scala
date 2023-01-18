@@ -5,10 +5,11 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority, UnitLinearGroundPush}
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
 

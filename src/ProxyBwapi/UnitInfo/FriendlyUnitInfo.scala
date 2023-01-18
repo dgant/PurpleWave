@@ -5,7 +5,7 @@ import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Micro.Agency.{Agent, Intention}
 import Performance.Cache
-import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Orders
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Tactic.Squads.Squad
@@ -14,7 +14,7 @@ import Utilities.Time.Forever
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) {
+final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitProxy(base, id) with Targeter {
   
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
@@ -42,23 +42,20 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   }
 
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
-  def spaceRemaining: Int = bwapiUnit.getSpaceRemaining
-  def kills: Int = bwapiUnit.getKillCount
   def lastFrameOccupied: Int = _lastFrameOccupied
 
   lazy val agent: Agent = new Agent(this)
   private var _client: Any = None
   private var _intent: Intention = new Intention
-  def client: Any = _client
+  var client: Any = None
   def intent: Intention = _intent
-  def intend(client: Any, intent: Intention): Unit = {
-    _client = Some(client)
+  def intend(intendingClient: Any, intent: Intention): Unit = {
+    _client = intendingClient
     _intent = intent
   }
 
   private var _squad: Option[Squad] = None
   private var _lastSquadChange: Int = 0
-  def lock: Option[LockUnits] = With.recruiter.lockOf(this)
   def friendlyTeam: Option[FriendlyTeam] = team.flatMap(t => Try(t.asInstanceOf[FriendlyTeam]).toOption)
   def squad: Option[Squad] = _squad
   def squadAge: Int = With.framesSince(_lastSquadChange)
@@ -101,7 +98,6 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
   def unready: Boolean = ! ready
   def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
-  def hijack(): Unit = nextOrderFrame = None
 
   def trainee: Option[FriendlyUnitInfo] = _traineeCache()
   private val _traineeCache = new Cache(() => if (training) With.units.ours.find(u => ! u.complete && u.pixel == pixel && is(u.unitClass.whatBuilds._1)) else None)
@@ -109,14 +105,12 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   override def loadedUnitCount: Int = loadedUnits.size
   def loadedUnits: Vector[FriendlyUnitInfo] = _loadedUnitsCache()
   private val _loadedUnitsCache = new Cache(() => if (unitClass.canLoadUnits) base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector else Vector.empty)
-  def loadedUnitsSize: Int = loadedUnits.view.map(_.unitClass.spaceRequired).sum
-  
   def canTransport(passenger: FriendlyUnitInfo): Boolean = (
     isTransport
     && passenger.unitClass.canBeTransported
     && passenger.canMove
     && passenger.transport.forall(==)
-    && loadedUnits.view.filterNot(passenger==).map(_.unitClass.spaceRequired).sum <= unitClass.spaceProvided)
+    && bwapiUnit.getSpaceRemaining + passenger.unitClass.spaceRequired <= unitClass.spaceProvided)
 
   def enemyRangeGrid: AbstractGridFloody = if (flying || transport.exists(_.flying)) With.grids.enemyRangeAir else With.grids.enemyRangeGround
 }

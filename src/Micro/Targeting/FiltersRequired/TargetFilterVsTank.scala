@@ -2,9 +2,10 @@ package Micro.Targeting.FiltersRequired
 
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
+import ProxyBwapi.Orders
 import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterVsTank extends TargetFilter {
 

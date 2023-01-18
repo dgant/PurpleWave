@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
-import ProxyBwapi.Engine.Damage
+import ProxyBwapi.Damage
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass

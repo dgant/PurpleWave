@@ -6,14 +6,14 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Agency.Intention
-import Micro.Targeting.Target
+import Micro.Targeting.TargetScoring
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
-import Utilities.{?, LightYear}
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsMobileDetector, IsWorker}
+import Utilities.{?, LightYear}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -65,7 +65,7 @@ class SquadDarkTemplar extends Squad {
 
     lazy val engagedDetectors   = bases.flatMap(_.enemies.filter(u => u.unitClass.isDetector && u.matchups.threatsInRange.nonEmpty))
     lazy val killableDetectors  = bases.flatMap(_.enemies.filter(u => u.unitClass.isDetector && ( ! u.complete || ! u.canAttack(dt))))
-    lazy val detectionMakers    = bases.flatMap(_.enemies.filter(Target.aidsDetection))
+    lazy val detectionMakers    = bases.flatMap(_.enemies.filter(TargetScoring.aidsDetection))
     lazy val workers            = bases.flatMap(_.enemies.filter(IsWorker))
     lazy val townHall           = bases.flatMap(_.townHall.toVector)
     lazy val hasMobileDetectors = With.units.existsEnemy(IsMobileDetector)

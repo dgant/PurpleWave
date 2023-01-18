@@ -14,7 +14,6 @@ class Recruiter {
 
   def available: Iterable[FriendlyUnitInfo] = unlockedUnits.view ++ unitsByLock.view.filter(_._1.interruptable).filterNot(_._1.owner.isPrioritized).flatMap(_._2.view)
   def locks: Seq[LockUnits] = activeLocks
-  def lockOf(unit: FriendlyUnitInfo): Option[LockUnits] = activeLocks.find(_.units.contains(unit))
   def lockedBy(lock: LockUnits): collection.Set[FriendlyUnitInfo] = unitsByLock.getOrElse(lock, Set.empty)
   def locksOf(owner: Prioritized): Iterable[LockUnits] = unitsByLock.view.filter(_._1.owner == owner).map(_._1)
   def lockedBy(owner: Prioritized): Iterable[FriendlyUnitInfo] = locksOf(owner).flatMap(_.units.view)

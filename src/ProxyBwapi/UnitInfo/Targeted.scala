@@ -2,7 +2,7 @@ package ProxyBwapi.UnitInfo
 
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
-trait Target {
+trait Targeted {
   private var _targetingIndex = 0
   private val targeting = Array.fill(2) { new UnorderedBuffer[UnitInfo]() }
 

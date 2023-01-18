@@ -7,8 +7,9 @@ import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Targeting.Target
 import Micro.Actions.Protoss.Carrier._
 import Micro.Agency.Commander
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 
 object BeCarrier extends Action {

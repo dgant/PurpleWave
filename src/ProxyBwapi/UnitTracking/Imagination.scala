@@ -4,8 +4,9 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.Shapes.Circle
 import Mathematics.{Maff, Shapes}
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitInfo.{ForeignUnitInfo, Orders}
+import ProxyBwapi.UnitInfo.ForeignUnitInfo
 import Utilities.Time.{Forever, Minutes, Seconds}
 import Utilities.UnitFilters.IsWarrior
 

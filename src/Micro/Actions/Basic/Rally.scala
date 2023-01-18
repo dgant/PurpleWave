@@ -6,12 +6,12 @@ import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-
+import Utilities.?
 
 object Rally extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    With.framesSince(unit.lastSetRally) > 24 * (if (unit.unitClass.producesLarva) 15 else 1)
+    With.framesSince(unit.lastSetRally) > 24 * ?(unit.unitClass.producesLarva, 15, 1)
     && unit.unitClass.isBuilding
     && unit.unitClass.trainsGroundUnits
     && unit.canDoAnything

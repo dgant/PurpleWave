@@ -5,9 +5,10 @@ import Micro.Actions.Action
 import Micro.Targeting.Target
 import Micro.Agency.Commander
 import Micro.Targeting.FiltersSituational.TargetFilterVisibleInRange
+import ProxyBwapi.Orders
 import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Root extends Action {
   

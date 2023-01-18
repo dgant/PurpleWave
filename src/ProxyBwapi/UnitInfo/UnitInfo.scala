@@ -13,9 +13,9 @@ import Mathematics.Points._
 import Mathematics.Shapes.{Ray, Ring}
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
-import Micro.Targeting.Target
+import Micro.Targeting.TargetScoring
 import Performance.{Cache, KeyedCache}
-import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
+import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -23,9 +23,10 @@ import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
+import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
 import bwapi.Color
 
-abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with Target with UnitFilter {
+abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with Targeted with UnitFilter {
 
   def friendly  : Option[FriendlyUnitInfo]  = None
   def foreign   : Option[ForeignUnitInfo]   = None
@@ -202,7 +203,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   val simulacrum: Simulacrum = new Simulacrum(this)
   var nextInCluster: Option[UnitInfo] = None
 
-  val targetBaseValue = new Cache(() => Target.getTargetBaseValue(this), 24)
+  val injury = new Cache(() => Maff.nanToZero((unitClass.maxTotalHealth - totalHealth).toDouble / unitClass.maxTotalHealth))
+  val targetBaseValue = new Cache(() => TargetScoring.getTargetBaseValue(this), 24)
   var spellTargetValue: Double = _
 
   @inline final def armorHealth: Int = armorHealthCache()

@@ -4,8 +4,9 @@ import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
+import ProxyBwapi.Orders
 import Utilities.UnitFilters.IsWarrior
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, Orders, UnitInfo}
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object BlockConstruction extends Action {
   

@@ -8,13 +8,13 @@ object ShowKills extends DebugView {
 
   override def renderScreen(): Unit = {
     val kills = With.units.ours
-      .filter(_.kills > 0)
+      .filter(_.bwapiUnit.getKillCount > 0)
       .toVector
-      .sortBy(- _.kills)
+      .sortBy(- _.bwapiUnit.getKillCount)
       .zipWithIndex
 
     if (kills.nonEmpty) {
-      val text = Vector("High score (Kills)") ++ kills.map(p => "#" + (p._2 + 1) + " " + p._1.unitClass.toString + ": " + p._1.kills)
+      val text = Vector("High score (Kills)") ++ kills.map(p => "#" + (p._2 + 1) + " " + p._1.unitClass.toString + ": " + p._1.bwapiUnit.getKillCount)
       DrawScreen.column(5, 5 * With.visualization.lineHeightSmall, text)
     }
   }
@@ -23,7 +23,7 @@ object ShowKills extends DebugView {
     With.units.ours.foreach(unit => {
       val t1 = 5
       val t2 = 25
-      val kills = unit.kills
+      val kills = unit.bwapiUnit.getKillCount
       val x2 = kills >= t1
       val x3 = kills >= t2
       val skulls = kills / (if (x3) t2 else if (x2) t1 else 1)

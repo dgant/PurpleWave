@@ -1,7 +1,7 @@
 package ProxyBwapi.UnitClasses
 
 import Mathematics.Points.Tile
-import ProxyBwapi.Engine.{Damage, Size}
+import ProxyBwapi.{Damage, Size}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}

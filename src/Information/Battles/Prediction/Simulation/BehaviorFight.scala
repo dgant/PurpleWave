@@ -1,7 +1,7 @@
 package Information.Battles.Prediction.Simulation
 
 import Mathematics.Maff
-import Micro.Targeting.Target
+import Micro.Targeting.TargetScoring
 import ProxyBwapi.Races.Protoss
 
 
@@ -14,7 +14,7 @@ object BehaviorFight extends SimulacrumBehavior {
       validTarget(simulacrum, t)
       && simulacrum.inRangeToAttack(t)).orElse({
       simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-      Maff.maxBy(simulacrum.targets)(Target.baseAttackerToTargetValue(simulacrum, _))
+      Maff.maxBy(simulacrum.targets)(TargetScoring.baseAttackerToTargetValue(simulacrum, _))
     }))
 
     // TODO: Retarget when target out of range

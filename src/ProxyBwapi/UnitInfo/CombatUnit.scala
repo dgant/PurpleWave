@@ -9,7 +9,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.Visibility
-import Utilities.LightYear
+import Utilities.{?, LightYear}
 import Utilities.Time.Forever
 
 import scala.collection.mutable
@@ -51,6 +51,8 @@ trait CombatUnit {
   def speed                     : Double
   def topSpeed                  : Double
   def topSpeedPossible          : Double
+  def targetValue               : Double
+  def injury                    : Double
 
   def canMove: Boolean
   def canAttack(other: CombatUnit): Boolean
@@ -156,15 +158,14 @@ trait CombatUnit {
   @inline final def framesBeforeAttacking(enemy: CombatUnit)              : Int = framesBeforeAttacking(enemy, enemy.pixel)
   @inline final def framesBeforeAttacking(enemy: CombatUnit, at: Pixel)   : Int = if (canAttack(enemy))  Math.max(cooldownLeft, framesToGetInRange(enemy)) else Forever()
 
-  @inline final def hitChanceAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = if (guaranteedToHit(enemy, from, to)) 1.0 else 0.47
+  @inline final def hitChanceAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = ?(guaranteedToHit(enemy, from, to), 1.0, 0.47)
   @inline final def guaranteedToHit(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
-    val tileFrom  = from.getOrElse(pixel)       .tile
-    val tileTo    =   to.getOrElse(enemy.pixel) .tile
-    flying || enemy.flying || unitClass.affectedByDarkSwarm || tileFrom.altitude >= tileTo.altitude
+    flying || enemy.flying || unitClass.affectedByDarkSwarm || from.getOrElse(pixel).tile.altitude >= to.getOrElse(enemy.pixel).tile.altitude
   }
-  @inline final def damageTypeAgainst (enemy: CombatUnit)  : Damage.Type  = if (enemy.flying) unitClass.airDamageType    else unitClass.groundDamageType
-  @inline final def attacksAgainst    (enemy: CombatUnit)  : Int          = if (enemy.flying) attacksAgainstAir          else attacksAgainstGround
-  @inline final def dpfOnNextHitAgainst(enemy: CombatUnit): Double = if (unitClass.suicides) damageOnNextHitAgainst(enemy) else { val cooldownVs = cooldownMaxAgainst(enemy); if (cooldownVs == 0) 0.0 else damageOnNextHitAgainst(enemy).toDouble / cooldownVs }
+  @inline final def attacksAgainst    (enemy: CombatUnit)  : Int          = ?(enemy.flying, attacksAgainstAir,       attacksAgainstGround)
+  @inline final def damageTypeAgainst (enemy: CombatUnit)  : Damage.Type  = ?(enemy.flying, unitClass.airDamageType, unitClass.groundDamageType)
+  @inline final def damageMultiplierAgainst(enemy: CombatUnit): Double = Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
+  @inline final def dpfOnNextHitAgainst(enemy: CombatUnit): Double = if (unitClass.suicides) damageOnNextHitAgainst(enemy) else { val cooldownVs = cooldownMaxAgainst(enemy); ?(cooldownVs <= 0, 0.0, damageOnNextHitAgainst(enemy).toDouble / cooldownVs) }
   @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
   @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
@@ -252,7 +253,7 @@ trait CombatUnit {
     val toRemove = damageQueue.view.filter(_.source == source).toVector
     damageQueue --= toRemove
   }
-  def clearDamage() {
+  def clearDamage(): Unit = {
     damageQueue.clear()
   }
   def doomed: Boolean = doomFrameAbsolute < Forever()
@@ -287,4 +288,6 @@ trait CombatUnit {
     }
     Forever()
   }
+
+  protected def _calculateInjury: Double = Maff.nanToZero((unitClass.maxTotalHealth - totalHealth).toDouble / unitClass.maxTotalHealth)
 }

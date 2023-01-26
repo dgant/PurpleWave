@@ -11,7 +11,7 @@ class Build(requests: RequestBuildable*) extends Plan {
     requests.take(3).map(_.toString).mkString(", ") +
     (if (requests.size > 3) "..." else ""))
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     With.scheduler.requestAll(this, requests)
   }
 }

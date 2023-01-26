@@ -56,19 +56,17 @@ object Target {
     TargetFilterGroups.filtersRequired.view.filter(_.appliesTo(attacker))
   }
 
-  def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)], Vector[(Boolean, TargetFilter)])] = {
+  def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
     attacker.matchups.targets
       .map(target => (
         target,
         (filtersRequired(attacker) ++ additionalFiltersRequired.filter(_.appliesTo(attacker)))
-          .map(filter => (filter.legal(attacker, target), filter)).toVector.sortBy(_._1),
-        TargetFilterGroups.filtersPreferred.filter(_.appliesTo(attacker))
           .map(filter => (filter.legal(attacker, target), filter)).toVector.sortBy(_._1)
       ))
       .toVector
   }
 
   def auditScore(attacker: FriendlyUnitInfo): Seq[(UnitInfo, Double, Double, Double)] = {
-    attacker.matchups.targets.view.map(target => (target, attacker.pixelDistanceEdge(target) / 32d, target.targetBaseValue(), attacker.targetScore(target))).toVector.sortBy(-_._3)
+    attacker.matchups.targets.view.map(target => (target, attacker.pixelDistanceEdge(target) / 32d, target.targetValue, attacker.targetScore(target))).toVector.sortBy(-_._3)
   }
 }

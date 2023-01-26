@@ -27,7 +27,7 @@ class AOETarget(
     .map(_.tile)
     .filter(_.valid)
     .flatMap(_.units.view.filter(u =>
-      u.likelyStillThere
+      SpellTargets.legal(u)
       && rectangle.contains(u.pixel))) // Require the unit to actually be there; don't trust the grid))
 
   val netValue: Double = units.view.map(_.spellTargetValue).sum

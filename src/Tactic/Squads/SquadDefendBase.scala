@@ -82,7 +82,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
 
     val targetsUnranked = if (canScour) scourables else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else enemies.filter(threateningBase)
-    targets = Some(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
+    setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
     formations.clear()
     if (canWithdraw) {
@@ -116,39 +116,39 @@ class SquadDefendBase(base: Base) extends Squad {
       .orElse(slot.map(p => target.pixel.project(p, scourer.pixelRangeAgainst(target))))
       .getOrElse(target.pixel)
       .traversiblePixel(scourer)
-    scourer.intend(this, new Intention {
-      targets = targets.map(target +: _)
-      toTravel = Some(where)
-      toReturn = SquadAutomation.getReturn(scourer, squad)
-    })
+    scourer.intend(this)
+      .setTargets(target)
+      .setTravel(where)
+      .setReturnTo(SquadAutomation.getReturn(scourer, squad))
   }
 
   def scour(): Unit = {
+    if (targets.get.isEmpty) {
+      SquadAutomation.send(this) // This is an error case; how can we scour if there's nothing to scour?
+      return
+    }
     val assigned    = new UnorderedBuffer[FriendlyUnitInfo]()
     val antiAir     = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackAir))
     val antiGround  = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
-    targets.get.foreach(target => {
-      val antiTarget = if (target.flying) antiAir else antiGround
-      assigned.clear()
-      var valueAssigned: Double = 0
-      while (antiTarget.nonEmpty && valueAssigned < 3 * target.subjectiveValue) {
-        // Send all follower units, like Carriers, to the most urgent target, because otherwise they'll just follow the leader
-        // SquadAcePilots will often preempt this logic due to substantial overlap between followers/aces
-        val antiTargetFollowers = antiTarget.view.filter(_.unitClass.followingAllowed)
-        val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target))).toVector // toVector necessary because we're about to modify the underlying collection
-        assigned.addAll(next)
-        antiAir.removeAll(next)
-        antiGround.removeAll(next)
-        valueAssigned += next.map(_.subjectiveValue).sum
-      }
-      val squad = this
-      assigned.foreach(intendScouring(_, target))
+    Seq(3, 6, 9).foreach(multiplier => {
+      targets.get.foreach(target => {
+        val antiTarget = if (target.flying) antiAir else antiGround
+        assigned.clear()
+        var valueAssigned: Double = 0
+        while (antiTarget.nonEmpty && valueAssigned < multiplier * target.subjectiveValue) {
+          // Send all follower units, like Carriers, to the most urgent target, because otherwise they'll just follow the leader
+          // SquadAcePilots will often preempt this logic due to substantial overlap between followers/aces
+          val antiTargetFollowers = antiTarget.view.filter(_.unitClass.followingAllowed)
+          val next = Maff.orElse(antiTargetFollowers, Maff.minBy(antiTarget)(_.framesToGetInRange(target))).toVector // toVector necessary because we're about to modify the underlying collection
+          assigned.addAll(next)
+          antiAir.removeAll(next)
+          antiGround.removeAll(next)
+          valueAssigned += next.map(_.subjectiveValue).sum
+        }
+        assigned.foreach(intendScouring(_, target))
+      })
     })
-    if (targets.get.isEmpty) {
-      SquadAutomation.send(this)
-    } else {
-      (antiAir.view ++ antiGround).distinct.foreach(intendScouring(_, targets.get.head))
-    }
+    (antiAir.view ++ antiGround).distinct.foreach(intendScouring(_, targets.get.head))
   }
 
   private def isBreaching(enemy: UnitInfo): Boolean = (

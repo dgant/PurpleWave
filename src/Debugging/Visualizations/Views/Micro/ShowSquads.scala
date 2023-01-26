@@ -34,7 +34,7 @@ object ShowSquads extends DebugView {
       if (q.nonEmpty) {
         val targetColor = Colors.BrightYellow
         DrawMap.crosshair(q.head.pixel, q.head.unitClass.dimensionMax / 2, targetColor)
-        while (i < q.length - 1) {
+        while (i < q.size - 1) {
           DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.BrightRed)
           i += 1
         }

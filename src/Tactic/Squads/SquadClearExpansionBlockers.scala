@@ -50,7 +50,7 @@ class SquadClearExpansionBlockers extends Squad {
 
   def run(): Unit = {
     if (units.isEmpty) return
-    targets = Some(SquadAutomation.rankedAround(this))
+    setTargets(SquadAutomation.rankedAround(this))
     detectorLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(64, 48)) }))
     sweeperLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)) }))
   }

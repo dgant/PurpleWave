@@ -49,7 +49,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def destination: Pixel = toTravel
     .orElse(toBoard.map(_.pixel))
-    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinishConstruction).map(unit.pixelToFireAt))
+    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinish).map(unit.pixelToFireAt))
     .orElse(toNuke)
     .orElse(unit.intent.toBuildTile.map(_.center))
     .orElse(unit.intent.toScoutTiles.headOption.map(_.center))

@@ -2,7 +2,6 @@ package Micro.Targeting.FiltersRequired
 
 import Lifecycle.With
 import Micro.Targeting.TargetFilter
-import Utilities.UnitFilters.IsProxied
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.GameTime
@@ -14,7 +13,7 @@ object TargetFilterRush extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     ! target.unitClass.isBuilding
     || target.base.forall(_.heart.explored)
-    || IsProxied(target)
+    || target.proxied
     || With.geography.zones.exists(z => z.walledIn && ! z.owner.isFriendly)
     || target.isAny(
         Terran.Bunker,

@@ -140,7 +140,7 @@ class Storyteller {
             tell(f"$unit projects to complete in $remainingFrames frames at ${Frames(unit.completionFrame)}")
           }
         } else {
-          val arrivalFrame = unit.arrivalFrame()
+          val arrivalFrame = unit.arrivalFrame
           val arrivalFramesAhead = arrivalFrame - With.frame
           tell(f"$unit projects to arrive in $arrivalFramesAhead frames at ${Frames(arrivalFrame)}")
         }

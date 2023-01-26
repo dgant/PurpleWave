@@ -96,8 +96,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def subjectiveValue: Double = subjectiveValueCache()
   private val subjectiveValueCache = new Cache(() =>
     unitClass.subjectiveValue
-      + (if (is(Protoss.Carrier)) friendly.map(_.interceptorCount).getOrElse(8) * Protoss.Interceptor.subjectiveValue else 0)
-      + (if (unitClass.isTransport) friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum else 0))
+      + ?(is(Protoss.Carrier), friendly.map(_.interceptorCount).getOrElse(8) * Protoss.Interceptor.subjectiveValue, 0)
+      + ?(unitClass.isTransport, friendly.map(_.loadedUnits.map(_.subjectiveValue).sum).sum, 0))
 
   @inline final def remainingOccupationFrames: Int = Math.max(
     remainingCompletionFrames,  Math.max(
@@ -140,24 +140,24 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def topSpeed: Double = if (canMove) topSpeedPossibleCache() else 0
   @inline final def topSpeedPossible: Double = topSpeedPossibleCache()
   private val topSpeedPossibleCache = new Cache(() =>
-    (if (ensnared) 0.5 else 1.0) * // TODO: Is this the multiplier?
-    (if (stimmed) 1.5 else 1.0) * (
-    (if (is(Terran.SiegeTankSieged)) Terran.SiegeTankUnsieged.topSpeed else unitClass.topSpeed)
-    * (if (
-      (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
-      (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
-      (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
-      (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
-      (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
-      (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
-      (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
-      (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)))
-      1.5 else 1.0)))
+      ?(ensnared, 0.5, 1.0) // TODO: Is this the multiplier?
+    * ?(stimmed, 1.5, 1.0)
+    * ?(is(Terran.SiegeTankSieged), Terran.SiegeTankUnsieged.topSpeed, unitClass.topSpeed)
+    * ?(
+        (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
+        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
+        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
+        (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
+        (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
+        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
+        (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
+        (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)),
+      1.5, 1.0))
 
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tile, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixel, pixels)
 
-  @inline final def isTransport: Boolean = flying && (if (Zerg.Overlord(this)) player.hasUpgrade(Zerg.OverlordDrops) else unitClass.isTransport)
+  @inline final def isTransport: Boolean = flying && ?(Zerg.Overlord(this), Zerg.OverlordDrops(player), unitClass.isTransport)
 
   @inline final def detectionRangePixels: Int = if (unitClass.isDetector) (if (unitClass.isBuilding) 32 * 7 else sightPixels) else 0
   @inline final def sightPixels: Int = sightRangePixelsCache()
@@ -179,7 +179,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def altitude: Double = tile.altitude
 
-  val arrivalFrame = new Cache(() => {
+  @inline final def arrivalFrame: Int = _arrivalFrame()
+  private val _arrivalFrame = new Cache(() => {
     val home        = With.geography.home.center
     val classSpeed  = unitClass.topSpeed
     val travelTime  = Math.min(
@@ -192,6 +193,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     arrivalTime
   })
 
+  @inline final def proxied: Boolean = _proxied()
+  private val _proxied = new Cache(() => ! isFriendly && unitClass.isBuilding && ! flying && With.scouting.proximity(tile) < 0.42, 240)
+
   ////////////
   // Combat //
   ////////////
@@ -203,9 +207,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   val simulacrum: Simulacrum = new Simulacrum(this)
   var nextInCluster: Option[UnitInfo] = None
 
-  val injury = new Cache(() => Maff.nanToZero((unitClass.maxTotalHealth - totalHealth).toDouble / unitClass.maxTotalHealth))
-  val targetBaseValue = new Cache(() => TargetScoring.getTargetBaseValue(this), 24)
   var spellTargetValue: Double = _
+  private val _injury = new Cache(() => _calculateInjury)
+  private val _targetValue = new Cache(() => TargetScoring(this))
+  def injury: Double = _injury()
+  def targetValue: Double = _targetValue()
 
   @inline final def armorHealth: Int = armorHealthCache()
   @inline final def armorShield: Int = armorShieldsCache()
@@ -310,10 +316,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       if (range >= distance && ( ! exhaustive || ! altitudeMatters)) return pixel
       // First, check if the simplest possible spot is acceptable
       val pixelClose  = enemy.pixel.project(pixel, range)
-      val usToEnemyGapFacingRight    =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
-      val usToEnemyGapFacingLeft     = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
-      val usToEnemyGapFacingDown     =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
-      val usToEnemyGapFacingUp       = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
+      val usToEnemyGapFacingRight =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
+      val usToEnemyGapFacingLeft  = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
+      val usToEnemyGapFacingDown  =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
+      val usToEnemyGapFacingUp    = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
       val pixelFar = pixelClose
         .add(
           // DOUBLE CHECK CLAMPS

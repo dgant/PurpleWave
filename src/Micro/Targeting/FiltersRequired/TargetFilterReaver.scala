@@ -7,9 +7,8 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterReaver extends TargetFilter {
   simulationSafe = true
-  override def appliesTo(actor: FriendlyUnitInfo): Boolean = Protoss.Reaver(actor)
+  override def appliesTo(actor: FriendlyUnitInfo): Boolean = Protoss.Reaver(actor) && actor.agent.ride.isDefined
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    if (actor.agent.ride.isEmpty) return true
 
     // Don't try to snipe tanks that will kill us first
     if (actor.loaded
@@ -21,10 +20,9 @@ object TargetFilterReaver extends TargetFilter {
 
     // Don't hit eg. random buildings in bases
     val worthAttacking = (
-      actor.base.exists(_.owner.isUs) // Make sure we hit Pylons or whatever other garbage is around
-      || target.canAttack
+      target.proxied
       || target.unitClass.attacksOrCastsOrDetectsOrTransports
-      || (target.base.exists(b => b.resources.forall(u => u.tile.visible)) && target.base.forall(_.workerCount == 0)))
+      || target.base.exists(b => b.workerCount == 0 && b.resources.forall(u => u.tile.visible)))
 
     val safeToAttack = (
       ! target.canAttack(actor)

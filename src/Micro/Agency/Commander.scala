@@ -500,7 +500,7 @@ object Commander {
     lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuild.map(_.tileArea.add(unit.intent.toBuildTile.get).center).getOrElse(unit.intent.toBuildTile.get.center))
     if (unit.flying) return
     if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
-    if (unit.intent.toFinishConstruction.isDefined)             unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toFinish.isDefined)             unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toRepair.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toBuildTile.isDefined)                      unit.agent.escalatePriority(?(buildDistance < 128, TrafficPriorities.Shove, TrafficPriorities.Bump))
     if (unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)

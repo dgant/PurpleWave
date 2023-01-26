@@ -3,10 +3,10 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Utilities.UnitFilters.{IsBuilding, IsMobileDetector, IsProxied, IsWarrior}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.{IsBuilding, IsMobileDetector, IsWarrior}
 
 class SquadAttack extends Squad {
   override def toString: String = f"Atk ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
@@ -46,7 +46,7 @@ class SquadAttack extends Squad {
     }
 
     lazy val horrorProxy  = Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.enemies.filter(IsBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
-    lazy val remoteProxy  = if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(IsProxied).map(_.pixel))(_.groundPixels(With.geography.home.center))
+    lazy val remoteProxy  = if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(_.proxied).map(_.pixel))(_.groundPixels(With.geography.home.center))
     lazy val bestBase     = Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.enemies.filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center))
     lazy val bestThreat   = aggressivestDivision.map(_._2)
     lazy val origin       = Some(With.scouting.enemyThreatOrigin.center)

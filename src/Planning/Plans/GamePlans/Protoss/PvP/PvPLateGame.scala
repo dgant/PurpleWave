@@ -223,6 +223,10 @@ class PvPLateGame extends GameplanImperative {
     }
     pump(Protoss.Observer, Math.min(3, enemies(Protoss.DarkTemplar)))
     if (shouldReaver) {
+      // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
+      if (recentlyExpandedFirst || ! shouldAttack) {
+        pump(Protoss.Reaver, 2)
+      }
       pumpShuttleAndReavers(2, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
     }
     pump(Protoss.Observer, 2)

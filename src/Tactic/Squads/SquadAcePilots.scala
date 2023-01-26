@@ -152,7 +152,7 @@ class SquadAcePilots extends Squad {
       otherSquad.targets.map(_.filter(_.flying)).getOrElse(Seq.empty),
       base.map(_.enemies.filter(_.flying)).getOrElse(Seq.empty),
       SquadAutomation.unrankedAround(this, vicinity))
-    targets = Some(targetsUnsorted.toVector.sortBy(_.pixelDistanceSquared(base.map(_.heart.center).getOrElse(vicinity))))
+     Some(targetsUnsorted.toVector.sortBy(_.pixelDistanceSquared(base.map(_.heart.center).getOrElse(vicinity))))
     SquadAutomation.send(this)
   }
 }

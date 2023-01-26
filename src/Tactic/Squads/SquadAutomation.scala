@@ -3,7 +3,6 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
 import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -21,14 +20,14 @@ object SquadAutomation {
 
   def target(squad: Squad): Unit = { target(squad, if (squad.fightConsensus) squad.vicinity else squad.homeConsensus) }
   def target(squad: Squad, to: Pixel): Unit = {
-    squad.targets = Some(SquadAutomation.rankedEnRoute(squad, to))
+    squad.setTargets(SquadAutomation.rankedEnRoute(squad, to))
   }
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
     val unrankedTargets   = unrankedAround(squad, to)
     lazy val targetCombat = unrankedTargets.filter(t => t.unitClass.isWorker || squad.canBeAttackedBy(t) || (t.unitClass.isStaticDefense && squad.units.exists(t.inRangeToAttack)))
     lazy val targetHall   = unrankedTargets.filter(_.unitClass.isTownHall)
-    squad.targets = Some(SquadAutomation.rankForArmy(squad, Maff.orElse(targetCombat, targetHall, unrankedTargets).toSeq).sortBy( ! _.unitClass.isWorker))
+    squad.setTargets(SquadAutomation.rankForArmy(squad, Maff.orElse(targetCombat, targetHall, unrankedTargets).toSeq).sortBy( ! _.unitClass.isWorker))
   }
 
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
@@ -98,22 +97,21 @@ object SquadAutomation {
     units.foreach(unit => {
       lazy val finalTravel = getTravel(unit, squad, defaultReturn)
       lazy val finalReturn = getReturn(unit, squad, defaultReturn)
-      unit.intend(squad, new Intention {
-        toTravel = if (squad.fightConsensus) finalTravel else finalReturn
-        toReturn = finalReturn
-      })
+      unit.intend(squad)
+        .setTravel(?(squad.fightConsensus, finalTravel, finalReturn))
+        .setReturnTo(finalReturn)
     })
   }
 
-  def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] = squad
+  def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel = squad
     .formations
     .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
     .filter(_.placements.contains(unit))
     .map(_.placements(unit))
     .orElse(defaultReturn)
-    .orElse(Some(squad.homeConsensus))
+    .getOrElse(squad.homeConsensus)
 
-  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Option[Pixel] =
+  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel =
     // Rush scenarios: Send army directly to vicinity
     Some(squad.vicinity)
       .filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
@@ -123,7 +121,7 @@ object SquadAutomation {
         .headOption
         .find(_.placements.contains(unit))
         .map(_.placements(unit)))
-      .orElse(if (squad.fightConsensus) Some(squad.vicinity) else getReturn(unit, squad, defaultReturn).orElse(Some(squad.homeConsensus)))
+      .getOrElse(?(squad.fightConsensus, squad.vicinity, getReturn(unit, squad, defaultReturn)))
 
   //////////////////////
   // Full automation! //

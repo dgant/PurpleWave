@@ -1,4 +1,4 @@
-package Micro.Targeting.FiltersOptional
+package Micro.Targeting.FiltersSituational
 
 import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

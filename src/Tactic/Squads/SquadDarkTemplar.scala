@@ -91,8 +91,7 @@ class SquadDarkTemplar extends Squad {
     val goBerserk       = nearestWorker < 256 || nearestWorker < nearestDetector || nearestWorker < nearestThreat
     dt.intend(this, new Intention {
       canFlee   = ! goBerserk
-      toTravel  = Some(base.heart.center)
-      targets   = Some(baseTargets) })
+      toTravel  = Some(base.heart.center) }).setTargets(baseTargets)
   }
 
   def run(): Unit = {
@@ -115,7 +114,7 @@ class SquadDarkTemplar extends Squad {
         val division = Maff.minBy(divisions)(_.centroidGround.groundPixels(dt.pixel))
 
         division.foreach(division => {
-          dt.intend(this, new Intention { toTravel = Some(base.heart.center); targets = Some(base.enemies) })
+          dt.intend(this, new Intention { toTravel = Some(base.heart.center) }.setTargets(base.enemies))
         })
 
         if (division.isEmpty) {

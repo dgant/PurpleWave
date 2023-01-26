@@ -10,7 +10,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrades
 import Utilities.CountMap
 import Utilities.Time.{GameTime, Minutes}
-import Utilities.UnitFilters.{IsHatchlike, IsProxied, IsWorker}
+import Utilities.UnitFilters.{IsHatchlike, IsWorker}
 
 trait EconomicModel {
 
@@ -110,7 +110,7 @@ trait EconomicModel {
     unit.unitClass.supplyProvided == 0
       && unit.unitClass.attacksOrCastsOrDetectsOrTransports
       && ! unit.unitClass.isWorker
-      && ( ! unit.unitClass.isBuilding || IsProxied(unit)))
+      && ( ! unit.unitClass.isBuilding || unit.proxied))
 
   private var lastUpdate: Int = 0
   protected def updateEconomicModel(): Unit = {

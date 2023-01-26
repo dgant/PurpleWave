@@ -41,9 +41,8 @@ class DefendFightersAgainstRush extends Tactic {
     defenders.acquire()
     defenders.units.foreach(_.intend(this, new Intention {
       toTravel = Some(target)
-      targets = Some(aggressors.toVector)
       canFlee = false
-    }))
+    }).setTargets(aggressors))
   }
 
   private lazy val fingerprintsRequiringFighterProtection = Seq(

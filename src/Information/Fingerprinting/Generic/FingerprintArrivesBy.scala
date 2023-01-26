@@ -16,12 +16,12 @@ class FingerprintArrivesBy(
   override val sticky = true
 
   protected def matchedUnits  : Iterable[UnitInfo] = With.units.everEnemy.filter(unitMatcher)
-  protected def arrivingUnits : Iterable[UnitInfo] = matchedUnits.filter(_.arrivalFrame() < gameTime())
+  protected def arrivingUnits : Iterable[UnitInfo] = matchedUnits.filter(_.arrivalFrame < gameTime())
   
   override def investigate: Boolean = {
     // Game time cutoff spares performance
     With.frame < gameTime() && arrivingUnits.size >= quantity
   }
 
-  override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame())).getOrElse(0))})"
+  override def reason: String = f"$quantity $unitMatcher arriving by $gameTime (at least ${arrivingUnits.size} by ${Frames(Maff.max(arrivingUnits.map(_.arrivalFrame)).getOrElse(0))})"
 }

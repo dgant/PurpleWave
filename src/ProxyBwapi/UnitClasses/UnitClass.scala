@@ -413,6 +413,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
         * (if (this == Protoss.Carrier) 2.0 else 1.0)
         * (if (this == Protoss.Interceptor) 0.25 else 1.0)
         / copiesProduced)
+  lazy val subjectiveValueOverHealth: Double = subjectiveValue / Math.max(1, maxTotalHealth)
   lazy val isTier1TownHall: Boolean = ==(Terran.CommandCenter) || ==(Protoss.Nexus) || ==(Zerg.Hatchery)
 
   lazy val skimulationValue: Double =
@@ -420,7 +421,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Terran.Marine) 0.35
     else if (this == Terran.Firebat) 0.3
     else if (this == Terran.Ghost) 0.15
-    else if (this == Terran.Medic) 1
+    else if (this == Terran.Medic) 0.75
     else if (this == Terran.SpiderMine) 0.25
     else if (this == Terran.Vulture) 0.65
     else if (this == Terran.Goliath) 1

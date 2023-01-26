@@ -159,7 +159,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
         }
       } else if (buildingClass.isTerran) {
         builder.get.intend(this, new Intention {
-          toFinishConstruction = trainee
+          toFinish = trainee
           canFight = false
         })
       }

@@ -58,31 +58,29 @@ object Root extends Action {
     private lazy val artilleryOutOfRange    = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
     private lazy val duckForCover           = false && (weAreALurker && unit.matchups.groupVs.detectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
     private lazy val letsKillThemAlready    = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
-    private lazy val leadingPush            = ! unit.agent.destination.base.exists(_.owner.isUs) && (rootersInPush.size + 1) / 3 > rootersInPushCloser
     private lazy val destinationFarAway     = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint
     private lazy val hugged                 = weAreATank && unit.matchups.threats.exists(t => ! t.flying && t.pixelDistanceEdge(unit) <= 96) && unit.matchups.targets.nonEmpty && unit.matchups.targets.forall(_.pixelDistanceEdge(unit) <= 96)
     
-    lazy val mustBeUnrooted = (
+    lazy val mustBeUnrooted: Boolean = (
           (threatsButNoTargets              )
       ||  (weAreATank && insideNarrowChoke  )
       ||  (beingPickedUp                    )
       ||  (outOfCombat && inTheWay          )
       ||  hugged
     )
-    lazy val mustNotRoot = (
+    lazy val mustNotRoot: Boolean = (
           (retreating && ! protectingBase   )
       ||  (weAreATank && insideTurretRange  )
     )
-    lazy val wantsToRoot = (
+    lazy val wantsToRoot: Boolean = (
           (nearFormationPoint               )
       ||  (turretsInRange                   )
       ||  (weAreATank && buildingInRange    )
-      //||  (leadingPush                      )
       ||  (girdForCombat                    )
       ||  (duckForCover                     )
       ||  (letsKillThemAlready              )
     )
-    lazy val wantsToUnroot = (
+    lazy val wantsToUnroot: Boolean = (
           (mustBeUnrooted                   )
       ||  (destinationFarAway               )
     )
@@ -98,13 +96,13 @@ object Root extends Action {
       && ! unit.morphing
     )
     
-    override def perform(unit: FriendlyUnitInfo) {
+    override def perform(unit: FriendlyUnitInfo): Unit = {
       Target.choose(unit, TargetFilterVisibleInRange)
       if (shouldRoot)   root(unit)
       if (shouldUnroot) unroot(unit)
     }
     
-    private def root(unit: FriendlyUnitInfo) {
+    private def root(unit: FriendlyUnitInfo): Unit = {
       if (weAreRooted) {
         return
       }
@@ -116,7 +114,7 @@ object Root extends Action {
       }
     }
   
-    private def unroot(unit: FriendlyUnitInfo) {
+    private def unroot(unit: FriendlyUnitInfo): Unit = {
       if ( ! weAreRooted) {
         return
       }
@@ -131,7 +129,7 @@ object Root extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isAny(IsTank,  Zerg.Lurker)
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     val rootAction = new RootAction(unit)
     rootAction.delegate(unit)
   }

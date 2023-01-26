@@ -14,7 +14,7 @@ object Produce extends Action {
       && (unit.trainingQueue.isEmpty || unit.trainee.exists(_.remainingCompletionFrames <= 1 + With.latency.latencyFrames + With.reaction.agencyMax))
       && unit.trainingQueue.size < 2)
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.intent.toTrain.isDefined) {
       if (With.framesSince(unit.intent.frameCreated) < Math.max(128, unit.intent.toTrain.get.buildFrames / 2)) {
         Commander.build(unit, unit.intent.toTrain.get)

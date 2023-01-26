@@ -13,7 +13,7 @@ object SabotageProxy extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
     && unit.unitClass.isWorker
-    && unit.matchups.targets.exists(IsProxied)
+    && unit.matchups.targets.exists(_.proxied)
     && ! ZvE4Pool())
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

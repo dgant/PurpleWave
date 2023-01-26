@@ -5,7 +5,7 @@ import Micro.Targeting.TargetFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterFocus extends TargetFilter {
-  simulationSafe = false
+  simulationSafe = true
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = actor.targetsAssigned.isDefined
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
     if (actor.agent.commit) return true

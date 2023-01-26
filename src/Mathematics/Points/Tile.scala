@@ -4,7 +4,8 @@ import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 import bwapi.TilePosition
 
 final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -321,5 +322,11 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def enemiesNearlyAttackingAir: Seq[UnitInfo] = {
     With.grids.enemyRangeAir.unitsNear(i)
+  }
+  @inline def enemiesAttacking(friendly: FriendlyUnitInfo): Seq[UnitInfo] = {
+    ?(friendly.flying, enemiesAttackingAir, enemiesAttackingGround)
+  }
+  @inline def enemiesNearlyAttacking(friendly: FriendlyUnitInfo): Seq[UnitInfo] = {
+    ?(friendly.flying, enemiesNearlyAttackingAir, enemiesNearlyAttackingGround)
   }
 }

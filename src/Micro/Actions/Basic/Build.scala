@@ -14,16 +14,15 @@ import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 object Build extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.toBuild.isDefined && unit.intent.toBuildTile.isDefined
   
   override def perform(unit: FriendlyUnitInfo): Unit = {
     
-    val ourBuilding = With.grids.units.get(unit.intent.toBuildTile.get).find(_.unitClass == unit.intent.toBuild.get)
+    val ourBuilding = unit.intent.toBuildTile.get.units.find(_.unitClass == unit.intent.toBuild.get)
     
-    if (ourBuilding.isDefined) {
+    if (ourBuilding.exists(u => u.complete || u.unitClass.isProtoss)) {
       unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
       Gather.apply(unit)
       return

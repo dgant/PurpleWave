@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsProxied, IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferClose
 
 class SquadBackstabProxy extends Squad {
@@ -15,7 +15,7 @@ class SquadBackstabProxy extends Squad {
 
   override def launch(): Unit = {
     if ( ! MacroFacts.enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.proxyRax)) return
-    if ( ! With.units.enemy.exists(IsProxied)) return
+    if ( ! With.units.enemy.exists(_.proxied)) return
 
     val targetBase = With.scouting.enemyMain
     if (targetBase.isEmpty) return
@@ -30,8 +30,8 @@ class SquadBackstabProxy extends Squad {
   }
 
   override def run(): Unit = {
-    targets = Some(With.units.enemy.filter(IsWorker).toVector)
-    if (targets.isEmpty) targets = None
+    setTargets(With.units.enemy.filter(IsWorker).toVector)
+    if (targets.exists(_.isEmpty)) targets = None
     units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
   }
 }

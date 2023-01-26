@@ -23,12 +23,12 @@ class BuildAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) exten
   override def isComplete: Boolean = trainee.exists(_.aliveAndComplete)
   override def hasSpent: Boolean = trainee.isDefined
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     trainee.foreach(_.setProducer(this))
     if (hasSpent || currencyLock.acquire()) {
       builderLock.acquire()
       if (trainee.isEmpty) {
-        builder.foreach(_.intend(this, new Intention { toAddon = Some(addonClass) }))
+        builder.foreach(_.intend(this, new Intention { toBuild = Some(addonClass) }))
       }
     }
   }

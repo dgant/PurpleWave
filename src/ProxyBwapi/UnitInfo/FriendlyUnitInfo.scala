@@ -7,6 +7,7 @@ import Micro.Agency.{Agent, Intention}
 import Performance.Cache
 import ProxyBwapi.Orders
 import ProxyBwapi.Techs.{Tech, Techs}
+import ProxyBwapi.UnitTracking.IndexedSet
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Tactic.Squads.Squad
 import Utilities.Time.Forever
@@ -49,9 +50,10 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _intent: Intention = new Intention
   var client: Any = None
   def intent: Intention = _intent
-  def intend(intendingClient: Any, intent: Intention): Unit = {
+  def intend(intendingClient: Any, intent: Intention = new Intention): Intention = {
     _client = intendingClient
     _intent = intent
+    _intent
   }
 
   private var _squad: Option[Squad] = None
@@ -65,7 +67,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
       _lastSquadChange = With.frame
     }
   }
-  def targetsAssigned: Option[Seq[UnitInfo]] = intent.targets.orElse(squad.flatMap(_.targets))
+  def targetsAssigned: Option[IndexedSet[UnitInfo]] = intent.targets.orElse(squad.flatMap(_.targets))
 
   def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
   def alliesBattle                  : Iterable[FriendlyUnitInfo]      = team.map(_.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)

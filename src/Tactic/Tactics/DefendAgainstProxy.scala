@@ -22,7 +22,9 @@ class DefendAgainstProxy extends Tactic {
     if (With.frame > Minutes(7)()) return
 
     // Get sorted list of proxies
-    val proxies = getProxies.toVector
+    val proxies = With.units.enemy
+      .filter(e => e.likelyStillThere && e.isAny(scaryTypes: _*) && e.proxied)
+      .toVector
       .sortBy(_.remainingCompletionFrames)
       .sortBy(_.totalHealth)
       .sortBy( ! _.unitClass.attacksGround)
@@ -94,14 +96,6 @@ class DefendAgainstProxy extends Tactic {
     With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     val squad = new SquadRazeProxies(defendersAssigned.toMap)
     squad.addUnits(defenders.units)
-  }
-  
-  private def getProxies: Iterable[UnitInfo] = {
-    With.units.enemy.view.filter(e =>
-      ! e.flying
-      && e.likelyStillThere
-      && e.isAny(scaryTypes: _*)
-      && IsProxied(e))
   }
   
   private lazy val scaryTypes = Vector(

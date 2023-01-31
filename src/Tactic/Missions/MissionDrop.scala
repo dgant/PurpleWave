@@ -13,14 +13,14 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Commands.Move
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
-import Micro.Agency.{Commander, Intention}
+import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.{Minutes, Seconds}
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.IsWorker
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -186,32 +186,32 @@ abstract class MissionDrop extends Mission {
     }
   }
   private def assemble(): Unit = {
-    transports.foreach(_.intend(this, new Intention { action = new ActionAssembleTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = new ActionAssemblePassenger }))
+    transports.foreach(_.intend(this).setAction(new ActionAssembleTransport))
+    passengers.foreach(_.intend(this).setAction(new ActionAssemblePassenger))
   }
   private def travel(): Unit = {
-    transports.foreach(_.intend(this, new Intention { action = new ActionTravelTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = DoNothing }))
+    transports.foreach(_.intend(this).setAction(new ActionTravelTransport))
+    passengers.foreach(_.intend(this).setAction(DoNothing))
   }
   private def land(): Unit = {
-    transports.foreach(_.intend(this, new Intention { action = new ActionLandTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = new ActionLandPassenger }))
+    transports.foreach(_.intend(this).setAction(new ActionLandTransport))
+    passengers.foreach(_.intend(this).setAction(new ActionLandPassenger))
   }
   protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
-    transports.foreach(_.intend(this, new Intention { action = new ActionRaidTransport}))
-    passengers.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
+    transports.foreach(_.intend(this).setAction(new ActionRaidTransport))
+    passengers.foreach(_.intend(this).setTravel(vicinity))
     passengers.foreach(_.agent.commit = true)
   }
   private def evacuate(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this, new Intention { action = new ActionEvacuateTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = new ActionEvacuatePassenger }))
+    transports.foreach(_.intend(this).setAction(new ActionEvacuateTransport))
+    passengers.foreach(_.intend(this).setAction(new ActionEvacuatePassenger))
   }
   private def escape(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this, new Intention { action = new ActionEscapeTransport }))
-    passengers.foreach(_.intend(this, new Intention { action = DoNothing }))
+    transports.foreach(_.intend(this).setAction(new ActionEscapeTransport))
+    passengers.foreach(_.intend(this).setAction(DoNothing))
   }
 
   private def createPath(transport: FriendlyUnitInfo): Unit = {

@@ -2,10 +2,10 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.Terran
+import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferClose
@@ -36,12 +36,10 @@ class SquadEjectScout extends Squad {
   }
   
   override def run(): Unit = {
-    units.foreach(ejector => {
-      ejector.intend(this, new Intention {
-        toScoutTiles = if (targetScout().exists(_.likelyStillThere)) Seq.empty else tilesToConsider()
-        toTravel = Some(destination())
-        toAttack = if (ejector.matchups.targets.forall(targetScout().contains)) targetScout() else None
-      })
-    })
+    units.foreach(ejector =>
+      ejector.intend(this)
+        .setTravel(destination())
+        .setAttack(?(ejector.matchups.targets.forall(targetScout().contains), targetScout(), None))
+        .setScout(?(targetScout().exists(_.likelyStillThere), Seq.empty, tilesToConsider())))
   }
 }

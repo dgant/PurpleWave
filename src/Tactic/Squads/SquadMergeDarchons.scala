@@ -2,9 +2,8 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
-import Utilities.UnitCounters.CountEverything
 import ProxyBwapi.Races.Protoss
+import Utilities.UnitCounters.CountEverything
 
 class SquadMergeDarchons extends Squad {
 
@@ -20,9 +19,8 @@ class SquadMergeDarchons extends Squad {
 
   override def run(): Unit = {
     val partyCentral = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.enemyThreatOrigin)).map(_.heart).getOrElse(With.geography.home).center
-    lock.units.foreach(u => u.intend(this, new Intention {
-      toTravel = Some(partyCentral)
-      shouldMeld = u.matchups.threatsInRange.isEmpty
-    }))
+    lock.units.foreach(_.intend(this)
+      .setShouldMeld(true)
+      .setTravel(partyCentral))
   }
 }

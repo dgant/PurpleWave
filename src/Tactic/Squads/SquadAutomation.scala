@@ -18,10 +18,9 @@ object SquadAutomation {
   // Targeting //
   ///////////////
 
-  def target(squad: Squad): Unit = { target(squad, if (squad.fightConsensus) squad.vicinity else squad.homeConsensus) }
-  def target(squad: Squad, to: Pixel): Unit = {
-    squad.setTargets(SquadAutomation.rankedEnRoute(squad, to))
-  }
+  def target(squad: Squad): Unit = target(squad, ?(squad.fightConsensus, squad.vicinity, squad.homeConsensus))
+  def target(squad: Squad, to: Pixel): Unit = squad.setTargets(SquadAutomation.rankedEnRoute(squad, to))
+
   def targetRaid(squad: Squad): Unit = targetRaid(squad, squad.vicinity)
   def targetRaid(squad: Squad, to: Pixel): Unit = {
     val unrankedTargets   = unrankedAround(squad, to)
@@ -32,22 +31,18 @@ object SquadAutomation {
 
   def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
     targets.sortBy(t =>
-      (t.pixelDistanceCenter(squad.centroidKey)
-      + 0.25 * t.pixelDistanceCenter(squad.vicinity)
-      + ?(t.visible, 0, 32 * 5)
-      + ?(t.pixel == t.pixelObserved, 0, 32 * 5)
-      + ?(t.totalHealth < t.unitClass.maxTotalHealth, -16.0, 0)
-      + (16.0 * t.totalHealth / Math.max(1.0, t.unitClass.maxTotalHealth))
-      + (if (t.unitClass.isWorker || squad.engagedUpon) 0 else 160)
-      + 160)
-      * (if (t.unitClass.attacksOrCastsOrDetectsOrTransports || ! squad.engagedUpon) 1 else 2))
+        ?(t.visible,                                  0, 32 * 5)
+      + ?(t.pixel == t.pixelObserved,                 0, 32 * 5)
+      + ?(t.unitClass.isWorker || squad.engagedUpon,  0, 32 * 5)
+      + t.pixelDistanceCenter(squad.centroidKey)
+      + t.pixelDistanceCenter(squad.vicinity))
   }
   def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
     val combatEnemiesInRoute = With.units.enemy.filter(e =>
       ! Protoss.Interceptor(e)
       && e.likelyStillThere
-      && e.canAttack
       && group.canAttack(e)
+      && group.canBeAttackedBy(e)
       && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
       .toVector
     val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct

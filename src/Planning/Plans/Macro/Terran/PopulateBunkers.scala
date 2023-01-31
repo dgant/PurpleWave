@@ -1,13 +1,12 @@
 package Planning.Plans.Macro.Terran
 
 import Lifecycle.With
-import Micro.Agency.Intention
-import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitPreferences.PreferClose
 import Planning.Plan
+import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitPreferences.PreferClose
 
 import scala.collection.mutable
 
@@ -35,11 +34,6 @@ class PopulateBunkers extends Plan {
   private def updateBunker(bunker: FriendlyUnitInfo): Unit = {
     val lock = bunkerLocks(bunker)
     lock.acquire()
-    lock.units.foreach(unit => {
-      val intent = new Intention
-      intent.toTravel = Some(bunker.pixel)
-      intent.toBoard = Some(bunker)
-      unit.intend(this, intent)
-    })
+    lock.units.foreach(_.intend(this).setTravel(bunker.pixel).setBoard(bunker))
   }
 }

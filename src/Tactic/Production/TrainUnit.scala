@@ -2,12 +2,11 @@ package Tactic.Production
 
 import Information.Counting.MacroCounter
 import Macro.Requests.{RequestBuildable, RequestUnit}
-import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.{PreferTiers, PreferTrainerFor}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.{PreferTiers, PreferTrainerFor}
 
 import scala.util.Try
 
@@ -48,14 +47,14 @@ class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
     trainerLock.acquire()
     trainee.foreach(_.setProducer(this))
     if (hasSpent) {
-      trainer.foreach(_.intend(this, new Intention))
+      trainer.foreach(_.intend(this)) // Do nothing, mainly; possibly cancel if needed
       return
     }
     if (currencyLock.acquire()) {
       if (trainer.exists(_.remainingOccupationFrames > 0)) {
         trainerLock.reacquire()
       }
-      trainer.filter(_.trainingQueue.size < 2).foreach(_.intend(this, new Intention { toTrain = Some(traineeClass) }))
+      trainer.filter(_.trainingQueue.size < 2).foreach(_.intend(this).setTrain(traineeClass))
     }
   }
 }

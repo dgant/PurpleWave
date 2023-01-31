@@ -5,7 +5,6 @@ import Lifecycle.With
 import Macro.Requests.RequestBuildable
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
-import Micro.Agency.Intention
 import Performance.Cache
 import Placement.Access.{Foundation, PlacementQuery}
 import Placement.Architecture.ArchitecturalAssessment
@@ -13,6 +12,7 @@ import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
 import ProxyBwapi.Races.Neutral
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 import Utilities.Time.Forever
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.{PreferAll, PreferClose, PreferIf}
@@ -144,24 +144,22 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
           // 1. Recall the builder
           // 2. Wait for the order to take effect
           intendAfter = Some(With.frame + 24)
-          builder.get.intend(this, new Intention {
-            toTravel    = desiredTile.map(_.center)
-            toBuildTile = desiredTile
-            canFight    = false })
+          builder.get.intend(this)
+            .setCanFight(false)
+            .setBuildTile(desiredTile)
+            .setTravel(desiredTile.map(_.center))
         } else {
           orderedTile = desiredTile
-          builder.get.intend(this, new Intention {
-            toBuild     = if (hasSpent || currencyLock.satisfied) Some(buildingClass) else None
-            toBuildTile = orderedTile
-            toTravel    = orderedTile.map(_.center)
-            canFight    = false
-          })
+          builder.get.intend(this)
+            .setCanFight(false)
+            .setBuild(?(hasSpent || currencyLock.satisfied, Some(buildingClass), None))
+            .setBuildTile(orderedTile)
+            .setTravel(orderedTile.map(_.center))
         }
       } else if (buildingClass.isTerran) {
-        builder.get.intend(this, new Intention {
-          toFinish = trainee
-          canFight = false
-        })
+        builder.get.intend(this)
+          .setCanFight(false)
+          .setFinish(trainee)
       }
     }
   }

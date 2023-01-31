@@ -3,12 +3,11 @@ package Planning.Plans.Army
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitCounters.{CountEverything, UnitCounter}
 import Utilities.UnitFilters.IsWorker
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable
 
@@ -99,9 +98,8 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   }
   
   def tickle(unit: FriendlyUnitInfo, target: Pixel): Unit = {
-    unit.intend(this, new Intention {
-      toTravel = Some(target)
-      canTickle = true
-    })
+    unit.intend(this)
+      .setTravel(target)
+      .setCanTickle(true)
   }
 }

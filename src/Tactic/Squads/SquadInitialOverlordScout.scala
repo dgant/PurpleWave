@@ -1,11 +1,11 @@
 package Tactic.Squads
 
 import Lifecycle.With
-import Micro.Agency.Intention
 import Performance.Cache
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.?
 import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 class SquadInitialOverlordScout extends Squad {
   var endScouting: Boolean = false
@@ -75,10 +75,9 @@ class SquadInitialOverlordScout extends Squad {
       val i = s._2
       val base = bases()(i % bases().size)
       val goal = base.townHallArea.tiles.minBy(overlord.pixelDistanceTravelling)
-      overlord.intend(this, new Intention {
-        toTravel = Some(goal.center)
-        toScoutTiles = if (goal.explored) base.tiles.view.filter(_.buildable).toVector else Seq.empty
-      })
+      overlord.intend(this)
+        .setTravel(goal.center)
+        .setScout(?(goal.explored, base.tiles.view.filter(_.buildable).toVector, Seq.empty))
     })
   }
 }

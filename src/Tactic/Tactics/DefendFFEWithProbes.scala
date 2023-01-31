@@ -6,15 +6,14 @@ import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
 import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsAll, IsComplete, IsWorker}
-import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Minutes
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWorker}
+import Utilities.UnitPreferences.PreferClose
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -101,12 +100,11 @@ class DefendFFEWithProbes extends Tactic {
         }
       })
 
-      workers.foreach(_.intend(this, new Intention {
-        canFlee   = false
-        toTravel  = Some(toDefend)
-        toReturn  = Some(toDefend)
-        //targetFilters = Seq(TargetFilterLeash(32 * 5))
-      }))
+      workers.foreach(_.intend(this)
+        .setCanFlee(false)
+        .setTravel(toDefend)
+        .setReturnTo(toDefend))
+
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))
       }

@@ -3,7 +3,6 @@ package Tactic.Squads
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -142,7 +141,7 @@ class SquadAcePilots extends Squad {
     val groundToAir = Maff.exemplarOpt(With.units.ours.filter(u => u.canAttackAir && ! u.flying).map(_.pixel))
     vicinity = groundToAir.getOrElse(homeConsensus)
     SquadAutomation.target(this)
-    units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity); toReturn = Some(vicinity)}))
+    units.foreach(_.intend(this).setTravel(vicinity).setReturnTo(vicinity))
   }
 
   private def followSquad(otherSquad: Squad): Unit = {

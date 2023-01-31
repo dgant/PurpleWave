@@ -2,12 +2,11 @@ package Tactic.Production
 
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
-import Micro.Agency.Intention
 import Planning.ResourceLocks._
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferIdle
 
 class ResearchUpgrade(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
@@ -23,11 +22,11 @@ class ResearchUpgrade(requestArg: RequestBuildable, expectedFramesArg: Int) exte
   override def isComplete: Boolean = upgrade(With.self, level)
   override def hasSpent: Boolean = upgraders.units.exists(_.upgradeProducing.contains(upgrade))
 
-  override def onUpdate() {
+  override def onUpdate(): Unit = {
     if (hasSpent || currencyLock.acquire()) {
       upgraders.acquire()
       if ( ! hasSpent) {
-        upgraders.units.foreach(_.intend(this, new Intention { toUpgrade = Some(upgrade) }))
+        upgraders.units.foreach(_.intend(this).setUpgrade(upgrade))
       }
     }
   }

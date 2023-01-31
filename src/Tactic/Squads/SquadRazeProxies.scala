@@ -2,7 +2,6 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -17,11 +16,10 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
     units.foreach(unit => {
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(IsWarrior)) None else assignee
-      unit.intend(this, new Intention {
-        toTravel  = Some(assignee.map(_.pixel).getOrElse(centroidUnit))
-        toAttack  = attackTarget
-        canFlee   = assignments.keys.forall( ! _.unitClass.isWorker)
-      })
+      unit.intend(this)
+        .setCanFlee(false)
+        .setTravel(assignee.map(_.pixel).getOrElse(centroidUnit))
+        .setAttack(attackTarget)
     })
   }
 

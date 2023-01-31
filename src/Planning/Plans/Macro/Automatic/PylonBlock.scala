@@ -3,14 +3,13 @@ package Planning.Plans.Macro.Automatic
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.{LockCurrency, LockUnits}
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.GameTime
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.IsWorker
 
 class PylonBlock extends Plan {
 
@@ -61,18 +60,12 @@ class PylonBlock extends Plan {
       blockerLock.units.headOption.foreach(blocker => {
         lastWorker = Some(blocker)
         val tileToBlock = baseToBlock.townHallTile.add(1, 1)
-        var intent = new Intention {
-          toTravel = Some(tileToBlock.center)
-          canFight = false
-        }
         if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed400 + 24 >= With.self.supplyTotal400) {
           currencyLock.acquire()
-          intent = new Intention {
-            toBuild = Some(Protoss.Pylon)
-            toBuildTile = Some(tileToBlock)
-          }
+          blocker.intend(this).setBuild(Protoss.Pylon).setBuildTile(tileToBlock)
+        } else {
+          blocker.intend(this).setCanFight(false).setTravel(tileToBlock.center)
         }
-        blocker.intend(this, intent)
       })
     })
   }

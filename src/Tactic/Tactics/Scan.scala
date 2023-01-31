@@ -3,10 +3,9 @@ package Tactic.Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.Terran
+import Utilities.UnitFilters.IsTank
 
 class Scan extends Tactic {
   
@@ -59,11 +58,11 @@ class Scan extends Tactic {
     }
   }
   
-  def scan(targetPixel: Pixel) {
+  def scan(targetPixel: Pixel): Unit = {
     scanners.acquire()
     val units = scanners.units
     if (units.nonEmpty) {
-      units.maxBy(_.energy).intend(this, new Intention { toScan = Some(targetPixel) })
+      units.maxBy(_.energy).intend(this).setScan(targetPixel)
       lastScan = With.frame
     }
   }

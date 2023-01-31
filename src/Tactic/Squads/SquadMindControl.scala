@@ -2,12 +2,11 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
-import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitFilters.IsTank
 
 class SquadMindControl extends Squad {
 
@@ -45,12 +44,12 @@ class SquadMindControl extends Squad {
         unready.add(darchon)
       } else {
         val destination = Some(targets.head(i).pixel.walkablePixel)
-        darchon.intend(this, new Intention { toTravel = destination })
+        darchon.intend(this).setTravel(destination)
       }
       i += 1
     })
 
     lazy val safety = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.enemyThreatOrigin)).map(_.heart).getOrElse(With.geography.home).center
-    unready.foreach(_.intend(this, new Intention { toTravel = Some(safety) }))
+    unready.foreach(_.intend(this).setTravel(safety))
   }
 }

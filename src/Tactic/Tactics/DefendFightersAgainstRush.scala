@@ -2,7 +2,6 @@ package Tactic.Tactics
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -39,10 +38,10 @@ class DefendFightersAgainstRush extends Tactic {
     defenders.counter = CountUpTo(workersToFight.toInt)
     defenders.preference = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
     defenders.acquire()
-    defenders.units.foreach(_.intend(this, new Intention {
-      toTravel = Some(target)
-      canFlee = false
-    }).setTargets(aggressors))
+    defenders.units.foreach(_.intend(this)
+      .setCanFlee(false)
+      .setTravel(target)
+      .setTargets(aggressors))
   }
 
   private lazy val fingerprintsRequiringFighterProtection = Seq(

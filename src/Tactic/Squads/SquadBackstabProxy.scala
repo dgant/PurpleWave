@@ -1,7 +1,6 @@
 package Tactic.Squads
 
 import Lifecycle.With
-import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
@@ -32,6 +31,6 @@ class SquadBackstabProxy extends Squad {
   override def run(): Unit = {
     setTargets(With.units.enemy.filter(IsWorker).toVector)
     if (targets.exists(_.isEmpty)) targets = None
-    units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity) }))
+    units.foreach(_.intend(this).setTravel(vicinity))
   }
 }

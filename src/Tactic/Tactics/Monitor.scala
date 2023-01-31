@@ -2,14 +2,13 @@ package Tactic.Tactics
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.{IsAny, IsMobileDetector}
 import Utilities.UnitPreferences.PreferClose
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.Time.Seconds
 
 class Monitor extends Tactic {
   val scouts = new LockUnits(this)
@@ -30,9 +29,8 @@ class Monitor extends Tactic {
     val cloaked = scouts.units.exists(_.cloaked)
     val naturals = bases.flatMap(_.natural.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(25)()))
     bases = Maff.orElse(naturals, bases).toVector
-    scouts.units.foreach(scout => scout.intend(this, new Intention {
-      toTravel = Some(With.geography.home.center)
-      toScoutTiles = bases.flatMap(_.zone.tiles.filter(t => t.enemyRangeAir <= 0 && ( ! cloaked || ! t.enemyDetectedUnchecked)))
-    }))
+    scouts.units.foreach(_.intend(this)
+      .setTravel(With.geography.home.center)
+      .setScout(bases.flatMap(_.zone.tiles.filter(t => t.enemyRangeAir <= 0 && ( ! cloaked || ! t.enemyDetectedUnchecked)))))
   }
 }

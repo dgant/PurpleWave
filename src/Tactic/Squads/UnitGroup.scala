@@ -58,10 +58,10 @@ trait UnitGroup {
   def pace01                    : Double    = _pace01()
   def combatGroundFraction      : Double    = _combatGroundFraction()
   def consensusPrimaryFoes      : UnitGroup = _consensusPrimaryFoes()
-  def keyDistanceTo       (pixel: Pixel): Double = if (hasGround) centroidKey       .groundPixels(pixel.walkablePixel) else centroidKey       .pixelDistance(pixel)
-  def attackKeyDistanceTo (pixel: Pixel): Double = if (hasGround) attackCentroidKey .groundPixels(pixel.walkablePixel) else attackCentroidKey .pixelDistance(pixel)
-  def canAttack(unit: UnitInfo): Boolean = if (unit.flying) attacksAir else attacksGround
-  def canBeAttackedBy(unit: UnitInfo): Boolean = unit.canAttackGround && hasGround || unit.canAttackAir && hasAir
+  def keyDistanceTo       (pixel: Pixel)  : Double  = ?(hasGround, centroidKey       .groundPixels(pixel.walkablePixel), centroidKey       .pixelDistance(pixel))
+  def attackKeyDistanceTo (pixel: Pixel)  : Double  = ?(hasGround, attackCentroidKey .groundPixels(pixel.walkablePixel), attackCentroidKey .pixelDistance(pixel))
+  def canAttack           (unit: UnitInfo): Boolean = ?(unit.flying, attacksAir, attacksGround)
+  def canBeAttackedBy     (unit: UnitInfo): Boolean = (unit.canAttackGround && hasGround) || (unit.canAttackAir && hasAir)
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()
   def count(matcher: UnitFilter): Int = _count.getOrElseUpdate(matcher, groupUnits.count(matcher))
@@ -88,10 +88,10 @@ trait UnitGroup {
   private val _widthPixels                = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidAir                = new Cache(() => GroupCentroid.air(centroidUnits(groupOrderable)))
   private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(groupOrderable)))
-  private val _centroidKey                = new Cache(() => if (_hasGround()) centroidGround else centroidAir)
+  private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
   private val _attackCentroidAir          = new Cache(() => GroupCentroid.air(centroidUnits(attackers)))
   private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers))))
-  private val _attackCentroidKey          = new Cache(() => if (_hasGround()) attackCentroidGround else attackCentroidAir)
+  private val _attackCentroidKey          = new Cache(() => ?(_hasGround(), attackCentroidGround, attackCentroidAir))
   private val _meanTopSpeed               = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerSpeed          = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerRange          = new Cache(() => Maff.mean(attackers.view.map(_.pixelRangeMax)))

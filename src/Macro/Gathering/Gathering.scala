@@ -75,7 +75,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     bases = With.geography.bases.filter(isValidBase) // Geography.ourBases may not be valid on frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
       val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
-      workers.foreach(_.intend(this, new Intention { toTravel = Some(goal) }))
+      workers.foreach(_.intend(this, new Intention().setTravel(goal)))
       return
     }
 
@@ -84,6 +84,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val distanceMineralBases = mineralSlots.view
       .filter(s =>
         ! isValidBase(s._1)
+        && s._1.mineralsLeft > 0
         && ! s._1.owner.isEnemy
         && s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases
       .map(p => (p._1, p._2, bases.map(b2 => baseCosts(b2, p._1)).min)) // associate each with the score to the closest extant base
@@ -180,11 +181,15 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   }
 
   private def issueCommands(): Unit = {
-    unassigned.foreach(i => i.intend(this, new Intention {
-      toGather = Maff.minBy(With.units.ours.filter(_.unitClass.isGas))(u => i.pixelDistanceTravelling(u.pixel.walkableTile))
-      toTravel = Some(Maff.sampleSet(nearestBase(i).metro.bases.maxBy(_.heart.groundPixels(With.scouting.enemyThreatOrigin)).tiles).center)
-      canFight = false }))
-    assignments.foreach(a => a._1.intend(this, new Intention { toGather = Some(a._2.resource) }))
+    lazy val longDistanceMinerals = longDistanceBases.flatMap(_.minerals).filter(_.mineralsLeft > 0)
+    unassigned.foreach(worker => worker.intend(this)
+      .setCanFight(false)
+      .setGather(
+        ?(longDistanceMinerals.isEmpty,
+          Maff.minBy(With.units.ours.filter(_.unitClass.isGas))(gas => worker.pixelDistanceTravelling(gas.pixel.walkableTile)),
+          Some(longDistanceMinerals(worker.id % longDistanceMinerals.length)))) // TODO: If we use multiple distance bases this logic will cause long-distance-distance mining
+      .setTravel(Maff.sampleSet(nearestBase(worker).metro.bases.maxBy(_.heart.groundPixels(With.scouting.enemyThreatOrigin)).tiles).center))
+    assignments.foreach(a => a._1.intend(this).setGather(a._2.resource))
   }
 
   private def doInitialSplit(): Boolean = {

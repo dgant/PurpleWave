@@ -2,12 +2,11 @@ package Tactic.Production
 
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
-import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitPreferences.PreferIdle
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitPreferences.PreferIdle
 
 class ResearchTech(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
@@ -25,7 +24,7 @@ class ResearchTech(requestArg: RequestBuildable, expectedFramesArg: Int) extends
   override def onUpdate(): Unit = {
     if (hasSpent || currencyLock.acquire()) {
       techers.acquire()
-      techers.units.foreach(_.intend(this, new Intention { toTech = Some(tech) }))
+      techers.units.foreach(_.intend(this).setTech(tech))
     }
   }
 }

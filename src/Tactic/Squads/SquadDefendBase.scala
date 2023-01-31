@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
-import Micro.Agency.{Commander, Intention}
+import Micro.Agency.Commander
 import Micro.Formation._
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -81,7 +81,10 @@ class SquadDefendBase(base: Base) extends Squad {
     val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
 
-    val targetsUnranked = if (canScour) scourables else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity) else enemies.filter(threateningBase)
+    val targetsUnranked =
+      if (canScour) scourables
+      else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity)
+      else enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
     formations.clear()
@@ -179,15 +182,13 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private def emergencyDTHugs(): Boolean = {
     val dts = enemies.filter(Protoss.DarkTemplar)
-    if (dts.nonEmpty && ! With.units.ours.exists(u => u.unitClass.isDetector && u.complete) && enemies.forall(e => Protoss.DarkTemplar(e) || IsWorker(e) || ! e.canAttackGround)) {
+    val shouldHug = dts.nonEmpty && ! With.units.existsOurs(u => u.unitClass.isDetector && u.complete) && enemies.forall(e => Protoss.DarkTemplar(e) || IsWorker(e) || ! e.canAttackGround)
+    if (shouldHug) {
       val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
       val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourNatural.zone.exitNowOrHeart.center)
-      units.foreach(_.intend(this, new Intention {
-        action = new HugAt(target)
-      }))
-      return true
+      units.foreach(_.intend(this).setAction(new HugAt(target)))
     }
-    false
+    shouldHug
   }
 
   private class HugAt(pixel: Pixel) extends Action {

@@ -4,16 +4,16 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsWarrior, IsWorker}
-import Utilities.UnitPreferences.PreferScout
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
+import Utilities.?
 import Utilities.Time.Seconds
+import Utilities.UnitCounters.CountUpTo
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import Utilities.UnitPreferences.PreferScout
 
 class SquadWorkerScout extends Squad {
 
@@ -32,10 +32,9 @@ class SquadWorkerScout extends Squad {
       With.grids.buildableTerrain.get(tile)
       && ! zone.bases.exists(_.harvestingArea.contains(tile)))) // Don't walk into worker line
 
-    unit.intend(this, new Intention {
-      toScoutTiles  = if (IsWarrior(unit)) Seq.empty else tiles
-      toTravel      = Some(destination)
-    })
+    unit.intend(this)
+      .setScout(?(IsWarrior(unit), Seq.empty, tiles))
+      .setTravel(destination)
     bases.foreach(With.scouting.registerScout)
   }
 
@@ -99,16 +98,13 @@ class SquadWorkerScout extends Squad {
       val bases     = if (enemyHasCombatUnits || base.tiles.exists(t => t.buildable && ! t.explored) || base.natural.isEmpty) Seq(base) else Seq(base, base.natural.get)
       val explored  = base.townHallArea.tiles.exists(_.explored)
       bases.foreach(basesToScoutQueue.remove)
-      scout.intend(this, new Intention{
-        toTravel = Some(base.townHallArea.cornerPixels.minBy(scout.pixelDistanceTravelling))
-        toScoutTiles =
+      scout.intend(this)
+        .setTravel(base.townHallArea.cornerPixels.minBy(scout.pixelDistanceTravelling))
+        .setScout(
           if (explored) bases.flatMap(_.tiles.view.filter(t => t.buildable && With.grids.enemyRangeGround(t) <= With.grids.enemyRangeGround.margin))
-          else Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling))
-      })
+          else Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling)))
     })
   }
 
-  override def run(): Unit = {
-
-  }
+  override def run(): Unit = {}
 }

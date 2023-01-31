@@ -2,7 +2,6 @@ package Tactic.Tactics
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
@@ -33,9 +32,8 @@ class DefendAgainstWorkerRush extends Tactic {
     }
     defenders.counter = CountUpTo(workersToDefend)
     defenders.acquire()
-    defenders.units.foreach(unit => unit.intend(this, new Intention {
-      canFlee   = false
-      toTravel  = Some(attackingCentroid)
-    }))
+    defenders.units.foreach(_.intend(this)
+      .setCanFlee(false)
+      .setTravel(attackingCentroid))
   }
 }

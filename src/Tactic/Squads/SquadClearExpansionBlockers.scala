@@ -1,13 +1,12 @@
 package Tactic.Squads
 
 import Lifecycle.With
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountOne
-import Utilities.UnitFilters.{IsMobileDetector, IsAny}
-import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
+import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.{IsAny, IsMobileDetector}
+import Utilities.UnitPreferences.PreferClose
 
 import scala.util.Random
 
@@ -51,7 +50,7 @@ class SquadClearExpansionBlockers extends Squad {
   def run(): Unit = {
     if (units.isEmpty) return
     setTargets(SquadAutomation.rankedAround(this))
-    detectorLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(64, 48)) }))
-    sweeperLock.units.foreach(_.intend(this, new Intention { toTravel = Some(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)) }))
+    detectorLock.units.foreach(_.intend(this).setTravel(vicinity.add(64, 48)))
+    sweeperLock.units.foreach(_.intend(this).setTravel(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)))
   }
 }

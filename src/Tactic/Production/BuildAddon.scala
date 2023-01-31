@@ -1,7 +1,6 @@
 package Tactic.Production
 
 import Macro.Requests.RequestBuildable
-import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -28,7 +27,7 @@ class BuildAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) exten
     if (hasSpent || currencyLock.acquire()) {
       builderLock.acquire()
       if (trainee.isEmpty) {
-        builder.foreach(_.intend(this, new Intention { toBuild = Some(addonClass) }))
+        builder.foreach(_.intend(this).setBuild(addonClass))
       }
     }
   }

@@ -1,7 +1,6 @@
 package Tactic.Tactics
 
 import Lifecycle.With
-import Micro.Agency.Intention
 import Planning.ResourceLocks.LockUnits
 import Utilities.?
 import Utilities.UnitCounters.{CountOne, CountUpTo}
@@ -15,11 +14,12 @@ class RemoveMineralBlocks extends Tactic {
   miners.matcher = IsWorker
   miners.counter = CountOne
 
+  private val blockerRadiusSquared = Math.pow(32 * 5, 2)
   override def launch(): Unit = {
     val ourEdges = With.geography.ourZones.flatten(_.edges)
     val ourMineralBlocks = With.units.neutral.view
       .filter(unit => unit.unitClass.isMinerals && unit.isBlocker)
-      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixel) || edge.pixelCenter.pixelDistanceSquared(unit.pixel) < Math.pow(32.0 * 3, 2)))
+      .filter(unit => ourEdges.exists(edge => edge.contains(unit.pixel) || edge.pixelCenter.pixelDistanceSquared(unit.pixel) < blockerRadiusSquared))
       .toVector
     if (ourMineralBlocks.isEmpty) return
 
@@ -32,6 +32,6 @@ class RemoveMineralBlocks extends Tactic {
     miners.preference = PreferClose(ourMineralBlocks.head.pixel)
     miners.counter = CountUpTo(workersToUse)
     miners.acquire()
-    miners.units.zipWithIndex.foreach(p => p._1.intend(this, new Intention { toGather = Some(ourMineralBlocks(p._2 % ourMineralBlocks.length)) }))
+    miners.units.zipWithIndex.foreach(p => p._1.intend(this).setGather(ourMineralBlocks(p._2 % ourMineralBlocks.length)))
   }
 }

@@ -34,27 +34,41 @@ class Intention {
   var shouldLiftoff : Boolean                       = false
   var targets       : Option[IndexedSet[UnitInfo]]  = None
 
-  def setTravel         (value: Pixel)              : Intention = { toTravel      = Some(value); this }
-  def setReturnTo       (value: Pixel)              : Intention = { toReturn      = Some(value); this }
-  def setScan           (value: Pixel)              : Intention = { toScan        = Some(value); this }
-  def setNuke           (value: Pixel)              : Intention = { toNuke        = Some(value); this }
-  def setAttack         (value: UnitInfo)           : Intention = { toAttack      = Some(value); this }
-  def setGather         (value: UnitInfo)           : Intention = { toGather      = Some(value); this }
-  def setRepair         (value: UnitInfo)           : Intention = { toRepair      = Some(value); this }
-  def setFinish         (value: UnitInfo)           : Intention = { toFinish      = Some(value); this }
-  def setBoard          (value: FriendlyUnitInfo)   : Intention = { toBoard       = Some(value); this }
-  def setTrain          (value: UnitClass)          : Intention = { toTrain       = Some(value); this }
-  def setBuild          (value: UnitClass)          : Intention = { toBuild       = Some(value); this }
-  def setBuildTile      (value: Tile)               : Intention = { toBuildTile   = Some(value); this }
-  def setUpgrade        (value: Upgrade)            : Intention = { toUpgrade     = Some(value); this }
-  def setTech           (value: Tech)               : Intention = { toTech        = Some(value); this }
-  def setAction         (value: Action)             : Intention = { action        = value; this }
-  def setScout          (value: Seq[Tile])          : Intention = { toScoutTiles  = value; this }
-  def setCanFight       (value: Boolean)            : Intention = { canFight      = value; this }
-  def setCanFlee        (value: Boolean)            : Intention = { canFlee       = value; this }
-  def setCanTickle      (value: Boolean)            : Intention = { canTickle     = value; this }
-  def setShouldMeld     (value: Boolean)            : Intention = { shouldMeld    = value; this }
-  def setShouldLiftoff  (value: Boolean)            : Intention = { shouldLiftoff = value; this }
-  def setTargets        (value: UnitInfo*)          : Intention = setTargets(value: _*)
-  def setTargets        (value: Iterable[UnitInfo]) : Intention = { targets       = Some(new IndexedSet[UnitInfo](value)); this }
+  def setTravel         (value: Pixel)                    : Intention = { toTravel      = Some(value); this }
+  def setReturnTo       (value: Pixel)                    : Intention = { toReturn      = Some(value); this }
+  def setScan           (value: Pixel)                    : Intention = { toScan        = Some(value); this }
+  def setNuke           (value: Pixel)                    : Intention = { toNuke        = Some(value); this }
+  def setAttack         (value: UnitInfo)                 : Intention = { toAttack      = Some(value); this }
+  def setGather         (value: UnitInfo)                 : Intention = { toGather      = Some(value); this }
+  def setRepair         (value: UnitInfo)                 : Intention = { toRepair      = Some(value); this }
+  def setFinish         (value: UnitInfo)                 : Intention = { toFinish      = Some(value); this }
+  def setBoard          (value: FriendlyUnitInfo)         : Intention = { toBoard       = Some(value); this }
+  def setTrain          (value: UnitClass)                : Intention = { toTrain       = Some(value); this }
+  def setBuild          (value: UnitClass)                : Intention = { toBuild       = Some(value); this }
+  def setBuildTile      (value: Tile)                     : Intention = { toBuildTile   = Some(value); this }
+  def setUpgrade        (value: Upgrade)                  : Intention = { toUpgrade     = Some(value); this }
+  def setTech           (value: Tech)                     : Intention = { toTech        = Some(value); this }
+  def setTravel         (value: Option[Pixel])            : Intention = { toTravel      = value; this }
+  def setReturnTo       (value: Option[Pixel])            : Intention = { toReturn      = value; this }
+  def setScan           (value: Option[Pixel])            : Intention = { toScan        = value; this }
+  def setNuke           (value: Option[Pixel])            : Intention = { toNuke        = value; this }
+  def setAttack         (value: Option[UnitInfo])         : Intention = { toAttack      = value; this }
+  def setGather         (value: Option[UnitInfo])         : Intention = { toGather      = value; this }
+  def setRepair         (value: Option[UnitInfo])         : Intention = { toRepair      = value; this }
+  def setFinish         (value: Option[UnitInfo])         : Intention = { toFinish      = value; this }
+  def setBoard          (value: Option[FriendlyUnitInfo]) : Intention = { toBoard       = value; this }
+  def setTrain          (value: Option[UnitClass])        : Intention = { toTrain       = value; this }
+  def setBuild          (value: Option[UnitClass])        : Intention = { toBuild       = value; this }
+  def setBuildTile      (value: Option[Tile])             : Intention = { toBuildTile   = value; this }
+  def setUpgrade        (value: Option[Upgrade])          : Intention = { toUpgrade     = value; this }
+  def setTech           (value: Option[Tech])             : Intention = { toTech        = value; this }
+  def setAction         (value: Action)                   : Intention = { action        = value; this }
+  def setScout          (value: Seq[Tile])                : Intention = { toScoutTiles  = value; this }
+  def setCanFight       (value: Boolean = true)           : Intention = { canFight      = value; this }
+  def setCanFlee        (value: Boolean = true)           : Intention = { canFlee       = value; this }
+  def setCanTickle      (value: Boolean = true)           : Intention = { canTickle     = value; this }
+  def setShouldMeld     (value: Boolean = true)           : Intention = { shouldMeld    = value; this }
+  def setShouldLiftoff  (value: Boolean = true)           : Intention = { shouldLiftoff = value; this }
+  def setTargets        (value: UnitInfo*)                : Intention = setTargets(value: _*)
+  def setTargets        (value: Iterable[UnitInfo])       : Intention = { targets       = Some(new IndexedSet[UnitInfo](value)); this }
 }

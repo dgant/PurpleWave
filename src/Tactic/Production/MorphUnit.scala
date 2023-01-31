@@ -4,7 +4,6 @@ import Information.Counting.MacroCounter
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -44,12 +43,11 @@ class MorphUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
       morpherLock.matcher = if (morpher.isDefined) morpher.contains else classInput
       morpherLock.acquire()
       morpher = morpherLock.units.headOption
-      morpher.foreach(_.intend(this, new Intention {
-        toTrain = Some(classOutput)
-        // TODO: Include behavior for morphing Guardians/Devourers
-        canFlee = classOutput == Zerg.Lurker
-        canFight = classOutput != Zerg.Lurker
-      }))
+      val shouldHide = Seq(Zerg.Lurker, Zerg.Guardian, Zerg.Devourer).contains(classOutput)
+      morpher.foreach(_.intend(this)
+        .setTrain(classOutput)
+        .setCanFlee(shouldHide)
+        .setCanFight( ! shouldHide))
     }
 
     // TODO: Send Hydras/Mutas somewhere smart soon before they morph based on currency projection

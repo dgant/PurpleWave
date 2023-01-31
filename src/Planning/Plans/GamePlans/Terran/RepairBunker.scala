@@ -2,10 +2,10 @@ package Planning.Plans.GamePlans.Terran
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Planning.Plan
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitPreferences.PreferClose
@@ -18,7 +18,7 @@ class RepairBunker extends Plan {
     val bunkers = With.units.ours
       .view
       .filter(u =>
-        u.is(Terran.Bunker)
+        Terran.Bunker(u)
         && ! u.base.exists(_.owner.isEnemy)
         && u.matchups.framesOfSafety < (if (u.hitPoints < u.unitClass.maxHitPoints) 72 else 12)
         && u.remainingCompletionFrames < Seconds(5)())
@@ -31,24 +31,16 @@ class RepairBunker extends Plan {
 
     val repairersNeeded = Maff.clamp(bunker.matchups.threats
       .map(t =>
-        if ( ! t.visible)
-          0.0
-        else if (t.is(Terran.Marine))
-          0.5
-        else if (t.is(Protoss.Zealot))
-          2.0
-        else if (t.is(Protoss.Dragoon))
-          (if (t.player.hasUpgrade(Protoss.DragoonRange)) 1.0 else 0.0)
-        else if (t.is(Protoss.DarkTemplar))
-          2.0
-        else if (t.is(Zerg.Zergling))
-          0.25
-        else if (t.is(Zerg.Hydralisk))
-          1.0
-        else if (t.is(Zerg.Lurker))
-          1.0
-        else
-          0.0)
+        if ( ! t.visible)                 0.0
+        else if (Terran.Marine(t))        0.5
+        else if (Terran.Vulture(t))       0.5
+        else if (Protoss.Zealot(t))       1.5
+        else if (Protoss.Dragoon(t))      ?(t.player.hasUpgrade(Protoss.DragoonRange), 1.0, 0.0)
+        else if (Protoss.DarkTemplar(t))  2.0
+        else if (Zerg.Zergling(t))        0.25
+        else if (Zerg.Hydralisk(t))       1.0
+        else if (Zerg.Lurker(t))          1.0
+        else                              0.0)
       .sum.toInt - 3 * bunker.alliesBattle.count(Terran.SiegeTankSieged),
       0,
       Math.min(6, With.units.countOurs(Terran.SCV) / 2 - 1))
@@ -57,8 +49,6 @@ class RepairBunker extends Plan {
     lock.counter = CountUpTo(repairersNeeded)
     lock.preference = PreferClose(bunker.pixel)
     lock.acquire()
-    lock.units.foreach(scv => scv.intend(this, new Intention {
-      toRepair = Some(bunker)
-    }))
+    lock.units.foreach(_.intend(this).setRepair(bunker))
   }
 }

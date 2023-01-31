@@ -1,12 +1,11 @@
 package Planning.Plans.Macro.Protoss
 
 import Lifecycle.With
-import Micro.Agency.Intention
+import Planning.Plan
 import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Races.Protoss
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitPreferences.PreferLowEnergy
-import Planning.Plan
-import ProxyBwapi.Races.Protoss
 
 class MeldArchons(maxEnergy: Int = 251) extends Plan {
   
@@ -32,9 +31,6 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     
     templar.release()
     templar.acquire()
-    templar.units.foreach(_.intend(this, new Intention {
-      toTravel = Some(With.geography.home.center)
-      shouldMeld = true
-    }))
+    templar.units.foreach(_.intend(this).setShouldMeld(true).setTravel(With.geography.home.center))
   }
 }

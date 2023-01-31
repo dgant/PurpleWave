@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
-import Micro.Agency.Intention
 import Micro.Targeting.TargetScoring
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -89,9 +88,10 @@ class SquadDarkTemplar extends Squad {
     val nearestDetector = dt.matchups.enemyDetectorDeepest.map(_.pixelsToSightRange(dt)).getOrElse(LightYear().toDouble)
     val nearestThreat   = dt.matchups.threatDeepest.filterNot(IsWorker).map(_.pixelsToGetInRange(dt)).getOrElse(LightYear().toDouble)
     val goBerserk       = nearestWorker < 256 || nearestWorker < nearestDetector || nearestWorker < nearestThreat
-    dt.intend(this, new Intention {
-      canFlee   = ! goBerserk
-      toTravel  = Some(base.heart.center) }).setTargets(baseTargets)
+    dt.intend(this)
+      .setCanFlee( ! goBerserk)
+      .setTravel(base.heart.center)
+      .setTargets(baseTargets)
   }
 
   def run(): Unit = {
@@ -111,13 +111,8 @@ class SquadDarkTemplar extends Squad {
         bases -= base
 
         val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
-        val division = Maff.minBy(divisions)(_.centroidGround.groundPixels(dt.pixel))
 
-        division.foreach(division => {
-          dt.intend(this, new Intention { toTravel = Some(base.heart.center) }.setTargets(base.enemies))
-        })
-
-        if (division.isEmpty) {
+        if (divisions.isEmpty) {
           if (waitForBackstab) {
             base = With.geography.preferredExpansionsEnemy.view
               .filterNot(With.scouting.enemyNatural.contains)
@@ -125,6 +120,8 @@ class SquadDarkTemplar extends Squad {
               .drop(iDt).headOption.getOrElse(base)
           }
           intendDTToBase(dt, base)
+        } else {
+          dt.intend(this).setTravel(base.heart.center).setTargets(base.enemies)
         }
       }
 

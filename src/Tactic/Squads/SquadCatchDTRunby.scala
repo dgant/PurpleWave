@@ -2,13 +2,12 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Agency.Intention
 import Performance.Cache
 import Planning.Predicates.MacroFacts
+import ProxyBwapi.Races.Protoss
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsMobileDetector
 import Utilities.UnitPreferences.PreferClose
-import ProxyBwapi.Races.Protoss
 
 class SquadCatchDTRunby extends Squad {
 
@@ -22,7 +21,7 @@ class SquadCatchDTRunby extends Squad {
   }
 
   override def run(): Unit = {
-    units.foreach(_.intend(this, new Intention { toTravel = Some(destination())}))
+    units.foreach(_.intend(this).setTravel(destination()))
   }
 
   private val destination = new Cache(() => {

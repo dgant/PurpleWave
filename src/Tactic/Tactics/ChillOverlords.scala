@@ -3,12 +3,11 @@ package Tactic.Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Circle
-import Micro.Agency.Intention
 import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.CountEverything
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitCounters.CountEverything
 
 class ChillOverlords extends Tactic {
   
@@ -28,6 +27,6 @@ class ChillOverlords extends Tactic {
   private def chillOut(overlord: FriendlyUnitInfo, count: Int) {
     val base = Maff.minBy(With.geography.ourBases.map(_.heart.center))(overlord.pixelDistanceSquared)
     val tile = base.map(b => Maff.sample(Circle(Math.sqrt(count).toInt).map(b.tile.add))).getOrElse(With.geography.home)
-    overlord.intend(this, new Intention { toTravel = Some(tile.center) })
+    overlord.intend(this).setTravel(tile.center)
   }
 }

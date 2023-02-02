@@ -69,10 +69,9 @@ object SquadAutomation {
   ////////////////
 
   def form(squad: Squad, from: Pixel, to: Pixel): ArrayBuffer[Formation] = {
-    var output: ArrayBuffer[Formation] = ArrayBuffer.empty
+    val output: ArrayBuffer[Formation] = ArrayBuffer.empty
     // If advancing, give a formation for forward movement
     if (squad.fightConsensus) {
-      val engageTarget = squad.targets.flatMap(_.headOption.map(_.pixel))
       output += Formations.march(squad, to)
     }
     // Always include a disengagey formation for units that want to retreat/kite

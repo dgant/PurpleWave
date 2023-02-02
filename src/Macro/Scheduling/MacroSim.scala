@@ -76,7 +76,7 @@ final class MacroSim {
         event.dTech = u.techingType
       } else if (u.unitClass.isGas) {
         event.dGeysers += 1
-      } else if ( ! u.complete && u.unitClass.isResourceDepot && ! u.isAny(Zerg.Lair, Zerg.Hive)) {
+      } else if ( ! u.complete && u.unitClass.isResourceDepot && u.isNone(Zerg.Lair, Zerg.Hive)) {
         val base = u.base.filter(_.townHall.contains(u))
         base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
       }

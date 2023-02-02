@@ -69,6 +69,15 @@ class Intention {
   def setCanTickle      (value: Boolean = true)           : Intention = { canTickle     = value; this }
   def setShouldMeld     (value: Boolean = true)           : Intention = { shouldMeld    = value; this }
   def setShouldLiftoff  (value: Boolean = true)           : Intention = { shouldLiftoff = value; this }
-  def setTargets        (value: UnitInfo*)                : Intention = setTargets(value: _*)
   def setTargets        (value: Iterable[UnitInfo])       : Intention = { targets       = Some(new IndexedSet[UnitInfo](value)); this }
+  def setTargets        (value: UnitInfo*)                : Intention = setTargets(value: _*)
+
+  // Ideally consistent with the Agent logic
+  def destination: Option[Pixel] = toTravel
+    .orElse(toBoard.map(_.pixel))
+    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(toFinish).map(_.pixel))
+    .orElse(toNuke)
+    .orElse(toBuildTile.map(_.center))
+    .orElse(toScoutTiles.headOption.map(_.center))
+    .orElse(toReturn)
 }

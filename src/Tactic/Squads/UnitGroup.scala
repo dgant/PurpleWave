@@ -1,6 +1,6 @@
 package Tactic.Squads
 
-import Information.Battles.Types.GroupCentroid
+import Information.Battles.Types.{Battle, GroupCentroid}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -15,6 +15,7 @@ import scala.collection.mutable
 trait UnitGroup {
   def groupUnits        : Seq[UnitInfo]
   def groupOrderable    : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
+  def mobileUnits       : Seq[UnitInfo] = _mobileUnits()
   def attackers         : Seq[UnitInfo] = _attackers()
   def detectors         : Seq[UnitInfo] = _detectors().view
   def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
@@ -22,6 +23,9 @@ trait UnitGroup {
   def attackersCasters  : Seq[UnitInfo] = groupOrderable.view.filter(_.unitClass.attacksOrCasts)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
   def attackersCloaky   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker))
+  def battles           : Set[Battle]   = _battles()
+  def battleEnemies     : Set[UnitInfo] = _battleEnemies()
+  def roadblocks        : Set[UnitInfo] = _roadblocks()
   def attackersCastersCount     : Int       = _attackersCastersCount()
   def attackersBioCount         : Int       = _attackersBioCount()
   def stormCount                : Int       = _stormCount()
@@ -36,12 +40,14 @@ trait UnitGroup {
   def engagingOn                : Boolean   = _engagingOn()
   def engagedUpon               : Boolean   = _engagedUpon()
   def volleyConsensus           : Boolean   = _volleyConsensus()
+  def centroidKey               : Pixel     = _centroidKey()
   def centroidAir               : Pixel     = _centroidAir()
   def centroidGround            : Pixel     = _centroidGround()
-  def centroidKey               : Pixel     = _centroidKey()
   def attackCentroidAir         : Pixel     = _attackCentroidAir()
   def attackCentroidGround      : Pixel     = _attackCentroidGround()
   def attackCentroidKey         : Pixel     = _attackCentroidKey()
+  def destinationConsensus      : Pixel     = _destinationConsensus()
+  def destinationDistance       : Double    = _destinationDistance()
   def widthPixels               : Double    = _widthPixels()
   def meanTopSpeed              : Double    = _meanTopSpeed()
   def meanAttackerSpeed         : Double    = _meanAttackerSpeed()
@@ -67,10 +73,14 @@ trait UnitGroup {
   def count(matcher: UnitFilter): Int = _count.getOrElseUpdate(matcher, groupUnits.count(matcher))
 
   private val _paceAge = 24
+  private def _mobileUnits()              = groupOrderable.view.filter(_.canMove)
   private def _attackers()                = groupOrderable.view.filter(isAttacker)
   private val _detectors                  = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && u.unitClass.isDetector).toVector)
   private val _mobileDetectors            = new Cache(() => detectors.filter(_.canMove))
   private val _arbiters                   = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && Protoss.Arbiter(u)).toVector)
+  private val _battles                    = new Cache(() => groupUnits.flatMap(_.battle).toSet)
+  private val _battleEnemies              = new Cache(() => battles.flatMap(_.enemy.units))
+  private val _roadblocks                 = new Cache(() => battleEnemies.filter(e => Math.max(keyDistanceTo(e.pixel), e.pixelDistanceTravelling(destinationConsensus)) < destinationDistance))
   private val _attackersCastersCount      = new Cache(() => attackersCasters.size)
   private val _attackersBioCount          = new Cache(() => attackersBio.size)
   private val _stormCount                 = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
@@ -86,12 +96,14 @@ trait UnitGroup {
   private val _engagedUpon                = new Cache(() => groupOrderable.exists(_.matchups.engagedUpon))
   private val _volleyConsensus            = new Cache(() => Maff.modeOpt(attackers.flatMap(_.matchups.wantsToVolley)).getOrElse(false))
   private val _widthPixels                = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
-  private val _centroidAir                = new Cache(() => GroupCentroid.air(centroidUnits(groupOrderable)))
-  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(groupOrderable)))
   private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
-  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air(centroidUnits(attackers)))
-  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers))))
+  private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
+  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
   private val _attackCentroidKey          = new Cache(() => ?(_hasGround(), attackCentroidGround, attackCentroidAir))
+  private val _destinationConsensus       = new Cache(() => GroupCentroid.ground(centroidUnits(attackers), u => u.friendly.map(f => f.intent.destination.getOrElse(f.agent.destination)).orElse(u.orderTargetPixel).getOrElse(u.pixel)))
+  private val _destinationDistance        = new Cache(() => keyDistanceTo(destinationConsensus))
   private val _meanTopSpeed               = new Cache(() => Maff.mean(groupOrderable.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerSpeed          = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerRange          = new Cache(() => Maff.mean(attackers.view.map(_.pixelRangeMax)))
@@ -114,8 +126,7 @@ trait UnitGroup {
   protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(
     units.view.filter(_.likelyStillThere),
     units.view,
-    groupOrderable.filter(_.likelyStillThere),
-    units.filter(_.likelyStillThere),
-    groupOrderable,
-    units)
+    groupOrderable.view.filter(_.likelyStillThere),
+    groupOrderable.view.filter(_.likelyStillThere),
+    groupUnits)
 }

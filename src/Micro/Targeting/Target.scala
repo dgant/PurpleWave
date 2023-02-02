@@ -2,10 +2,26 @@ package Micro.Targeting
 
 import Lifecycle.With
 import Mathematics.Maff
+import Micro.Targeting.FiltersRequired.{TargetFilterEnemy, TargetFilterFocus, TargetFilterLarvaAndEgg, TargetFilterMissing, TargetFilterPossible, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterVsInterceptors, TargetFilterVsTank, TargetFilterVulture}
 import Micro.Targeting.FiltersSituational.TargetFilterWhitelist
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Target {
+
+  val defaultFilters: Vector[TargetFilter] = Vector(
+    TargetFilterEnemy,
+    TargetFilterPossible,
+    TargetFilterMissing,
+    TargetFilterLarvaAndEgg,
+    TargetFilterFocus,
+    TargetFilterStayCloaked,
+    TargetFilterScourge,
+    TargetFilterReaver,
+    TargetFilterRush,
+    TargetFilterVulture,
+    TargetFilterVsInterceptors,
+    TargetFilterVsTank)
+
   def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
     attacker.agent.toAttack = best(attacker, required: _*)
     attacker.agent.toAttack.foreach(_.addTargeter(attacker))
@@ -53,7 +69,7 @@ object Target {
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {
-    TargetFilterGroups.filtersRequired.view.filter(_.appliesTo(attacker))
+    defaultFilters.view.filter(_.appliesTo(attacker))
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {

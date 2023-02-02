@@ -360,47 +360,38 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
     output
   }
-  private val gatheringOrders = Seq(Orders.WaitForMinerals, Orders.MiningMinerals, Orders.WaitForGas, Orders.HarvestGas, Orders.MoveToMinerals, Orders.MoveToGas, Orders.ReturnGas, Orders.ReturnMinerals, Orders.ResetCollision)
+  private val _gatheringOrders = Seq(Orders.WaitForMinerals, Orders.MiningMinerals, Orders.WaitForGas, Orders.HarvestGas, Orders.MoveToMinerals, Orders.MoveToGas, Orders.ReturnGas, Orders.ReturnMinerals, Orders.ResetCollision)
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
-  @inline final def airborne: Boolean = flying || friendly.exists(_.transport.exists(_.flying))
-  @inline final def gathering: Boolean = unitClass.isWorker && gatheringOrders.contains(order)
-  @inline final def carrying: Boolean = carryingMinerals || carryingGas
+  @inline final def airborne  : Boolean = flying || friendly.exists(_.transport.exists(_.flying))
+  @inline final def gathering : Boolean = unitClass.isWorker && _gatheringOrders.contains(order)
+  @inline final def carrying  : Boolean = carryingMinerals || carryingGas
 
-  @inline final def presumptiveDestination: Pixel = if (isOurs) calculatePresumptiveDestination else presumptiveDestinationCached()
-  @inline final def presumptiveStep: Pixel = if (isOurs) MicroPathing.getWaypointToPixel(this, presumptiveDestination) else presumptiveStepCached()
-  @inline final def presumptiveTarget: Option[UnitInfo] = if (isOurs) calculatePresumptiveTarget else presumptiveTargetCached()
+  @inline final def presumptiveDestination: Pixel             = ?(isOurs, _presumeDestination,  _presumptiveDestination())
+  @inline final def presumptiveStep       : Pixel             = ?(isOurs, _presumeStep,         _presumptiveStep())
+  @inline final def presumptiveTarget     : Option[UnitInfo]  = ?(isOurs, _presumeTarget,       _presumptiveTarget())
   @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveStep, framesToLookAhead * topSpeed)
-  val presumptiveDestinationCached = new KeyedCache(() => calculatePresumptiveDestination, () => friendly.map(_.agent.destination))
-  val presumptiveStepCached = new KeyedCache(() => MicroPathing.getWaypointToPixel(this, presumptiveDestinationCached()), () => presumptiveDestinationCached(), 240)
-  val presumptiveTargetCached = new KeyedCache(() => calculatePresumptiveTarget, () => friendly.map(_.agent.toAttack))
-  private def calculatePresumptiveDestination: Pixel =
-    if (canMove)
-      friendly.flatMap(_.agent.toTravel)
+  private val _presumptiveDestination = new KeyedCache(() => _presumeDestination, () => friendly.map(_.agent.destination))
+  private val _presumptiveStep        = new KeyedCache(() => _presumeStep,        () => (presumptiveDestination, pixel), 240)
+  private val _presumptiveTarget      = new KeyedCache(() => _presumeTarget,      () => friendly.map(_.agent.toAttack))
+  private def _presumeDestination: Pixel =
+    ?(canMove,
+      friendly.map(f => f.intent.destination.getOrElse(f.agent.destination))
         .orElse(targetPixel)
         .orElse(orderTargetPixel)
         .orElse(presumptiveTarget.map(pixelToFireAt))
-        .getOrElse(pixel)
-    else pixel
-  private def calculatePresumptiveTarget: Option[UnitInfo] =
+        .getOrElse(pixel),
+      pixel)
+  private def _presumeStep: Pixel =
+    ?(canMove,
+      MicroPathing.getWaypointToPixel(this, presumptiveDestination),
+      pixel)
+  private def _presumeTarget: Option[UnitInfo] =
     friendly.flatMap(_.agent.toAttack)
+      .orElse(friendly.flatMap(_.intent.toAttack))
       .orElse(target)
       .orElse(orderTarget)
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
       .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
-
-  @inline final def isBeingViolent: Boolean = {
-    unitClass.isStaticDefense ||
-    cooldownLeft > 0          ||
-    orderTarget.exists(isEnemyOf)
-  }
-
-  @inline final def isBeingViolentTo(victim: UnitInfo): Boolean = {
-    isBeingViolent &&
-    isEnemyOf(victim) &&
-    canAttack(victim) &&
-    target.forall(victim==) &&
-    framesToGetInRange(victim) < 48
-  }
 
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]

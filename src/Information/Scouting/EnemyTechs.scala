@@ -42,7 +42,7 @@ trait EnemyTechs {
       addIf(Terran.SpiderMinePlant, enemies.exists(Terran.SpiderMine))
       addIf(Terran.Stim,            enemies.exists(_.stimmed))
       addIf(Terran.WraithCloak,     enemies.exists(u => Terran.Wraith(u) && u.cloaked))
-      addIf(Zerg.Burrow,            enemies.exists(u => u.burrowed && ! u.isAny(Terran.SpiderMine, Zerg.Lurker)))
+      addIf(Zerg.Burrow,            enemies.exists(u => u.burrowed && u.isNone(Terran.SpiderMine, Zerg.Lurker)))
       addIf(Zerg.Ensnare,           ours.exists(_.ensnared),      checkOurs = true)
       addIf(Zerg.LurkerMorph,       enemies.exists(Zerg.Lurker) || enemies.exists(Zerg.LurkerEgg))
       addIf(Zerg.Plague,            ours.exists(_.plagued),       checkOurs = true)

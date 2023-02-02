@@ -69,6 +69,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var damageReceived      : Double = _
   var valueReceived       : Double = _
   var events              : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
+
   def reset(newSimulation: Simulation): Unit = {
     initialized         = true
     simulation          = newSimulation

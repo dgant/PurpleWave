@@ -57,7 +57,7 @@ class Camera extends TimedTask {
         (unit, interest)
       }).toMap
     
-    val eligibleUnits       = With.units.ours.filterNot(_.isAny(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine))
+    val eligibleUnits       = With.units.ours.filter(_.isNone(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine))
     val unitInterests       = With.units.ours.map(unit => (unit, totalInterest(unit)))
     val mostInterestingUnit = Maff.maxBy(unitInterests)(_._2)
     

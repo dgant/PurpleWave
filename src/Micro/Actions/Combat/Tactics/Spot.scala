@@ -5,17 +5,14 @@ import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import Planning.Predicates.MacroFacts
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Spot extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
-    && unit.flying
-    && ! unit.canAttack
-    && ! unit.isAny(Terran.Dropship, Protoss.Shuttle)
-    && unit.agent.passengers.isEmpty
+    unit.flying
+    && (unit.unitClass.isBuilding || unit.isAny(Terran.Wraith, Terran.Valkyrie, Terran.ScienceVessel, Protoss.Observer, Protoss.Scout, Zerg.Overlord))
     && unit.squad.exists(_.attackers.nonEmpty)
     && (unit.matchups.pixelsEntangled < -64
       || unit.totalHealth > 500

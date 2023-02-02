@@ -11,6 +11,7 @@ import Micro.Actions.Combat.Decisionmaking.Combat
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -22,7 +23,7 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   var lastFrame     : Int = 0
   var lastStim      : Int = 0
-  var lastCloak     : Int  = 0
+  var lastCloak     : Int = 0
   var tryingToMove  : Boolean = false
 
   ///////////////
@@ -31,13 +32,13 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   var toTravel      : Option[Pixel]             = None
   var toReturn      : Option[Pixel]             = None
+  var toNuke        : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
   var toGather      : Option[UnitInfo]          = None
+  var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
-  var toNuke        : Option[Pixel]             = None
-  var toRepair   : Option[UnitInfo] = None
-  var shouldFight: Boolean          = false
-  var commit     : Boolean          = false
+  var shouldFight   : Boolean                   = false
+  var commit        : Boolean                   = false
   var wantsUnload   : Boolean                   = false
   var priority      : TrafficPriority           = TrafficPriorities.None
   val forces        : ForceMap                  = new ForceMap
@@ -47,6 +48,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Suggestions //
   /////////////////
 
+  // Ideally consistent with the Intention logic
   def destination: Pixel = toTravel
     .orElse(toBoard.map(_.pixel))
     .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinish).map(unit.pixelToFireAt))
@@ -54,9 +56,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     .orElse(unit.intent.toBuildTile.map(_.center))
     .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
     .getOrElse(safety)
-  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel).orElse(toReturn).getOrElse(home)
-  def home: Pixel = homeCache()
-  private val homeCache = new Cache[Pixel](() =>
+  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel)
+    .orElse(toReturn)
+    .getOrElse(home)
+  def home: Pixel = _home()
+  private val _home = new Cache[Pixel](() =>
     Maff.minBy(
       With.geography.ourBases.filter(base =>
         base.scoutedByEnemy
@@ -65,7 +69,7 @@ class Agent(val unit: FriendlyUnitInfo) {
         || base == With.geography.ourMain))(base =>
       unit.pixelDistanceTravelling(base.heart)
       // Retreat into main
-      + (if (base.naturalOf.filter(_.owner.isUs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base))) 32 * 40 else 0))
+      + ?(base.naturalOf.filter(_.isOurs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base)), 32 * 40, 0))
     .map(_.heart.center)
     .getOrElse(With.geography.home.center))
 

@@ -27,7 +27,7 @@ object Gather extends Action {
   private def minerThreatenedAt(miner: FriendlyUnitInfo, resource: UnitInfo): Boolean = (
     resourceThreatened(resource)
     && miner.matchups.threats.exists(threat =>
-      ! threat.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+      threat.isNone(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
       && threat.pixelsToGetInRange(miner, resource.pixel) < defenseRadiusPixels))
   
   override def perform(unit: FriendlyUnitInfo): Unit = {
@@ -58,7 +58,7 @@ object Gather extends Action {
       // Burrow from threats
       if (unit.canBurrow
         && unit.matchups.enemies.exists(enemy =>
-          ! enemy.isAny(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
+          enemy.isNone(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout)
           && enemy.pixelDistanceEdge(unit) < enemy.pixelRangeAgainst(unit) + 32)
           && ! unit.tile.enemyDetected) {
         Commander.burrow(unit)

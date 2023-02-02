@@ -13,6 +13,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 
 import scala.collection.SeqView
 
@@ -62,11 +63,10 @@ object MicroPathing {
     Circle(5).view.map(p => from.add(p.x * 32, p.y * 32)).filter(_.valid)
   }
 
-  def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = {
-    if (unit.flying) goal else getGroundWaypointToPixel(unit.pixel, goal)
-  }
+  def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = ?(unit.flying, goal, getGroundWaypointToPixel(unit.pixel, goal))
 
   def getGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Pixel = {
+    if (from.pixelDistance(rawGoal) < 32) return rawGoal
     val goal              = rawGoal.walkablePixel
     val lineWaypoint      = if (Ray(from, goal).forall(_.walkable)) Some(from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels))) else None
     lazy val hillPath     = DownhillPathfinder.decend(from.tile, goal.tile)

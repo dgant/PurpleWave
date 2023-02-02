@@ -23,7 +23,7 @@ class SquadAttack extends Squad {
     u.likelyStillThere
     && ! u.flying
     && IsWarrior(u)
-    && ! u.isAny(Terran.Vulture, Zerg.Zergling)
+    && u.isNone(Terran.Vulture, Zerg.Zergling)
     && ( ! u.effectivelyCloaked || units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)))
   protected def getVicinity: Pixel = {
     lazy val airValue   = units.view.filter(_.flying).map(_.subjectiveValue).sum

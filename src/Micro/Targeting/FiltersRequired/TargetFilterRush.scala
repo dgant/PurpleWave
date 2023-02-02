@@ -7,7 +7,6 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.GameTime
 
 object TargetFilterRush extends TargetFilter {
-  simulationSafe = true
   private val timeThreshold = GameTime(5, 15)()
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = With.frame < timeThreshold
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (

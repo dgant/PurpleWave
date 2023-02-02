@@ -3,18 +3,18 @@ package Information.Battles.Prediction.Simulation
 import Information.Battles.Prediction.SimulationCheckpoint
 import Information.Battles.Types.Battle
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable.ArrayBuffer
 
 final class Simulation {
-  val resolution: Int = With.configuration.simulationResolution
-  var battle: Battle = _
-  val realUnits: ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
-  val realUnitsOurs: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
-  val realUnitsEnemy: ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
-  val grid: SimulationGrid = new SimulationGrid
+  val resolution      : Int                   = With.configuration.simulationResolution
+  var battle          : Battle                = _
+  val realUnits       : ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
+  val realUnitsOurs   : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
+  val realUnitsEnemy  : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
+  val grid            : SimulationGrid        = new SimulationGrid
 
   def reset(newBattle: Battle): Unit = {
     battle = newBattle
@@ -45,13 +45,14 @@ final class Simulation {
   @inline private def simulatable(unit: UnitInfo): Boolean = (
     ! unit.unitClass.isSpell
     && ! unit.stasised
-    && ! unit.isAny(Protoss.Interceptor, Protoss.Scarab))
+    && ! unit.invincible
+    && unit.isNone(Protoss.Interceptor, Protoss.Scarab, Zerg.Egg, Zerg.Larva))
 
   private def cleanup(): Unit = {
    battle.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
     if (battle.logSimulation) {
-     battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
-     battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
+      battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
+      battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
     }
     checkpoint()
   }

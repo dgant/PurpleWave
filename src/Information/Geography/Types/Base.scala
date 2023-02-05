@@ -46,14 +46,6 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def plannedExpoRecently     : Boolean           = With.framesSince(lastPlannedExpo) < Minutes(1)()
   def resources               : Seq[UnitInfo]     = minerals.view ++ gas
 
-  def isOurs    : Boolean       = owner.isUs
-  def isAlly    : Boolean       = owner.isAlly
-  def isEnemy   : Boolean       = owner.isEnemy
-  def isNeutral : Boolean       = owner.isNeutral
-  def ourUnits  : Seq[UnitInfo] = units.view.filter(_.isOurs)
-  def allies    : Seq[UnitInfo] = units.view.filter(_.isFriendly)
-  def enemies   : Seq[UnitInfo] = units.view.filter(_.isEnemy)
-
   lazy val overlooks: Vector[(Tile, Double)] = {
     val exit = zone.exitOriginal
     if (exit.isEmpty || naturalOf.isEmpty) Vector.empty else {

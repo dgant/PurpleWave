@@ -47,7 +47,6 @@ class DefendAgainstProxy extends Tactic {
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
-      val isEmergency         = proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon) && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u => Protoss.Pylon(u) && With.grids.psi3Height.psiPoints.view.map(u.tileTopLeft.add).contains(proxy.tileTopLeft)))
       val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
       val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(t => proxy.pixelDistanceEdge(t.center) < proxy.effectiveRangePixels))
       val framesBeforeDamage  = Maff
@@ -56,6 +55,11 @@ class DefendAgainstProxy extends Tactic {
           && u.unitClass.isBuilding
           && u.pixelDistanceCenter(proxy) < u.effectiveRangePixels + 96).map(_.remainingCompletionFrames))
         .getOrElse(Forever())
+      val isEmergency = (
+        proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon)
+          && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u =>
+            Protoss.Pylon(u)
+              && With.grids.psi3Height.psiPoints.view.exists(p => u.tileTopLeft.add(p) == proxy.tileTopLeft))))
       val defendersRequired   = if (isEmergency) 6 else if (isAnnoying) 2 else 1
       val defendersViable     = defendersAvailable
         .toVector

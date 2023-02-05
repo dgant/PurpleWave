@@ -14,7 +14,7 @@ object UpdateZones {
     // Precalculate these
     With.geography.zones.foreach(_.distanceGrid)
     With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
-    With.geography.zones.foreach(z => z.units = With.units.all.filter(_.likelyStillThere).filter(_.zone == z).toVector)
+    With.geography.zones.foreach(z => z.setUnits(With.units.all.filter(_.likelyStillThere).filter(_.zone == z).toVector))
     With.geography.zones.foreach(updateZone)
   
     if (With.frame == 0) {
@@ -28,7 +28,7 @@ object UpdateZones {
             }))
     }
   
-    With.geography.zones.foreach(_.owner = With.neutral)
+    With.geography.zones.foreach(_.setOwner(With.neutral))
     With.geography.zones.foreach(_.contested = false)
     val playerBorders = Players.all
       .filterNot(_.isNeutral)
@@ -36,10 +36,10 @@ object UpdateZones {
       .toMap
     playerBorders.foreach(pair => pair._2.foreach(zone =>
       if ( ! zone.owner.isNeutral || zone.contested) {
-        zone.owner = With.neutral
+        zone.setOwner(With.neutral)
         zone.contested = true
       } else {
-        zone.owner = pair._1
+        zone.setOwner(pair._1)
       }))
   
     With.geography.home = Maff

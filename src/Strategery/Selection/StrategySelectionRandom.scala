@@ -12,7 +12,7 @@ object StrategySelectionRandom extends StrategySelectionPolicy {
         branch._1,
         1.0 / branch._2
       ))
-    Maff.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
+    Maff.sampleWeighted(weights.keys.toSeq, weights).get
   }
 
   override def toString = "StrategySelectionRandom"

@@ -14,7 +14,7 @@ import Planning.Predicates.Reactive.SafeToMoveOut
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsTank
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Terran.TvP2FacJoyO
+import Strategery.Strategies.Terran.TvP2Fac
 
 object TvPIdeas {
   
@@ -47,7 +47,7 @@ object TvPIdeas {
   class TvPAttack extends Parallel(
     // Keep pressuring if appropriate
     new If(
-      new Employing(TvP2FacJoyO),
+      new Employing(TvP2Fac),
       new ConsiderAttacking,
       // Otherwise, wait for our later timing
       new Trigger(

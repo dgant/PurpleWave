@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsBuilding, IsWarrior, IsWorker}
 
 object UpdateBase {
   
@@ -18,9 +18,22 @@ object UpdateBase {
     base.mineralsLeft     = base.minerals.view.map(_.mineralsLeft).sum
     base.gasLeft          = base.gas.view.map(_.gasLeft).sum
     base.startingMinerals = Math.max(base.startingMinerals, base.mineralsLeft)
-    base.startingGas      = Math.max(base.startingGas, base.gasLeft)
-    base.lastPlannedExpo  = if (base.plannedExpo()) With.frame else base.lastPlannedExpo
+    base.startingGas      = Math.max(base.startingGas,      base.gasLeft)
     base.enemyCombatValue = base.units.view.filter(_.isEnemy).filter(IsWarrior).map(_.subjectiveValue).sum
+
+    // Check for planned expansions
+    // Most of this logic is ensuring we don't count buildings placed just to *block* expansions, eg. Pylons
+    if (base.owner.isNeutral) {
+      var planningExpo = false
+      planningExpo ||=
+        With.units.ours.map(_.intent).exists(intent =>
+          intent.toBuildTile.filter(_.base.contains(base)).exists(tile =>
+            intent.toBuild.exists(_.isTownHall) || ! base.townHallArea.contains(tile)))
+      planningExpo ||= base.ourUnits.filter(IsBuilding).exists( ! _.tileArea.intersects(base.townHallArea))
+      if (planningExpo) {
+        base.lastPlannedExpo = With.frame
+      }
+    }
 
     if (base.townHallArea.tiles.exists(_.visibleUnchecked)) {
       base.lastFrameScoutedByUs = With.frame

@@ -91,8 +91,11 @@ object Commander {
     if (unit.unready) return
     if (unit.transport.exists(_.flying)) { requestUnload(unit); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
-    if ( ! unit.readyForAttackOrder) { sleep(unit); return }
+    // We shouldn't target interceptors anymore, but in case we do:
     if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
+    // When a ground unit attacks a Carrier, have it attack-move when off cooldown to ensure we burn off Interceptors even if we can't find a route to the Carrier
+    if (Protoss.Carrier(target) && unit.readyForAttackOrder && ! unit.inRangeToAttack(target) && ! unit.flying) { attackMove(unit, target.pixel); return }
+    if ( ! unit.readyForAttackOrder) { sleep(unit); return }
     if (Zerg.Lurker(unit) && ! unit.burrowed) { move(unit, target.pixel); return }
     if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) { move(unit, target.pixel); return }
 

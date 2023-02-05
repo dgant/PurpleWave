@@ -45,10 +45,9 @@ object SquadAutomation {
       && group.canBeAttackedBy(e)
       && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
       .toVector
-    val combatTeams = combatEnemiesInRoute.flatMap(_.team).distinct
     val output =
       Maff.orElse(
-        combatTeams.flatMap(_.units) ++ combatEnemiesInRoute.view.filter(_.team.isEmpty),
+        combatEnemiesInRoute.view.filter(_.team.isEmpty),
         // If there's no battle (defenseless targets) then wipe the zone!
         to.base
           .map(_.enemies)

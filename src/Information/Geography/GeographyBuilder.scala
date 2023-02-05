@@ -67,7 +67,7 @@ trait GeographyBuilder {
     val baseTilesByZone = baseTiles.groupBy(zoneByValidTile)
     val baseTileSets = baseTilesByZone.flatMap(p => p._2.map(base => (base, p._1.tiles.filter(tile => p._2.filterNot(base==).forall(_.tileDistanceSquared(tile) > base.tileDistanceSquared(tile))))))
     _bases = baseTileSets.map(p => new Base(baseNames.next(), p._1, p._2)).toVector
-    _baseByTile = allTiles.map(t => _bases.find(_.tiles.contains(t))).toVector
+    _baseByTile = allTiles.map(t => _bases.find(_.tiles.contains(t)))
 
     // We need zones and bases updated in order to construct metros
     //
@@ -75,11 +75,11 @@ trait GeographyBuilder {
 
     // Build Metros
     //
-    val mainMetros = With.geography.startBases.map(main => Metro(Seq(main) ++ main.natural))
+    val mainMetros = With.geography.startBases.map(main => Metro(Vector(main) ++ main.natural))
     val otherMetros = With.geography.bases
       .filterNot(base => mainMetros.exists(_.bases.contains(base)))
       .sortBy(base => With.geography.startLocations.map(_.groundPixels(base.heart)).min)
-      .map(base => Metro(Seq(base)))
+      .map(base => Metro(Vector(base)))
     _metros = mainMetros ++ otherMetros
     var i = 0
     while(i < metros.length) {

@@ -9,18 +9,16 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
 import Utilities.Time.{Forever, Minutes}
-import Utilities.UnitFilters.IsBuilding
 
-final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) {
-        val isStartLocation   : Boolean           = With.geography.startLocations.contains(townHallTile)
-        val townHallArea      : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
-        val radians           : Double            = Points.middle.radiansTo(townHallArea.center)
-        val zone              : Zone              = With.geography.zoneByTile(townHallTile)
-  lazy  val metro             : Metro             = With.geography.metros.find(_.bases.contains(this)).get
+final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) extends Geo {
+  lazy val metro              : Metro             = With.geography.metros.find(_.bases.contains(this)).get
+  val isStartLocation         : Boolean           = With.geography.startLocations.contains(townHallTile)
+  val townHallArea            : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
+  val radians                 : Double            = Points.middle.radiansTo(townHallArea.center)
+  val zone                    : Zone              = With.geography.zoneByTile(townHallTile)
+  val bases                   : Seq[Base]         = Seq(this)
+  val zones                   : Seq[Zone]         = Seq(zone)
   val economicValue           : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
-  val plannedExpo             : Cache[Boolean]    = new Cache(() => owner.isNeutral && (
-    With.units.ours.exists(u => u.intent.toBuildTile.exists(t => t.base.contains(this) && (! townHallArea.contains(t) || u.intent.toBuild.exists(_.isTownHall))))
-    || ourUnits.filter(IsBuilding).exists(u => ! townHallArea.contains(u.tileTopLeft))))
   val centroid                : Tile              = Maff.centroidTiles(tiles)
   var natural                 : Option[Base]      = None
   var naturalOf               : Option[Base]      = None
@@ -29,10 +27,10 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   var gas                     : Vector[UnitInfo]  = Vector.empty
   var minerals                : Vector[UnitInfo]  = Vector.empty
   var owner                   : PlayerInfo        = With.neutral
-  var enemyCombatValue        : Double            = _
-  var workerCount             : Int               = _
   val saturation              : Cache[Double]     = new Cache(() => workerCount.toDouble / (1 + 3 * gas.size + 2 * minerals.size))
   var allTimeOwners           : Set[PlayerInfo]   = Set.empty
+  var enemyCombatValue        : Double            = _
+  var workerCount             : Int               = _
   var mineralsLeft            : Int               = 0
   var gasLeft                 : Int               = 0
   var startingMinerals        : Int               = 0
@@ -41,19 +39,20 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   var lastFrameScoutedByUs    : Int               = 0
   var lastFrameScoutedByEnemy : Int               = 0
   var frameTaken              : Int               = 0
-  def isOurs                  : Boolean           = owner.isUs
-  def isAlly                  : Boolean           = owner.isAlly
-  def isEnemy                 : Boolean           = owner.isEnemy
-  def isNeutral               : Boolean           = owner.isNeutral
-  def isOurMain               : Boolean           = With.geography.ourMain == this
-  def isOurNatural            : Boolean           = With.geography.ourNatural == this
+  def isOurMain               : Boolean           = this == With.geography.ourMain
+  def isOurNatural            : Boolean           = this == With.geography.ourNatural
   def scoutedByUs             : Boolean           = lastFrameScoutedByUs > 0
   def scoutedByEnemy          : Boolean           = lastFrameScoutedByEnemy > 0
-  def plannedExpoRecently     : Boolean           = plannedExpo() || With.framesSince(lastPlannedExpo) < Minutes(1)()
+  def plannedExpoRecently     : Boolean           = With.framesSince(lastPlannedExpo) < Minutes(1)()
   def resources               : Seq[UnitInfo]     = minerals.view ++ gas
-  def ourUnits                : Seq[UnitInfo]     = units.view.filter(_.isOurs)
-  def allies                  : Seq[UnitInfo]     = units.view.filter(_.isFriendly)
-  def enemies                 : Seq[UnitInfo]     = units.view.filter(_.isEnemy)
+
+  def isOurs    : Boolean       = owner.isUs
+  def isAlly    : Boolean       = owner.isAlly
+  def isEnemy   : Boolean       = owner.isEnemy
+  def isNeutral : Boolean       = owner.isNeutral
+  def ourUnits  : Seq[UnitInfo] = units.view.filter(_.isOurs)
+  def allies    : Seq[UnitInfo] = units.view.filter(_.isFriendly)
+  def enemies   : Seq[UnitInfo] = units.view.filter(_.isEnemy)
 
   lazy val overlooks: Vector[(Tile, Double)] = {
     val exit = zone.exitOriginal

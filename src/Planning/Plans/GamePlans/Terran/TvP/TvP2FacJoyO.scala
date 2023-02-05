@@ -16,11 +16,11 @@ import Planning.Plan
 import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Terran.TvP2FacJoyO
+import Strategery.Strategies.Terran.TvP2Fac
 
 class TvP2FacJoyO extends GameplanTemplate {
   
-  override val activationCriteria: Predicate = new Employing(TvP2FacJoyO)
+  override val activationCriteria: Predicate = new Employing(TvP2Fac)
   override val completionCriteria: Predicate = new Latch(new BasesAtLeast(2))
 
   override def scoutPlan: Plan = new ScoutOn(Terran.SupplyDepot, quantity = 2)

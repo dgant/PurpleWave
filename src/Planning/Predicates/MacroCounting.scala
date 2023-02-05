@@ -85,6 +85,14 @@ trait MacroCounting {
     With.units.countEverOurs(_.isAny(matchers: _*))
   }
 
+  def have(matchers: UnitFilter*): Boolean = {
+    With.units.existsOurs(matchers: _*)
+  }
+
+  def haveComplete(matchers: UnitFilter*): Boolean = {
+    With.units.existsOurs(IsAll(IsComplete, IsAny(matchers: _*)))
+  }
+
   def framesUntilUnit(unitClass: UnitClass): Int = {
     With.projections.unit(unitClass)
   }
@@ -101,15 +109,15 @@ trait MacroCounting {
     gas >= tech.gasPrice || techComplete(tech)
   }
 
-  def haveGasForUpgrade(upgrade: Upgrade, level: Int): Boolean = {
+  def haveGasForUpgrade(upgrade: Upgrade, level: Int = 1): Boolean = {
     gas >= upgrade.gasCost(level) || upgradeComplete(upgrade, level)
   }
 
-  def haveGasForUnit(unitClass: UnitClass, quantity: Int): Boolean = {
+  def haveGasForUnit(unitClass: UnitClass, quantity: Int = 1): Boolean = {
     gas >= quantity * unitClass.gasPrice - units(unitClass)
   }
 
-  def haveMineralsForUnit(unitClass: UnitClass, quantity: Int): Boolean = {
+  def haveMineralsForUnit(unitClass: UnitClass, quantity: Int = 1): Boolean = {
     minerals >= quantity * unitClass.mineralPrice - units(unitClass)
   }
 
@@ -127,6 +135,10 @@ trait MacroCounting {
 
   def confidenceAway11: Double = {
     With.battles.globalAway.judgement.map(_.confidence11Total).getOrElse(0.0)
+  }
+
+  def attacking: Boolean = {
+    With.tactics.attackSquad.units.nonEmpty
   }
 
   def gasCapsUntouched: Boolean = (
@@ -191,6 +203,11 @@ trait MacroCounting {
 
   def enemyCarriersLikely: Boolean = {
     enemyHasShown(Protoss.Carrier, Protoss.Interceptor, Protoss.FleetBeacon) || enemyHasUpgrade(Protoss.CarrierCapacity)
+  }
+
+  def enemyArbitersLikely: Boolean = {
+    enemyHasShown(Protoss.Arbiter, Protoss.ArbiterTribunal) ||
+      (enemyHasShown(Protoss.Stargate)&& enemyHasShown(Protoss.DarkTemplar, Protoss.HighTemplar, Protoss.Archon, Protoss.DarkArchon, Protoss.TemplarArchives))
   }
 
   def scoutCleared: Boolean = {

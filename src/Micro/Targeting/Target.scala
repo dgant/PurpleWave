@@ -2,7 +2,7 @@ package Micro.Targeting
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Targeting.FiltersRequired.{TargetFilterEnemy, TargetFilterFocus, TargetFilterLarvaAndEgg, TargetFilterMissing, TargetFilterPossible, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterVsInterceptors, TargetFilterVsTank, TargetFilterVulture}
+import Micro.Targeting.FiltersRequired.{TargetFilterEnemy, TargetFilterFocus, TargetFilterType, TargetFilterMissing, TargetFilterCanAttack, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterVsTank, TargetFilterVulture}
 import Micro.Targeting.FiltersSituational.TargetFilterWhitelist
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
@@ -10,16 +10,15 @@ object Target {
 
   val defaultFilters: Vector[TargetFilter] = Vector(
     TargetFilterEnemy,
-    TargetFilterPossible,
+    TargetFilterCanAttack,
     TargetFilterMissing,
-    TargetFilterLarvaAndEgg,
+    TargetFilterType,
     TargetFilterFocus,
     TargetFilterStayCloaked,
     TargetFilterScourge,
     TargetFilterReaver,
     TargetFilterRush,
     TargetFilterVulture,
-    TargetFilterVsInterceptors,
     TargetFilterVsTank)
 
   def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {

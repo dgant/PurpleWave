@@ -18,11 +18,11 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitCounters.CountUpTo
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Terran.TvPSiegeExpandBunker
+import Strategery.Strategies.Terran.TvP1Fac
 
 class TvPSiegeExpandBunker extends GameplanTemplate {
 
-  override val activationCriteria = new Employing(TvPSiegeExpandBunker)
+  override val activationCriteria = new Employing(TvP1Fac)
   override val completionCriteria = new Latch(new And(
     new BasesAtLeast(2),
     new TechStarted(Terran.SiegeMode),

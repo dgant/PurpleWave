@@ -12,6 +12,6 @@ object StrategySelectionDynamic extends StrategySelectionPolicy {
         branch._1,
         Math.exp(With.configuration.dynamicStickiness * With.strategy.winProbabilityByBranch(branch._1)) / branch._2
       ))
-    Maff.sampleWeighted(weights.keys.toSeq, w => weights(w)).get
+    Maff.sampleWeighted(weights.keys.toSeq, weights).get
   }
 }

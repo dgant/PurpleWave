@@ -18,7 +18,7 @@ trait Sample {
     set.iterator.drop(Random.nextInt(set.size)).next
   }
 
-  @inline final def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
+  final def sampleWeighted[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     if (seq.isEmpty) return None
     val denominator = seq.map(extract).map(v => Math.max(v, 0)).sum
     val numerator   = Random.nextDouble() * denominator

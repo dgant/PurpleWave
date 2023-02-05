@@ -7,19 +7,19 @@ final case class TileRectangle(
   startInclusive : Tile,
   endExclusive   : Tile) {
 
-  @inline def this() {
+  def this() {
     this(new Tile(0), new Tile(0))
   }
 
-  @inline def this(tile: Tile, width: Int, height: Int) {
+  def this(tile: Tile, width: Int, height: Int) {
     this(tile, tile.add(width, height))
   }
 
-  @inline def this(tile: Tile) {
-    this(tile, 1, 1)
+  def this(tile: Tile) {
+    this(tile, tile.add(1, 1))
   }
 
-  @inline def this(included: Iterable[Tile]) {
+  def this(included: Iterable[Tile]) {
     this(
       Tile(
         Maff.min(included.view.map(_.x)).getOrElse(0),
@@ -29,7 +29,7 @@ final case class TileRectangle(
         Maff.max(included.view.map(_.y + 1)).getOrElse(0)))
   }
 
-  @inline def this(included: Traversable[TileRectangle]) {
+  def this(included: Traversable[TileRectangle]) {
     this(
       Tile(
         Maff.min(included.view.map(_.startInclusive.x)).getOrElse(0),
@@ -39,8 +39,10 @@ final case class TileRectangle(
         Maff.min(included.view.map(_.endExclusive.y)).getOrElse(0)))
   }
 
-  @inline def this(xStartInclusive: Int, yStartInclusive: Int, xEndExclusive: Int, yEndExclusive: Int) {
-    this(Tile(xStartInclusive, yStartInclusive), Tile(xEndExclusive, yEndExclusive))
+  def this(xStartInclusive: Int, yStartInclusive: Int, xEndExclusive: Int, yEndExclusive: Int) {
+    this(
+      Tile(xStartInclusive, yStartInclusive),
+      Tile(xEndExclusive, yEndExclusive))
   }
 
   if (endExclusive.x < startInclusive.x) {

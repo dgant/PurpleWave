@@ -7,9 +7,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetFilterScourge extends TargetFilter {
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = Zerg.Scourge(actor)
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
-    if (Zerg.Overlord(target)) return false
-    if (Protoss.Interceptor(target)) return false
-    target.unitClass.attacksOrCastsOrDetectsOrTransports
+    if (target.unitClass.isBuilding) return false
+    target.isNone(Protoss.Interceptor, Zerg.Overlord)
   }
-  
 }

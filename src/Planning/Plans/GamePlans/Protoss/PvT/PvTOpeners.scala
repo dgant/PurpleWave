@@ -8,7 +8,7 @@ import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsAll, IsProxied, IsWarrior, IsWorker}
 
-abstract class PvTOpeners extends GameplanImperative{
+abstract class PvTOpeners extends GameplanImperative {
 
   var openingComplete: Boolean = false
 

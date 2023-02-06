@@ -1,9 +1,11 @@
 package Information.Geography.Types
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 
 case class Metro(bases: Vector[Base]) extends Geo {
   def merge(other: Metro): Metro = Metro(bases ++ other.bases)
@@ -21,7 +23,11 @@ case class Metro(bases: Vector[Base]) extends Geo {
 
   def units: Seq[UnitInfo] = zones.view.flatMap(_.units)
 
-  def owner: PlayerInfo = ???
+  def owner: PlayerInfo = {
+    val owners = bases.view.map(_.owner).filterNot(_.isNeutral).distinct
+    ?(owners.length == 1, owners.head, With.neutral)
+  }
 
-  def heart: Tile = ???
+  lazy val heart: Tile = main.orElse(natural).map(_.heart).getOrElse(Maff.exemplarTiles(bases.map(_.heart)))
+  lazy val isStartLocation: Boolean = bases.exists(_.isStartLocation)
 }

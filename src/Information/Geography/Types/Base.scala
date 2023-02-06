@@ -14,12 +14,10 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   lazy val metro              : Metro             = With.geography.metros.find(_.bases.contains(this)).get
   val isStartLocation         : Boolean           = With.geography.startLocations.contains(townHallTile)
   val townHallArea            : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
-  val radians                 : Double            = Points.middle.radiansTo(townHallArea.center)
   val zone                    : Zone              = With.geography.zoneByTile(townHallTile)
   val bases                   : Seq[Base]         = Seq(this)
   val zones                   : Seq[Zone]         = Seq(zone)
   val economicValue           : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
-  val centroid                : Tile              = Maff.centroidTiles(tiles)
   var natural                 : Option[Base]      = None
   var naturalOf               : Option[Base]      = None
   var townHall                : Option[UnitInfo]  = None

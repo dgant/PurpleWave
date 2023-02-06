@@ -114,6 +114,12 @@ trait Reduce {
     values.minBy(_.pixelDistanceSquared(valuesCentroid))
   }
 
+  @inline final def exemplarTiles(values: Traversable[Tile]): Tile = {
+    if (values.isEmpty) return Points.tileMiddle
+    val valuesCentroid = centroidTiles(values)
+    values.minBy(_.pixelDistance(valuesCentroid))
+  }
+
   @inline final def exemplarOpt(values: Traversable[Pixel]): Option[Pixel] = {
     if (values.isEmpty) None else Some(exemplar(values))
   }

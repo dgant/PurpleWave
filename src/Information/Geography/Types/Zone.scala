@@ -4,15 +4,12 @@ import Information.Geography.Calculations.UpdateZones
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Direction, Pixel, Tile, TileRectangle}
+import Mathematics.Points.{Direction, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwta.Region
 
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
-        val boundary          : TileRectangle       = new TileRectangle(tiles)
-        val centroid          : Tile                = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles, Seq(new Pixel(bwemRegion.getCenter).tile)))
-        val border            : Set[Tile]           = tiles.filter( ! _.adjacent8.forall(tiles.contains))
   lazy  val island            : Boolean             = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
   lazy  val metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
@@ -20,7 +17,7 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   lazy  val exitOriginal      : Option[Edge]        = Maff.minBy(edges)(e => With.geography.startBases.map(_.heart).map(e.distanceGrid.get).max)
   lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(if(bases.length == 1) bases.head.heart else centroid)
   lazy  val exitDirection     : Option[Direction]   = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
-
+  lazy  val isStartLocation   : Boolean             = bases.exists(_.isStartLocation)
   var contested       : Boolean           = false
   var walledIn        : Boolean           = false
   var exitNow         : Option[Edge]      = None
@@ -44,9 +41,9 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   }
   def owner: PlayerInfo = _owner
 
-  def heart         : Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
-  def downtown      : Tile = heart.center.midpoint(exitOriginal.map(_.pixelCenter).getOrElse(heart.center)).walkableTile
-  def exitNowOrHeart: Tile = exitNow.map(_.pixelCenter.walkableTile).getOrElse(heart)
+  def heart           : Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
+  def downtown        : Tile = heart.center.midpoint(exitOriginal.map(_.pixelCenter).getOrElse(heart.center)).walkableTile
+  def exitNowOrHeart  : Tile = exitNow.map(_.pixelCenter.walkableTile).getOrElse(heart)
 
   override def toString: String = f"$name ${if (bases.nonEmpty) f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) " else ""}$centroid"
 

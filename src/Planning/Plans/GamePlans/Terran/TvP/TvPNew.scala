@@ -2,6 +2,7 @@ package Planning.Plans.GamePlans.Terran.TvP
 
 import Lifecycle.With
 import Mathematics.Maff
+import Placement.Access.PlaceLabels
 import Planning.Plans.Macro.Automatic.Enemy
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.?
@@ -32,13 +33,65 @@ class TvPNew extends TvPNewOpeners {
     shouldAttack &&= safeToMoveOut
     shouldAttack &&= ! enemyCloak || have(Terran.Comsat, Terran.ScienceVessel) || (unitsComplete(Terran.Vulture) >= 6 && Terran.SpiderMinePlant())
 
+    trainArmy() // TODO: Bypass; avoid duping
     get(Terran.Barracks)
     get(Terran.Refinery)
     get(Terran.Factory)
     get(Terran.MachineShop)
     requireMiningBases(2)
     get(2, Terran.Factory)
+    addScanOrTurrets()
+    buildGasPumps()
+    shopTech()
+    singleUpgrades() // TODO: Avoid duping
+    addScan()
+    get(3, Terran.Factory)
     requireMiningBases(3)
+    doubleUpgrades()
+    get(6, Terran.Factory)
+    get(2, Terran.MachineShop)
+    get(10, Terran.Factory)
+    get(3, Terran.MachineShop)
+  }
+
+  def shopTech(): Unit = {
+    if (units(Terran.Vulture) >= 3) {
+      get(Terran.SpiderMinePlant)
+    }
+    get(Terran.SiegeMode)
+    get(Terran.SpiderMinePlant)
+    get(Terran.VultureSpeed)
+  }
+
+  def addScanOrTurrets(): Unit = {
+    if (skipTurrets) addScan() else addTurrets()
+  }
+
+  def addScan(): Unit = {
+    get(Terran.Academy)
+    pump(Terran.Comsat, units(Terran.CommandCenter))
+  }
+
+  def addTurrets(): Unit = {
+    get(Terran.EngineeringBay)
+    buildTurretsAtNatural(1, PlaceLabels.DefendEntrance)
+    buildTurretsAtMain(1, PlaceLabels.DefendHall)
+  }
+
+  def singleUpgrades(): Unit = {
+    get(Terran.Armory)
+    upgradeContinuously(Terran.MechDamage) && upgradeContinuously(Terran.MechArmor)
+    get(Terran.Starport)
+    get(Terran.ScienceFacility)
+  }
+
+  def doubleUpgrades(): Unit = {
+    get(Terran.Armory)
+    upgradeContinuously(Terran.MechDamage)
+    get(Terran.Starport)
+    get(2, Terran.Armory)
+    get(Terran.ScienceFacility)
+    upgradeContinuously(Terran.MechArmor)
   }
 
   def trainArmy(): Unit = {

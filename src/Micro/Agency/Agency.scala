@@ -10,12 +10,11 @@ import scala.collection.mutable
 class Agency extends TimedTask {
 
   withAlwaysSafe(true)
-  
+
+  var lastQueueCompletion = 0
   val agentQueue          = new mutable.Queue[Agent]
   val cycleLengths        = new mutable.Queue[Int]
-  var lastQueueCompletion = 0
-
-  val actionPerformance = new mutable.HashMap[Action, ActionPerformance]()
+  val actionPerformance   = new mutable.HashMap[Action, ActionPerformance]()
 
   override def isComplete: Boolean = agentQueue.isEmpty
 
@@ -38,15 +37,16 @@ class Agency extends TimedTask {
         .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
     }
 
-    while (agentQueue.nonEmpty && timer.ongoing) {
+    while (agentQueue.nonEmpty && timer.greenLight) {
       val agent = agentQueue.dequeue()
       val unit = agent.unit
       unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit)))
       if (unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
-        val timeBefore = With.performance.frameMs
+        val timeBefore = With.performance.frameElapsedMs
         agent.execute()
-        if (With.configuration.enablePerformancePauses && ! timer.ongoing) {
-          val timeAfter = With.performance.frameMs
+        agent.toAttack.foreach(_.addTargeter(unit))
+        if (With.configuration.enablePerformancePauses && timer.redLight && With.performance.frameBrokeLimit) {
+          val timeAfter = With.performance.frameElapsedMs
           val timeDelta = timeAfter - timeBefore
           With.logger.performance(f"${unit.unitClass} broke ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actions.isEmpty) agent.lastAction.get else agent.actions.mkString(", ")}")
         }

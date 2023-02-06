@@ -203,14 +203,14 @@ trait CombatUnit {
     override def toString: String = f"$damageTotal from $source in ${With.framesUntil(onFrame)} frames ${if(guaranteed) "(Guaranteed)" else if (committed) "(Committed)" else ""}"
   }
   val damageQueue = new mutable.ArrayBuffer[DamageSource]()
-  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean): Unit = {
+  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean, automaticallyGuaranteed: Boolean, fixedDamage: Option[Int] = None): Unit = {
     val damagePrevious = damageQueue.find(_.source == source)
     val damageNew = DamageSource(
       source      = source,
       onFrame     = Math.min(damagePrevious.map(_.onFrame).getOrElse(Forever()), With.frame + inFrames),
-      committed   = damagePrevious.exists(_.committed) || committed,
-      guaranteed  = damagePrevious.exists(_.guaranteed) || (committed && source.hitChanceAgainst(this) > .9),
-      damageTotal = source.damageOnNextHitAgainst(this))
+      committed   = automaticallyGuaranteed || damagePrevious.exists(_.committed) || committed,
+      guaranteed  = automaticallyGuaranteed || damagePrevious.exists(_.guaranteed) || (committed && source.hitChanceAgainst(this) > .9),
+      damageTotal = fixedDamage.getOrElse(source.damageOnNextHitAgainst(this)))
     damagePrevious.foreach(damageQueue.-=)
     val insertIndex = damageQueue.indexWhere(_.onFrame > damageNew.onFrame)
     if (insertIndex >= 0) damageQueue.insert(insertIndex, damageNew) else damageQueue += damageNew
@@ -219,7 +219,8 @@ trait CombatUnit {
     addDamage(
       source,
       source.framesToConnectDamage(this),
-      committed = source.isOurs && source.inRangeToAttack(this))
+      committed = source.isOurs && source.inRangeToAttack(this),
+      automaticallyGuaranteed = false)
   }
   def framesToLaunchAttack(target: CombatUnit): Int = {
     Maff.vmax(unitInfo.map(_.remainingOccupationFrames).getOrElse(0), cooldownLeft, framesToGetInRange(target))
@@ -229,25 +230,12 @@ trait CombatUnit {
     // - Melee units without bullets (seem to) deal damage instantly
     // - Ranged units with instant-speed bullets (seem to) deal damage at the end of their attack animation
     // - Ranged units with projectile bullets deal damage after the bullet has arrived, and bullet travel time varies on bullet type/distance
-    // As long as we don't overestimate the amount of damage actually done, and prefer underestimating time before attacks, we'll be okay
+    // As long as we don't overestimate the amount of damage actually done, and prefer underestimating time before attacks, we'll be okay.
     framesToLaunchAttack(target) + expectedProjectileFrames(target)
   }
-  /**
-   * For the very small number of units with substantial stop frames
-   * AND a travelling projectile,
-   * this gives the expected duration in which bullet is present but target has yet to receive damage
-   */
   def expectedProjectileFrames(target: CombatUnit): Int = {
-    // At max range it looks to be 12 frames for a Dragoon.
-    // Closer range can be 7 and possibly shorter
-    if (unitClass == Protoss.Dragoon) unitClass.stopFrames + 7
-    // Measured minimum of 5 frames for a Vulture right next to a Cannon
-    else if (unitClass == Protoss.PhotonCannon) unitClass.stopFrames + 5
-    // Measured 7 at close-ish range; assuming 6 is possible when closer
-    else if (unitClass == Zerg.Mutalisk) 2
-    // I definitely did not take the trouble to actually measure this
-    else if (unitClass == Zerg.Devourer) unitClass.stopFrames + 7
-    else 0
+    // At no point have I attempted to figure out bullet duration as a function of target distance
+    unitClass.expectedProjectileFrames
   }
   def removeDamage(source: CombatUnit): Unit = {
     val toRemove = damageQueue.view.filter(_.source == source).toVector
@@ -256,9 +244,10 @@ trait CombatUnit {
   def clearDamage(): Unit = {
     damageQueue.clear()
   }
-  def doomed: Boolean = doomFrameAbsolute < Forever()
-  def doomedInFrames: Int = doomFrameAbsolute - With.frame
-  def doomFrameAbsolute: Int = {
+  // Measure whether a unit is doomed, counting only guaranteed sources of damage
+  def doomed            : Boolean = doomFrameAbsolute < Forever()
+  def doomedInFrames    : Int     = doomFrameAbsolute - With.frame
+  def doomFrameAbsolute : Int     = {
     var damageRequired = totalHealth
     var i = 0
     var frame = 0
@@ -273,9 +262,10 @@ trait CombatUnit {
     }
     Forever()
   }
-  def likelyDoomed: Boolean = likelyDoomFrameAbsolute < Forever()
-  def likelyDoomedInFrames: Int = likelyDoomFrameAbsolute - With.frame
-  def likelyDoomFrameAbsolute: Int = {
+  // Measure whether a unit is doomed, counting damage that has a chance to miss
+  def likelyDoomed            : Boolean = likelyDoomFrameAbsolute < Forever()
+  def likelyDoomedInFrames    : Int     = likelyDoomFrameAbsolute - With.frame
+  def likelyDoomFrameAbsolute : Int     = {
     var damageRequired = totalHealth
     var i = 0
     var frame = 0

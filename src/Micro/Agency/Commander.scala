@@ -561,7 +561,6 @@ object Commander {
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
       unit.nextOrderFrame.getOrElse(0))
-
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
       With.configuration.trackUnit = false
       unit.sleepUntil(sleepUntil) // This is where you want the trackUnit breakpoint

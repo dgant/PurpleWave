@@ -22,7 +22,7 @@ class TaskQueueSerial(val tasks: TimedTask*) extends TimedTask {
     val timer = new Timer(budgetMs)
     var proceed = true
     while (proceed) {
-      if (timer.expired) {
+      if (timer.redLight) {
         proceed = false
       } else if (index >= tasks.length) {
         // We have reached the end of the task queue.

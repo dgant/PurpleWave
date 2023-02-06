@@ -11,7 +11,7 @@ final class DamageTracker {
 
   // Bullets which travel in the air before doing damage,
   // and are mostly sure to hit (thereby excluding Valkyries and Lurkers)
-  lazy val hangtime = Set(
+  lazy val hangtime: Set[BulletType] = Set(
     BulletType.ATS_ATA_Laser_Battery,   // Battlecruiser
     BulletType.Burst_Lasers,            // Wraith air-to-ground
     BulletType.Gemini_Missiles,         // Wraith/Goliath *-to-air
@@ -35,45 +35,46 @@ final class DamageTracker {
   @inline def countBullet(bullet: BulletInfo): Unit = {
     if ( ! bullet.sourceUnit.exists(source => bullet.targetUnit.exists(_.isEnemyOf(source)))) return
     if ( ! bullet.moving) return
-    val source      = bullet.sourceUnit.get
-    val target      = bullet.targetUnit.get
-    val bulletType  = bullet.bulletType
+    val source        = bullet.sourceUnit.get
+    val target        = bullet.targetUnit.get
+    val bulletType    = bullet.bulletType
+    lazy val inFrames = Math.max(1, (source.expectedProjectileFrames(target) * bullet.pixel.pixelDistance(target.pixel) / source.pixel.pixelDistance(target.pixel)).toInt)
+    var damage = 0
+    var automaticallyGuaranteed = false
     if (bulletType == BulletType.Yamato_Gun) {
-      // TODO: Yamato damage
+      damage = 260
+      automaticallyGuaranteed = true
     } else if (bulletType == BulletType.Consume) {
-      // TODO: Assume it's dead
+      damage = 2000
+      automaticallyGuaranteed = true
     } else if (bulletType == BulletType.Queen_Spell_Carrier) {
       // Parasite or Spawn Broodling (Ensnare has its own type)
       if ( ! target.flying && ! target.unitClass.isRobotic) {
-        // TODO: Assume it's dead from Spawn Broodling
+        // Assume it's dead from Spawn Broodling
+        damage = 2000
+        automaticallyGuaranteed = true
       }
-    } else if (hangtime.contains(bulletType)) {
-      val inFrames = Math.max(1, (source.expectedProjectileFrames(target) * bullet.pixel.pixelDistance(target.pixel) / source.pixel.pixelDistance(target.pixel)).toInt)
-      target.addDamage(source, inFrames, committed = true)
-    }
+    } else if ( ! hangtime.contains(bulletType)) return
+    target.addDamage(source, inFrames, committed = true, automaticallyGuaranteed = automaticallyGuaranteed, fixedDamage = Some(damage).filter(_ > 0))
   }
 
   @inline def countDamage(attacker: UnitInfo): Unit = {
     // Count damage that the unit is likely about to deal
     // Goal is to count whenever possible but being careful to not double-count damage that has already been dealt
     // Better to undercount damage than overcount it
-    val target = attacker.orderTarget
-    lazy val attackFrameStart = attacker.lastFrameStartingAttack
-    lazy val attackFrameEnd = attackFrameStart + attacker.unitClass.stopFrames
-    lazy val damageFrame = attackFrameEnd - With.frame + attacker.expectedProjectileFrames(target.get)
-    if (target.exists(attacker.isEnemyOf)) {
-      if (attacker.expectedProjectileFrames(target.get) > 0 && With.frame < attackFrameEnd) {
-        // Add frames for unit types with long projectile travel times.
-        // The duration varies based on projectile travel time.
-        target.get.addDamage(attacker, damageFrame, committed = true)
-      } else if (target.exists(attacker.inRangeToAttack)) {
-        target.get.addFutureAttack(attacker)
-      }
-    }
+    attacker.orderTarget
+      .filter(attacker.isEnemyOf)
+      .foreach(target => {
+        lazy val attackFrameStart = attacker.lastFrameStartingAttack
+        lazy val attackFrameEnd   = attackFrameStart + attacker.unitClass.stopFrames
+        lazy val damageFrame      = attackFrameEnd - With.frame + attacker.expectedProjectileFrames(target)
+        if (attacker.expectedProjectileFrames(target) > 0 && With.frame < attackFrameEnd) {
+          // Add frames for unit types with long projectile travel times.
+          // The duration varies based on projectile travel time.
+          target.addDamage(attacker, damageFrame, committed = true, automaticallyGuaranteed = false)
+        } else if (attacker.inRangeToAttack(target)) {
+          target.addFutureAttack(attacker)
+        }
+      })
   }
-
-  @inline def projectedHitPoints(unit: UnitInfo): Int = {
-    unit.hitPoints
-  }
-
 }

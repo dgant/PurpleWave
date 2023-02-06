@@ -56,7 +56,7 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val ratioLocalHealthValueLostNet    : Double = ratioLocalHealthValueLostEnemy - ratioLocalHealthValueLostUs
   val weightLife = 1.0
   val weightHealth = 0.1
-  val totalScore: Double = if (With.performance.danger)
+  val totalScore: Double = if (With.performance.disqualificationDanger)
     Maff.weightedMean(Seq(
       (localValueLostRatio,           weightLife),
       (localHealthValueLostRatio,     weightHealth)))

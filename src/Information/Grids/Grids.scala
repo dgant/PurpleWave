@@ -116,6 +116,6 @@ class Grids extends TimedTask {
       _updateQueue.enqueue(next)
       next.update()
       gridsUpdated += 1
-    } while (gridsUpdated < all.size && timer.ongoing)
+    } while (gridsUpdated < all.size && timer.greenLight)
   }
 }

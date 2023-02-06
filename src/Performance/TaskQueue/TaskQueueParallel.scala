@@ -44,7 +44,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
       val budgetMsRecentSpent = task.runMsRecentTotal()
       val taskBudgetMs        = Maff.clamp(budgetMsRecent - budgetMsRecentSpent, 0, With.performance.msBeforeTarget).toLong
 
-      if (i == 0 || (task.due && ! With.performance.danger) || (timer.ongoing && task.safeToRun(taskBudgetMs))) {
+      if (i == 0 || (task.due && ! With.performance.disqualificationDanger) || (timer.greenLight && task.safeToRun(taskBudgetMs))) {
         task.run(taskBudgetMs)
       } else {
         task.skip()
@@ -52,8 +52,8 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
       i += 1
     }
 
-    if (With.performance.violatedLimit) {
-      With.logger.performance(f"$toString crossed ${With.configuration.frameLimitMs}ms to ${With.performance.frameMs}ms. Task durations: ${
+    if (With.performance.frameBrokeLimit) {
+      With.logger.performance(f"$toString crossed ${With.configuration.frameLimitMs}ms to ${With.performance.frameElapsedMs}ms. Task durations: ${
         tasksSorted
           .filter(_.framesSinceRunning <= 1)
           .sortBy(- _.runMsLast)

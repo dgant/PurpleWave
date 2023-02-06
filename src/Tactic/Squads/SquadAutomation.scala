@@ -26,10 +26,10 @@ object SquadAutomation {
     val unrankedTargets   = unrankedAround(squad, to)
     lazy val targetCombat = unrankedTargets.filter(t => t.unitClass.isWorker || squad.canBeAttackedBy(t) || (t.unitClass.isStaticDefense && squad.units.exists(t.inRangeToAttack)))
     lazy val targetHall   = unrankedTargets.filter(_.unitClass.isTownHall)
-    squad.setTargets(SquadAutomation.rankForArmy(squad, Maff.orElse(targetCombat, targetHall, unrankedTargets).toSeq).sortBy( ! _.unitClass.isWorker))
+    squad.setTargets(SquadAutomation.rankForArmy(squad, Maff.orElse(targetCombat, targetHall, unrankedTargets).toVector).sortBy( ! _.unitClass.isWorker))
   }
 
-  def rankForArmy(squad: Squad, targets: Seq[UnitInfo]): Seq[UnitInfo] = {
+  def rankForArmy(squad: Squad, targets: Vector[UnitInfo]): Vector[UnitInfo] = {
     targets.sortBy(t =>
         ?(t.visible,                                  0, 32 * 5)
       + ?(t.pixel == t.pixelObserved,                 0, 32 * 5)
@@ -37,29 +37,25 @@ object SquadAutomation {
       + t.pixelDistanceCenter(squad.centroidKey)
       + t.pixelDistanceCenter(squad.vicinity))
   }
-  def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    val combatEnemiesInRoute = With.units.enemy.filter(e =>
+  def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Set[UnitInfo] = {
+    val combatEnemiesInRoute = group.battleEnemies.filter(e =>
       ! Protoss.Interceptor(e)
       && e.likelyStillThere
       && group.canAttack(e)
       && group.canBeAttackedBy(e)
       && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
-      .toVector
-    val output =
-      Maff.orElse(
-        combatEnemiesInRoute.view.filter(_.team.isEmpty),
-        // If there's no battle (defenseless targets) then wipe the zone!
-        to.base
-          .map(_.enemies)
-          .getOrElse(to.zone.units.view.filter(e => e.isEnemy && group.canAttack(e)))).toVector
-    output
+    val around = unrankedAround(group, to)
+    combatEnemiesInRoute ++ around
   }
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
-    With.units.enemy.filter(u => u.likelyStillThere && (u.zone == to.zone || u.pixelDistanceCenter(to) < 32 * 12)).toVector
+    to.base.getOrElse(to.zone).enemies
+      .filter(_.likelyStillThere)
+      .filter(group.canAttack)
+      .toVector
   }
 
   def rankedEnRoute(squad: Squad): Seq[UnitInfo] = rankedEnRoute(squad, squad.vicinity)
-  def rankedEnRoute(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedEnRouteTo(squad, goalAir))
+  def rankedEnRoute(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedEnRouteTo(squad, goalAir).toVector)
   def rankedAround(squad: Squad): Seq[UnitInfo] = rankedAround(squad, squad.vicinity)
   def rankedAround(squad: Squad, goalAir: Pixel): Seq[UnitInfo] = rankForArmy(squad, unrankedAround(squad, goalAir))
 

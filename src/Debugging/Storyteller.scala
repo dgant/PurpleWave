@@ -94,7 +94,7 @@ class Storyteller {
     new Story                           ("Monitor bases",       () => With.blackboard.monitorBases.get),
     new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                    _.mkString(" "), expand = true),
     new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                  _.mkString(", "), expand = true),
-    new Story                           ("Performance danger",  () => With.performance.danger),
+    new Story                           ("Performance danger",  () => With.performance.disqualificationDanger),
     new Story                           ("Sluggishness",        () => With.reaction.sluggishness),
     new Story                           ("Gas worker floor",    () => With.blackboard.gasWorkerFloor()),
     new Story                           ("Gas worker ceiling",  () => With.blackboard.gasWorkerCeiling()),
@@ -168,7 +168,7 @@ class Storyteller {
     tell(
       "The bot believes its performance"
       + (if (Main.jbwapiConfiguration.getAsync) ", if it were running synchronously, would have been " else " was ")
-      + (if (With.performance.disqualified) "BAD" else if (With.performance.danger) "DANGEROUS" else "good"))
+      + (if (With.performance.disqualified) "BAD" else if (With.performance.disqualificationDanger) "DANGEROUS" else "good"))
     tell(PurpleBWClient.getPerformanceMetrics.toString)
     tell(
       DrawScreen.tableToString(

@@ -83,7 +83,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
     val targetsUnranked =
       if (canScour) scourables
-      else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity)
+      else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector
       else enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
 
@@ -116,7 +116,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val slot = formations.headOption.flatMap(_(scourer))
     val where = slot
       .filter(p => scourer.pixelsToGetInRangeFrom(target, p) <= scourer.pixelsToGetInRange(target))
-      .orElse(slot.map(p => target.pixel.project(p, scourer.pixelRangeAgainst(target))))
+      .orElse(slot.map(p => target.pixel.project(p, scourer.pixelsToGetInRange(target))))
       .getOrElse(target.pixel)
       .traversiblePixel(scourer)
     scourer.intend(this)

@@ -23,7 +23,6 @@ object Target {
 
   def choose(attacker: FriendlyUnitInfo, required: TargetFilter*): Option[UnitInfo] = {
     attacker.agent.toAttack = best(attacker, required: _*)
-    attacker.agent.toAttack.foreach(_.addTargeter(attacker))
     attacker.agent.toAttack
   }
 

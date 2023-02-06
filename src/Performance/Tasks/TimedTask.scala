@@ -47,7 +47,7 @@ abstract class TimedTask {
   final val runMsRecentMean     = new Cache(() => runMsPast.view.map(Math.min(_, 100)).sum / Math.max(1, runMsPast.size))
   final val runMsRecentTotal    = new Cache(() => runMsPast.sum)
   final val runMsSamplesMax     = 8
-  private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.danger && Main.jbwapiConfiguration.getAsync) runMsRecentMax() else runMsRecentMean())
+  private def runMsProjected: Double = Math.max(if (runsTotal < 10) 5 else 1, if (With.performance.disqualificationDanger && Main.jbwapiConfiguration.getAsync) runMsRecentMax() else runMsRecentMean())
   private def runMsEnqueue(value: Long): Unit = {
     runMsPast.enqueue(Math.max(0L, value))
     while (runMsPast.size > runMsSamplesMax) runMsPast.dequeue()
@@ -76,15 +76,15 @@ abstract class TimedTask {
     budgetMsEnqueue(budgetMs)
     val budgetMsCapped        = Math.min(budgetMs, With.performance.msBeforeTarget)
     val millisecondsBefore    = With.performance.systemMillis
-    val targetAlreadyViolated = With.performance.violatedTarget
-    val limitAlreadyViolated  = With.performance.violatedLimit
+    val targetAlreadyViolated = With.performance.frameBrokeTarget
+    val limitAlreadyViolated  = With.performance.frameBrokeLimit
     onRun(budgetMsCapped)
     val millisecondsAfter     = With.performance.systemMillis
     var millisecondsDuration  = millisecondsAfter - millisecondsBefore
 
     // Debug pauses (ie. setting breakpoints) produce measurement outliers and throw off performance tuning
     // Detect and ignore debug pauses; use a reasonable default value in their place
-    if (With.performance.hitBreakpointThisFrame) {
+    if (With.performance.frameHitBreakpoint) {
       millisecondsDuration = runMsRecentMean()
     }
 
@@ -93,14 +93,14 @@ abstract class TimedTask {
       _runMsMax = Math.max(_runMsMax, millisecondsDuration)
     }
     runMsEnqueue(millisecondsDuration)
-    if ( ! targetAlreadyViolated && With.performance.violatedTarget) {
+    if ( ! targetAlreadyViolated && With.performance.frameBrokeTarget) {
       _runsCrossingTarget += 1
     }
-    if ( ! limitAlreadyViolated && With.performance.violatedLimit) {
+    if ( ! limitAlreadyViolated && With.performance.frameBrokeLimit) {
       _runsCrossingLimit += 1
       if (skipsMax > 0 && With.configuration.enablePerformancePauses && With.performance.lastTaskWarningFrame < With.frame) {
         With.performance.lastTaskWarningFrame = With.frame
-        With.logger.performance(f"$toString${if(due)" (Due)" else ""} crossed ${With.configuration.frameLimitMs}ms taking ${millisecondsDuration}ms on a ${budgetMs}ms budget (${Maff.meanL(budgetMsPast).toInt}ms avg budget), reaching ${With.performance.frameMs}ms on the frame.")
+        With.logger.performance(f"$toString${if(due)" (Due)" else ""} crossed ${With.configuration.frameLimitMs}ms taking ${millisecondsDuration}ms on a ${budgetMs}ms budget (${Maff.meanL(budgetMsPast).toInt}ms avg budget), reaching ${With.performance.frameElapsedMs}ms on the frame.")
       }
     }
     lastRunFrame = With.frame

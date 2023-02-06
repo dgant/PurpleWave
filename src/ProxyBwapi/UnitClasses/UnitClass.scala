@@ -573,6 +573,23 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Ultralisk) 15
     else 0
 
+  /**
+    * For the very small number of units with substantial stop frames AND a travelling projectile,
+    * this gives the expected duration in which a bullet exists but its target has yet to receive damage
+    */
+  lazy val expectedProjectileFrames: Int = {
+    // At max range it looks to be 12 frames for a Dragoon.
+    // Closer range can be 7 and possibly shorter
+    if (this == Protoss.Dragoon) stopFrames + 7
+    // Measured minimum of 5 frames for a Vulture right next to a Cannon
+    else if (this == Protoss.PhotonCannon) stopFrames + 5
+    // Measured 7 at close-ish range; assuming 6 is possible when closer
+    else if (this == Zerg.Mutalisk) 2
+    // I definitely did not take the trouble to actually measure this
+    else if (this == Zerg.Devourer) stopFrames + 7
+    else 0
+  }
+
   //////////////////
   // Capabilities //
   //////////////////

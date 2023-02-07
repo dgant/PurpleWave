@@ -158,7 +158,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def setTarget(targetNew: Option[Simulacrum]): Unit = {
-    addEvent(SimulationEventSwitchTarget(this, target, targetNew))
+    if (target != targetNew) {
+      addEvent(SimulationEventSwitchTarget(this, target, targetNew))
+    }
     target = targetNew
   }
 

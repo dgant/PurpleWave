@@ -21,6 +21,7 @@ class ProtossFFA extends GameplanTemplate {
     Get(8,   Protoss.Probe),
     Get(Protoss.Pylon),
     Get(10, Protoss.Probe),
+    Get(Protoss.Gateway),
     Get(12,  Protoss.Probe),
     Get(2, Protoss.Pylon),
     Get(13,  Protoss.Probe),

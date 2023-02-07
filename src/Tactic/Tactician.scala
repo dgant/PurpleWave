@@ -136,7 +136,7 @@ class Tactician extends TimedTask {
 
     // Sort defense divisions by descending distance from home.
     // The further the base is, the pickier we must be about which defenders we bring along.
-    var divisionsToDefend = With.battles.divisions.filter(_.bases.exists(b => b.isOurs || b.plannedExpoRecently))
+    var divisionsToDefend = With.battles.divisions.filter(_.bases.exists(b => (b.isOurs || b.plannedExpoRecently) && ! b.isEnemy))
     divisionsToDefend = divisionsToDefend
       .filterNot(d =>
         // TODO: Old checks which we should probably generalize better

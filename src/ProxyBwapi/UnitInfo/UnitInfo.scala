@@ -194,7 +194,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   })
 
   @inline final def proxied: Boolean = _proxied()
-  private val _proxied = new Cache(() => ! isFriendly && unitClass.isBuilding && ! flying && With.scouting.proximity(tile) < 0.42, 240)
+  private val _proxied = new Cache(() => ! isFriendly && unitClass.isBuilding && ! flying && With.scouting.proximity(tile) > 0.42, 240)
 
   ////////////
   // Combat //

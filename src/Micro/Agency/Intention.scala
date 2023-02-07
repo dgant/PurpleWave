@@ -70,7 +70,7 @@ class Intention {
   def setShouldMeld     (value: Boolean = true)           : Intention = { shouldMeld    = value; this }
   def setShouldLiftoff  (value: Boolean = true)           : Intention = { shouldLiftoff = value; this }
   def setTargets        (value: Iterable[UnitInfo])       : Intention = { targets       = Some(new IndexedSet[UnitInfo](value)); this }
-  def setTargets        (value: UnitInfo*)                : Intention = setTargets(value: _*)
+  def setTargets        (value: UnitInfo*)                : Intention = setTargets(value)
 
   // Ideally consistent with the Agent logic
   def destination: Option[Pixel] = toTravel

@@ -41,7 +41,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   def isOurNatural            : Boolean           = this == With.geography.ourNatural
   def scoutedByUs             : Boolean           = lastFrameScoutedByUs > 0
   def scoutedByEnemy          : Boolean           = lastFrameScoutedByEnemy > 0
-  def plannedExpoRecently     : Boolean           = With.framesSince(lastPlannedExpo) < Minutes(1)()
+  def plannedExpoRecently     : Boolean           = isNeutral && With.framesSince(lastPlannedExpo) < Minutes(1)()
   def resources               : Seq[UnitInfo]     = minerals.view ++ gas
 
   lazy val overlooks: Vector[(Tile, Double)] = {

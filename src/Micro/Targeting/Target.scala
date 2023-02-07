@@ -81,6 +81,10 @@ object Target {
   }
 
   def auditScore(attacker: FriendlyUnitInfo): Seq[(UnitInfo, Double, Double, Double)] = {
-    attacker.matchups.targets.view.map(target => (target, attacker.pixelDistanceEdge(target) / 32d, target.targetValue, attacker.targetScore(target))).toVector.sortBy(-_._3)
+    attacker.matchups.targets.view.map(target => (
+      target,
+      attacker.pixelDistanceEdge(target) / 32d,
+      target.targetValue,
+      attacker.targetScore(target))).toVector.sortBy(-_._3)
   }
 }

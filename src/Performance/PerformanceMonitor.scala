@@ -1,6 +1,7 @@
 package Performance
 
 import Lifecycle.{PurpleBWClient, With}
+import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import Utilities.?
 import Utilities.Time.{Forever, Seconds}
@@ -39,7 +40,7 @@ class PerformanceMonitor {
   // https://www.geeksforgeeks.org/java-system-nanotime-vs-system-currenttimemillis/
   def systemMillis        : Long    = System.nanoTime / 1000000
   def frameMaxMs          : Long    = frameTimes.max
-  def frameMeanMs         : Long    = frameTimes.view.map(Math.min(_, 100L)).sum / Math.min(With.frame, frameTimes.length)
+  def frameMeanMs         : Long    = frameTimes.view.map(Math.min(_, 100L)).sum / Math.min(Math.max(1, With.frame), frameTimes.length)
   def frameElapsedMs      : Long    = Math.max(0, systemMillis - frameStartMs)
   def msBeforeTarget      : Long    = ?(With.frame == 0, Forever(), With.configuration.frameTargetMs - ?(frameHitBreakpoint, 0, frameElapsedMs))
   def msBeforeLimit       : Long    = ?(With.frame == 0, Forever(), With.configuration.frameLimitMs  - ?(frameHitBreakpoint, 0, frameElapsedMs))

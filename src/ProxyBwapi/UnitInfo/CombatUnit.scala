@@ -73,31 +73,31 @@ trait CombatUnit {
     if (output == 0  && unitClass == Protoss.Reaver)  output = 1
     output
   })
-  @inline final def stimAttackSpeedBonus: Int = if (stimmed) 2 else 1
+  @inline final def stimAttackSpeedBonus: Int = ?(stimmed, 2, 1)
   @inline final def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
     unitClass.pixelRangeAir +
-      (if (unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange))     32.0 else 0.0) +
-      (if (unitClass == Terran.Goliath  && player.hasUpgrade(Terran.GoliathAirRange)) 96.0 else 0.0) +
-      (if (unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange))   64.0 else 0.0) +
-      (if (unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange))    32.0 else 0.0))
+      ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),     32.0, 0.0) +
+      ?(unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange),     32.0, 0.0) +
+      ?(unitClass == Terran.Goliath  && player.hasUpgrade(Terran.GoliathAirRange), 96.0, 0.0) +
+      ?(unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange),   64.0, 0.0) +
+      ?(unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange),    32.0, 0.0))
   @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.pixelRangeGround +
-      (if (unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange))   32.0 else 0.0) +
-      (if (unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange)) 64.0 else 0.0) +
-      (if (unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange))  32.0 else 0.0))
+      ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),   32.0, 0.0) +
+      ?(unitClass == Terran.Marine   && player.hasUpgrade(Terran.MarineRange),   32.0, 0.0) +
+      ?(unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange), 64.0, 0.0) +
+      ?(unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange),  32.0, 0.0))
   @inline final def pixelRangeMin: Double = unitClass.groundMinRangeRaw
   @inline final def pixelRangeMax: Double = Math.max(pixelRangeAir, pixelRangeGround)
 
   @inline final def totalHealth: Int = hitPoints + shieldPoints + matrixPoints
-  @inline final def cooldownMaxAir    : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
-  @inline final def cooldownMaxGround : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
-  @inline final def cooldownMaxAirGround: Int = Math.max(if (unitClass.attacksAir) cooldownMaxAir else 0, if (unitClass.attacksGround)  cooldownMaxGround else 0)
-  @inline final def cooldownMaxAgainst(enemy: CombatUnit): Int = if (enemy.flying) cooldownMaxAir else cooldownMaxGround
-  @inline final def pixelRangeAgainst(enemy: CombatUnit): Double = if (enemy.flying) pixelRangeAir else pixelRangeGround
+  @inline final def cooldownMaxAir      : Int = (2 + unitClass.airDamageCooldown)     / stimAttackSpeedBonus // +2 is the RNG
+  @inline final def cooldownMaxGround   : Int = (2 + unitClass.groundDamageCooldown)  / stimAttackSpeedBonus // +2 is the RNG
+  @inline final def cooldownMaxAirGround: Int = Math.max(?(unitClass.attacksAir, cooldownMaxAir, 0), ?(unitClass.attacksGround, cooldownMaxGround, 0))
+  @inline final def cooldownMaxAgainst  (enemy: CombatUnit): Int    = ?(enemy.flying, cooldownMaxAir, cooldownMaxGround)
+  @inline final def pixelRangeAgainst   (enemy: CombatUnit): Double = ?(enemy.flying, pixelRangeAir,  pixelRangeGround)
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
 
   @inline final def x           : Int   = pixel.x
@@ -117,7 +117,7 @@ trait CombatUnit {
   @inline final def pixelEndAt              (at: Pixel)                     : Pixel   = at.subtract(pixel).add(right, bottom)
   @inline final def pixelDistanceCenter     (otherPixel:  Pixel)            : Double  = pixel.pixelDistance(otherPixel)
   @inline final def pixelDistanceCenter     (otherUnit:   CombatUnit)       : Double  = pixelDistanceCenter(otherUnit.pixel)
-  @inline final def pixelDistanceShooting   (other:       CombatUnit)       : Double  = if (unitClass == Protoss.Reaver && pixel.zone != other.pixel.zone) pixelDistanceTravelling(other.pixel) else pixelDistanceEdge(other.pixelStart, other.pixelEnd)
+  @inline final def pixelDistanceShooting   (other:       CombatUnit)       : Double  = ?(unitClass == Protoss.Reaver && pixel.zone != other.pixel.zone, pixelDistanceTravelling(other.pixel), pixelDistanceEdge(other.pixelStart, other.pixelEnd))
   @inline final def pixelDistanceEdge       (other:       CombatUnit)       : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
   @inline final def pixelDistanceEdge       (other: CombatUnit, otherAt: Pixel) : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(1 + other.unitClass.dimensionRight, 1 + other.unitClass.dimensionDown))
   @inline final def pixelDistanceEdge       (oStart: Pixel, oEnd: Pixel)    : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEnd, oStart, oEnd)
@@ -128,35 +128,35 @@ trait CombatUnit {
   @inline final def pixelDistanceSquared    (otherPixel:  Pixel)            : Double  = pixel.pixelDistanceSquared(otherPixel)
   @inline final def pixelDistanceTravelling (destination: Pixel)            : Double  = pixelDistanceTravelling(pixel, destination)
   @inline final def pixelDistanceTravelling (destination: Tile)             : Double  = pixelDistanceTravelling(pixel, destination.center)
-  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)        : Double  = if (flying) from.pixelDistance(to) else from.walkableTile.groundPixels(to.walkableTile)
-  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)         : Double  = if (flying) from.center.pixelDistance(to.center) else from.walkableTile.groundPixels(to.walkableTile)
-  @inline final def pixelsTravelledMax(framesAhead: Int): Double = if (canMove) topSpeed * framesAhead else 0.0
+  @inline final def pixelDistanceTravelling (from: Pixel, to: Pixel)        : Double  = ?(flying, from.pixelDistance(to),               from.walkableTile.groundPixels(to.walkableTile))
+  @inline final def pixelDistanceTravelling (from: Tile,  to: Tile)         : Double  = ?(flying, from.center.pixelDistance(to.center), from.walkableTile.groundPixels(to.walkableTile))
+  @inline final def pixelsTravelledMax(framesAhead: Int): Double = ?(canMove, topSpeed * framesAhead, 0.0)
   @inline final def pixelReachAir     (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeAir
   @inline final def pixelReachGround  (framesAhead: Int): Double = pixelsTravelledMax(framesAhead) + pixelRangeGround
   @inline final def pixelReachMax     (framesAhead: Int): Double = Math.max(pixelReachAir(framesAhead), pixelReachGround(framesAhead))
-  @inline final def pixelReachAgainst (framesAhead: Int, enemy: CombatUnit): Double = if (enemy.flying) pixelReachAir(framesAhead) else pixelReachGround(framesAhead)
+  @inline final def pixelReachAgainst (framesAhead: Int, enemy: CombatUnit): Double = ?(enemy.flying, pixelReachAir(framesAhead), pixelReachGround(framesAhead))
   @inline final def inRangeToAttack(enemy: CombatUnit)                    : Boolean = pixelDistanceEdge(enemy)          <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy)          > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: UnitInfo, enemyAt: Pixel)      : Boolean = pixelDistanceEdge(enemy, enemyAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdge(enemy, enemyAt) > pixelRangeMin)
   @inline final def inRangeToAttack(enemy: CombatUnit, usAt: Pixel, to: Pixel): Boolean = { val d = pixelDistanceEdge(enemy, usAt, to); d <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || d > pixelRangeMin) }
   @inline final def inRangeToAttackFrom(enemy: CombatUnit, usAt: Pixel)   : Boolean = pixelDistanceEdgeFrom(enemy, usAt) <= pixelRangeAgainst(enemy) && (pixelRangeMin <= 0.0 || pixelDistanceEdgeFrom(enemy, usAt) > pixelRangeMin)
-  @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy)            - pixelRangeAgainst(enemy)) else LightYear()
-  @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = if (canAttack(enemy)) (pixelDistanceEdge(enemy, enemyAt)   - pixelRangeAgainst(enemy)) else LightYear()
-  @inline final def pixelsToGetInRangeFrom(enemy: CombatUnit, usAt: Pixel): Double = if (canAttack(enemy)) (pixelDistanceEdgeFrom(enemy, usAt)  - pixelRangeAgainst(enemy)) else LightYear()
+  @inline final def pixelsToGetInRange(enemy: CombatUnit)                 : Double = ?(canAttack(enemy), pixelDistanceEdge(enemy)            - pixelRangeAgainst(enemy), LightYear())
+  @inline final def pixelsToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Double = ?(canAttack(enemy), pixelDistanceEdge(enemy, enemyAt)   - pixelRangeAgainst(enemy), LightYear())
+  @inline final def pixelsToGetInRangeFrom(enemy: CombatUnit, usAt: Pixel): Double = ?(canAttack(enemy), pixelDistanceEdgeFrom(enemy, usAt)  - pixelRangeAgainst(enemy), LightYear())
   @inline final def pixelsToGetInRangeTraveling(enemy: CombatUnit)        : Double = Math.max(pixelsToGetInRange(enemy), if ( ! canAttack(enemy) || flying || inRangeToAttack(enemy)) 0 else pixelDistanceTravelling(enemy.pixel) - pixelRangeAgainst(enemy) - unitClass.dimensionMin - enemy.unitClass.dimensionMin)
   @inline final def framesToTravelTo(destination: Pixel)    : Int = framesToTravelPixels(pixelDistanceTravelling(destination))
   @inline final def framesToTravelTo(destination: Tile)     : Int = framesToTravelTo(destination.center)
-  @inline final def framesToTravelPixels(pixels: Double)    : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + (if (burrowed || unitClass == Terran.SiegeTankSieged) 24 else 0)
+  @inline final def framesToTravelPixels(pixels: Double)    : Int = (if (pixels <= 0.0) 0 else if (canMove) Math.max(0, Math.ceil(pixels / topSpeedPossible).toInt) else Forever()) + ?(burrowed || unitClass == Terran.SiegeTankSieged, 24, 0)
   @inline final def framesToTurnTo    (radiansTo: Double)   : Double = unitClass.framesToTurn(Maff.normalizePiToPi(Maff.radiansTo(angleRadians, radiansTo)))
   @inline final def framesToTurnTo    (pixelTo: Pixel)      : Double = framesToTurnTo(pixel.radiansTo(pixelTo))
   @inline final def framesToTurnFrom  (pixelTo: Pixel)      : Double = framesToTurnTo(pixelTo.radiansTo(pixel))
   @inline final def framesToTurnTo    (enemyFrom: CombatUnit) : Double = framesToTurnTo(enemyFrom.pixel.radiansTo(pixel))
   @inline final def framesToTurnFrom  (enemyFrom: CombatUnit) : Double = framesToTurnTo(pixel.radiansTo(enemyFrom.pixel))
-  @inline final def framesToStopRightNow: Double = if (unitClass.isFlyer || unitClass.floats) Maff.clamp(Maff.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate) else 0.0
+  @inline final def framesToStopRightNow: Double = ?(unitClass.isFlyer || unitClass.floats, Maff.clamp(Maff.nanToZero(framesToAccelerate * speed / topSpeed), 0.0, framesToAccelerate), 0.0)
   @inline final def framesToAccelerate: Double = Maff.clamp(Maff.nanToZero((topSpeed - speed) / unitClass.accelerationFrames), 0, unitClass.accelerationFrames)
-  @inline final def framesToGetInRange(enemy: CombatUnit)                 : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy)) else Forever()
-  @inline final def framesToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Int = if (canAttack(enemy)) framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)) else Forever()
+  @inline final def framesToGetInRange(enemy: CombatUnit)                 : Int = ?(canAttack(enemy), framesToTravelPixels(pixelsToGetInRange(enemy)),          Forever())
+  @inline final def framesToGetInRange(enemy: CombatUnit, enemyAt: Pixel) : Int = ?(canAttack(enemy), framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)), Forever())
   @inline final def framesBeforeAttacking(enemy: CombatUnit)              : Int = framesBeforeAttacking(enemy, enemy.pixel)
-  @inline final def framesBeforeAttacking(enemy: CombatUnit, at: Pixel)   : Int = if (canAttack(enemy))  Math.max(cooldownLeft, framesToGetInRange(enemy)) else Forever()
+  @inline final def framesBeforeAttacking(enemy: CombatUnit, at: Pixel)   : Int = ?(canAttack(enemy),  Math.max(cooldownLeft, framesToGetInRange(enemy)), Forever())
 
   @inline final def hitChanceAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = ?(guaranteedToHit(enemy, from, to), 1.0, 0.47)
   @inline final def guaranteedToHit(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
@@ -165,13 +165,13 @@ trait CombatUnit {
   @inline final def attacksAgainst    (enemy: CombatUnit)  : Int          = ?(enemy.flying, attacksAgainstAir,       attacksAgainstGround)
   @inline final def damageTypeAgainst (enemy: CombatUnit)  : Damage.Type  = ?(enemy.flying, unitClass.airDamageType, unitClass.groundDamageType)
   @inline final def damageMultiplierAgainst(enemy: CombatUnit): Double = Damage.scaleBySize(damageTypeAgainst(enemy), enemy.unitClass.size)
-  @inline final def dpfOnNextHitAgainst(enemy: CombatUnit): Double = if (unitClass.suicides) damageOnNextHitAgainst(enemy) else { val cooldownVs = cooldownMaxAgainst(enemy); ?(cooldownVs <= 0, 0.0, damageOnNextHitAgainst(enemy).toDouble / cooldownVs) }
+  @inline final def dpfOnNextHitAgainst(enemy: CombatUnit): Double = ?(unitClass.suicides, damageOnNextHitAgainst(enemy), Math.max(0.0, Maff.nanToZero(damageOnNextHitAgainst(enemy).toDouble / cooldownMaxAgainst(enemy))))
   @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
   @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
   private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
-  @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: CombatUnit): Int = if(enemy.flying) damageOnHitAir else damageOnHitGround
+  @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: CombatUnit): Int = ?(enemy.flying, damageOnHitAir, damageOnHitGround)
   @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Int = {
     val enemyShieldPoints       = shields.getOrElse(enemy.shieldPoints)
     val hits                    = attacksAgainst(enemy)
@@ -192,8 +192,8 @@ trait CombatUnit {
   @inline final def isNeutral  : Boolean = player.isNeutral
   @inline final def isFriendly : Boolean = player.isAlly || isOurs
   @inline final def isEnemy    : Boolean = player.isEnemy
-  @inline final def isEnemyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy) || (isEnemy && otherUnit.isFriendly)
-  @inline final def isAllyOf(otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
+  @inline final def isEnemyOf (otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isEnemy)    || (isEnemy && otherUnit.isFriendly)
+  @inline final def isAllyOf  (otherUnit: UnitInfo): Boolean = (isFriendly && otherUnit.isFriendly) || (isEnemy && otherUnit.isEnemy)
 
   ////////////
   // Damage //
@@ -208,12 +208,12 @@ trait CombatUnit {
     val damageNew = DamageSource(
       source      = source,
       onFrame     = Math.min(damagePrevious.map(_.onFrame).getOrElse(Forever()), With.frame + inFrames),
-      committed   = automaticallyGuaranteed || damagePrevious.exists(_.committed) || committed,
-      guaranteed  = automaticallyGuaranteed || damagePrevious.exists(_.guaranteed) || (committed && source.hitChanceAgainst(this) > .9),
+      committed   = automaticallyGuaranteed || damagePrevious.exists(_.committed)   || committed,
+      guaranteed  = automaticallyGuaranteed || damagePrevious.exists(_.guaranteed)  || (committed && source.hitChanceAgainst(this) > .9),
       damageTotal = fixedDamage.getOrElse(source.damageOnNextHitAgainst(this)))
     damagePrevious.foreach(damageQueue.-=)
     val insertIndex = damageQueue.indexWhere(_.onFrame > damageNew.onFrame)
-    if (insertIndex >= 0) damageQueue.insert(insertIndex, damageNew) else damageQueue += damageNew
+    ?(insertIndex >= 0, damageQueue.insert(insertIndex, damageNew), damageQueue += damageNew)
   }
   def addFutureAttack(source: CombatUnit): Unit = {
     addDamage(

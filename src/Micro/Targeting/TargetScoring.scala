@@ -40,17 +40,30 @@ object TargetScoring {
 
     val attackValue = this.attackValue(
       targetValue = target.targetValue,
-      injury      = target.injury,
+      injury      = ?(target.doomed, 0.0, target.injury),
       pixelCost   = pixelCost(attacker, target),
       efficacy    = splashEfficacy * attacker.hitChanceAgainst(target) * attacker.damageMultiplierAgainst(target))
 
-    val threatCost  = attacker.pixelToFireAt(target).tile.enemiesAttacking(attacker).length match {
-      case 0 => 0
-      case 1 => 1
-      case _ => 3
+    var meleeSpreadBonus = 8.0
+    if (attacker.unitClass.melee) {
+      val otherAttackers  = Math.max(0, target.targetedByRecentlyMelee.size - 1)
+      val surfaceArea     = target.unitClass.perimeter
+      val surfaceTaken    = attacker.unitClass.dimensionMax * otherAttackers
+      val surfaceRatio    = surfaceTaken / surfaceArea
+      if (otherAttackers > 1 && surfaceRatio >= 0.25) {
+        meleeSpreadBonus = Math.max(0, meleeSpreadBonus - 1.0 * otherAttackers)
+      }
     }
 
-    attackValue * splashEfficacy - threatCost
+    val catchBonus = add(12.0, target.caught || target.caughtBy(attacker))
+
+    val threatCost = attacker.pixelToFireAt(target).tile.enemiesAttacking(attacker).length match {
+      case 0 => 0.0
+      case 1 => 1.0
+      case _ => 3.0
+    }
+
+    (attackValue + meleeSpreadBonus + catchBonus) * splashEfficacy - threatCost
   }
 
   /**
@@ -76,6 +89,10 @@ object TargetScoring {
     output += add(2.0,  ! target.canMove)
     output += add(12.0, ! target.canMove || target.visible)
     output += add(12.0, ! target.canMove || target.likelyStillThere)
+
+    // Doom penalties
+    output += add(2.0, ! target.likelyDoomed)
+    output += add(2.0, ! target.doomed)
 
     // Interceptor penalty
     output += add(12.0, ! Protoss.Interceptor(target))

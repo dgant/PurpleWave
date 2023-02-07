@@ -22,7 +22,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.{GenericFriendlyUnitGroup, TFriendlyUnitGroup, UnitGroup}
 import Utilities.?
 import Utilities.Time.{Forever, Seconds}
-import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot, IsWorker}
+import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot}
 
 final class Combat(unit: FriendlyUnitInfo) extends Action {
 
@@ -71,8 +71,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
   def innerPerform(): Unit = {
     Target.choose(unit)
-    val canBypass = unit.matchups.ignorant || (unit.agent.shouldFight && unit.matchups.threatsInPixels(96).forall(IsWorker))
-    unit.agent.shouldFight &&= target.nonEmpty
+    val bypass = target.isEmpty && (unit.matchups.ignorant || unit.agent.shouldFight)
     Commander.defaultEscalation(unit)
 
     firingPixel         = target.map(unit.pixelToFireAt)
@@ -83,8 +82,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
     technique =
       if ( ! unit.canMove)              Fight
+      else if (bypass)                  Walk
       else if (unit.agent.shouldFight)  Fight
-      else if (canBypass)               Walk
       else                              Flee
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)

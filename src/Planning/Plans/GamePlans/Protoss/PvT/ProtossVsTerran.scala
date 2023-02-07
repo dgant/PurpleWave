@@ -84,7 +84,7 @@ class ProtossVsTerran extends PvTOpeners {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       get(Protoss.DragoonRange)
       requireGas()
-      val observersForVultures = enemyHasShown(Terran.SpiderMine) || gasPumps > 2
+      val observersForVultures  = enemyHasShown(Terran.SpiderMine) || gasPumps > 2
       val observersForWraiths   = enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1
       val observersForSomething = observersForVultures || observersForWraiths
       val safeForUpgrades       = unitsComplete(IsWarrior) > 12 && safeAtHome
@@ -248,6 +248,7 @@ class ProtossVsTerran extends PvTOpeners {
 
     if (shouldAttack) attack()
     harass()
+    gasLimitCeiling(Math.max(1, miningBases) * 300)
     With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
 
     val army = new DoQueue(doArmyNormalPriority)

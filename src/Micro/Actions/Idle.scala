@@ -4,7 +4,7 @@ import Micro.Actions.Basic._
 import Micro.Actions.Combat.Decisionmaking.FightOrFlee
 import Micro.Actions.Combat.Fight
 import Micro.Actions.Combat.Tactics.Unbunk
-import Micro.Actions.Commands.{Attack, Move}
+import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.Meld
 import Micro.Actions.Scouting.Scout
 import Micro.Actions.Transportation.Transport
@@ -17,7 +17,7 @@ object Idle extends Action {
 
   @inline
   final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_.apply(unit))
-  
+
   private val actions = Vector(
     Cancel,
     Liftoff,
@@ -42,6 +42,6 @@ object Idle extends Action {
     Crack,
     Fight,
     Attack,
-    Move
+    Travel
   )
 }

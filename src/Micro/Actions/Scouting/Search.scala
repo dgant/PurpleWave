@@ -6,7 +6,6 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
 import Micro.Actions.Action
-import Micro.Actions.Commands.Move
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Heuristics.Potential
@@ -30,7 +29,7 @@ abstract class AbstractSearch extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.matchups.threats.isEmpty && ! unit.intent.toScoutTiles.exists(_.explored)) {
-      Move.apply(unit)
+      Commander.move(unit)
       return
     }
 
@@ -65,7 +64,7 @@ abstract class AbstractSearch extends Action {
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
     unit.agent.toTravel = Some(tilesToScout.minBy(_.center.pixelDistance(target)).center)
 
-    val profile = new PathfindProfile(unit.tile)
+    val profile               = new PathfindProfile(unit.tile)
     profile.end               = Some(unit.agent.destination.tile)
     profile.employGroundDist  = true
     profile.costOccupancy     = 0.01
@@ -74,7 +73,7 @@ abstract class AbstractSearch extends Action {
     profile.lengthMaximum     = Some(20)
     profile.unit              = Some(unit)
     profile.alsoUnwalkable    = bannedTiles
-    val path = profile.find
+    val path                  = profile.find
 
     if (unit.zone == unit.agent.destination.zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {
       unit.agent.forces(Forces.travel) = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destination))

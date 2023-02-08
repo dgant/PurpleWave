@@ -83,7 +83,9 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     Math.max(Math.abs(x-other.x), Math.abs(y-other.y))
   }
   @inline def tile: Tile = {
-    Tile(x / 32, y / 32) // Note! This will handle negative coordinates incorrectly
+    // This handles negative coordinates correctly AND is potentially an optimization:
+    // https://stackoverflow.com/questions/18560844/does-java-optimize-division-by-powers-of-two-to-bitshifting
+    Tile(x >> 5, y >> 5)
   }
   @inline def toPoint: Point = {
     Point(x, y)
@@ -139,19 +141,22 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (xFirst) nwtTest(t0).orElse(nwtTest(t1))
     else        nwtTest(t1).orElse(nwtTest(t0))
   @inline def walkableTile: Tile = {
-    val ti = tile
-    if (ti.walkable) return ti
-    val tx = x / 32
-    val ty = y / 32
-    val dx = if (x % 32 < 16) -1 else 1
-    val dy = if (y % 32 < 16) -1 else 1
-    val xFirst = Math.abs(16 - (x % 32)) > Math.abs(16 - (y % 32))
+    val tileHere = tile
+    if (tileHere.walkable) return tileHere
+    // Find an adjacent walkable tile
+    // Prefer tiles in the direction of this pixel's alignment within the tile
+    // For example: if we're at P(33, 48) inside T(1, 1) we'd prefer T(0, 1) to T(1, 0)
+    val tx = x >> 5
+    val ty = y >> 5
+    val dx = if ((x & 31) < 16) -1 else 1
+    val dy = if ((y & 31) < 16) -1 else 1
+    val xFirst = Math.abs(16 - (x & 31)) > Math.abs(16 - (y & 31))
     val output =
               nwtFlip(xFirst, Tile(tx + dx, ty), Tile(tx, ty + dy))
       .orElse(nwtTest(        Tile(tx + dx, ty + dy)))
       .orElse(nwtFlip(xFirst, Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(nwtTest(        Tile(tx - dx, ty - dy)))
-      .orElse(Spiral(16).view.map(ti.add).find(_.walkable))
+      .orElse(Spiral(16).view.map(tileHere.add).find(_.walkable))
       .getOrElse(tile)
     output
   }
@@ -173,7 +178,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       Maff.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       Maff.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
-  @inline def offsetFromTileCenter: Pixel = Pixel(x % 32 - 16, y % 32 - 16)
+  @inline def offsetFromTileCenter: Pixel = Pixel((x & 31) - 16, (x & 31) - 16)
 
   override def toString: String = f"[$x, $y](${Maff.signum(x) * Math.abs(x/32)}, ${Maff.signum(y) * Math.abs(y/32)})"
 }

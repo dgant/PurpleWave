@@ -1,5 +1,6 @@
 package Information.Geography.Types
 
+import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Points, Tile, TileRectangle}
 import ProxyBwapi.Players.PlayerInfo
@@ -14,6 +15,7 @@ trait Geo {
   def zones           : Seq[Zone]
   def isStartLocation : Boolean
 
+  lazy val island   : Boolean       = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val boundary : TileRectangle = new TileRectangle(tiles)
   lazy val centroid : Tile          = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles))
   lazy val border   : Set[Tile]     = tiles.filter( ! _.adjacent8.forall(tiles.contains))

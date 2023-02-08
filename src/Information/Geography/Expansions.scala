@@ -76,8 +76,8 @@ trait Expansions {
       val originThreat      = if (player.isEnemy)     With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin
       val distanceHome      = Maff.mean(friendlyTiles.map(base.heart.groundTiles).map(_.toDouble))
       val distanceEnemy     = Maff.mean(opposingTiles.map(base.heart.groundTiles).map(_.toDouble))
-      val distanceStrength  = originStrength.walkableTile.groundTiles(base.heart)
-      val distanceThreat    = originThreat.walkableTile.groundTiles(base.heart)
+      val distanceStrength  = originStrength.groundTiles(base.heart)
+      val distanceThreat    = originThreat.groundTiles(base.heart)
       val nearHome          = distanceToMultiplier(distanceHome)
       val nearEnemy         = distanceToMultiplier(distanceEnemy)
       val nearStrength      = distanceToMultiplier(distanceStrength)

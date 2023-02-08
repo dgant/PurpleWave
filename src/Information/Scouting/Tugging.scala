@@ -29,8 +29,8 @@ trait Tugging {
   def weControl               (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) > controlPoints(zone).count(enemyControls)
   def enemyControls           (base   : Base)   : Boolean     = controlPoints(base).count(weControl) < controlPoints(base).count(enemyControls)
   def enemyControls           (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) < controlPoints(zone).count(enemyControls)
-  def ourMuscleDistance       (pixel  : Pixel)  : Double      = ourMuscleOrigin.walkableTile.groundPixels(pixel)
-  def enemyMuscleDistance     (pixel  : Pixel)  : Double      = enemyMuscleOrigin.walkableTile.groundPixels(pixel)
+  def ourMuscleDistance       (pixel  : Pixel)  : Double      = ourMuscleOrigin.groundPixels(pixel)
+  def enemyMuscleDistance     (pixel  : Pixel)  : Double      = enemyMuscleOrigin.groundPixels(pixel)
   def deltaMuscle11           (pixel  : Pixel)  : Double      = (enemyMuscleDistance(pixel) - ourMuscleDistance(pixel)) / Math.max(13 * 32, enemyMuscleDistance(pixel) + ourMuscleDistance(pixel)) // Floor distance is to avoid wild swings when both players are close
   private def controlPoints   (base   : Base)   : Seq[Pixel]  = Seq(Some(base.townHallArea.center), Some(base.centroid.center), base.zone.entranceNow.map(_.pixelCenter), base.zone.exitNow.map(_.pixelCenter)).flatten
   private def controlPoints   (zone   : Zone)   : Seq[Pixel]  = (zone.bases.flatMap(controlPoints) ++ Seq(Some(zone.centroid.center), zone.entranceNow.map(_.pixelCenter), zone.exitNow.map(_.pixelCenter)).flatten).distinct
@@ -40,8 +40,8 @@ trait Tugging {
   def ourThreatOrigin   : Tile = _ourThreatOrigin()
   def ourMuscleOrigin   : Tile = _ourMuscleOrigin()
 
-  private val _tugStart             = new Cache(() => With.geography.home.walkableTile)
-  private val _tugEnd               = new Cache(() => With.scouting.enemyHome.walkableTile)
+  private val _tugStart             = new Cache(() => With.geography.home)
+  private val _tugEnd               = new Cache(() => With.scouting.enemyHome)
   private val _ourProximity         = new Cache(() => proximity(ourMuscleOrigin))
   private val _enemyProximity       = new Cache(() => proximity(enemyMuscleOrigin))
   private val _weControlOurNatural  = new Cache(() => weControl(With.geography.ourNatural))

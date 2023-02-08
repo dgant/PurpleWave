@@ -117,40 +117,40 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     dx * dx + dy * dy
   }
   @inline def topLeftPixel: Pixel = {
-    Pixel(x * 32, y * 32)
+    Pixel(x << 5, y << 5)
   }
   @inline def topRightPixel: Pixel = {
-    Pixel(x * 32 + 31, y * 32)
+    Pixel(x << 5 + 31, y << 5)
   }
   @inline def bottomRightPixel: Pixel = {
-    Pixel(x * 32 + 31, y * 32 + 31)
+    Pixel(x << 5 + 31, y << 5 + 31)
   }
   @inline def bottomLeftPixel: Pixel = {
-    Pixel(x * 32, y * 32 + 31)
+    Pixel(x << 5, y << 5 + 31)
   }
   @inline def pixelCorners: Array[Pixel] = {
     Array(topLeftPixel, topRightPixel, bottomRightPixel, bottomLeftPixel)
   }
   @inline def center: Pixel = {
-    Pixel(x * 32 + 15, y * 32 + 15)
+    Pixel(x << 5 + 15, y << 5 + 15)
   }
   @inline def contains(pixel: Pixel): Boolean = {
-    x == pixel.x / 32 && y == pixel.y / 32
+    x == pixel.x >> 5 && y == pixel.y >> 5
   }
   @inline def topLeftWalkPixel: WalkTile = {
-    WalkTile(x * 4, y * 4)
+    WalkTile(x >> 2, y >> 2)
   }
   @inline def left: Tile = {
     Tile(x - 1, y)
   }
   @inline def right: Tile = {
-    Tile(x+1, y)
+    Tile(x + 1, y)
   }
   @inline def up: Tile = {
-    Tile(x, y-1) //Remember our flipped coordinate system
+    Tile(x, y - 1) // Remember our flipped coordinate system
   }
   @inline def down: Tile = {
-    Tile(x, y+1) //Remember our flipped coordinate system
+    Tile(x, y + 1) // Remember our flipped coordinate system
   }
   @inline def adjacent4: Array[Tile] = {
     Array(up, down, left, right)
@@ -221,11 +221,14 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def explored: Boolean = {
     With.game.isExplored(x, y)
   }
+  @inline def exploredUnchecked: Boolean = {
+    With.game.isExploredUnsafe(x, y)
+  }
   @inline def visible: Boolean = {
     valid && visibleUnchecked
   }
   @inline def visibleUnchecked: Boolean = {
-    With.game.isVisible(x, y) // TODO: Replace with actually unchecked variant
+    With.game.isVisibleUnsafe(x, y)
   }
   @inline def visibleToEnemy: Boolean = {
     valid && visibleToEnemyUnchecked
@@ -287,9 +290,6 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def lastSeen: Int = {
     With.grids.lastSeen(this)
   }
-  @inline def visibleBwapi: Boolean = {
-    With.game.isVisible(x, y)
-  }
   @inline def units: Traversable[UnitInfo] = {
     With.grids.units.get(this)
   }
@@ -303,7 +303,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.game.hasCreep(x, y)
   }
   @inline def creepUnchecked: Boolean = {
-    With.game.hasCreep(x, y) // TODO: Replace with actually unchecked variant
+    With.game.hasCreepUnsafe(x, y)
   }
   @inline def enemiesVulnerableGround: Seq[UnitInfo] = {
     With.grids.enemyVulnerabilityGround.unitsOn(i)

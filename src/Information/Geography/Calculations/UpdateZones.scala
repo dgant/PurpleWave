@@ -43,7 +43,7 @@ object UpdateZones {
       }))
   
     With.geography.home = Maff
-      .minBy(With.geography.ourBases)(_.townHallTile.walkableTile.groundTiles(With.geography.home.walkableTile))
+      .minBy(With.geography.ourBases)(_.townHallTile.groundTiles(With.geography.home))
       .map(_.townHallTile)
       .getOrElse(With.geography.home)
   }

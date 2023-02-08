@@ -10,7 +10,6 @@ import Mathematics.Points.Points
 import Micro.Actions.Basic.{DoNothing, ReloadScarabs}
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
-import Micro.Actions.Commands.Move
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
@@ -306,7 +305,7 @@ abstract class MissionDrop extends Mission {
         if (transport.matchups.pixelsEntangled > -64) {
           Retreat.delegate(transport)
         }
-        Move.delegate(transport)
+        Commander.move(transport)
       }
     }
   }

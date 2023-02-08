@@ -101,8 +101,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       && unit.matchups.threatsInFrames(unit.unitClass.framesToPotshot + 9).forall(_.isAny(Terran.Vulture, IsSpeedlot, Zerg.Zergling)))
     transition(Fallback,  unit.isAny(Protoss.Archon, Protoss.Zealot) && unit.matchups.targetsInRange.exists(IsSpeedling))
 
-    unit.agent.shouldFight ||= shouldEngage
-    if (shouldRetreat) unit.agent.toTravel = Some(unit.agent.safety)
+    if (shouldEngage && ! unit.agent.shouldFight) {
+      unit.agent.shouldFight = true
+      unit.agent.fightReason = "Technique"
+    }
+    if (shouldRetreat) {
+      unit.agent.toTravel = Some(unit.agent.safety)
+      if (unit.agent.shouldFight) {
+        unit.agent.shouldFight = false
+        unit.agent.fightReason = "Technique"
+      }
+    }
 
     if (technique == Walk     && walk())        return
     if (technique == Aim      && aim())         return
@@ -230,8 +239,11 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def walk(): Boolean = {
     unit.agent.shouldFight = true // This encourages the unit to use its forward formation rather than its retreat formation
-    if (unit.agent.receivedPushPriority() > unit.agent.priority) {
-      applyForce(Forces.travel, Potential.towardsDestination(unit))
+    unit.agent.fightReason = "Walking"
+    if (unit.intent.canSneak) {
+      MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
+    } else if (unit.agent.receivedPushPriority() > unit.agent.priority) {
+      applyForce(Forces.travel, Potential.towards(unit, unit.agent.destination))
       moveForcefully()
     } else {
       move()

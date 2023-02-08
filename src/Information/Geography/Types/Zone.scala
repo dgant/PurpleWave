@@ -10,7 +10,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import bwta.Region
 
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
-  lazy  val island            : Boolean             = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
   lazy  val metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
   lazy  val entranceOriginal  : Option[Edge]        = UpdateZones.calculateEntrance(this)

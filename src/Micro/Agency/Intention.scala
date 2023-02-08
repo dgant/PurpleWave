@@ -29,6 +29,7 @@ class Intention {
   var action        : Action                        = Idle
   var canFight      : Boolean                       = true
   var canFlee       : Boolean                       = true
+  var canSneak      : Boolean                       = false
   var canTickle     : Boolean                       = false
   var shouldMeld    : Boolean                       = false
   var shouldLiftoff : Boolean                       = false
@@ -66,6 +67,7 @@ class Intention {
   def setScout          (value: Seq[Tile])                : Intention = { toScoutTiles  = value; this }
   def setCanFight       (value: Boolean = true)           : Intention = { canFight      = value; this }
   def setCanFlee        (value: Boolean = true)           : Intention = { canFlee       = value; this }
+  def setCanSneak       (value: Boolean = true)           : Intention = { canSneak      = value; this }
   def setCanTickle      (value: Boolean = true)           : Intention = { canTickle     = value; this }
   def setShouldMeld     (value: Boolean = true)           : Intention = { shouldMeld    = value; this }
   def setShouldLiftoff  (value: Boolean = true)           : Intention = { shouldLiftoff = value; this }

@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.?
 import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters._
@@ -13,21 +14,21 @@ class SquadScoutExpansions extends Squad {
 
   def frameToScout: GameTime = {
     if (With.self.isProtoss) {
-      if (With.enemy.isTerran)        GameTime(9, 0)
+      if      (With.enemy.isTerran)   GameTime(9, 0)
       else if (With.enemy.isProtoss)  GameTime(9, 0)
       else                            GameTime(7, 0)
     } else if (With.self.isTerran) {
-      if (With.enemy.isTerran)        GameTime(8, 0)
+      if      (With.enemy.isTerran)   GameTime(8, 0)
       else if (With.enemy.isProtoss)  GameTime(7, 0)
       else                            GameTime(7, 0)
     } else {
-      if (With.enemy.isTerran)        GameTime(9, 0)
+      if      (With.enemy.isTerran)   GameTime(9, 0)
       else if (With.enemy.isProtoss)  GameTime(9, 0)
       else                            GameTime(12, 0)
     }
   }
 
-  val matchAll: UnitFilter = IsAny(
+  private val scoutClasses = Seq(
     Terran.Marine,
     Terran.Firebat,
     Terran.Vulture,
@@ -37,20 +38,15 @@ class SquadScoutExpansions extends Squad {
     Protoss.Dragoon,
     Protoss.DarkTemplar,
     Protoss.Observer,
+    Protoss.Corsair,
     Zerg.Zergling,
     Zerg.Hydralisk,
     Zerg.Overlord,
     Zerg.Scourge,
-    Is(scoutZergThird && IsWorker(_)))
+    Zerg.Queen)
+  val matchAll    : UnitFilter = IsAny((scoutClasses :+ Is(scoutZergThird && IsWorker(_))): _*)
+  val matchFlying : UnitFilter = IsAny(scoutClasses.filter(_.canFly): _*)
 
-  val matchFlying: UnitFilter = IsAny(
-    Terran.Wraith,
-    Protoss.Observer,
-    Zerg.Overlord,
-    Zerg.Scourge)
-
-  lock.counter = CountOne
-  lock.matcher = matchAll
   val scoutableBases = new Cache(() =>
     With.geography.neutralBases
       .view
@@ -62,11 +58,15 @@ class SquadScoutExpansions extends Squad {
           && With.scouting.enemyNatural.exists(n =>
             b.heart.groundTiles(m.heart) < n.heart.groundTiles(m.heart))))
       .toVector
-      .sortBy(base => -With.scouting.baseIntrigue.getOrElse(base, 0.0))
-      .sortBy(b => lock.units.exists(_.flying) || b.zone.island))
+      .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
+      .sortBy(b => lock.units.exists(_.flying) || b.island))
 
   val scoutZergCutoff: Int = Minutes(4)()
-  def scoutZergThird: Boolean = With.frame < scoutZergCutoff && ! With.self.isZerg && With.enemies.exists(_.isZerg) && With.tactics.scoutWithWorkers.abandonScouting
+  def scoutZergThird: Boolean = (
+    With.frame < scoutZergCutoff
+    && ! With.self.isZerg
+    && With.enemies.exists(_.isZerg)
+    && With.tactics.scoutWithWorkers.abandonScouting)
 
   def launch(): Unit = {
     if ( ! scoutZergThird) {
@@ -74,7 +74,6 @@ class SquadScoutExpansions extends Squad {
       if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return
     }
     if (scoutableBases().isEmpty) return
-    lock.matcher = if (With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65) matchAll else matchFlying
 
     val toScoutBases = Maff.orElse(
       scoutableBases().filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(90)()),
@@ -84,17 +83,22 @@ class SquadScoutExpansions extends Squad {
       Maff.maxBy(units)(_.squadAge).map(_.framesToTravelTo(b.heart))
       .getOrElse(b.heart.groundTiles(With.geography.home)))
 
-    vicinity = toScoutBaseSorted.head.townHallArea.center
+    vicinity = toScoutBaseSorted.head.heart.center
 
+    lock.counter = CountOne
+    lock.matcher = ?(With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65, matchAll, matchFlying)
     lock.preference = PreferClose(vicinity)
     lock.acquire()
   }
 
   def run(): Unit = {
-    val harassers = units.filter(u => u.canAttackGround && u.base.exists(_.isEnemy) && u.agent.shouldFight)
-    val scouts = units.filterNot(harassers.contains)
-    SquadAutomation.sendUnits(this, scouts)
-    scouts.foreach(u => u.intent.canFight = u.visibleToOpponents && u.matchups.threatsInRange.nonEmpty)
-    harassers.foreach(u => u.intend(this).setTravel(u.base.map(_.heart.center)))
+    units.foreach(u => {
+      val targetsHere = u.base.toSeq.filter(_.isEnemy).flatMap(_.enemies)
+      val targetsThere = vicinity.base.toSeq.flatMap(_.enemies)
+      u.intend(this)
+        .setCanSneak(true)
+        .setTravel(u.base.map(_.heart.center))
+        .setTargets(SquadAutomation.rankForArmy(this, (targetsHere ++ targetsThere).toSet.toVector))
+    })
   }
 }

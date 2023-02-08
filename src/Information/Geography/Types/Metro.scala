@@ -15,7 +15,7 @@ case class Metro(bases: Vector[Base]) extends Geo {
   val zones   : Vector[Zone] = With.geography.zones.filter(zone =>
     zone.bases.exists(bases.contains)
     || (zone.bases.isEmpty && {
-      val center = zone.centroid.walkableTile
+      val center = zone.centroid
       With.paths.aStar(center, With.geography.startLocations.maxBy(_.groundTiles(center))).tiles.exists(_.exists(_.base.exists(bases.contains)))
     })
   )

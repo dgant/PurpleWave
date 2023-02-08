@@ -58,8 +58,9 @@ class PvZ2022 extends PvZ2022Openings {
     }
     var shouldAttack = safeToMoveOut
     shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 3
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 5 || ! enemyStrategy(With.fingerprints.ninePool)
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 7 || ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 5   || ! enemyStrategy(With.fingerprints.ninePool)
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 7   || ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 15  || ! anticipateSpeedlings
     shouldAttack ||= miningBases < targetMiningBases
     shouldAttack ||= targetMiningBases > 2
     shouldAttack ||= bases > 2

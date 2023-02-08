@@ -13,6 +13,7 @@ import Micro.Targeting.Target
 import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 
 object Build extends Action {
   
@@ -98,7 +99,7 @@ object Build extends Action {
     }
 
     unit.agent.toTravel = Some(movePixel)
-    if (unit.pixelDistanceTravelling(movePixel) > 256 + (if (unit.agent.lastPath.isEmpty) 0 else 256)) {
+    if (unit.pixelDistanceTravelling(movePixel) > 256 + ?(unit.agent.lastPath.isEmpty, 0, 256)) {
       MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     }
     Commander.move(unit)

@@ -16,7 +16,7 @@ object Imagination {
     // Speculative sanity check based on a case where an observer died while our detection was leaving the area but was flagged alive
     if ( ! unit.visible && unit.visibility == Visibility.Dead) return
 
-    lazy val shouldBeVisible = unit.tile.visibleBwapi
+    lazy val shouldBeVisible = unit.tile.visible
     lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (
       unit.visibility == Visibility.InvisibleBurrowed
@@ -142,7 +142,7 @@ object Imagination {
       .map(unit.tile.add)
       .filter(tile =>
         tile.valid
-        && ! tile.visibleBwapi
+        && ! tile.visibleUnchecked
         && tile.traversableBy(unit)
         && tile.lastSeen < unit.lastSeen
         && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySq

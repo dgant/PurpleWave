@@ -117,10 +117,10 @@ object MicroPathing {
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
     val waypoint = getWaypointAlongTilePath(unit, path).map(_.add(unit.pixel.offsetFromTileCenter))
-    waypoint.foreach(pixel => {
+    if (waypoint.isDefined) {
       unit.agent.toTravel = waypoint
       Commander.move(unit)
-    })
+    }
   }
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {

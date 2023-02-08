@@ -5,6 +5,7 @@ import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 
 final class PathfindProfile(
   var start               : Tile,
@@ -57,6 +58,7 @@ final class PathfindProfile(
   private var finalized: Boolean = false
   def find: TilePath = {
     finalized = true
+    start = ?(canCrossUnwalkable.orElse(unit.map(_.flying)).getOrElse(false), start, start.walkableTile)
     end = end.map(e => if (endUnwalkable) e else e.walkableTile)
     With.paths.aStar(this)
   }

@@ -23,7 +23,7 @@ trait GroundDistance {
     // before which we're getting pixel-resolution distance and after which we're getting tile-resolution distance
     Math.max(
       origin.tileDistanceManhattan(destination),
-      groundTiles(origin, destination))
+      groundTiles(origin.walkableTile, destination.walkableTile))
   }
 
   @inline final def groundPixels(origin: Pixel, destination: Pixel): Double = {
@@ -38,11 +38,11 @@ trait GroundDistance {
     // before which we're getting pixel-resolution distance and after which we're getting tile-resolution distance
     Math.max(
       origin.pixelDistance(destination),
-      32.0 * groundTiles(origin.tile, destination.tile))
+      32.0 * groundTiles(origin.walkableTile, destination.walkableTile))
   }
 
   @inline final protected def groundTiles(origin: Tile, destination: Tile): Int = {
-    if ( ! origin.valid) return impossiblyLargeDistanceTiles
+    if ( ! origin.valid)      return impossiblyLargeDistanceTiles
     if ( ! destination.valid) return impossiblyLargeDistanceTiles
     Maff
       .min(destination.zone.edges.view.map(edge =>

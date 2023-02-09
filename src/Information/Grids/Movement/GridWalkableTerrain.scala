@@ -13,7 +13,7 @@ class GridWalkableTerrain extends AbstractGridArrayBoolean {
     indices.foreach(i => set(
       i,
       Square(4)
-        .map(new Tile(i).topLeftWalkPixel.add)
+        .map(new Tile(i).topLeftWalk.add)
         .count(walkTile => With.game.isWalkable(walkTile.bwapi)) >= walkableGoal))
   }
 

@@ -116,10 +116,11 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val gasNow                = With.self.gas
     val gasWorkersTripMinimum = (7 + gasGoalMinimum - With.self.gas) / 8
     val gasWorkersTripMaximum = (7 + gasGoalMaximum - With.self.gas) / 8
+    val gasWorkersRatioBasic  = (400 * With.blackboard.gasWorkerRatio() + With.self.minerals) / (400 + With.self.minerals + With.self.gas)
     val gasWorkersRatioTarget = Math.round(With.blackboard.gasWorkerRatio() * (workers.size - 3)).toInt // -3 covers "we have almost no workers left" scenarios. 0.3 ratio means we still put 3 on gas when eg assimilator finishes
     val gasWorkersBaseTarget  = Maff.clamp(gasWorkersRatioTarget, gasWorkersTripMinimum, gasWorkersTripMaximum)
-    val gasWorkerTarget       = Maff.clamp(gasWorkersBaseTarget, gasWorkersHardMinimum, gasWorkersHardMaximum)
-    var gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
+    val gasWorkerTarget       = Maff.clamp(gasWorkersBaseTarget,  gasWorkersHardMinimum, gasWorkersHardMaximum)
+    val gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
     gasWorkersToAdd           = gasWorkerTarget - gasWorkersNow
 
     if (doInitialSplit()) return

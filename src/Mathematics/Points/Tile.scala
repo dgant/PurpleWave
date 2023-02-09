@@ -120,25 +120,25 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     Pixel(x << 5, y << 5)
   }
   @inline def topRightPixel: Pixel = {
-    Pixel(x << 5 + 31, y << 5)
+    Pixel((x << 5) + 31, y << 5)
   }
   @inline def bottomRightPixel: Pixel = {
-    Pixel(x << 5 + 31, y << 5 + 31)
+    Pixel((x << 5) + 31, (y << 5) + 31)
   }
   @inline def bottomLeftPixel: Pixel = {
-    Pixel(x << 5, y << 5 + 31)
+    Pixel((x << 5), (y << 5) + 31)
   }
   @inline def pixelCorners: Array[Pixel] = {
     Array(topLeftPixel, topRightPixel, bottomRightPixel, bottomLeftPixel)
   }
   @inline def center: Pixel = {
-    Pixel(x << 5 + 15, y << 5 + 15)
+    Pixel((x << 5) + 15, (y << 5) + 15)
   }
   @inline def contains(pixel: Pixel): Boolean = {
-    x == pixel.x >> 5 && y == pixel.y >> 5
+    x == (pixel.x >> 5) && y == (pixel.y >> 5)
   }
-  @inline def topLeftWalkPixel: WalkTile = {
-    WalkTile(x >> 2, y >> 2)
+  @inline def topLeftWalk: WalkTile = {
+    WalkTile(x << 2, y << 2)
   }
   @inline def left: Tile = {
     Tile(x - 1, y)

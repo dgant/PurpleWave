@@ -10,8 +10,8 @@ final class IndexedSet[T] extends IndexedSeq[T]  {
   }
   def this(other: Iterable[T]) {
     this
-    _set = other.toSet
-    _seq = _set.toIndexedSeq
+    _seq = other.toIndexedSeq
+    _set = _seq.toSet
   }
 
   override def length: Int = _seq.length

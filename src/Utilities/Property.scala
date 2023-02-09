@@ -1,6 +1,6 @@
 package Utilities
 
-class Property[T](default: T) {
+class Property[T](val default: T) {
   
   private var _parent: Option[Property[T]] = None
   private var _value: T = default

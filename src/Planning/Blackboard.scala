@@ -27,7 +27,7 @@ class Blackboard {
   val gasWorkerFloor          : Property[Int]               = add(new Property(0))      // Require at least this many gas workers
   val gasWorkerCeiling        : Property[Int]               = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)
   val gasLimitFloor           : Property[Int]               = add(new Property(0))      // Max gas mining until at least this much gas
-  val gasLimitCeiling         : Property[Int]               = add(new Property(100000)) // Stop gas mining after this much gas
+  val gasLimitCeiling         : Property[Int]               = add(new Property(500))    // Stop gas mining (if minerals are available) after this much gas
   val workersPulled           : Property[Int]               = add(new Property(0))
   val maxBuilderTravelFrames  : Property[Int]               = add(new Property(Seconds(50)()))
   val workerDelta             : Property[Int]               = add(new Property(0))

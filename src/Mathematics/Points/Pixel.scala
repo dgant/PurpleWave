@@ -180,5 +180,5 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def offsetFromTileCenter: Pixel = Pixel((x & 31) - 16, (x & 31) - 16)
 
-  override def toString: String = f"[$x, $y](${Maff.signum(x) * Math.abs(x/32)}, ${Maff.signum(y) * Math.abs(y/32)})"
+  override def toString: String = f"[$x, $y](${Maff.signum(x) * Math.abs(x / 32)}, ${Maff.signum(y) * Math.abs(y / 32)})"
 }

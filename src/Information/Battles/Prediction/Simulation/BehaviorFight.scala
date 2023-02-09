@@ -47,8 +47,7 @@ object BehaviorFight extends SimulacrumBehavior {
     if (distance <= range) {
       if (simulacrum.cooldownLeft <= 0) {
         simulacrum.dealDamageTo(target)
-      }
-      else {
+      } else {
         simulacrum.sleep(Math.min(simulacrum.cooldownLeft, simulacrum.simulation.resolution), Some("Cooldown"))
       }
     } else if (simulacrum.canMove) {

@@ -44,6 +44,12 @@ object TargetScoring {
       pixelCost   = pixelCost(attacker, target),
       efficacy    = splashEfficacy * attacker.hitChanceAgainst(target) * attacker.damageMultiplierAgainst(target))
 
+    val active      = target.canAttack
+    val passive     = ! target.unitClass.attacksOrCastsOrDetectsOrTransports
+    val inCombat    = attacker.team.exists(_.engagedUpon) || target.team.exists(_.engagingOn)
+    val actionMatch = (inCombat && active) || ( ! inCombat && passive)
+    val combatValue = combatBonus * ?(actionMatch, 1, -1)
+
     var meleeSpreadBonus = 8.0
     if (attacker.unitClass.melee) {
       val otherAttackers  = Math.max(0, target.targetedByRecentlyMelee.size - 1)
@@ -63,7 +69,7 @@ object TargetScoring {
       case _ => 3.0
     }
 
-    (attackValue + meleeSpreadBonus + catchBonus) * splashEfficacy - threatCost
+    (attackValue + combatValue + meleeSpreadBonus + catchBonus) * splashEfficacy - threatCost
   }
 
   /**
@@ -71,6 +77,7 @@ object TargetScoring {
     * The unit of value is tiles, as in, how far would we extend ourselves to attack this unit?
     */
   private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValue / Protoss.Dragoon.maxTotalHealth
+  private val combatBonus = 12.0
   def apply(target: UnitInfo): Double = {
     var output = baseValue * target.unitClass.subjectiveValueOverHealth
 
@@ -79,8 +86,8 @@ object TargetScoring {
     output += add(10.0, target.gathering)
 
     if (target.unitClass.attacksOrCastsOrDetectsOrTransports && ! Zerg.Overlord(target)) {
-      // Combat bonus
-      output += add(12.0, target.matchups.engagingOn)
+      // Combat bonus; granted by default to aid simulation, but removed selectively
+      output += combatBonus
 
       // Protect our fliers
       output += add(2.0, target.presumptiveTarget.exists(t => t.isFriendly && t.flying && t.attacksAgainstGround > 0))

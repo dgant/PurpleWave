@@ -38,13 +38,13 @@ object PvPIdeas extends MacroActions with MacroCounting {
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
   def dtBraveryHome   : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestArrival(Protoss.Observer)
   def pvpSafeToMoveOut: Boolean = {
-    var output = safeToMoveOut
+    var output = safePushing
     output ||= dtBraveryAbroad
     output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
     output
   }
   def pvpSafeAtHome: Boolean = {
-    var output = safeAtHome
+    var output = safeDefending
     output ||= dtBraveryHome
     output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     output
@@ -75,7 +75,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       expectEarliestArrival ||= enemyRecentStrategy(With.fingerprints.dtRush)
       expectEarliestArrival ||= ! With.fingerprints.dragoonRange()
     }
-    lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safeToMoveOut)
+    lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safePushing)
     lazy val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
     lazy val expectedArrival     = if (expectEarliestArrival) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame

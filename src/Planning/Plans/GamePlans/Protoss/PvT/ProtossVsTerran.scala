@@ -87,7 +87,7 @@ class ProtossVsTerran extends PvTOpeners {
       val observersForVultures  = enemyHasShown(Terran.SpiderMine) || gasPumps > 2
       val observersForWraiths   = enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1
       val observersForSomething = observersForVultures || observersForWraiths
-      val safeForUpgrades       = unitsComplete(IsWarrior) > 12 && safeAtHome
+      val safeForUpgrades       = unitsComplete(IsWarrior) > 12 && safeDefending
       if ((observersForWraiths && TechCarrier.profited) || (observersForSomething && safeForUpgrades)) {
         get(?(upgradeStarted(Protoss.ObserverSpeed), Protoss.ObserverVisionRange, Protoss.ObserverSpeed))
       }
@@ -212,7 +212,7 @@ class ProtossVsTerran extends PvTOpeners {
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       10, 0))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     12, 0))
     armySizeMinimum     = Math.min(armySizeMinimum, 200 - workerGoal)
-    var armySizeLow     = armySizeUd < armySizeMinimum || confidenceHome01 < With.scouting.enemyProximity
+    var armySizeLow     = armySizeUd < armySizeMinimum || confidenceDefending01 < With.scouting.enemyProximity
     armySizeLow       &&= unitsComplete(Protoss.DarkTemplar) == 0 || enemyHasShown(Terran.SpellScannerSweep, Terran.SpiderMine, Terran.ScienceVessel)
     val zealotAggro     = frame < Minutes(5)() && unitsComplete(Protoss.Zealot) > 0
     val pushMarines     = barracksCheese && ! With.strategy.isRamped

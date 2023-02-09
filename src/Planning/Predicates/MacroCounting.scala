@@ -20,15 +20,15 @@ import bwapi.Race
 trait MacroCounting {
 
   def frame: Int = With.frame
-  def after(gameTime: FrameCount): Boolean = frame > gameTime()
-  def before(gameTime: FrameCount): Boolean = frame < gameTime()
+  def after   (gameTime: FrameCount): Boolean = frame > gameTime()
+  def before  (gameTime: FrameCount): Boolean = frame < gameTime()
 
-  def gas: Int = With.self.gas
-  def minerals: Int = With.self.minerals
-  def supplyUsed400: Int = With.self.supplyUsed400
-  def supplyTotal400: Int = With.self.supplyTotal400
-  def supplyUsed200: Int = (supplyUsed400 + 1) / 2
-  def supplyTotal200: Int = supplyTotal400 / 2
+  def gas             : Int = With.self.gas
+  def minerals        : Int = With.self.minerals
+  def supplyUsed400   : Int = With.self.supplyUsed400
+  def supplyTotal400  : Int = With.self.supplyTotal400
+  def supplyUsed200   : Int = (supplyUsed400 + 1) / 2
+  def supplyTotal200  : Int = supplyTotal400 / 2
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
   def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
 
@@ -121,29 +121,34 @@ trait MacroCounting {
     minerals >= quantity * unitClass.mineralPrice - units(unitClass)
   }
 
-  def safeAtHome: Boolean = {
-    With.battles.globalDefend.judgement.exists(_.shouldFight)
+  def safeDefending: Boolean = {
+    confidenceDefending11 >= 0.0
   }
 
-  def safeToMoveOut: Boolean = {
-    With.battles.globalAttack.judgement.exists(_.shouldFight)
+  def safePushing: Boolean = {
+    confidenceSlugging11 + Math.max(0, confidenceSkirmishing11) > 0.2 || killPotential
   }
 
-  def confidenceHome11: Double = {
-    With.battles.globalDefend.judgement.map(_.confidence11Total).getOrElse(0.0)
+  def killPotential: Boolean = {
+    confidenceAttacking11 > 0.5 * With.scouting.ourProximity
   }
 
-  def confidenceAway11: Double = {
-    With.battles.globalAttack.judgement.map(_.confidence11Total).getOrElse(0.0)
+  def safeSkirmishing: Boolean = {
+    confidenceSkirmishing11 > 0.25 || skirmishBetterThanDefense
   }
 
-  def confidenceHome01: Double = {
-    With.battles.globalDefend.judgement.map(_.confidence01Total).getOrElse(0.0)
+  def skirmishBetterThanDefense: Boolean = {
+    confidenceSkirmishing11 > confidenceDefending11 + 0.25
   }
 
-  def confidenceAway01: Double = {
-    With.battles.globalAttack.judgement.map(_.confidence01Total).getOrElse(0.0)
-  }
+  def confidenceDefending11   : Double = With.battles.globalDefend  .judgement.map(_.confidence11Total).getOrElse(0.0)
+  def confidenceAttacking11   : Double = With.battles.globalAttack  .judgement.map(_.confidence11Total).getOrElse(0.0)
+  def confidenceSlugging11    : Double = With.battles.globalSlug    .judgement.map(_.confidence11Total).getOrElse(0.0)
+  def confidenceSkirmishing11 : Double = With.battles.globalSkirmish.judgement.map(_.confidence11Total).getOrElse(0.0)
+  def confidenceDefending01   : Double = With.battles.globalDefend  .judgement.map(_.confidence01Total).getOrElse(0.0)
+  def confidenceAttacking01   : Double = With.battles.globalAttack  .judgement.map(_.confidence01Total).getOrElse(0.0)
+  def confidenceSlugging01    : Double = With.battles.globalSlug    .judgement.map(_.confidence01Total).getOrElse(0.0)
+  def confidenceSkirmishing01 : Double = With.battles.globalSkirmish.judgement.map(_.confidence01Total).getOrElse(0.0)
 
   def attacking: Boolean = {
     With.tactics.attackSquad.units.nonEmpty
@@ -226,16 +231,16 @@ trait MacroCounting {
 
   def enemyBases: Int = With.geography.enemyBases.size
   def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
-  def foundEnemyBase: Boolean = enemyBases > 0
-  def enemyNaturalConfirmed: Boolean = With.geography.enemyBases.exists(b => b.naturalOf.isDefined && b.townHall.isDefined)
-  def enemyCrossSpawn: Boolean = With.scouting.enemyMain.exists(b => With.geography.startBases.sortBy(_.heart.groundPixels(With.geography.ourMain.heart)).indexOf(b) >= 3)
+  def foundEnemyBase        : Boolean = enemyBases > 0
+  def enemyNaturalConfirmed : Boolean = With.geography.enemyBases.exists(b => b.naturalOf.isDefined && b.townHall.isDefined)
+  def enemyCrossSpawn       : Boolean = With.scouting.enemyMain.exists(b => With.geography.startBases.sortBy(_.heart.groundPixels(With.geography.ourMain.heart)).indexOf(b) >= 3)
 
   def enemyIs(race: Race): Boolean = With.enemies.exists(_.raceCurrent == race)
-  def enemyIsTerran: Boolean = enemyIs(Race.Terran)
-  def enemyIsProtoss: Boolean = enemyIs(Race.Protoss)
-  def enemyIsZerg: Boolean = enemyIs(Race.Zerg)
-  def enemyIsRandom: Boolean = enemyIs(Race.Unknown)
-  def enemyRaceKnown: Boolean = enemyIsTerran || enemyIsProtoss || enemyIsZerg
+  def enemyIsTerran   : Boolean = enemyIs(Race.Terran)
+  def enemyIsProtoss  : Boolean = enemyIs(Race.Protoss)
+  def enemyIsZerg     : Boolean = enemyIs(Race.Zerg)
+  def enemyIsRandom   : Boolean = enemyIs(Race.Unknown)
+  def enemyRaceKnown  : Boolean = enemyIsTerran || enemyIsProtoss || enemyIsZerg
   def enemyStrategy(fingerprints: Fingerprint*): Boolean = fingerprints.exists(_())
 
   def enemyRecentStrategy(fingerprints: Fingerprint*): Boolean = {

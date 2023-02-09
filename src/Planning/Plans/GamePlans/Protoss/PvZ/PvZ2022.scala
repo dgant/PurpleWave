@@ -53,10 +53,10 @@ class PvZ2022 extends PvZ2022Openings {
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
     targetMiningBases = Maff.clamp(targetMiningBases, 1, 4)
-    if (enemies(Zerg.SunkenColony) > 0 && unitsComplete(IsWarrior) >= 5 && (safeToMoveOut || (enemies(Zerg.Lair) > 0 && With.scouting.enemyProximity < 0.5))) {
+    if (enemies(Zerg.SunkenColony) > 0 && unitsComplete(IsWarrior) >= 5 && (safePushing || (enemies(Zerg.Lair) > 0 && With.scouting.enemyProximity < 0.5))) {
       targetMiningBases = Math.max(targetMiningBases, 2)
     }
-    var shouldAttack = safeToMoveOut
+    var shouldAttack = safePushing
     shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 3
     shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 5   || ! enemyStrategy(With.fingerprints.ninePool)
     shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 7   || ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
@@ -80,7 +80,7 @@ class PvZ2022 extends PvZ2022Openings {
     status(f"${targetMiningBases}base")
 
     if (enemyMutalisksLikely || (
-      safeAtHome
+      safeDefending
         && miningBases > 1
         && frame > With.scouting.earliestArrival(Zerg.Mutalisk) - Protoss.Forge.buildFrames - Protoss.PhotonCannon.buildFrames
         && ! enemyHydralisksLikely
@@ -97,14 +97,14 @@ class PvZ2022 extends PvZ2022Openings {
 
     val safeVsMutalisk = 0.75 * units(Protoss.Dragoon) + 1.5 * units(Protoss.Corsair) > Math.max(enemies(Zerg.Mutalisk), ?(enemyMutalisksLikely, 6, 0))
 
-    if (                  unitsComplete(IsWarrior) >= ?(safeAtHome, 7, 12)) techStage1()
-    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeAtHome, 12, 18) && miningBases > 1)  techStage2()
-    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeAtHome, 18, 24) && miningBases > 1)  techStage3()
+    if (                  unitsComplete(IsWarrior) >= ?(safeDefending, 7, 12)) techStage1()
+    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeDefending, 12, 18) && miningBases > 1)  techStage2()
+    if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeDefending, 18, 24) && miningBases > 1)  techStage3()
 
     pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 5, 1))
     if (enemyMutalisksLikely) get(Protoss.Stargate)
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
-    if (enemyLurkersLikely || (safeAtHome && frame > GameTime(8, 30)())) {
+    if (enemyLurkersLikely || (safeDefending && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       buildCannonsAtOpenings(1)
     }
@@ -112,7 +112,7 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5), Friendly(Protoss.Archon, 2.0)))
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
-    if (enemyLurkersLikely && safeAtHome) {
+    if (enemyLurkersLikely && safeDefending) {
       upgradeContinuously(Protoss.ObserverSpeed)
     }
     upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
@@ -177,6 +177,6 @@ class PvZ2022 extends PvZ2022Openings {
       get(Math.min(3, 1 + enemies(Zerg.Mutalisk) / 5), Protoss.Stargate)
       once(Protoss.Corsair)
     }
-    get(?(safeAtHome, 2, 3) * miningBases, Protoss.Gateway)
+    get(?(safeDefending, 2, 3) * miningBases, Protoss.Gateway)
   }
 }

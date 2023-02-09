@@ -30,7 +30,7 @@ class TvPNew extends TvPNewOpeners {
     val enemyCloak = enemyHasShown(Protoss.TemplarArchives, Protoss.DarkTemplar, Protoss.ArbiterTribunal, Protoss.Arbiter)
     var shouldAttack = false
     shouldAttack ||= With.scouting.enemyExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameEnemy) < Minutes(3)() && (attacking || unitsComplete(IsWarrior) >= 6)
-    shouldAttack &&= safeToMoveOut
+    shouldAttack &&= killPotential
     shouldAttack &&= ! enemyCloak || have(Terran.Comsat, Terran.ScienceVessel) || (unitsComplete(Terran.Vulture) >= 6 && Terran.SpiderMinePlant())
 
     trainArmy() // TODO: Bypass; avoid duping

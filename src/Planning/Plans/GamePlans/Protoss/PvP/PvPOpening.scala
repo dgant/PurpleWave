@@ -325,14 +325,14 @@ class PvPOpening extends GameplanImperative {
     // or the timing window might close permanently.
     earlyTimingClosed ||= PvP1012()         && With.fingerprints.twoGate()
     earlyTimingClosed ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! upgradeComplete(Protoss.DragoonRange)
-    earlyTimingClosed ||= PvPGateCoreGate() && enemyHasUpgrade(Protoss.DragoonRange) && ! safeToMoveOut && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    earlyTimingClosed ||= PvPGateCoreGate() && enemyHasUpgrade(Protoss.DragoonRange) && ! safePushing && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     atEarlyTiming     ||= PvPDT()           && enemyHasUpgrade(Protoss.DragoonRange)
     mainTimingClosed  ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
     mainTimingClosed  ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
     mainTimingClosed  ||= PvPDT()           && enemiesComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
     shouldAttack   = atEarlyTiming  && ! earlyTimingClosed
     shouldAttack ||= atMainTiming   && ! mainTimingClosed
-    shouldAttack &&= safeToMoveOut
+    shouldAttack &&= safePushing
     shouldAttack &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
     shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
     shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
@@ -356,12 +356,12 @@ class PvPOpening extends GameplanImperative {
       shouldExpand &&= PvPIdeas.pvpSafeAtHome
     } else if (PvP4GateGoon()) {
       shouldExpand = atMainTiming && ! mainTimingClosed && unitsEver(IsWarrior) >= 20
-      shouldExpand || unitsComplete(IsWarrior) >= ?(safeToMoveOut, ?(PvPIdeas.enemyContained, 14, 20), 28)
+      shouldExpand || unitsComplete(IsWarrior) >= ?(safePushing, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
-    if (shouldAttack || shouldExpand || (safeAtHome && ! PvPDT())) {
+    if (shouldAttack || shouldExpand || (safeDefending && ! PvPDT())) {
       holdNatural()
     }
 

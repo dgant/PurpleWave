@@ -67,7 +67,7 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(RoboTech)    .filter(x => commitToTech))
     shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage) || enemies(Protoss.PhotonCannon) >= 5
 
-    fearDeath   = ! safeAtHome
+    fearDeath   = ! safeDefending
     fearDeath   ||= unitsComplete(IsWarrior) < 8
     fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
     fearDeath   &&= ! dtBraveryHome

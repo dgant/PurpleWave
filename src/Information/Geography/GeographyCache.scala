@@ -36,7 +36,7 @@ trait GeographyCache extends GeographyBuilder {
         With.strategy.isInverted
           && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
           && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(IsTank)))
-          && (With.units.existsEnemy(_.unitClass.ranged) || MacroFacts.safeAtHome))
+          && (With.units.existsEnemy(_.unitClass.ranged) || MacroFacts.safeDefending))
 
       ++ With.geography.ourBases.filter(_.plannedExpoRecently)
     ).distinct

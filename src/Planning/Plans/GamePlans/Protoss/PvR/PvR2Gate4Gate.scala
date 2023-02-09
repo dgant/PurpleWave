@@ -13,7 +13,7 @@ class PvR2Gate4Gate extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
-    if (safeToMoveOut && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24)) attack()
+    if (safePushing && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24)) attack()
     if (units(Protoss.Dragoon) >= 4) get(Protoss.DragoonRange)
     maintainMiningBases(1)
     pump(Protoss.Dragoon)

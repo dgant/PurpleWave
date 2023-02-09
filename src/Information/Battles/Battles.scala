@@ -16,17 +16,25 @@ class Battles extends TimedTask {
   withSkipsMax(3)
   withWeight(TaskQueueGlobalWeights.Battles)
 
-  var globalHome  : Battle                = new Battle(isGlobal = true)
-  var globalAway  : Battle                = new Battle(isGlobal = true)
-  var byUnit      : Map[UnitInfo, Battle] = Map.empty
-  var local       : Vector[Battle]        = Vector.empty
-  var divisions   : Vector[Division]      = Vector.empty
+  var byUnit                    : Map[UnitInfo, Battle] = Map.empty
+  var local                     : Vector[Battle]        = Vector.empty
+  var divisions                 : Vector[Division]      = Vector.empty
+  var globalDefend              : Battle                = new Battle(isGlobal = true)
+  var globalAttack              : Battle                = new Battle(isGlobal = true)
+  var globalSlug                : Battle                = new Battle(isGlobal = true)
+  var globalSkirmish            : Battle                = new Battle(isGlobal = true)
+  var nextBattleGlobalDefend    : Battle                = new Battle(isGlobal = true)
+  var nextBattleGlobalAttack    : Battle                = new Battle(isGlobal = true)
+  var nextBattleGlobalSlug      : Battle                = new Battle(isGlobal = true)
+  var nextBattleGlobalSkirmish  : Battle                = new Battle(isGlobal = true)
+  var nextBattlesLocal          : Vector[Battle]        = Vector.empty
+  var nextDivisions             : Vector[Division]      = Vector.empty
 
-  var nextBattleGlobalHome  : Battle            = new Battle(isGlobal = true)
-  var nextBattleGlobalAway  : Battle            = new Battle(isGlobal = true)
-  var nextBattlesLocal      : Vector[Battle]    = Vector.empty
-  var nextDivisions         : Vector[Division]  = Vector.empty
-  def nextBattles: Seq[Battle] = nextBattlesLocal.view :+ nextBattleGlobalHome :+ nextBattleGlobalAway
+  def nextBattles: Seq[Battle] = nextBattlesLocal ++ Seq(
+    nextBattleGlobalDefend,
+    nextBattleGlobalAttack,
+    nextBattleGlobalSlug,
+    nextBattleGlobalSkirmish)
 
   val clustering = new BattleClustering
 
@@ -38,10 +46,9 @@ class Battles extends TimedTask {
     _processingState = newState
   }
 
-  val stateTasks = new StateTasks
-
   override def isComplete: Boolean = framesSinceRunning < 1 && _processingState.isFinalStep
 
+  val stateTasks = new StateTasks
   override def onRun(budgetMs: Long): Unit = {
     val timer = new Timer(budgetMs)
     while (timer.greenLight) {

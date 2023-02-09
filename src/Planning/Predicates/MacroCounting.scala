@@ -122,19 +122,27 @@ trait MacroCounting {
   }
 
   def safeAtHome: Boolean = {
-    With.battles.globalHome.judgement.exists(_.shouldFight)
+    With.battles.globalDefend.judgement.exists(_.shouldFight)
   }
 
   def safeToMoveOut: Boolean = {
-    With.battles.globalAway.judgement.exists(_.shouldFight)
+    With.battles.globalAttack.judgement.exists(_.shouldFight)
   }
 
   def confidenceHome11: Double = {
-    With.battles.globalHome.judgement.map(_.confidence11Total).getOrElse(0.0)
+    With.battles.globalDefend.judgement.map(_.confidence11Total).getOrElse(0.0)
   }
 
   def confidenceAway11: Double = {
-    With.battles.globalAway.judgement.map(_.confidence11Total).getOrElse(0.0)
+    With.battles.globalAttack.judgement.map(_.confidence11Total).getOrElse(0.0)
+  }
+
+  def confidenceHome01: Double = {
+    With.battles.globalDefend.judgement.map(_.confidence01Total).getOrElse(0.0)
+  }
+
+  def confidenceAway01: Double = {
+    With.battles.globalAttack.judgement.map(_.confidence01Total).getOrElse(0.0)
   }
 
   def attacking: Boolean = {

@@ -11,6 +11,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Strategery.Strategies.Strategy
+import Tactic.Squads.Squad
 import Utilities.Time.{Frames, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
@@ -32,10 +33,9 @@ class Storyteller {
       val valueNew = currentValue()
       if (valueLast != valueNew) {
         if (valueLast == valueInitial) {
-          tell(f"$label is ${stringify(valueNew)}")
+          tell(f"$label: ${stringify(valueNew)}")
         } else if (expand) {
-          tell(f"$label was ${stringify(valueLast)}")
-          tell(f"$label now ${stringify(valueNew)}")
+          tell(f"$label\n  Was: ${stringify(valueLast)}\n  Now: ${stringify(valueNew)}")
         } else {
           tell(f"$label changed from ${stringify(valueLast)} to ${stringify(valueNew)}")
         }
@@ -101,6 +101,7 @@ class Storyteller {
     new Story                           ("Gas worker ratio",    () => With.blackboard.gasWorkerRatio()),
     new Story                           ("Gas limit floor",     () => With.blackboard.gasLimitFloor()),
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
+    new Story[Iterable[Squad]]          ("Active squads",       () => With.squads.all,                                                                                            _.mkString(", "), expand = true)
   )
 
   private var firstLog: Boolean = true

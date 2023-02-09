@@ -212,7 +212,7 @@ class ProtossVsTerran extends PvTOpeners {
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.twoFac(),       10, 0))
     armySizeMinimum     = Math.max(armySizeMinimum, ?(With.fingerprints.threeFac(),     12, 0))
     armySizeMinimum     = Math.min(armySizeMinimum, 200 - workerGoal)
-    var armySizeLow     = armySizeUd < armySizeMinimum || With.battles.globalHome.judgement.exists(_.confidence01Total < With.scouting.enemyProximity)
+    var armySizeLow     = armySizeUd < armySizeMinimum || confidenceHome01 < With.scouting.enemyProximity
     armySizeLow       &&= unitsComplete(Protoss.DarkTemplar) == 0 || enemyHasShown(Terran.SpellScannerSweep, Terran.SpiderMine, Terran.ScienceVessel)
     val zealotAggro     = frame < Minutes(5)() && unitsComplete(Protoss.Zealot) > 0
     val pushMarines     = barracksCheese && ! With.strategy.isRamped

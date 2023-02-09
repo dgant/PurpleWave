@@ -50,7 +50,7 @@ class PvPLateGame extends GameplanImperative {
 
     lazy val nonStrengthUs              = unitsNotStrengthening(With.self).map(skimEquivalent).sum
     lazy val nonStrengthEnemy           = unitsNotStrengthening(With.enemy).map(skimEquivalent).sum
-    lazy val estimatedArmyDifferential  = With.battles.globalAway.differential + nonStrengthEnemy - nonStrengthUs
+    lazy val estimatedArmyDifferential  = With.battles.globalAttack.differential + nonStrengthEnemy - nonStrengthUs
     lazy val commitToTech               = productionCapacity >= 5 && saturated
     primaryTech = primaryTech
       .orElse(Some(RoboTech)    .filter(x => units(Protoss.RoboticsFacility) > 0))

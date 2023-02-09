@@ -4,6 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
+import Planning.Predicates.MacroFacts
 import Utilities.UnitFilters.IsTank
 
 trait GeographyCache extends GeographyBuilder {
@@ -28,14 +29,14 @@ trait GeographyCache extends GeographyBuilder {
   protected def getSettlements: Vector[Base] = (
     Vector.empty
       ++ With.geography.bases.view.filter(_.ourUnits.exists(u =>
-      u.unitClass.isBuilding
-      && (u.unitClass.isTownHall || ! u.base.exists(_.townHallArea.intersects(u.tileArea))))) // Ignore proxy base blockers
+        u.unitClass.isBuilding
+        && (u.unitClass.isTownHall || ! u.base.exists(_.townHallArea.intersects(u.tileArea))))) // Ignore proxy base blockers
 
       ++ Vector(With.geography.ourNatural).filter(x =>
-      With.strategy.isInverted
-        && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
-        && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(IsTank)))
-        && (With.units.existsEnemy(_.unitClass.ranged) || With.battles.globalHome.judgement.exists(_.shouldFight)))
+        With.strategy.isInverted
+          && ! With.geography.ourMain.units.exists(_.unitClass.isStaticDefense)
+          && With.units.ours.exists(u => u.complete && u.unitClass.ranged && (u.unitClass.canMove || u.is(IsTank)))
+          && (With.units.existsEnemy(_.unitClass.ranged) || MacroFacts.safeAtHome))
 
       ++ With.geography.ourBases.filter(_.plannedExpoRecently)
     ).distinct

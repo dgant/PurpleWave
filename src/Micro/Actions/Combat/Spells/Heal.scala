@@ -30,13 +30,15 @@ object Heal extends Action {
   }
   
   private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit.alliesSquadOrBattle
-      .toVector
+    unit
+      .alliesSquad
       .filter(u =>
         u.unitClass.isOrganic
         && ! u.beingHealed
         && ! u.is(Terran.Medic)
         && (u.hitPoints < u.unitClass.maxHitPoints|| u.matchups.threats.nonEmpty))
+
+      .toVector
   }
   
   private def targetValue(medic: FriendlyUnitInfo, patient: UnitInfo): Double = {

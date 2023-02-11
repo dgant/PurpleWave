@@ -1,6 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
@@ -26,16 +27,17 @@ object EmergencyRepair extends Action {
   }
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Seq[UnitInfo] =
-    repairer.alliesSquadThenBattle.flatten.view.filter(patient =>
-      patient != repairer
-      && patient.complete
-      && patient.unitClass.isMechanical
-      && isCloseEnough(repairer, patient)
-      && needsRepair(repairer, patient)
-      && ! patient.is(Terran.SCV)
-      && ! patient.moving
-      && ! patient.plagued
-    )
+    Maff.orElseFiltered(
+      repairer.matchups.allies,
+      repairer.alliesSquad)(patient =>
+        patient != repairer
+        && patient.complete
+        && patient.unitClass.isMechanical
+        && isCloseEnough(repairer, patient)
+        && needsRepair(repairer, patient)
+        && ! patient.is(Terran.SCV)
+        && ! patient.moving
+        && ! patient.plagued).toSeq
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
     if (repairer.pixelDistanceEdge(patient) > 32.0 * 30.0) return false

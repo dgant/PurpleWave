@@ -55,6 +55,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   var simulationReport = new mutable.HashMap[UnitInfo, ReportCard]
   var simulationEvents: Iterable[SimulationEvent] = Iterable.empty
   val simulationCheckpoints: mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
+  def simulationLog: String = simulationEvents.map(_.toString).mkString("\n")
 
   //////////////
   // Features //

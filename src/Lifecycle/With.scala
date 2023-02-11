@@ -75,7 +75,6 @@ object With {
   var camera            : Camera              = _
   var coordinator       : Coordinator         = _
   var configuration     : Configuration       = _
-  var expansions        : Expansions          = _
   var fingerprints      : Fingerprints        = _
   var gathering         : Gathering           = _
   var geo               : NeoGeo              = _

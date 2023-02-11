@@ -62,5 +62,6 @@ class MissionKillExpansion extends Mission {
 
     SquadAutomation.targetRaid(this)
     SquadAutomation.formAndSend(this)
+    units.foreach(_.intent.setCanSneak(true))
   }
 }

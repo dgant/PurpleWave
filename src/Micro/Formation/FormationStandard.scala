@@ -20,7 +20,7 @@ import Utilities.Time.Minutes
 //Disabling spurious IntelliJ warnings
 class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
-  private def units       = group.groupFriendlyOrderable
+  private def units       = group.unintended
   private def airUnits    = units.filter(_.flying)
   private def groundUnits = units.filterNot(_.flying)
 

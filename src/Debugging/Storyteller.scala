@@ -104,7 +104,8 @@ class Storyteller {
     new Story                           ("Gas worker ratio",    () => With.blackboard.gasWorkerRatio()),
     new Story                           ("Gas limit floor",     () => With.blackboard.gasLimitFloor()),
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
-    new Story[Iterable[Squad]]          ("Active squads",       () => With.squads.all,                                                                                            _.mkString(", "), expand = true)
+    new Story[Iterable[Squad]]          ("Active squads",       () => With.squads.all.toVector,                                                                                    _.mkString(", "), expand = true),
+    new Story                           ("Attack squad",        () => With.tactics.attackSquad.toString)
   )
 
   private var firstLog: Boolean = true

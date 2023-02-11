@@ -18,6 +18,7 @@ trait Reduce {
   }
 
   @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.dropRight(1).find(_.nonEmpty).getOrElse(x.last)
+  @inline final def orElseFiltered[T](x: Iterable[T]*)(predicate: T => Boolean): Iterable[T] = x.find(_.exists(predicate)).map(_.filter(predicate)).getOrElse(Iterable.empty)
 
   @inline final def ??[T >: Null](x: T*): T = x.find(_ != null).orNull
 

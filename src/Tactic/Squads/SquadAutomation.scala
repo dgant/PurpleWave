@@ -79,7 +79,7 @@ object SquadAutomation {
   }
 
   def send(squad: Squad, defaultReturn: Option[Pixel] = None): Unit = {
-    sendUnits(squad, squad.units, defaultReturn)
+    sendUnits(squad, squad.unintended, defaultReturn)
   }
 
   def sendUnits(squad: Squad, units: Iterable[FriendlyUnitInfo], defaultReturn: Option[Pixel] = None): Unit = {

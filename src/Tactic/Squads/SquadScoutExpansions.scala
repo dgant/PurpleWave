@@ -97,7 +97,7 @@ class SquadScoutExpansions extends Squad {
       val targetsThere = vicinity.base.toSeq.flatMap(_.enemies)
       u.intend(this)
         .setCanSneak(true)
-        .setTravel(u.base.map(_.heart.center))
+        .setTravel(Some(vicinity))
         .setTargets(SquadAutomation.rankForArmy(this, (targetsHere ++ targetsThere).toSet.toVector))
     })
   }

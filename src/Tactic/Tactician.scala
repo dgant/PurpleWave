@@ -64,7 +64,7 @@ class Tactician extends TimedTask {
 
   private lazy val baseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
   private val catchDTRunby = new SquadCatchDTRunby
-  val attackSquad = new SquadAttackNew
+  val attackSquad = new SquadAttack
 
   ///////////////////////
   // Background squads //

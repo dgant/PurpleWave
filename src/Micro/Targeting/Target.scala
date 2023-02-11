@@ -86,11 +86,11 @@ object Target {
       attacker.pixelDistanceEdge(target) / 32d,
       target.targetValue,
       attacker.targetScore(target))).toVector
-      .sortBy(-_._3)
+      .sortBy(-_._4)
       .map(s =>
         (s._1,
-          "%02d".format(s._2),
-          "%02d".format(s._3),
-          "%02d".format(s._4)))
+          s._2.toInt.toString,
+          s._3.toInt.toString,
+          s._4.toInt.toString))
   }
 }

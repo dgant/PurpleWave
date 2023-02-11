@@ -2,56 +2,92 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
-import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitInfo.UnitInfo
+import Planning.Predicates.MacroFacts
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsBuilding, IsMobileDetector, IsWarrior}
 
 class SquadAttack extends Squad {
+  override def toString: String = f"$mode ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
 
+  override def launch(): Unit = {} // This squad receives its units from Tactician
 
-  override def launch(): Unit = { /* This squad is given its recruits externally */ }
+  trait AttackMode
+  object RazeBase     extends AttackMode { override val toString = "Raze"     }
+  object RazeProxy    extends AttackMode { override val toString = "Deprox"   }
+  object PushMain     extends AttackMode { override val toString = "Push"     }
+  object CrushArmy    extends AttackMode { override val toString = "Crush"    }
+  object ContainArmy  extends AttackMode { override val toString = "Contain"  }
+  object ClearMap     extends AttackMode { override val toString = "Clear"    }
+
+  var mode: AttackMode = PushMain
+
+  def chooseMode(): AttackMode = {
+    val proxies       = With.units.enemy.filter(_.proxied).toVector
+    val faster        = MacroFacts.safeSkirmishing && ((With.self.isZerg && ! With.enemies.exists(_.isZerg)) || (With.self.isProtoss && With.enemies.forall(_.isTerran)))
+    val basesOccupied = units.view.flatMap(_.base).filter(_.isEnemy).toSet
+
+    if (basesOccupied.nonEmpty) {
+      mode      = RazeBase
+      vicinity  = basesOccupied.map(_.heart.center).minBy(attackKeyDistanceTo)
+      setTargets(SquadAutomation.rankedAround(this))
+
+    } else if (proxies.nonEmpty) {
+      mode      = RazeProxy
+      vicinity  = proxies.map(_.pixel).minBy(attackKeyDistanceTo)
+      setTargets(proxies ++ SquadAutomation.rankedAround(this))
+
+    } else if (MacroFacts.killPotential) {
+      mode      = PushMain
+      vicinity  = With.scouting.enemyHome.center
+      setTargets(SquadAutomation.rankedEnRoute(this))
+
+    } else if (MacroFacts.safePushing && With.scouting.enemyProximity > 0.5) {
+      mode      = CrushArmy
+      vicinity  = With.scouting.enemyMuscleOrigin.center
+      setTargets(SquadAutomation.rankedEnRoute(this))
+
+    } else if (MacroFacts.safePushing) {
+      mode      = ContainArmy
+      vicinity  = With.scouting.enemyThreatOrigin.center
+      setTargets(SquadAutomation.rankedEnRoute(this))
+
+    } else {
+      mode      = ClearMap
+      vicinity  =
+        Maff.orElse(
+          Maff.orElse(
+            With.geography.enemyBases.filterNot(b => With.scouting.enemyMain.exists(_.metro.bases.contains(b))),
+            With.geography.enemyBases.filterNot(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b)))
+          .toSeq
+          .sortBy(b => keyDistanceTo(b.heart.center) - With.scouting.enemyThreatOrigin.groundPixels(b.heart)),
+        With.geography.preferredExpansionsEnemy.filter(_.lastFrameScoutedByUs < With.frame - Minutes(1)()),
+        With.geography.preferredExpansionsEnemy)
+          .headOption
+          .map(_.heart.center)
+          .getOrElse(With.scouting.enemyThreatOrigin.center)
+      setTargets(SquadAutomation.rankedAround(this))
+    }
+
+    mode
+  }
+
 
   override def run(): Unit = {
     if (units.isEmpty) return
-    vicinity = getVicinity
-    SquadAutomation.targetFormAndSend(this)
-  }
-
-  private def isNonTrolly(u: UnitInfo): Boolean = (
-    u.likelyStillThere
-    && ! u.flying
-    && IsWarrior(u)
-    && u.isNone(Terran.Vulture, Zerg.Zergling)
-    && ( ! u.effectivelyCloaked || units.exists(IsMobileDetector) || With.units.existsOurs(Terran.Comsat)))
-  protected def getVicinity: Pixel = {
-    lazy val airValue   = units.view.filter(_.flying).map(_.subjectiveValue).sum
-    lazy val totalValue = units.view.map(_.subjectiveValue).sum
-    lazy val baseScores = With.geography.enemyBases.map(b => {
-      val distanceThreat  = With.scouting.enemyThreatOrigin.walkableTile.groundPixels(b.heart.center)
-      val distanceArmy    = keyDistanceTo(b.heart.center)
-      val distanceHome    = With.geography.home.groundPixels(b.heart)
-      val accessibility   = if (b.zone.island) Math.pow(Maff.nanToZero(airValue / totalValue), 2) else 1.0
-      (b, accessibility * (3 * distanceThreat - distanceArmy - distanceHome))
-    }).toMap
-
-    val aggressiveDivisions = With.battles.divisions
-      .filter(_.enemies.exists(isNonTrolly))
-      .map(d => (d, d.attackCentroidGround))
-      .map(d => (d._1, d._2, With.scouting.proximity(d._2)))
-    val aggressivestDivision = Maff.maxBy(aggressiveDivisions)(_._3)
-    if (aggressivestDivision.exists(_._3 > 0.2)) {
-      return aggressivestDivision.get._2
+    chooseMode()
+    if (mode == ContainArmy && With.enemies.forall(_.isTerran) && MacroFacts.safeSkirmishing && units.size >= 12) {
+      With.geography.preferredExpansionsEnemy.take(3).foreach(base =>
+        Maff.minBy(unintended.filter(_.canAttackGround))(_.framesToTravelTo(base.heart.center)).foreach(camper =>
+          camper.intend(this)
+            .setCanSneak(true)
+            .setTravel(base.heart.center)
+            .setTargets(base.enemies)))
     }
-
-    lazy val horrorProxy  = Maff.minBy(With.geography.ourBasesAndSettlements.flatMap(_.enemies.filter(IsBuilding).map(_.pixel)))(_.groundPixels(With.geography.home.center))
-    lazy val remoteProxy  = if (With.geography.ourBases.size > 1 && With.frame > Minutes(10)()) None else Maff.minBy(With.units.enemy.view.filter(_.proxied).map(_.pixel))(_.groundPixels(With.geography.home.center))
-    lazy val bestBase     = Maff.maxBy(baseScores)(_._2).map(b => Maff.minBy(b._1.enemies.filter(_.unitClass.isBuilding).map(_.pixel))(keyDistanceTo).getOrElse(b._1.townHallArea.center))
-    lazy val bestThreat   = aggressivestDivision.map(_._2)
-    lazy val origin       = Some(With.scouting.enemyThreatOrigin.center)
-
-    val destinations = Maff.orElse(horrorProxy, remoteProxy, bestBase, bestThreat, origin)
-    destinations.headOption.getOrElse(With.scouting.enemyHome.center)
+    if (Seq(ContainArmy, ClearMap).contains(mode)) {
+      // TODO: Scour stray units, like SquadDefendBase does
+    }
+    SquadAutomation.formAndSend(this)
+    if (Seq(RazeBase, ClearMap).contains(mode) && ! MacroFacts.safePushing) {
+      units.foreach(_.intent.setCanSneak(true))
+    }
   }
 }

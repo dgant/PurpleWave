@@ -128,8 +128,8 @@ object JudgmentModifiers {
     val attackers         = battleLocal.us.attackers.size
     val inTankRange       = battleLocal.us.attackers.count(_.matchups.inTankRange)
     val tankInRange       = battleLocal.us.attackers.count(_.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
-    val inRankRangeScore  = 1.0 / 3.0 * inTankRange / attackers
-    val tankInRangeScore  = 2.0 / 3.0 * tankInRange / attackers
+    val inRankRangeScore  = 1.0 / 3.0 * inTankRange / Math.max(1, attackers)
+    val tankInRangeScore  = 2.0 / 3.0 * tankInRange / Math.max(1, attackers)
     val score             = 0.5 * (inRankRangeScore + tankInRangeScore)
     ?(score <= 0, None, Some(JudgmentModifier(targetDelta = score)))
   }

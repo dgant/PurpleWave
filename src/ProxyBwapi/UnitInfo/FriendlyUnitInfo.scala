@@ -48,7 +48,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   lazy val agent: Agent = new Agent(this)
   private var _client: Any = None
   private var _intent: Intention = new Intention
-  var client: Any = None
+  def client: Any = _client
   def intent: Intention = _intent
   def intend(intendingClient: Any, intent: Intention = new Intention): Intention = {
     _client = intendingClient
@@ -69,29 +69,11 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   }
   def targetsAssigned: Option[IndexedSet[UnitInfo]] = intent.targets.orElse(squad.flatMap(_.targets))
 
-  def alliesSquad                   : Iterable[FriendlyUnitInfo]      = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
-  def alliesBattle                  : Iterable[FriendlyUnitInfo]      = team.map(_.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
-  def alliesAll                     : Iterable[FriendlyUnitInfo]      = With.units.ours.filter(_ != this)
-  def enemiesSquad                  : Iterable[UnitInfo]              = squad.map(s => s.targets.getOrElse(s.enemies)).getOrElse(Iterable.empty)
-  def enemiesBattle                 : Iterable[UnitInfo]              = battle.map(_.enemy.units.view).getOrElse(Seq.empty)
-  def enemiesAll                    : Iterable[UnitInfo]              = With.units.enemy
-  def alliesBattleThenSquad         : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesBattle, alliesSquad)
-  def alliesBattleThenSquadThenAll  : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesBattle, alliesSquad, alliesAll)
-  def alliesSquadThenBattle         : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesSquad, alliesBattle)
-  def alliesSquadThenBattleThenAll  : Seq[Iterable[FriendlyUnitInfo]] = Seq(alliesSquad, alliesBattle, alliesAll)
-  def alliesBattleOrSquad           : Iterable[FriendlyUnitInfo]      = if (alliesBattle.nonEmpty) alliesBattle else alliesSquad
-  def alliesBattleOrSquadOrAll      : Iterable[FriendlyUnitInfo]      = if (alliesBattle.nonEmpty) alliesBattle else if (alliesSquad.nonEmpty) alliesSquad else alliesAll
-  def alliesSquadOrBattle           : Iterable[FriendlyUnitInfo]      = if (alliesSquad.nonEmpty) alliesSquad else alliesBattle
-  def alliesSquadOrBattleOrAll      : Iterable[FriendlyUnitInfo]      = if (alliesSquad.nonEmpty) alliesSquad else if (alliesBattle.nonEmpty) alliesBattle else alliesAll
-  def enemiesBattleThenSquad        : Seq[Iterable[UnitInfo]]         = Seq(enemiesBattle, enemiesSquad)
-  def enemiesBattleThenSquadThenAll : Seq[Iterable[UnitInfo]]         = Seq(enemiesBattle, enemiesSquad, enemiesAll)
-  def enemiesSquadThenBattle        : Seq[Iterable[UnitInfo]]         = Seq(enemiesSquad, enemiesBattle)
-  def enemiesSquadThenBattleThenAll : Seq[Iterable[UnitInfo]]         = Seq(enemiesSquad, enemiesBattle, enemiesAll)
-  def enemiesBattleOrSquad          : Iterable[UnitInfo]              = if (enemiesBattle.nonEmpty) enemiesBattle else enemiesSquad
-  def enemiesBattleOrSquadOrAll     : Iterable[UnitInfo]              = if (enemiesBattle.nonEmpty) enemiesBattle else if (enemiesSquad.nonEmpty) enemiesSquad else enemiesAll
-  def enemiesSquadOrBattle          : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else enemiesBattle
-  def enemiesSquadOrBattleOrAll     : Iterable[UnitInfo]              = if (enemiesSquad.nonEmpty) enemiesSquad else if (enemiesBattle.nonEmpty) enemiesBattle else enemiesAll
-  
+  def alliesSquad   : Iterable[FriendlyUnitInfo]  = squad.map(_.units.view).map(_.filter(_ != this)).getOrElse(Iterable.empty)
+  def alliesBattle  : Iterable[FriendlyUnitInfo]  = team.map(_.units.view.map(_.friendly).filter(_.nonEmpty).map(_.get)).getOrElse(Iterable.empty).filter(_ != this)
+  def enemiesSquad  : Iterable[UnitInfo]          = squad.map(s => s.targets.getOrElse(s.enemies)).getOrElse(Iterable.empty)
+  def enemiesBattle : Iterable[UnitInfo]          = battle.map(_.enemy.units.view).getOrElse(Iterable.empty)
+
   def buildUnit     : Option[UnitInfo]  = With.units.get(base.getBuildUnit)
   def techingType   : Tech              = Techs.get(base.getTech)
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)

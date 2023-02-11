@@ -1,34 +1,68 @@
 package Micro.Actions.Combat.Tactics
 
 import Mathematics.Maff
-import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Planning.Predicates.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Tactic.Squads.UnitGroup
+import Utilities.UnitFilters.IsTank
 
 object Spot extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.flying
-    && (unit.unitClass.isBuilding || unit.isAny(Terran.Wraith, Terran.Valkyrie, Terran.ScienceVessel, Protoss.Observer, Protoss.Scout, Zerg.Overlord))
-    && unit.squad.exists(_.attackers.nonEmpty)
-    && (unit.matchups.pixelsEntangled < -64
-      || unit.totalHealth > 500
-      || (unit.cloaked
-        && ! MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)
-        && unit.matchups.enemyDetectorDeepest.forall(_.pixelsToSightRange(unit) > 96))))
-  
-  override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val from            = unit.team.map(_.centroidAir).getOrElse(unit.agent.destination)
-    val toSpotEnemy     = best(from, unit, unit.enemiesSquad).orElse(best(from, unit, unit.enemiesBattle))
-    val toSpot          = toSpotEnemy.map(_.pixel).getOrElse(unit.agent.destination)
-    unit.agent.toTravel = Some(toSpot)
-    Commander.move(unit)
+  override def allowed(unit: FriendlyUnitInfo): Boolean = {
+    var output = unit.canMove && unit.unitClass.isDetector
+    output ||= unit.flying && unit.unitClass.isBuilding
+    output ||= (unit.isAny(Terran.Wraith, Terran.Valkyrie, Terran.ScienceVessel)
+      && unit.squad.exists(_.count(IsTank) > 0)
+      && unit.matchups.targets.filter(IsTank).exists(t => t.matchups.threatDeepest.exists(_.inRangeToAttack(t)) && ! t.visible))
+    output &&= groupSupported(unit).nonEmpty
+    output
   }
 
-  def best(from: Pixel, spotter: FriendlyUnitInfo, enemies: Iterable[UnitInfo]): Option[UnitInfo] = {
-    Maff.minBy(Maff.orElse(enemies.filterNot(_.visible), enemies))(_.pixelDistanceCenter(from))
+  private def canEventuallyCloak(unit: UnitInfo): Boolean = unit.isAny(Terran.SpiderMine, Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Zerg.Lurker)
+  
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    val from    = groupSupported(unit).get.centroidKey
+    val to      = groupSupported(unit).get.stepConsensus
+    val spooky  = detectionTarget(unit)
+    val spot    = spotTarget(unit)
+
+    unit.agent.toTravel = spooky.map(_.projectFrames(48))
+      .orElse(spot.map(_.pixel))
+      .orElse(Some(from.project(to, unit.sightPixels)))
+
+    if (unit.matchups.pixelsEntangled > -96) {
+      unit.agent.toReturn = groupSupported(unit).map(_.attackCentroidKey)
+      Retreat.delegate(unit)
+    } else {
+      Commander.move(unit)
+    }
+  }
+
+  def enemiesToConsider(unit: FriendlyUnitInfo): Seq[Iterable[UnitInfo]] = Seq(
+    unit.targetsAssigned.getOrElse(Seq.empty),
+    unit.enemiesSquad,
+    unit.enemiesBattle)
+
+  def groupSupported(unit: FriendlyUnitInfo): Option[UnitGroup] = {
+    (unit.squad.toSeq :+ unit.matchups.groupOf).find(g => g.attacksGround || g.attacksAir)
+  }
+
+  def detectionTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {
+    if ( ! unit.unitClass.isDetector) return None
+    val spookies = Maff.orElseFiltered(enemiesToConsider(unit): _*)(e =>
+        (e.cloakedOrBurrowed || canEventuallyCloak(e))
+        && (unit.squad.exists(_.canAttackIfVisible(e)) || unit.matchups.groupOf.canAttackIfVisible(e)))
+    val spookiesResponsible = spookies.filter(_.matchups.enemyDetectorDeepest.forall(unit==))
+    Maff.minBy(spookiesResponsible)(_.pixelDistanceSquared(unit))
+  }
+
+  def spotTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {
+    if ( ! unit.squad.filter(groupSupported(unit).contains).exists(_.attacksGround)) return None
+    val tanks = Maff.orElseFiltered(enemiesToConsider(unit): _*)(IsTank)
+    val tank = Maff.minBy(Maff.orElse(tanks.filter(_.matchups.pixelsEntangled >= 0), tanks))(_.pixelDistanceSquared(groupSupported(unit).get.attackCentroidKey))
+    tank
   }
 }

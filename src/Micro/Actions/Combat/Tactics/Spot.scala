@@ -1,6 +1,8 @@
 package Micro.Actions.Combat.Tactics
 
+import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Shapes.Circle
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -26,12 +28,20 @@ object Spot extends Action {
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val from    = groupSupported(unit).get.centroidKey
     val to      = groupSupported(unit).get.stepConsensus
+    val mid     = from.project(to, unit.sightPixels).tile
     val spooky  = detectionTarget(unit)
-    val spot    = spotTarget(unit)
+    val tank    = tankTarget(unit)
 
-    unit.agent.toTravel = spooky.map(_.projectFrames(48))
-      .orElse(spot.map(_.pixel))
-      .orElse(Some(from.project(to, unit.sightPixels)))
+    unit.agent.toTravel =
+      if (spooky.isDefined) {
+        spooky.map(_.projectFrames(48))
+      } else if (tank.exists(s => s.matchups.threatDeepest.exists(_.inRangeToAttack(s)))) {
+        tank.map(_.pixel)
+      } else {
+        Some(Maff.weightedCentroid(Circle(8)
+          .map(tank.map(_.tile).getOrElse(mid).add)
+          .map(t => (t.center, With.framesSince(t.lastSeen).toDouble))))
+      }
 
     if (unit.matchups.pixelsEntangled > -96) {
       unit.agent.toReturn = groupSupported(unit).map(_.attackCentroidKey)
@@ -59,7 +69,7 @@ object Spot extends Action {
     Maff.minBy(spookiesResponsible)(_.pixelDistanceSquared(unit))
   }
 
-  def spotTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {
+  def tankTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {
     if ( ! unit.squad.filter(groupSupported(unit).contains).exists(_.attacksGround)) return None
     val tanks = Maff.orElseFiltered(enemiesToConsider(unit): _*)(IsTank)
     val tank = Maff.minBy(Maff.orElse(tanks.filter(_.matchups.pixelsEntangled >= 0), tanks))(_.pixelDistanceSquared(groupSupported(unit).get.attackCentroidKey))

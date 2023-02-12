@@ -79,8 +79,7 @@ object Commander {
   private val tryingToMoveThreshold = 32
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    // This is likely incorrect because we don't want to fly into the target
-    //unit.agent.setRideGoal(target.pixel)
+    unit.agent.setRideGoal(unit.pixelToFireAt(target))
     leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (Protoss.Reaver(unit)) {

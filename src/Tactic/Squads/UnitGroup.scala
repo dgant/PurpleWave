@@ -29,6 +29,7 @@ trait UnitGroup {
   def attackersCastersCount     : Int       = _attackersCastersCount()
   def attackersBioCount         : Int       = _attackersBioCount()
   def stormCount                : Int       = _stormCount()
+  def airToAirStrength          : Int       = _airToAirStrength()
   def attacksAir                : Boolean   = _attacksAir()
   def attacksGround             : Boolean   = _attacksGround()
   def catchesAir                : Boolean   = _catchesAir()
@@ -123,6 +124,7 @@ trait UnitGroup {
   private val _combatValueAir             = new Cache(() => attackersCasters.filter(_.flying).map(_.subjectiveValue).sum)
   private val _combatValueGround          = new Cache(() => attackersCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
+  private val _airToAirStrength           = new Cache(() => attackers.filterNot(Protoss.Interceptor).filterNot(Zerg.Guardian).map(u => u.friendly.filter(Protoss.Carrier).map(_.interceptorCount).getOrElse(u.unitClass.supplyRequired)).sum)
   private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.attackersCastersCount * 4 >= With.units.groupVs(u).attackersCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker

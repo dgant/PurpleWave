@@ -1,15 +1,16 @@
 package Micro.Actions.Protoss
 
-import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Targeting.Target
 import Micro.Actions.Protoss.Carrier._
 import Micro.Agency.Commander
+import Micro.Targeting.FiltersSituational.{TargetFilterCombatants, TargetFilterVisibleInRange}
+import Micro.Targeting.Target
 import ProxyBwapi.Orders
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.LightYear
 
 
 object BeCarrier extends Action {
@@ -32,71 +33,59 @@ object BeCarrier extends Action {
   // On the other hand, similar performance against small units could potentially be achieved by
   // having carriers target different enemies, which would reduce the frequency of carriers having to switch targets.
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.aliveAndComplete && Protoss.Carrier(unit) && unit.matchups.enemies.nonEmpty
+  override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Carrier(unit) && unit.matchups.enemies.nonEmpty
 
-  protected final def interceptorActive(interceptor: UnitInfo): Boolean = (
-    ! interceptor.complete
-    || interceptor.order == Orders.InterceptorAttack
-    || With.framesSince(interceptor.lastFrameStartingAttack) < 72
-  )
+  protected final def isInterceptorActive(interceptor: UnitInfo): Boolean = Seq(Orders.InterceptorAttack, Orders.InterceptorReturn).contains(interceptor.order)
+
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-
-    def airToAirSupply(units: Seq[UnitInfo]): Double = {
-      units.map(u => if (u.flying) u.unitClass.supplyRequired else 0).sum
-    }
-    def shouldNeverHitUs(threat: UnitInfo): Boolean = {
-      // Never stand in range of static defense
-      if ( ! threat.canMove) return true
-      
-      // We can't always run from faster flying units
-      if (threat.flying && threat.topSpeed >= unit.topSpeed) return false
-
-      // Avoid standing in eg. Goliath range
-      if ( ! threat.flying) return true
-
-      if (unit.agent.shouldFight && threat.pixelRangeAgainst(unit) > 32.0 * 6.0) return false
-      
-      true
-    }
-
-    lazy val framesToAccelerate = unit.framesToAccelerate
-    lazy val interceptorsDone   = unit.interceptors.filter(_.complete)
-    lazy val interceptorsActive = interceptorsDone.count(interceptorActive) >= interceptorsDone.size / 2
-    lazy val canLeave           = airToAirSupply(unit.matchups.threats) < airToAirSupply(unit.matchups.alliesInclSelf) || unit.matchups.threats.exists(_.isAny(Terran.Battlecruiser, Protoss.Carrier))
-    lazy val exitingLeash       = unit.matchups.targets.filter(_.matchups.framesToLive > 48).forall(_.pixelDistanceEdge(unit) > 32.0 * 7.0)
-    lazy val inRangeNeedlessly  = unit.matchups.threats.exists(threat => shouldNeverHitUs(threat) && unit.pixelsOfEntanglement(threat) > - 32)
-    lazy val safeFromThreats    = unit.matchups.threats.forall(threat => threat.pixelDistanceCenter(unit) > threat.pixelRangeAir + 8 * 32 && ! threat.is(Protoss.Carrier)) // Protect interceptors!
-    lazy val shouldFight        = interceptorsDone.nonEmpty && ! inRangeNeedlessly && (unit.agent.shouldFight || safeFromThreats || (interceptorsDone.nonEmpty && ! canLeave))
-
-    if (shouldFight) {
+    if (unit.agent.shouldFight) {
       // Avoid changing targets (causes interceptors to not attack)
       // Avoid targeting something leaving leash range
-      // Keep moving/reposition while
-      val targetNow = unit.orderTarget.filter(t => t.alive && t.visible && t.pixelDistanceEdge(unit) < 32.0 * 10.0)
-      val targetDistance = targetNow.map(unit.pixelDistanceEdge)
-      if (safeFromThreats && targetDistance.exists(_ < 32.0 * 9.5)) {
-        unit.agent.toAttack = targetNow
-        if (unit.interceptors.forall(interceptorActive) || targetDistance.exists(_ < 32.0 * 8.0)) {
-          CarrierOpenLeash.apply(unit)
+      def target = unit.agent.toAttack
+      unit.agent.toAttack = unit
+        .orderTarget
+        .filter(t => t.alive && t.visible && t.isEnemy && t.pixelDistanceEdge(unit) <= 32.0 * 10.0)
+        .orElse(Target.choose(unit, TargetFilterCombatants, TargetFilterVisibleInRange))
+        .orElse(Target.choose(unit))
+
+      val interceptorsActive      = unit.interceptors.count(isInterceptorActive) >= 1 + unit.interceptors.count(_.complete) / 2
+      val interceptorSafetyMargin = Maff.max(unit.matchups.threats.filterNot(Protoss.Carrier).map(threat => threat.pixelsToGetInRange(unit) - 8 * 32)).getOrElse(LightYear().toDouble)
+      val carrierSafetyMargin     = unit.matchups.pixelsEntangled
+
+      if (target.isDefined) {
+        if (interceptorsActive) {
+          val chasePixel = unit.agent.toAttack.get.projectFrames(48)
+          val chasingAlready = unit.speedApproaching(chasePixel) > unit.topSpeed / 2
+          unit.agent.toTravel = Some(chasePixel)
+
+          // Chase with impunity, or if target is leaving our range
+          if ( ! chasingAlready && (interceptorSafetyMargin > 32 || unit.pixelDistanceEdge(target.get) > 32 * 9)) {
+            unit.agent.act("CarrierChase")
+            Commander.move(unit)
+
+          // Attack with impunity
+          } else if (interceptorSafetyMargin > 0) {
+            unit.agent.act("CarrierAttack")
+            Commander.attack(unit)
+
+          // Open leash
+          } else if (target.get.pixelDistanceEdge(unit) < 32 * 8) {
+            Retreat.delegate(unit)
+            unit.agent.act("OpenLeash")
+
+          // Hold leash
+          } else {
+            unit.agent.toTravel = unit.agent.toAttack.map(_.pixel.project(unit.agent.home, 7.5 * 32))
+            Commander.move(unit)
+          }
         } else {
-          CarrierHoldLeash.apply(unit)
+          unit.agent.act("Launch")
+          Commander.attack(unit)
         }
+      } else {
+        WarmUpInterceptors.apply(unit)
+        Commander.attackMove(unit)
       }
-      else {
-        Target.choose(unit)
-        if (safeFromThreats && interceptorsActive) {
-          CarrierChase.apply(unit)
-        }
-        Commander.attack(unit)
-      }
-      WarmUpInterceptors.apply(unit)
-      if (unit.matchups.targets.exists(_.isAny(Protoss.Carrier, Protoss.Interceptor))) {
-        unit.agent.toAttack = unit.agent.toAttack
-          .orElse(Maff.minBy(unit.matchups.targetsInRange .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(u => u.totalHealth / (1 + u.subjectiveValue)))
-          .orElse(Maff.minBy(unit.matchups.targets        .filter(u => u.canAttack(unit) && ! u.is(Protoss.Interceptor)))(_.pixelDistanceEdge(unit)))
-        Commander.attack(unit)
-      }
-      Commander.attackMove(unit)
     } else {
       Retreat.apply(unit)
     }

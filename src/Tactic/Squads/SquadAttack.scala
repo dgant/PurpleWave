@@ -2,6 +2,9 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.{Pixel, Points}
+import Mathematics.Shapes.Spiral
+import Performance.Cache
 import Planning.Predicates.MacroFacts
 import Utilities.Time.Minutes
 
@@ -16,13 +19,22 @@ class SquadAttack extends Squad {
   object PushMain     extends AttackMode { override val toString = "Push"     }
   object CrushArmy    extends AttackMode { override val toString = "Crush"    }
   object ContainArmy  extends AttackMode { override val toString = "Contain"  }
+  object Backstab     extends AttackMode { override val toString = "Backstab" }
   object ClearMap     extends AttackMode { override val toString = "Clear"    }
 
   var mode: AttackMode = PushMain
 
+  private def faster: Boolean = {
+    MacroFacts.safeSkirmishing && ((With.self.isZerg && ! With.enemies.exists(_.isZerg)) || (With.self.isProtoss && With.enemies.forall(_.isTerran)))
+  }
+
+  lazy val midmap: Cache[Option[Pixel]] = new Cache(() => Spiral(48)
+    .map(Points.tileMiddle.add)
+    .find(t => t.walkable && ! t.visibleToEnemy && t.enemyRange == 0 && ! t.zone.island)
+    .map(_.center))
+
   def chooseMode(): AttackMode = {
     val proxies       = With.units.enemy.filter(_.proxied).toVector
-    val faster        = MacroFacts.safeSkirmishing && ((With.self.isZerg && ! With.enemies.exists(_.isZerg)) || (With.self.isProtoss && With.enemies.forall(_.isTerran)))
     val basesOccupied = units.view.flatMap(_.base).filter(_.isEnemy).toSet
 
     if (basesOccupied.nonEmpty) {
@@ -50,6 +62,12 @@ class SquadAttack extends Squad {
       vicinity  = With.scouting.enemyThreatOrigin.center
       setTargets(SquadAutomation.rankedEnRoute(this))
 
+    } else if (faster && With.scouting.enemyProximity > 0.4) {
+      mode      = Backstab
+      vicinity  = Maff.maxBy(With.geography.enemyBases.map(_.heart))(_.groundPixels(With.scouting.enemyMuscleOrigin))
+        .getOrElse(With.scouting.enemyHome)
+        .center
+      setTargets(SquadAutomation.rankedAround(this))
     } else {
       mode      = ClearMap
       vicinity  =
@@ -70,12 +88,11 @@ class SquadAttack extends Squad {
     mode
   }
 
-
   override def run(): Unit = {
     if (units.isEmpty) return
     chooseMode()
     if (mode == ContainArmy && With.enemies.forall(_.isTerran) && MacroFacts.safeSkirmishing && units.size >= 12) {
-      With.geography.preferredExpansionsEnemy.take(3).foreach(base =>
+      With.geography.preferredExpansionsEnemy.filterNot(_.island).take(3).foreach(base =>
         Maff.minBy(unintended.filter(_.canAttackGround))(_.framesToTravelTo(base.heart.center)).foreach(camper =>
           camper.intend(this)
             .setCanSneak(true)
@@ -86,8 +103,12 @@ class SquadAttack extends Squad {
       // TODO: Scour stray units, like SquadDefendBase does
     }
     SquadAutomation.formAndSend(this)
-    if (Seq(RazeBase, ClearMap).contains(mode) && ! MacroFacts.safePushing) {
+    if (Seq(RazeBase, ClearMap, Backstab).contains(mode) && ! MacroFacts.safePushing) {
       units.foreach(_.intent.setCanSneak(true))
+    }
+
+    if (faster) {
+      units.foreach(_.intent.toReturn = midmap())
     }
   }
 }

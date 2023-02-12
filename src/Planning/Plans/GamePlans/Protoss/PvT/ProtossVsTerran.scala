@@ -143,7 +143,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechCarrier extends TechTransition {
     def started: Boolean = profited || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
-    def profited: Boolean = unitsEver(Protoss.Carrier) >= 4 && upgradeStarted(Protoss.CarrierCapacity)
+    def profited: Boolean = unitsEver(Protoss.Interceptor) >= 24 && upgradeStarted(Protoss.CarrierCapacity)
     def perform(): Unit = {
       get(Math.min(4, miningBases), Protoss.Stargate)
       requireGas()
@@ -323,7 +323,7 @@ class ProtossVsTerran extends PvTOpeners {
 
   def doArmyNormalPriority(): Unit = {
     pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
-    pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 1, 2), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
+    pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 3), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
     if (TechCarrier.started && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1)) {
       pump(Protoss.Observer, 8)
     }

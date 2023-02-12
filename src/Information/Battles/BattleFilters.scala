@@ -7,7 +7,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
-import Utilities.UnitFilters.{IsRangedGoon, IsSpeedScout, IsSpeedVulture, IsSpeedling, IsSpeedlot}
+import Utilities.UnitFilters.{IsRangedGoon, IsSpeedVulture, IsSpeedling, IsSpeedlot}
 
 object BattleFilters {
   def local(unit: UnitInfo): Boolean = any(unit) && unit.likelyStillThere
@@ -36,7 +36,7 @@ object BattleFilters {
   private def foesLackU(player: PlayerInfo, units: UnitClass*): Boolean = ?(player.isFriendly, With.unitsShown.allEnemies(units: _*) == 0, ! With.units.existsOurs(units: _*))
   def skirmish(unit: UnitInfo): Boolean = {
     val o = unit.player
-    var output = unit.isAny(IsSpeedVulture, Terran.Wraith, IsRangedGoon, Protoss.DarkTemplar, Protoss.Corsair, IsSpeedScout, Zerg.Mutalisk, Zerg.Scourge)
+    var output = unit.isAny(IsSpeedVulture, Terran.Wraith, IsRangedGoon, Protoss.DarkTemplar, Protoss.Corsair, Protoss.Arbiter, Protoss.Carrier, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge)
     output ||= Terran.Vulture(unit)   && foesLack(o, Terran.VultureSpeed, Zerg.ZerglingSpeed)
     output ||= Zerg.Zergling(unit)    && foesLack(o, Zerg.ZerglingSpeed)    && foesLackU(o, Terran.Vulture)
     output ||= IsSpeedling(unit)      && foesLack(o, Terran.VultureSpeed)

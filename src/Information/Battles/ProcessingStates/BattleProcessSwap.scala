@@ -32,7 +32,7 @@ class BattleProcessSwap extends BattleProcessState {
       unitsGlobalOurs.filter(BattleFilters.slugging).toVector,
       unitsGlobalEnemy.filter(BattleFilters.slugging).toVector,
       isGlobal = true)
-    With.battles.nextBattleGlobalSlug = new Battle(
+    With.battles.nextBattleGlobalSkirmish = new Battle(
       unitsGlobalOurs.filter(BattleFilters.skirmish).toVector,
       unitsGlobalEnemy.filter(BattleFilters.skirmish).toVector,
       isGlobal = true)

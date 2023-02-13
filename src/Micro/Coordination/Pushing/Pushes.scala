@@ -3,9 +3,11 @@ package Micro.Coordination.Pushing
 import Information.Grids.ArrayTypes.GridBuffer
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
+import ProxyBwapi.Bullets.BulletInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.{IsAll, IsVisible}
 import bwapi.BulletType
 
 import scala.collection.JavaConverters._
@@ -57,6 +59,7 @@ class Pushes {
         case BulletType.EMP_Missile         => put(new ExplosionEMP(bullet))
         case BulletType.Subterranean_Spines => if ( ! bullet.sourceUnit.exists(_.isOurs)) put(new ExplosionLurkerNow(bullet))
         case BulletType.Psionic_Storm       => put(new ExplosionPsionicStorm(bullet))
+        case BulletType.Gauss_Rifle_Hit     => checkMarineRange(bullet)
         case _ =>
       })
 
@@ -79,5 +82,15 @@ class Pushes {
     })
 
     With.game.getNukeDots.asScala.view.map(new Pixel(_)).map(new ExplosionNuke(_)).foreach(put)
+  }
+
+  def checkMarineRange(bullet: BulletInfo): Unit = {
+    if (bullet.sourceUnit.isEmpty
+      && ! Terran.MarineRange(bullet.player)
+      && ! With.units.existsEnemy(IsAll(IsVisible, Terran.Marine))
+      && bullet.targetUnit.exists(target =>
+        target.matchups.threats.filter(Terran.Bunker).exists(_.pixelsToGetInRange(target) > 16))) {
+      bullet.player.ratchetUpgradeLevel(Terran.MarineRange, 1)
+    }
   }
 }

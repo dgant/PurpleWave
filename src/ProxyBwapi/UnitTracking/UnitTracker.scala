@@ -7,7 +7,7 @@ import Performance.{Cache, TotalUnitCounter}
 import ProxyBwapi.UnitInfo._
 import Tactic.Squads.{GenericFriendlyUnitGroup, GenericUnitGroup, UnitGroup}
 import Utilities.?
-import Utilities.UnitFilters.UnitFilter
+import Utilities.UnitFilters.{IsAny, UnitFilter}
 
 import scala.collection.JavaConverters._
 
@@ -105,27 +105,27 @@ final class UnitTracker {
 
   private val counterOurs = new TotalUnitCounter(() => ours)
   @inline def existsOurs(matcher: UnitFilter*): Boolean = countOurs(matcher: _*) > 0
-  @inline def countOurs(matcher: UnitFilter*): Int = counterOurs(matcher: _*)
+  @inline def countOurs(matcher: UnitFilter*): Int = counterOurs(IsAny(matcher: _*))
   @inline def countOursP(predicate: (UnitInfo) => Boolean): Int = counterOurs.p(predicate)
 
   private val counterEnemy = new TotalUnitCounter(() => enemy)
   @inline def existsEnemy(matcher: UnitFilter*): Boolean = countEnemy(matcher: _*) > 0
-  @inline def countEnemy(matcher: UnitFilter*): Int = counterEnemy(matcher: _*)
+  @inline def countEnemy(matcher: UnitFilter*): Int = counterEnemy(IsAny(matcher: _*))
   @inline def countEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEnemy.p(predicate)
 
   private val counterEver = new TotalUnitCounter(() => With.units.ever)
   @inline def existsEver(matcher: UnitFilter*): Boolean = countEver(matcher: _*) > 0
-  @inline def countEver(matcher: UnitFilter*): Int = counterEver(matcher: _*)
+  @inline def countEver(matcher: UnitFilter*): Int = counterEver(IsAny(matcher: _*))
   @inline def countEverP(predicate: (UnitInfo) => Boolean): Int = counterEver.p(predicate)
 
   private val counterEverOurs = new TotalUnitCounter(() => With.units.everOurs)
-  @inline def existsEverOurs(matcher: UnitFilter*): Boolean = counterEverOurs(matcher: _*) > 0
-  @inline def countEverOurs(matcher: UnitFilter*): Int = counterEverOurs(matcher: _*)
+  @inline def existsEverOurs(matcher: UnitFilter*): Boolean = counterEverOurs(IsAny(matcher: _*)) > 0
+  @inline def countEverOurs(matcher: UnitFilter*): Int = counterEverOurs(IsAny(matcher: _*))
   @inline def countEverOursP(predicate: (UnitInfo) => Boolean): Int = counterEverOurs.p(predicate)
 
   private val counterEverEnemy = new TotalUnitCounter(() => With.units.everEnemy)
-  @inline def existsEverEnemy(matcher: UnitFilter*): Boolean = counterEverEnemy(matcher: _*) > 0
-  @inline def countEverEnemy(matcher: UnitFilter*): Int = counterEverEnemy(matcher: _*)
+  @inline def existsEverEnemy(matcher: UnitFilter*): Boolean = counterEverEnemy(IsAny(matcher: _*)) > 0
+  @inline def countEverEnemy(matcher: UnitFilter*): Int = counterEverEnemy(IsAny(matcher: _*))
   @inline def countEverEnemyP(predicate: (UnitInfo) => Boolean): Int = counterEverEnemy.p(predicate)
 
   ////////////

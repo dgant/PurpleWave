@@ -42,6 +42,8 @@ abstract class PvTOpeners extends GameplanImperative {
 
   def openNexusFirst(): Unit = {
     // Reference: https://www.youtube.com/watch?v=AuIqTCxQ1PY
+    // Flash says cross-scout; if we verify cross-spawn I believe the correct response is go direct to one gate core, maybe depending on gas.
+    With.blackboard.crossScout.set(true)
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(9, Protoss.Probe)
@@ -50,7 +52,7 @@ abstract class PvTOpeners extends GameplanImperative {
     once(2, Protoss.Nexus)
     once(14, Protoss.Probe)
     once(Protoss.Gateway)
-    scoutOn(Protoss.Gateway) // Flash says cross-scout; if we verify cross-spawn I believe the correct response is go direct to one gate core, maybe depending on gas.
+    scoutOn(Protoss.Gateway)
     once(15, Protoss.Probe)
     once(2, Protoss.Gateway)
     once(16, Protoss.Probe)
@@ -66,7 +68,7 @@ abstract class PvTOpeners extends GameplanImperative {
     // Flash follows with robo, range, and fast arbiter, and thus takes 2nd gas here
     // TODO: I think one gate core if cross-spawn, two if close. Also might depend on gas/no gas
     // Then: Robo if rax expand; range if not
-    openingComplete ||= units(Protoss.Nexus) > 1 && units(Protoss.Dragoon) > 1
+    openingComplete ||= units(Protoss.Nexus) > 1 && unitsEver(Protoss.Dragoon) > 1
   }
 
   def openZealotExpand(): Unit = {

@@ -233,7 +233,7 @@ trait MacroCounting {
   def enemyMiningBases: Int = With.geography.enemyBases.count(isMiningBase)
   def foundEnemyBase        : Boolean = enemyBases > 0
   def enemyNaturalConfirmed : Boolean = With.geography.enemyBases.exists(b => b.naturalOf.isDefined && b.townHall.isDefined)
-  def enemyCrossSpawn       : Boolean = With.scouting.enemyMain.exists(b => With.geography.startBases.sortBy(_.heart.groundPixels(With.geography.ourMain.heart)).indexOf(b) >= 3)
+  def enemyCrossSpawn       : Boolean = With.scouting.enemyMain.exists(_.isCross)
 
   def enemyIs(race: Race): Boolean = With.enemies.exists(_.raceCurrent == race)
   def enemyIsTerran   : Boolean = enemyIs(Race.Terran)

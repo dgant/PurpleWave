@@ -16,10 +16,6 @@ class TotalUnitCounter[T <: UnitInfo](source: () => Iterable[T]) {
     }
   })
   
-  def apply(matcher: UnitFilter*): Int = {
-    matcher.map(m => counts()(m)).sum
-  }
-  
   def apply(predicate: (T) => Boolean): Int = {
     // How can we speed this up?
     p(predicate)

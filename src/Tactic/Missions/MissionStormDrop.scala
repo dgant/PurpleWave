@@ -17,11 +17,8 @@ class MissionStormDrop extends MissionDrop {
 
   object MatchStormDroppable extends IsAll(IsComplete, Protoss.HighTemplar, _.energy >= 75, recruitablePassenger)
 
-  val stormLock = new LockUnits(this)
-  stormLock.matcher = MatchStormDroppable
-  stormLock.counter = CountUpTo(2)
-  val zealotLock = new LockUnits(this)
-  zealotLock.matcher = u => Protoss.Zealot(u) && recruitablePassenger(u)
+  val stormLock = new LockUnits(this, MatchStormDroppable, CountUpTo(2))
+  val zealotLock = new LockUnits(this, u => Protoss.Zealot(u) && recruitablePassenger(u))
 
   override protected def recruit(): Unit = {
     populateItinerary()

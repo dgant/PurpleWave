@@ -34,14 +34,9 @@ class MissionReaverDrop extends MissionDrop {
         >= passengers.view.map(_.subjectiveValue).sum))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
-  val reaverLock = new LockUnits(this)
-  reaverLock.matcher = unit => Protoss.Reaver(unit) && recruitablePassenger(unit)
-  val zealotDTLock = new LockUnits(this)
-  zealotDTLock.matcher = unit => unit.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(unit)
-  zealotDTLock.counter = CountUpTo(2)
-  val dragoonArchonLock = new LockUnits(this)
-  dragoonArchonLock.matcher = unit => unit.isAny(Protoss.Archon, Protoss.Dragoon) && recruitablePassenger(unit)
-  dragoonArchonLock.counter = CountOne
+  val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u)                            && recruitablePassenger(u))
+  val smallLock   : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(u)).setCounter(CountUpTo(2))
+  val bigLock     : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Archon, Protoss.Dragoon)     && recruitablePassenger(u)).setCounter(CountOne)
 
   override protected def recruit(): Unit = {
     populateItinerary()
@@ -52,21 +47,18 @@ class MissionReaverDrop extends MissionDrop {
 
     val transportPixel = transportLock.units.head.pixel
     reaverLock.preference = PreferClose(transportPixel)
-    zealotDTLock.preference = PreferClose(transportPixel)
-    dragoonArchonLock.preference = PreferClose(transportPixel)
+    smallLock.preference = PreferClose(transportPixel)
+    bigLock.preference = PreferClose(transportPixel)
 
     reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     reaverLock.acquire()
     if (reaverLock.units.isEmpty) { terminate("No reavers available"); return }
-    if (reaverLock.units.size < 2) {
-      zealotDTLock.acquire()
-      if (zealotDTLock.units.isEmpty) {
-        dragoonArchonLock.acquire()
-      }
+    if (reaverLock.units.size < 2 && smallLock.acquire().isEmpty) {
+      bigLock.acquire()
     }
     transports ++= transportLock.units
     passengers ++= reaverLock.units
-    passengers ++= zealotDTLock.units
-    passengers ++= dragoonArchonLock.units
+    passengers ++= smallLock.units
+    passengers ++= bigLock.units
   }
 }

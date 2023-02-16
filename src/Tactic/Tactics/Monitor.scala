@@ -11,10 +11,8 @@ import Utilities.UnitFilters.{IsAny, IsMobileDetector}
 import Utilities.UnitPreferences.PreferClose
 
 class Monitor extends Tactic {
-  val scouts = new LockUnits(this)
-  scouts.matcher = IsAny(Protoss.Observer, Zerg.Overlord)
-  scouts.counter = CountOne
-  scouts.interruptable = false
+
+  val scouts: LockUnits = new LockUnits(this, IsAny(Protoss.Observer, Zerg.Overlord), CountOne, interruptable = false)
 
   override def launch(): Unit = {
     var bases = With.geography.enemyBases

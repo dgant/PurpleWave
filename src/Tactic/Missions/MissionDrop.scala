@@ -40,10 +40,7 @@ abstract class MissionDrop extends Mission {
   protected def shouldGoHome: Boolean = false
   protected def recruitable(unit: UnitInfo): Boolean = unit.complete && ! unit.team.exists(_.engagedUpon)
   protected def recruitablePassenger(unit: UnitInfo): Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
-  protected val transportLock = new LockUnits(this)
-  transportLock.matcher = unit => unit.isTransport && recruitable(unit)
-  transportLock.counter = CountOne
-  transportLock.interruptable = false
+  protected val transportLock: LockUnits = new LockUnits(this, u => u.isTransport && recruitable(u)).setCounter(CountOne).setInterruptible(false)
 
   val itinerary = new mutable.Queue[Base]
   val transports = new ArrayBuffer[FriendlyUnitInfo]

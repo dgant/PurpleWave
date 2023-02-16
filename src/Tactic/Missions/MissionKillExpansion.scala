@@ -27,9 +27,7 @@ class MissionKillExpansion extends Mission {
   var lastFrameInBase = 0
   lock.matcher = IsAll(IsWarrior, IsAntiGround)
 
-  val detectorLock = new LockUnits(this)
-  detectorLock.matcher = IsMobileDetector
-  detectorLock.counter = CountExactly(1)
+  val detectorLock: LockUnits = new LockUnits(this, IsMobileDetector).setCounter(CountExactly(1))
 
   override def recruit(): Unit = {
     val targetBase = best

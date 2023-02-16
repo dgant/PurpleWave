@@ -9,11 +9,9 @@ import ProxyBwapi.Races.Protoss
 class MissionRecall extends Mission {
   override def shouldForm: Boolean = Protoss.Recall(With.self) && arbiterLock.inquire().exists(_.nonEmpty)
 
-  val arbiterLock = new LockUnits(this)
-  arbiterLock.matcher = IsAll(Protoss.Arbiter, _.energy >= Protoss.Recall.energyCost || state == StateFighting)
-  val armyLock = new LockUnits(this)
-  armyLock.matcher = IsAny(Protoss.Zealot, Protoss.Dragoon, Protoss.HighTemplar, Protoss.Archon, Protoss.Reaver, Protoss.Carrier)
-  armyLock.counter = CountBetween(10, 20)
+  val arbiterLock: LockUnits = new LockUnits(this, IsAll(Protoss.Arbiter, _.energy >= Protoss.Recall.energyCost || state == StateFighting))
+  val armyLock   : LockUnits = new LockUnits(this, IsAny(Protoss.Zealot, Protoss.Dragoon, Protoss.HighTemplar, Protoss.Archon, Protoss.Reaver, Protoss.Carrier))
+    .setCounter(CountBetween(10, 20))
 
   override protected def recruit(): Unit = {
     state = StateAssembling

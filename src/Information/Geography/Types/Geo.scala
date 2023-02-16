@@ -15,6 +15,7 @@ trait Geo {
   def zones           : Seq[Zone]
   def isStartLocation : Boolean
 
+  lazy val isCross  : Boolean       = ! With.geography.startBases.sortBy(With.geography.ourMain.groundDistance).exists(bases.contains)
   lazy val island   : Boolean       = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val boundary : TileRectangle = new TileRectangle(tiles)
   lazy val centroid : Tile          = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles))
@@ -28,4 +29,7 @@ trait Geo {
   def ourUnits      : Seq[UnitInfo] = units.view.filter(_.isOurs)
   def allies        : Seq[UnitInfo] = units.view.filter(_.isFriendly)
   def enemies       : Seq[UnitInfo] = units.view.filter(_.isEnemy)
+
+  def airDistance   (other: Geo): Double = heart.pixelDistance(other.heart)
+  def groundDistance(other: Geo): Double = heart.groundPixels(other.heart)
 }

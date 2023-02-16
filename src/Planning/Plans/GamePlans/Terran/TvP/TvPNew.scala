@@ -16,6 +16,7 @@ class TvPNew extends TvPNewOpeners {
   // If armory before ebay/academy, always academy because gols will be your anti-air
   // 1 rax fe vs gate-core-expand-robo, you want fac-fac-armory-academy
   // If protoss tech before range, reasonable to push on 3 tanks
+  // Chobo: Hiya 4-fac is modern way of punishing fast 3-base Protoss
 
   var expandedBeforeFactory: Boolean = _
   var skipTurrets: Boolean = _

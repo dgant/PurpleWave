@@ -16,16 +16,16 @@ class MorphUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
   setRequest(requestArg, expectedFramesArg)
   val classOutput   : UnitClass     = request.unit.get
   val classInput    : UnitClass     = classOutput.whatBuilds._1
-  val currencyLock  : LockCurrency  = new LockCurrencyFor(this, classOutput, 1)
-  val morpherLock   : LockUnits     = new LockUnits(this)
-  morpherLock.matcher = IsAny(classInput, _.friendly.exists(_.buildType == classOutput))
-  morpherLock.counter = CountOne
-  morpherLock.preference = PreferTrainerFor(classOutput)
+  val currencyLock  : LockCurrency  = new LockCurrencyFor(this, classOutput)
+  val morpherLock   : LockUnits     = new LockUnits(this,
+    IsAny(classInput, _.friendly.exists(_.buildType == classOutput)),
+    PreferTrainerFor(classOutput),
+    CountOne)
 
   var morpher: Option[FriendlyUnitInfo] = None
 
   def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classOutput) > 0)
-  def hasSpent: Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
+  def hasSpent  : Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
   def onUpdate(): Unit = {
     // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production

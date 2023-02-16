@@ -1,6 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
+import Planning.Predicates.MacroFacts
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -23,7 +24,6 @@ abstract class PvTOpener extends PvTStrategy {
   setChoice(PvTMidgameCarrier, PvTMidgameReaver, PvTMidgameStorm, PvTMidgameOpen)
 }
 abstract class PvTOpenerNoZealot extends PvTOpener {
-  //setMinimumGamesVsOpponent(1)
   blacklistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,
@@ -43,7 +43,11 @@ object PvT13Nexus extends PvTOpenerNoZealotNoRange {
 object PvTRangeless     extends PvTOpenerNoZealotNoRange
 object PvT28Nexus       extends PvTOpenerNoZealot
 object PvTZealotExpand  extends PvTOpener
-object PvTZZCoreZ       extends PvTOpener
+object PvTZZCoreZ       extends PvTOpener {
+  addRequirement(() =>
+    ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
+    || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
+}
 object PVT910           extends PvTOpener {
   whitelistVs(
     With.fingerprints.workerRush,

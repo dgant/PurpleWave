@@ -19,8 +19,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class DefendFFEWithProbes extends Tactic {
   
-  val defenders = new LockUnits(this)
-  defenders.matcher = IsWorker
+  val defenders = new LockUnits(this, IsWorker)
   
   protected def probeCount: Int = {
     val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEverEnemy(Zerg.Zergling)).max

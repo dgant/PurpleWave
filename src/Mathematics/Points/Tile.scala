@@ -99,6 +99,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def radiansTo(other: Tile): Double = {
     Maff.fastAtan2(other.y - y, other.x - x)
   }
+  @inline def radiansToSlow(other: Tile): Double = {
+    Math.atan2(other.y - y, other.x - x)
+  }
   @inline def directionTo(other: Tile): Direction = {
     other.subtract(this).direction
   }

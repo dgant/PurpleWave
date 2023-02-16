@@ -11,11 +11,11 @@ import Utilities.UnitPreferences.PreferIdle
 class BuildAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(buildableAddon, expectedFramesArg)
   def addonClass    : UnitClass     = request.unit.get
-  val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass, 1)
-  val builderLock   : LockUnits     = new LockUnits(this)
-  builderLock.matcher     = IsAll(addonClass.whatBuilds._1, _.addon.filter(addonClass).forall(_.producer.contains(this)))
-  builderLock.counter     = CountOne
-  builderLock.preference  = PreferIdle
+  val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass)
+  val builderLock   : LockUnits     = new LockUnits(this,
+    IsAll(addonClass.whatBuilds._1, _.addon.filter(addonClass).forall(_.producer.contains(this))),
+    PreferIdle,
+    CountOne)
 
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   override def trainee: Option[FriendlyUnitInfo] = builder.flatMap(_.addon).filter(addonClass).flatMap(_.friendly)

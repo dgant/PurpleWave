@@ -9,12 +9,10 @@ import Utilities.UnitFilters.IsTank
 
 class Scan extends Tactic {
   
-  val scanners = new LockUnits(this)
-  scanners.matcher = Terran.Comsat
-  
+  val scanners = new LockUnits(this, Terran.Comsat)
   var lastScan = 0
   
-  def launch() {
+  def launch(): Unit = {
     if ( ! With.units.existsOurs(Terran.Comsat)) return
     if (With.framesSince(lastScan) < 72) return
     
@@ -36,8 +34,8 @@ class Scan extends Tactic {
       ! u.visible
       && u.likelyStillThere
       && u.is(IsTank)
-      &&u.matchups.enemies.exists(e =>
-        e.is(Terran.SiegeTankSieged)
+      && u.matchups.enemies.exists(e =>
+        Terran.SiegeTankSieged(e)
         && e.cooldownLeft == 0
         && e.inRangeToAttack(u)
         && ! e.matchups.targetsInRange.exists(_.visible)))
@@ -59,11 +57,9 @@ class Scan extends Tactic {
   }
   
   def scan(targetPixel: Pixel): Unit = {
-    scanners.acquire()
-    val units = scanners.units
-    if (units.nonEmpty) {
-      units.maxBy(_.energy).intend(this).setScan(targetPixel)
+    Maff.maxBy(scanners.acquire())(_.energy).foreach(scanner => {
+      scanner.intend(this).setScan(targetPixel)
       lastScan = With.frame
-    }
+    })
   }
 }

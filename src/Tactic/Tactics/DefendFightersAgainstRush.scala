@@ -12,8 +12,7 @@ import Utilities.UnitPreferences.PreferClose
 
 class DefendFightersAgainstRush extends Tactic {
   
-  val defenders = new LockUnits(this)
-  defenders.matcher = IsWorker
+  val defenders = new LockUnits(this, IsWorker)
 
   private def inOurBase(unit: UnitInfo): Boolean = unit.base.exists(_.isOurs)
   def launch(): Unit = {

@@ -202,7 +202,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   private def arcSlots(classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
     var unitClass       = Terran.Marine
     var angleIncrement  = 0d
-    val angleCenter     = face.radiansTo(apex)
+    val angleCenter     = face.radiansToSlow(apex)
     val radiusIncrement = 4d
     var radius          = face.pixelDistance(apex) - radiusIncrement
     var rowSlot         = -1

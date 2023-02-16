@@ -19,21 +19,16 @@ import Utilities.UnitPreferences.{PreferAll, PreferClose, PreferIf}
 
 class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
-  val buildingClass   : UnitClass       = request.unit.get
-  val builderMatcher  : UnitClass       = buildingClass.whatBuilds._1
-  val placementQuery  : PlacementQuery  = requestArg.placement.getOrElse(new PlacementQuery(buildingClass))
-  val tileLock        : LockTiles       = new LockTiles(this)
-  val currencyLock    : LockCurrencyFor = new LockCurrencyFor(this, buildingClass, 1)
-  val builderLock     : LockUnits       = new LockUnits(this)
-  builderLock.matcher = builderMatcher
-  builderLock.counter = CountOne
-  builderLock.interruptable = false
-
-  var orderedTile : Option[Tile]        = None
-  var foundation  : Option[Foundation]  = None
-  var intendAfter : Option[Int]         = None
+  val buildingClass   : UnitClass           = request.unit.get
+  val builderMatcher  : UnitClass           = buildingClass.whatBuilds._1
+  val placementQuery  : PlacementQuery      = requestArg.placement.getOrElse(new PlacementQuery(buildingClass))
+  val tileLock        : LockTiles           = new LockTiles(this)
+  val currencyLock    : LockCurrencyFor     = new LockCurrencyFor(this, buildingClass)
+  val builderLock     : LockUnits           = new LockUnits(this, builderMatcher, CountOne, interruptable = false)
+  var orderedTile     : Option[Tile]        = None
+  var foundation      : Option[Foundation]  = None
+  var intendAfter     : Option[Int]         = None
   private var _trainee: Option[FriendlyUnitInfo] = None
-
   private val proposedBuilder = new Cache(() => builderLock.inquire().flatMap(_.headOption))
   def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))

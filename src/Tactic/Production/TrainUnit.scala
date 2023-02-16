@@ -4,7 +4,7 @@ import Information.Counting.MacroCounter
 import Macro.Requests.{RequestBuildable, RequestUnit}
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.{PreferTiers, PreferTrainerFor}
 
@@ -15,12 +15,12 @@ class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Pr
   val traineeClass    : UnitClass           = request.unit.get
   val trainerClass    : UnitClass           = traineeClass.whatBuilds._1
   val addonClass      : Option[UnitClass]   = traineeClass.buildUnitsEnabling.find(b => b.isAddon && b.whatBuilds._1 == trainerClass)
-  val currencyLock    : LockCurrency        = new LockCurrencyFor(this, traineeClass, 1)
-  val trainerLock     : LockUnits           = new LockUnits(this)
   val requestUnit     : Option[RequestUnit] = Try(requestArg.asInstanceOf[RequestUnit]).toOption
-  trainerLock.counter     = CountOne
-  trainerLock.preference  = requestUnit.flatMap(_.parentPreference).map(p => PreferTiers(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass))
-  trainerLock.matcher     = u => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r)))
+  val currencyLock    : LockCurrency        = new LockCurrencyFor(this, traineeClass)
+  val trainerLock     : LockUnits           = new LockUnits(this,
+    (u: UnitInfo)  => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r))),
+    requestUnit.flatMap(_.parentPreference).map(p => PreferTiers(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass)),
+    CountOne)
 
   var finalTrainer: Option[FriendlyUnitInfo] = None
   var finalTrainee: Option[FriendlyUnitInfo] = None

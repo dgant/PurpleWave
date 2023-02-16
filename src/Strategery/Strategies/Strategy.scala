@@ -32,6 +32,7 @@ abstract class Strategy extends SimpleString {
   private var _responsesBlacklisted   : Seq[Fingerprint]    = Seq.empty
   private var _responsesWhitelisted   : Seq[Fingerprint]    = Seq.empty
   private var _choices                : Seq[Seq[Strategy]]  = Seq.empty
+  private var _requirements           : Seq[() => Boolean]  = Seq.empty
 
   def gameplan                : Option[Plan]        = _gameplan
   def islandMaps              : Boolean             = _islandMaps
@@ -53,34 +54,35 @@ abstract class Strategy extends SimpleString {
   def mapsWhitelisted         : Seq[StarCraftMap]   = _mapsWhitelisted
   def responsesBlacklisted    : Seq[Fingerprint]    = _responsesBlacklisted
   def responsesWhitelisted    : Seq[Fingerprint]    = _responsesWhitelisted
+  def requirements            : Seq[() => Boolean]  = _requirements
   def choices                 : Seq[Seq[Strategy]]  = _choices
-
 
   /////////////////////////////////////////////////////
   // 2022 style of implementing strategies: Mutators //
   /////////////////////////////////////////////////////
 
-  def setIslandMaps(value: Boolean)           : Unit = { _islandMaps = value }
-  def setGroundMaps(value: Boolean)           : Unit = { _groundMaps = value }
-  def setEntranceRamped(value: Boolean)       : Unit = { _entranceRamped = value }
-  def setEntranceFlat(value: Boolean)         : Unit = { _entranceFlat = value }
-  def setEntranceInverted(value: Boolean)     : Unit = { _entranceInverted = value }
-  def setFFA(value: Boolean)                  : Unit = { _ffa = value }
-  def setAllowedVsHuman(value: Boolean)       : Unit = { _allowedVsHuman = value }
-  def setRushTilesMinimum(value: Int)         : Unit = { _rushTilesMinimum = value }
-  def setRushTilesMaximum(value: Int)         : Unit = { _rushTilesMaximum = value }
-  def setStartLocationsMin(value: Int)        : Unit = { _startLocationsMin = value }
-  def setStartLocationsMax(value: Int)        : Unit = { _startLocationsMax = value }
-  def setMinimumGamesVsOpponent(value: Int)   : Unit = { _minimumGamesVsOpponent = value }
-  def setWorkerDelta(value: Int)              : Unit = { _workerDelta = value }
-  def setOurRace(values: Race*)               : Unit = { _ourRaces = values }
-  def setEnemyRace(values: Race*)             : Unit = { _enemyRaces = values }
-  def whitelistOn(maps: StarCraftMap*)        : Unit = { _mapsWhitelisted ++= maps }
-  def blacklistOn(maps: StarCraftMap*)        : Unit = { _mapsBlacklisted ++= maps }
-  def whitelistVs(fingerprints: Fingerprint*) : Unit = { _responsesWhitelisted ++= fingerprints }
-  def blacklistVs(fingerprints: Fingerprint*) : Unit = { _responsesBlacklisted ++= fingerprints }
-  def addChoice(strategies: Strategy*)        : Unit = { _choices = _choices :+ strategies }
-  def setChoice(strategies: Strategy*)        : Unit = { _choices = Seq(strategies) }
+  def setIslandMaps             (value: Boolean)              : Unit = { _islandMaps = value }
+  def setGroundMaps             (value: Boolean)              : Unit = { _groundMaps = value }
+  def setEntranceRamped         (value: Boolean)              : Unit = { _entranceRamped = value }
+  def setEntranceFlat           (value: Boolean)              : Unit = { _entranceFlat = value }
+  def setEntranceInverted       (value: Boolean)              : Unit = { _entranceInverted = value }
+  def setFFA                    (value: Boolean)              : Unit = { _ffa = value }
+  def setAllowedVsHuman         (value: Boolean)              : Unit = { _allowedVsHuman = value }
+  def setRushTilesMinimum       (value: Int)                  : Unit = { _rushTilesMinimum = value }
+  def setRushTilesMaximum       (value: Int)                  : Unit = { _rushTilesMaximum = value }
+  def setStartLocationsMin      (value: Int)                  : Unit = { _startLocationsMin = value }
+  def setStartLocationsMax      (value: Int)                  : Unit = { _startLocationsMax = value }
+  def setMinimumGamesVsOpponent (value: Int)                  : Unit = { _minimumGamesVsOpponent = value }
+  def setWorkerDelta            (value: Int)                  : Unit = { _workerDelta = value }
+  def setOurRace                (values: Race*)               : Unit = { _ourRaces = values }
+  def setEnemyRace              (values: Race*)               : Unit = { _enemyRaces = values }
+  def whitelistOn               (maps: StarCraftMap*)         : Unit = { _mapsWhitelisted ++= maps }
+  def blacklistOn               (maps: StarCraftMap*)         : Unit = { _mapsBlacklisted ++= maps }
+  def whitelistVs               (fingerprints: Fingerprint*)  : Unit = { _responsesWhitelisted ++= fingerprints }
+  def blacklistVs               (fingerprints: Fingerprint*)  : Unit = { _responsesBlacklisted ++= fingerprints }
+  def addChoice                 (strategies: Strategy*)       : Unit = { _choices = _choices :+ strategies }
+  def setChoice                 (strategies: Strategy*)       : Unit = { _choices = Seq(strategies) }
+  def addRequirement            (predicate: () => Boolean)    : Unit = { _requirements = _requirements :+ predicate }
 
   /**
     * Flag a strategy as being salient to the gameplay.

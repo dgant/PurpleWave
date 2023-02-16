@@ -17,9 +17,7 @@ class MissionSpeedlotDrop extends MissionDrop {
     && With.recruiter.available.count(MatchDroppableSpeedlot) >= 4)
 
   object MatchDroppableSpeedlot extends IsAll(Protoss.Zealot, recruitablePassenger)
-  val zealotLock = new LockUnits(this)
-  zealotLock.matcher = MatchDroppableSpeedlot
-  zealotLock.counter = CountExactly(4)
+  val zealotLock: LockUnits = new LockUnits(this, MatchDroppableSpeedlot).setCounter(CountExactly(4))
 
   override protected def recruit(): Unit = {
     transportLock.preference = PreferClose(With.geography.home.center)

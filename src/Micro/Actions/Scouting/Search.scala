@@ -21,9 +21,7 @@ object SearchWhenBored extends AbstractSearch {
 
 abstract class AbstractSearch extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.geography.enemyBases.nonEmpty || unit.intent.toScoutTiles.nonEmpty
-  }
+  override def allowed(unit: FriendlyUnitInfo): Boolean =  With.geography.enemyBases.nonEmpty || unit.intent.toScoutTiles.nonEmpty
   
   protected val boredomFrames: Int
   

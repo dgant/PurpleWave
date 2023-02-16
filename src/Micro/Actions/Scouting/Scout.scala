@@ -6,11 +6,9 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Scout extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.agent.toTravel.isDefined && unit.agent.isScout
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.isScout
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     SabotageProxy.apply(unit)
     KnockKnock.apply(unit)
     PreserveScout.apply(unit)

@@ -24,16 +24,10 @@ class PopulateBunkers extends Plan {
   }
   
   private def newLock(bunker: FriendlyUnitInfo): LockUnits = {
-    val output = new LockUnits(this)
-    output.matcher = Terran.Marine
-    output.counter = CountUpTo(4)
-    output.preference = PreferClose(bunker.pixel)
-    output
+    new LockUnits(this, Terran.Marine, PreferClose(bunker.pixel), CountUpTo(4))
   }
   
   private def updateBunker(bunker: FriendlyUnitInfo): Unit = {
-    val lock = bunkerLocks(bunker)
-    lock.acquire()
-    lock.units.foreach(_.intend(this).setTravel(bunker.pixel).setBoard(bunker))
+    bunkerLocks(bunker).acquire().foreach(_.intend(this).setTravel(bunker.pixel).setBoard(bunker))
   }
 }

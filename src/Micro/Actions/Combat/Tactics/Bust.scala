@@ -1,17 +1,16 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.Maff
+import Mathematics.Points.Pixel
+import Mathematics.Shapes.Arc
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.Time.{Minutes, Seconds}
-import bwapi.Race
-
-import scala.util.Random
+import Utilities.?
+import Utilities.Time.Minutes
 
 object Bust extends Action {
   
@@ -19,78 +18,79 @@ object Bust extends Action {
   // jaj22: quick bunker test, range goon has at least a 33 pixel variation for where it stops on a straight line attack command.
   // Conclusion: We need to identify where Dragoons are supposed to stand to shoot at a Bunker, then tell them to Hold Position
   
-  // Killing bunkers with Dragoons is an important technique that we can't yet perform on first princples.
+  // Killing bunkers with Dragoons is an important skill that we can't yet perform on first princples.
   // Range-upgraded Dragoons just barely outrange a Bunker containing non-range-upgraded Marines.
   
-  protected def safeFromThreat(
-    dragoon: FriendlyUnitInfo,
-    threat: UnitInfo,
-    pixel: Pixel): Boolean = (
-    threat.isAny(Terran.Bunker, Terran.SCV, Terran.Marine, Terran.Vulture)
-    || threat.pixelDistanceEdge(dragoon, pixel) > threat.pixelRangeAgainst(dragoon) + 48.0
+  protected def safeFromThreat(dragoon: FriendlyUnitInfo, threat: UnitInfo, pixel: Pixel): Boolean = (
+    threat.isAny(Terran.Bunker, Terran.SCV, Terran.Marine, Terran.Vulture)  || threat.pixelsToGetInRange(dragoon) > 48
   )
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.frame < Minutes(8)() // Performance short-circuit
+    && Protoss.Dragoon(unit)
+    && Protoss.DragoonRange()
     && unit.shieldPoints > 12 // Don't take hull damage
     && unit.totalHealth > 24
-    && With.enemies.exists(_.raceCurrent == Race.Terran)
     && unit.intent.canFight
-    && unit.canMove
-    && unit.is(Protoss.Dragoon)
-    && With.self.hasUpgrade(Protoss.DragoonRange)
-    && unit.matchups.threats.forall(threat => safeFromThreat(unit, threat, unit.pixel))
+    && With.enemies.exists(e => e.isTerran && ! Terran.MarineRange(e))
+    && unit.matchups.threatDeepest.exists(Terran.Bunker)
+    && unit.matchups.threats.forall(safeFromThreat(unit, _, unit.pixel))
     && unit.matchups.targets.exists(bunker =>
-      (bunker.visible || bunker.altitude <= unit.altitude)
-      && bunker.aliveAndComplete
-      && Terran.Bunker(bunker)
-      && ! bunker.player.hasUpgrade(Terran.MarineRange)
-      && unit.matchups.threats.forall(threat =>
-        threat == bunker || (
-          threat.pixelsToGetInRange(unit) > bunker.pixelsToGetInRange(unit)
-          && safeFromThreat(
-            unit,
-            threat,
-            unit.pixel.project(bunker.pixel, unit.pixelDistanceEdge(bunker) - unit.pixelRangeAgainst(bunker)))))))
-  
-  override protected def perform(unit: FriendlyUnitInfo) {
-    // Goal: Take down the bunker. Don't take any damage from it.
-    // If we're getting shot at by the bunker, back off.
-    lazy val bunkers = unit.matchups.targets.filter(Terran.Bunker)
-    lazy val repairers = bunkers.flatMap(_.matchups.repairers)
-    lazy val goons = unit.alliesSquad.filter(u => u.friendly.exists(Bust.allowed) && bunkers.exists(b => u.framesToGetInRange(b) < 24))
+      Terran.Bunker(bunker)
+      && (bunker.visible || bunker.altitude <= unit.altitude)
+      && unit.matchups.threats.filterNot(bunker==).forall(threat =>
+        threat.pixelsToGetInRange(unit)
+        > Math.max(bunker.pixelsToGetInRange(unit), unit.pixelsToGetInRange(bunker)))))
 
-    if (unit.readyForAttackOrder && repairers.nonEmpty && goons.size >= repairers.map(_.hitPoints).min / 10) {
-      unit.agent.toAttack = Some(repairers.sortBy(_.pixelDistanceCenter(Maff.centroid(goons.map(_.pixel)))).minBy(_.hitPoints))
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
+    lazy val bunkers    = unit.matchups.targets.filter(Terran.Bunker)
+    lazy val repairers  = bunkers.flatMap(_.matchups.repairers)
+    lazy val goons      = unit.alliesSquad
+      .flatMap(_.friendly)
+      .filter(Bust.allowed)
+      .filter(u => bunkers.exists(b => u.framesToGetInRange(b) < 24))
+
+    // Few-shot repairers
+    if (unit.readyForAttackOrder && repairers.nonEmpty && goons.size >= repairers.map(_.hitPoints).min / 20) {
+      unit.agent.toAttack = Some(repairers
+        .sortBy(_.pixelDistanceCenter(Maff.centroid(goons.map(_.pixel))))
+        .minBy(_.hitPoints))
       Commander.attack(unit)
     }
 
-    if (With.framesSince(unit.lastFrameTakingDamage) < Seconds(1)()) {
+    if (unit.matchups.threatDeepest.exists(_.inRangeToAttack(unit)) || With.framesSince(unit.lastFrameTakingDamage) < 12) {
       Retreat.delegate(unit)
     }
 
-    unit.agent.toAttack = Maff.minBy(unit.matchups.targets.filter(_.unitClass.attacksGround))(_.pixelDistanceEdge(unit))
-    if (unit.agent.toAttack.exists(t => t.unitClass == Terran.Bunker && ! unit.inRangeToAttack(t))) {
+    unit.agent.toAttack = Maff.minBy(unit.matchups.targets.filter(_.canAttackGround))(unit.pixelDistanceEdge)
+
+    if (unit.agent.toAttack.exists(Terran.Bunker)) {
+
       val bunker = unit.agent.toAttack.get
-      val range = unit.pixelRangeAgainst(bunker)
+      val bunkerPixel = bunker.pixel
+      val bunkerAltitude = bunker.altitude
       val bunkerDistance = unit.pixelDistanceEdge(bunker)
-      def stationAcceptable(pixel: Pixel) = (
-        pixel.walkable
-        && ! unit.alliesSquad.exists(a =>
-          ! a.flying
-          && unit.pixelDistanceEdge(a, pixel) < 4
-          && a.pixelDistanceEdge(bunker) < bunkerDistance)
-        && ! unit.matchups.enemies.exists(_.inRangeToAttack(unit, pixel)))
-      var station = Some(unit.pixel.project(bunker.pixel, Math.max(Random.nextInt(9), bunkerDistance - range))).filter(stationAcceptable)
-      if (station.isEmpty && bunkerDistance > range + 32) {
-        val stationCount = 256
-        val stations = (0 until stationCount)
-          .map(_ * 2 * Math.PI / stationCount)
-          .map(bunker.pixel.radiateRadians(_ , range + unit.unitClass.dimensionMax + bunker.unitClass.dimensionMax))
-          .filter(stationAcceptable)
-        station = Maff.minBy(stations)(unit.pixelDistanceCenter)
+
+      if (unit.inRangeToAttack(bunker) && bunker.visible) {
+        // Hold Position should result in an attack faster than Stop:
+        // https://docs.google.com/spreadsheets/d/1LhC8rdqHTrhze6Gh7HitemGs-g2Xq-hVRDaA6X4bBnM/edit#gid=1092732143
+        if (unit.moving) Commander.hold(unit) else Commander.attack(unit)
+        return
       }
-      if (station.nonEmpty) {
+
+      val station = Arc(
+        bunkerPixel,
+        unit.pixel,
+        unit.pixelRangeAgainst(bunker) + unit.unitClass.dimensionMin + bunker.unitClass.dimensionMin,
+        8.0, 3, Math.PI / 2)
+        .map(bunkerPixel.add)
+        .find(station =>
+          station.traversableBy(unit)
+          && station.altitude >= bunkerAltitude
+          && ! unit.alliesSquad.exists(a => ! a.flying && unit.pixelDistanceEdge(a, station) < 4 && a.pixelDistanceEdge(bunker) < bunkerDistance)
+          && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, station)))
+
+      if (station.exists(_.pixelDistance(unit.pixel) > ?(unit.pixel == unit.previousPixel(4), 8, 0))) {
         unit.agent.toTravel = station
         Commander.move(unit)
       }

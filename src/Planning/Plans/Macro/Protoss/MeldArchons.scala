@@ -12,9 +12,7 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
   protected def maximumTemplar: Int = 100
   protected def minimumArchons: Int = 0
   
-  val templar = new LockUnits(this)
-  templar.matcher = Protoss.HighTemplar
-  templar.preference = PreferLowEnergy
+  val templar = new LockUnits(this, Protoss.HighTemplar, PreferLowEnergy)
   
   override def onUpdate(): Unit = {
     // Fast check for performance
@@ -27,10 +25,11 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
     val archonsNow    = With.units.countOurs(Protoss.Archon)
     val archonsToAdd  = Vector(0, minimumArchons - archonsNow, templarExcess / 2).max
     val templarToMeld = Math.max(templarLow, 2 * archonsToAdd)
-    templar.counter = CountUpTo(templarToMeld)
-    
-    templar.release()
-    templar.acquire()
-    templar.units.foreach(_.intend(this).setShouldMeld(true).setTravel(With.geography.home.center))
+
+    templar
+      .setCounter(CountUpTo(templarToMeld))
+      .release()
+      .acquire()
+      .foreach(_.intend(this).setShouldMeld(true).setTravel(With.geography.home.center))
   }
 }

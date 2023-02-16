@@ -4,16 +4,15 @@ import Lifecycle.With
 import Mathematics.Points.Tile
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.GameTime
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
 
 class ScoutForCannonRush extends Tactic {
-  val scouts = new LockUnits(this)
-  scouts.matcher = u => u.unitClass.isWorker && ! u.carrying
-  scouts.counter = CountOne
-  scouts.interruptable = false
+
+  val scouts: LockUnits = new LockUnits(this, (u:  UnitInfo) => u.unitClass.isWorker && ! u.carrying, CountOne, interruptable = false)
 
   lazy val previouslyCannonRushed: Boolean = With.strategy.enemyFingerprints(5).contains(With.fingerprints.cannonRush.toString)
 
@@ -41,12 +40,13 @@ class ScoutForCannonRush extends Tactic {
         && ! With.fingerprints.gatewayFirst()
         && With.frame > GameTime(1, 30)()
         && With.frame < GameTime(6, 0)())
-    shouldScout = shouldScout || (gettingCannonRushed && With.frame < GameTime(10, 0)())
+    shouldScout ||=  (gettingCannonRushed && With.frame < GameTime(10, 0)())
 
     if ( ! shouldScout) return
 
-    scouts.preference = PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center))
-    scouts.acquire()
-    scouts.units.foreach(_.intend(this).setTravel(With.geography.home.center).setScout(tilesToScout))
+    scouts
+      .setPreference(PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center)))
+      .acquire()
+      .foreach(_.intend(this).setTravel(With.geography.home.center).setScout(tilesToScout))
   }
 }

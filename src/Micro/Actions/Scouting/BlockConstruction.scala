@@ -18,7 +18,7 @@ object BlockConstruction extends Action {
       && (unit.hitPoints > 10 || ! unit.base.exists(_.owner.isEnemy))
   )
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
     val destination = builder.targetPixel.getOrElse(builder.pixel)
     unit.agent.toAttack = Some(builder)
@@ -36,7 +36,7 @@ object BlockConstruction extends Action {
     }
   }
   
-  val constructionOrders = Vector(
+  val constructionOrders: Seq[String] = Vector(
     Orders.PlaceBuilding,
     Orders.ZergBuildingMorph,
     Orders.ConstructingBuilding,

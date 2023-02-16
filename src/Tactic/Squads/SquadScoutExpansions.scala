@@ -66,7 +66,7 @@ class SquadScoutExpansions extends Squad {
     With.frame < scoutZergCutoff
     && ! With.self.isZerg
     && With.enemies.exists(_.isZerg)
-    && With.tactics.scoutWithWorkers.abandonScouting)
+    && With.tactics.scoutWithWorkers.scoutingAbandoned)
 
   def launch(): Unit = {
     if ( ! scoutZergThird) {

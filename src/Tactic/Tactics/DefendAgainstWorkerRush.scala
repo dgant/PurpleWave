@@ -8,8 +8,7 @@ import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
 class DefendAgainstWorkerRush extends Tactic {
   
-  val defenders = new LockUnits(this)
-  defenders.matcher = IsWorker
+  val defenders = new LockUnits(this, IsWorker)
   
   def launch(): Unit = {
     val attackingWorkers = With.geography.ourBases
@@ -31,8 +30,7 @@ class DefendAgainstWorkerRush extends Tactic {
       defenders.release()
     }
     defenders.counter = CountUpTo(workersToDefend)
-    defenders.acquire()
-    defenders.units.foreach(_.intend(this)
+    defenders.acquire().foreach(_.intend(this)
       .setCanFlee(false)
       .setTravel(attackingCentroid))
   }

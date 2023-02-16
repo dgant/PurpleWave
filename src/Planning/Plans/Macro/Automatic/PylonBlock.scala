@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
-import Planning.ResourceLocks.{LockCurrency, LockUnits}
+import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.GameTime
@@ -13,12 +13,8 @@ import Utilities.UnitFilters.IsWorker
 
 class PylonBlock extends Plan {
 
-  val blockerLock = new LockUnits(this)
-  blockerLock.matcher = IsWorker
-  blockerLock.counter = CountOne
-
-  val currencyLock = new LockCurrency(this)
-  currencyLock.minerals = 100
+  val blockerLock: LockUnits = new LockUnits(this, IsWorker).setCounter(CountOne)
+  val currencyLock = new LockCurrencyFor(this, Protoss.Pylon)
 
   var lastWorkerDeathFrame: Int = 0
   var lastWorker: Option[FriendlyUnitInfo] = None

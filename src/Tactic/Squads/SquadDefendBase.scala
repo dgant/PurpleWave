@@ -8,9 +8,11 @@ import Micro.Actions.Action
 import Micro.Agency.Commander
 import Micro.Formation._
 import Performance.Cache
+import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWorker
 
@@ -18,11 +20,10 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def launch(): Unit = { /* This squad is given its recruits externally */ }
 
-  lazy val heart: Pixel = if (base.metro == With.geography.ourMain.metro) With.geography.ourMain.heart.center else base.heart.center
-  vicinity = heart
-
   private var lastAction = "Def"
   override def toString: String = f"$lastAction ${base.name.take(5)}"
+
+  private val workerLock = new LockUnits(this)
 
   val zoneAndChoke = new Cache(() => {
     val zone: Zone = base.zone
@@ -55,11 +56,12 @@ class SquadDefendBase(base: Base) extends Squad {
   val bastion: Cache[Pixel] = new Cache(() => Maff.minBy(
     base.metro.zones.flatMap(_.units.view.filter(_.isOurs))
       .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || (u.complete && u.totalHealth < 300)))
-      .map(_.pixel))(_.groundPixels(guardChoke.map(_.pixelCenter).getOrElse(heart))).getOrElse(heart))
+      .map(_.pixel))(_.groundPixels(guardChoke.map(_.pixelCenter).getOrElse(vicinity))).getOrElse(vicinity))
 
   private var formationReturn: Formation = FormationEmpty
 
   override def run(): Unit = {
+    vicinity = ?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center
     if (units.isEmpty) return
     if (emergencyDTHugs()) return
 
@@ -70,7 +72,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val travelGoal        = if (canScour) vicinity else guardChoke.map(_.pixelCenter).getOrElse(bastion())
     val withdrawingUnits  = units.count(u =>
       ! u.metro.contains(base.metro)
-      && u.pixelDistanceTravelling(heart) + 32 * 15 > travelGoal.travelPixelsFor(heart, u)
+      && u.pixelDistanceTravelling(vicinity) + 32 * 15 > travelGoal.travelPixelsFor(vicinity, u)
       && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
@@ -85,7 +87,7 @@ class SquadDefendBase(base: Base) extends Squad {
       if (canScour) scourables
       else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector
       else enemies.filter(threateningBase)
-    setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(heart)))
+    setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)))
 
     formations.clear()
     if (canWithdraw) {

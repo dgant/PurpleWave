@@ -63,7 +63,7 @@ object TargetScoring {
 
     val catchBonus = add(12.0, target.caught || target.caughtBy(attacker))
 
-    val threatCost = attacker.pixelToFireAt(target).tile.enemiesAttacking(attacker).length match {
+    val threatCost = ?(Protoss.Carrier(attacker), target.tile, attacker.pixelToFireAt(target).tile).enemiesAttacking(attacker).length match {
       case 0 => 0.0
       case 1 => 1.0
       case _ => 3.0

@@ -288,6 +288,10 @@ abstract class PvTOpeners extends GameplanImperative {
       status("AcceleratedExpand")
       requireMiningBases(2)
     }
+    if (PvTZZCoreZ() && enemyStrategy(With.fingerprints.wallIn)) {
+      PvTZZCoreZ.swapOut()
+      PvTZealotExpand.swapIn()
+    }
   }
 
   def barracksCheese: Boolean = enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad) && ! enemyHasShown(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)

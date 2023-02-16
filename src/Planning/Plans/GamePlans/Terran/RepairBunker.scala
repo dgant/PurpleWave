@@ -11,8 +11,7 @@ import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitPreferences.PreferClose
 
 class RepairBunker extends Plan {
-  val lock = new LockUnits(this)
-  lock.matcher = Terran.SCV
+  val lock = new LockUnits(this, Terran.SCV)
 
   override def onUpdate(): Unit = {
     val bunkers = With.units.ours
@@ -46,9 +45,10 @@ class RepairBunker extends Plan {
       Math.min(6, With.units.countOurs(Terran.SCV) / 2 - 1))
 
     lock.release()
-    lock.counter = CountUpTo(repairersNeeded)
-    lock.preference = PreferClose(bunker.pixel)
-    lock.acquire()
-    lock.units.foreach(_.intend(this).setRepair(bunker))
+    lock
+      .setCounter(CountUpTo(repairersNeeded))
+      .setPreference(PreferClose(bunker.pixel))
+      .acquire()
+      .foreach(_.intend(this).setRepair(bunker))
   }
 }

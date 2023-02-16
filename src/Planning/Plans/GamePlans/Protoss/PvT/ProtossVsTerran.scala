@@ -83,7 +83,6 @@ class ProtossVsTerran extends PvTOpeners {
     def perform(): Unit = {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       get(Protoss.DragoonRange)
-      requireGas()
       val observersForVultures  = enemyHasShown(Terran.SpiderMine) || gasPumps > 2
       val observersForWraiths   = enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1
       val observersForSomething = observersForVultures || observersForWraiths
@@ -103,7 +102,6 @@ class ProtossVsTerran extends PvTOpeners {
       once(2, Protoss.Reaver)
       get(Protoss.ShuttleSpeed)
       get(Protoss.DragoonRange)
-      requireGas()
       if (units(Protoss.Reaver) > 2) get(Protoss.ScarabDamage)
     }
   }
@@ -113,7 +111,6 @@ class ProtossVsTerran extends PvTOpeners {
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
-      requireGas()
       get(Protoss.ZealotSpeed)
       get(?(counterBio, 2, 1), Protoss.Forge)
       get(Protoss.TemplarArchives)
@@ -130,7 +127,6 @@ class ProtossVsTerran extends PvTOpeners {
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
-      requireGas()
       get(Protoss.ZealotSpeed)
       get(Protoss.TemplarArchives)
       once(2, Protoss.HighTemplar)
@@ -145,16 +141,20 @@ class ProtossVsTerran extends PvTOpeners {
     def started: Boolean = profited || units(Protoss.FleetBeacon) > 0 || (units(Protoss.Stargate) > 0 && units(Protoss.TemplarArchives, Protoss.ArbiterTribunal) == 0)
     def profited: Boolean = unitsEver(Protoss.Interceptor) >= 24 && upgradeStarted(Protoss.CarrierCapacity)
     def perform(): Unit = {
-      get(Math.min(4, miningBases), Protoss.Stargate)
-      requireGas()
+      // TODO: Antiga recommends storm after 6 carriers, 4 gas; currently we rely on learning to pick it
+      // We're leaning heavily on MacroSim to sequence this for us
+      val stargates = Math.min(4, miningBases)
+      get(2, Protoss.Stargate)
       get(Protoss.FleetBeacon)
-      once(2, Protoss.Carrier)
+      get(stargates, Protoss.Stargate)
+      once(stargates, Protoss.Carrier)
       get(Protoss.CarrierCapacity)
       once(4, Protoss.Carrier)
       get(Protoss.DragoonRange) // Make sure we get it before we start air upgrades
       if (enemyStrategy(With.fingerprints.bio)) upgradeContinuously(Protoss.AirArmor) else upgradeContinuously(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirArmor, 3))  upgradeContinuously(Protoss.AirDamage)
       if (upgradeComplete(Protoss.AirDamage, 3))  upgradeContinuously(Protoss.AirArmor)
+      requireGas()
       buildCannonsAtExpansions(2)
     }
   }
@@ -164,7 +164,6 @@ class ProtossVsTerran extends PvTOpeners {
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
-      requireGas()
       get(Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Stargate)
       get(Protoss.ArbiterEnergy)
       once(2, Protoss.Arbiter)
@@ -184,15 +183,17 @@ class ProtossVsTerran extends PvTOpeners {
     TechStorm           (PvTMidgameStorm()      || stormVsBio)
     TechCarrier         (PvTMidgameCarrier()    && ( ! counterBio || TechCarrier.started))
     TechUpgrades        (counterBio)
-    TechObservers       ()
+    TechObservers       ( ! counterBio)
     TechReavers         (PvTMidgameReaver())
     TechUpgrades        ()
+    TechObservers       ()
     TechCarrier         (PvTEndgameCarrier()  && ( ! counterBio || TechCarrier.started))
     TechStorm           (PvTMidgameStorm() || PvTEndgameStorm() || TechCarrier.queued || counterBio)
     TechArbiter         ()
     PvTMidgameOpen.activate()
     PvTEndgameArbiter.activate()
 
+    val terranOneBase   = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures)
     val techsComplete   = techs.count(_.profited)
     val gatewayEquivs   = ?(TechCarrier.queued, miningBases, 0) + ?(TechReavers.queued, 2, 0)
     val gatewayWant     = (3.0 * miningBases).toInt - gatewayEquivs
@@ -290,22 +291,24 @@ class ProtossVsTerran extends PvTOpeners {
     recordRequestedBases()
     tech()
     army()
-    get(?(armySizeLow, gatewayWant, gatewayNeed), Protoss.Gateway)
+    get(?(terranOneBase, gatewayWant, gatewayNeed), Protoss.Gateway)
+    // Crummy gas formula; in general we're counting on MacroSim to bump up the later invocation of requireGas if we really need it
+    requireGas(units(Protoss.Gateway, Protoss.RoboticsSupportBay, Protoss.Stargate, Protoss.CitadelOfAdun) / 4)
     approachMiningBases(3)
-    requireGas()
     get(gatewayWant, Protoss.Gateway)
     buildCannonsAtExpansions(2)
     if (isMiningBase(With.geography.ourNatural)) {
       buildCannonsAtNatural(2)
     }
     approachMiningBases(4)
+    requireGas() //
     techs.foreach(_.perform())
     approachMiningBases(5)
     get(6 * miningBases, Protoss.Gateway)
   }
 
-  def requireGas(): Unit = {
-    if (With.self.gas < 500) buildGasPumps()
+  def requireGas(quantity: Int = Int.MaxValue): Unit = {
+    if (With.self.gas < 500) buildGasPumps(quantity)
   }
 
   def doArmyHighPriority(): Unit = {

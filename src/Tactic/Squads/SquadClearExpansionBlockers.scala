@@ -12,13 +12,8 @@ import scala.util.Random
 
 class SquadClearExpansionBlockers extends Squad {
   
-  val detectorLock = new LockUnits(this)
-  detectorLock.matcher = IsMobileDetector
-  detectorLock.counter = CountOne
-
-  val sweeperLock = new LockUnits(this)
-  sweeperLock.matcher = IsAny(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk)
-  sweeperLock.counter = CountOne
+  val detectorLock: LockUnits = new LockUnits(this, IsMobileDetector, CountOne)
+  val sweeperLock : LockUnits = new LockUnits(this, IsAny(Terran.Marine, Terran.Firebat, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk), CountOne)
 
   def launch(): Unit = {
     if (With.frame < Minutes(6)()) return

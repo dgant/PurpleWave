@@ -8,6 +8,7 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
+import ProxyBwapi.Races.Protoss
 import Utilities.?
 import bwapi.Race
 
@@ -67,9 +68,9 @@ trait Expansions {
     val opposingRaces   = opposingPlayers.map(_.raceCurrent).filterNot(Race.Unknown==)
 
     val raceShyness     = matchupShyness  .getOrElse(player.raceCurrent, Map.empty)
-    val raceGasBases    = gasNeeds              .getOrElse(player.raceCurrent, Map.empty)
+    val raceGasBases    = gasNeeds        .getOrElse(player.raceCurrent, Map.empty)
     val shyness         = Maff.min(opposingRaces.flatMap(raceShyness.get)).getOrElse(1.0)
-    val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get)).getOrElse(3)
+    val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get) ++ Seq(4).filter(x => With.unitsShown(player, Protoss.FleetBeacon) > 0)).getOrElse(3)
 
     def scoreBase(base: Base, player: PlayerInfo): Double = {
       val originStrength    = if (player.isFriendly)  With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin

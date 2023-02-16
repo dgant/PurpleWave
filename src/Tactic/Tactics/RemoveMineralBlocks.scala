@@ -9,10 +9,7 @@ import Utilities.UnitPreferences.PreferClose
 
 class RemoveMineralBlocks extends Tactic {
   
-  val miners = new LockUnits(this)
-  miners.interruptable = false
-  miners.matcher = IsWorker
-  miners.counter = CountOne
+  val miners: LockUnits = new LockUnits(this, IsWorker, CountOne, interruptable = false)
 
   private val blockerRadiusSquared = Math.pow(32 * 5, 2)
   override def launch(): Unit = {
@@ -29,9 +26,11 @@ class RemoveMineralBlocks extends Tactic {
     if (workersFree <= 0 && workersTotal < ?(With.blackboard.wantToAttack(), 32, 39)) return
 
     val workersToUse = Math.max(1, Math.min(ourMineralBlocks.size, workersFree))
-    miners.preference = PreferClose(ourMineralBlocks.head.pixel)
-    miners.counter = CountUpTo(workersToUse)
-    miners.acquire()
-    miners.units.zipWithIndex.foreach(p => p._1.intend(this).setGather(ourMineralBlocks(p._2 % ourMineralBlocks.length)))
+    miners
+      .setPreference(PreferClose(ourMineralBlocks.head.pixel))
+      .setCounter(CountUpTo(workersToUse))
+      .acquire()
+      .zipWithIndex
+      .foreach(p => p._1.intend(this).setGather(ourMineralBlocks(p._2 % ourMineralBlocks.length)))
   }
 }

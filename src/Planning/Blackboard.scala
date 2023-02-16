@@ -32,6 +32,7 @@ class Blackboard {
   val maxBuilderTravelFrames  : Property[Int]               = add(new Property(Seconds(50)()))
   val workerDelta             : Property[Int]               = add(new Property(0))
   val gasWorkerRatio          : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
+  val crossScout              : Property[Boolean]           = add(new Property(false))
   val yoloing                 : Property[Boolean]           = add(new Property(false))
   val allowIslandBases        : Property[Boolean]           = add(new Property(false))
   val monitorBases            : Property[Boolean]           = add(new Property(false))

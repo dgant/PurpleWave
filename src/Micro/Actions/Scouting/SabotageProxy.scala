@@ -4,7 +4,6 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Utilities.UnitFilters.IsProxied
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Zerg.ZvE4Pool
 
@@ -12,18 +11,18 @@ object SabotageProxy extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
-    && unit.unitClass.isWorker
+    && unit.canAttackGround
     && unit.matchups.targets.exists(_.proxied)
     && ! ZvE4Pool())
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val buildingTarget = Maff.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
+    unit.agent.toAttack = Maff.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)
     if (unit.matchups.threats.forall(threat =>
       threat.framesToGetInRange(unit) > 12
       || (threat.unitClass.isWorker
         && (threat.totalHealth <= unit.totalHealth
-          || buildingTarget.exists(b => Math.max(15 + threat.pixelRangeAgainst(unit), b.pixelDistanceEdge(unit)) < threat.pixelDistanceEdge(unit)))))) {
-      unit.agent.toAttack = buildingTarget
+          || unit.agent.toAttack.exists(b =>
+            Math.max(15 + threat.pixelRangeAgainst(unit), b.pixelDistanceEdge(unit)) < threat.pixelsToGetInRange(unit)))))) {
       Commander.attack(unit)
     }
     Retreat.delegate(unit)

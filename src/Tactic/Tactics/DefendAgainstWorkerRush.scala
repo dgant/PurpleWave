@@ -18,10 +18,8 @@ class DefendAgainstWorkerRush extends Tactic {
           (ally.unitClass.isBuilding || ally.friendly.exists(_.intent.toBuild.isDefined))
           && u.framesToGetInRange(ally) < 24 * 3)))
       .distinct
-  
-    lazy val attackingCentroid = Maff.centroid(attackingWorkers.map(_.pixel))
-    lazy val ourWorkers = With.units.countOurs(IsWorker)
-    lazy val ourCombatUnits = With.units.countOurs(IsWarrior)
+
+    val ourCombatUnits = With.units.countOurs(IsWarrior)
     
     if (attackingWorkers.size < 3 || ourCombatUnits >= 3) return
       
@@ -29,9 +27,13 @@ class DefendAgainstWorkerRush extends Tactic {
     if (defenders.units.size > workersToDefend) {
       defenders.release()
     }
-    defenders.counter = CountUpTo(workersToDefend)
-    defenders.acquire().foreach(_.intend(this)
-      .setCanFlee(false)
-      .setTravel(attackingCentroid))
+
+    lazy val attackingCentroid = Maff.centroid(attackingWorkers.map(_.pixel))
+    defenders
+      .setCounter(CountUpTo(workersToDefend))
+      .acquire()
+      .foreach(_.intend(this)
+        .setCanFlee(false)
+        .setTravel(attackingCentroid))
   }
 }

@@ -9,12 +9,13 @@ import Micro.Agency.Commander
 import Micro.Formation._
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.IsWorker
+import Utilities.UnitCounters.CountEverything
+import Utilities.UnitFilters.{IsTank, IsWorker}
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -23,7 +24,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private var lastAction = "Def"
   override def toString: String = f"$lastAction ${base.name.take(5)}"
 
-  private val workerLock = new LockUnits(this)
+  val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.base.filter(_.isOurs).forall(base==), CountEverything)
 
   val zoneAndChoke = new Cache(() => {
     val zone: Zone = base.zone
@@ -69,27 +70,35 @@ class SquadDefendBase(base: Base) extends Squad {
     val scourables        = enemies.filter(isScourable)
     val breached          = scourables.exists(isBreaching)
     val canScour          = scourables.nonEmpty && (canWander || breached)
-    val travelGoal        = if (canScour) vicinity else guardChoke.map(_.pixelCenter).getOrElse(bastion())
+    val travelGoal        = ?(canScour, vicinity, guardChoke.map(_.pixelCenter).getOrElse(bastion()))
     val withdrawingUnits  = units.count(u =>
       ! u.metro.contains(base.metro)
       && u.pixelDistanceTravelling(vicinity) + 32 * 15 > travelGoal.travelPixelsFor(vicinity, u)
       && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
+
+    val canPullWorkers = (
+      withdrawingUnits == 0
+      && confidence11 < -0.2
+      && breached
+      && enemies.exists(_.isAny(Terran.Marine, IsTank, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk))
+      && ! enemies.exists(_.isAny(Terran.Firebat, Terran.Vulture, Protoss.DarkTemplar, Protoss.Archon, Protoss.Reaver, Zerg.Lurker, Zerg.Ultralisk)))
+    if (canPullWorkers) {
+      addUnits(workerLock.acquire())
+    }
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
     lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
     lazy val formationBastion   = Formations.march(this, bastion())
     lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
 
-    val canWithdraw = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
-    val canGuard    = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
-
+    val canWithdraw     = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
+    val canGuard        = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg))
     val targetsUnranked =
       if (canScour) scourables
       else if (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector
       else enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)))
 
-    formations.clear()
     if (canWithdraw) {
       lastAction = "Withdraw"
       if (canScour) {
@@ -158,7 +167,9 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private def isBreaching(enemy: UnitInfo): Boolean = (
     enemy.canAttackGround
-      && (enemy.base.exists(_.owner.isUs) || guardChoke.exists(c => enemy.metro.exists(_.bases.contains(base)) && enemy.pixel.walkableTile.groundPixels(base.heart) < c.pixelCenter.walkableTile.groundPixels(base.heart)))
+      && (enemy.base.exists(_.owner.isUs)
+        || With.geography.ourBases.exists(_.townHall.exists(th => enemy.inRangeToAttack(th) && th.injury > 0.5))
+        || guardChoke.exists(c => enemy.metro.exists(_.bases.contains(base)) && enemy.pixel.walkableTile.groundPixels(base.heart) < c.pixelCenter.walkableTile.groundPixels(base.heart)))
       && (With.fingerprints.workerRush() || ! IsWorker(enemy))
       && ! guardZone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 

@@ -70,6 +70,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     _enemiesNow.clear()
   }
   final def prepareToRun(): Unit = {
+    formations.clear()
     val swapUnits = _unitsNow
     _unitsNow = _unitsNext
     _unitsNext = swapUnits

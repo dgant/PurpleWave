@@ -62,7 +62,7 @@ class Tactician extends TimedTask {
   // Basic squads //
   //////////////////
 
-  private lazy val baseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
+  lazy val defenseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
   private val catchDTRunby = new SquadCatchDTRunby
   val attackSquad = new SquadAttack
 
@@ -145,7 +145,7 @@ class Tactician extends TimedTask {
       .sortBy(d => - ?(d.attackers.nonEmpty, d.attackCentroidGround, d.centroidGround).walkablePixel.groundPixels(With.geography.home))
 
     // Pick a squad for each
-    val squadsDefending = divisionsToDefend.map(d => (d, baseSquads({
+    val squadsDefending = divisionsToDefend.map(d => (d, defenseSquads({
       val base = d.bases
         .toVector
         .sortBy( - _.economicValue())
@@ -176,7 +176,7 @@ class Tactician extends TimedTask {
     if (With.scouting.enemyProximity < 0.5 && MacroFacts.enemyHasShown(Zerg.Mutalisk) && ( ! With.blackboard.wantToAttack() || ! acePilots.hasFleet)) {
       freelancersPick(
         freelancers,
-        With.geography.ourBases.filter(MacroFacts.isMiningBase).map(baseSquads(_)),
+        With.geography.ourBases.filter(MacroFacts.isMiningBase).map(defenseSquads(_)),
         filter = (f, s) => Protoss.Archon(f) && s.unitsNext.isEmpty)
     }
 
@@ -192,7 +192,7 @@ class Tactician extends TimedTask {
         Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
       freelancersPick(
         freelancers,
-        dropVulnerableBases.map(baseSquads(_)),
+        dropVulnerableBases.map(defenseSquads(_)),
         filter = (f, s) => f.isAny(qualifiedClasses: _*) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
 
@@ -207,7 +207,7 @@ class Tactician extends TimedTask {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else Maff.maxBy(Maff.orElse(With.blackboard.basesToHold(), With.geography.ourBasesAndSettlements))(_.economicValue()).map(adjustDefenseBase).map(baseSquads).toSeq
+        else Maff.maxBy(Maff.orElse(With.blackboard.basesToHold(), With.geography.ourBasesAndSettlements))(_.economicValue()).map(adjustDefenseBase).map(defenseSquads).toSeq
       freelancersPick(freelancers, squadsDefendingOrWaiting)
     }
   }

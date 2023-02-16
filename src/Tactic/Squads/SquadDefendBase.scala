@@ -76,13 +76,14 @@ class SquadDefendBase(base: Base) extends Squad {
       && u.pixelDistanceTravelling(vicinity) + 32 * 15 > travelGoal.travelPixelsFor(vicinity, u)
       && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
 
-    val canPullWorkers = (
-      withdrawingUnits == 0
+    val pullWorkers = (
+      With.frame < Minutes(8)()
+      && withdrawingUnits == 0
       && confidence11 < -0.2
       && breached
       && enemies.exists(_.isAny(Terran.Marine, IsTank, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk))
       && ! enemies.exists(_.isAny(Terran.Firebat, Terran.Vulture, Protoss.DarkTemplar, Protoss.Archon, Protoss.Reaver, Zerg.Lurker, Zerg.Ultralisk)))
-    if (canPullWorkers) {
+    if (pullWorkers) {
       addUnits(workerLock.acquire())
     }
 

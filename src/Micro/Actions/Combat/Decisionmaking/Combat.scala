@@ -335,8 +335,14 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def abuse(): Boolean = {
-    if (idealDistanceForward < - Math.min(32, unit.topSpeed * (unit.cooldownLeft + With.latency.latencyFrames)) || ! attackIfReady()) {
+    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.presumptiveTarget.contains(unit), 128, 64))
+    kite &&= unit.confidence11 < 0.75
+    kite ||= ! attackIfReady()
+    if (kite) {
       Retreat(unit)
+    }
+    if (idealDistanceForward > 0) {
+      chase()
     }
     unit.unready
   }

@@ -5,14 +5,14 @@ import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points.Pixel
 import ProxyBwapi.ConvertBWAPI
-import ProxyBwapi.Players.{PlayerInfo, Players}
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwapi.{Bullet, BulletType}
 
 case class BulletInfo(bwapi: Bullet) {
   val id                    : Int               = bwapi.getID
   val exists                : Boolean           = bwapi.exists
-  lazy val player           : PlayerInfo        = Players.get(bwapi.getPlayer)
+  // bwapi.getPlayer is sometimes? Frequently? null. Figure out when/why before we dare use this
+  //lazy val player           : PlayerInfo        = Players.get(bwapi.getPlayer)
   lazy val pixel            : Pixel             = new Pixel(bwapi.getPosition)
   lazy val sourceUnit       : Option[UnitInfo]  = With.units.get(bwapi.getSource)
   lazy val targetUnit       : Option[UnitInfo]  = With.units.get(bwapi.getTarget)

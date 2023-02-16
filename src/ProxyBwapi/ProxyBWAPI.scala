@@ -2,9 +2,9 @@ package ProxyBwapi
 
 import Lifecycle.With
 import ProxyBwapi.Players.PlayerInfo
-import ProxyBwapi.Techs._
-import ProxyBwapi.UnitClasses._
-import ProxyBwapi.Upgrades._
+import ProxyBwapi.Techs.{Tech, TechTypes}
+import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
+import ProxyBwapi.Upgrades.{Upgrade, UpgradeTypes}
 
 import scala.collection.JavaConverters._
 

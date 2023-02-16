@@ -86,11 +86,11 @@ class Pushes {
 
   def checkMarineRange(bullet: BulletInfo): Unit = {
     if (bullet.sourceUnit.isEmpty
-      && ! Terran.MarineRange(bullet.player)
+      && With.enemies.exists( ! Terran.MarineRange(_))
       && ! With.units.existsEnemy(IsAll(IsVisible, Terran.Marine))
       && bullet.targetUnit.exists(target =>
         target.matchups.threats.filter(Terran.Bunker).exists(_.pixelsToGetInRange(target) > 16))) {
-      bullet.player.ratchetUpgradeLevel(Terran.MarineRange, 1)
+      With.enemies.filter(_.isTerran).foreach(_.ratchetUpgradeLevel(Terran.MarineRange, 1))
     }
   }
 }

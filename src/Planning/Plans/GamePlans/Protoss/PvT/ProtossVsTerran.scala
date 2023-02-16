@@ -217,17 +217,18 @@ class ProtossVsTerran extends PvTOpeners {
     val zealotAggro     = frame < Minutes(5)() && unitsComplete(Protoss.Zealot) > 0
     val pushMarines     = barracksCheese && ! With.strategy.isRamped
     val mineContain     = enemyHasShown(Terran.SpiderMine) && unitsComplete(Protoss.Observer) == 0
-    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
+    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
     val nascentCarriers = TechCarrier.started && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
     val encroaching     = With.scouting.enemyProximity > 0.65
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
     shouldAttack      ||= ! barracksCheese
+    shouldAttack      &&= safeSkirmishing
     shouldAttack      &&= ! mineContain
-    shouldAttack      &&= ! safeSkirmishing
     shouldAttack      &&= ! vultureRush
     shouldAttack      &&= ! consolidatingFE
     shouldAttack      ||= zealotAggro
+    shouldAttack      ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
     shouldAttack      ||= bases > 2
     shouldAttack      ||= enemyMiningBases > miningBases
     shouldAttack      ||= frame > Minutes(10)()

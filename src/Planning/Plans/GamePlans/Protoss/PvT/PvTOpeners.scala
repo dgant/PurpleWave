@@ -52,7 +52,9 @@ abstract class PvTOpeners extends GameplanImperative {
     once(2, Protoss.Nexus)
     once(14, Protoss.Probe)
     once(Protoss.Gateway)
-    scoutOn(Protoss.Gateway)
+    // Flash scouts. Antiga suggests no-scout.
+    // If we knew what Flash would actually want to do with the intel, we could scout
+    // scoutOn(Protoss.Gateway)
     once(15, Protoss.Probe)
     once(2, Protoss.Gateway)
     once(16, Protoss.Probe)

@@ -21,14 +21,20 @@ class Fingerprints {
       rampBlock) ++
     (if (With.enemies.exists(_.isUnknownOrTerran)) Seq(
       bunkerRush,
+      proxyRax,
       fiveRax,
+      eightRax,
       bbs,
       twoRax1113,
+      twoRaxAcad,
+      oneRaxGas,
+      oneFac,
+      siegeExpand,
+      fd,
       twoFac,
       twoFacVultures,
       threeFac,
       threeFacVultures,
-      siegeExpand,
       oneRaxFE,
       fourteenCC,
       twoPortWraith,
@@ -96,11 +102,12 @@ class Fingerprints {
   lazy val twoRaxAcad           = addFingerprint(new Fingerprint2RaxAcad)
   lazy val oneRaxGas            = addFingerprint(new Fingerprint1RaxGas)
   lazy val oneFac               = addFingerprint(new Fingerprint1Fac)
+  lazy val siegeExpand          = addFingerprint(new FingerprintSiegeExpand)
+  lazy val fd                   = addFingerprint(new FingerprintFD)
   lazy val twoFac               = addFingerprint(new Fingerprint2Fac)
   lazy val twoFacVultures       = addFingerprint(new Fingerprint2FacVultures)
   lazy val threeFac             = addFingerprint(new Fingerprint3Fac)
   lazy val threeFacVultures     = addFingerprint(new Fingerprint3FacVultures)
-  lazy val siegeExpand          = addFingerprint(new FingerprintSiegeExpand)
   lazy val oneRaxFE             = addFingerprint(new Fingerprint1RaxFE)
   lazy val fourteenCC           = addFingerprint(new Fingerprint14CC)
   lazy val twoPortWraith        = addFingerprint(new Fingerprint2PortWraith)

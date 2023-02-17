@@ -12,28 +12,24 @@ object Skimulator {
   def durabilityFrames(team: Team): Double = team.meanAttackerHealth / team.opponent.meanDpf
 
   def predict(battle: Battle): Unit = {
+    val maxEffectiveRange = Maff.max(battle.units.map(_.effectiveRangePixels)).getOrElse(0.0)
 
     // Calculate unit distance
     battle.teams.foreach(team => team.units.foreach(unit => {
+      // Since we're deciding whether to attack into the enemy,
+      // assume the enemy need only spend its time regrouping, rather than advancing
+      val minDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
       // How far does this unit have to go to get into the fight, either dealing or receiving damage?
-      unit.skimDistanceToEngage = if (battle.isGlobal) 32 * 13 else Math.max(0d,
-        // Assume we're attacking the closest target
-        Maff.min(
-          team.opponent.units.map(e =>
-            // Take the unit's distance to the enemy.
-            // We grant some bonus range to enemy or engaged units.
-            // I forget why I wrote this originally, but I think it's on the pessimistic assumption that the enemy will fall into more coherent shape as we approach,
-            // especially units unprotected by static defense range retreating towards it
-            // Ideally this checks pixelDistanceTraveling but that's very slow; observed as 5% CPU usage
-            ?(unit.isEnemy || unit.inRangeToAttack(e),
-              unit.pixelDistanceEdge(e),
-              Math.max(0, unit.pixelDistanceEdge(e) - unit.pixelRangeAgainst(e)))
-              //
-              - Math.max(
-                ?(e.canAttack(unit), e.pixelRangeAgainst(unit), 0),
-                ?(unit.canAttack(e), unit.pixelRangeAgainst(e), 0))))
-          // If there's no opponent, assume we are too far to help anything
-          .getOrElse(LightYear().toDouble))}))
+      unit.skimDistanceToEngage =
+        ?(battle.isGlobal,
+          maxEffectiveRange - unit.effectiveRangePixels,
+          // Assume we're attacking the closest target
+          Maff.min(team.opponent.units.view.map(oppo =>
+            Math.min(
+              minDistance + maxEffectiveRange - unit.pixelRangeAgainst(oppo),
+              unit.pixelsToGetInRange(oppo))))
+            .getOrElse(LightYear()))
+    }))
 
     // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
     // Note that this can significantly swing our perception of hidden army strength

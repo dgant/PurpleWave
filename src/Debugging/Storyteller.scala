@@ -255,6 +255,7 @@ class Storyteller {
     tell(f"Map hash: ${With.game.mapHash}")
     tell(f"Map id: ${With.mapCleanName}")
     tell(f"Start: ${With.mapClock} o'clock")
+    tell(s"Rush distance: ${With.strategy.rushDistanceMean}")
   }
 
   private def logStrategyEvaluation(): Unit = {

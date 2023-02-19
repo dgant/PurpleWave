@@ -65,7 +65,7 @@ class ProtossVsTerran extends PvTOpeners {
   val techs = new ArrayBuffer[TechTransition]
   def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())
   def doNextTech(): Unit = {
-    techs.foreach(t => { t.perform(); if ( ! t.profited) return })
+    techs.sortBy( ! _.started).foreach(t => { t.perform(); if ( ! t.profited) return })
   }
   trait TechTransition extends SimpleString {
     def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
@@ -76,6 +76,14 @@ class ProtossVsTerran extends PvTOpeners {
     def order: Int = if (techs.contains(this)) techs.indexOf(this) else techs.length
     def queued: Boolean = techs.contains(this)
     override def toString: String = f"${super.toString}${if (profited) "(Done)" else if (started) "(Start)" else ""}"
+  }
+  object TechDarkTemplar extends TechTransition {
+    override def started: Boolean = have(Protoss.CitadelOfAdun)
+    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 1
+    override def perform(): Unit = {
+      get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
+      once(?(PvT29Arbiter(), 1, 2), Protoss.DarkTemplar)
+    }
   }
   object TechObservers extends TechTransition {
     def started: Boolean = have(Protoss.Observatory) // TODO: Consider Robo, not being used for earlier tech
@@ -93,7 +101,7 @@ class ProtossVsTerran extends PvTOpeners {
     }
   }
   object TechReavers extends TechTransition {
-    def started: Boolean = unitsEver(Protoss.Reaver) > 0 || (have(Protoss.RoboticsSupportBay) && bases < 3)
+    def started: Boolean = unitsEver(Protoss.Reaver) > 0 || (have(Protoss.RoboticsSupportBay) && ! have(Protoss.TemplarArchives))
     def profited: Boolean = unitsEver(Protoss.Reaver) > 1
     def perform(): Unit = {
       get(Protoss.RoboticsFacility)
@@ -173,6 +181,11 @@ class ProtossVsTerran extends PvTOpeners {
 
   def counterBio: Boolean = With.fingerprints.bio() && enemies(Terran.Marine, Terran.Firebat, Terran.Medic) >= enemies(Terran.Vulture) * 1.5
   def executeMain(): Unit = {
+    var scoredEnemy   = false
+    def scoreEnemy(value: Boolean): Int = {
+      scoredEnemy ||= value
+      Maff.fromBoolean(value)
+    }
     var ecoScoreUs    = 0
     var ecoScoreFoe   = 0
     ecoScoreUs  +=  4 * Maff.fromBoolean(PvT13Nexus())
@@ -183,43 +196,42 @@ class ProtossVsTerran extends PvTOpeners {
     ecoScoreUs  += -2 * Maff.fromBoolean(PvTDT())
     ecoScoreUs  += -2 * Maff.fromBoolean(PvT1BaseReaver())
     ecoScoreUs  += -3 * Maff.fromBoolean(PvT1015())
-    ecoScoreUs  += -5 * Maff.fromBoolean(PVT910())
-    ecoScoreFoe +=  4 * Maff.fromBoolean(With.fingerprints.fourteenCC())
-    ecoScoreFoe +=  2 * Maff.fromBoolean(With.fingerprints.oneRaxFE())
-    ecoScoreFoe +=  0 * Maff.fromBoolean(With.fingerprints.oneFac())
-    ecoScoreFoe += -2 * Maff.fromBoolean(With.fingerprints.twoFac())
-    ecoScoreFoe += -2 * Maff.fromBoolean(With.fingerprints.twoRax1113())
-    ecoScoreFoe += -3 * Maff.fromBoolean(With.fingerprints.threeFac())
-    ecoScoreFoe += -4 * Maff.fromBoolean(With.fingerprints.twoRaxAcad())
-    ecoScoreFoe += -6 * Maff.fromBoolean(With.fingerprints.bbs())
-    var ecoEdge       = ecoScoreUs - ecoScoreFoe
-    ecoEdge          += ?(enemyCrossSpawn == ecoEdge > 0, 1, -1)
-    val terranTwoFac  = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.twoFacVultures, With.fingerprints.threeFac, With.fingerprints.threeFacVultures)
-    val terranOneBase = terranTwoFac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)
-    val reaverVsBio   = counterBio && ! PvTDT()
-    val stormVsBio    = counterBio && ! reaverVsBio
-    val goReaver      = TechReavers.started || terranOneBase || reaverVsBio
-    val goCarrier     = TechCarrier.started || (ecoEdge >= 2 && With.scouting.enemyProximity < 0.75) // Safe with eco edge
-    val goArbiter     = TechArbiter.started || ! goCarrier
-    val goStorm       = TechStorm.started   || (goArbiter && goReaver /*We'll have archives and shuttle speed*/)
+    ecoScoreUs  += -4 * Maff.fromBoolean(PvT4Gate())
+    ecoScoreUs  += -5 * Maff.fromBoolean(PvT910())
+    ecoScoreFoe +=  4 * scoreEnemy(With.fingerprints.fourteenCC())
+    ecoScoreFoe +=  2 * scoreEnemy(With.fingerprints.oneRaxFE())
+    ecoScoreFoe +=  0 * scoreEnemy(With.fingerprints.oneFac() && ! With.fingerprints.fd()) // Includes siege expand
+    ecoScoreFoe += -1 * scoreEnemy(With.fingerprints.fd())
+    ecoScoreFoe += -2 * scoreEnemy(With.fingerprints.twoFac())
+    ecoScoreFoe += -2 * scoreEnemy(With.fingerprints.twoRax1113())
+    ecoScoreFoe += -3 * scoreEnemy(With.fingerprints.threeFac())
+    ecoScoreFoe += -4 * scoreEnemy(With.fingerprints.twoRaxAcad())
+    ecoScoreFoe += -6 * scoreEnemy(With.fingerprints.bbs())
+    val ecoEdge       = ecoScoreUs - ecoScoreFoe
+    val terran23Fac   = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac)
+    val terranOneBase = terran23Fac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)
+    val goDT          = PvTDT() || PvT29Arbiter() || (scoredEnemy && ecoEdge <= -3 && ! enemyHasShown(Terran.EngineeringBay, Terran.MissileTurret, Terran.SpiderMine) && roll("DT", 0.6))
+    val goFastReaver  = PvT1BaseReaver() || (! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
+    val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5
+    val goReaver      = goFastCarrier && ! have(Protoss.TemplarArchives)
+    val goCarrier     = miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
 
     techs.clear()
-    TechObservers       (With.fingerprints.twoFacVultures() || With.fingerprints.threeFacVultures())
-    TechReavers         (TechReavers.started    || reaverVsBio || terranOneBase)
-    TechObservers       (TechObservers.started  || ! stormVsBio || enemyHasShown(Terran.SpiderMine))
-    TechUpgrades        (mineralOnlyBase)
-    TechStorm           (PvTMidgameStorm()      || stormVsBio)
-    TechCarrier         (PvTMidgameCarrier()    && ( ! counterBio || TechCarrier.started))
-    TechUpgrades        (counterBio)
-    TechObservers       ( ! counterBio)
-    TechReavers         (PvTMidgameReaver())
-    TechUpgrades        ()
+    TechDarkTemplar     (goDT)
+    TechArbiter         (PvT29Arbiter())
+    TechReavers         (goFastReaver)
+    TechObservers       (terran23Fac)
+    TechCarrier         (goFastCarrier)
     TechObservers       ()
-    TechCarrier         (PvTEndgameCarrier()  && ( ! counterBio || TechCarrier.started))
-    TechStorm           (PvTMidgameStorm() || PvTEndgameStorm() || TechCarrier.queued || counterBio)
-    TechArbiter         ()
-    PvTMidgameOpen.activate()
-    PvTEndgameArbiter.activate()
+    TechCarrier         (goCarrier)
+    TechReavers         (goReaver)
+    TechStorm           (TechCarrier.started && ! TechReavers.started)
+    TechUpgrades        (TechCarrier.started || miningBases >= 3)
+    TechStorm           (safeSkirmishing && safeDefending && gasPumps >= 3 + Maff.fromBoolean(TechReavers.started))
+    TechArbiter         ( ! TechCarrier.started)
+    TechUpgrades        ()
+    TechStorm           ()
+    TechCarrier         (TechCarrier.started)
 
     val techsComplete   = techs.count(_.profited)
     val gatewayEquivs   = ?(TechCarrier.queued, miningBases, 0) + ?(TechReavers.queued, 2, 0)

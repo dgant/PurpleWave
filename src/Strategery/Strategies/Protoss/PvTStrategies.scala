@@ -11,19 +11,7 @@ abstract class PvTStrategy extends Strategy {
   setEnemyRace(Race.Terran)
 }
 
-object PvTEndgameCarrier  extends PvTStrategy
-object PvTEndgameArbiter  extends PvTStrategy
-object PvTEndgameStorm    extends PvTStrategy
-
-object PvTMidgameCarrier  extends PvTStrategy { setChoice(PvTEndgameCarrier); blacklistVs(With.fingerprints.bio) }
-object PvTMidgameReaver   extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
-object PvTMidgameStorm    extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm); whitelistVs(With.fingerprints.bio) }
-object PvTMidgameOpen     extends PvTStrategy { setChoice(PvTEndgameCarrier, PvTEndgameArbiter, PvTEndgameStorm) }
-
-abstract class PvTOpener extends PvTStrategy {
-  setChoice(PvTMidgameCarrier, PvTMidgameReaver, PvTMidgameStorm, PvTMidgameOpen)
-}
-abstract class PvTOpenerNoZealot extends PvTOpener {
+abstract class PvTStrategyNoZealot extends PvTStrategy {
   blacklistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,
@@ -31,24 +19,24 @@ abstract class PvTOpenerNoZealot extends PvTOpener {
     With.fingerprints.eightRax,
     With.fingerprints.bbs)
 }
-abstract class PvTOpenerNoZealotNoRange extends PvTOpenerNoZealot {
+abstract class PvTStrategyNoZealotNoRange extends PvTStrategyNoZealot {
   blacklistVs(
     With.fingerprints.bunkerRush,
     With.fingerprints.twoRax1113)
 }
-object PvT13Nexus extends PvTOpenerNoZealotNoRange {
+object PvT13Nexus extends PvTStrategyNoZealotNoRange {
   setStartLocationsMin(4)
   setRushTilesMinimum(180)
 }
-object PvTRangeless     extends PvTOpenerNoZealotNoRange
-object PvT28Nexus       extends PvTOpenerNoZealot
-object PvTZealotExpand  extends PvTOpener
-object PvTZZCoreZ       extends PvTOpener {
+object PvTRangeless     extends PvTStrategyNoZealotNoRange
+object PvT28Nexus       extends PvTStrategyNoZealot
+object PvTZealotExpand  extends PvTStrategy
+object PvTZZCoreZ       extends PvTStrategy {
   addRequirement(() =>
     ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
 }
-object PVT910           extends PvTOpener {
+object PvT910 extends PvTStrategy {
   whitelistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,
@@ -58,7 +46,7 @@ object PVT910           extends PvTOpener {
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE)
 }
-object PvT1015 extends PvTOpenerNoZealot {
+object PvT1015 extends PvTStrategyNoZealot {
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -68,8 +56,7 @@ object PvT1015 extends PvTOpenerNoZealot {
   blacklistVs(
     With.fingerprints.wallIn)
 }
-object PvT1BaseReaver extends PvTOpenerNoZealot {
-  setChoice(PvTMidgameReaver)
+object PvT1BaseReaver extends PvTStrategyNoZealot {
   whitelistVs(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
@@ -78,15 +65,15 @@ object PvT1BaseReaver extends PvTOpenerNoZealot {
     With.fingerprints.bio,
     With.fingerprints.twoRaxAcad)
 }
-object PvTDT extends PvTOpenerNoZealot {
-  setChoice(PvTMidgameStorm, PvTMidgameOpen)
+object PvTDT extends PvTStrategyNoZealot {
   blacklistVs(
     With.fingerprints.twoRax1113,
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFacVultures)
 }
-object PvT4Gate extends PvTOpenerNoZealot {
+object PvT29Arbiter extends PvTStrategyNoZealot
+object PvT4Gate extends PvTStrategyNoZealot {
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -98,7 +85,7 @@ object PvT4Gate extends PvTOpenerNoZealot {
     With.fingerprints.wallIn
   )
 }
-object PvTProxy2Gate extends PvTOpener {
+object PvTProxy2Gate extends PvTStrategy {
   blacklistOn(MapGroups.badForProxying: _*)
   blacklistVs(With.fingerprints.wallIn)
 }

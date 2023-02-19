@@ -20,10 +20,11 @@ abstract class PvTOpeners extends GameplanImperative {
     else  if (PvTZZCoreZ())       openZZCoreZ()
     else  if (PvTRangeless())     open20Rangeless()
     else  if (PvT28Nexus())       open28Nexus()
-    else  if (PVT910())           open910()
+    else  if (PvT910())           open910()
     else  if (PvT1015())          open1015()
     else  if (PvT4Gate())         open4Gate()
     else  if (PvT1BaseReaver())   openReaver()
+    else  if (PvT29Arbiter())     open29Arbiter()
     else  if (PvTDT())            openDT()
     else                          openZZCoreZ() // A safe default if something went wrong
   }
@@ -240,6 +241,36 @@ abstract class PvTOpeners extends GameplanImperative {
     once(2, Protoss.Nexus)
     once(5, Protoss.Pylon)
     openingComplete ||= units(Protoss.Nexus) > 1 && units(Protoss.Reaver) > 0
+  }
+
+  def open29Arbiter(): Unit = {
+    // https://tl.net/forum/bw-strategy/538921-pvt-revolution-29-arbiter-build
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(9, Protoss.Probe)
+    once(Protoss.Assimilator)
+    once(11, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(14, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(15, Protoss.Probe)
+    once(2, Protoss.Pylon)
+    scoutOn(Protoss.Pylon, 2)
+    once(18, Protoss.Probe)
+    once(Protoss.CitadelOfAdun)
+    once(Protoss.Dragoon)
+    once(19, Protoss.Probe)
+    once(3, Protoss.Pylon)
+    once(21, Protoss.Probe)
+    once(Protoss.Stargate, Protoss.TemplarArchives)
+    once(24, Protoss.Probe)
+    requireBases(2)
+    once(27, Protoss.Probe)
+    once(Protoss.ArbiterTribunal, Protoss.DarkTemplar)
+    once(31, Protoss.Probe)
+    once(Protoss.Arbiter)
+    once(2, Protoss.Dragoon)
+    openingComplete ||= unitsEver(Protoss.Arbiter) >= 1 && unitsEver(Protoss.Dragoon) >= 2
   }
 
   def openDT(): Unit = {

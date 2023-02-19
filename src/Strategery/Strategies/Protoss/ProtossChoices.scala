@@ -30,14 +30,15 @@ object ProtossChoices {
     PvTRangeless,
     PvT28Nexus,
     PvTDT,
+    PvT1015,
     PvT1BaseReaver,
-    PvT4Gate,
-    PvT1015
+    PvT29Arbiter,
+    PvT4Gate
   )
 
   val pvtOpenersTransitioningFrom2Gate = Vector(
     PvTZZCoreZ, // Not really, but it should behave well
-    PVT910,
+    PvT910,
     PvT4Gate,
     PvT1015
   )

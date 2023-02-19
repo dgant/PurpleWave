@@ -94,7 +94,7 @@ object Potential {
     output
   }
   def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
-    val magnitude = collisionRepulsionMagnitude(unit, other, 12.0)
+    val magnitude = collisionRepulsionMagnitude(unit, other, 6.0)
     if (magnitude == 0) new Force else towardsUnit(unit, other, -magnitude)
   }
   

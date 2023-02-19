@@ -81,6 +81,8 @@ object TargetScoring {
   def apply(target: UnitInfo): Double = {
     var output = baseValue * target.unitClass.subjectiveValueOverHealth
 
+    output += add(12.0, target.matrixPoints > 50)
+
     // Immobility bonus
     output += add(4.0,  target.constructing)
     output += add(10.0, target.gathering)

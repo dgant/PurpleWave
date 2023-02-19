@@ -254,9 +254,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def dodge(): Boolean = {
     if (unit.ready) {
       unit.agent.escalatePriority(TrafficPriorities.Shove) // Just lower than the dodge itself
-      val towards = MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))
-      if (towards.isDefined) {
-        unit.agent.toTravel = towards
+      if (MicroPathing.setWaypointForcefully(unit)) {
         move()
       }
     }

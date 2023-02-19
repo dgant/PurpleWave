@@ -81,6 +81,17 @@ object MicroPathing {
     } else None
   }
 
+  def moveForcefully(unit: FriendlyUnitInfo): Unit = {
+    setWaypointForcefully(unit)
+    Commander.move(unit)
+  }
+
+  def setWaypointForcefully(unit: FriendlyUnitInfo): Boolean = {
+    val waypoint = MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))
+    unit.agent.toTravel = waypoint.orElse(unit.agent.toTravel)
+    waypoint.isDefined
+  }
+
   // More rays = more accurate movement, but more expensive
   // 8 is definitely too little for competent movement
   private def rayRadiansN(rays: Int) = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)

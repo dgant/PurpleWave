@@ -10,8 +10,8 @@ object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.unitClass.followingAllowed
     && unit.canMove
-    && ! unit.agent.leader().contains(unit)
     && ! unit.matchups.groupVs.splashesAir
+    && unit.agent.leader().exists(unit !=)
     && unit.matchups.threatsInRange.forall(_.inRangeToAttack(unit.agent.leader().get)))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

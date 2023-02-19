@@ -439,7 +439,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Corsair) 1.5
     else if (this == Protoss.Scout) 0.75
     else if (this == Protoss.Carrier) 5
-    else if (this == Protoss.Arbiter) 0.25
+    else if (this == Protoss.Arbiter) 0.5
     else if (this == Protoss.Reaver) 1.75
     else if (this == Protoss.PhotonCannon) 1
     else if (this == Zerg.Zergling) 0.25
@@ -630,7 +630,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     Terran.Battlecruiser,
     Terran.Wraith,
     Terran.Valkyrie,
-    Protoss.Carrier,
     Protoss.Corsair,
     Protoss.Scout,
     Zerg.Mutalisk).contains(this)

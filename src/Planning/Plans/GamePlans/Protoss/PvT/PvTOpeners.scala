@@ -15,7 +15,7 @@ abstract class PvTOpeners extends GameplanImperative {
   def open(): Unit = {
     if (openingComplete) return
     doOpeningShortCircuits()
-          if (PvT13Nexus())       openNexusFirst()
+          if (PvT13Nexus())       open12NexusGateScout()
     else  if (PvTZealotExpand())  openZealotExpand()
     else  if (PvTZZCoreZ())       openZZCoreZ()
     else  if (PvTRangeless())     open20Rangeless()
@@ -41,7 +41,7 @@ abstract class PvTOpeners extends GameplanImperative {
     once(Protoss.CyberneticsCore)
   }
 
-  def openNexusFirst(): Unit = {
+  def open12NexusGateScout(): Unit = {
     // Reference: https://www.youtube.com/watch?v=AuIqTCxQ1PY
     // Flash says cross-scout; if we verify cross-spawn I believe the correct response is go direct to one gate core, maybe depending on gas.
     With.blackboard.crossScout.set(true)
@@ -53,9 +53,8 @@ abstract class PvTOpeners extends GameplanImperative {
     once(2, Protoss.Nexus)
     once(14, Protoss.Probe)
     once(Protoss.Gateway)
-    // Flash scouts. Antiga suggests no-scout.
-    // If we knew what Flash would actually want to do with the intel, we could scout
-    // scoutOn(Protoss.Gateway)
+    // Mainly scouting to calculate eco diff
+    scoutOn(Protoss.Gateway)
     once(15, Protoss.Probe)
     once(2, Protoss.Gateway)
     once(16, Protoss.Probe)
@@ -247,6 +246,7 @@ abstract class PvTOpeners extends GameplanImperative {
 
   def open29Arbiter(): Unit = {
     // https://tl.net/forum/bw-strategy/538921-pvt-revolution-29-arbiter-build
+    gasWorkerFloor(3)
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(9, Protoss.Probe)

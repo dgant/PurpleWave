@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class ProtossVsTerran extends PvTOpeners {
 
-  val workerGoal = 65
+  val workerGoal = 75
 
   override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = workerGoal)
 
@@ -63,23 +63,29 @@ class ProtossVsTerran extends PvTOpeners {
   }
 
   val techs = new ArrayBuffer[TechTransition]
-  def doTech(n: Int): Unit = techs.view.drop(n).headOption.foreach(_.perform())
-  def doNextTech(): Unit = {
-    techs.sortBy( ! _.started).foreach(t => { t.perform(); if ( ! t.profited) return })
+  def techsSorted: Seq[TechTransition] = techs.toVector.sortBy( ! _.started)
+  def doNextTech(maxInProgress: Int = 1): Unit = {
+    var inProgress = 0
+    techsSorted.foreach(t =>
+      if (inProgress < maxInProgress) {
+        t.perform()
+        inProgress += Maff.fromBoolean(t.inProgress)
+      })
   }
   trait TechTransition extends SimpleString {
-    def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
-    def apply(): Unit = if ( ! queued) techs += this
+    final def apply(predicate: Boolean): Boolean = if (predicate) { apply(); true } else false
+    final def apply(): Unit = if ( ! queued) techs += this
     def started: Boolean // Have we invested anything significant into this tech?
     def profited: Boolean // Have we finished the up-front investment to gain value out of it
     def perform(): Unit
-    def order: Int = if (techs.contains(this)) techs.indexOf(this) else techs.length
-    def queued: Boolean = techs.contains(this)
+    final def inProgress: Boolean = started && ! profited
+    final def order: Int = if (techs.contains(this)) techsSorted.indexOf(this) else techs.length
+    final def queued: Boolean = techs.contains(this)
     override def toString: String = f"${super.toString}${if (profited) "(Done)" else if (started) "(Start)" else ""}"
   }
   object TechDarkTemplar extends TechTransition {
     override def started: Boolean = have(Protoss.CitadelOfAdun)
-    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 1
+    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 0
     override def perform(): Unit = {
       get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
       once(?(PvT29Arbiter(), 1, 2), Protoss.DarkTemplar)
@@ -87,7 +93,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechDarkTemplarDrop extends TechTransition {
     override def started: Boolean = TechDarkTemplar.started && have(Protoss.RoboticsFacility)
-    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 1 && unitsEver(Protoss.Shuttle) > 1
+    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 0 && unitsEver(Protoss.Shuttle) > 0
     override def perform(): Unit = {
       once(Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.TemplarArchives, Protoss.Shuttle)
       once(2, Protoss.DarkTemplar)
@@ -110,7 +116,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechReavers extends TechTransition {
     def started: Boolean = unitsEver(Protoss.Reaver) > 0 || (have(Protoss.RoboticsSupportBay) && ! have(Protoss.TemplarArchives))
-    def profited: Boolean = unitsEver(Protoss.Reaver) > 1
+    def profited: Boolean = unitsEver(Protoss.Reaver) > 0 && unitsEver(Protoss.Shuttle) > 0
     def perform(): Unit = {
       get(Protoss.RoboticsFacility)
       once(Protoss.Shuttle)
@@ -122,7 +128,7 @@ class ProtossVsTerran extends PvTOpeners {
     }
   }
   object TechUpgrades extends TechTransition {
-    def started: Boolean = upgradeStarted(Protoss.ZealotSpeed)
+    def started: Boolean = upgradeStarted(Protoss.ZealotSpeed) && unitsEver(Protoss.Forge) > 0
     def profited: Boolean = started && upgradeStarted(Protoss.GroundDamage)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
@@ -139,7 +145,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechStorm extends TechTransition {
     def started: Boolean = profited || unitsEver(Protoss.HighTemplar) > 0
-    def profited: Boolean = unitsEver(Protoss.HighTemplar) >= 2 && techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ShuttleSpeed)
+    def profited: Boolean = unitsEver(Protoss.HighTemplar) > 0 && techStarted(Protoss.PsionicStorm)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
@@ -157,7 +163,6 @@ class ProtossVsTerran extends PvTOpeners {
     def started: Boolean = profited || have(Protoss.FleetBeacon) || (have(Protoss.Stargate) && ! have(Protoss.TemplarArchives, Protoss.ArbiterTribunal))
     def profited: Boolean = unitsEver(Protoss.Interceptor) >= 24 && upgradeStarted(Protoss.CarrierCapacity)
     def perform(): Unit = {
-      // TODO: Antiga recommends storm after 6 carriers, 4 gas; currently we rely on learning to pick it
       // We're leaning heavily on MacroSim to sequence this for us
       val stargates = Math.min(4, miningBases)
       get(2, Protoss.Stargate)
@@ -176,13 +181,16 @@ class ProtossVsTerran extends PvTOpeners {
   }
   object TechArbiter extends TechTransition {
     def started: Boolean = profited || units(Protoss.ArbiterTribunal) > 0
-    def profited: Boolean = unitsEver(Protoss.Arbiter) > 0 && techStarted(Protoss.Stasis)
+    def profited: Boolean = unitsEver(Protoss.Arbiter) > 0
     def perform(): Unit = {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Stargate)
-      get(Protoss.ArbiterEnergy)
+      if ( ! have(Protoss.Arbiter)) {
+        get(Protoss.ArbiterEnergy)
+      }
       once(2, Protoss.Arbiter)
       get(Protoss.Stasis)
+      get(Protoss.ArbiterEnergy)
       if (gasPumps > 3) get(2, Protoss.Stargate)
     }
   }
@@ -201,8 +209,9 @@ class ProtossVsTerran extends PvTOpeners {
     ecoScoreUs  +=  1 * Maff.fromBoolean(PvTRangeless())
     ecoScoreUs  +=  0 * Maff.fromBoolean(PvT28Nexus())
     ecoScoreUs  += -1 * Maff.fromBoolean(PvTZZCoreZ())
-    ecoScoreUs  += -2 * Maff.fromBoolean(PvTDT())
+    ecoScoreUs  += -1 * Maff.fromBoolean(PvTDT())
     ecoScoreUs  += -2 * Maff.fromBoolean(PvT1BaseReaver())
+    ecoScoreUs  += -2 * Maff.fromBoolean(PvT29Arbiter())
     ecoScoreUs  += -3 * Maff.fromBoolean(PvT1015())
     ecoScoreUs  += -4 * Maff.fromBoolean(PvT4Gate())
     ecoScoreUs  += -5 * Maff.fromBoolean(PvT910())
@@ -228,11 +237,12 @@ class ProtossVsTerran extends PvTOpeners {
     val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
 
     techs.clear()
-    TechDarkTemplar     (goDT)
+    TechDarkTemplar     (goDT && ! PvT29Arbiter())
     TechDarkTemplarDrop (goDTDrop)
     TechArbiter         (PvT29Arbiter())
     TechReavers         (goFastReaver)
     TechObservers       (terran23Fac)
+    TechStorm           (unitsEver(Protoss.Carrier) >= 6 && gasPumps >= 4)
     TechCarrier         (goFastCarrier)
     TechObservers       ()
     TechCarrier         (goCarrier)
@@ -302,7 +312,8 @@ class ProtossVsTerran extends PvTOpeners {
     With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
 
     val army = new DoQueue(doArmyNormalPriority)
-    val tech = new DoQueue(doNextTech)
+    val techOnce = new DoQueue(() => doNextTech(1))
+    val techTwice = new DoQueue(() => doNextTech(2))
 
     ////////////////
     // Transition //
@@ -313,7 +324,7 @@ class ProtossVsTerran extends PvTOpeners {
 
     if (armySizeLow) {
       if (miningBases > 1 && techs.exists(t => t.started && ! t.profited)) {
-        tech()
+        techOnce()
       }
       army()
     }
@@ -340,17 +351,21 @@ class ProtossVsTerran extends PvTOpeners {
 
     maintainMiningBases(4)
     recordRequestedBases()
-    tech()
+    techOnce()
     army()
     get(?(terranOneBase, gatewaysMax, gatewaysMin), Protoss.Gateway)
     // Crummy gas formula; in general we're counting on MacroSim to bump up the later invocation of requireGas if we really need it
     requireGas(units(Protoss.Gateway, Protoss.RoboticsSupportBay, Protoss.Stargate, Protoss.CitadelOfAdun) / 4)
     approachMiningBases(3)
+    if ( ! armySizeLow) {
+      techTwice()
+    }
     get(gatewaysMax, Protoss.Gateway)
     buildCannonsAtExpansions(2)
     if (isMiningBase(With.geography.ourNatural)) {
       buildCannonsAtNatural(2)
     }
+    techTwice()
     approachMiningBases(4)
     requireGas()
     techs.foreach(_.perform())

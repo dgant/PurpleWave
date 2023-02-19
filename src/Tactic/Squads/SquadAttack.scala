@@ -95,7 +95,7 @@ class SquadAttack extends Squad {
       With.geography.preferredExpansionsEnemy.filterNot(_.island).take(3).foreach(base =>
         Maff.minBy(unintended.filter(_.canAttackGround))(_.framesToTravelTo(base.heart.center)).foreach(camper =>
           camper.intend(this)
-            .setCanSneak(true)
+            //.setCanSneak(true) Too non-performant
             .setTravel(base.heart.center)
             .setTargets(base.enemies)))
     }

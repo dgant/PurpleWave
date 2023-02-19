@@ -85,6 +85,14 @@ class ProtossVsTerran extends PvTOpeners {
       once(?(PvT29Arbiter(), 1, 2), Protoss.DarkTemplar)
     }
   }
+  object TechDarkTemplarDrop extends TechTransition {
+    override def started: Boolean = TechDarkTemplar.started && have(Protoss.RoboticsFacility)
+    override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 1 && unitsEver(Protoss.Shuttle) > 1
+    override def perform(): Unit = {
+      once(Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.TemplarArchives, Protoss.Shuttle)
+      once(2, Protoss.DarkTemplar)
+    }
+  }
   object TechObservers extends TechTransition {
     def started: Boolean = have(Protoss.Observatory) // TODO: Consider Robo, not being used for earlier tech
     def profited: Boolean = unitsEver(Protoss.Observer) > 0
@@ -207,17 +215,21 @@ class ProtossVsTerran extends PvTOpeners {
     ecoScoreFoe += -3 * scoreEnemy(With.fingerprints.threeFac())
     ecoScoreFoe += -4 * scoreEnemy(With.fingerprints.twoRaxAcad())
     ecoScoreFoe += -6 * scoreEnemy(With.fingerprints.bbs())
-    val ecoEdge       = ecoScoreUs - ecoScoreFoe
+    val ecoEdge       = ?(scoredEnemy, ecoScoreUs - ecoScoreFoe, 0)
     val terran23Fac   = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac)
     val terranOneBase = terran23Fac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)
-    val goDT          = PvTDT() || PvT29Arbiter() || (scoredEnemy && ecoEdge <= -3 && ! enemyHasShown(Terran.EngineeringBay, Terran.MissileTurret, Terran.SpiderMine) && roll("DT", 0.6))
-    val goFastReaver  = PvT1BaseReaver() || (! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
+    val turretsShown  = enemyHasShown(Terran.EngineeringBay, Terran.MissileTurret)
+    val detectorShown = turretsShown || enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep, Terran.SpiderMine)
+    val goDT          = PvTDT() || PvT29Arbiter() || (ecoEdge <= -3 && ! detectorShown && roll("DT", 0.6))
+    val goDTDrop      = ! PvT4Gate() && ! goDT && ecoEdge <= -1 && ! turretsShown && roll("DTDrop", 0.4)
+    val goFastReaver  = PvT1BaseReaver() || ( ! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
     val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5
     val goReaver      = goFastCarrier && ! have(Protoss.TemplarArchives)
-    val goCarrier     = miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
+    val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
 
     techs.clear()
     TechDarkTemplar     (goDT)
+    TechDarkTemplarDrop (goDTDrop)
     TechArbiter         (PvT29Arbiter())
     TechReavers         (goFastReaver)
     TechObservers       (terran23Fac)
@@ -260,18 +272,19 @@ class ProtossVsTerran extends PvTOpeners {
     val nascentCarriers = TechCarrier.started && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
     val encroaching     = With.scouting.enemyProximity > 0.65
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
-    shouldAttack      ||= ! barracksCheese
-    shouldAttack      &&= safeSkirmishing
-    shouldAttack      &&= ! mineContain
-    shouldAttack      &&= ! vultureRush
-    shouldAttack      &&= ! consolidatingFE
-    shouldAttack      ||= zealotAggro
-    shouldAttack      ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
-    shouldAttack      ||= bases > 2
-    shouldAttack      ||= enemyMiningBases > miningBases
-    shouldAttack      ||= frame > Minutes(10)()
-    shouldAttack      ||= pushMarines
+    shouldAttack  ||= ! barracksCheese
+    shouldAttack  &&= safeSkirmishing
+    shouldAttack  &&= ! mineContain
+    shouldAttack  &&= ! vultureRush
+    shouldAttack  &&= ! consolidatingFE
+    shouldAttack  ||= zealotAggro
+    shouldAttack  ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
+    shouldAttack  ||= bases > 2
+    shouldAttack  ||= enemyMiningBases > miningBases
+    shouldAttack  ||= frame > Minutes(10)()
+    shouldAttack  ||= pushMarines
 
+    status(f"Eco$ecoScoreUs,$ecoScoreFoe=$ecoEdge")
     status(f"${gatewaysMin}-${gatewaysMax}gate")
     status(techs.mkString("-").replaceAll("Tech", "") + f":${techsComplete}/${techs.length}")
     if (armySizeLow) status("ArmyLow")

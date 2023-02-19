@@ -159,7 +159,9 @@ abstract class PvTOpeners extends GameplanImperative {
     once(Protoss.Dragoon)
     once(17, Protoss.Probe)
     once(Protoss.DragoonRange)
-    // TODO: only 2 on gas here
+    if (gasCapsUntouched && unitsEver(Protoss.Dragoon) > 0 && haveGasForUpgrade(Protoss.DragoonRange)) {
+      gasWorkerCeiling(2)
+    }
     once(19, Protoss.Probe)
     once(2, Protoss.Dragoon)
     once(20, Protoss.Probe)

@@ -11,7 +11,6 @@ import bwapi.Race
 abstract class Strategy extends SimpleString {
   override val toString: String = ToString(this)
 
-  private var _gameplan               : Option[Plan]        = None
   private var _islandMaps             : Boolean             = false
   private var _groundMaps             : Boolean             = true
   private var _entranceRamped         : Boolean             = true
@@ -34,7 +33,7 @@ abstract class Strategy extends SimpleString {
   private var _choices                : Seq[Seq[Strategy]]  = Seq.empty
   private var _requirements           : Seq[() => Boolean]  = Seq.empty
 
-  def gameplan                : Option[Plan]        = _gameplan
+  def gameplan                : Option[Plan]        = None
   def islandMaps              : Boolean             = _islandMaps
   def groundMaps              : Boolean             = _groundMaps
   def entranceRamped          : Boolean             = _entranceRamped

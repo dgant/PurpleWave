@@ -76,12 +76,12 @@ object TargetScoring {
     * Measures the value of targeting a unit, in isolation
     * The unit of value is tiles, as in, how far would we extend ourselves to attack this unit?
     */
-  private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValue / Protoss.Dragoon.maxTotalHealth
-  private val combatBonus = 12.0
+  private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValueOverHealth
+  private val combatBonus = 8.0
   def apply(target: UnitInfo): Double = {
-    var output = baseValue * target.unitClass.subjectiveValueOverHealth
+    var output = 8.0 * baseValue * target.unitClass.subjectiveValueOverHealth
 
-    output += add(12.0, target.matrixPoints > 50)
+    output += add(12.0, target.matrixPoints == 0)
 
     // Immobility bonus
     output += add(4.0,  target.constructing)
@@ -93,21 +93,19 @@ object TargetScoring {
 
       // Protect our fliers
       output += add(2.0, target.presumptiveTarget.exists(t => t.isFriendly && t.flying && t.attacksAgainstGround > 0))
+
+      // Goose chase penalties
+      output += add(2.0,  ! target.canMove)
+      output += add(6.0, ! target.canMove || target.visible)
+      output += add(6.0, ! target.canMove || target.likelyStillThere)
     }
-    // Goose chase penalties
-    output += add(2.0,  ! target.canMove)
-    output += add(12.0, ! target.canMove || target.visible)
-    output += add(12.0, ! target.canMove || target.likelyStillThere)
 
     // Doom penalties
     output += add(2.0, ! target.likelyDoomed)
     output += add(2.0, ! target.doomed)
 
-    // Interceptor penalty
-    output += add(12.0, ! Protoss.Interceptor(target))
-
     // Cloaked bonus: Target cloaked units before they escape detection
-    output += add(8.0, target.cloaked && ! With.units.existsEnemy(Protoss.Arbiter))
+    output += add(8.0, target.cloaked && target.detected && ! With.units.existsEnemy(Protoss.Arbiter))
 
     // Burrow bonus: Target burrowed units while scan is active
     output += add(8.0, (target.burrowed && With.units.existsOurs(Terran.SpellScannerSweep)))

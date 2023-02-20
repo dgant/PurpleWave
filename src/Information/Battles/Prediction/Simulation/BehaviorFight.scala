@@ -9,14 +9,12 @@ object BehaviorFight extends SimulacrumBehavior {
   @inline override def act(simulacrum: Simulacrum): Unit = {
     // Remove target if invalid
     // If no valid target, pick target
-    simulacrum.setTarget(simulacrum.target.filter(t =>
-      validTarget(simulacrum, t)
-      && simulacrum.inRangeToAttack(t)).orElse({
-      simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-      Maff.maxBy(simulacrum.targets)(TargetScoring.fast(simulacrum, _))
-    }))
-
-    // TODO: Retarget when target out of range
+    simulacrum.setTarget(simulacrum.target
+      .filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t))
+      .orElse({
+        simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
+        Maff.maxBy(simulacrum.targets)(TargetScoring.fast(simulacrum, _))
+      }))
 
     // If no valid target, flee
     if (simulacrum.target.isEmpty) {
@@ -28,10 +26,10 @@ object BehaviorFight extends SimulacrumBehavior {
     // TODO: Lurker burrow/unburrow
     // TODO: Non-Lurker Unburrow
 
-    val target = simulacrum.target.get
-    val distance = simulacrum.pixelDistanceEdge(target)
-    val range = simulacrum.pixelRangeAgainst(target)
-    if (target.threat.forall(t => t.pixelDistanceEdge(target) - t.pixelRangeAgainst(target) > distance - range)) {
+    val target    = simulacrum.target.get
+    val distance  = simulacrum.pixelDistanceEdge(target)
+    val range     = simulacrum.pixelRangeAgainst(target)
+    if (target.threat.forall(_.pixelsToGetInRange(target) > distance - range)) {
       target.threat = Some(simulacrum)
     }
     if ((simulacrum.unitClass.abuseAllowed || simulacrum.unitClass == Protoss.Reaver)
@@ -45,6 +43,7 @@ object BehaviorFight extends SimulacrumBehavior {
       }
     }
     if (distance <= range) {
+      simulacrum.simulation.engaged = true
       if (simulacrum.cooldownLeft <= 0) {
         simulacrum.dealDamageTo(target)
       } else {

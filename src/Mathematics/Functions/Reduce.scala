@@ -47,6 +47,10 @@ trait Reduce {
     if (values.isEmpty) 1.0 else Math.pow(values.product, 1.0 / values.size)
   }
 
+  @inline final def vmean(values: Double*): Double = {
+    mean(values)
+  }
+
   @inline final def vmin[A](values: A*)(implicit cmp: scala.Ordering[A]): A = {
     values.min(cmp)
   }

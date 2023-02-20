@@ -20,6 +20,9 @@ class BattleProcessPredict extends BattleProcessState {
       if ( ! battle.skimulationComplete) {
         Skimulator.predict(battle)
         battle.skimulationComplete = true
+
+        // For visualizing skim strength, we only want to record the local strength (as the global strength is uninteresting)
+        battle.units.foreach(u => u.skimStrengthDisplay = u.skimStrength)
       } else {
         if (With.simulation.battle != battle) {
           With.simulation.reset(battle)

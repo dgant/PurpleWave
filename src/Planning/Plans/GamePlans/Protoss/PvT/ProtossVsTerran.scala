@@ -226,7 +226,7 @@ class ProtossVsTerran extends PvTOpeners {
     ecoScoreFoe += -6 * scoreEnemy(With.fingerprints.bbs())
     val ecoEdge       = ?(scoredEnemy, ecoScoreUs - ecoScoreFoe, 0)
     val terran23Fac   = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac)
-    val terranOneBase = terran23Fac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)
+    val terranOneBase = terran23Fac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.oneBaseBioMech)
     val turretsShown  = enemyHasShown(Terran.EngineeringBay, Terran.MissileTurret)
     val detectorShown = turretsShown || enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep, Terran.SpiderMine)
     val goDT          = PvTDT() || PvT29Arbiter() || (ecoEdge <= -3 && ! detectorShown && roll("DT", 0.6))

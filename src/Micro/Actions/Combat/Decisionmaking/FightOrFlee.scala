@@ -34,7 +34,7 @@ object FightOrFlee extends Action {
     decide(true,  "Hug",        () => unit.agent.ride.isEmpty && unit.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(unit)))
     decide(true,  "Archon",     () => Protoss.Archon(unit) && unit.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(false, "CantFight",  () => ! unit.intent.canFight)
-    decide(true,  "Berzerk",    () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && ! Zerg.ZerglingSpeed() && unit.metro.exists(_.bases.exists(_.owner.isEnemy)) && ! unit.team.exists(_.catchesGround) && unit.matchups.threats.exists(Terran.Vulture))
+    decide(true,  "Berzerk",    () => With.frame < Minutes(6)() && unit.isAny(Protoss.Zealot, Zerg.Zergling) && ! Zerg.ZerglingSpeed() && ! unit.metro.exists(_.isOurs) && ! unit.team.exists(_.catchesGround) && unit.matchups.threats.exists(Terran.Vulture))
     decide(true,  "Cloaked",    () => unit.effectivelyCloaked || (unit.is(Terran.Wraith) && unit.energy >= 50 && unit.matchups.groupVs.detectors.isEmpty && With.self.hasTech(Terran.WraithCloak)))
     decide(true,  "Lurking",    () => Zerg.Lurker(unit) && unit.matchups.groupVs.detectors.isEmpty)
     decide(false, "Scourge",    () => unit.flying && unit.matchups.threats.exists(t => Zerg.Scourge(t) && t.pixelDistanceEdge(unit) < 128 && t.matchups.threatsInRange.map(_.damageOnNextHitAgainst(t)).sum < t.hitPoints))

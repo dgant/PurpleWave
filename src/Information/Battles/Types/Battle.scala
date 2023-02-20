@@ -9,6 +9,7 @@ import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.Time.Minutes
 
 import scala.collection.mutable
@@ -32,10 +33,10 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   //////////////////////////
 
   // Simulation is expensive and gets less accurate as team sizes increase
-  lazy val skimWeight: Double = if (isGlobal || With.reaction.sluggishness > 0) 1.0 else {
-    val output = teams.map(_.units.size).min / 20.0 + frameCreated / Minutes(20)() - 0.2
+  lazy val skimWeight: Double = ?(isGlobal || With.reaction.sluggishness > 0, 1.0, {
+    val output = teams.map(_.units.size).min / 30.0 + frameCreated.toDouble / Minutes(20)() - 0.2
     if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
-  }
+  })
   lazy val simWeight        : Double                = 1.0 - skimWeight
   lazy val simulated        : Boolean               = simWeight > 0
   lazy val skimulated       : Boolean               = skimWeight > 0

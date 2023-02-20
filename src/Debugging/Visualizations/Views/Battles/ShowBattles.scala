@@ -13,7 +13,7 @@ import bwapi.Color
 
 object ShowBattles extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     localBattle.foreach(renderBattleScreen)
     if (With.yolo.active && With.frame / 24 % 2 == 0) {
       DrawScreen.column(610, 230, "YOLO")
@@ -88,7 +88,7 @@ object ShowBattles extends DebugView {
   }
 
   def renderSkimulationMap(battle: Battle): Unit = {
-    battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrength), u.pixel, u.player.colorDark))
+    battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrengthDisplay), u.pixel, u.player.colorDark))
   }
 
   def renderBattleMap(battle: Battle): Unit = {

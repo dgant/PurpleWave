@@ -3,6 +3,7 @@ package Information.Battles.Prediction.Simulation
 import Information.Battles.Prediction.SimulationCheckpoint
 import Information.Battles.Types.Battle
 import Lifecycle.With
+import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -15,26 +16,30 @@ final class Simulation {
   val realUnitsOurs   : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy  : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val grid            : SimulationGrid        = new SimulationGrid
+  var enemyVanguard   : Pixel                 = Points.middle
+  var engaged         : Boolean               = false
 
   def reset(newBattle: Battle): Unit = {
     battle = newBattle
     realUnits.clear()
     realUnitsOurs.clear()
     realUnitsEnemy.clear()
-    realUnits ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
-    realUnitsOurs ++= realUnits.view.filter(_.isOurs)
-    realUnitsEnemy ++= realUnits.view.filter(_.isEnemy)
+    realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
+    realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
+    realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
+    enemyVanguard = battle.enemy.vanguardKey()
+    engaged = battle.units.exists(u => u.matchups.threatDeepest.exists(_.inRangeToAttack(u)))
     simulacra.foreach(_.reset(this))
   }
 
   @inline def step(): Unit = {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
-   battle.simulationFrames += 1
-   battle.simulationComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
-   battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
-   battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
-   battle.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    battle.simulationFrames += 1
+    battle.simulationComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
+    battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
+    battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
+    battle.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
     if (battle.simulationComplete) {
       cleanup()
     } else if (battle.simulationFrames - battle.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {

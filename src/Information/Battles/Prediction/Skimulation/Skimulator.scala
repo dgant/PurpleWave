@@ -1,15 +1,13 @@
 package Information.Battles.Prediction.Skimulation
 
-import Information.Battles.Types.{Battle, Team}
+import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Utilities.{?, LightYear}
 import Utilities.UnitFilters._
+import Utilities.{?, LightYear}
 
 object Skimulator {
-
-  def durabilityFrames(team: Team): Double = team.meanAttackerHealth / team.opponent.meanDpf
 
   def predict(battle: Battle): Unit = {
     val maxEffectiveRange = Maff.max(battle.units.map(_.effectiveRangePixels)).getOrElse(0.0)
@@ -19,14 +17,17 @@ object Skimulator {
       // Since we're deciding whether to attack into the enemy,
       // assume the enemy need only spend its time regrouping, rather than advancing
       val minDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
+      val targets = ?(Terran.Medic(unit),
+        team.units.view.filter(_.unitClass.isOrganic),
+        team.opponent.units)
       // How far does this unit have to go to get into the fight, either dealing or receiving damage?
       unit.skimDistanceToEngage =
         ?(battle.isGlobal,
           maxEffectiveRange - unit.effectiveRangePixels,
           // Assume we're attacking the closest target
-          Maff.min(team.opponent.units.view.map(oppo =>
+          Maff.min(targets.view.map(oppo =>
             Math.min(
-              minDistance + maxEffectiveRange - unit.pixelRangeAgainst(oppo),
+              minDistance + maxEffectiveRange - unit.effectiveRangePixels,
               unit.pixelsToGetInRange(oppo))))
             .getOrElse(LightYear()))
     }))
@@ -52,6 +53,7 @@ object Skimulator {
 
     // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
+      val opponent      = team.opponent
       val energy        = if (unit.isFriendly) unit.energy else 100
       val player        = unit.player
       val casts75       = Math.floor(unit.energy / 75)
@@ -61,30 +63,30 @@ object Skimulator {
       unit.skimStrength = Maff.nanToZero(unit.unitClass.skimulationValue * unit.totalHealth / unit.unitClass.maxTotalHealth)
 
       // Count basic upgrades
-      unit.skimStrength *= 1.0 + 0.15 * (unit.armorHealth - unit.unitClass.armor)
-      if (unit.unitClass.effectiveAirDamage > 0)
-        unit.skimStrength *= unit.damageOnHitAir.toDouble / unit.unitClass.effectiveAirDamage
-      else if (unit.unitClass.effectiveGroundDamage > 0)
-        unit.skimStrength *= unit.damageOnHitGround.toDouble / unit.unitClass.effectiveGroundDamage
+      // We do mean(1, multiplier) to acknowledge that half of a unit's contribution to the fight is just tanking.
+      // With better modeling of damage dropoff that might not be necessary
+      unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne((team.meanDamageOnHit - unit.unitClass.armor) / (opponent.meanDamageOnHit - (unit.armorHealth - unit.unitClass.armor))))
+      if      (unit.unitClass.effectiveAirDamage    > 0)  unit.skimStrength *= Maff.vmean(1.0,  Maff.nanToOne((unit.damageOnHitAir.toDouble    - opponent.meanArmorAir)    / (unit.unitClass.effectiveAirDamage    - opponent.meanArmorAir)))
+      else if (unit.unitClass.effectiveGroundDamage > 0)  unit.skimStrength *= Maff.vmean(1.0,  Maff.nanToOne((unit.damageOnHitGround.toDouble - opponent.meanArmorGround) / (unit.unitClass.effectiveGroundDamage - opponent.meanArmorGround)))
 
       // Consider high ground advantage
       if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
         if (unit.presumptiveTarget.exists(_.altitude > unit.altitude)) {
-          unit.skimStrength *= 0.5
+          unit.skimStrength *= 0.75 // 0.5 in terms of DPS, but see above remarks about treating units partly as sponges
         } else if (unit.presumptiveTarget.exists(t => t.altitude < unit.pixelToFireAt(t).altitude)) {
-          unit.skimStrength *= 1.5
+          unit.skimStrength *= 1.25 // 1.5 in terms of DPS, but see above remarks about treating units partly as sponges
         }
       }
 
       // Consider detection
       if (unit.isEnemy && ! team.opponent.hasDetection) {
-        if (Terran.Wraith(unit) && Terran.WraithCloak(player)) unit.skimStrength *= 5
-        if (Protoss.DarkTemplar(unit)) unit.skimStrength *= 15
-        if (Zerg.Lurker(unit)) unit.skimStrength *= 5
+        if (Terran.Wraith(unit) && Terran.WraithCloak(player))  unit.skimStrength *= 5
+        if (Protoss.DarkTemplar(unit))                          unit.skimStrength *= 15
+        if (Zerg.Lurker(unit))                                  unit.skimStrength *= 5
       }
 
       // Count other unit properties
-      if (unit.canStim)                                                   unit.skimStrength *= 1.2
+      if (unit.canStim)                                                   unit.skimStrength *= ?(unit.stimmed, 1.2, 1.1) // Consider whether they already have taken the damage hit from stim
       if (unit.ensnared)                                                  unit.skimStrength *= 0.5
       if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.3
       if (Terran.Marine(unit)   && Terran.Stim(player))                   unit.skimStrength *= 1.3

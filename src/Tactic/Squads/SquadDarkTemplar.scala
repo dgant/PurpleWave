@@ -84,10 +84,12 @@ class SquadDarkTemplar extends Squad {
           .sortBy(_.remainingCompletionFrames)
 
     // Go berserk if we have a shot at workers
-    val nearestWorker   = Maff.min(workers.map(w => dt.pixelDistanceTravelling(w.pixel))).getOrElse(LightYear().toDouble)
     val nearestDetector = dt.matchups.enemyDetectorDeepest.map(_.pixelsToSightRange(dt)).getOrElse(LightYear().toDouble)
     val nearestThreat   = dt.matchups.threatDeepest.filterNot(IsWorker).map(_.pixelsToGetInRange(dt)).getOrElse(LightYear().toDouble)
-    val goBerserk       = nearestWorker < 256 || nearestWorker < nearestDetector || nearestWorker < nearestThreat
+    val nearestMiner    = Maff.min(workers
+      .filter(w => w.base.exists(b => w.pixelDistanceCenter(b.townHallArea.center) < 256))
+      .map(w => dt.pixelDistanceTravelling(w.pixel))).getOrElse(LightYear().toDouble)
+    val goBerserk       = nearestMiner < 256 || nearestMiner < nearestDetector + 64 || nearestMiner < nearestThreat + 64
     dt.intend(this)
       .setCanFlee( ! goBerserk)
       .setTravel(base.heart.center)

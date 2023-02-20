@@ -38,6 +38,7 @@ class Fingerprints {
       oneRaxFE,
       fourteenCC,
       twoPortWraith,
+      oneBaseBioMech,
       bio,
     ) else Seq.empty) ++
     (if (With.enemies.exists(_.isUnknownOrProtoss)) Seq(
@@ -111,6 +112,7 @@ class Fingerprints {
   lazy val oneRaxFE             = addFingerprint(new Fingerprint1RaxFE)
   lazy val fourteenCC           = addFingerprint(new Fingerprint14CC)
   lazy val twoPortWraith        = addFingerprint(new Fingerprint2PortWraith)
+  lazy val oneBaseBioMech       = addFingerprint(new Fingerprint1BaseBioMech)
   lazy val bio                  = addFingerprint(new FingerprintBio)
   lazy val oneArmoryUpgrades    = addFingerprint(new Fingerprint1ArmoryUpgrades)
   lazy val twoArmoryUpgrades    = addFingerprint(new Fingerprint2ArmoryUpgrades)

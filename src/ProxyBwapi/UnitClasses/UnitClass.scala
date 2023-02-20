@@ -418,7 +418,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   lazy val skimulationValue: Double =
     if (isWorker) 0.01
-    else if (this == Terran.Marine) 0.3
+    else if (this == Terran.Marine) 0.35
     else if (this == Terran.Firebat) 0.25
     else if (this == Terran.Ghost) 0.15
     else if (this == Terran.Medic) 0.5
@@ -440,7 +440,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Scout) 0.75
     else if (this == Protoss.Carrier) 5
     else if (this == Protoss.Arbiter) 0.5
-    else if (this == Protoss.Reaver) 1.75
+    else if (this == Protoss.Reaver) 2.0
     else if (this == Protoss.PhotonCannon) 1
     else if (this == Zerg.Zergling) 0.25
     else if (this == Zerg.Hydralisk) 0.75

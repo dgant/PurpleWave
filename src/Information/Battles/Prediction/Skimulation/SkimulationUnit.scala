@@ -7,4 +7,7 @@ trait SkimulationUnit {
   var skimDelay: Double = 0.0
   var skimExtension: Double = 0.0
   var skimPresence: Double = 0.0
+
+  // Only for debug/display purposes
+  var skimStrengthDisplay: Double = 0.0
 }

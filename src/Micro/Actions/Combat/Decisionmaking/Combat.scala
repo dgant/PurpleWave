@@ -72,6 +72,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   def innerPerform(): Unit = {
     Target.choose(unit)
     val bypass = target.isEmpty && (unit.matchups.ignorant || unit.agent.shouldFight)
+    val approach = unit.agent.shouldFight || (unit.matchups.pixelsEntangled < -160)
     Commander.defaultEscalation(unit)
 
     firingPixel         = target.map(unit.pixelToFireAt)

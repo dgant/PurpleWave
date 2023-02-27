@@ -171,7 +171,6 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _player                 = Players.get(bwapiUnit.getPlayer)
       _pixelObserved          = new Pixel(bwapiUnit.getPosition)
       changePixel(_pixelObserved)
-      _tileTopLeft            = new Tile(bwapiUnit.getTilePosition) // Set this via changePixel()
       _complete               = bwapiUnit.isCompleted
       _burrowed               = bwapiUnit.isBurrowed
       _cloaked                = bwapiUnit.isCloaked
@@ -247,12 +246,14 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _unitClass = Terran.SiegeTankSieged
       }
     }
+    updateGridsIfNecessary(onChange = false)
   }
 
   @inline final def changePixel(pixelNew: Pixel): Unit = {
     val tileNew = pixelNew.tile
     if (_tile != tileNew) {
-
+      _tileTopLeft = new Tile(bwapiUnit.getTilePosition)
+      updateGridsIfNecessary(onChange = true)
     }
     _pixel = pixelNew
     _tile  = pixelNew.tile
@@ -260,26 +261,39 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
 
   @inline final def changeUnitType(unitClassNew: UnitClass): Unit = {
     if (unitClassNew != _unitClass) {
-      _lastClassChange = With.frame
-      _lastClassChangeHealth = hitPoints
+      _lastClassChange        = With.frame
+      _lastClassChangeHealth  = hitPoints
       _lastClassChangeShields = shieldPoints
-      _unitClass = unitClassNew
+      _unitClass              = unitClassNew
+      updateGridsIfNecessary(onChange = true)
     }
   }
 
-  final def changeVisibility(value: Visibility.Value): Unit = {
-    _visibility = value
-    _visibility match {
-      case Visibility.Visible           => _burrowed = bwapiUnit.isBurrowed ; _alive = true; _lastSeen = With.frame
-      case Visibility.InvisibleBurrowed => _burrowed = true                 ; _alive = true; _detected = false
-      case Visibility.InvisibleNearby   => _burrowed = false                ; _alive = true; _detected = false
-      case Visibility.InvisibleMissing  => _burrowed = false                ; _alive = true; _detected = false
-      case Visibility.Hypothetical      => _burrowed = false                ; _alive = true; _detected = false
-      case Visibility.Dead              => _alive = false
+  final def changeVisibility(visibilityNew: Visibility.Value): Unit = {
+    if (_visibility != visibilityNew) {
+      _visibility = visibilityNew
+      _visibility match {
+        case Visibility.Visible           => _burrowed = bwapiUnit.isBurrowed ; _alive = true; _lastSeen = With.frame
+        case Visibility.InvisibleBurrowed => _burrowed = true                 ; _alive = true; _detected = false
+        case Visibility.InvisibleNearby   => _burrowed = false                ; _alive = true; _detected = false
+        case Visibility.InvisibleMissing  => _burrowed = false                ; _alive = true; _detected = false
+        case Visibility.Hypothetical      => _burrowed = false                ; _alive = true; _detected = false
+        case Visibility.Dead              => _alive = false
+      }
+      updateGridsIfNecessary(onChange = true)
     }
   }
 
-  @inline final def changeCompletion(value: Boolean): Unit = {
-    _complete = value
+  @inline final def changeCompletion(completionNew: Boolean): Unit = {
+    if (_complete != completionNew) {
+      _complete = completionNew
+      With.grids.unit.foreach(_.updateUnit(this))    }
+  }
+
+  // We want to update grids when relevant properties change, but not while we're constructing the unit for the first time
+  @inline final private def updateGridsIfNecessary(onChange: Boolean): Unit = {
+    if (onChange != (With.frame == frameDiscovered)) {
+      With.grids.unit.foreach(_.updateUnit(this))
+    }
   }
 }

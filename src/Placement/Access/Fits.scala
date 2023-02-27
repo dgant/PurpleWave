@@ -41,8 +41,8 @@ trait Fits {
     if ( ! foundation.tile.valid) return
     val point = foundation.point
     val requirement = point.requirement
-    (0 until requirement.width).flatMap(dx =>
-        (0 until requirement.height).map(foundation.tile.add(dx, _)))
+    (0 until requirement.width).view.flatMap(dx =>
+        (0 until requirement.height).view.map(foundation.tile.add(dx, _)))
           .filter(_.valid)
           .map(_.i)
           .foreach(points(_) = point)

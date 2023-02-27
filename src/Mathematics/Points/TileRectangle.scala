@@ -107,13 +107,13 @@ final case class TileRectangle(
   @inline def cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   @inline def cornerTilesInclusive: Array[Tile] = Array(startInclusive, Tile(endExclusive.x - 1, startInclusive.y), endExclusive.subtract(1, 1), Tile(startInclusive.x, endExclusive.y - 1))
   
-  @inline def tiles: IndexedSeq[Tile] =
-    (0 until endExclusive.y - startInclusive.y).flatMap(y =>
-      (0 until endExclusive.x - startInclusive.x).map(x =>
+  @inline def tiles: Seq[Tile] =
+    (0 until endExclusive.y - startInclusive.y).view.flatMap(y =>
+      (0 until endExclusive.x - startInclusive.x).view.map(x =>
         Tile(startInclusive.x + x, startInclusive.y + y)))
 
-  @inline def tilesAtEdge: IndexedSeq[Tile] = Box(width, height).map(startInclusive.add)
-  @inline def tilesSurrounding: IndexedSeq[Tile] = Box(width + 2, height + 2).map(startInclusive.subtract(1, 1).add)
+  @inline def tilesAtEdge: Seq[Tile] = Box(width, height).map(startInclusive.add)
+  @inline def tilesSurrounding: Seq[Tile] = Box(width + 2, height + 2).map(startInclusive.subtract(1, 1).add)
 
   @inline def toPixels: PixelRectangle = PixelRectangle(startPixel, endPixel)
 }

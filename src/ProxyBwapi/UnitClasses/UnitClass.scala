@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile, TileRectangle}
 import ProxyBwapi.Buildable
-import ProxyBwapi.Players.Players
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitInfo.UnitInfo
@@ -594,18 +593,18 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Capabilities //
   //////////////////
 
-  lazy val canFly: Boolean = isFlyer || isFlyingBuilding
-  lazy val canBurrow: Boolean = Vector(Terran.SpiderMine, Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker, Zerg.Defiler).contains(this)
-  lazy val canStim: Boolean = this == Terran.Marine || this == Terran.Firebat
-  lazy val canBeIrradiated: Boolean = Players.all.exists(_.isUnknownOrTerran) && !isBuilding
-  lazy val canBeIrradiateBurned: Boolean = Players.all.exists(_.isUnknownOrTerran) && !isBuilding && isOrganic && this != Zerg.LurkerEgg && this != Zerg.Egg
-  lazy val canBeStormed: Boolean = Players.all.exists(_.isUnknownOrProtoss) && ! isBuilding && ! isInvincible
-  lazy val canBeLockedDown: Boolean = Players.all.exists(_.isUnknownOrTerran) && !isBuilding && isMechanical
-  lazy val canBeMaelstrommed: Boolean = Players.all.exists(_.isUnknownOrProtoss) && !isBuilding && isOrganic
-  lazy val canBeEnsnared: Boolean = Players.all.exists(_.isUnknownOrZerg) && !isBuilding
-  lazy val canBeStasised: Boolean = Players.all.exists(_.isUnknownOrProtoss) && !isBuilding
-  lazy val canLoadUnits: Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
-  lazy val canBeTransported: Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
+  lazy val canFly               : Boolean = isFlyer || isFlyingBuilding
+  lazy val canBurrow            : Boolean = Vector(Terran.SpiderMine, Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker, Zerg.Defiler).contains(this)
+  lazy val canStim              : Boolean = this == Terran.Marine || this == Terran.Firebat
+  lazy val canBeIrradiated      : Boolean = ! isBuilding
+  lazy val canBeIrradiateBurned : Boolean = ! isBuilding && isOrganic && this != Zerg.LurkerEgg && this != Zerg.Egg
+  lazy val canBeStormed         : Boolean = ! isBuilding && ! isInvincible
+  lazy val canBeLockedDown      : Boolean = ! isBuilding && isMechanical
+  lazy val canBeMaelstrommed    : Boolean = ! isBuilding && isOrganic
+  lazy val canBeEnsnared        : Boolean = ! isBuilding
+  lazy val canBeStasised        : Boolean = ! isBuilding
+  lazy val canLoadUnits         : Boolean = Vector(Terran.Bunker, Terran.Dropship, Protoss.Shuttle, Zerg.Overlord).contains(this)
+  lazy val canBeTransported     : Boolean = ! isBuilding && spaceRequired <= 8 // BWAPI gives 255 for unloadable units
   lazy val spells: Array[Tech] =
     if (this == Terran.Battlecruiser) Array(Terran.Yamato)
     else if (this == Terran.Ghost) Array(Terran.GhostCloak, Terran.Lockdown, Terran.NuclearStrike)

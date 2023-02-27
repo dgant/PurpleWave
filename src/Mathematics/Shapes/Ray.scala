@@ -5,22 +5,11 @@ import Mathematics.Points.{Pixel, Tile}
 
 object Ray {
 
-  @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): IndexedSeq[Tile] = {
+  @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): Iterator[Tile] = {
     apply(from, from.radiateRadians(radians, lengthPixels))
   }
-  
-  @inline final def apply(from: Pixel, to: Pixel): IndexedSeq[Tile] = {
-    if (to.x == from.x) {
-      val direction = Maff.signum(to.y - from.y)
-      if (direction == 0) return Array(to.tile)
-      return (from.y / 32 to to.y / 32 by direction).map(tileY => Tile(to.x/32, tileY))
-    }
-    if (to.y == from.y) {
-      val direction = Maff.signum(to.x - from.x)
-      if (direction == 0) return Array(to.tile)
-      return (from.x / 32 to to.x / 32 by direction).map(tileX => Tile(tileX, to.y/32))
-    }
-    
+
+  case class Generator(from: Pixel, to: Pixel) extends Iterator[Tile] {
     val gridSize    = 32
     val signX       = Maff.signum(to.x - from.x)
     val signY       = Maff.signum(to.y - from.y)
@@ -31,9 +20,18 @@ object Ray {
     val tileCount   = 1 + from.tile.tileDistanceManhattan(to.tile)
     val output      = new Array[Tile](tileCount)
     var tileIndex   = 0
-    while (tileIndex < tileCount) {
-      output(tileIndex)   = Tile(x/32, y/32)
-      tileIndex           += 1
+    var cornerSkip: Option[Tile] = None
+
+    override def hasNext: Boolean = tileIndex < tileCount
+
+    override def next(): Tile = {
+      if (cornerSkip.isDefined) {
+        val output = cornerSkip.get
+        cornerSkip = None
+        return output
+      }
+      val output = Tile(x / 32, y / 32)
+      tileIndex  += 1
       if (tileIndex < tileCount) {
         val nextXCrossing   = x + signX * Math.abs(gridSize - Math.abs(x) % gridSize)
         val nextYCrossing   = y + signY * Math.abs(gridSize - Math.abs(y) % gridSize)
@@ -44,11 +42,22 @@ object Ray {
         y                   = Math.ceil(y + velocityY * deltaTime).toInt
         if (x % gridSize == 0 && y % gridSize == 0) {
           // We landed right on the corner of the grid, which would cause us to skip a corner tile.
-          output(tileIndex) = Tile(x/32, y/32 - signY)
+          cornerSkip = Some(Tile(x / 32, y / 32 - signY))
           tileIndex += 1
         }
       }
+      output
     }
-    output
+  }
+  
+  @inline final def apply(from: Pixel, to: Pixel): Iterator[Tile] = {
+    if (to.x == from.x) {
+      if (to.y == from.y) return Iterator(to.tile)
+      return (from.y / 32 to to.y / 32 by Maff.signum(to.y - from.y)).iterator.map(tileY => Tile(to.x / 32, tileY))
+    } else  if (to.y == from.y) {
+      return (from.x / 32 to to.x / 32 by Maff.signum(to.x - from.x)).iterator.map(tileX => Tile(tileX, to.y / 32))
+    }
+
+    return Generator(from, to)
   }
 }

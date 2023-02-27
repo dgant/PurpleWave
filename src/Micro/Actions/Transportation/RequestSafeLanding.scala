@@ -15,7 +15,7 @@ object RequestSafeLanding {
       val searchOriginTile  = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile
       val landingOption     = Spiral(6)
         .map(searchOriginTile.add)
-        .find(tile => tile.walkable && With.grids.enemyRangeGround.get(tile) <= 0)
+        .find(tile => tile.walkable && tile.enemyRange < With.grids.enemyRangeGround.margin)
       landingOption.foreach(landing => {
         unit.agent.setRideGoal(landing.center)
         if (unit.pixelDistanceEdge(landing.center) < 48) {

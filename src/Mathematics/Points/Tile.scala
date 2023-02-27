@@ -207,7 +207,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (unit.flying) this else center.traversiblePixel(unit).tile
   }
   @inline def walkableTile: Tile = {
-    if (walkable) this else Spiral(16).view.map(add).find(_.walkable).getOrElse(this)
+    ?(walkable, this, Spiral(16).map(add).find(_.walkable).getOrElse(this))
   }
   @inline def buildable: Boolean = {
     valid && buildableUnchecked

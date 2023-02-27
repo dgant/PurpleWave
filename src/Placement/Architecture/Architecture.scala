@@ -211,7 +211,7 @@ class Architecture {
         if (building.isTownHall && ! With.grids.buildableTownHall.get(nextTile)) {
           return ArchitecturalAssessment.ViolatesResourceGap
         }
-        if ( ! building.isTownHall && With.grids.units.get(nextTile).exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
+        if ( ! building.isTownHall && nextTile.units.exists(u => ! u.flying && u.isEnemy || ! u.canMove)) {
           return ArchitecturalAssessment.BlockedByUnit
         }
         y += 1

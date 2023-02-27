@@ -6,7 +6,7 @@ object Spiral {
   
   // Via http://stackoverflow.com/questions/3706219/algorithm-for-iterating-over-an-outward-spiral-on-a-discrete-2d-grid-from-the-or
   //
-  def apply(radius: Int): IndexedSeq[Point] = {
+  def apply(radius: Int): Seq[Point] = {
     var dx = 1
     var dy = 0
     var segment_length = 1
@@ -16,7 +16,7 @@ object Spiral {
     var segment_passed = 0
 
     val pointsToSearch = (2 * radius + 1) * (2 * radius + 1)
-    IndexedSeq(Point(0, 0)) ++ (0 to pointsToSearch).map(i => {
+    IndexedSeq(Point(0, 0)).view ++ (0 to pointsToSearch).view.map(i => {
       x += dx
       y += dy
       segment_passed += 1
@@ -31,5 +31,5 @@ object Spiral {
       }
       Point(x, y)
     })
- }
+  }
 }

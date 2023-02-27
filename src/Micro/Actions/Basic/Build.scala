@@ -32,15 +32,11 @@ object Build extends Action {
     val distance  = unit.pixelDistanceCenter(unit.intent.toBuildTile.get.center)
     val buildArea = unit.intent.toBuild.get.tileArea.add(unit.intent.toBuildTile.get)
     
-    def blockersForTile(tile: Tile) = {
-      With.grids.units
-        .get(tile)
-        .filter(blocker =>
-          blocker != unit
-          && ! blocker.unitClass.isGas
-          && ! blocker.flying
-          && blocker.visible)
-    }
+    def blockersForTile(tile: Tile) = tile.units.filter(blocker =>
+      blocker != unit
+      && ! blocker.unitClass.isGas
+      && ! blocker.flying
+      && blocker.visible)
     
     val ignoreBlockers        = distance > 32.0 * 8.0 || With.yolo.active
     lazy val blockersIn       = if (ignoreBlockers) Seq.empty else buildArea.tiles.flatMap(blockersForTile).toSeq

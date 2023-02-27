@@ -1,18 +1,30 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
-import Mathematics.Shapes.Circle
-import Mathematics.{Maff, Shapes}
+import Mathematics.Maff
+import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Shapes.Ring
+import Performance.Cache
 import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.ForeignUnitInfo
+import Utilities.?
 import Utilities.Time.{Forever, Minutes, Seconds}
-import Utilities.UnitFilters.IsWarrior
+import Utilities.UnitFilters.{IsTank, IsWarrior}
 
 object Imagination {
 
   def checkVisibility(unit: ForeignUnitInfo): Unit = {
+
+    // Yay, we see the unit!
+    //
+    // Check BOTH exists and visible because I have seen cases where one value or the other is nonsensical
+    // though this may just be a symptom of ghost unit data.
+    if (unit.bwapiUnit.exists && unit.bwapiUnit.isVisible) {
+      unit.changeVisibility(Visibility.Visible)
+      return
+    }
+
     // Speculative sanity check based on a case where an observer died while our detection was leaving the area but was flagged alive
     if ( ! unit.visible && unit.visibility == Visibility.Dead) return
 
@@ -30,16 +42,7 @@ object Imagination {
         tripper.unitClass.triggersSpiderMines
         && tripper.isEnemyOf(unit)
         && tripper.pixelDistanceEdge(unit) < 96
-        && unit.altitude >= tripper.altitude))
-
-    // Yay, we see the unit!
-    //
-    // Check BOTH exists and visible because I have seen cases where one value or the other is nonsensical
-    // though this may just be a symptom of ghost unit data.
-    if (unit.bwapiUnit.exists && unit.bwapiUnit.isVisible) {
-      unit.changeVisibility(Visibility.Visible)
-      return
-    }
+        && (unit.altitude >= tripper.altitude || tripper.visibleToOpponents)))
 
     // Assume units we haven't seen in a very long time are dead
     // - Timed units can just expire
@@ -49,15 +52,9 @@ object Imagination {
     val expectedSurvivalFrames =
       if (unit.isAny(Zerg.Broodling, Zerg.SpelLDarkSwarm, Protoss.SpellDisruptionWeb, Terran.SpellScannerSweep))
         unit.removalFrames - With.framesSince(unit.lastSeen)
-      else if (unit.unitClass.isOrganic && unit.irradiated)
-        unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
-      else if (IsWarrior(unit))
-        if (With.strategy.isFfa)
-          Minutes(4)()
-        else
-          Minutes(8)()
-      else
-        Forever()
+      else if (unit.painfullyIrradiated)  unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
+      else if (IsWarrior(unit))           ?(With.strategy.isFfa, Minutes(4), Minutes(8))()
+      else                                Forever()
 
     if (With.framesSince(unit.lastSeen) > expectedSurvivalFrames) {
       unit.changeVisibility(Visibility.Dead)
@@ -71,12 +68,6 @@ object Imagination {
     }
 
     // TODO: If a Lurker should have attacked, but hasn't, it's likely missing
-
-    // Missing units stay missing
-    if (unit.visibility == Visibility.InvisibleMissing) {
-      return
-    }
-
     // Assume other burrowing units burrowed
     if (likelyBurrowed) {
       unit.changeVisibility(Visibility.InvisibleBurrowed)
@@ -89,71 +80,83 @@ object Imagination {
       return
     }
 
-    // Presume the unit is alive but elsewhere
-    unit.changeVisibility(Visibility.InvisibleNearby)
-
-    // Missing buildings must either be floated or dead
-    if (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding) {
+    // Missing buildings must either be floated or dead. Burning is a common case.
+    // Critters can move but we don't care about predicting their location
+    if (unit.isNeutral || (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding)) {
       if (shouldBeVisible) {
         unit.changeVisibility(Visibility.Dead)
       }
       return
     }
 
-    // Invalidate long-absent units in the middle of the map
-    lazy val friendsNearby        = unit.team.exists(_.units.exists(f => f.visible && f.pixelDistanceEdge(unit) < 32 * 5 + unit.effectiveRangePixels))
-    lazy val outrangesVision      = unit.matchups.targets.nonEmpty && unit.matchups.enemies.forall(_.sightPixels <= unit.effectiveRangePixels)
-    lazy val inferProximityFrames = Seconds(10 + 20 * Maff.fromBoolean(friendsNearby) + 20 * Maff.fromBoolean(outrangesVision))()
-    if ( ! unit.base.exists(_.owner == unit.player) && With.framesSince(unit.lastSeen) > inferProximityFrames) {
-      unit.changeVisibility(Visibility.InvisibleMissing)
+    // Imagination is expensive; limit re-tries
+    if (unit.visibility == Visibility.InvisibleMissing && (With.framesSince(unit.lastImagination) < Seconds(5)() || With.framesSince(unit.lastSeen) < Seconds(30)()))  {
       return
     }
+    unit.lastImagination = With.frame
 
     // Predict the unit's location
     // If we fail to come up with a reasonable prediction, treat the unit as missing
     val predictedPixel: Option[Pixel] = predictPixel(unit)
     if (predictedPixel.isDefined) {
+      unit.changeVisibility(Visibility.InvisibleNearby)
       unit.changePixel(predictedPixel.get)
     } else {
       unit.changeVisibility(Visibility.InvisibleMissing)
     }
   }
 
+  // We want to imagine units heading towards the center of their army, adjusted for their effective range
+  // eg. don't assume melee units will back all the way up to ranged units
+  private val rangeMax = new Cache(() => Maff.max(With.units.enemy.map(_.effectiveRangePixels)).getOrElse(0.0))
+  private val destination = new Cache(() =>
+    Maff.maxBy(
+      With.battles.divisions
+        .filter(_.count(IsWarrior) > 0))(_.count(IsWarrior))
+        .map(_.attackCentroidKey)
+    .getOrElse(With.scouting.enemyMuscleOrigin.center))
+
   private def predictPixel(unit: ForeignUnitInfo): Option[Pixel] = {
-    if ( ! unit.tile.visible) {
-      return Some(unit.pixel)
-    }
-
+    val topSpeed        = ?(IsTank(unit), Terran.SiegeTankUnsieged.topSpeed, unit.topSpeedPossible)
     val framesUnseen    = With.framesSince(unit.lastSeen)
-    val tileLastSeen    = unit.pixelObserved.tile
-    val maxTilesAway    = Math.min(12, With.framesSince(unit.lastSeen) * unit.topSpeed / 32).toInt
-    val maxTilesAwaySq  = 2 + maxTilesAway * maxTilesAway
-    val friends         = Maff.orElse(
-      unit.team.map(_.units.view.filter(_.unitClass == unit.unitClass).filter(_.visible)).getOrElse(Seq.empty),
-      unit.team.map(_.units.view.filter(_.unitClass == unit.unitClass)).getOrElse(Seq.empty),
-      unit.team.map(_.units.view.filter(_.visible)).getOrElse(Seq.empty),
-      unit.team.map(_.units.view).getOrElse(Seq.empty),
-      With.units.enemy.filter(_.unitClass ==  unit.unitClass),
-      With.units.enemy).map(_.pixel)
-    val friend          = Maff.minBy(friends)(unit.pixelDistanceSquared)
-    val projection      = unit.projectFrames(8)
+    val maxPixelsAway   = 64 + framesUnseen * topSpeed
+    val maxTilesAway    = Math.min((Maff.sqrt2 * maxPixelsAway).toInt / 32,  With.mapTileHeight + With.mapTileWidth)// The sqrt2 multiplier accounts for ground distance metrics being rectilinear
+    val maxTilesAwaySq  = maxTilesAway * maxTilesAway
+    val observedPixel   = unit.pixelObserved
+    val observedTile    = observedPixel.tile
+    val predictedTile   = unit.tile // TODO: Delete
+    val goalPixel       = ?(With.framesSince(unit.lastSeen) < Seconds(10)() || ! IsWarrior(unit), unit.presumptiveDestination, unit.pixel.projectUpTo(destination(), rangeMax() - unit.effectiveRangePixels))
+    val goalTile        = goalPixel.tile
+    val expectedPixel   = observedPixel.projectUpTo(goalPixel, maxPixelsAway).clamp()
+    val expectedTile    = expectedPixel.tile
 
-    val possiblePixels = Circle(maxTilesAway)
-      .map(unit.tile.add)
-      .filter(tile =>
-        tile.valid
-        && ! tile.visibleUnchecked
-        && tile.traversableBy(unit)
-        && tile.lastSeen < unit.lastSeen
-        && tile.tileDistanceSquared(tileLastSeen) <= maxTilesAwaySq
-        && (unit.flying || Shapes.Ray(unit.pixel, tile.center).forall(_.traversableBy(unit))))
-      .map(_.center)
+    var positionsExplored = 0
+    @inline def isLegalPrediction(tile: Tile): Boolean = (
+      { positionsExplored += 1; true }
+      && ! tile.visible
+      && tile.lastSeen <= unit.lastSeen
+      && (tile == observedTile || (
+        (unit.unitClass.isFlyingBuilding || tile.traversableBy(unit))
+        && tile.tileDistanceSquared(observedTile) <= maxTilesAwaySq
+        && (unit.flying || tile.groundTiles(observedTile) <= maxTilesAway)
+        && (unit.flying || tile.units.forall(unit==)))))
 
-    val output = Maff.minBy(possiblePixels)(p =>
-      p.pixelDistance(unit.pixel)
-      + p.pixelDistance(projection)
-      + friend.map(p.pixelDistance).getOrElse(0d))
+    val persistence = 3
+    val possiblePixels =
+      (Seq(expectedPixel).filter(p => isLegalPrediction(p.tile))
+      ++ ((0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(unit.tile.add)))
+      ++  (0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(expectedTile.add)))
+      ++  (0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(observedTile.add))))
+        .filter(isLegalPrediction)
+        .map(_.center))
 
+    val output = possiblePixels.headOption
+    if (output.isEmpty) {
+      positionsExplored += 1 // TODO: For debug breakpoints only; delete later
+    }
+    if (positionsExplored < 0) {
+      return None // TODO: Debugging only
+    }
     output
   }
 }

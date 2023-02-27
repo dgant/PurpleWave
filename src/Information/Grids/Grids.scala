@@ -19,9 +19,17 @@ class Grids extends TimedTask {
   alwaysSafe = true // Until proven otherwise
 
   private val _grids = new ArrayBuffer[Grid]()
+  private val _unitGrids = new ArrayBuffer[GridUnits]()
   def all: Seq[Grid] = _grids
+  def unit: Seq[GridUnits] = _unitGrids
   private def add[T <: Grid](grid: T): T = { _grids += grid; grid }
-  private def add[T <: Grid](code: String, grid: T): T = { grid.code = code; add(grid) }
+  private def add[T <: Grid](code: String, grid: T): T = {
+    grid.code = code
+    if (grid.isInstanceOf[GridUnits]) {
+      _unitGrids += grid.asInstanceOf[GridUnits]
+    }
+    add(grid)
+  }
 
   // Pass-through calls to other grids
   val buildable                   = add("b",    new GridBuildable)
@@ -46,10 +54,8 @@ class Grids extends TimedTask {
   val psionicStorm                = add("ps",   new GridPsionicStorm)
   val unwalkableUnits             = add("wu",   new GridUnwalkableUnits)
 
-  // Updated on the fly
+  // Based on unit position
   val units                       = add("u",    new GridUnits)
-
-  // Flood-filly grids
   val enemyRangeAir               = add("era",  new GridEnemyRangeAir)
   val enemyRangeGround            = add("erg",  new GridEnemyRangeGround)
   val enemyRangeAirGround         = add("erag", new GridEnemyRangeAirGround)

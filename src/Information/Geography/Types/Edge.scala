@@ -14,7 +14,7 @@ final class Edge(choke: Chokepoint) {
   def otherSideof(zone: Zone): Zone = zones.find(_ != zone).getOrElse(zones.head)
   lazy val pixelCenter  : Pixel         = new Pixel(choke.getCenter)
   lazy val radiusPixels : Double        = choke.getWidth / 2
-  lazy val tiles        : Vector[Tile]  = Maff.orElse(Shapes.Ray(sidePixels.head, sidePixels.last), Vector(pixelCenter.tile)).toVector
+  lazy val tiles        : Vector[Tile]  = Maff.orElse(Shapes.Ray(sidePixels.head, sidePixels.last).toVector, Vector(pixelCenter.tile)).toVector
   lazy val sidePixels   : Seq[Pixel]    = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
   lazy val direction    : Direction     = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)

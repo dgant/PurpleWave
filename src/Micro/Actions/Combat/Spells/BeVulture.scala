@@ -22,12 +22,12 @@ object BeVulture extends Action {
     && unit.spiderMines > 0
   )
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     layTrap(unit)
     sabotage(unit)
   }
   
-  protected def placeMine(unit: FriendlyUnitInfo, target: Pixel) {
+  protected def placeMine(unit: FriendlyUnitInfo, target: Pixel): Unit = {
     val finalTarget = calculateMineTarget(unit, target)
     Commander.useTechOnPixel(unit, Terran.SpiderMinePlant, finalTarget)
   }
@@ -39,12 +39,12 @@ object BeVulture extends Action {
     unit.pixel.add(velocity.x.toInt, velocity.y.toInt)
   }
   
-  protected def layTrap(unit: FriendlyUnitInfo) {
+  protected def layTrap(unit: FriendlyUnitInfo): Unit = {
     if (unit.spiderMines < 2) return
     if (unit.matchups.framesOfSafety <= 0) return
     
     lazy val inChoke = unit.zone.edges.exists(e => unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
-    lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(With.grids.units.get(_).exists(Terran.SpiderMine))
+    lazy val mineSpace = ! unit.tileArea.expand(1, 1).tiles.exists(_.units.exists(Terran.SpiderMine))
     lazy val retreating = unit.matchups.threats.nonEmpty && ! unit.agent.shouldFight
     lazy val timeToMine  = unit.matchups.framesOfSafety > Seconds(2)()
     lazy val inWorkerLine = unit.base.exists(base => base.owner.isUs && base.harvestingArea.contains(unit.tile))
@@ -60,7 +60,7 @@ object BeVulture extends Action {
     override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = target.unitClass.triggersSpiderMines
   }
   
-  protected def sabotage(vulture: FriendlyUnitInfo) {
+  protected def sabotage(vulture: FriendlyUnitInfo): Unit = {
     // TODO: Do it if we have enough Vultures with mines
     if ( ! vulture.agent.shouldFight && ! vulture.matchups.enemies.exists(e => e.is(Protoss.DarkTemplar) && e.effectivelyCloaked)) return
 

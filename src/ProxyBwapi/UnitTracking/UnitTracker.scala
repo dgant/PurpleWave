@@ -87,7 +87,7 @@ final class UnitTracker {
   private def _ours   : Seq[FriendlyUnitInfo] = With.units.bufferFriendly.all.filterNot(GhostUnit(_))
   private def _enemy  : Seq[ForeignUnitInfo]  = With.units.bufferEnemy.all.filterNot(GhostUnit(_))
 
-  def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(With.grids.units.get)
+  def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(_.units)
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)
   def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = inTiles(
     Circle

@@ -91,7 +91,7 @@ class PlacementQuery {
   }
 
   def accept(foundation: Foundation): Boolean = {
-    requirements.accept(foundation) && ! With.grids.units.get(foundation.tile).exists(u => u.unitClass.isBuilding && u.isFriendly)
+    requirements.accept(foundation) && ! foundation.tile.units.exists(u => u.unitClass.isBuilding && u.isFriendly)
   }
 
   def score(foundation: Foundation): Double = {

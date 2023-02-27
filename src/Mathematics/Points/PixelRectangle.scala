@@ -2,8 +2,6 @@ package Mathematics.Points
 
 import Mathematics.Maff
 
-import scala.collection.immutable
-
 case class PixelRectangle(
   startInclusive : Pixel,
   endExclusive   : Pixel) {
@@ -74,8 +72,8 @@ case class PixelRectangle(
   
   lazy val cornerPixels: Array[Pixel] = Array(startPixel, topRightPixel, endPixel, bottomleftPixel)
   
-  lazy val pixelsEach32: immutable.IndexedSeq[Pixel] =
-    (0 until endExclusive.x - startInclusive.x by 32).flatMap(x =>
-      (0 until endExclusive.y - startInclusive.y by 32).map(y =>
+  lazy val pixelsEach32: Seq[Pixel] =
+    (0 until endExclusive.x - startInclusive.x by 32).view.flatMap(x =>
+      (0 until endExclusive.y - startInclusive.y by 32).view.map(y =>
         Pixel(startInclusive.x + x, startInclusive.y + y)))
 }

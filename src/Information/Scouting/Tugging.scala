@@ -52,7 +52,9 @@ trait Tugging {
   })
 
   private val _ourThreatOrigin = new Cache(() => {
-    Maff.weightedExemplar(With.units.ours.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue)) ++ Seq((With.geography.home.center, productionWeight))).walkableTile
+    Maff.weightedExemplar(
+      With.units.ours.filter(countMuscle).map(u => (u.pixel, u.subjectiveValue))
+      ++ Seq((With.geography.home.center, productionWeight))).walkableTile
   })
 
   private val _enemyMuscleOrigin = new Cache(() => {
@@ -63,7 +65,7 @@ trait Tugging {
 
   private val _ourMuscleOrigin = new Cache(() => {
     val muscle = With.units.ours.filter(countMuscle)
-    if (muscle.isEmpty) With.geography.home
+    if (muscle.size < 7) _ourThreatOrigin() // Small unit counts tend to produce high oscillation
     else Maff.weightedExemplar(muscle.map(u => (u.pixel, u.subjectiveValue))).walkableTile
   })
 

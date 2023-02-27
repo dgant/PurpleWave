@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import bwapi.Position
 
 final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -159,7 +160,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       .orElse(nwtTest(        Tile(tx + dx, ty + dy)))
       .orElse(nwtFlip(xFirst, Tile(tx + dx, ty - dy), Tile(tx - dx, ty + dy)))
       .orElse(nwtTest(        Tile(tx - dx, ty - dy)))
-      .orElse(Spiral(16).view.map(tileHere.add).find(_.walkable))
+      .orElse(Spiral(16).map(tileHere.add).find(_.walkable))
       .getOrElse(tile)
     output
   }
@@ -169,12 +170,12 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def traversiblePixel(unit: UnitInfo): Pixel = {
     if (unit.flying) this else walkablePixel
   }
-  @inline def walkablePixel: Pixel = if (walkable) this else {
+  @inline def walkablePixel: Pixel = ?(walkable, this, {
     val center = walkableTile.center
     Pixel(
       Maff.clamp(x, center.x - 16, center.x + 16),
       Maff.clamp(y, center.y - 16, center.y + 16))
-  }
+  })
   @inline def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
     val center = walkableTile.center
     Pixel(

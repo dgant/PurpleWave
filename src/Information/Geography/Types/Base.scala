@@ -84,7 +84,7 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     val bestDistance    = resourceTiles.map(hallDistanceSquared).min
     val from            = resourceTiles.filter(hallDistanceSquared(_) <= bestDistance).minBy(_.tileDistanceSquared(heart))
     val to              = townHallArea.tiles.minBy(_.tileDistanceSquared(from))
-    val route           = Shapes.Ray(from.center, to.center)
+    val route           = Shapes.Ray(from.center, to.center).toVector
     route
   })).toMap
 

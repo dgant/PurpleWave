@@ -9,6 +9,8 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
 
   override val foreign: Option[ForeignUnitInfo] = Some(this)
 
+  var lastImagination: Int = 0
+
   override def update(): Unit = {
     if (GhostUnit(this)) {
       With.units.onUnitDestroy(bwapiUnit)

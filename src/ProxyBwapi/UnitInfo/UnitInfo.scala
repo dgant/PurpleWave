@@ -401,6 +401,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]
 
+  def painfullyIrradiated: Boolean = unitClass.canBeIrradiateBurned && irradiated
+
   ////////////////
   // Visibility //
   ////////////////
@@ -409,26 +411,26 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private var _frameKnownToOpponents: Int = Forever()
   @inline final def frameKnownToOpponents: Int = _frameKnownToOpponents
   @inline final def knownToOpponents: Boolean = _frameKnownToOpponents < Forever()
-  @inline final def visibleToOpponents: Boolean = if (isEnemy) true else (
+  @inline final def visibleToOpponents: Boolean = isEnemy || (
     tile.visibleToEnemy
     || (unitClass.tileWidth > 1 && unitClass.tileHeight > 1 && tileArea.tiles.exists(_.visibleToEnemy))
     || With.framesSince(lastFrameTakingDamage) < Seconds(2)()
     || With.framesSince(lastFrameStartingAttack) < Seconds(2)())
-  @inline final def likelyStillThere: Boolean = alive && visible || (
+  @inline final def likelyStillThere: Boolean = alive && (visible || (
     visibility == Visibility.Visible
-    || visibility == Visibility.InvisibleBurrowed
-    || visibility == Visibility.InvisibleNearby)
+    || visibility == Visibility.InvisibleNearby
+    || visibility == Visibility.InvisibleBurrowed))
   @inline final def cloakedOrBurrowed: Boolean = cloaked || burrowed
   @inline final def effectivelyCloaked: Boolean = (
     cloakedOrBurrowed
     && ! ensnared
     && ! plagued
-    && (if (isOurs) (
+    && ?(isOurs,
         ! tile.enemyDetected
         && ! matchups.enemies.exists(_.orderTarget.contains(this))
         && ! matchups.enemies.exists(_.target.contains(this))
-        && ! With.bullets.all.exists(_.targetUnit.contains(this)))
-      else ! detected))
+        && ! With.bullets.all.exists(_.targetUnit.contains(this)),
+        detected))
 
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright

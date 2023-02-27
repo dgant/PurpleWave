@@ -10,14 +10,14 @@ object Arc {
      stepDistance: Double,
      arcsOutward: Int = 1,
      maxDeltaRadius: Double = Math.PI)
-      : Iterable[Point] = {
+      : Seq[Point] = {
 
     val centerRadians = Math.atan2(to.y - from.y, to.x - from.x)
 
-    (0 until arcsOutward).flatMap(arcIndex =>
+    (0 until arcsOutward).view.flatMap(arcIndex =>
     {
       val arcRadius = innerRadius + arcIndex * stepDistance
-      (0 until (2 * maxDeltaRadius * arcRadius / stepDistance).toInt).map(stepIndex => {
+      (0 until (2 * maxDeltaRadius * arcRadius / stepDistance).toInt).view.map(stepIndex => {
         val slot = (stepIndex + 1) / 2 * ((stepIndex & 1) * 2 - 1)
         val radians = centerRadians + stepDistance * slot
         Point(

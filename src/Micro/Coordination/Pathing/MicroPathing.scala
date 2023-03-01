@@ -95,32 +95,35 @@ object MicroPathing {
   // More rays = more accurate movement, but more expensive
   // 8 is definitely too little for competent movement
   private def rayRadiansN(rays: Int) = (0 until rays).map(_ * 2 * Math.PI / rays - Math.PI).toVector.sortBy(Math.abs)
-  private val rayRadians12 = rayRadiansN(12)
-  private val rayRadians16 = rayRadiansN(16)
   private val rayRadians32 = rayRadiansN(32)
+  private val rayRadians16 = rayRadiansN(16)
+  private val rayRadians12 = rayRadiansN(12)
   def getWaypointInDirection(
     unit          : FriendlyUnitInfo,
     radians       : Double,
     mustApproach  : Option[Pixel] = None,
     requireSafety : Boolean = false): Option[Pixel] = {
 
-    lazy val travelDistanceCurrent = mustApproach.map(unit.pixelDistanceTravelling)
+    lazy val unacceptableDistance = mustApproach.map(unit.pixelDistanceTravelling)
 
-    val enemyRangeNow = unit.tile.enemyRangeAgainst(unit)
-    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || pixel.tile.enemyRangeAgainst(unit) <= enemyRangeNow
+    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || pixel.tile.enemyRangeAgainst(unit) < Math.max(1, unit.tile.enemyRangeAgainst(unit))
 
     if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) return mustApproach
 
     val waypointDistance = Math.max(waypointDistancePixels, if (requireSafety) 64 + unit.matchups.pixelsEntangled else 0)
-    val rayRadians = if (With.reaction.sluggishness <= 1) rayRadians32 else if (With.reaction.sluggishness <= 2) rayRadians16 else rayRadians12
+    val rayRadians = With.reaction.sluggishness match {
+      case 0 => rayRadians32
+      case 1 => rayRadians32
+      case 2 => rayRadians16
+      case _ => rayRadians12
+    }
     val terminus = rayRadians
-      .indices
       .view
-      .map(i => castRay(unit.pixel, lengthPixels = waypointDistance, radians = radians + rayRadians(i), flying = unit.flying))
+      .map(r => castRay(unit.pixel, lengthPixels = waypointDistance, radians = radians + r, flying = unit.flying))
       .find(p => {
         val clamped = p.clamp(unit.unitClass.dimensionMax / 2)
         (unit.pixelDistanceCenter(clamped) >= 80
-          && travelDistanceCurrent.forall(_ > clamped.travelPixelsFor(mustApproach.get, unit))
+          && unacceptableDistance.forall(_ > clamped.travelPixelsFor(mustApproach.get, unit))
           && acceptableForSafety(unit.pixel.project(clamped, 80)))
       })
     terminus
@@ -173,13 +176,13 @@ object MicroPathing {
   def castRay(from: Pixel, lengthPixels: Double, radians: Double, flying: Boolean): Pixel = {
     var output = from
     var proceed = true
-    Shapes.Ray(from, lengthPixels = lengthPixels, radians = radians).foreach(tile =>
-      if (proceed) {
-        if (tile.valid && (flying || tile.walkableUnchecked)) {
-          output = tile.center
-        } else proceed = false
-      }
-    )
+    Shapes
+      .Ray(from, lengthPixels = lengthPixels, radians = radians)
+      .foreach(tile => {
+        proceed &&= tile.valid
+        proceed &&= flying || tile.walkableUnchecked
+        if (proceed) output = tile.center
+      })
     output
   }
 }

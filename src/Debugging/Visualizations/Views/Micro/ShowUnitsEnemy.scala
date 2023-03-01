@@ -11,7 +11,7 @@ import Utilities.Time.Frames
 
 object ShowUnitsEnemy extends DebugView {
   
-  var showSiegeRadius = false
+  var showSiegeRadius = true
   var showFogged      = true
   var showCountdown   = true
   
@@ -38,7 +38,8 @@ object ShowUnitsEnemy extends DebugView {
       }
     }
     if (showSiegeRadius) {
-      if (unit.is(Terran.SiegeTankSieged)) {
+      if (Terran.SiegeTankSieged(unit)) {
+
         With.game.drawCircleMap(
           unit.pixel.bwapi,
           (unit.pixelRangeGround + unit.unitClass.radialHypotenuse).toInt,

@@ -1,13 +1,13 @@
 package Information.Battles.Prediction.Skimulation
 
 trait SkimulationUnit {
-  var skimDistanceToEngage: Double = 0.0
-  var skimStrength: Double = 0.0
-  var skimMagic: Double = 0.0
-  var skimDelay: Double = 0.0
-  var skimExtension: Double = 0.0
-  var skimPresence: Double = 0.0
-
+  var skimDistanceToEngage  : Double = _
+  var skimStrength          : Double = _
+  var skimMagic             : Double = _
+  var skimDelay             : Double = _
+  var skimExtension         : Double = _
+  var skimPresence          : Double = _
   // Only for debug/display purposes
-  var skimStrengthDisplay: Double = 0.0
+  var skimStrengthDisplay   : Double = _
+  var skimPresenceDisplay   : Double = _
 }

@@ -23,6 +23,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   private def units       = group.unintended
   private def airUnits    = units.filter(_.flying)
   private def groundUnits = units.filterNot(_.flying)
+  private def keyUnits    = Maff.orElse(groundUnits, airUnits)
 
   // + Glossary +
   // goal:             Where the group is trying to move. Travel formations (March/Disengage) want to pull the group towards this.
@@ -39,7 +40,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val target              : Pixel                 = targetTowards.orElse(targetNear).map(_.pixel).getOrElse(goal)
   val threatOrigin        : Pixel                 = Maff.minBy(group.consensusPrimaryFoes.attackers.map(_.pixel))(_.pixelDistanceSquared(group.centroidKey)).getOrElse(With.scouting.enemyMuscleOrigin.center)
   val vanguardOrigin      : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) threatOrigin else goal
-  val vanguardUnits       : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, groundUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
+  val vanguardUnits       : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, keyUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
   val vanguardCentroid    : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
   val goalPath            : TilePath              = findGoalPath
   val targetPath          : TilePath              = findTargetPath

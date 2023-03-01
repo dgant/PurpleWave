@@ -28,12 +28,13 @@ object Imagination {
     // Speculative sanity check based on a case where an observer died while our detection was leaving the area but was flagged alive
     if ( ! unit.visible && unit.visibility == Visibility.Dead) return
 
-    lazy val shouldBeVisible = unit.tile.visible
+    lazy val shouldBeVisible = ?(unit.unitClass.isBuilding, unit.tiles.exists(_.visible), unit.tile.visible)
     lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (
       unit.visibility == Visibility.InvisibleBurrowed
       || unit.burrowed
-      || Array(Orders.Burrowing, Orders.VultureMine).contains(unit.order)
+      || unit.order == Orders.Burrowing
+      || unit.order == Orders.VultureMine
       || (Terran.SpiderMine(unit) && With.framesSince(unit.frameDiscovered) < 48))
     lazy val shouldUnburrow = (
       likelyBurrowed
@@ -80,20 +81,22 @@ object Imagination {
       return
     }
 
-    // Missing buildings must either be floated or dead. Burning is a common case.
-    // Critters can move but we don't care about predicting their location
-    if (unit.isNeutral || (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding)) {
-      if (shouldBeVisible) {
-        unit.changeVisibility(Visibility.Dead)
-      }
+    // Buildings that can't move are either in the same place or dead
+    if (unit.unitClass.isBuilding && ! unit.unitClass.isFlyingBuilding) {
+      unit.changeVisibility(?(shouldBeVisible, Visibility.Dead, Visibility.InvisibleNearby))
       return
     }
 
     // Imagination is expensive; limit re-tries
-    if (unit.visibility == Visibility.InvisibleMissing && (With.framesSince(unit.lastImagination) < Seconds(5)() || With.framesSince(unit.lastSeen) < Seconds(30)()))  {
-      return
+    if (With.framesSince(Math.max(unit.lastSeen, unit.lastImagination)) < 128) {
+      if (unit.visibility == Visibility.InvisibleMissing) {
+        return
+      }
+      if ( ! shouldBeVisible) {
+        unit.changeVisibility(Visibility.InvisibleNearby)
+        return
+      }
     }
-    unit.lastImagination = With.frame
 
     // Predict the unit's location
     // If we fail to come up with a reasonable prediction, treat the unit as missing
@@ -117,45 +120,45 @@ object Imagination {
     .getOrElse(With.scouting.enemyMuscleOrigin.center))
 
   private def predictPixel(unit: ForeignUnitInfo): Option[Pixel] = {
-    val topSpeed        = ?(IsTank(unit), Terran.SiegeTankUnsieged.topSpeed, unit.topSpeedPossible)
-    val framesUnseen    = With.framesSince(unit.lastSeen)
-    val maxPixelsAway   = 64 + framesUnseen * topSpeed
-    val maxTilesAway    = Math.min((Maff.sqrt2 * maxPixelsAway).toInt / 32,  With.mapTileHeight + With.mapTileWidth)// The sqrt2 multiplier accounts for ground distance metrics being rectilinear
-    val maxTilesAwaySq  = maxTilesAway * maxTilesAway
-    val observedPixel   = unit.pixelObserved
-    val observedTile    = observedPixel.tile
-    val predictedTile   = unit.tile // TODO: Delete
-    val goalPixel       = ?(With.framesSince(unit.lastSeen) < Seconds(10)() || ! IsWarrior(unit), unit.presumptiveDestination, unit.pixel.projectUpTo(destination(), rangeMax() - unit.effectiveRangePixels))
-    val goalTile        = goalPixel.tile
-    val expectedPixel   = observedPixel.projectUpTo(goalPixel, maxPixelsAway).clamp()
-    val expectedTile    = expectedPixel.tile
+    unit.lastImagination  = With.frame
+    val topSpeed          = ?(IsTank(unit), Terran.SiegeTankUnsieged.topSpeed, unit.topSpeedPossible)
+    val framesUnseen      = With.framesSince(unit.lastSeen)
+    val maxPixelsAway     = 64 + framesUnseen * topSpeed
+    val maxTilesAway      = Math.min((Maff.sqrt2 * maxPixelsAway).toInt / 32,  With.mapTileHeight + With.mapTileWidth)// The sqrt2 multiplier accounts for ground distance metrics being rectilinear
+    val maxTilesAwaySq    = maxTilesAway * maxTilesAway
+    val observedPixel     = unit.pixelObserved
+    val observedTile      = observedPixel.tile
+    val goalPixel         = ?(With.framesSince(unit.lastSeen) < Seconds(5)() || ! IsWarrior(unit), unit.presumptiveDestination, destination())
+    val goalTile          = goalPixel.tile
+    val expectedPixel     = observedPixel.projectUpTo(goalPixel, maxPixelsAway).clamp()
+    val expectedTile      = expectedPixel.tile
+    val canFly            = unit.unitClass.canFly
 
     var positionsExplored = 0
-    @inline def isLegalPrediction(tile: Tile): Boolean = (
-      { positionsExplored += 1; true }
-      && ! tile.visible
-      && tile.lastSeen <= unit.lastSeen
-      && (tile == observedTile || (
-        (unit.unitClass.isFlyingBuilding || tile.traversableBy(unit))
-        && tile.tileDistanceSquared(observedTile) <= maxTilesAwaySq
-        && (unit.flying || tile.groundTiles(observedTile) <= maxTilesAway)
-        && (unit.flying || tile.units.forall(unit==)))))
+    @inline def isLegalPrediction(tile: Tile): Boolean = {
+      positionsExplored += 1
+      ( ! tile.visible
+        && tile.lastSeen <= unit.lastSeen
+        && (tile == observedTile || (
+          tile.tileDistanceSquared(observedTile) <= maxTilesAwaySq
+          && (canFly || (
+            tile.walkable
+            && tile.groundTiles(observedTile) <= maxTilesAway
+            && tile.units.forall(u => u.flying || u == unit))))))
+    }
 
-    val persistence = 3
     val possiblePixels =
-      (Seq(expectedPixel).filter(p => isLegalPrediction(p.tile))
-      ++ ((0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(unit.tile.add)))
-      ++  (0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(expectedTile.add)))
-      ++  (0 to maxTilesAway by persistence).view.flatMap(d1 => (0 until persistence).view.flatMap(d2 => Ring(d1 + d2).map(observedTile.add))))
-        .filter(isLegalPrediction)
-        .map(_.center))
+      (Seq(expectedPixel).view.filter(p => isLegalPrediction(p.tile))
+      ++  ((0 to maxTilesAway).view.flatMap(Ring(_).map(expectedTile.add))
+        ++ (0 to maxTilesAway).view.flatMap(Ring(_).map(observedTile.add)))
+            .filter(isLegalPrediction)
+            .map(_.center))
 
     val output = possiblePixels.headOption
     if (output.isEmpty) {
       positionsExplored += 1 // TODO: For debug breakpoints only; delete later
-    }
-    if (positionsExplored < 0) {
-      return None // TODO: Debugging only
+    } else {
+      positionsExplored += 1 // TODO: For debug breakpoints only; delete later
     }
     output
   }

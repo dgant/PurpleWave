@@ -53,7 +53,7 @@ object ShowZones extends DebugView {
       DrawMap.tileRectangle(base.townHallArea,    base.owner.colorDark)
       DrawMap.labelBox(
         Vector(
-          base.description,
+          base.toString,
           "Resources: " + base.mineralsLeft + "m + " + base.gasLeft + "g",
           if (With.framesSince(base.lastFrameScoutedByUs) < 24 * 5) ""
           else if (base.lastFrameScoutedByUs <= 0) "Unscouted"

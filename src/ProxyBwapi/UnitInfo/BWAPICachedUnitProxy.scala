@@ -252,7 +252,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def changePixel(pixelNew: Pixel): Unit = {
     val tileNew = pixelNew.tile
     if (_tile != tileNew) {
-      _tileTopLeft = new Tile(bwapiUnit.getTilePosition)
+      _tileTopLeft = pixelNew.subtract(unitClass.dimensionLeft, unitClass.dimensionUp).tile
       updateGridsIfNecessary(onChange = true)
     }
     _pixel = pixelNew

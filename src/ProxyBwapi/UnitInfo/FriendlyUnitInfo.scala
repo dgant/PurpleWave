@@ -6,6 +6,7 @@ import Lifecycle.With
 import Micro.Agency.{Agent, Intention}
 import Performance.Cache
 import ProxyBwapi.Orders
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitTracking.IndexedSet
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
@@ -88,7 +89,10 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
 
   override def loadedUnitCount: Int = loadedUnits.size
   def loadedUnits: Vector[FriendlyUnitInfo] = _loadedUnitsCache()
-  private val _loadedUnitsCache = new Cache(() => if (unitClass.canLoadUnits) base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector else Vector.empty)
+  private val _loadedUnitsCache = new Cache(() =>
+         if (is(Protoss.Carrier))     interceptors.flatMap(_.friendly).toVector
+    else if (unitClass.canLoadUnits)  base.getLoadedUnits.asScala.flatMap(With.units.get).flatMap(_.friendly).toVector
+    else Vector.empty)
   def canTransport(passenger: FriendlyUnitInfo): Boolean = (
     isTransport
     && passenger.unitClass.canBeTransported

@@ -101,11 +101,16 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   }
 
   def description: String = (
-    if (this == With.geography.ourMain) "Our main"
+    if      (this == With.geography.ourMain)    "Our main"
     else if (this == With.geography.ourNatural) "Our natural"
-    else
-      ((if (isEnemy) "Enemy" else if (isOurs) "Our" else if (isAlly) "Ally" else "Neutral")
-      + (if (isStartLocation && ! isOurs) " main" else if (naturalOf.isDefined && ! isOurs) " natural" else " base")))
+    else(
+        (     if (isEnemy)  "Enemy"
+        else  if (isOurs)   "Our"
+        else  if (isAlly)   "Ally"
+        else                "Neutral")
+      + (     if (isStartLocation     && ! isOurs)  " main"
+        else  if (naturalOf.isDefined && ! isOurs)  " natural"
+        else                                        " base")))
 
   override def toString: String = f"$description $name, ${zone.name} $heart"
 }

@@ -85,13 +85,15 @@ object Skimulator {
         if (Zerg.Lurker(unit))                                  unit.skimStrength *= 5
       }
 
+      lazy val maxEffectiveMedics = team.attackersBioCount / 3.0
+
       // Count other unit properties
       if (unit.canStim)                                                   unit.skimStrength *= ?(unit.stimmed, 1.2, 1.1) // Consider whether they already have taken the damage hit from stim
       if (unit.ensnared)                                                  unit.skimStrength *= 0.5
       if (Terran.Marine(unit)   && Terran.MarineRange(player))            unit.skimStrength *= 1.3
       if (Terran.Marine(unit)   && Terran.Stim(player))                   unit.skimStrength *= 1.3
       if (Terran.Firebat(unit)  && Terran.Stim(player))                   unit.skimStrength *= 1.3
-      if (Terran.Medic(unit))                                             unit.skimStrength *= Maff.clamp(team.attackersBioCount / 3.0 - (team.count(Terran.Medic) - 1), 0.0, 2.0)
+      if (Terran.Medic(unit))                                             unit.skimStrength *= Maff.clamp(maxEffectiveMedics / Math.max(1, team.count(Terran.Medic)), 0.0, 1.0)
       if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
       if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size / 8.0

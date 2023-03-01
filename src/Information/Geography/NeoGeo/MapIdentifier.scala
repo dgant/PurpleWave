@@ -12,7 +12,7 @@ object MapIdentifier {
   }
 
   def clock(pixel: Pixel): String = {
-    val output = Math.round(Maff.normalize0ToPi(Points.middle.radiansTo(pixel)) * 6 / Math.PI).toInt.toString
+    val output = Math.round(Maff.normalize0To2Pi(Points.middle.radiansTo(pixel)) * 6 / Math.PI).toInt.toString
     if (output == "0") "12" else output
   }
 }

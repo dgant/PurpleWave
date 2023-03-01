@@ -4,10 +4,10 @@ import bwapi.Color
 
 object Colors {
   
-  //Via http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
+  // Via http://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
   def hsv(h: Int, s: Int, v: Int): Color = {
     if (s == 0) return new Color(v, v, v)
-    val region = h/43
+    val region = h / 43
     val remainder = 6 * (h - 43 * region)
     val p = (v * (255 - s)) >> 8
     val q = (v * (255 - ((s * remainder) >> 8))) >> 8

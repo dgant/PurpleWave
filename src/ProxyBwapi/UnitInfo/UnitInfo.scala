@@ -274,9 +274,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && (enemy.unitClass.triggersSpiderMines || ! Terran.SpiderMine(this))
     && ( ! unitClass.affectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
 
-  @inline final def canAttackAir: Boolean = canAttack && attacksAgainstAir > 0
-  @inline final def canAttackGround: Boolean = canAttack && attacksAgainstGround > 0
-  @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && isAny(Zerg.Drone, Zerg.Zergling, Zerg.Hydralisk, Zerg.Defiler)))
+  @inline final def canAttackAir    : Boolean = canAttack && attacksAgainstAir    > 0
+  @inline final def canAttackGround : Boolean = canAttack && attacksAgainstGround > 0
+  @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && unitClass.canBurrow))
 
   def confidence11: Double = _confidence()
   private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))

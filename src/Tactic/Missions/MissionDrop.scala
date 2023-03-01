@@ -25,30 +25,31 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 abstract class MissionDrop extends Mission {
-  trait DropState extends SimpleString
+  trait DropState   extends SimpleString
   object Assembling extends DropState
   object Travelling extends DropState
-  object Landing extends DropState
-  object Raiding extends DropState
+  object Landing    extends DropState
+  object Raiding    extends DropState
   object Evacuating extends DropState
-  object Escaping extends DropState
+  object Escaping   extends DropState
 
-  protected def additionalFormationConditions: Boolean
-  protected def additionalItineraryConditions(base: Base): Boolean = true
-  protected def requireWorkers: Boolean = false
-  protected def shouldStopRaiding: Boolean = false
-  protected def shouldGoHome: Boolean = false
-  protected def recruitable(unit: UnitInfo): Boolean = unit.complete && ! unit.team.exists(_.engagedUpon)
-  protected def recruitablePassenger(unit: UnitInfo): Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
+  protected def additionalFormationConditions             : Boolean
+  protected def additionalItineraryConditions(base: Base) : Boolean = true
+  protected def requireWorkers                            : Boolean = false
+  protected def shouldStopRaiding                         : Boolean = false
+  protected def shouldGoHome                              : Boolean = false
+  protected def recruitable(unit: UnitInfo)               : Boolean = unit.complete && ! unit.team.exists(_.engagedUpon)
+  protected def recruitablePassenger(unit: UnitInfo)      : Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
   protected val transportLock: LockUnits = new LockUnits(this, u => u.isTransport && recruitable(u)).setCounter(CountOne).setInterruptible(false)
 
-  val itinerary = new mutable.Queue[Base]
-  val transports = new ArrayBuffer[FriendlyUnitInfo]
-  val passengers = new ArrayBuffer[FriendlyUnitInfo]
-  var state: DropState = Assembling
-  var path: Option[TilePath] = None
-  var pathItineraryBase: Base = _
-  var pathValues: Array[PathValues] = Array.fill(256)(PathValues())
+  val itinerary                             = new mutable.Queue[Base]
+  val transports                            = new ArrayBuffer[FriendlyUnitInfo]
+  val passengers                            = new ArrayBuffer[FriendlyUnitInfo]
+  var state             : DropState         = Assembling
+  var path              : Option[TilePath]  = None
+  var pathItineraryBase : Base              = _
+  var pathValues        : Array[PathValues] = Array.fill(256)(PathValues())
+
   case class PathValues(enemyRange: Int = 0, enemyVision: Boolean = false)
 
   override def reset(): Unit = {

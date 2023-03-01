@@ -88,7 +88,10 @@ object ShowBattles extends DebugView {
   }
 
   def renderSkimulationMap(battle: Battle): Unit = {
-    battle.units.foreach(u => DrawMap.labelDot(format(u.skimStrengthDisplay), u.pixel, u.player.colorDark))
+    battle.units.foreach(u => DrawMap.labelDot(
+      format(u.skimStrengthDisplay),
+      u.pixel,
+      Colors.hsv(u.player.hue, 255, Maff.clamp(64 + (128 * u.skimPresence).toInt, 64, 192))))
   }
 
   def renderBattleMap(battle: Battle): Unit = {

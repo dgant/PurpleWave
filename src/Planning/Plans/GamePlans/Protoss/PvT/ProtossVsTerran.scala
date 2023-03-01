@@ -232,7 +232,7 @@ class ProtossVsTerran extends PvTOpeners {
     val goDT          = PvTDT() || PvT29Arbiter() || (ecoEdge <= -3 && ! detectorShown && roll("DT", 0.6))
     val goDTDrop      = ! PvT4Gate() && ! goDT && ecoEdge <= -1 && ! turretsShown && roll("DTDrop", 0.4)
     val goFastReaver  = PvT1BaseReaver() || ( ! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
-    val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5
+    val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5 && ! counterBio && (enemyBases > 1 || enemies(Terran.CommandCenter) > 1)
     val goReaver      = goFastCarrier && ! have(Protoss.TemplarArchives)
     val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
 
@@ -323,7 +323,7 @@ class ProtossVsTerran extends PvTOpeners {
     doArmyHighPriority()
 
     if (armySizeLow) {
-      if (miningBases > 1 && techs.exists(t => t.started && ! t.profited)) {
+      if (miningBases > 1) {
         techOnce()
       }
       army()

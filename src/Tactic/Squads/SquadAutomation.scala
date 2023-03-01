@@ -4,6 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Formation.{Formation, FormationStyleDisengage, FormationStyleGuard, Formations}
+import Micro.Targeting.FiltersRequired.TargetFilterFocus
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
@@ -42,8 +43,9 @@ object SquadAutomation {
       ! Protoss.Interceptor(e)
       && e.likelyStillThere
       && group.canAttack(e)
-      && group.canBeAttackedBy(e)
-      && group.groupUnits.exists(u => e.canAttack(u) && e.pixelsToGetInRange(u) < 32 * 7))
+      && (
+        TargetFilterFocus.canTargetAsRoadblock(group, e)
+        || group.meanAttackerSpeed > 1.2 * e.topSpeed))
     val around = unrankedAround(group, to)
     combatEnemiesInRoute ++ around
   }
@@ -102,14 +104,14 @@ object SquadAutomation {
 
   def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel =
     // Rush scenarios: Send army directly to vicinity
-    Some(squad.vicinity)
-      .filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
+    Some(squad.vicinity).filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
+      .orElse(?(squad.hasGround, None, Some(squad.vicinity)))
       .orElse(
         squad
-        .formations
-        .headOption
-        .find(_.placements.contains(unit))
-        .map(_.placements(unit)))
+          .formations
+          .headOption
+          .find(_.placements.contains(unit))
+          .map(_.placements(unit)))
       .getOrElse(?(squad.fightConsensus, squad.vicinity, getReturn(unit, squad, defaultReturn)))
 
   //////////////////////

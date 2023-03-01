@@ -17,6 +17,7 @@ trait UnitGroup {
   def groupOrderable    : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
   def mobileUnits       : Seq[UnitInfo] = _mobileUnits()
   def attackers         : Seq[UnitInfo] = _attackers()
+  def attackersNonWorker: Seq[UnitInfo] = _attackersNonWorker()
   def detectors         : Seq[UnitInfo] = _detectors().view
   def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
   def arbiters          : Seq[UnitInfo] = _arbiters().view
@@ -82,6 +83,7 @@ trait UnitGroup {
   private val _paceAge = 24
   private def _mobileUnits()              = groupOrderable.view.filter(_.canMove)
   private def _attackers()                = groupOrderable.view.filter(isAttacker)
+  private def _attackersNonWorker()       = attackers.filterNot(_.unitClass.isWorker)
   private val _detectors                  = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && u.unitClass.isDetector).toVector)
   private val _mobileDetectors            = new Cache(() => detectors.filter(_.canMove))
   private val _arbiters                   = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && Protoss.Arbiter(u)).toVector)
@@ -104,10 +106,10 @@ trait UnitGroup {
   private val _volleyConsensus            = new Cache(() => Maff.modeOpt(attackers.flatMap(_.matchups.wantsToVolley)).getOrElse(false))
   private val _widthPixels                = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
-  private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
-  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
-  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
-  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
+  private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
+  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(                     attackers,  groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackersNonWorker,  attackers,  groupOrderable, groupUnits)), _.pixel))
   private val _attackCentroidKey          = new Cache(() => ?(_hasGround(), attackCentroidGround, attackCentroidAir))
   private val _stepConsensus              = new Cache(() => GroupCentroid.ground(centroidUnits(attackers), _.presumptiveStep))
   private val _destinationConsensus       = new Cache(() => GroupCentroid.ground(centroidUnits(attackers), _.presumptiveDestination))

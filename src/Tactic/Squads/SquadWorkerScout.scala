@@ -84,6 +84,8 @@ class SquadWorkerScout extends Squad {
           if (explored) bases.flatMap(_.tiles.view.filter(t => t.buildable && With.grids.enemyRangeGround(t) <= With.grids.enemyRangeGround.margin))
           else          Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling)))
     })
+    // For bookkeeping/debugging; vicinity is not actually used
+    vicinity = orderedScouts.head.agent.destination
   }
 
   override def run(): Unit = {}

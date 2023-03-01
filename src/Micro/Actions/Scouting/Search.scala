@@ -5,11 +5,13 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Physics.Gravity
+import Mathematics.Points.Tile
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 
 object Search extends AbstractSearch {
   override protected val boredomFrames: Int = 24 * 30
@@ -40,9 +42,16 @@ abstract class AbstractSearch extends Action {
         .take(count)
     }
 
-    val bannedTiles = unit.intent.toScoutTiles.view
-      .flatMap(_.base).toSet.filter(b => b.isEnemy && b.scoutedByUs)
-      .flatMap(_.harvestingTrafficTiles)
+    val bannedTiles: Set[Tile] = ?(unit.flying,
+      unit.intent.toScoutTiles
+        .filter(_.enemyRangeAir > 0)
+        .toSet,
+      unit.intent.toScoutTiles
+        .view
+        .flatMap(_.base)
+        .toSet
+        .filter(b => b.isEnemy && b.scoutedByUs)
+        .flatMap(_.harvestingTrafficTiles))
 
     val tilesToScout = unit.intent.toScoutTiles
       .filter(tile =>
@@ -64,7 +73,7 @@ abstract class AbstractSearch extends Action {
 
     val profile               = new PathfindProfile(unit.tile)
     profile.end               = Some(unit.agent.destination.tile)
-    profile.employGroundDist  = true
+    profile.employGroundDist  = ! unit.flying
     profile.costOccupancy     = 0.01
     profile.costRepulsion     = 5
     profile.repulsors         = MicroPathing.getPathfindingRepulsors(unit)

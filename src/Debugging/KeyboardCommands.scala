@@ -50,6 +50,7 @@ object KeyboardCommands {
 
 
   def quitVsHuman(): Unit = {
+    // "Anonymous AI" is the name assigned us in SCHNAIL's ranked mode
     if (With.configuration.humanMode && With.self.name != "Anonymous AI") {
       With.lambdas.add(() => With.game.leaveGame())
     }

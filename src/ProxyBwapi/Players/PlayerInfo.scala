@@ -1,6 +1,7 @@
 package ProxyBwapi.Players
 
 import Debugging.Visualizations.Colors
+import Information.Geography.NeoGeo.Internal.NeoColors.Hues
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Performance.Cache
@@ -89,6 +90,12 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
     else if (isNeutral) Colors.White
     else if (isAlly)    Colors.NeonBlue
     else                Colors.NeonRed
+
+  lazy val hue: Int =
+    if      (isUs)      Hues.Violet
+    else if (isNeutral) 0
+    else if (isAlly)    Hues.Blue
+    else                Hues.Red
 
   def bases: Vector[Base] = With.geography.bases.filter(_.owner == this)
 

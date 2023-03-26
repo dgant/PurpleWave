@@ -3,6 +3,7 @@ package Debugging.Visualizations.Views.Economy
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
+import Mathematics.Maff
 
 object ShowAccounting extends DebugView {
   
@@ -19,8 +20,8 @@ object ShowAccounting extends DebugView {
       "Accuracy (minerals):",
       "Accuracy (gas):"
     )
-    val mineralAccuracyRatio  = With.accounting.ourEstimatedTotalMinerals  / With.accounting.ourActualTotalMinerals
-    val gasAccuracyRatio      = With.accounting.ourEstimatedTotalGas       / With.accounting.ourActualTotalGas
+    val mineralAccuracyRatio  = Maff.nanToOne(With.accounting.ourEstimatedTotalMinerals  / With.accounting.ourActualTotalMinerals)
+    val gasAccuracyRatio      = Maff.nanToOne(With.accounting.ourEstimatedTotalGas       / With.accounting.ourActualTotalGas)
     val mineralAccuracy       = Math.min(mineralAccuracyRatio, 1.0 / mineralAccuracyRatio)
     val gasAccuracy           = Math.min(gasAccuracyRatio, 1.0 / gasAccuracyRatio)
     val values = Vector(

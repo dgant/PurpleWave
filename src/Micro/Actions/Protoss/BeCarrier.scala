@@ -58,7 +58,7 @@ object BeCarrier extends Action {
           val chasingAlready = unit.speedApproaching(chasePixel) > unit.topSpeed / 2
           unit.agent.toTravel = Some(chasePixel)
 
-          // Chase with impunity, or if target is leaving our range
+          // Chase with impunity, or if target is leaving leash range
           if ( ! chasingAlready && (interceptorSafetyMargin > 32 || unit.pixelDistanceEdge(target.get) > 32 * 9)) {
             unit.agent.act("CarrierChase")
             Commander.move(unit)

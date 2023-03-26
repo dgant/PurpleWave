@@ -1,32 +1,38 @@
 package Strategery.Strategies.Protoss
 
-import Strategery.Strategies.Protoss.FFA._
 import Strategery.Strategies._
 
 object ProtossChoices {
   
-  val pvr = Vector(
+  val vsRandom = Vector(
     PvROpen2Gate910,
     PvROpen2Gate1012,
     PvROpenZCoreZ,
     PvRProxy2Gate,
     PvR2Gate4Gate,
     PvR1BaseDT,
-    ProtossFFA,
-    ProtossHuntersFFA,
   )
-  
+
+  val oddball = Vector(
+    ProtossFFA,
+    ProtossFFAHunters,
+    ProtossFFAMoney,
+    PvTFPM,
+    PvPFPM,
+    PvZFPM,
+    PvRFPM)
+
   /////////
   // PvT //
   /////////
-  
-  val pvtOpenersTransitioningFromNothing = Vector(
+
+  val vsTerran_NeverVsRandom = Vector(
     //PvTProxy2Gate,
     PvT13Nexus,
     PvTZealotExpand
   )
 
-  val pvtOpenersTransitioningFrom1GateCore = Vector(
+  val vsTerran_OpenersTransitioningFrom_1GateCore = Vector(
     PvTRangeless,
     PvT28Nexus,
     PvTDT,
@@ -36,62 +42,62 @@ object ProtossChoices {
     PvT4Gate
   )
 
-  val pvtOpenersTransitioningFrom2Gate = Vector(
+  val vsTerran_OpenersTransitioningFrom_2Gate = Vector(
     PvTZZCoreZ, // Not really, but it should behave well
     PvT910,
     PvT4Gate,
     PvT1015
   )
 
-  val pvtOpenersAll: Vector[Strategy] = (pvtOpenersTransitioningFromNothing ++ pvtOpenersTransitioningFrom1GateCore ++ pvtOpenersTransitioningFrom2Gate).distinct
-  
+  val vsTerran_All: Vector[Strategy] = (vsTerran_NeverVsRandom ++ vsTerran_OpenersTransitioningFrom_1GateCore ++ vsTerran_OpenersTransitioningFrom_2Gate).distinct
+
   /////////
   // PvP //
   /////////
 
-  val pvpOpenersWithoutTransitions = Vector(
+  val vsProtoss_NeverVsRandom = Vector(
     PvPProxy2Gate
   )
-  
-  val pvpOpenersTransitioningFrom2Gate = Vector(
+
+  val vsProtoss_OpenersTransitioningFrom_2Gate = Vector(
     PvPRobo,
     PvPDT,
     PvP3GateGoon,
     PvP4GateGoon
   )
-  
-  val pvpOpenersTransitioningFrom1GateCore = Vector(
+
+  val vsProtoss_OpenersTransitioningFrom_1GateCore = Vector(
     PvPRobo,
     PvPDT,
     PvPCoreExpand,
     PvP3GateGoon,
     PvP4GateGoon
   )
-  
-  val pvpOpenersAll: Vector[Strategy] = (pvpOpenersWithoutTransitions ++ pvpOpenersTransitioningFrom2Gate ++ pvpOpenersTransitioningFrom1GateCore).distinct
-  
+
+  val vsProtoss_Openers: Vector[Strategy] = (vsProtoss_NeverVsRandom ++ vsProtoss_OpenersTransitioningFrom_2Gate ++ vsProtoss_OpenersTransitioningFrom_1GateCore).distinct
+
   /////////
   // PvZ //
   /////////
-  
-  val pvzOpenersWithoutTransitions = Vector(
+
+  val vsZerg_NeverVsRandom = Vector(
     PvZFFE,
     PvZGatewayFE,
   )
 
-  val pvzOpenersTransitioningFrom1GateCore = Vector(
+  val vsZerg_OpenersTransitioningFrom_1GateCore = Vector(
     PvZ2022
   )
 
-  val pvzOpenersTransitioningFrom2Gate = Vector(
+  val vsZerg_OpenersTransitioningFrom_2Gate = Vector(
     PvZ2022
   )
 
-  val pvzOpenersAll: Vector[Strategy] = (pvzOpenersWithoutTransitions ++ pvzOpenersTransitioningFrom1GateCore ++ pvzOpenersTransitioningFrom2Gate).distinct
-  
+  val vsZerg_Openers: Vector[Strategy] = (vsZerg_NeverVsRandom ++ vsZerg_OpenersTransitioningFrom_1GateCore ++ vsZerg_OpenersTransitioningFrom_2Gate).distinct
+
   /////////
   // All //
   /////////
 
-  val all: Vector[Strategy] = (pvr ++ pvtOpenersAll ++ pvpOpenersAll ++ pvzOpenersAll).distinct
+  val all: Vector[Strategy] = (vsRandom ++ vsTerran_All ++ vsProtoss_Openers ++ vsZerg_Openers ++ oddball).distinct
 }

@@ -5,12 +5,15 @@ import Mathematics.Maff
 import Performance.Cache
 import Performance.Tasks.TimedTask
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 import Utilities.Time.Forever
 
 class Accounting extends TimedTask {
+
+  lazy val mapBonus: Double = ?(With.strategy.isMoneyMap, 1.737, 1) // Empirical estimation
   
-  val workerIncomePerFrameMinerals = 0.044
-  val workerIncomePerFrameGas = 0.069
+  lazy val workerIncomePerFrameMinerals = 0.044 * mapBonus
+  lazy val workerIncomePerFrameGas = 0.069
 
   // Should start at 50, of course,but this -30 offsets the effect of starting workers all being far from minerals
   var ourEstimatedTotalMinerals = 20.0

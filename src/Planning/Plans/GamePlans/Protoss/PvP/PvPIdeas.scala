@@ -127,7 +127,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {
         get(Protoss.Forge)
         val bestBase    = Some(With.geography.ourNatural).filter(_.ourUnits.exists(u => Protoss.PhotonCannon(u) && u.complete)).getOrElse(With.geography.ourMain)
-        val holdNatural = bestBase.naturalOf.isDefined
+        val holdNatural = bestBase.naturalOf.isDefined && ! With.strategy.isMoneyMap
         val bestTile    = ?(holdNatural, bestBase.zone.exitNowOrHeart, ?(cannonsAreReady, bestBase.zone.exitNowOrHeart, bestBase.heart))
         val label       = ?(holdNatural || cannonsAreReady, DefendEntrance, DefendHall)
         status(f"DTHere-Hold${?(holdNatural, "Nat", "Main")}-${?(cannonsAreReady, "Prepared", "Scrambling")}")
@@ -141,7 +141,9 @@ object PvPIdeas extends MacroActions with MacroCounting {
       } else if (dtPrecedesCannon) {
         status("DTPrecedesCannon")
         get(Protoss.Forge)
-        requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, 0)
+        if ( ! With.strategy.isMoneyMap) {
+          requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, 0)
+        }
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, 0)
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendHall,     0)
 
@@ -160,7 +162,9 @@ object PvPIdeas extends MacroActions with MacroCounting {
           status("DoForgeCannon")
           get(RequestUnit(Protoss.Forge, minStartFrameArg = forgeMinStartFrame))
         }
-        requestTower  (Protoss.Pylon,         1, With.geography.ourNatural,   DefendEntrance, if (naturalPylonNow) 0 else pylonMinStartFrame)
+        if ( ! With.strategy.isMoneyMap) {
+          requestTower(Protoss.Pylon,         1, With.geography.ourNatural,   DefendEntrance, if (naturalPylonNow) 0 else pylonMinStartFrame)
+        }
         if (doForgeCannon) {
           requestTower(Protoss.PhotonCannon,  1, With.geography.ourNatural,   DefendEntrance, cannonMinStartFrame)
           requestTower(Protoss.PhotonCannon,  1, With.geography.ourMain,      DefendEntrance, cannonMinStartFrame)

@@ -17,6 +17,7 @@ abstract class Strategy extends SimpleString {
   private var _entranceFlat           : Boolean             = true
   private var _entranceInverted       : Boolean             = true
   private var _ffa                    : Boolean             = false
+  private var _moneyMap               : Boolean             = false
   private var _allowedVsHuman         : Boolean             = true
   private var _rushTilesMinimum       : Int                 = - LightYear()
   private var _rushTilesMaximum       : Int                 =   LightYear()
@@ -40,6 +41,7 @@ abstract class Strategy extends SimpleString {
   def entranceFlat            : Boolean             = _entranceFlat
   def entranceInverted        : Boolean             = _entranceInverted
   def ffa                     : Boolean             = _ffa
+  def moneyMap                : Boolean             = _moneyMap
   def allowedVsHuman          : Boolean             = _allowedVsHuman
   def rushTilesMinimum        : Int                 = _rushTilesMinimum
   def rushTilesMaximum        : Int                 = _rushTilesMaximum
@@ -66,6 +68,7 @@ abstract class Strategy extends SimpleString {
   def setEntranceFlat           (value: Boolean)              : Unit = { _entranceFlat = value }
   def setEntranceInverted       (value: Boolean)              : Unit = { _entranceInverted = value }
   def setFFA                    (value: Boolean)              : Unit = { _ffa = value }
+  def setMoneyMap               (value: Boolean)              : Unit = { _moneyMap = value }
   def setAllowedVsHuman         (value: Boolean)              : Unit = { _allowedVsHuman = value }
   def setRushTilesMinimum       (value: Int)                  : Unit = { _rushTilesMinimum = value }
   def setRushTilesMaximum       (value: Int)                  : Unit = { _rushTilesMaximum = value }

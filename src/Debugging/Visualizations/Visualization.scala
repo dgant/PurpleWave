@@ -62,6 +62,7 @@ class Visualization extends TimedTask {
     ShowFormations,
     ShowFoundations,
     ShowGas,
+
     ShowGradients,
     ShowGrids,
     ShowHappyUnits,

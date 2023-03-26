@@ -15,16 +15,16 @@ abstract class PvRStrategy extends Strategy {
 
 abstract class PvR1GateCoreStrategy extends PvRStrategy {
   override lazy val choices = Vector(
-    ProtossChoices.pvtOpenersTransitioningFrom1GateCore,
-    ProtossChoices.pvpOpenersTransitioningFrom1GateCore,
-    ProtossChoices.pvzOpenersTransitioningFrom1GateCore)
+    ProtossChoices.vsTerran_OpenersTransitioningFrom_1GateCore,
+    ProtossChoices.vsProtoss_OpenersTransitioningFrom_1GateCore,
+    ProtossChoices.vsZerg_OpenersTransitioningFrom_1GateCore)
 }
 
 abstract class PvR2GateStrategy extends PvRStrategy {
   override lazy val choices = Vector(
-    ProtossChoices.pvtOpenersTransitioningFrom2Gate,
-    ProtossChoices.pvpOpenersTransitioningFrom2Gate,
-    ProtossChoices.pvzOpenersTransitioningFrom2Gate)
+    ProtossChoices.vsTerran_OpenersTransitioningFrom_2Gate,
+    ProtossChoices.vsProtoss_OpenersTransitioningFrom_2Gate,
+    ProtossChoices.vsZerg_OpenersTransitioningFrom_2Gate)
 }
 
 object PvROpenZCoreZ extends PvR1GateCoreStrategy

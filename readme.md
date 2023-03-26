@@ -17,6 +17,7 @@ PurpleWave has won:
  * :2nd_place_medal: 2nd Place in the [2017 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
  * :2nd_place_medal: 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
  * :3rd_place_medal: 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
+ * :3rd_place_medal: 3rd Place in the [2022-23 SSCAIT](https://sscaitournament.com/index.php?action=2022)
  
 PurpleWave has also ranked #1 on the [BASIL](https://basil.bytekeeper.org/ranking.html), SSCAIT, and [SAIL](https://www.cs.mun.ca/~z24rmk/starcraftailaddertest/about) ladders.
 
@@ -31,13 +32,15 @@ Thanks to:
 * Igor Dimitrijevic for [BWEM](http://bwem.sourceforge.net/)
 * @JasperGeurtz for the [Java port of BWEM](https://github.com/JavaBWAPI/JBWAPI/tree/develop/src/main/java/bwem)
 * @kovarex and @heinermann for [BWAPI](https://github.com/bwapi/bwapi)
+* @michalsustr and @certicky for [SC-Docker](https://github.com/Games-and-Simulations/sc-docker) and @Bytekeeper for its [BASIL port](https://github.com/basil-ladder/sc-docker/) for powering [PotatoPeeler](https://github.com/dgant/PotatoPeeler)
 * @jabbo16 for configuring PurpleWave's Maven build
 * @davechurchill @certicky @krasi0 @Bytekeeper @bgweber @SonkoMagnus Nathan Roth and the Cognition & Intelligence Lab at Sejong University for hosting Brood War competitions and environments that have given PurpleWave visibility and purpose
 * @chriscoxe for diagnosing and solving technical issues in tournament environments that have affected PurpleWave's ability to compete
-* @jaj22/JohnJ for lots of advice navigating Brood War mechanics
+* @jaj22/JohnJ and Ankmairdor for lots of advice navigating Brood War mechanics
 * @IMP42 @AdakiteSystems and @tscmoo for helping me get BWAPI up and running when I was getting started
 * @tscmoo for [OpenBW](https://github.com/OpenBW/openbw/)
 * NepetaNigra, ChoboSwaggins, @Nitekat, and CH Miner for sharing PurpleWave's games with the world and helping tell our story 
+
 The community around BWAPI and StarCraft AI is amazing and PurpleWave could not exist without building on the decade of work these folks have done.
 
 ## How to build PurpleWave

@@ -13,7 +13,7 @@ object UpdateBase {
     base.units            = base.zone.units.filter(u => u.base.contains(base) && u.likelyStillThere).toVector
     base.townHall         = Maff.minBy(base.units.view.filter(u => u.unitClass.isTownHall && ! u.flying && u.tileTopLeft.tileDistanceFast(base.townHallTile) < 12))(_.tileTopLeft.tileDistanceManhattan(base.townHallTile))
     base.minerals         = base.units.filter(u => u.mineralsLeft > 0 && ! u.isBlocker)
-    base.gas              = base.units.filter(_.unitClass.isGas)
+    base.gas              = base.units.filter(_.unitClass.isGas).sortBy(_.pixelDistanceEdge(base.townHallTile.center))
     base.workerCount      = base.units.count(u => u.player == base.owner && u.is(IsWorker))
     base.mineralsLeft     = base.minerals.view.map(_.mineralsLeft).sum
     base.gasLeft          = base.gas.view.map(_.gasLeft).sum

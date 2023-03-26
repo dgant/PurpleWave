@@ -38,6 +38,7 @@ class StrategyLegality(strategy: Strategy) {
 
   val isLegal: Boolean = (
     (strategy.ffa == With.strategy.isFfa)
+    && (strategy.moneyMap == With.strategy.isMoneyMap)
     &&  (strategy.islandMaps  || ! isIsland)
     &&  (strategy.groundMaps  || ! isGround)
     &&  ! disabledInPlaybook

@@ -2,6 +2,6 @@ package Planning.Plans.GamePlans.Protoss.FFA
 
 import Planning.Predicates.{Never, Predicate}
 
-class ProtossHuntersFFA extends ProtossFFA {
+class ProtossFFAMoney extends ProtossFFA {
   override def doExpand: Predicate = new Never
 }

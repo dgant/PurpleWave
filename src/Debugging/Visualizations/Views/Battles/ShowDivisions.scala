@@ -10,7 +10,7 @@ import bwapi.Color
 
 object ShowDivisions extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val y = 17 * With.visualization.lineHeightSmall
     val x0 = 5
     val x1 = 220
@@ -22,7 +22,7 @@ object ShowDivisions extends DebugView {
   
   private def renderScreenUnits(units: Iterable[UnitInfo]): String = f"${units.size}: ${ShowSquads.enumerateUnits(units)}"
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.battles.divisions.foreach(division => {
       val enemyPoints = division.enemies.flatMap(u =>
         u.corners

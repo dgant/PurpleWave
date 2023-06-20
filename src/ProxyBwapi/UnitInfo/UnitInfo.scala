@@ -391,10 +391,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       MicroPathing.getWaypointToPixel(this, presumptiveDestination),
       pixel)
   private def _presumeTarget: Option[UnitInfo] =
-    friendly.flatMap(_.agent.toAttack)
-      .orElse(friendly.flatMap(_.intent.toAttack))
-      .orElse(target)
-      .orElse(orderTarget)
+    friendly.flatMap(_.agent.toAttack                                   .filter(isEnemyOf))
+      .orElse(friendly.flatMap(_.intent.toAttack)                       .filter(isEnemyOf))
+      .orElse(target                                                    .filter(isEnemyOf))
+      .orElse(orderTarget                                               .filter(isEnemyOf))
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
       .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
 

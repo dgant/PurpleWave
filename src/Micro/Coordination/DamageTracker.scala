@@ -55,6 +55,8 @@ final class DamageTracker {
         automaticallyGuaranteed = true
       }
     } else if ( ! hangtime.contains(bulletType)) return
+    // TODO: Ankmairdor hypothesizes that you can predict missed bullets before arrival: target position != target's position
+    // Ank: Bullets update after units. If a moving bullet is not a miss, then it updates its target position every frame. Not all bullets move, so you would likely need to compare on the first frame of the bullet's life. Note, Valkyrie don't aim at their targets and that is not technically a miss.
     target.addDamage(source, inFrames, committed = true, automaticallyGuaranteed = automaticallyGuaranteed, fixedDamage = Some(damage).filter(_ > 0))
   }
 

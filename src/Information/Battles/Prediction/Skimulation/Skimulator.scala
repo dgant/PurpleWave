@@ -25,10 +25,10 @@ object Skimulator {
         ?(battle.isGlobal,
           maxEffectiveRange - unit.effectiveRangePixels,
           // Assume we're attacking the closest target
-          Maff.min(targets.view.map(oppo =>
+          Maff.min(targets.view.map(other =>
             Math.min(
               minDistance + maxEffectiveRange - unit.effectiveRangePixels,
-              unit.pixelsToGetInRange(oppo))))
+              unit.pixelsToGetInRange(other))))
             .getOrElse(LightYear()))
     }))
 
@@ -101,11 +101,11 @@ object Skimulator {
       if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.count(Protoss.Shuttle) / team.count(Protoss.Reaver), 1.0, if (Protoss.ShuttleSpeed(unit.player)) 2.0 else 1.5)
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Dragoon(unit) && Protoss.DragoonRange(player))          unit.skimStrength *= 1.5
-      if (Zerg.Lurker(unit)     && ! unit.burrowed)                       unit.skimStrength *= 0.8
       if (Zerg.Zergling(unit)   && Zerg.ZerglingSpeed(player))            unit.skimStrength *= 1.2
       if (Zerg.Zergling(unit)   && Zerg.ZerglingAttackSpeed(player))      unit.skimStrength *= 1.2
       if (Zerg.Hydralisk(unit)  && Zerg.HydraliskSpeed(player))           unit.skimStrength *= 1.2
       if (Zerg.Hydralisk(unit)  && Zerg.HydraliskRange(player))           unit.skimStrength *= 1.2
+      if (Zerg.Lurker(unit)     && ! unit.burrowed)                       unit.skimStrength *= 0.8
 
       // Major upgrade thresholds
       if (Protoss.Zealot(unit) && unit.presumptiveTarget.exists(t => Zerg.Zergling(t) && unit.damageUpgradeLevel > t.armorHealth)) unit.skimStrength *= 1.3

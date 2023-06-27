@@ -98,7 +98,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     && passenger.unitClass.canBeTransported
     && passenger.canMove
     && passenger.transport.forall(==)
-    && bwapiUnit.getSpaceRemaining + passenger.unitClass.spaceRequired <= unitClass.spaceProvided)
+    && (passenger.transport.exists(==) || passenger.unitClass.spaceRequired <= bwapiUnit.getSpaceRemaining))
 
   def enemyRangeGrid: AbstractGridFloody = if (flying || transport.exists(_.flying)) With.grids.enemyRangeAir else With.grids.enemyRangeGround
 }

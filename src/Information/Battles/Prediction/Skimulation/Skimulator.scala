@@ -14,12 +14,16 @@ object Skimulator {
 
     // Calculate unit distance
     battle.teams.foreach(team => team.units.foreach(unit => {
-      // Since we're deciding whether to attack into the enemy,
-      // assume the enemy need only spend its time regrouping, rather than advancing
-      val minDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
+      // Since we're deciding whether to attack into the enemy,assume the enemy can thrive by just regrouping instead of advancing
+      //
+      // Friendly: Distance to get in range of target
+      // Enemy: Min(Distance to get in range of target, distance to regroup)
+
+      val floorDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
       val targets = ?(Terran.Medic(unit),
         team.units.view.filter(_.unitClass.isOrganic),
-        team.opponent.units)
+        Maff.orElse(unit.presumptiveTarget, team.opponent.units))
+
       // How far does this unit have to go to get into the fight, either dealing or receiving damage?
       unit.skimDistanceToEngage =
         ?(battle.isGlobal,
@@ -27,7 +31,7 @@ object Skimulator {
           // Assume we're attacking the closest target
           Maff.min(targets.view.map(other =>
             Math.min(
-              minDistance + maxEffectiveRange - unit.effectiveRangePixels,
+              floorDistance + maxEffectiveRange - unit.effectiveRangePixels,
               unit.pixelsToGetInRange(other))))
             .getOrElse(LightYear()))
     }))

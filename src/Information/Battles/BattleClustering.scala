@@ -22,8 +22,9 @@ class BattleClustering {
   var lastCompletion      : Int = _
 
   private class Cluster(val units: ArrayBuffer[UnitInfo] = new ArrayBuffer[UnitInfo]()) {
-    var hull: Seq[UnitInfo] = Maff.convexHull(units, (u: UnitInfo) => u.pixel)
-    var hullCentroid: Option[Pixel] = None
+    var hull          : Seq[UnitInfo] = Maff.convexHull(units, (u: UnitInfo) => u.pixel)
+    var hullCentroid  : Option[Pixel] = None
+
     def hullExpanded: Seq[Pixel] = {
       hullCentroid = hullCentroid.orElse(Some(Maff.centroid(hull.view.map(_.pixel))))
       hull.view.map(_.pixel).map(p => hullCentroid.get.project(p, hullCentroid.get.pixelDistance(p) + rangePixels))
@@ -34,8 +35,7 @@ class BattleClustering {
       units ++= other.units
     }
     def intersects(other: Cluster): Boolean = (
-      hull.exists(u => Maff.convexPolygonContains(other.hullExpanded, u.pixel))
-      || other.hull.exists(u => Maff.convexPolygonContains(hullExpanded, u.pixel))
+      Maff.convexPolygonsIntersect(hull.view.map(_.pixel), other.hullExpanded)
     )
   }
 

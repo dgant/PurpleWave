@@ -58,7 +58,6 @@ object BehaviorFight extends SimulacrumBehavior {
   }
 
   @inline def validTarget(attacker: Simulacrum, target: Simulacrum): Boolean = {
-    // TODO: Check detection
     target.alive && attacker.canAttack(target)
   }
 }

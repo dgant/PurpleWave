@@ -51,11 +51,7 @@ object ShowBattles extends DebugView {
     ))
   }
 
-  def renderBattleScreen(battle: Battle): Unit = {
-    if (battle.skimulated) {
-      renderSkimulationScreen(battle)
-    }
-    if ( ! battle.simulated) return
+  def renderSimulationScreen(battle: Battle): Unit = {
     val x = 5
     battle.simulationCheckpoints.lastOption.foreach(metrics => {
       DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
@@ -85,6 +81,21 @@ object ShowBattles extends DebugView {
       fixedYMax = Some(1.0),
       width = graphWidth,
       height = graphWidth)
+  }
+
+  def renderBattleScreen(battle: Battle): Unit = {
+    val skimBarWidth = 80
+    val skimBarX0 = (640 - 80) / 2
+    val skimBarX2 = (640 + 80) / 2
+    val skimBarX1 = (skimBarWidth * battle.skimWeight).toInt
+    val skimBarY0 = 340
+    val skimBarY1 = skimBarY0 + 12
+    With.game.drawBoxScreen(skimBarX0, skimBarY0, skimBarX1, skimBarY1, Color.Black, true)
+    With.game.drawBoxScreen(skimBarX1, skimBarY0, skimBarX2, skimBarY1, Color.White, true)
+    With.game.drawTextScreen(skimBarX0 + 1, skimBarY0 + 1, "Skim")
+    With.game.drawTextScreen(skimBarX1 + 1, skimBarY0 + 1, "Sim")
+    if (battle.skimulated) renderSkimulationScreen(battle)
+    if (battle.simulated) renderSimulationScreen(battle)
   }
 
   def renderSkimulationMap(battle: Battle): Unit = {

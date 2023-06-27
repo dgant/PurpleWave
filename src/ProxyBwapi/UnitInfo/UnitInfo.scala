@@ -425,11 +425,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     cloakedOrBurrowed
     && ! ensnared
     && ! plagued
-    && ?(isOurs,
-        ! tile.enemyDetected
-        && ! matchups.enemies.exists(_.orderTarget.contains(this))
-        && ! matchups.enemies.exists(_.target.contains(this))
-        && ! With.bullets.all.exists(_.targetUnit.contains(this)),
+    && ! ?(isOurs,
+        tile.enemyDetected
+        || matchups.enemies.exists(_.orderTarget.contains(this))
+        ||  matchups.enemies.exists(_.target.contains(this))
+        || With.bullets.all.exists(_.targetUnit.contains(this)),
         detected))
 
   @inline final def teamColor: Color =

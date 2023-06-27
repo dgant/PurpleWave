@@ -81,21 +81,67 @@ trait Polygons {
     output
   }
 
+  @inline final def lineSide(p0X: Int,  p0Y: Int, p1X: Int, p1Y: Int, point: AbstractPoint) : Int = {
+    (point.y - p0Y) * (p1X - p0X) - (point.x - p0X) * (p1Y - p0Y)
+  }
+
   @inline final def convexPolygonContains(points: Seq[AbstractPoint], point: AbstractPoint): Boolean = {
     // A point is inside a convex polygon if it is on the same side of each segment
-    if (points.length < 2) return false
+    if (points.length < 3) return false
     var consensusSide: Option[Boolean] = None
     var i = 0
     while(i < points.length) {
-      val p1 = points(i)
-      val p2 = points((i + 1) % points.length)
-      val side = (point.y - p1.y) * (p2.x - p1.x) - (point.x - p1.x) * (p2.y - p1.y)
+      val p0 = points(i)
+      val p1 = points((i + 1) % points.length)
+      val side = lineSide(p0.x, p0.y, p1.x, p1.y, point)
       if (side != 0) {
         val binarySide = side > 0
         consensusSide = consensusSide.orElse(Some(binarySide))
         if ( ! consensusSide.contains(binarySide)) return false
       }
       i += 1
+    }
+    true
+  }
+
+  // Two convex polygons intersect unless a polygon has a face for which all points of the other polygon lie on the same side
+  // https://stackoverflow.com/questions/753140/how-do-i-determine-if-two-convex-polygons-intersect
+
+  @inline final def convexPolygonsIntersect(a: Seq[AbstractPoint], b: Seq[AbstractPoint]): Boolean = {
+    // Sanity check
+    if (a.length < 3) return false
+    if (b.length < 3) return false
+    // Fast check: Box intersection
+    val a0x = a.view.map(_.x).min
+    val a0y = a.view.map(_.y).min
+    val a1x = a.view.map(_.x).max
+    val a1y = a.view.map(_.y).max
+    val b0x = b.view.map(_.x).min
+    val b0y = b.view.map(_.y).min
+    val b1x = b.view.map(_.x).max
+    val b1y = b.view.map(_.y).max
+    // Fast bounds check
+    if ( ! Maff.rectanglesIntersect(a0x, a0y, a1x, a1y, b0x, b0y, b1x, b1y)) return false
+    var i0 = 0
+    while (i0 < a.length) {
+      val i1 = (i0 + 1) % a.length
+      var sideConsensus = 0
+      var j = 0
+      while (j < b.length) {
+        val a0 = a(i0)
+        val a1 = a(i1)
+        val b0  = b(j)
+        val sideNext = lineSide(a0.x, a0.y, a1.x, a1.y, b0)
+        if (j > 0 && sideNext != sideConsensus && sideNext != 0 && sideConsensus != 0) {
+          j = b.length + 1 // Break and skip sentinel value
+        }
+        sideConsensus = sideNext
+        j += 1
+      }
+      if (j == b.length) { // Hitting sentinel value means all points from b are on the same side of a0-a1, meaning that the polygons don't intersect
+        return false
+      }
+      i0 += 1
     }
     true
   }

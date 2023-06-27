@@ -89,7 +89,18 @@ class SquadDefendBase(base: Base) extends Squad {
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
     lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
-    lazy val formationBastion   = Formations.march(this, bastion())
+    lazy val formationBastion   = {
+      val enemyTopSpeed         = Maff.max(enemies.view.filter(u => u.canAttack && ! IsWorker(u)).map(_.topSpeed)).getOrElse(2 * Terran.Vulture.topSpeed)
+      val formationBastion      = Formations.march(this, bastion())
+      def sendToCenter(unit: FriendlyUnitInfo): Boolean = unit.unitClass.ranged && unit.topSpeed >= enemyTopSpeed
+      if (units.exists(sendToCenter)) {
+        lazy val formationCenter  = Formations.march(this, bastion().zone.centroid.walkableTile.center)
+        new Formation {
+          override def style: FormationStyle = formationBastion.style
+          override def placements: Map[FriendlyUnitInfo, Pixel] = formationBastion.placements.filterNot(p => sendToCenter(p._1)) ++ formationCenter.placements.filter(p => sendToCenter(p._1))
+        }
+      } else formationBastion
+    }
     lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
 
     val canWithdraw     = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75

@@ -150,7 +150,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     With.groundskeeper.reserved.foreach(With.grids.formationSlots.block)
     With.coordinator.pushes.all.view.filter(_.priority >= TrafficPriorities.Shove).foreach(_.tiles.foreach(With.grids.formationSlots.block))
     if (style == FormationStyleGuard && groundUnits.exists(Protoss.Reaver)) {
-      Shapes.Ray(face, vanguardCentroid).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
+      Shapes.Ray(face, vanguardCentroid).map(_.tile).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
     }
     val classCount = groundUnits
       .groupBy(_.unitClass)

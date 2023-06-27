@@ -100,7 +100,7 @@ object Potential {
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
     if (unit.flying) return new Force
-    val repulsions = unit.inTileRadius(3).filterNot(unit==).map(collisionRepulsion(unit, _))
+    val repulsions = unit.inTileRadius(3).filter(o => unit != o && o.canMove).map(collisionRepulsion(unit, _))
     ForceMath.mean(repulsions).clipAtMost(1.0)
   }
 

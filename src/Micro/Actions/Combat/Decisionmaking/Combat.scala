@@ -334,7 +334,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def abuse(): Boolean = {
-    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.presumptiveTarget.contains(unit), 128, 64))
+    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.presumptiveTarget.contains(unit), 80, 16) + ?(unit.canAttack(t), Math.max(0, unit.pixelRangeAgainst(t) - unit.pixelDistanceEdge(t) - 16), 48))
     kite &&= unit.confidence11 < 0.75
     kite ||= ! attackIfReady()
     if (kite) {

@@ -350,7 +350,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val sightPixel = enemy.pixel.projectUpTo(pixel, Math.min(sightPixels, range))
     Ray(sightPixel, enemy.pixel)
       .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
-      .map(_.center)
       .getOrElse(enemy.pixel.traversiblePixel(this))
   }
   @inline final def pixelsToSightRange(other: UnitInfo): Double = pixelDistanceEdge(other) - sightPixels

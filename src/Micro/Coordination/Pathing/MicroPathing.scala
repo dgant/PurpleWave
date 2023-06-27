@@ -178,10 +178,10 @@ object MicroPathing {
     var proceed = true
     Shapes
       .Ray(from, lengthPixels = lengthPixels, radians = radians)
-      .foreach(tile => {
-        proceed &&= tile.valid
-        proceed &&= flying || tile.walkableUnchecked
-        if (proceed) output = tile.center
+      .foreach(pixel => {
+        proceed &&= pixel.valid
+        proceed &&= flying || pixel.walkableUnchecked
+        if (proceed) output = pixel
       })
     output
   }

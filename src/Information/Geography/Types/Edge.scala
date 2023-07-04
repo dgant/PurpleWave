@@ -38,6 +38,7 @@ final class Edge(choke: Chokepoint) {
   def pixelTowards(zone: Zone): Pixel = endPixels.minBy(p => if (endsWalkable) zone.distanceGrid.get(p.tile) else p.pixelDistanceSquared(zone.centroid.center))
   def contains(pixel: Pixel): Boolean = pixelCenter.pixelDistance(pixel) <= radiusPixels
   def contains(tile: Tile): Boolean = contains(tile.center)
+  def contains(zone: Zone): Boolean = zones.head == zone || zones.last == zone
   def diameterPixels: Double = 2 * radiusPixels
 
   def badness(group: UnitGroup, from: Zone): Double = {

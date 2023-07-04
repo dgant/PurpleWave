@@ -1,5 +1,7 @@
 package Debugging
 
+import Information.Battles.Types.Battle
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.{PurpleBWClient, With}
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -61,7 +63,11 @@ object KeyboardCommands {
      breakpointFodder = -breakpointFodder
   }
 
-  private def unit: FriendlyUnitInfo = With.units.ours.find(_.selected).get
+  private def selectedUnit  : Option[FriendlyUnitInfo]  = With.units.ours.find(_.selected)
+  private def unit          : FriendlyUnitInfo          = selectedUnit.orElse(Maff.minBy(With.units.ours)(_.pixelDistanceCenter(With.viewport.center))).get
+  private def base          : Base                      = selectedUnit.flatMap(_.base).getOrElse(With.geography.bases.minBy(_.heart.pixelDistance(With.viewport.center)))
+  private def zone          : Zone                      = selectedUnit.map(_.zone).getOrElse(With.geography.zones.minBy(_.heart.pixelDistance(With.viewport.center)))
+  private def battle        : Battle                    = unit.battle.orElse(With.battles.local.headOption).get
 }
 
 

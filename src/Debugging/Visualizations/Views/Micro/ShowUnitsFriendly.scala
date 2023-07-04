@@ -5,8 +5,7 @@ import Debugging.Visualizations.Views.DebugView
 import Debugging.Visualizations.{Colors, Forces}
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import bwapi.Color
 
 object ShowUnitsFriendly extends DebugView {
@@ -25,13 +24,6 @@ object ShowUnitsFriendly extends DebugView {
   var showTarget      : Boolean = true
   
   override def renderMap(): Unit = { With.units.ours.foreach(renderUnitState) }
-
-  def renderUnitBoxAt(unit: UnitInfo, at: Pixel, color: Color): Unit = {
-    DrawMap.box(
-      at.subtract (unit.unitClass.width / 2, unit.unitClass.height / 2),
-      at.add      (unit.unitClass.width / 2, unit.unitClass.height / 2),
-      color)
-  }
   
   def renderUnitState(unit: FriendlyUnitInfo): Unit = {
     val agent = unit.agent

@@ -4,7 +4,7 @@ import Information.Geography.Calculations.UpdateZones
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Direction, Tile}
+import Mathematics.Points.{Direction, Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 import bwta.Region
@@ -43,6 +43,8 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   def heart           : Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
   def downtown        : Tile = heart.center.midpoint(exitOriginal.map(_.pixelCenter).getOrElse(heart.center)).walkableTile
   def exitNowOrHeart  : Tile = exitNow.map(_.pixelCenter.walkableTile).getOrElse(heart)
+
+  def edgeTo(to: Pixel) : Option[Edge] = Maff.minBy(edges)(_.pixelCenter.groundPixels(to))
 
   override def toString: String = f"$name ${if (bases.nonEmpty) f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) " else ""}$centroid"
 

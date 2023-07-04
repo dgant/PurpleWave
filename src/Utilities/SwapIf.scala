@@ -1,13 +1,13 @@
 package Utilities
 
 object SwapIf {
-  def apply(predicate: Boolean, a: () => Unit, b: () => Unit): Unit = {
+  def apply[T](predicate: Boolean, a: => T, b: => T): T = {
     if (predicate) {
-      b()
-      a()
+      b
+      a
     } else {
-      a()
-      b()
+      a
+      b
     }
   }
 }

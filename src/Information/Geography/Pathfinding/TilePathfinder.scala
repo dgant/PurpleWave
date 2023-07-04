@@ -2,8 +2,8 @@ package Information.Geography.Pathfinding
 
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
-import Mathematics.Points.Tile
 import Mathematics.Maff
+import Mathematics.Points.Tile
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -91,8 +91,9 @@ trait TilePathfinder {
     // To escape a tile that's 5 tiles into enemy range means we have to pass through tiles of value 5+4+3+2+1
     // So the floor of the cost we'll pay is the Gaussian expansion of the threat cost at the current tile.
 
-    val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0).getOrElse(0.0)
-    val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid01(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
+    // Added costOutOfRepulsion at some point but never tested integrating it
+    //val costOutOfRepulsion  : Double = profile.costRepulsion * Maff.fastSigmoid01(tiles(i).repulsion) // Hacky; used to smartly tiebreak tiles that are otherwise h() = 0. Using this formulation to minimize likelihood of breaking heuristic requirements
+    val costDistanceToEnd   : Double = profile.end.map(end => if (profile.crossUnwalkable || ! profile.employGroundDist) tile.tileDistanceFast(end) else tile.groundPixels(end) / 32.0 * tile.tileDistanceFast(end) * 0.01).getOrElse(0.0)
     val costOutOfThreat     : Double = profile.costThreat * profile.threatGrid.getUnchecked(i)
 
     Math.max(costDistanceToEnd, costOutOfThreat)

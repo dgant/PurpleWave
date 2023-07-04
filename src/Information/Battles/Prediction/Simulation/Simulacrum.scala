@@ -7,6 +7,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
+import Utilities.?
 import Utilities.Time.Forever
 
 import scala.collection.mutable.ArrayBuffer
@@ -224,4 +225,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       events += event
     }
   }
+
+  def describe: String = f"${?(isFriendly, "F", "E")} ${unitClass.toString} #${realUnit.id}"
+
+  override def toString: String = f"$describe $hitPoints/${unitClass.maxHitPoints} ${if (shieldPoints > 0) f"($shieldPoints/${unitClass.maxShields})" else  ""} $pixel"
 }

@@ -2,7 +2,6 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
-import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -54,7 +53,7 @@ object FightOrFlee extends Action {
         Protoss.ShieldBattery(ally)
         && ally.complete
         && ally.energy > 20
-        && ally.pixelDistanceEdge(unit, otherAt = Maff.minBy(unit.matchups.targets.view.map(unit.pixelToFireAt))(unit.pixelDistanceCenter).getOrElse(unit.pixel)) < 72))
+        && ally.pixelDistanceEdge(unit, unit.presumptiveTarget.map(unit.pixelToFireAtSimple).getOrElse(unit.pixel)) < 72))
     if (decision.isDefined) {
       unit.agent.shouldFight = decision.get
     } else {

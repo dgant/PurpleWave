@@ -39,7 +39,11 @@ object Skimulator {
     // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
     // Note that this can significantly swing our perception of hidden army strength
     if (battle.enemy.units.exists(_.visible)) {
-      val enemyMeanVisibleDistance = Maff.mean(battle.enemy.units.view.filter(_.visible).map(_.skimDistanceToEngage))
+      val enemyMeanVisibleDistance = Maff.mean(
+        Maff.orElse(
+          battle.enemy.attackersNonWorker,
+          battle.enemy.attackers,
+          battle.enemy.units).view.filter(_.visible).map(_.skimDistanceToEngage))
       battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimDistanceToEngage = Maff.clamp(u.skimDistanceToEngage - u.topSpeed * With.framesSince(u.lastSeen), u.skimDistanceToEngage, enemyMeanVisibleDistance))
     }
 
@@ -77,7 +81,7 @@ object Skimulator {
       if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
         if (unit.presumptiveTarget.exists(_.altitude > unit.altitude)) {
           unit.skimStrength *= 0.75 // 0.5 in terms of DPS, but see above remarks about treating units partly as sponges
-        } else if (unit.presumptiveTarget.exists(t => t.altitude < unit.pixelToFireAt(t).altitude)) {
+        } else if (unit.presumptiveTarget.exists(t => t.altitude < unit.pixelToFireAtSimple(t).altitude)) {
           unit.skimStrength *= 1.25 // 1.5 in terms of DPS, but see above remarks about treating units partly as sponges
         }
       }

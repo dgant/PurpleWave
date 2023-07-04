@@ -33,7 +33,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   var toTravel      : Option[Pixel]             = None
   var toReturn      : Option[Pixel]             = None
   var toNuke        : Option[Pixel]             = None
+  var toAttackFrom  : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
+  var toAttackLast  : Option[UnitInfo]          = None
   var toGather      : Option[UnitInfo]          = None
   var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
@@ -51,7 +53,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Ideally consistent with the Intention logic
   def destination: Pixel = toTravel
     .orElse(toBoard.map(_.pixel))
-    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinish).map(unit.pixelToFireAt))
+    .orElse(toAttackFrom)
+    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinish).map(unit.pixelToFireAtSimple))
     .orElse(toNuke)
     .orElse(unit.intent.toBuildTile.map(_.center))
     .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
@@ -96,15 +99,9 @@ class Agent(val unit: FriendlyUnitInfo) {
   def execute(): Unit = {
     if ( ! unit.isFriendly) return // Mind Control
 
-    toTravel    = unit.intent.toTravel
-    toReturn    = unit.intent.toReturn
-    toAttack    = unit.intent.toAttack
-    toGather    = unit.intent.toGather
-    toRepair    = unit.intent.toRepair
-    toBoard     = unit.intent.toBoard.orElse(toBoard)
-    toNuke      = unit.intent.toNuke
-
     forces.clear()
+    lastFrame     = With.frame
+    toAttackLast  = toAttack
     lastPath      = None
     priority      = TrafficPriorities.None
     fightReason   = ""
@@ -118,8 +115,14 @@ class Agent(val unit: FriendlyUnitInfo) {
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
     unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
 
+    toTravel  = unit.intent.toTravel
+    toReturn  = unit.intent.toReturn
+    toAttack  = unit.intent.toAttack
+    toGather  = unit.intent.toGather
+    toRepair  = unit.intent.toRepair
+    toBoard   = unit.intent.toBoard.orElse(toBoard)
+    toNuke    = unit.intent.toNuke
     unit.intent.action.apply(unit)
-    lastFrame = With.frame
   }
 
   /////////////
@@ -171,4 +174,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   def rideGoal: Option[Pixel] = _rideGoal
   def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
+
+  ///////////////
+  // Targeting //
+  ///////////////
+
+  def chooseAttackFrom(): Option[Pixel] = {
+    toAttackFrom = toAttackFrom.orElse(toAttack.map(unit.pixelToFireAtExhaustive))
+    toAttackFrom
+  }
 }

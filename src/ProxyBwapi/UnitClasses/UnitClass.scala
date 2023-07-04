@@ -133,6 +133,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val attacksAir: Boolean = effectiveAirDamage > 0
   lazy val canAttack: Boolean = attacksGround || attacksAir
 
+  def canAttack(flyingTarget: Boolean): Boolean = ?(flyingTarget, attacksAir, attacksGround)
   def canAttack(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
   def canAttack(enemy: UnitInfo): Boolean = if (enemy.flying) attacksAir else attacksGround
 

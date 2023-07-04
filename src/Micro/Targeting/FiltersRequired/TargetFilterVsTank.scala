@@ -16,7 +16,7 @@ object TargetFilterVsTank extends TargetFilter {
     if (target.unitClass.suicides) return true
     if (Protoss.Reaver(actor) && actor.matchups.inTankRange) return true // A Reaver under pressure just needs to get shots off
 
-    lazy val firingPixel = actor.pixelToFireAt(target)
+    lazy val firingPixel = actor.pixelToFireAtSimple(target)
 
     // Avoid eating tank fire while attacking unimportant units
     (target.isAny(IsTank, Terran.Battlecruiser, Terran.SpiderMine)

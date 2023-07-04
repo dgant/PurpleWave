@@ -7,7 +7,7 @@ final case class SimulationEventBehavior(
   behaviorNew: SimulacrumBehavior)
     extends SimulationEvent(sim) {
 
-  override def toString: String = f"$frame: ${describe(sim)} transitions from $behaviorOld to $behaviorNew"
+  override def toString: String = f"$frame: ${sim.describe} transitions from $behaviorOld to $behaviorNew"
 
   override val to: Pixel = from
 }

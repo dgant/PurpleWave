@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority, UnitLinearGroundPush}
+import Micro.Coordination.Pushing.{CircularPush, Push, TrafficPriorities, TrafficPriority, UnitLinearGroundPush}
 import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -79,24 +79,43 @@ object Commander {
   private val tryingToMoveThreshold = 32
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    unit.agent.setRideGoal(unit.pixelToFireAt(target))
+    lazy val attackFrom = unit.agent.chooseAttackFrom().getOrElse(target.pixel.nearestTraversablePixel(unit))
+    if (unit.agent.ride.isDefined) {
+      unit.agent.setRideGoal(attackFrom)
+    }
     leadFollower(unit, attack(_, target))
     unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (Protoss.Reaver(unit)) {
-      pushTowards(unit, target.pixel, TrafficPriorities.Bump)
-    } else if ( ! unit.flying && ! target.visible || ! unit.inRangeToAttack(target)) {
-      pushTowards(unit, target.pixel, TrafficPriorities.Nudge)
+      if (unit.loaded) {
+        pushAway(unit, attackFrom, TrafficPriorities.Bump)
+      } else {
+        pushThrough(unit, attackFrom, TrafficPriorities.Bump)
+      }
+    } else if ( ! target.visible || ! unit.inRangeToAttack(target)) {
+      pushThrough(unit, attackFrom, TrafficPriorities.Nudge)
     }
     if (unit.unready) return
-    if (unit.transport.exists(_.flying)) { requestUnload(unit); return }
+    if (unit.transport.exists(_.flying) && (unit.inRangeToAttack(target) || unit.pixelDistanceCenter(attackFrom) < 48)) {
+      requestUnload(unit); return
+    }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     // We shouldn't target interceptors anymore, but in case we do:
-    if (Protoss.Interceptor(target)) { attackMove(unit, target.pixel); return }
+    if (Protoss.Interceptor(target)) {
+      attackMove(unit, attackFrom); return
+    }
     // When a ground unit attacks a Carrier, have it attack-move when off cooldown to ensure we burn off Interceptors even if we can't find a route to the Carrier
-    if (Protoss.Carrier(target) && unit.readyForAttackOrder && ! unit.inRangeToAttack(target) && ! unit.flying) { attackMove(unit, target.pixel); return }
-    if ( ! unit.readyForAttackOrder) { sleep(unit); return }
-    if (Zerg.Lurker(unit) && ! unit.burrowed) { move(unit, target.pixel); return }
-    if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) { move(unit, target.pixel); return }
+    if (Protoss.Carrier(target) && unit.readyForAttackOrder && ! unit.inRangeToAttack(target) && ! unit.flying) {
+      attackMove(unit, attackFrom); return
+    }
+    if ( ! unit.readyForAttackOrder) {
+      sleep(unit); return
+    }
+    if (Zerg.Lurker(unit) && ! unit.burrowed) {
+      move(unit, attackFrom); return
+    }
+    if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) {
+      move(unit, attackFrom);return
+    }
 
     // If we should be attack-commanding
     if (target.visible && (unit.unitClass.melee || unit.flying || ! unit.canMove || unit.pixelsToGetInRange(target) <= unit.unitClass.dimensionMax + unit.topSpeed * (With.latency.latencyFrames + With.reaction.agencyAverage))) {
@@ -127,7 +146,7 @@ object Commander {
     if (obviousPosition.traversableBy(unit) && (target.visible || obviousPosition.altitude >= target.altitude)) {
       move(unit, obviousPosition)
     } else {
-      move(unit, target.pixel)
+      move(unit, attackFrom)
     }
   }
 
@@ -241,7 +260,7 @@ object Commander {
         unit.bwapiUnit.move(to.bwapi)
       }
       if ( ! unit.flying) {
-        pushTowards(unit, to, TrafficPriorities.None)
+        pushThrough(unit, to, TrafficPriorities.None)
       }
     }
     sleep(unit)
@@ -513,13 +532,21 @@ object Commander {
     }
   }
 
-  def pushTowards(unit: FriendlyUnitInfo, to: Pixel, minimumPriority: TrafficPriority, maxDistance: Double = 96): Unit = {
+  private def push(unit: FriendlyUnitInfo,  minimumPriority: TrafficPriority, makePush: => Push): Unit = {
     if (unit.flying) return
     unit.agent.escalatePriority(minimumPriority)
     defaultEscalation(unit)
     if (unit.agent.priority > TrafficPriorities.None) {
-      With.coordinator.pushes.put(new UnitLinearGroundPush(unit.agent.priority, unit, ?(unit.pixelDistanceCenter(to) > maxDistance, unit.pixel.project(to, maxDistance), to)))
+      With.coordinator.pushes.put(makePush)
     }
+  }
+
+  def pushAway(unit: FriendlyUnitInfo, to: Pixel, minimumPriority: TrafficPriority, radius: Double = 48): Unit = {
+    push(unit, minimumPriority, new CircularPush(unit.agent.priority, to, radius, unit))
+  }
+
+  def pushThrough(unit: FriendlyUnitInfo, to: Pixel, minimumPriority: TrafficPriority, maxDistance: Double = 96): Unit = {
+    push(unit, minimumPriority, new UnitLinearGroundPush(unit.agent.priority, unit, ?(unit.pixelDistanceCenter(to) > maxDistance, unit.pixel.project(to, maxDistance), to)))
   }
 
   private def autoUnburrow(unit: FriendlyUnitInfo): Boolean = {

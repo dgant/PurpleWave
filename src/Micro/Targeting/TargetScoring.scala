@@ -8,7 +8,7 @@ import Utilities.?
 object TargetScoring {
 
   @inline private def pixelCost(attacker: CombatUnit, target: CombatUnit): Double = {
-    Math.max(0, attacker.pixelsToGetInRange(target) - attacker.cooldownLeft * attacker.topSpeed)
+    Math.max(0, attacker.pixelsToGetInRange(target) - 0.5 * attacker.cooldownLeft * attacker.topSpeed)
   }
 
   private val inv32 = 1.0 / 32.0
@@ -63,7 +63,7 @@ object TargetScoring {
 
     val catchBonus = add(12.0, target.caught || target.caughtBy(attacker))
 
-    val threatCost = ?(Protoss.Carrier(attacker), target.tile, attacker.pixelToFireAt(target).tile).enemiesAttacking(attacker).length match {
+    val threatCost = ?(Protoss.Carrier(attacker), target.tile, attacker.pixelToFireAtSimple(target).tile).enemiesAttacking(attacker).length match {
       case 0 => 0.0
       case 1 => 1.0
       case _ => 3.0
@@ -79,13 +79,13 @@ object TargetScoring {
   private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValueOverHealth
   private val combatBonus = 8.0
   def apply(target: UnitInfo): Double = {
-    var output = 8.0 * baseValue * target.unitClass.subjectiveValueOverHealth
+    var output = 4.0 * baseValue * target.unitClass.subjectiveValueOverHealth
 
-    output += add(12.0, target.matrixPoints == 0)
+    output += add(10.0, target.matrixPoints == 0)
 
     // Immobility bonus
-    output += add(4.0,  target.constructing)
-    output += add(10.0, target.gathering)
+    output += add(4.0, target.constructing)
+    output += add(6.0, target.gathering)
 
     if (target.unitClass.attacksOrCastsOrDetectsOrTransports && ! Zerg.Overlord(target)) {
       // Combat bonus; granted by default to aid simulation, but removed selectively
@@ -95,8 +95,8 @@ object TargetScoring {
       output += add(2.0, target.presumptiveTarget.exists(t => t.isFriendly && t.flying && t.attacksAgainstGround > 0))
 
       // Goose chase penalties
-      output += add(2.0,  ! target.canMove)
-      output += add(6.0, ! target.canMove || target.visible)
+      output += add(2.0, ! target.canMove)
+      output += add(6.0, ! target.canMove || ?(target.isOurs, target.visibleToOpponents, target.visible))
       output += add(6.0, ! target.canMove || target.likelyStillThere)
     }
 
@@ -105,12 +105,16 @@ object TargetScoring {
     output += add(2.0, ! target.doomed)
 
     // Cloaked bonus: Target cloaked units before they escape detection
-    output += add(8.0, target.cloaked && target.detected && ! With.units.existsEnemy(Protoss.Arbiter))
+    // modified because it needs performant player-agnosticism for simulation
+    //output += add(8.0, target.cloaked && target.detected && ! With.units.existsEnemy(Protoss.Arbiter))
+    output += add(8.0, Protoss.DarkTemplar(target))
 
     // Burrow bonus: Target burrowed units while scan is active
-    output += add(8.0, (target.burrowed && With.units.existsOurs(Terran.SpellScannerSweep)))
+    // Disabled because it needs performant player-agnosticism for simulation
+    //output += add(8.0, (target.burrowed && With.units.existsOurs(Terran.SpellScannerSweep)))
 
     // Detector bonus
+    // TODO: Needs player-agnosticism for simulation
     output += add(6.0, (Terran.WraithCloak() || With.units.existsOurs(Zerg.Lurker, Protoss.Arbiter, Protoss.DarkTemplar)) && aidsDetection(target))
 
     // Alternative repair value

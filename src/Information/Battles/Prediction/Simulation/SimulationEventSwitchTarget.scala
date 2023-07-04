@@ -15,8 +15,8 @@ case class SimulationEventSwitchTarget(unit: Simulacrum, targetBefore: Option[Si
   private val sAfter    = targetAfter.map(TargetScoring.fast(unit, _)).getOrElse(0.0)
   private def describeOpt(unit: Simulacrum, target: Option[Simulacrum], at: Option[Pixel], distance: Double, score: Double): String =
     target
-      .map(t => f"${describe(t)} ${describePixel(at)} @ ${formatter.format(distance)} tiles & ${formatter.format(score)} pts")
+      .map(t => f"${unit.describe} ${describePixel(at)} @ ${formatter.format(distance)} tiles & ${formatter.format(score)} pts")
       .getOrElse("(Nobody)")
 
-  override def toString: String = f"$frame: ${describe(unit)} changes target from ${describeOpt(unit, targetBefore, pBefore, dBefore, sBefore)} to ${describeOpt(unit, targetAfter, pAfter, dAfter, sAfter)}"
+  override def toString: String = f"$frame: ${unit.describe} changes target from ${describeOpt(unit, targetBefore, pBefore, dBefore, sBefore)} to ${describeOpt(unit, targetAfter, pAfter, dAfter, sAfter)}"
 }

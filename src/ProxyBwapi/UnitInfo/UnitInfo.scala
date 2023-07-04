@@ -10,7 +10,7 @@ import Macro.Allocation.Prioritized
 import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points._
-import Mathematics.Shapes.{Ray, Ring}
+import Mathematics.Shapes.Arc
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Matchups.MatchupAnalysis
 import Micro.Targeting.TargetScoring
@@ -299,58 +299,173 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output                = distanceEntangled + distanceClosedByEnemy
     output
   }
-  @inline val ptfVeryFarSquared: Int = With.mapPixelPerimeter * With.mapPixelPerimeter
-  @inline private final def ptfBadAltitudePenalty(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Int = if (altitudeMatters && pixel.altitude < enemyAltitude) ptfVeryFarSquared  else 0
-  @inline private final def ptfGoodAltitudeBonus(altitudeMatters: Boolean, enemyAltitude: Double, pixel: Pixel): Double = if ( ! altitudeMatters || pixel.altitude > enemyAltitude) 1 else 0
-  @inline final def pixelToFireAt(enemy: UnitInfo): Pixel = pixelToFireAt(enemy, exhaustive = false)
-  @inline final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
-    // Note: The entire "Exhaustive" branch of this was written for SSCAIT 2020 and unused since creating DefaultCombat. It is probably not well-tested.
+  @inline final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
+  @inline final def pixelToFireAtExhaustive(enemy: UnitInfo)  : Pixel = pixelToFireAt(enemy, exhaustive = true)
+  @inline private final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
+    // Pixel selection methods:
+    //
+    // Hug: Use enemy pixel
+    // Range: Sit at max range
+    // Sight: Sit at min(range, sight range)
+    // HugRange: Hug vs ranged; Range vs. melee
+    // HugSight: Hug vs ranged; Sight vs. melee
+    // Special: Find safe place to drop Shuttle
 
-    // Simple calculation
-    if (unitClass.melee || With.reaction.sluggishness > 1 || ! canMove) {
-      if (inRangeToAttack(enemy)) return pixel
-      return enemy.pixel.project(pixel, pixelRangeAgainst(enemy) + unitClass.dimensionMin)
+    // Pixel selection criteria:
+    //
+    // > 1 zone: Hug
+    //
+    // Dragoon  wide    uphill    visible   HugRange
+    // Dragoon  wide    uphill    invisible Hug
+    // Dragoon  wide    flat      visible   Range
+    // Dragoon  wide    flat      invisible Sight
+    // Dragoon  wide    downhill  visible   Range
+    // Dragoon  wide    downhill  invisible Sight
+    // Dragoon  narrow  uphill    visible   HugRange
+    // Dragoon  narrow  uphill    invisible Hug
+    // Dragoon  narrow  flat      visible   HugRange
+    // Dragoon  narrow  flat      invisible HugSight
+    // Dragoon  narrow  downhill  visible   HugRange
+    // Dragoon  narrow  downhill  invisible HugSight
+    // Reaver   wide    uphill    visible   Range
+    // Reaver   wide    uphill    invisible Hug
+    // Reaver   wide    flat      visible   Range
+    // Reaver   wide    flat      invisible Sight
+    // Reaver   wide    downhill  visible   Range
+    // Reaver   wide    downhill  invisible Sight
+    // Reaver   narrow  uphill    visible   Special -> Hug
+    // Reaver   narrow  uphill    invisible Special -> Hug
+    // Reaver   narrow  flat      visible   Special -> Hug
+    // Reaver   narrow  flat      invisible Special -> Hug
+    // Reaver   narrow  downhill  visible   Special -> Hug
+    // Reaver   narrow  downhill  invisible Special -> Hug
+    // Zealot   wide    uphill    visible   Range
+    // Zealot   wide    uphill    invisible Hug
+    // Zealot   wide    flat      visible   Range
+    // Zealot   wide    flat      invisible Sight
+    // Zealot   wide    downhill  visible   Range
+    // Zealot   wide    downhill  invisible Sight
+    // Zealot   narrow  uphill    visible   Range
+    // Zealot   narrow  uphill    invisible Hug
+    // Zealot   narrow  flat      visible   Range
+    // Zealot   narrow  flat      invisible Sight
+    // Zealot   narrow  downhill  visible   Range
+    // Zealot   narrow  downhill  invisible Sight
+    //
+    // Re-sorted:
+
+    // Zealot	  narrow	uphill  	invisible  	Hug
+    // Zealot	  wide  	uphill  	invisible  	Hug
+    // Zealot	  narrow	downhill	visible  	  Range
+    // Zealot	  narrow	flat    	visible  	  Range
+    // Zealot	  narrow	uphill  	visible  	  Range
+    // Zealot	  wide  	downhill	visible  	  Range
+    // Zealot	  wide  	flat    	visible  	  Range
+    // Zealot	  wide  	uphill  	visible  	  Range
+    // Zealot   narrow	downhill	invisible  	Sight
+    // Zealot	  narrow	flat    	invisible  	Sight
+    // Zealot	  wide  	downhill	invisible  	Sight
+    // Zealot	  wide  	flat    	invisible  	Sight
+    // Reaver	  wide  	downhill	visible  	  Range
+    // Reaver	  wide  	flat    	visible  	  Range
+    // Reaver	  wide  	uphill  	visible  	  Range
+    // Reaver	  wide  	downhill	invisible  	Sight
+    // Reaver	  wide  	flat    	invisible  	Sight
+    // Reaver	  wide  	uphill  	invisible  	Special ->	Hug
+    // Reaver	  narrow	downhill	invisible  	Special ->	Hug
+    // Reaver	  narrow	flat    	invisible  	Special ->	Hug
+    // Reaver	  narrow	uphill  	invisible  	Special ->	Hug
+    // Reaver	  narrow	downhill	visible  	  Special ->	Hug
+    // Reaver	  narrow	flat    	visible  	  Special ->	Hug
+    // Reaver	  narrow	uphill  	visible  	  Special ->	Hug
+    // Dragoon	wide    flat    	visible  	  Range
+    // Dragoon	wide    downhill	visible  	  Range
+    // Dragoon	wide    uphill  	visible  	  HugRange
+    // Dragoon	narrow	downhill	visible  	  HugRange
+    // Dragoon	narrow	flat    	visible  	  HugRange
+    // Dragoon	narrow	uphill  	visible  	  HugRange
+    // Dragoon	narrow  uphill  	invisible  	Hug
+    // Dragoon	wide    uphill  	invisible  	Hug
+    // Dragoon	wide    flat    	invisible  	Sight
+    // Dragoon	wide    downhill	invisible  	Sight
+    // Dragoon	narrow	downhill	invisible  	HugSight
+    // Dragoon	narrow	flat    	invisible  	HugSight
+
+    lazy val enemyZone        = enemy.zone
+    lazy val enemyAltitude    = enemy.altitude
+    lazy val enemyVisible     = enemy.visible
+    lazy val enemyDistance    = pixelDistanceEdge(enemy)
+    lazy val enemyThreatens   = enemy.unitClass.canAttack(flying) || enemy.tile.enemyRangeAgainst(this) >= With.grids.enemyRangeAirGround.margin
+    lazy val range            = pixelRangeAgainst(enemy)
+    lazy val weOutrange       = ! enemyThreatens || enemy.pixelRangeAgainst(this) < range
+    lazy val rangeCenter      = range + unitClass.dimensionMin + enemy.unitClass.dimensionMin
+    lazy val edge             = ?(zone == enemyZone, None, zone.edgeTo(enemy.pixel))
+    lazy val zoneDistance     = if (zone == enemy.zone) 0 else if (edge.isDefined && edge.get.contains(enemyZone)) 1 else 2
+    lazy val wide             = zoneDistance != 1 || edge.forall(e => e.diameterPixels > 128 || enemy.pixelDistanceCenter(e.pixelCenter) > range)
+    lazy val uphill           = altitude < enemyAltitude
+    lazy val downhill         = altitude > enemyAltitude
+    lazy val flat             = ! uphill && ! downhill
+    lazy val isReaver         = is(Protoss.Reaver)
+    lazy val isMelee          = unitClass.melee
+
+    lazy val pixelParadrop = {
+      Arc(enemy.pixel, pixel, effectiveRangePixels, 32)
+        .map(_.asPixel)
+        .find(spot => {
+          val spotTile = spot.tile
+          var output = spotTile.valid
+          output &&= spotTile.walkable
+          output &&= (wide || spotTile.zone == enemyZone)
+          output &&= spotTile.altitude >= enemyAltitude || enemy.visible
+          output &&= spotTile.enemyRange < With.grids.enemyRangeAirGround.margin
+          output
+        })
     }
-    val range = pixelRangeAgainst(enemy)
-    val distance = pixelDistanceEdge(enemy)
-    val distanceSquared = pixelDistanceSquared(enemy)
-    val enemyAltitude = enemy.altitude
 
-    val altitudeMatters = ! flying && ! enemy.flying && ! unitClass.melee
-    if (enemy.visible || (flying && sightPixels >= range)) {
-      if (range >= distance && ( ! exhaustive || ! altitudeMatters)) return pixel
-      // First, check if the simplest possible spot is acceptable
-      val pixelClose  = enemy.pixel.project(pixel, range)
-      val usToEnemyGapFacingRight =    enemy.x - enemy.unitClass.dimensionLeft   - x - unitClass.dimensionRight
-      val usToEnemyGapFacingLeft  = - (enemy.x - enemy.unitClass.dimensionRight  - x - unitClass.dimensionLeft)
-      val usToEnemyGapFacingDown  =    enemy.y - enemy.unitClass.dimensionUp     - y - unitClass.dimensionDown
-      val usToEnemyGapFacingUp    = - (enemy.y - enemy.unitClass.dimensionDown   - y - unitClass.dimensionUp)
-      val pixelFar = pixelClose
-        .add(
-          // DOUBLE CHECK CLAMPS
-          Maff.clamp(usToEnemyGapFacingLeft, 0, enemy.unitClass.dimensionRight + unitClass.dimensionLeft)  - Maff.clamp(usToEnemyGapFacingRight, 0, enemy.unitClass.dimensionLeft + unitClass.dimensionRight),
-          Maff.clamp(usToEnemyGapFacingUp,   0, enemy.unitClass.dimensionDown  + unitClass.dimensionUp)    - Maff.clamp(usToEnemyGapFacingDown, 0, enemy.unitClass.dimensionUp + unitClass.dimensionDown))
-      if ( ! exhaustive || With.reaction.sluggishness > 0) {
-        return pixelFar.traversiblePixel(this)
-      } else if (ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, pixelFar) == 0 && ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, pixelFar) > 0) {
-        return pixelFar
+    lazy val pixelHug         = enemy.pixel.nearestTraversablePixel(this)
+    lazy val pixelRange       = enemy.pixel.project(pixel, rangeCenter).nearestTraversablePixel(this)
+    lazy val pixelSight       = enemy.pixel.project(pixel, Math.min(rangeCenter, sightPixels)).nearestTraversablePixel(this)
+    lazy val pixelHugRange    = ?(weOutrange, pixelRange, pixelHug)
+    lazy val pixelHugSight    = ?(weOutrange, pixelSight, pixelHug)
+    lazy val pixelHugParadrop = ?(exhaustive, pixelParadrop.getOrElse(pixelRange), pixelRange)
+
+    if (unitClass.isBuilding) {
+      pixel
+    } else if (zoneDistance > 1) {
+      pixelHug
+    } else if (flying) {
+      if (enemyThreatens) {
+        pixelRange
+      } else {
+        pixelHug
       }
-      // Search for the ideal firing position
-      val offset = pixel.offsetFromTileCenter
-      val ringPixels =
-        Ring
-          .apply(range.toInt / 32)
-          .map(enemy.tile.add(_).center.add(offset))
-          .filter(p => canTraverse(p) && pixelDistanceSquared(p) < distanceSquared)
-      val ringSpot = Maff.minBy(ringPixels)(p => pixelDistanceSquared(p) * (2 - ptfGoodAltitudeBonus(altitudeMatters, enemyAltitude, p)) - ptfBadAltitudePenalty(altitudeMatters, enemyAltitude, p))
-      val output = ringSpot.getOrElse(pixelFar.traversiblePixel(this))
-      return output
+    } else if (isMelee) {
+      if (uphill && ! enemyVisible) {
+        pixelHug
+      } else if (enemyVisible) {
+        pixelRange
+      } else {
+        pixelSight
+      }
+    } else if (isReaver) {
+      if (wide && (enemyVisible || ! uphill)) {
+        pixelRange
+      } else {
+        pixelHugParadrop
+      }
+    } else if (enemyVisible) {
+      if (wide && ! uphill) {
+        pixelRange
+      } else {
+        pixelHugRange
+      }
+    } else if (uphill) {
+      pixelHug
+    } else if (wide) {
+      pixelSight
+    } else {
+      pixelHugSight
     }
-    // If the enemy isn't visible (likely uphill) we not only need to get in physical range, but altitude-adjusted sight range as well
-    val sightPixel = enemy.pixel.projectUpTo(pixel, Math.min(sightPixels, range))
-    Ray(sightPixel, enemy.pixel)
-      .find(t => t.traversableBy(this) && ( ! altitudeMatters || t.altitude >= enemyAltitude))
-      .getOrElse(enemy.pixel.traversiblePixel(this))
   }
   @inline final def pixelsToSightRange(other: UnitInfo): Double = pixelDistanceEdge(other) - sightPixels
   @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
@@ -382,7 +497,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       friendly.map(f => f.intent.destination.getOrElse(f.agent.destination))
         .orElse(targetPixel)
         .orElse(orderTargetPixel)
-        .orElse(presumptiveTarget.map(pixelToFireAt))
+        .orElse(presumptiveTarget.map(pixelToFireAtSimple))
         .getOrElse(pixel),
       pixel)
   private def _presumeStep: Pixel =
@@ -390,12 +505,13 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       MicroPathing.getWaypointToPixel(this, presumptiveDestination),
       pixel)
   private def _presumeTarget: Option[UnitInfo] =
-    friendly.flatMap(_.agent.toAttack                                   .filter(isEnemyOf))
-      .orElse(friendly.flatMap(_.intent.toAttack)                       .filter(isEnemyOf))
-      .orElse(target                                                    .filter(isEnemyOf))
-      .orElse(orderTarget                                               .filter(isEnemyOf))
+              friendly.flatMap(_.agent.toAttack     .filter(isEnemyOf))
+      .orElse(friendly.flatMap(_.agent.toAttackLast).filter(isEnemyOf))
+      .orElse(friendly.flatMap(_.intent.toAttack)   .filter(isEnemyOf))
+      .orElse(target                                .filter(isEnemyOf))
+      .orElse(orderTarget                           .filter(isEnemyOf))
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
-      .orElse(Maff.minBy(matchups.targets)(_.pixelDistanceEdge(targetPixel.orElse(orderTargetPixel).getOrElse(pixel))))
+      .orElse(matchups.targetNearest)
 
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]

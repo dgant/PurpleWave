@@ -3,6 +3,7 @@ package Micro.Actions.Basic
 import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Agency.Commander
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Minutes
 
@@ -15,13 +16,14 @@ object Crack extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canAttack
     && ! unit.unitClass.melee
+    && ! unit.isAny(Terran.SiegeTankSieged, Protoss.Reaver, Zerg.InfestedTerran)
     && With.frame > Minutes(5)()
     && With.frame < Minutes(12)() // For performance, mainly
     && ! unit.team.exists(_.engagedUpon)
     && unit.base.exists(_.isOurs)
     && unit.matchups.framesOfSafety > unit.cooldownMaxGround
     && unit.pixelDistanceCenter(unit.agent.destination) < unit.pixelRangeMax
-    && unit.cooldownLeft == 0
+    && unit.readyForAttackOrder
     && egg(unit).isDefined)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

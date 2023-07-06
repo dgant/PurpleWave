@@ -56,11 +56,26 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemies(Zerg.SunkenColony) > 0 && unitsComplete(IsWarrior) >= 5 && (safePushing || (enemies(Zerg.Lair) > 0 && With.scouting.enemyProximity < 0.5))) {
       targetMiningBases = Math.max(targetMiningBases, 2)
     }
+    var requiredAttackers = 3
+    if (enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)) {
+      requiredAttackers += 4
+    } else if (enemyStrategy(With.fingerprints.ninePool)) {
+      requiredAttackers += 2
+    }
+    if (anticipateSpeedlings || enemyHasUpgrade(Zerg.ZerglingSpeed)) {
+      requiredAttackers += 3
+      if ( ! upgradeComplete(Protoss.GroundDamage)) {
+        requiredAttackers += 3
+      }
+      if ( ! upgradeComplete(Protoss.ZealotSpeed)) {
+        requiredAttackers += 3
+      }
+      if ( ! upgradeComplete(Protoss.DragoonRange)) {
+        requiredAttackers += 3
+      }
+    }
     var shouldAttack = safePushing
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 3
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 5   || ! enemyStrategy(With.fingerprints.ninePool)
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 7   || ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.oneHatchGas, With.fingerprints.twoHatchMain)
-    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= 15  || ! anticipateSpeedlings
+    shouldAttack &&= unitsEver(IsAll(IsComplete, IsWarrior)) >= requiredAttackers
     shouldAttack ||= miningBases < targetMiningBases
     shouldAttack ||= targetMiningBases > 2
     shouldAttack ||= bases > 2

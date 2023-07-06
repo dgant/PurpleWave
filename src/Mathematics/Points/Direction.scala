@@ -3,8 +3,8 @@ package Mathematics.Points
 import Mathematics.Maff
 
 class Direction(_x: Int, _y: Int) extends AbstractPoint (
-  if (_x*_x < _y*_y) 0 else Maff.signum(_x),
-  if (_x*_x >= _y*_y) 0 else Maff.signum(_y)) {
+  if (_x*_x < _y*_y) 0 else Maff.signum101(_x),
+  if (_x*_x >= _y*_y) 0 else Maff.signum101(_y)) {
 
   def this(start: AbstractPoint, end: AbstractPoint) {
     this(end.x - start.x, end.y - start.y)

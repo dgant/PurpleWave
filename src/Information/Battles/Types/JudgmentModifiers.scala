@@ -7,7 +7,7 @@ import Micro.Actions.Basic.Gather
 import ProxyBwapi.Races.Terran
 import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsTank, IsWorker}
+import Utilities.UnitFilters.{IsSpeedling, IsTank, IsWorker}
 import bwapi.Color
 
 import scala.collection.mutable.ArrayBuffer
@@ -28,6 +28,7 @@ object JudgmentModifiers {
     add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))
     add("Choke",        Colors.MediumOrange,  choke(battle))
     add("TankLock",     Colors.MediumRed,     tankLock(battle))
+    add("Caught",       Colors.BrightGreen,   caught(battle))
     output
   }
   // Prefer fighting
@@ -132,5 +133,15 @@ object JudgmentModifiers {
     val tankInRangeScore  = 2.0 / 3.0 * tankInRange / Math.max(1, attackers)
     val score             = 0.5 * (inRankRangeScore + tankInRangeScore)
     ?(score <= 0, None, Some(JudgmentModifier(targetDelta = score)))
+  }
+
+  // Prefer fighting when caught by fast units
+  def caught(battleLocal: Battle): Option[JudgmentModifier] = {
+    val catchers  = battleLocal.enemy.units.count(u => u.isAny(IsSpeedling, Terran.Vulture))
+    val enemies   = battleLocal.enemy.units.length
+    val caught    = battleLocal.us.units.count(u => u.matchups.threatDeepest.exists(t => t.isAny(IsSpeedling, Terran.Vulture) && t.inRangeToAttack(u) && t.topSpeed > u.topSpeed))
+    val allies    = battleLocal.us.units.length
+    val score     = Maff.nanToZero(catchers / enemies * caught / allies)
+    ?(score <= 0, None, Some(JudgmentModifier(targetDelta =  -score)))
   }
 }

@@ -46,7 +46,7 @@ object Heal extends Action {
     val distanceFrames  = Maff.nanToInfinity(distancePixels / medic.topSpeed)
     val lifetimeFrames  = patient.matchups.framesToLive
     val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
-    val safety          = Maff.signum(Math.max(0.0, patient.matchups.framesOfSafety))
+    val safety          = Maff.signum101(Math.max(0.0, patient.matchups.framesOfSafety))
     val valueWorthwhile = Maff.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
     val output          = (1.0 + damage) * valueWorthwhile
     output

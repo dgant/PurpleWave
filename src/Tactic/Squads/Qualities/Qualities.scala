@@ -7,9 +7,9 @@ import ProxyBwapi.UnitInfo.UnitInfo
 object Qualities {
   object Cloaked extends Quality {
     def apply(u: UnitInfo): Boolean = u.burrowed || u.isAny(
-      Terran.Ghost, Terran.Wraith, Terran.SpiderMine,
-      Protoss.Arbiter, Protoss.DarkTemplar, Protoss.Observer,
-      Zerg.Lurker, Zerg.LurkerEgg) || (Terran.Vulture(u) && u.player.hasTech(Terran.SpiderMinePlant))
+      Terran.Ghost,     Terran.Wraith,        Terran.SpiderMine,
+      Protoss.Arbiter,  Protoss.DarkTemplar,  Protoss.Observer,
+      Zerg.Lurker,      Zerg.LurkerEgg) || (Terran.Vulture(u) && u.player.hasTech(Terran.SpiderMinePlant))
     override val counteredBy: Array[Quality] = Array(Detector)
   }
   object SpiderMine extends Quality {

@@ -146,6 +146,8 @@ class Agent(val unit: FriendlyUnitInfo) {
   val leader = new Cache(() => unit.squad.flatMap(_.leader(unit.unitClass)))
   var leadFollower: (FriendlyUnitInfo) => Unit = x => {}
 
+  def isLeader: Boolean = leader().contains(unit)
+
   /////////////////
   // Ridesharing //
   /////////////////
@@ -174,6 +176,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   }
   def rideGoal: Option[Pixel] = _rideGoal
   def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
+  def isPrimaryPassenger: Boolean = unit.transport.exists(_.agent.passengersPrioritized.headOption.contains(unit))
 
   ///////////////
   // Targeting //

@@ -278,7 +278,7 @@ final class MacroSim {
       val event     = steps(i).event
       val dFrames   = event.dFrames - steps(i - 1).event.dFrames
       stateNext.minerals          = stateLast.minerals        + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
-      stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * With.accounting.ourIncomePerFrameGas).toInt
+      stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * ?(With.gathering.gasIsCappedOnQuantity, With.accounting.ourIncomePerFrameGas, With.accounting.ourIncomePerFrameGasMax)).toInt
       stateNext.supplyAvailable   = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
       stateNext.supplyUsed        = stateLast.supplyUsed      + event.dSupplyUsed
       stateNext.mineralPatches    = stateLast.mineralPatches  + event.dMineralPatches

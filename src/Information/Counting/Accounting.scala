@@ -12,8 +12,8 @@ class Accounting extends TimedTask {
 
   lazy val mapBonus: Double = ?(With.strategy.isMoneyMap, 1.737, 1) // Empirical estimation
   
-  lazy val workerIncomePerFrameMinerals = 0.044 * mapBonus
-  lazy val workerIncomePerFrameGas = 0.069
+  lazy val workerIncomePerFrameMinerals : Double = 0.044 * mapBonus
+  lazy val workerIncomePerFrameGas      : Double = 0.069
 
   // Should start at 50, of course,but this -30 offsets the effect of starting workers all being far from minerals
   var ourEstimatedTotalMinerals = 20.0
@@ -32,6 +32,7 @@ class Accounting extends TimedTask {
 
   def ourIncomePerFrameMinerals : Double = ourIncomePerFrameMineralsCache()
   def ourIncomePerFrameGas      : Double = ourIncomePerFrameGasCache()
+  def ourIncomePerFrameGasMax   : Double = ourIncomePerFrameGasMaxCache() // Gas income if we dedicated all workers to it
 
   def ourActiveMiners   : Int = ourActiveMinersCache()
   def ourActiveDrillers : Int = ourActiveDrillersCache()
@@ -39,12 +40,13 @@ class Accounting extends TimedTask {
   def framesToMineMinerals(amount: Int): Int = Math.ceil(Maff.nanToN(amount / ourIncomePerFrameMinerals, Forever())).toInt
   def framesToMineGas     (amount: Int): Int = Math.ceil(Maff.nanToN(amount / ourIncomePerFrameGas, Forever())).toInt
 
-  private val ourPatchesMineralsCache = new Cache(() => if (With.frame == 0) 9 else With.geography.ourBases.map(_.minerals.size).sum)
-  private val ourPatchesGasCache      = new Cache(() =>                             With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)
-  private val ourActiveMinersCache    = new Cache(() => if (With.frame == 0) 4 else With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.mineralsLeft > 0))) // Subtract one to account for a lone miner+builder
-  private val ourActiveDrillersCache  = new Cache(() =>                             With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.gasLeft > 0)))
-  private val ourIncomePerFrameMineralsCache  = new Cache(() => Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache())   * workerIncomePerFrameMinerals)
-  private val ourIncomePerFrameGasCache       = new Cache(() => Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()) * workerIncomePerFrameGas)
+  private val ourPatchesMineralsCache         = new Cache(() => ?(With.frame == 0, 9, With.geography.ourBases.map(_.minerals.size).sum))
+  private val ourPatchesGasCache              = new Cache(() =>                       With.geography.ourBases.map(_.gas.count(g => g.complete && g.isOurs)).sum)
+  private val ourActiveMinersCache            = new Cache(() => ?(With.frame == 0, 4, With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.mineralsLeft > 0)))) // Subtract one to account for a lone miner+builder
+  private val ourActiveDrillersCache          = new Cache(() =>                       With.units.ours.count(u => isActivelyMining(u) && u.agent.toGather.exists(_.gasLeft > 0)))
+  private val ourIncomePerFrameMineralsCache  = new Cache(() => workerIncomePerFrameMinerals  * Math.min(2.0 * ourPatchesMineralsCache(), ourActiveMinersCache()))
+  private val ourIncomePerFrameGasCache       = new Cache(() => workerIncomePerFrameGas       * Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache()))
+  private val ourIncomePerFrameGasMaxCache    = new Cache(() => workerIncomePerFrameGas       * Math.min(3.0 * ourPatchesGasCache(),      ourActiveDrillersCache() + ourActiveMinersCache()))
 
   private val activeMiningDistance = Math.pow(32.0 * 8.0, 2)
   private def isActivelyMining(unit: FriendlyUnitInfo): Boolean = unit.agent.toGather.exists(_.pixelDistanceSquared(unit) < activeMiningDistance)

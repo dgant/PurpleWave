@@ -26,21 +26,21 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (With.mapPixelHeight - y < min) min = With.mapPixelHeight - y
     min
   }
-  @inline def +(other: Pixel): Pixel = add(other)
-  @inline def -(other: Pixel): Pixel = subtract(other)
-  @inline def /(value: Int): Pixel = if (value == 0) this else Pixel(x / value, y / value)
-  @inline def *(value: Int): Pixel = Pixel(x * value, y * value)
-  @inline def /(value: Double): Pixel = if (value == 0) this else Pixel((x / value).toInt, (y / value).toInt)
-  @inline def *(value: Double): Pixel = Pixel((x * value).toInt, (y * value).toInt)
-  @inline def add(dx: Int, dy: Int): Pixel = Pixel(x + dx, y + dy)
-  @inline def add(point: Point): Pixel = add(point.x, point.y)
-  @inline def add(pixel: Pixel): Pixel = add(pixel.x, pixel.y)
-  @inline def subtract(dx: Int, dy: Int): Pixel = add(-dx, -dy)
-  @inline def subtract(otherPixel: Pixel): Pixel = subtract(otherPixel.x, otherPixel.y)
-  @inline def multiply(scale: Int): Pixel = Pixel(scale * x, scale * y)
-  @inline def multiply(scale: Double): Pixel = Pixel((scale * x).toInt, (scale * y).toInt)
-  @inline def divide(scale: Int): Pixel = Pixel(x / scale, y / scale)
-  @inline def clamp(margin: Int = 0): Pixel = {
+  @inline def +(other: Pixel)             : Pixel = add(other)
+  @inline def -(other: Pixel)             : Pixel = subtract(other)
+  @inline def /(value: Int)               : Pixel = if (value == 0) this else Pixel(x / value, y / value)
+  @inline def *(value: Int)               : Pixel = Pixel(x * value, y * value)
+  @inline def /(value: Double)            : Pixel = if (value == 0) this else Pixel((x / value).toInt, (y / value).toInt)
+  @inline def *(value: Double)            : Pixel = Pixel((x * value).toInt, (y * value).toInt)
+  @inline def add(dx: Int, dy: Int)       : Pixel = Pixel(x + dx, y + dy)
+  @inline def add(point: Point)           : Pixel = add(point.x, point.y)
+  @inline def add(pixel: Pixel)           : Pixel = add(pixel.x, pixel.y)
+  @inline def subtract(dx: Int, dy: Int)  : Pixel = add(-dx, -dy)
+  @inline def subtract(otherPixel: Pixel) : Pixel = subtract(otherPixel.x, otherPixel.y)
+  @inline def multiply(scale: Int)        : Pixel = Pixel(scale * x, scale * y)
+  @inline def multiply(scale: Double)     : Pixel = Pixel((scale * x).toInt, (scale * y).toInt)
+  @inline def divide(scale: Int)          : Pixel = Pixel(x / scale, y / scale)
+  @inline def clamp(margin: Int = 0)      : Pixel = {
     Pixel(
       Maff.clamp(x, margin, With.mapPixelWidth - margin),
       Maff.clamp(y, margin, With.mapPixelHeight - margin))
@@ -79,17 +79,15 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     Maff.broodWarDistance(x, y, other.x, other.y)
   }
   @inline def pixelDistanceSquared(other: Pixel): Int = {
-    val dx = x - other.x
-    val dy = y - other.y
-    dx * dx + dy * dy
+    Maff.squared(x - other.x) + Maff.squared(y - other.y)
   }
   @inline def pixelDistanceChebyshev(other: Pixel): Int = {
-    Math.max(Math.abs(x-other.x), Math.abs(y-other.y))
+    Math.max(Math.abs(x - other.x), Math.abs(y - other.y))
   }
   @inline def tile: Tile = {
     // This handles negative coordinates correctly AND is potentially an optimization:
     // https://stackoverflow.com/questions/18560844/does-java-optimize-division-by-powers-of-two-to-bitshifting
-    Tile(x >> 5, y >> 5)
+    Tile(Maff.div32(x), Maff.div32(y))
   }
   @inline def toPoint: Point = {
     Point(x, y)
@@ -150,11 +148,11 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     // Find an adjacent walkable tile
     // Prefer tiles in the direction of this pixel's alignment within the tile
     // For example: if we're at P(33, 48) inside T(1, 1) we'd prefer T(0, 1) to T(1, 0)
-    val tx = x >> 5
-    val ty = y >> 5
-    val dx = if ((x & 31) < 16) -1 else 1
-    val dy = if ((y & 31) < 16) -1 else 1
-    val xFirst = Math.abs(16 - (x & 31)) > Math.abs(16 - (y & 31))
+    val tx = Maff.div32(x)
+    val ty = Maff.div32(y)
+    val dx = if (Maff.mod32(x) < 16) -1 else 1
+    val dy = if (Maff.mod32(y) < 16) -1 else 1
+    val xFirst = Math.abs(16 - Maff.mod32(x)) > Math.abs(16 - Maff.mod32(y))
     val output =
               nwtFlip(xFirst, Tile(tx + dx, ty), Tile(tx, ty + dy))
       .orElse(nwtTest(        Tile(tx + dx, ty + dy)))
@@ -182,7 +180,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       Maff.clamp(x, center.x - 16 + Math.min(16, unit.unitClass.dimensionLeft), center.x + 16 - Math.min(16, unit.unitClass.dimensionRight)),
       Maff.clamp(y, center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),   center.y + 16 - Math.min(16, unit.unitClass.dimensionDown)))
   }
-  @inline def offsetFromTileCenter: Pixel = Pixel((x & 31) - 16, (x & 31) - 16)
+  @inline def offsetFromTileCenter: Pixel = Pixel(Maff.mod32(x) - 16, Maff.mod32(x) - 16)
 
-  override def toString: String = f"[$x, $y](${Maff.signum(x) * Math.abs(x / 32)}, ${Maff.signum(y) * Math.abs(y / 32)})"
+  override def toString: String = f"[$x, $y](${Maff.signum101(x) * Math.abs(x / 32)}, ${Maff.signum101(y) * Math.abs(y / 32)})"
 }

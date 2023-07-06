@@ -80,21 +80,22 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val placements  : Map[FriendlyUnitInfo, Pixel]  = unassigned.outwardFromCentroid
 
   private def findGoalPath: TilePath = {
-    val pathStart   = vanguardCentroid.zone
-    val pathEnd     = goal.zone
-    val pathToGoal  = With.paths.zonePath(pathStart, pathEnd)
-    var pathToMarch = pathToGoal
-    val choke       = pathToGoal.flatMap(_.steps.find(_.to == pathEnd))
-    // Prefer flanking the enemy to attacking them through a nasty choke
+    val zonePathStart   = vanguardCentroid.zone
+    val zonePathEnd     = goal.zone
+    val zonePathToGoal  = With.paths.zonePath(zonePathStart, zonePathEnd)
+    var zonePathToMarch = zonePathToGoal
+    val choke           = zonePathToGoal.flatMap(_.steps.find(_.to == zonePathEnd))
+
+    // Prefer flanking the enemy over attacking them through a nasty choke
     if (choke.exists(c => c.to == threatOrigin.zone && c.edge.badness(group, vanguardCentroid.zone) > 1.5)) {
-      val paths = pathEnd.edges.flatMap(e => With.paths.zonePath(pathStart, pathEnd, Seq(e))).filter(_.steps.nonEmpty)
+      val paths = zonePathEnd.edges.flatMap(e => With.paths.zonePath(zonePathStart, zonePathEnd, Seq(e))).filter(_.steps.nonEmpty)
       val best = Maff.minBy(paths)(p => p.length * p.steps.last.edge.badness(group, p.steps.last.from))
-      if (best.exists(b => pathToMarch.exists(_.length < b.length))) {
+      if (best.exists(b => zonePathToMarch.exists(_.length < b.length))) {
         _flanking = true
       }
-      pathToMarch = best
+      zonePathToMarch = best
     }
-    val waypoint = pathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
+    val waypoint = zonePathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
     new PathfindProfile(
       vanguardCentroid.walkableTile,
       Some(waypoint),
@@ -162,8 +163,23 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       if      (style == FormationStyleGuard)  overlookSlots(classCount, requireTarget = false)
       else if (style == FormationStyleEngage) overlookSlots(classCount, requireTarget = true)
       else                                    Map.empty */
-    val classCountRemaining = classCount.map(c => c.slots - classSlotsOverlook.get(c.unitClass).map(_.length).getOrElse(0))
-    val classSlotsArc       = arcSlots(classCount, 32 + apex.pixelDistance(face))
+    var classSlotsArc         = arcSlots(face, classCount, 32 + apex.pixelDistance(face))
+    lazy val arcSlotsDesired  = 0.8 * classCount.view.map(_.slots).sum
+    lazy val arcSlotsProduced = classSlotsArc.view.map(_._2.length).sum
+    if (style == FormationStyleGuard && face.tile.enemiesAttackingGround.nonEmpty && arcSlotsProduced < arcSlotsDesired) {
+      // We have failed to produce an acceptable guard formatio , likely because the choke has been breached.
+      // Let's back up one choke and try again
+      val alternateFaces = goalPathTiles.takeWhile(_ != face.zone).lastOption
+      alternateFaces.map(_.center).foreach(alternateFace => {
+        val alternateClassSlotsArc    = arcSlots(alternateFace, classCount, 32 + apex.pixelDistance(alternateFace))
+        val alternateArcSlotsProduced = alternateClassSlotsArc.view.map(_._2.length).sum
+        if (alternateArcSlotsProduced > arcSlotsProduced) {
+          With.logger.debug(f"Substituting Guard arc from $face to $alternateFace because that results in $alternateArcSlotsProduced/$arcSlotsDesired > $arcSlotsDesired/$arcSlotsDesired slots")
+          face = alternateFace
+          classSlotsArc = alternateClassSlotsArc
+        }
+      })
+    }
     val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)
     val classSlotsAir       = airUnits.groupBy(_.unitClass).map(u => (u._1, u._2.map(x => groundExemplar)))
     val output              = classSlotsOverlook ++ classSlotsArc ++ classSlotsAir
@@ -200,12 +216,12 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   /**
     * Positions formation slots by tracing an arc around the goal, centered at the apex.
     */
-  private def arcSlots(classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
+  private def arcSlots(toFace: Pixel, classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
     var unitClass       = Terran.Marine
     var angleIncrement  = 0d
-    val angleCenter     = face.radiansToSlow(apex)
+    val angleCenter     = toFace.radiansToSlow(apex)
     val radiusIncrement = 4d
-    var radius          = face.pixelDistance(apex) - radiusIncrement
+    var radius          = toFace.pixelDistance(apex) - radiusIncrement
     var rowSlot         = -1
     var slotsEvaluated  = 0
     var haltNegative    = false
@@ -230,7 +246,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       if (angleDelta > Maff.halfPI) return nextRow()
       if (s < 0 && haltNegative) return true
       if (s > 0 && haltPositive) return true
-      val p = face.radiateRadians(angleCenter + angleDelta, radius)
+      val p = toFace.radiateRadians(angleCenter + angleDelta, radius)
       if (rowSlot == 0) { arcZone = p.zone }
       if ( ! p.walkable) {
         if ( ! p.walkableTerrain && p.zone != arcZone) {
@@ -264,4 +280,6 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
       DrawMap.label(style.name, Maff.centroid(placements.values), drawBackground = true, style.color)
     }
   }
+
+  override def toString: String = f"$group $style from $vanguardCentroid to $goal"
 }

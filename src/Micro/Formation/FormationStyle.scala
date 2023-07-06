@@ -1,10 +1,10 @@
 package Micro.Formation
 
-import Debugging.ToString
+import Debugging.{SimpleString, ToString}
 import Debugging.Visualizations.Colors
 import bwapi.Color
 
-abstract class FormationStyle(val color: Color, val offset: Int) {
+abstract class FormationStyle(val color: Color, val offset: Int) extends SimpleString {
   val name: String = ToString(this).replace("FormationStyle", "")
 }
 

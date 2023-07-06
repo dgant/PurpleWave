@@ -299,9 +299,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output                = distanceEntangled + distanceClosedByEnemy
     output
   }
-  @inline final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
-  @inline final def pixelToFireAtExhaustive(enemy: UnitInfo)  : Pixel = pixelToFireAt(enemy, exhaustive = true)
-  @inline private final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
+  final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
+  final def pixelToFireAtExhaustive(enemy: UnitInfo)  : Pixel = pixelToFireAt(enemy, exhaustive = true)
+  private final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
     // Pixel selection methods:
     //
     // Hug: Use enemy pixel

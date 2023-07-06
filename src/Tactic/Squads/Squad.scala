@@ -15,29 +15,30 @@ import Tactic.Tactics.Tactic
 import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
-  var batchId     : Int                           = Int.MinValue
-  var vicinity    : Pixel                         = Points.middle
-  var targets     : Option[IndexedSet[UnitInfo]]  = None
-  var formations  : ArrayBuffer[Formation]        = ArrayBuffer.empty
-  val lock        : LockUnits                     = new LockUnits(this)
+  var batchId         : Int                           = Int.MinValue
+  var vicinity        : Pixel                         = Points.middle
+  var targets         : Option[IndexedSet[UnitInfo]]  = None
+  var formations      : ArrayBuffer[Formation]        = ArrayBuffer.empty
+  val lock            : LockUnits                     = new LockUnits(this)
+  val qualityCounter  : QualityCounter                = new QualityCounter
 
   private var _unitsNow       = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext      = new ArrayBuffer[FriendlyUnitInfo]
   private var _enemiesNow     = new ArrayBuffer[UnitInfo]
   private var _enemiesNext    = new ArrayBuffer[UnitInfo]
-  private val _qualityCounter = new QualityCounter
+
 
   def commission(): Unit = {
     if ( ! With.squads.isCommissioned(this)) {
       With.squads.commission(this)
       _enemiesNow.clear()
-      _qualityCounter.clear()
+      qualityCounter.clear()
     }
   }
 
   final def candidateValue(candidate: FriendlyUnitInfo): Double = {
     commission()
-    _qualityCounter.utility(candidate)
+    qualityCounter.utility(candidate)
   }
 
   @inline final def units: Seq[FriendlyUnitInfo] = _unitsNow
@@ -47,7 +48,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     commission()
     if ( ! _unitsNext.contains(unit)) {
       _unitsNext += unit
-      _qualityCounter.countUnit(unit)
+      qualityCounter.countUnit(unit)
     }
   }
 
@@ -57,7 +58,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     commission()
     if ( ! _enemiesNext.contains(enemy)) {
       _enemiesNext += enemy
-      _qualityCounter.countUnit(enemy)
+      qualityCounter.countUnit(enemy)
     }
   }
 

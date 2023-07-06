@@ -3,13 +3,13 @@ package Tactic.Squads.Qualities
 import Mathematics.Maff
 import Utilities.UnitFilters.UnitFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.CountMap
+import Utilities.{?, CountMap}
 
 class QualityCounter {
 
-  private val qualitiesEnemy = new CountMap[Quality]
-  private val qualitiesFriendly = new CountMap[Quality]
-  private val unitsPossessed = new CountMap[UnitFilter]
+  val qualitiesEnemy          = new CountMap[Quality]
+  val qualitiesFriendly       = new CountMap[Quality]
+  private val unitsPossessed  = new CountMap[UnitFilter]
 
   def clear(): Unit = {
     qualitiesEnemy.clear()
@@ -18,19 +18,19 @@ class QualityCounter {
   }
 
   def countUnit(unit: UnitInfo): Unit = {
-    (if (unit.isFriendly) Qualities.friendly else Qualities.enemy).foreach(countUnitQuality(unit, _))
+    ?(unit.isFriendly, Qualities.friendly, Qualities.enemy).foreach(countUnitQuality(unit, _))
   }
 
   private def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
-    (if (unit.isFriendly) qualitiesFriendly else qualitiesEnemy)(quality) += unitValue(unit, quality)
+    ?(unit.isFriendly, qualitiesFriendly, qualitiesEnemy)(quality) += unitValue(unit, quality)
   }
 
   private def unitValue(unit: UnitInfo, quality: Quality): Int = {
-    if (unit.is(quality)) unit.subjectiveValue.toInt else 0
+    ?(quality(unit), unit.subjectiveValue.toInt, 0)
   }
 
   private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitFilter): Unit = {
-    unitsPossessed(matcher) += Maff.fromBoolean(unit.is(matcher))
+    unitsPossessed(matcher) += Maff.fromBoolean(matcher(unit))
   }
 
   // Captures the idea that if we have *no* units which serve a role, we really want at least one (eg anti-air, detector, etc)

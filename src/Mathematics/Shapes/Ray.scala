@@ -10,8 +10,8 @@ object Ray {
   }
 
   case class Generator(from: Pixel, to: Pixel) extends Iterator[Pixel] {
-    val signX             = Maff.signum(to.x - from.x)
-    val signY             = Maff.signum(to.y - from.y)
+    val signX             = Maff.signum101(to.x - from.x)
+    val signY             = Maff.signum101(to.y - from.y)
     val dx                = to.x - from.x
     val dy                = to.y - from.y
     val velocityX         = dx.toDouble
@@ -55,9 +55,9 @@ object Ray {
   @inline final def apply(from: Pixel, to: Pixel): Iterator[Pixel] = {
     if (to.x == from.x) {
       if (to.y == from.y) return Iterator(to)
-      return (from.y / 32 to to.y / 32 by Maff.signum(to.y - from.y)).iterator.map(tileY => Pixel(to.x, tileY * 32))
+      return (from.y / 32 to to.y / 32 by Maff.signum101(to.y - from.y)).iterator.map(tileY => Pixel(to.x, tileY * 32))
     } else  if (to.y == from.y) {
-      return (from.x / 32 to to.x / 32 by Maff.signum(to.x - from.x)).iterator.map(tileX => Pixel(tileX * 32, to.y))
+      return (from.x / 32 to to.x / 32 by Maff.signum101(to.x - from.x)).iterator.map(tileX => Pixel(tileX * 32, to.y))
     }
     Generator(from, to)
   }

@@ -65,6 +65,10 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private var longDistanceBases     : Seq[Base] = Seq.empty
   private var gasWorkersToAdd       : Int = 0
 
+  // A signal on whether we are holding back on gas production due to a surplus,
+  // particularly so MacroSim knows to project gas availability optimistically.
+  var gasIsCappedOnQuantity: Boolean = _
+
   def setWorkers(newWorkers: collection.Set[FriendlyUnitInfo]): Unit = { workers = newWorkers }
 
   def getWorkersByResource(resource: UnitInfo): Iterable[UnitInfo] = slotsByResource.get(resource).view.flatMap(_.flatMap(_.worker))
@@ -113,7 +117,6 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val gasWorkersHardMaximum = Math.min(gasPumps.view.map(slotsByResource(_).size).sum,  Math.max(With.blackboard.gasWorkerFloor(), With.blackboard.gasWorkerCeiling()))
     val gasGoalMinimum        = Math.min(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
     val gasGoalMaximum        = Math.max(With.blackboard.gasLimitFloor(), With.blackboard.gasLimitCeiling())
-    val gasNow                = With.self.gas
     val gasWorkersTripMinimum = (7 + gasGoalMinimum - With.self.gas) / 8
     val gasWorkersTripMaximum = (7 + gasGoalMaximum - With.self.gas) / 8
     val gasWorkersRatioBasic  = (400 * With.blackboard.gasWorkerRatio() + With.self.minerals) / (400 + With.self.minerals + With.self.gas)
@@ -122,6 +125,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val gasWorkerTarget       = Maff.clamp(gasWorkersBaseTarget,  gasWorkersHardMinimum, gasWorkersHardMaximum)
     val gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
     gasWorkersToAdd           = gasWorkerTarget - gasWorkersNow
+    gasIsCappedOnQuantity     = With.self.gas >= gasGoalMinimum && gasWorkersHardMaximum > 0
 
     if (doInitialSplit()) return
 

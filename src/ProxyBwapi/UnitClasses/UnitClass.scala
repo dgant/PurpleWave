@@ -399,19 +399,19 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   }
 
   lazy val supplyNet    : Int = supplyProvided - supplyRequired
-  lazy val mineralValue : Int = if (this == Zerg.Larva) 0 else mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
-  lazy val gasValue     : Int = if (this == Zerg.Larva) 0 else gasPrice     + buildUnitsSpent.map(_.gasValue).sum
+  lazy val mineralValue : Int = if (this == Zerg.Larva) 0 else if (this == Terran.SpiderMine) 5 else mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
+  lazy val gasValue     : Int = if (this == Zerg.Larva) 0                                       else gasPrice     + buildUnitsSpent.map(_.gasValue).sum
   lazy val copiesProduced: Int = ?(isTwoUnitsInOneEgg, 2, 1)
   lazy val subjectiveValue: Double =
     if (isSpell) 0 else if (this == Zerg.LurkerEgg) Zerg.Lurker.subjectiveValue else if (this == Zerg.Cocoon) Zerg.Guardian.subjectiveValue else (
       (mineralValue
           + 1.5 * gasValue
           + 6.25 * supplyRequired // 100 minerals buys 16 supply; 100 / 16 = 6.25
-          + (if (isZerg) 25.0 / copiesProduced else 0.0)) // Larva value
-        * (if (isWorker) 1.3 else 1.0)
-        * (if (whatBuilds._1 == Terran.Factory) 1.2 else 1.0)
-        * (if (this == Protoss.Carrier) 2.0 else 1.0)
-        * (if (this == Protoss.Interceptor) 0.25 else 1.0)
+          + ?(isZerg, 25.0 / copiesProduced, 0.0)) // Larva value
+        * ?(isWorker,                         1.3,  1.0)
+        * ?(whatBuilds._1 == Terran.Factory,  1.2 , 1.0)
+        * ?(this == Protoss.Carrier,          2.0,  1.0)
+        * ?(this == Protoss.Interceptor,      0.25, 1.0)
         / copiesProduced)
   lazy val subjectiveValueOverHealth: Double = subjectiveValue / Math.max(1, maxTotalHealth)
   lazy val isTier1TownHall: Boolean = ==(Terran.CommandCenter) || ==(Protoss.Nexus) || ==(Zerg.Hatchery)

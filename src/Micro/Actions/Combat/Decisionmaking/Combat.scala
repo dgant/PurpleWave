@@ -164,7 +164,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def readyToApproachTarget: Boolean = {
     if (target.isEmpty) return false
-    val effectiveCooldown = if (unit.transport.exists(_.flying)) 0 else unit.cooldownLeft
+    val effectiveCooldown = if (unit.transport.exists(_.flying)) 0 else unit.framesToBeReadyForAttackOrder
     if (unit.unitClass.ranged && effectiveCooldown > unit.framesToGetInRange(target.get) + 4) return false
     true
   }

@@ -11,21 +11,21 @@ import bwapi.Color
 
 object ShowClustering extends DebugView {
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val y = 7 * With.visualization.lineHeightSmall
     val x0 = 5
     val x1 = 325
     val rows0 = With.battles.local.map(_.us.units)
     val rows1 = With.battles.local.map(_.enemy.units)
-    DrawScreen.column(x0, y, "Battle, friendly: " +: rows0.map(renderScreenUnits))
-    DrawScreen.column(x1, y, "Battle, enemy: "    +: rows1.map(renderScreenUnits))
+    DrawScreen.column(x0, y, "Battle, friendly: " +: rows0.map(describeUnits))
+    DrawScreen.column(x1, y, "Battle, enemy: "    +: rows1.map(describeUnits))
   }
   
-  private def renderScreenUnits(units: Seq[UnitInfo]): String = {
-    "(" + units.size + ") " + ShowSquads.enumerateUnits(units)
+  private def describeUnits(units: Seq[UnitInfo]): String = {
+    f"(${units.size}) ${ShowSquads.enumerateUnits(units)}"
   }
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     val battles = With.battles.local
     battles.foreach(b => Seq(
       (b.us, With.self.colorNeon),
@@ -34,7 +34,7 @@ object ShowClustering extends DebugView {
     ))
   }
   
-  private def renderMapBattle(battle: Battle, color: Color) {
+  private def renderMapBattle(battle: Battle, color: Color): Unit = {
     battle.teams.foreach(team =>
       team.units.foreach(unit =>
         DrawMap.line(unit.pixel, team.centroidAir, color)))

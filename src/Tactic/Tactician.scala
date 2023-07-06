@@ -11,6 +11,7 @@ import Tactic.Missions._
 import Tactic.Production.Produce
 import Tactic.Squads._
 import Tactic.Tactics._
+import _root_.Tactic.Squads.Qualities.Qualities
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters._
@@ -96,7 +97,7 @@ class Tactician extends TimedTask {
     while (i < freelancers.length) {
       val freelancer = freelancers(i)
       val squadsEligible = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
-      val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + (if (freelancer.squad.contains(squad)) 0 else 320))
+      val bestSquad = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + ?(freelancer.squad.contains(squad), 0, 320))
       if (bestSquad.isDefined) {
         bestSquad.get.addUnit(freelancers.remove(i))
         With.recruiter.lockTo(bestSquad.get.lock, freelancer)
@@ -131,7 +132,10 @@ class Tactician extends TimedTask {
     })
   }
 
-  private def adjustDefenseBase(base: Base): Base = base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
+  private def adjustDefenseBase(base: Base): Base = {
+    base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
+  }
+
   private def runCoreTactics(): Unit = {
 
     // Sort defense divisions by descending distance from home.
@@ -202,12 +206,28 @@ class Tactician extends TimedTask {
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step
     if (With.blackboard.wantToAttack() && (With.blackboard.yoloing() || freelancerValue >= freelancerValueInitial * .7)) {
+      // Let's set the attack squad up for success
+      if (MacroFacts.enemyHasShown(Terran.MachineShop, Terran.Vulture, Terran.SpiderMine, Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)) {
+        attackSquad.qualityCounter.qualitiesEnemy.increaseTo(Qualities.Vulture,     (Terran.Vulture.subjectiveValue * Math.max(3, With.units.countEnemy(Terran.Vulture))).toInt)
+        attackSquad.qualityCounter.qualitiesEnemy.increaseTo(Qualities.SpiderMine,  3 * Terran.SpiderMine.subjectiveValue.toInt)
+        attackSquad.qualityCounter.qualitiesEnemy.increaseTo(Qualities.Cloaked,     3 * Terran.SpiderMine.subjectiveValue.toInt)
+      }
+      if (MacroFacts.enemyDarkTemplarLikely) {
+        attackSquad.qualityCounter.qualitiesEnemy.increaseTo(Qualities.Cloaked, Protoss.DarkTemplar.subjectiveValue.toInt)
+      }
+      if (MacroFacts.enemyLurkersLikely) {
+        attackSquad.qualityCounter.qualitiesEnemy.increaseTo(Qualities.Cloaked, Zerg.Lurker.subjectiveValue.toInt)
+      }
       freelancersPick(freelancers, Seq(attackSquad))
     } else {
       // If there are no active defense squads, activate one to defend our entrance
       val squadsDefendingOrWaiting: Seq[Squad] =
         if (squadsDefending.nonEmpty) squadsDefending.view.map(_._2)
-        else Maff.maxBy(Maff.orElse(With.blackboard.basesToHold(), With.geography.ourBasesAndSettlements))(_.economicValue()).map(adjustDefenseBase).map(defenseSquads).toSeq
+        else Maff.maxBy(Maff.orElse(
+          With.blackboard.basesToHold(),
+          With.geography.ourBasesAndSettlements))(_.economicValue())
+            .map(adjustDefenseBase)
+            .map(defenseSquads).toSeq
       freelancersPick(freelancers, squadsDefendingOrWaiting)
     }
   }

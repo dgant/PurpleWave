@@ -11,25 +11,25 @@ import scala.language.postfixOps
 
 trait TilePathfinder {
 
-  val stampDefault: Long = Long.MinValue
-  var stampCurrent: Long = 0L
-  private var tilesExplored: Long = 0
+  val stampDefault            : Long = Long.MinValue
+  var stampCurrent            : Long = 0L
+  private var tilesExplored   : Long = 0
   private val tilesExploredMax: Long = 4 * (With.mapTileWidth + With.mapTileHeight)
 
   // Performance metrics
-  var aStarPathfinds: Long = 0
-  var aStarExplorationMaxed: Long = 0
-  var aStarOver1ms: Long = 0
-  var aStarNanosMax: Long = 0
-  var aStarNanosTotal: Long = 0
-  var aStarPathLengthMax: Long = 0
-  var aStarPathLengthTotal: Long = 0
-  var aStarTilesExploredMax: Long = 0
-  var aStarTilesExploredTotal: Long = 0
+  var aStarPathfinds          : Long = 0
+  var aStarExplorationMaxed   : Long = 0
+  var aStarOver1ms            : Long = 0
+  var aStarNanosMax           : Long = 0
+  var aStarNanosTotal         : Long = 0
+  var aStarPathLengthMax      : Long = 0
+  var aStarPathLengthTotal    : Long = 0
+  var aStarTilesExploredMax   : Long = 0
+  var aStarTilesExploredTotal : Long = 0
 
   def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
   private var tiles: Array[TileState] = Array.empty
-  private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.totalCostFloor))
+  private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => -t.costToEndFloor))
 
   @inline private final def totalRepulsion(profile: PathfindProfile, tile: Tile): Double = {
     var output = 0.0
@@ -62,7 +62,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
-      profile.costOccupancy * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costOccupancy * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff))
     }
     val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0) 0 else {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costRepulsion
@@ -70,7 +70,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum(diff))
+      profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff))
     }
     val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
     val output = costSoFar + costDistance + costEnemyVision + costImmobility + costOccupancy + costRepulsion + costThreat
@@ -107,18 +107,18 @@ trait TilePathfinder {
   // until I reach the top.
   // Baby I'm A*. --Prince
   def aStar(profile: PathfindProfile): TilePath = {
-    val nanosBefore = System.nanoTime()
-    val output = aStarInner(profile)
-    val nanosDelta = Math.max(0, System.nanoTime() - nanosBefore)
-    val pathLength = output.tiles.map(_.length).getOrElse(0)
-    aStarPathfinds += 1
-    aStarExplorationMaxed += Maff.fromBoolean(tilesExplored >= tilesExploredMax)
-    aStarOver1ms += Maff.fromBoolean(nanosDelta > 1e6)
-    aStarNanosMax = Math.max(aStarNanosMax, nanosDelta)
-    aStarNanosTotal += nanosDelta
-    aStarPathLengthMax = Math.max(aStarPathLengthMax, pathLength)
-    aStarPathLengthTotal += pathLength
-    aStarTilesExploredMax = Math.max(aStarTilesExploredMax, tilesExplored)
+    val nanosBefore          = System.nanoTime()
+    val output               = aStarInner(profile)
+    val nanosDelta           = Math.max(0, System.nanoTime() - nanosBefore)
+    val pathLength           = output.tiles.map(_.length).getOrElse(0)
+    aStarPathfinds          += 1
+    aStarExplorationMaxed   += Maff.fromBoolean(tilesExplored >= tilesExploredMax)
+    aStarOver1ms            += Maff.fromBoolean(nanosDelta > 1e6)
+    aStarNanosMax            = Math.max(aStarNanosMax, nanosDelta)
+    aStarNanosTotal         += nanosDelta
+    aStarPathLengthMax       = Math.max(aStarPathLengthMax, pathLength)
+    aStarPathLengthTotal    += pathLength
+    aStarTilesExploredMax    = Math.max(aStarTilesExploredMax, tilesExplored)
     aStarTilesExploredTotal += tilesExplored
     output
   }
@@ -140,7 +140,7 @@ trait TilePathfinder {
     startTileState.setCameFrom(startTile)
     startTileState.setRepulsion(totalRepulsion(profile, startTile))
     startTileState.setCostFromStart(costFromStart(profile, startTile))
-    startTileState.setTotalCostFloor(costToEndFloor(profile, startTile))
+    startTileState.setCostToEndFloor(costToEndFloor(profile, startTile))
     startTileState.setPathLength(1)
     horizon += startTileState
     tilesExplored = 0
@@ -203,7 +203,7 @@ trait TilePathfinder {
             if ( ! wasEnqueued || neighborState.costFromStart > neighborCostFromStart) {
               neighborState.setCameFrom(bestTileState.tile)
               neighborState.setCostFromStart(neighborCostFromStart)
-              neighborState.setTotalCostFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile))
+              neighborState.setCostToEndFloor(neighborCostFromStart + costToEndFloor(profile, neighborTile))
               neighborState.setPathLength(bestTileState.pathLength + (if (neighborOrthogonal) 1 else Maff.sqrt2))
             }
             if ( ! wasEnqueued) {

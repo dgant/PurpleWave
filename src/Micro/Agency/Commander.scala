@@ -95,7 +95,7 @@ object Commander {
       pushThrough(unit, attackFrom, TrafficPriorities.Nudge)
     }
     if (unit.unready) return
-    if (unit.transport.exists(_.flying) && (unit.inRangeToAttack(target) || unit.pixelDistanceCenter(attackFrom) < 48)) {
+    if (unit.transport.exists(_.flying) && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
       requestUnload(unit); return
     }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
@@ -160,8 +160,8 @@ object Commander {
     if (With.reaction.sluggishness == 0 && unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
       val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
       if (to == unit.pixel) {
-        val signX = Maff.forcedSignum(Points.middle.x - to.x)
-        val signY = Maff.forcedSignum(Points.middle.y - to.y)
+        val signX = Maff.signum11(Points.middle.x - to.x)
+        val signY = Maff.signum11(Points.middle.y - to.y)
         to = to.add((signX * overshootDistance).toInt, (signY * overshootDistance).toInt)
       } else if (unit.pixelDistanceSquared(to) < overshootDistance * overshootDistance) {
         to = unit.pixel.project(to, overshootDistance)

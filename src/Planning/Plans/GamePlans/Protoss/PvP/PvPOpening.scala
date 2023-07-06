@@ -14,30 +14,33 @@ import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
 
-  var complete          : Boolean = false
-  var atEarlyTiming     : Boolean = false
-  var atMainTiming      : Boolean = false
-  var earlyTimingClosed : Boolean = false
-  var mainTimingClosed  : Boolean = false
-  var shouldExpand      : Boolean = false
-  var shouldAttack      : Boolean = false
-  var shouldHarass      : Boolean = false
+  var complete            : Boolean = false
+  var atEarlyTiming       : Boolean = false
+  var atMainTiming        : Boolean = false
+  var earlyTimingClosed   : Boolean = false
+  var mainTimingClosed    : Boolean = false
+  var shouldExpand        : Boolean = false
+  var shouldAttack        : Boolean = false
+  var shouldHarass        : Boolean = false
+  var had2GateBeforeCore  : Boolean = false
+  var hadTechBeforeRange  : Boolean = false
+  
   // 10-12
-  var commitZealots     : Boolean = false
-  var sevenZealot       : Boolean = false
+  var commitZealots       : Boolean = false
+  var sevenZealot         : Boolean = false
   // 1 Gate Core
-  var zBeforeCore       : Boolean = false
-  var zAfterCore        : Boolean = false
+  var zBeforeCore         : Boolean = false
+  var zAfterCore          : Boolean = false
   // Robo
-  var getObservers      : Boolean = false
-  var getObservatory    : Boolean = false
-  var getReavers        : Boolean = false
-  var reaverAllIn       : Boolean = false
-  var shuttleFirst      : Boolean = false
-  var shuttleSpeed      : Boolean = false
+  var getObservers        : Boolean = false
+  var getObservatory      : Boolean = false
+  var getReavers          : Boolean = false
+  var reaverAllIn         : Boolean = false
+  var shuttleFirst        : Boolean = false
+  var shuttleSpeed        : Boolean = false
   // DT
-  var greedyDT          : Boolean = false
-  var cannonExpand      : Boolean = false
+  var greedyDT            : Boolean = false
+  var cannonExpand        : Boolean = false
 
   override def activated: Boolean = true
   override def completed: Boolean = {
@@ -267,7 +270,7 @@ class PvPOpening extends GameplanImperative {
         }
       }
       if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
-        shuttleFirst = getReavers && (enemyBases > 1 || enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst, With.fingerprints.robo))
+        shuttleFirst = getReavers // Let's try always getting Shuttle first
       }
       if (enemyCitadel) {
         shuttleFirst = false
@@ -323,19 +326,21 @@ class PvPOpening extends GameplanImperative {
     atMainTiming  ||= enemyBases > 1
     // There may not be a timing depending on what our opponent does,
     // or the timing window might close permanently.
-    earlyTimingClosed ||= PvP1012()         && With.fingerprints.twoGate()
-    earlyTimingClosed ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! upgradeComplete(Protoss.DragoonRange)
-    earlyTimingClosed ||= PvPGateCoreGate() && enemyHasUpgrade(Protoss.DragoonRange) && ! safePushing && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
-    atEarlyTiming     ||= PvPDT()           && enemyHasUpgrade(Protoss.DragoonRange)
-    mainTimingClosed  ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
-    mainTimingClosed  ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
-    mainTimingClosed  ||= PvPDT()           && enemiesComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
-    shouldAttack   = atEarlyTiming  && ! earlyTimingClosed
-    shouldAttack ||= atMainTiming   && ! mainTimingClosed
-    shouldAttack &&= safePushing
-    shouldAttack &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
-    shouldAttack ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
-    shouldHarass = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
+    earlyTimingClosed   ||= PvP1012()         && With.fingerprints.twoGate()
+    earlyTimingClosed   ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! upgradeComplete(Protoss.DragoonRange)
+    earlyTimingClosed   ||= PvPGateCoreGate() && enemyHasUpgrade(Protoss.DragoonRange) && ! safePushing && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    atEarlyTiming       ||= PvPDT()           && enemyHasUpgrade(Protoss.DragoonRange)
+    mainTimingClosed    ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
+    mainTimingClosed    ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
+    mainTimingClosed    ||= PvPDT()           && enemiesComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
+    shouldAttack          = atEarlyTiming  && ! earlyTimingClosed
+    shouldAttack        ||= atMainTiming   && ! mainTimingClosed
+    shouldAttack        &&= safePushing
+    shouldAttack        &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
+    shouldAttack        ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
+    shouldHarass          = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
+    had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && have(Protoss.CyberneticsCore)
+    hadTechBeforeRange  ||= have(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) && ! upgradeStarted(Protoss.DragoonRange)
 
     if (reaverAllIn) {
       shouldExpand = units(Protoss.Reaver) >= 2 && units(Protoss.Shuttle) >= 1
@@ -361,7 +366,8 @@ class PvPOpening extends GameplanImperative {
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
-    if (shouldAttack || shouldExpand || (safeDefending && ! PvPDT())) {
+    val rangeDelayed = Maff.fromBoolean(With.fingerprints.twoGate() || With.fingerprints.nexusFirst()) - Maff.fromBoolean(had2GateBeforeCore) - Maff.fromBoolean(hadTechBeforeRange) > 0
+    if (shouldAttack || (shouldExpand && bases < 2) || (safeDefending && ! PvPDT() && ( ! rangeDelayed || Protoss.DragoonRange()))) {
       holdNatural()
     }
 
@@ -821,7 +827,7 @@ class PvPOpening extends GameplanImperative {
     pumpObs ||= With.fingerprints.dtRush()
     if (getObservers) once(Protoss.Observer)
     if (pumpObs) pump(Protoss.Observer, 2) else if (units(Protoss.Observer) > 1) cancel(Protoss.Observer)
-    if (reaverAllIn || units(Protoss.Reaver) >= 3) pumpShuttleAndReavers() else pump(Protoss.Reaver)
+    if (reaverAllIn || units(Protoss.Reaver) >= 2) pumpShuttleAndReavers() else pump(Protoss.Reaver)
   }
 
   private def trainGatewayUnits(): Unit = {

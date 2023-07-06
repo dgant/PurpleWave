@@ -12,7 +12,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   
   def this(i: Int) = this(i % With.mapTileWidth, i / With.mapTileWidth )
   def this(tilePosition: TilePosition) = this(tilePosition.getX, tilePosition.getY)
-  
+
+  lazy val i: Int = x + With.mapTileWidth * y
+
   @inline def bwapi: TilePosition = new TilePosition(x, y)
   
   // Performance optimization: This is not a strict equality check!
@@ -39,7 +41,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     if (With.mapTileHeight - y < min) min = With.mapTileHeight - y
     min
   }
-  val i: Int = x + With.mapTileWidth * y
+
   @inline def add(dx: Int, dy: Int): Tile = {
     Tile(x + dx, y + dy)
   }
@@ -115,33 +117,31 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     Maff.broodWarDistance(x, y, tile.x, tile.y)
   }
   @inline def tileDistanceSquared(tile: Tile): Int = {
-    val dx = x - tile.x
-    val dy = y - tile.y
-    dx * dx + dy * dy
+    Maff.squared(x - tile.x) + Maff.squared(y - tile.y)
   }
   @inline def topLeftPixel: Pixel = {
-    Pixel(x << 5, y << 5)
+    Pixel(Maff.x32(x), Maff.x32(y))
   }
   @inline def topRightPixel: Pixel = {
-    Pixel((x << 5) + 31, y << 5)
+    Pixel(Maff.x32(x) + 31, Maff.x32(y))
   }
   @inline def bottomRightPixel: Pixel = {
-    Pixel((x << 5) + 31, (y << 5) + 31)
+    Pixel(Maff.x32(x) + 31, Maff.x32(y) + 31)
   }
   @inline def bottomLeftPixel: Pixel = {
-    Pixel((x << 5), (y << 5) + 31)
+    Pixel(Maff.x32(x), Maff.x32(y) + 31)
   }
   @inline def pixelCorners: Array[Pixel] = {
     Array(topLeftPixel, topRightPixel, bottomRightPixel, bottomLeftPixel)
   }
   @inline def center: Pixel = {
-    Pixel((x << 5) + 15, (y << 5) + 15)
+    Pixel(Maff.x32(x) + 15, Maff.x32(y) + 15)
   }
   @inline def contains(pixel: Pixel): Boolean = {
-    x == (pixel.x >> 5) && y == (pixel.y >> 5)
+    x == Maff.div32(pixel.x) && y == Maff.div32(pixel.y)
   }
   @inline def topLeftWalk: WalkTile = {
-    WalkTile(x << 2, y << 2)
+    WalkTile(Maff.x4(x), Maff.x4(y))
   }
   @inline def left: Tile = {
     Tile(x - 1, y)

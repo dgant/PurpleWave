@@ -26,9 +26,14 @@ object Spot extends Action {
   private def canEventuallyCloak(unit: UnitInfo): Boolean = unit.isAny(Terran.SpiderMine, Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Zerg.Lurker)
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val from    = groupSupported(unit).get.centroidKey
-    val to      = groupSupported(unit).get.stepConsensus
-    val mid     = from.project(to, unit.sightPixels).tile
+    val group   = groupSupported(unit).get
+    val from    = group.centroidKey
+    val to      = if (unit.agent.isLeader) group.stepConsensus else Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.stepConsensus)
+    val enemy   = Maff.minBy(group.battleEnemies)(_.pixelDistanceSquared(unit)).map(_.pixel).getOrElse(With.scouting.enemyThreatOrigin.center)
+    val dFromTo = Math.min(unit.sightPixels, from.pixelDistance(to))
+    val dEnemy  = unit.sightPixels - dFromTo
+    val mid     = from.project(to,dFromTo).project(enemy, dEnemy)
+    val midTile = mid.tile
     val spooky  = detectionTarget(unit)
     val tank    = tankTarget(unit)
 
@@ -39,7 +44,7 @@ object Spot extends Action {
         tank.map(_.pixel)
       } else {
         Some(Maff.weightedCentroid(Circle(8)
-          .map(tank.map(_.tile).getOrElse(mid).add)
+          .map(tank.map(_.tile).getOrElse(midTile).add)
           .map(t => (t.center, With.framesSince(t.lastSeen).toDouble))))
       }
 

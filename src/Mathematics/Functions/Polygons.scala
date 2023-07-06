@@ -1,7 +1,7 @@
 package Mathematics.Functions
 
 import Mathematics.Maff
-import Mathematics.Maff.signum
+import Mathematics.Maff.signum101
 import Mathematics.Points.{AbstractPoint, Pixel}
 
 import scala.collection.mutable
@@ -47,7 +47,7 @@ trait Polygons {
   @inline final def clockDirection(a: AbstractPoint, b: AbstractPoint, c: AbstractPoint): Int = {
     // See https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order/1180256#1180256
     // and https://www.geeksforgeeks.org/orientation-3-ordered-points/
-    signum((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
+    signum101((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y))
   }
 
   @inline final def convexHull(points: Seq[Pixel]): Seq[Pixel] = convexHull(points, (pixel: Pixel) => pixel)

@@ -13,12 +13,12 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.FriendlyUnitGroup
-import Utilities.LightYear
+import Utilities.{?, LightYear}
 import Utilities.Time.Minutes
 
 //noinspection ComparingUnrelatedTypes
 //Disabling spurious IntelliJ warnings
-class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
+final class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle, val goal: Pixel, var argZone: Option[Zone] = None) extends Formation {
   private case class ClassSlots(unitClass: UnitClass, var slots: Int, formationRangePixels: Double)
   private def units       = group.unintended
   private def airUnits    = units.filter(_.flying)
@@ -30,7 +30,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   // target:           Enemies we are likely to fight en route to our goal
   // apex:             The starting point from which we build the formation
   // face:             The point the formation should be facing
-  val knownRangeTiles     : Int                   = Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels.toInt / 32)).getOrElse(0)
+  val knownRangeTiles     : Int                   = Maff.div32(Maff.max(With.units.enemy.filter(u => u.unitClass.attacksGround && ! u.unitClass.isBuilding).view.map(_.formationRangePixels)).getOrElse(0.0).toInt)
   val raceRangeTiles      : Int                   = if (With.frame > Minutes(4)() && With.enemies.exists(_.isProtoss)) 6 else if (With.enemies.exists(_.isTerran)) 4 else 1
   val expectRangeTiles    : Int                   = Math.max(knownRangeTiles, raceRangeTiles)
   val targetsNear         : Seq[UnitInfo]         = group.groupUnits.flatMap(_.battle).distinct.flatMap(_.enemy.units).filter(e => group.groupUnits.exists(u => u.canAttack(e) && u.pixelsToGetInRange(e) < 32 * 5))
@@ -62,8 +62,8 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
   val altitudeOutside     : Int                   = edge.map(_.otherSideof(zone).centroid.altitude).getOrElse(altitudeInside)
   val altitudeRequired    : Int                   = if (style == FormationStyleGuard && expectRangeTiles > 1 && altitudeInside > altitudeOutside) altitudeInside else -1
   val maxThreat           : Int                   = if (style == FormationStyleEngage) With.grids.enemyRangeGround.margin - 1 else With.grids.enemyRangeGround.defaultValue
-  var face                : Pixel                 = if (style == FormationStyleEngage) threatOrigin else if (style == FormationStyleGuard) goal else goalPath5.center
-  var apex                : Pixel                 = goal
+  var face                : Pixel                 = if (style == FormationStyleEngage) threatOrigin else goal // This will usually be overridden
+  var apex                : Pixel                 = goal // This will usually be overridden
   var stepTilesPace       : Int                   = 0
   var stepTilesEngage     : Int                   = 0
   var stepTilesAssemble   : Int                   = 0
@@ -140,7 +140,14 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
         if (tile.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(tile.center))) output *= 10000
         output
       }
-      apex = Maff.minBy(goalPathTiles)(scoreApex).map(_.center).getOrElse(goal)
+      val bestApexTile  = Maff.minBy(goalPathTiles)(scoreApex)
+      val bestFaceTile  = bestApexTile.map(t => {
+        val apexIndex = goalPathTiles.indexOf(bestApexTile)
+        val faceIndex = apexIndex + 1 + group.meanAttackerRange.toInt / 32
+        ?(faceIndex >= goalPathTiles.length, goalPathTiles.last, goalPathTiles(faceIndex))
+      })
+      apex = bestApexTile.map(_.center).getOrElse(goal)
+      face = bestFaceTile.map(_.center).getOrElse(goal)
     }
   }
 
@@ -155,7 +162,7 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     }
     val classCount = groundUnits
       .groupBy(_.unitClass)
-      .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels / 32)))
+      .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels * Maff.inv32)))
       .toVector
       .sortBy(_.formationRangePixels)
 
@@ -228,43 +235,58 @@ class FormationStandard(val group: FriendlyUnitGroup, var style: FormationStyle,
     var haltPositive    = false
     var arcZone: Zone   = null
     def nextRow(): Boolean = {
-      radius += radiusIncrement
-      angleIncrement = radiusIncrement / radius
-      rowSlot = -1
-      haltNegative = false
-      haltPositive = false
+      radius          += radiusIncrement
+      angleIncrement  = radiusIncrement / radius
+      rowSlot         = -1
+      haltNegative    = false
+      haltPositive    = false
       true
     }
     nextRow()
-    def proceed(): Boolean = {
-      slotsEvaluated += 1
-      if (slotsEvaluated > 10000) return false
-      rowSlot += 1
-      val s = if (rowSlot % 2 == 0) 1 else -1
-      val m = s * rowSlot / 2
-      val angleDelta = angleIncrement * m
-      if (angleDelta > Maff.halfPI) return nextRow()
-      if (s < 0 && haltNegative) return true
-      if (s > 0 && haltPositive) return true
-      val p = toFace.radiateRadians(angleCenter + angleDelta, radius)
-      if (rowSlot == 0) { arcZone = p.zone }
-      if ( ! p.walkable) {
-        if ( ! p.walkableTerrain && p.zone != arcZone) {
-          haltNegative ||= s < 0
-          haltPositive ||= s > 0
-          if (haltNegative && haltPositive) return nextRow()
+
+    // Why can't Scala just have break statements like a normal language
+    var i = 0
+    while (i < classSlots.length) {
+      unitClass = classSlots(i).unitClass
+      var j = 0
+      while (j < classSlots(i).slots) {
+        var proceed = true
+        while (proceed) {
+          slotsEvaluated += 1
+          if (slotsEvaluated > 10000) {
+            proceed = false
+          } else {
+            rowSlot += 1
+            val s = if (Maff.mod2(rowSlot) == 0) 1 else -1
+            val m = s * Maff.div2(rowSlot)
+            val angleDelta = angleIncrement * m
+            proceed =
+              if (angleDelta > Maff.halfPi) {
+                nextRow()
+              } else if (s < 0 && haltNegative) {
+                true
+              } else if (s > 0 && haltPositive) {
+                true
+              } else {
+                val p = toFace.radiateRadians(angleCenter + angleDelta, radius)
+                if (rowSlot == 0) { arcZone = p.zone }
+                if (p.walkable) {
+                  p.altitude < minAltitude || p.tile.enemyRangeGround > maxThreat || ! With.grids.formationSlots.tryPlace(unitClass, p)
+                } else if ( ! p.walkableTerrain && p.zone != arcZone) {
+                  haltNegative ||= s < 0
+                  haltPositive ||= s > 0
+                  ! haltNegative || ! haltPositive || nextRow()
+                } else {
+                  true
+                }
+            }
+          }
         }
-        return true
+        j += 1
       }
-      val groundTilesToGoal = p.groundPixels(goal) / 32
-      if (p.altitude < minAltitude) return true
-      if (p.tile.enemyRangeGround > maxThreat) return true
-      ! With.grids.formationSlots.tryPlace(unitClass, p)
+      i += 1
     }
-    classSlots.foreach(classSlot => {
-      unitClass = classSlot.unitClass
-      (0 until classSlot.slots).foreach(i => while(proceed()) {})
-    })
+
     With.grids.formationSlots.placed.groupBy(_._1).map(p => (p._1, p._2.map(_._2)))
   }
 

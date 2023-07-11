@@ -14,23 +14,25 @@ import scala.collection.JavaConverters.collectionAsScalaIterableConverter
   * Builds and publishes basic geographical features
   */
 trait GeographyBuilder {
-          val allTiles    : Vector[Tile]          = new TileRectangle(0, 0, With.mapTileWidth, With.mapTileHeight).tiles.toVector
-  private var _edges      : Vector[Edge]          = Vector.empty
-  private var _bases      : Vector[Base]          = Vector.empty
-  private var _zones      : Vector[Zone]          = Vector.empty
-  private var _metros     : Vector[Metro]         = Vector.empty
-  private var _zoneByTile : Vector[Zone]          = Vector.empty
-  private var _baseByTile : Vector[Option[Base]]  = Vector.empty
+          val allTiles    : Vector[Tile]        = new TileRectangle(0, 0, With.mapTileWidth, With.mapTileHeight).tiles.toVector
+  private var _edges      : Vector[Edge]        = Vector.empty
+  private var _bases      : Vector[Base]        = Vector.empty
+  private var _zones      : Vector[Zone]        = Vector.empty
+  private var _metros     : Vector[Metro]       = Vector.empty
+  private var _zoneByTile : Array[Zone]         = Array.empty
+  private var _baseByTile : Array[Option[Base]] = Array.empty
 
-  def edges   : Vector[Edge]  = _edges
-  def bases   : Vector[Base]  = _bases
-  def zones   : Vector[Zone]  = _zones
-  def metros  : Vector[Metro] = _metros
+  @inline final def edges   : Vector[Edge]  = _edges
+  @inline final def bases   : Vector[Base]  = _bases
+  @inline final def zones   : Vector[Zone]  = _zones
+  @inline final def metros  : Vector[Metro] = _metros
 
-  def zoneByTile(tile: Tile)      : Zone          = zoneByValidTile(tile.clip)
-  def zoneByValidTile(i: Int)     : Zone          = _zoneByTile(i)
-  def zoneByValidTile(tile: Tile) : Zone          = _zoneByTile(tile.i)
-  def baseByTile(tile: Tile)      : Option[Base]  = if (tile.valid) _baseByTile(tile.i) else None
+  @inline final def zoneByTile      (tile: Tile)  : Zone          = _zoneByTile(Maff.clamp(tile.i, 0, _zoneByTile.length - 1))
+  @inline final def zoneByValidTile (i: Int)      : Zone          = _zoneByTile(i)
+  @inline final def zoneByValidTile (tile: Tile)  : Zone          = _zoneByTile(tile.i)
+  @inline final def baseByTile      (tile: Tile)  : Option[Base]  = if (tile.valid) _baseByTile(tile.i) else None
+  @inline final def baseByValidTile (i: Int)      : Option[Base]  = _baseByTile(i)
+  @inline final def baseByValidTile (tile: Tile)  : Option[Base]  = _baseByTile(tile.i)
 
   def onStart(): Unit = {
     With.grids.walkableTerrain.initialize()
@@ -55,7 +57,7 @@ trait GeographyBuilder {
       val neighborZones = Spiral(5).map(tile.add).filter(_.valid).map(_.i).map(regionByTile)
       regionByTile(i) = Maff.maxBy(neighborZones.groupBy(x => x))(_._2.size).map(_._1).getOrElse(regions.minBy(r => new Pixel(r.getCenter).tile.tileDistanceSquared(tile)))})
     _zones = regions.map(r => new Zone(zoneNames.next(), r, regionByTile.indices.filter(regionByTile(_) == r).map(new Tile(_)).toSet)).toVector
-    _zoneByTile = allTiles.map(tile => zones.find(_.tiles.contains(tile)).get)
+    _zoneByTile = allTiles.view.map(tile => zones.find(_.tiles.contains(tile)).get).toArray
 
     // Build Edges
     //
@@ -67,7 +69,7 @@ trait GeographyBuilder {
     val baseTilesByZone = baseTiles.groupBy(zoneByValidTile)
     val baseTileSets = baseTilesByZone.flatMap(p => p._2.map(base => (base, p._1.tiles.filter(tile => p._2.filterNot(base==).forall(_.tileDistanceSquared(tile) > base.tileDistanceSquared(tile))))))
     _bases = baseTileSets.map(p => new Base(baseNames.next(), p._1, p._2)).toVector
-    _baseByTile = allTiles.map(t => _bases.find(_.tiles.contains(t)))
+    _baseByTile = allTiles.view.map(t => _bases.find(_.tiles.contains(t))).toArray
 
     // We need zones and bases updated in order to construct metros
     //

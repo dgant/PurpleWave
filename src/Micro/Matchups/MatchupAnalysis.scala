@@ -38,7 +38,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def others                      : Seq[UnitInfo]     = enemies ++ allies
   def allUnits                    : Seq[UnitInfo]     = others :+ me
   def threats                     : Seq[UnitInfo]     = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
-  def targets                     : Seq[UnitInfo]     = enemies.filter(threatens(me, _))
+  def targets                     : Seq[UnitInfo]     = ?(me.unitClass.canAttack || me.unitClass.isTransport, enemies.filter(threatens(me, _)), Seq.empty.view)
   def threatsInRange              : Seq[UnitInfo]     = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInPixels(p: Double)  : Seq[UnitInfo]     = threats.filter(_.pixelsToGetInRange(me) <= p)
   def threatsInFrames(f: Int)     : Seq[UnitInfo]     = threats.filter(_.framesToGetInRange(me) <= f)
@@ -55,7 +55,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def inTankRange                 : Boolean           = _inTankRange()
   def inRangeOfTank               : Boolean           = _inRangeOfTank()
   def targetedByScarab            : Boolean           = _targetedByScarab()
-  def withinSafetyMargin          : Boolean           = pixelsEntangled <= ?(me.flying && me.topSpeed > Maff.max(threats.map(_.topSpeed)).getOrElse(0.0), -64, -safetyMargin)
+  def withinSafetyMargin          : Boolean           = _withinSafetyMargin()
   def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
   def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
@@ -73,6 +73,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _dpfReceiving         = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
   private val _inTankRange          = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
   private val _inRangeOfTank        = new Cache(() => targetsInRange.exists(Terran.SiegeTankSieged))
+  private val _withinSafetyMargin   = new Cache(() => pixelsEntangled <= ?(me.flying && me.topSpeed > groupVs.maxAttackerSpeedVsAir, -64, -safetyMargin))
   private val _targetedByScarab     = new Cache(() => me.battle.exists(_.scarabTargets.exists(_._2 == me)))
   private val _framesToLive         = new Cache(() => me.likelyDoomedInFrames)
   private val _wantsToVolley        = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated

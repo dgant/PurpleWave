@@ -87,7 +87,7 @@ object ShowBattles extends DebugView {
     val skimBarWidth = 80
     val skimBarX0 = (640 - skimBarWidth) / 2
     val skimBarX2 = (640 + skimBarWidth) / 2
-    val skimBarX1 = skimBarX0 + (skimBarWidth * battle.skimWeight).toInt
+    val skimBarX1 = skimBarX0 + Maff.clamp((skimBarWidth * battle.skimWeight).toInt, 1, skimBarWidth - 1) // Make sure each side has at least 1px visibility
     val skimBarY0 = 340
     val skimBarY1 = skimBarY0 + 12
     With.game.drawBoxScreen(skimBarX0, skimBarY0, skimBarX1, skimBarY1, Color.Black, true)

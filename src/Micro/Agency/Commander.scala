@@ -583,15 +583,12 @@ object Commander {
   }
   
   def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {
-    val sleepUntil = Maff.vmax(
+    unit.sleepUntil = Maff.vmax(
       With.frame + requiredDelay,
       With.frame + With.latency.turnSize,
-      unit.nextOrderFrame.getOrElse(0))
+      unit.sleepUntil)
     if (With.configuration.trackUnit && (unit.selected || unit.transport.exists(_.selected))) {
-      With.configuration.trackUnit = false
-      unit.sleepUntil(sleepUntil) // This is where you want the trackUnit breakpoint
-    } else {
-      unit.sleepUntil(sleepUntil)
+      With.configuration.trackUnit = false // This is where you want the trackUnit breakpoint
     }
   }
 

@@ -61,7 +61,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       (pixels * Math.sin(angleRadians)).toInt)
   }
   @inline def degreesTo(other: Pixel): Double = {
-    radiansTo(other) / radiansOverDegrees
+    radiansTo(other) * Maff.x2PiInv360
   }
   @inline def radiansTo(other: Pixel): Double = {
     Maff.fastAtan2(other.y - y, other.x - x)

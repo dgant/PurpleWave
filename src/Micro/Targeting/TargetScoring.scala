@@ -1,6 +1,7 @@
 package Micro.Targeting
 
 import Lifecycle.With
+import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 import Utilities.?
@@ -11,10 +12,9 @@ object TargetScoring {
     Math.max(0, attacker.pixelsToGetInRange(target) - 0.5 * attacker.cooldownLeft * attacker.topSpeed)
   }
 
-  private val inv32 = 1.0 / 32.0
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
     val value = targetValue + 4.0 * injury
-    ?(value > 0, efficacy, 1.0) * value - inv32 * pixelCost
+    ?(value > 0, efficacy, 1.0) * value - Maff.inv32 * pixelCost
   }
 
   /**

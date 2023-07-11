@@ -1,7 +1,9 @@
 package Information.Grids.Miscellaneous
 
 import Information.Grids.ArrayTypes.AbstractGridArray
-import Mathematics.Points.{Pixel, PixelRectangle, Tile}
+import Lifecycle.With
+import Mathematics.Maff
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.UnorderedBuffer
@@ -27,19 +29,43 @@ final class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitCl
     }
   }
 
+  private def intersects(x0: Int, y0: Int, x1: Int, y1: Int, i: Int): Boolean = {
+    val j = Maff.clamp(i, 0, lengthMinusOne)
+    val slots = get(j)
+    var k = 0
+    while (k < slots.length) {
+      val (u, p) = slots(k)
+      if (Maff.rectanglesIntersect(x0, y0, x1, y1,
+        p.x - u.dimensionLeft,
+        p.y - u.dimensionUp,
+        p.x + u.dimensionRight,
+        p.y + u.dimensionDown)) {
+        return true
+      }
+      k += 1
+    }
+    false
+  }
   def tryPlace(unitClass: UnitClass, pixel: Pixel): Boolean = {
-    if ( ! pixel.valid) return false
-    val tile = pixel.tile
+    val i = this.i(Maff.div32(pixel.x), Maff.div32(pixel.y))
+    if (i < 0 || i > length) return false
     if (unitClass.isFlyer) return true
-    val rectangle = PixelRectangle(
-      pixel.subtract(unitClass.dimensionLeft, unitClass.dimensionUp),
-      pixel.add(unitClass.dimensionRight, unitClass.dimensionDown))
-    val canPlace = ! tile.adjacent9.exists(t =>
-      get(t).exists(other => rectangle.intersects(PixelRectangle(
-        other._2.subtract(other._1.dimensionLeft, other._1.dimensionUp),
-        other._2.add(other._1.dimensionRight, other._1.dimensionDown)))))
-    if (canPlace) forcePlaceUnchecked(unitClass, pixel, tile)
-    canPlace
+    val x0 = pixel.x - unitClass.dimensionLeft
+    val x1 = pixel.x + unitClass.dimensionRight
+    val y0 = pixel.y - unitClass.dimensionUp
+    val y1 = pixel.y + unitClass.dimensionDown
+    val output = (
+         ! intersects(x0, y0, x1, y1, i - 1)
+      && ! intersects(x0, y0, x1, y1, i)
+      && ! intersects(x0, y0, x1, y1, i + 1)
+      && ! intersects(x0, y0, x1, y1, i - 1 - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i     - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i + 1 - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i - 1 + With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i     + With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i + 1 + With.mapTileWidth))
+    if (output) forcePlaceUnchecked(unitClass, pixel)
+    output
   }
 
   def forcePlaceUnchecked(unitClass: UnitClass, pixel: Pixel): Unit = {

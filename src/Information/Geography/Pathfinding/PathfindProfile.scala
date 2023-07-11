@@ -10,10 +10,10 @@ import Utilities.?
 final class PathfindProfile(
   var start               : Tile,
   var end                 : Option[Tile]    = None,
-  var endDistanceMaximum  : Float           = 0,
+  var endDistanceMaximum  : Double          = 0,
   var threatMaximum       : Option[Int]     = None, // Default: Ignore threat
-  var lengthMinimum       : Option[Float]   = None,
-  var lengthMaximum       : Option[Float]   = None, // It's hazardous to set a maximum with a specific destination when ground distance is off
+  var lengthMinimum       : Option[Double]  = None,
+  var lengthMaximum       : Option[Double]  = None, // It's hazardous to set a maximum with a specific destination when ground distance is off
   var canCrossUnwalkable  : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
   var canEndUnwalkable    : Option[Boolean] = None, // Default: Reasonable value for unit, otherwise false
   var employGroundDist    : Boolean         = false,

@@ -14,12 +14,15 @@ object Skimulator {
 
     // Calculate unit distance
     battle.teams.foreach(team => team.units.foreach(unit => {
-      // Since we're deciding whether to attack into the enemy,assume the enemy can thrive by just regrouping instead of advancing
+      // Since we're deciding whether to attack into the enemy, assume the enemy can thrive by just regrouping instead of advancing
+      // Give enemies bonus range based on time before the fight gets underway
       //
       // Friendly: Distance to get in range of target
       // Enemy: Min(Distance to get in range of target, distance to regroup)
 
-      val floorDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
+      //val floorDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
+      val floorDistance: Double = LightYear().toDouble
+
       val targets = ?(Terran.Medic(unit),
         team.units.view.filter(_.unitClass.isOrganic),
         Maff.orElse(unit.presumptiveTarget, team.opponent.units))
@@ -50,19 +53,19 @@ object Skimulator {
     battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(IsWarrior).map(_.skimDistanceToEngage)).getOrElse(LightYear()))
     battle.teams.foreach(team => team.units.foreach(unit => {
       // Calculate speed, accounting reasonably for immobile units
-      val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed / 4)
-      val delayFrames           = Math.max(unit.cooldownLeft, Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / speed / (if (unit.isFriendly) battle.speedMultiplier else 1.0)))
+      val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed * 0.25)
+      val delayFrames           = Math.max(unit.cooldownLeft, Maff.nanToOne((unit.skimDistanceToEngage - team.skimMeanWarriorDistanceToEngage) / speed / ?(unit.isFriendly, battle.speedMultiplier, 1.0)))
       val extensionFrames       = Maff.nanToOne((team.skimMeanWarriorDistanceToEngage - unit.skimDistanceToEngage) / team.meanAttackerSpeed)
-      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanAttackerHealth / team.opponent.meanDpf), 12, 240)
-      unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames / teamDurabilityFrames), 0.0, 1.0)
-      unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames / teamDurabilityFrames), 0.0, 0.75)
+      val teamDurabilityFrames  = Maff.clamp(Maff.nanToOne(team.meanAttackerHealth  / team.opponent.meanDpf), 12,   240)
+      unit.skimDelay            = Maff.clamp(Maff.nanToOne(delayFrames              / teamDurabilityFrames),  0.0,  1.0)
+      unit.skimExtension        = Maff.clamp(Maff.nanToZero(extensionFrames         / teamDurabilityFrames),  0.0,  0.75)
       unit.skimPresence         = 1.0 - Math.max(unit.skimDelay, unit.skimExtension)
     }))
 
     // Calculate unit strength
     battle.teams.foreach(team => team.units.foreach(unit => {
       val opponent      = team.opponent
-      val energy        = if (unit.isFriendly) unit.energy else 100
+      val energy        = ?(unit.isFriendly, unit.energy, 100)
       val player        = unit.player
       val casts75       = Math.floor(unit.energy / 75)
       val casts100      = Math.floor(unit.energy / 100)
@@ -104,7 +107,7 @@ object Skimulator {
       if (Terran.Medic(unit))                                             unit.skimStrength *= Maff.clamp(maxEffectiveMedics / Math.max(1, team.count(Terran.Medic)), 0.0, 1.0)
       if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
-      if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size / 8.0
+      if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size * Maff.inv8
       if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(IsGroundWarrior) / 12, 1.0, 2.5)
       if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.count(Protoss.Shuttle) / team.count(Protoss.Reaver), 1.0, if (Protoss.ShuttleSpeed(unit.player)) 2.0 else 1.5)
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
@@ -150,9 +153,9 @@ object Skimulator {
     battle.teams.foreach(team => team.units.foreach(unit => {
       team.skimStrengthTotal    += unit.skimStrength
       team.skimStrengthAir      += unit.skimStrength * Maff.fromBoolean(unit.flying)
-      team.skimStrengthGround   += unit.skimStrength * Maff.fromBoolean(! unit.flying)
-      team.skimStrengthVsAir    += unit.skimStrength * Maff.fromBoolean(unit.canAttackAir || ! unit.canAttack)
-      team.skimStrengthVsGround += unit.skimStrength * Maff.fromBoolean(unit.canAttackGround || ! unit.canAttack || (Protoss.Corsair(unit) && unit.energy >= 125 && Protoss.DisruptionWeb(unit.player)))
+      team.skimStrengthGround   += unit.skimStrength * Maff.fromBoolean( ! unit.flying)
+      team.skimStrengthVsAir    += unit.skimStrength * Maff.fromBoolean(unit.canAttackAir     || ! unit.canAttack)
+      team.skimStrengthVsGround += unit.skimStrength * Maff.fromBoolean(unit.canAttackGround  || ! unit.canAttack || (Protoss.Corsair(unit) && unit.skimMagic > 0))
     }))
   }
 }

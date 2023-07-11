@@ -4,6 +4,7 @@ import Mathematics.Points.Tile
 import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
+import Utilities.?
 import Utilities.Time.Frames
 
 final class MacroEvent(val state: MacroState) {
@@ -32,13 +33,13 @@ final class MacroEvent(val state: MacroState) {
   var tile                : Option[Tile]  = None
 
   private def sign(value: Int): String = {
-    if (value >= 0) f"+$value" else f"$value"
+    ?(value >= 0, f"+$value", f"$value")
   }
   private def count(value: Int): String = {
     f"($value)"
   }
   private def freeOrDone(unitClass: UnitClass): String = {
-    if (dUnitComplete == unitClass) f"Done $unitClass" else f"Free $unitClass"
+    ?(dUnitComplete == unitClass, f"Done $unitClass", f"Free $unitClass")
   }
   private def tileString: String = {
     tile.map(t => f" $t").mkString("")

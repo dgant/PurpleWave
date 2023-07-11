@@ -32,7 +32,7 @@ final class Cluster(val units: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[U
   def intersects(other: Cluster): Boolean = (
     Maff.convexPolygonsIntersect(hull.view.map(_.pixel), other.hullExpanded)
   )
-  def atWar: Boolean = strengthRatioScale < 4.0
+  def atWar: Boolean = strengthRatioScale < 1000.0
 
   def measureCentroid(): Unit = {
     hullCentroid = hullCentroid.orElse(Some(Maff.centroid(hull.view.map(_.pixel))))

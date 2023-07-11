@@ -12,6 +12,7 @@ import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Strategery.Benzene
+import Utilities.?
 import Utilities.Time.{Minutes, Seconds}
 
 object Gather extends Action {
@@ -22,13 +23,14 @@ object Gather extends Action {
 
   val defenseRadiusPixels = 160
 
-  private def resourceThreatened(resource: UnitInfo): Boolean = resource.tileArea.tiles.map(With.grids.enemyRangeGround.get).max > 0
+  private def resourceThreatened(resource: UnitInfo): Boolean = resource.tile.enemyRangeGround > 0 || resource.tile.add(1, 0).enemyRangeGround > 0
 
   private def minerThreatenedAt(miner: FriendlyUnitInfo, resource: UnitInfo): Boolean = (
     resourceThreatened(resource)
-    && miner.matchups.threats.exists(threat =>
-      threat.isNone(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
-      && threat.pixelsToGetInRange(miner, resource.pixel) < defenseRadiusPixels))
+    && resource.base.exists(_.enemies.exists(e =>
+      e.canAttackGround
+      && e.isNone(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
+      && e.pixelsToGetInRange(miner, resource.pixel) < defenseRadiusPixels)))
   
   override def perform(unit: FriendlyUnitInfo): Unit = {
 
@@ -65,27 +67,32 @@ object Gather extends Action {
       }
 
       // Help with fights when appropriate
-      lazy val beckonedToFight  = unit.matchups.targets.exists(target =>
-        ! target.unitClass.isWorker
-        && target.unitClass.attacksOrCastsOrDetectsOrTransports
-        && target.pixelDistanceCenter(resource) < defenseRadiusPixels
-        && unit.base.map(_.heart.center).forall(target.pixelDistanceCenter(_) < defenseRadiusPixels))
+      lazy val beckonedToFight = (
+        unit.battle.isDefined
+        && unit.base.exists(base =>
+          base.isOurs
+          && base.enemies.exists(target =>
+            ! target.unitClass.isWorker
+            && ! target.unitClass.isFlyer
+            && target.unitClass.attacksOrCastsOrDetectsOrTransports
+            && target.pixelDistanceCenter(resource) < defenseRadiusPixels
+            && unit.base.map(_.heart.center).forall(target.pixelDistanceCenter(_) < defenseRadiusPixels))))
+
       if (unit.totalHealth > 32 && beckonedToFight) {
         Target.choose(unit)
         Commander.attack(unit)
       }
 
       // Escape dangerous melee units
-      val lethalStabbers = unit.matchups.threatsInRange.filter(threat =>
-        threat.unitClass.melee
-        && (if (threat.presumptiveTarget.contains(unit)) 2 else 1) * threat.damageOnNextHitAgainst(unit) >= unit.totalHealth)
-      if (lethalStabbers.nonEmpty && unit.base.isDefined) {
+      lazy val stabbers        = unit.matchups.threatsInRange.filter(_.unitClass.melee)
+      lazy val stabbingLethal  = stabbers.map(e => ?(e.presumptiveTarget.contains(unit), 3, 2) * e.damageOnNextHitAgainst(unit)).sum >= unit.totalHealth
+      if (unit.tile.enemyRangeGround > 0 && unit.base.isDefined && stabbingLethal) {
         val drillGoal = (unit.base.get.resources ++ unit.base.flatMap(_.townHall))
           .filter(goal =>
             ((unit.carryingGas || unit.carryingMinerals)  && goal.unitClass.isTownHall  && goal.isOurs) ||
             (!unit.carryingGas                            && goal.unitClass.isGas       && goal.isOurs) ||
             (!unit.carryingMinerals                       && goal.unitClass.isMinerals))
-        val bestGoal = Maff.maxBy(drillGoal)(resource => lethalStabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
+        val bestGoal = Maff.maxBy(drillGoal)(resource => stabbers.map(stabber => resource.pixelDistanceCenter(stabber)).max)
         if (bestGoal.exists(_.unitClass.isTownHall)) {
           Commander.returnCargo(unit)
         } else if (bestGoal.isDefined) {

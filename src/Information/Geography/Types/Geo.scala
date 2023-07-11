@@ -22,6 +22,9 @@ trait Geo {
   lazy val border   : Set[Tile]     = tiles.filter( ! _.adjacent8.forall(tiles.contains))
   lazy val radians  : Double        = Points.middle.radiansTo(heart.center)
 
+  lazy val groundPixelsToBases: Map[Base, Double] = With.geography.bases.map(b => (b, b.heart.groundPixels(heart))).toMap
+  lazy val groundPixelsToZones: Map[Zone, Double] = With.geography.zones.map(z => (z, z.heart.groundPixels(heart))).toMap
+
   def isOurs        : Boolean       = owner.isUs
   def isAlly        : Boolean       = owner.isAlly
   def isEnemy       : Boolean       = owner.isEnemy

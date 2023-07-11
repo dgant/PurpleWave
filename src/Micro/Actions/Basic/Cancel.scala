@@ -1,6 +1,7 @@
 package Micro.Actions.Basic
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Zerg
@@ -28,8 +29,8 @@ object Cancel extends Action {
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered
     lazy val framesCutoff     = 48 + With.reaction.agencyAverage
     lazy val framesToLive     = unit.matchups.framesToLive
-    lazy val framesToFinish   = Seq(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames).max
-    lazy val doomed           = unit.battle.isDefined && unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
+    lazy val framesToFinish   = Maff.vmax(unit.remainingTechFrames, unit.remainingUpgradeFrames, unit.remainingTrainFrames)
+    lazy val doomed           = unit.battle.isDefined && unit.hitPoints < unit.unitClass.maxHitPoints && unit.matchups.threatsInRange.nonEmpty && framesToLive < framesCutoff
     lazy val willNeverFinish  = unit.matchups.threatsInRange.nonEmpty && framesToLive < framesToFinish
     lazy val canCancel        = unit.isAny(_.unitClass.isBuilding, Zerg.LurkerEgg, Zerg.Egg, Zerg.Cocoon) // Performance hack to avoid accessing .training, etc.
     lazy val producing        = unit.training || unit.upgrading || unit.teching

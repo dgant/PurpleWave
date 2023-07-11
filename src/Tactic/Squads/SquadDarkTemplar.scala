@@ -105,7 +105,7 @@ class SquadDarkTemplar extends Squad {
     var iDt = 0
     while (dts.nonEmpty) {
       var base  = bases.headOption.getOrElse(firstBase)
-      val dt    = dts.minBy(_.pixelDistanceTravelling(base.heart))
+      val dt    = dts.minBy(dt => dt.pixelDistanceTravelling(base.heart) * ?(dt.orderTargetPixel.orElse(dt.orderTarget.map(_.pixel)).exists(_.base.contains(base)), 0.75, 1.0))
       val dtTargets = Some(base.enemies.toVector)
       if (base.isEnemy && ! base.owner.isZerg) {
         intendDTToBase(dt, base)

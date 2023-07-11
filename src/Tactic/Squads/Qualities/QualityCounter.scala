@@ -22,42 +22,29 @@ class QualityCounter {
   }
 
   private def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
-    ?(unit.isFriendly, qualitiesFriendly, qualitiesEnemy)(quality) += unitValue(unit, quality)
+    ?(unit.isFriendly, qualitiesFriendly, qualitiesEnemy)(quality) += ?(quality(unit), unit.subjectiveValue.toInt, 0)
   }
 
-  private def unitValue(unit: UnitInfo, quality: Quality): Int = {
-    ?(quality(unit), unit.subjectiveValue.toInt, 0)
+  def utility(unit: FriendlyUnitInfo): Double = {
+    var max = 0.0
+    val qfi = qualitiesFriendly.iterator
+    while (qfi.hasNext) {
+      val (qf, qfc) = qfi.next()
+      val qei = qualitiesEnemy.iterator
+      while (qei.hasNext) {
+        val (qe, qec) = qei.next()
+        var i = 0
+        while (i <  qe.counteredBy.length) {
+          if (qf == qe.counteredBy(i)) {
+            // We have thoroughly surpassed the required value: 0.0
+            // We are already at exact match value: 1.0
+            // We have no existing value: 2.0
+            max = Math.max(max, 1 + Maff.nanToZero(Maff.clamp((qec - qfc * qe.counterScaling) / qec, -1, 1)))
+          }
+          i += 1
+        }
+      }
+    }
+    max
   }
-
-  private def countUnitNeed(unit: FriendlyUnitInfo, matcher: UnitFilter): Unit = {
-    unitsPossessed(matcher) += Maff.fromBoolean(matcher(unit))
-  }
-
-  // Captures the idea that if we have *no* units which serve a role, we really want at least one (eg anti-air, detector, etc)
-  // but as we pass the amount we need, the marginal value rapidly declines
-  def scaleNeed(value: Double): Double = Maff.clamp(value, 0.01, 100)
-
-  def utility(unit: FriendlyUnitInfo): Double = Maff.max(utilityQualities(unit).view.map(_._3)).getOrElse(0.0)
-
-  def utilityQualities(unit: FriendlyUnitInfo): Seq[(Quality, Quality, Double)] =
-    Qualities.friendly
-      .view
-      .filter(_(unit))
-      .flatMap(friendlyQuality =>
-        qualitiesEnemy
-          .view
-          .filter(_._2 > 0)
-          .flatMap(enemyQuality =>
-            enemyQuality._1.counteredBy
-              .view
-              .filter(friendlyQuality==)
-              .map(unused => {
-                val valueRequired = enemyQuality._2
-                val valuePossessed = qualitiesFriendly(friendlyQuality) * friendlyQuality.counterScaling
-                // We have thoroughly surpassed the required value: 0.0
-                // We are already at exact match value: 1.0
-                // We have no existing value: 2.0
-                val score = 1 + Maff.nanToZero(Maff.clamp((valueRequired - valuePossessed) / valueRequired, -1, 1))
-                (friendlyQuality, enemyQuality._1, score)
-            })))
 }

@@ -79,10 +79,9 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def techingType   : Tech              = Techs.get(base.getTech)
   def upgradingType : Upgrade           = Upgrades.get(base.getUpgrade)
 
-  var nextOrderFrame: Option[Int] = None
-  def ready: Boolean = nextOrderFrame.forall(_ <= With.frame)
+  var sleepUntil: Int = _
+  def ready: Boolean = sleepUntil <= With.frame
   def unready: Boolean = ! ready
-  def sleepUntil(frame: Int): Unit = nextOrderFrame = Some(frame)
 
   def trainee: Option[FriendlyUnitInfo] = _traineeCache()
   private val _traineeCache = new Cache(() => if (training) With.units.ours.find(u => ! u.complete && u.pixel == pixel && is(u.unitClass.whatBuilds._1)) else None)

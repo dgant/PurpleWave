@@ -185,4 +185,15 @@ object MicroPathing {
       })
     output
   }
+
+  def pullTowards(from: Pixel, leash: Double, towards: Pixel*): Pixel = {
+    var distanceCovered = 0.0
+    var output = from
+    towards.foreach(to => {
+      val distanceTo = Math.min(leash - distanceCovered, output.pixelDistance(to))
+      output = from.project(to, distanceTo)
+      distanceCovered += distanceTo
+    })
+    output
+  }
 }

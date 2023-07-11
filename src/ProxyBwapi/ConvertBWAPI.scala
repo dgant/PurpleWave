@@ -13,7 +13,7 @@ object ConvertBWAPI {
     // The units are radians, converted from [-128, 128]:
     // https://github.com/bwapi/bwapi/blob/3438abd8e0222f37934ba62b2130c3933b067678/bwapi/BWAPI/Source/BWAPI/UnitUpdate.cpp#L212
 
-    Maff.normalize0To2Pi(bwapiAngle + Maff.halfPI)
+    Maff.normalize0To2Pi(bwapiAngle + Maff.halfPi)
   }
 
   def position(position: Position): Option[Pixel] = {

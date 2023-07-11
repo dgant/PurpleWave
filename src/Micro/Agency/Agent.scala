@@ -1,11 +1,10 @@
 
 package Micro.Agency
 
-import Debugging.Visualizations.ForceMap
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Physics.ForceMath
+import Mathematics.Physics.{ForceMap, ForceMath}
 import Mathematics.Points.Pixel
 import Micro.Actions.Combat.Decisionmaking.Combat
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}

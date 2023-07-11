@@ -87,6 +87,14 @@ object Imagination {
       return
     }
 
+    // Let the trail go cold, as appropriate
+    lazy val atHome     = unit.metro.exists(_.bases.exists(_.owner == unit.player))
+    lazy val hasCompany = unit.matchups.allies.exists(ally => With.framesSince(ally.lastSeen) < 24 * 20 && ally.pixelDistanceEdge(unit) < 32 * 15)
+    if (With.framesSince(unit.lastSeen) > 24 * 20 && ! atHome && ! hasCompany) {
+      unit.changeVisibility(Visibility.InvisibleMissing)
+      return
+    }
+
     // Imagination is expensive; limit re-tries
     if (With.framesSince(Math.max(unit.lastSeen, unit.lastImagination)) < 128) {
       if (unit.visibility == Visibility.InvisibleMissing) {
@@ -124,7 +132,7 @@ object Imagination {
     val topSpeed          = ?(IsTank(unit), Terran.SiegeTankUnsieged.topSpeed, unit.topSpeedPossible)
     val framesUnseen      = With.framesSince(unit.lastSeen)
     val maxPixelsAway     = 64 + framesUnseen * topSpeed
-    val maxTilesAway      = Math.min((Maff.sqrt2 * maxPixelsAway).toInt / 32,  With.mapTileHeight + With.mapTileWidth)// The sqrt2 multiplier accounts for ground distance metrics being rectilinear
+    val maxTilesAway      = Math.min(Maff.div32((Maff.sqrt2 * maxPixelsAway).toInt),  With.mapTileHeight + With.mapTileWidth)// The sqrt2 multiplier accounts for ground distance metrics being rectilinear
     val maxTilesAwaySq    = maxTilesAway * maxTilesAway
     val observedPixel     = unit.pixelObserved
     val observedTile      = observedPixel.tile

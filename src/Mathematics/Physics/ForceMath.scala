@@ -1,6 +1,6 @@
 package Mathematics.Physics
 
-import Debugging.Visualizations.{ForceLabel, ForceMap}
+import Debugging.Visualizations.ForceLabel
 import Mathematics.Points.Pixel
 import Mathematics.Maff
 
@@ -31,7 +31,7 @@ object ForceMath {
     Force(Maff.nanToZero(x/i), Maff.nanToZero(y/i))
   }
   
-  def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force = if (from == to) new Force() else fromRadians(from.radiansTo(to), magnitude)
+  def fromPixels(from: Pixel, to: Pixel, magnitude: Double = 1.0): Force = if (from == to) Forces.None else fromRadians(from.radiansTo(to), magnitude)
   
   def fromRadians(radians: Double, magnitude: Double = 1.0): Force =
     Force(

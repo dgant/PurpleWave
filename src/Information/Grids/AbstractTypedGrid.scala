@@ -14,6 +14,7 @@ abstract class AbstractTypedGrid[T] extends Grid {
   @inline final def apply(i: Int): T = get(i)
   @inline final def apply(tile: Tile): T = get(tile)
   @inline final def getUnchecked(tile: Tile): T = getUnchecked(tile.i)
+  @inline final def getUnchecked(tileX: Int, tileY: Int): T = getUnchecked(i(tileX, tileY))
   def getUnchecked(i: Int): T
   val defaultValue: T
   def repr(value: T): String = value.toString

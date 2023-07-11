@@ -6,6 +6,7 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Placement.Access.PlaceLabels.{Important, PlaceLabel, Unimportant}
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 
 class PlacementQueryParameters {
   var width     : Option[Int]       = None
@@ -41,9 +42,16 @@ class PlacementQueryParameters {
   private val acceptOver: Double = 0.99
 
   protected def scoreImportance(foundation: Foundation): Double = {
-         if (foundation.point.requirement.labels.contains(Important))   1.2
-    else if (foundation.point.requirement.labels.contains(Unimportant)) 1.0
-    else                                                                1.1
+    var i = 0
+    while (i < foundation.point.requirement.labels.length) {
+      if (foundation.point.requirement.labels(i) == Important) {
+        return 1.2
+      } else if (foundation.point.requirement.labels(i) == Unimportant) {
+        return 1.0
+      }
+      i += 1
+    }
+    1.0
   }
 
   protected def scoreWidth(foundation: Foundation): Double = {
@@ -76,26 +84,57 @@ class PlacementQueryParameters {
 
   protected def scoreLabelYes(foundation: Foundation): Double = {
     if (labelYes.isEmpty) return 1.0
-    if (labelYes.forall(foundation.point.requirement.labels.contains)) return 1.0
-    0.25 * labelYes.count(foundation.point.requirement.labels.contains) / labelYes.size
+    val length = labelYes.length
+    var count = 0
+    var i = 0
+    while (i < length) {
+      var j = 0
+      while  (j < foundation.point.requirement.labels.length) {
+        if (labelYes(i) == foundation.point.requirement.labels(j)) {
+          count += 1
+        }
+        j += 1
+      }
+      i += 1
+    }
+    ?(count >= length, 1.0, 0.25) * count / length
   }
 
   protected def scoreLabelNo(foundation: Foundation): Double = {
     if (labelNo.isEmpty) return 1.0
-    if ( ! labelNo.exists(foundation.point.requirement.labels.contains)) return 1.0
-    0.25 * labelNo.count( ! foundation.point.requirement.labels.contains(_)) / labelNo.size
+    val length = labelNo.length
+    var count = 0
+    var i = 0
+    while (i < length) {
+      var j = 0
+      while  (j < foundation.point.requirement.labels.length) {
+        if (labelNo(i) == foundation.point.requirement.labels(j)) {
+          count += 1
+        }
+        j += 1
+      }
+      i += 1
+    }
+    ?(count == 0, 1.0, 0.25) * (length - count) / length
   }
 
+  private val inv256x32 = 1.0 / 256.0 / 32.0
   protected def scoreZone(foundation: Foundation): Double = {
     if (zone.isEmpty) return 1.0
     if (zone.contains(foundation.tile.zone)) return 1.0
-    0.25 * Maff.clamp(1 - Maff.nanToOne(zone.view.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
+    lazy val foundationTileZone = foundation.tile.zone
+    val distancePixels = zone.view.map(_.groundPixelsToZones(foundationTileZone)).max
+    0.25 * Maff.clamp(1 - distancePixels * inv256x32, 0.0, 1.0)
   }
-
   protected def scoreBase(foundation: Foundation): Double = {
     if (base.isEmpty) return 1.0
     if (base.exists(foundation.tile.base.contains)) return 1.0
-    0.25 * Maff.clamp(1 - Maff.nanToOne(base.view.map(_.heart.groundTiles(foundation.tile)).min) / 256.0, 0.0, 1.0)
+    lazy val foundationTileZone = foundation.tile.zone
+    val distancePixels = foundation.tile.base
+      .map(fb => base.view.map(_.groundPixelsToBases(fb)))
+      .getOrElse(base.view.map(_.groundPixelsToZones(foundationTileZone)))
+      .max
+    0.25 * Maff.clamp(1 - distancePixels * inv256x32, 0.0, 1.0)
   }
 
   protected def scoreTile(foundation: Foundation): Double = {

@@ -141,18 +141,20 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def topSpeedPossible: Double = topSpeedPossibleCache()
   private val topSpeedPossibleCache = new Cache(() =>
       ?(ensnared, 0.5, 1.0) // TODO: Is this the multiplier?
-    * ?(stimmed, 1.5, 1.0)
+    * ?(stimmed,  1.5, 1.0)
     * ?(is(Terran.SiegeTankSieged), Terran.SiegeTankUnsieged.topSpeed, unitClass.topSpeed)
     * ?(
-        (is(Terran.Vulture)   && player.hasUpgrade(Terran.VultureSpeed))    ||
-        (is(Protoss.Observer) && player.hasUpgrade(Protoss.ObserverSpeed))  ||
-        (is(Protoss.Scout)    && player.hasUpgrade(Protoss.ScoutSpeed))     ||
-        (is(Protoss.Shuttle)  && player.hasUpgrade(Protoss.ShuttleSpeed))   ||
-        (is(Protoss.Zealot)   && player.hasUpgrade(Protoss.ZealotSpeed))    ||
-        (is(Zerg.Overlord)    && player.hasUpgrade(Zerg.ZerglingSpeed))     ||
-        (is(Zerg.Hydralisk)   && player.hasUpgrade(Zerg.HydraliskSpeed))    ||
-        (is(Zerg.Ultralisk)   && player.hasUpgrade(Zerg.UltraliskSpeed)),
+        (is(Terran.Vulture)   && Terran.VultureSpeed    (player))  ||
+        (is(Protoss.Observer) && Protoss.ObserverSpeed  (player)) ||
+        (is(Protoss.Scout)    && Protoss.ScoutSpeed     (player)) ||
+        (is(Protoss.Shuttle)  && Protoss.ShuttleSpeed   (player)) ||
+        (is(Protoss.Zealot)   && Protoss.ZealotSpeed    (player)) ||
+        (is(Zerg.Overlord)    && Zerg.OverlordSpeed     (player)) ||
+        (is(Zerg.Zergling)    && Zerg.ZerglingSpeed     (player)) ||
+        (is(Zerg.Hydralisk)   && Zerg.HydraliskSpeed    (player)) ||
+        (is(Zerg.Ultralisk)   && Zerg.UltraliskSpeed    (player)),
       1.5, 1.0))
+  @inline final def topSpeedTransported: Double = Math.max(topSpeed, friendly.flatMap(_.transport).map(_.topSpeed).getOrElse(topSpeed))
 
   @inline final def inTileRadius  (tiles: Int)  : Traversable[UnitInfo] = With.units.inTileRadius(tile, tiles)
   @inline final def inPixelRadius (pixels: Int) : Traversable[UnitInfo] = With.units.inPixelRadius(pixel, pixels)
@@ -206,7 +208,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   ////////////
 
   @inline final def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
-  @inline final def team: Option[Team] = battle.map(b => if (isFriendly) b.us else b.enemy)
+  @inline final def team: Option[Team] = battle.map(b => ?(isFriendly, b.us, b.enemy))
   @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val simulacrum: Simulacrum = new Simulacrum(this)
@@ -536,16 +538,17 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     || visibility == Visibility.InvisibleNearby
     || visibility == Visibility.InvisibleBurrowed))
   @inline final def cloakedOrBurrowed: Boolean = cloaked || burrowed
-  @inline final def effectivelyCloaked: Boolean = (
+  @inline final def effectivelyCloaked: Boolean = _effectivelyCloaked()
+  private val _effectivelyCloaked = new Cache(() =>
     cloakedOrBurrowed
-    && ! ensnared
-    && ! plagued
-    && ! ?(isOurs,
-        tile.enemyDetected
+      && ! ensnared
+      && ! plagued
+      && ! ?(isOurs,
+      tile.enemyDetected
         || matchups.enemies.exists(_.orderTarget.contains(this))
-        ||  matchups.enemies.exists(_.target.contains(this))
+        || matchups.enemies.exists(_.target.contains(this))
         || With.bullets.all.exists(_.targetUnit.contains(this)),
-        detected))
+      detected))
 
   @inline final def teamColor: Color =
     if      (visible)             player.colorBright

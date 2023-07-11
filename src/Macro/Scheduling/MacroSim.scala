@@ -24,8 +24,14 @@ final class MacroSim {
   private def requests: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
   def queue: Seq[(RequestBuildable, Int)] = requests.filter(_._1.specificUnit.isDefined) ++ requests.filter(_._1.specificUnit.isEmpty)
 
+  private var _simIncomeMineralsPerFrame: Double = _
+  private var _simIncomeGasPerFrame: Double = _
+
   private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
+    _simIncomeMineralsPerFrame = With.accounting.ourIncomePerFrameMinerals
+    _simIncomeGasPerFrame = ?(With.gathering.gasIsCappedOnQuantity, With.accounting.ourIncomePerFrameGasMax, With.accounting.ourIncomePerFrameGas)
+
     val requests = new ArrayBuffer[RequestBuildable]
     redundant.clear()
     denied.clear()
@@ -121,7 +127,7 @@ final class MacroSim {
           With.units.ours.filter(u).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
       val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
       val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
-      val diff        = Seq(unitDiff, upgradeDiff, techDiff).max
+      val diff        = Maff.vmax(unitDiff, upgradeDiff, techDiff)
       if (diff <= 0) {
         redundant += request
       } else {
@@ -133,8 +139,8 @@ final class MacroSim {
             val framesAfter = Math.ceil(Seq(
               request.minStartFrame - With.frame,
               stepBefore.event.dFrames,
-              if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / With.accounting.ourIncomePerFrameMinerals,  Forever()),
-              if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / With.accounting.ourIncomePerFrameGas,       Forever()))
+              if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
+              if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
               .max).toInt
             if (framesAfter < Forever()) {
               val stepStart           = new MacroStep
@@ -152,7 +158,7 @@ final class MacroSim {
               eventFinish.dProducer1  = eventStart.dProducer1
               eventFinish.dProducer1N = - eventStart.dProducer1N
               request.unit.foreach(u => {
-                val ASAP                        = request.minStartFrame <= With.frame + u.buildFrames / 4
+                val ASAP                        = request.minStartFrame <= With.frame + Maff.div4(u.buildFrames)
                 eventStart.dUnitExtant1         = u
                 eventStart.dUnitExtant1N        = u.copiesProduced
                 eventFinish.dUnitComplete       = u
@@ -199,14 +205,14 @@ final class MacroSim {
     val step = steps(i)
     var cant = false
     lazy val atFrame = {
-      val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / With.accounting.ourIncomePerFrameMinerals))
-      val gasFrames     = Math.max(0, Maff.nanToInfinity((request.gasCost     - step.state.gas)       / With.accounting.ourIncomePerFrameGas))
+      val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / _simIncomeMineralsPerFrame))
+      val gasFrames     = Math.max(0, Maff.nanToInfinity((request.gasCost     - step.state.gas)       / _simIncomeGasPerFrame))
       step.event.dFrames + Math.max(mineralFrames, gasFrames)
     }
     cant ||= exceedsMinInsert(request, i + 1)
-    cant ||= request.mineralCost > Math.max(0, step.state.minerals) && With.accounting.ourIncomePerFrameMinerals == 0
+    cant ||= request.mineralCost > Math.max(0, step.state.minerals) && _simIncomeMineralsPerFrame == 0
     // TODO: Restore once we update income per-state
-    //cant ||= request.gasCost > Math.max(0, step.state.gas) && With.accounting.ourIncomePerFrameGas == 0
+    //cant ||= request.gasCost > Math.max(0, step.state.gas) && _simIncomeGasPerFrame == 0
     cant ||= request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0
     // Verify that the request doesn't block us on supply.
     //
@@ -277,8 +283,8 @@ final class MacroSim {
       val stateNext = steps(i).state
       val event     = steps(i).event
       val dFrames   = event.dFrames - steps(i - 1).event.dFrames
-      stateNext.minerals          = stateLast.minerals        + event.dMinerals + (dFrames * With.accounting.ourIncomePerFrameMinerals).toInt
-      stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * ?(With.gathering.gasIsCappedOnQuantity, With.accounting.ourIncomePerFrameGas, With.accounting.ourIncomePerFrameGasMax)).toInt
+      stateNext.minerals          = stateLast.minerals        + event.dMinerals + (dFrames * _simIncomeMineralsPerFrame).toInt
+      stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * _simIncomeGasPerFrame).toInt
       stateNext.supplyAvailable   = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
       stateNext.supplyUsed        = stateLast.supplyUsed      + event.dSupplyUsed
       stateNext.mineralPatches    = stateLast.mineralPatches  + event.dMineralPatches

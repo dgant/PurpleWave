@@ -80,7 +80,7 @@ final case class TileRectangle(
   }
 
   @inline def contains(pixel: Pixel): Boolean = {
-    contains(pixel.x / 32, pixel.y / 32)
+    contains(Maff.div32(pixel.x), Maff.div32(pixel.y))
   }
   
   @inline def intersects(otherRectangle: TileRectangle): Boolean = {

@@ -3,8 +3,8 @@ package Debugging
 import Mathematics.Maff
 
 object RadianArrow {
-  private val offset      : Double = Maff.twoPI / 8
-  private val multiplier  : Double = 8 * Maff.inv2PI
+  private val offset      : Double = Maff.twoPi / 8
+  private val multiplier  : Double = 8 * Maff.inv2Pi
 
   def apply(r: Double, scale: Double = 1.0, emoji: Boolean = true): String = {
     val direction = (Maff.normalize0To2Pi(r + offset) * multiplier).toInt

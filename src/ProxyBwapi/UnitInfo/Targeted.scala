@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitInfo
 
+import Mathematics.Maff
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 
 import scala.collection.mutable
@@ -18,8 +19,7 @@ trait Targeted {
   def targetedByRecentlyMelee : Iterable[UnitInfo]  = _targetedByRecentlyMelee.view
 
   def resetTargeting(): Unit = {
-    _targetersIndex += 1
-    _targetersIndex %= 2
+    _targetersIndex = Maff.mod2(_targetersIndex + 1)
     _targetedByNow.clear()
     _targetedByRecently.clear()
     _targetedByRecentlyMelee ++= _targetedByBefore

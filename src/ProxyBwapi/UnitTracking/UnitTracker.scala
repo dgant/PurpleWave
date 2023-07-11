@@ -1,6 +1,7 @@
 package ProxyBwapi.UnitTracking
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.{Cache, TotalUnitCounter}
@@ -96,7 +97,7 @@ final class UnitTracker {
       .map(tile.add))
   def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
     val pixelsSquared = pixels * pixels
-    inTileRadius(pixel.tile, pixels / 32 + 1).filter(_.pixel.pixelDistanceSquared(pixel) <= pixelsSquared)
+    inTileRadius(pixel.tile, Maff.div32(pixels)).filter(_.pixel.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
 
   //////////////

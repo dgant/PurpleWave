@@ -35,15 +35,15 @@ object Ray {
       }
       val output = Pixel(x, y)
       if (hasNext) {
-        val nextXCrossing   = x + signX * Math.abs(32 - Math.abs(x) % 32)
-        val nextYCrossing   = y + signY * Math.abs(32 - Math.abs(y) % 32)
+        val nextXCrossing   = x + signX * Math.abs(32 - Maff.mod32(Math.abs(x)))
+        val nextYCrossing   = y + signY * Math.abs(32 - Maff.mod32(Math.abs(y)))
         val timeToNextX     = (nextXCrossing - x) / velocityX
         val timeToNextY     = (nextYCrossing - y) / velocityY
         val deltaTime       = Math.min(timeToNextX, timeToNextY)
         x                   = Math.ceil(x + velocityX * deltaTime).toInt
         y                   = Math.ceil(y + velocityY * deltaTime).toInt
         lengthSquaredNow    = Maff.squared(x - from.x) + Maff.squared(y - from.y)
-        if (x % 32 == 0 && y % 32 == 0) {
+        if (Maff.mod32(x) == 0 && Maff.mod32(y) == 0) {
           // We landed right on the corner of the grid, which would cause us to skip a corner tile.
           cornerSkip = Some(Pixel(x, y - signY))
         }
@@ -55,9 +55,9 @@ object Ray {
   @inline final def apply(from: Pixel, to: Pixel): Iterator[Pixel] = {
     if (to.x == from.x) {
       if (to.y == from.y) return Iterator(to)
-      return (from.y / 32 to to.y / 32 by Maff.signum101(to.y - from.y)).iterator.map(tileY => Pixel(to.x, tileY * 32))
+      return (Maff.div32(from.y) to Maff.div32(to.y) by Maff.signum101(to.y - from.y)).iterator.map(tileY => Pixel(to.x, Maff.x32(tileY)))
     } else  if (to.y == from.y) {
-      return (from.x / 32 to to.x / 32 by Maff.signum101(to.x - from.x)).iterator.map(tileX => Pixel(tileX * 32, to.y))
+      return (Maff.div32(from.x) to Maff.div32(to.x) by Maff.signum101(to.x - from.x)).iterator.map(tileX => Pixel(Maff.x32(tileX), to.y))
     }
     Generator(from, to)
   }

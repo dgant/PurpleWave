@@ -22,7 +22,7 @@ abstract class TargetedSpell extends Action {
   protected def pixelHeight       : Int = 96
   protected def bonusSearchPixels : Int = 32
 
-  final def castRangePixels: Int = castRangeTiles * 32
+  final def castRangePixels: Int = Maff.x32(castRangeTiles)
   
   protected def valueTarget(target: UnitInfo, caster: FriendlyUnitInfo): Double
 

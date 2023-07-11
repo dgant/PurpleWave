@@ -96,7 +96,7 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       (tiles * Math.sin(angleRadians)).toInt)
   }
   @inline def degreesTo(other: Tile): Double = {
-    radiansTo(other) / radiansOverDegrees
+    radiansTo(other) * Maff.x2PiInv360
   }
   @inline def radiansTo(other: Tile): Double = {
     Maff.fastAtan2(other.y - y, other.x - x)

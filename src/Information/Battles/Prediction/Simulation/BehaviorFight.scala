@@ -38,7 +38,7 @@ object BehaviorFight extends SimulacrumBehavior {
       && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {
       val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - distance
       if (freeDistance > 0) {
-        simulacrum.tween(simulacrum.threat.get.pixel.project(simulacrum.pixel, simulacrum.threat.get.pixelDistanceEdge(simulacrum) + freeDistance / 2), Some("Kiting"))
+        simulacrum.tween(simulacrum.threat.get.pixel.project(simulacrum.pixel, simulacrum.threat.get.pixelDistanceEdge(simulacrum) + freeDistance * 0.5), Some("Kiting"))
         return
       }
     }

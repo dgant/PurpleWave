@@ -745,13 +745,16 @@ class PvPOpening extends GameplanImperative {
         }
       }
       if (getReavers) {
-        val bayStartFrame = With.units.ours
-          .find(Protoss.Observatory)
-          .map(With.frame + _.remainingCompletionFrames - Protoss.RoboticsSupportBay.buildFrames)
-          .getOrElse(
-            if (getObservatory) Forever()
-            else if (shuttleFirst) Maff.min(With.units.everOurs.filter(Protoss.Shuttle).map(_.completionFrame)).getOrElse(Forever()) - Protoss.RoboticsSupportBay.buildFrames
-            else 0)
+        var bayStartFrame = With.frame - Protoss.RoboticsSupportBay.buildFrames
+        if (shuttleFirst && ! With.units.everOurs.exists(u => u.complete && Protoss.Shuttle(u))) {
+          bayStartFrame += With.units.ours.find(Protoss.Shuttle).map(_.remainingCompletionFrames).getOrElse(Protoss.Shuttle.buildFrames)
+        }
+        if (getObservatory && getObservers) {
+          bayStartFrame += With.units.ours.find(Protoss.Observatory).map(_.remainingCompletionFrames).getOrElse(Protoss.Observatory.buildFrames)
+          if (! With.units.everOurs.exists(u => u.complete && Protoss.Observer(u))) {
+            bayStartFrame += With.units.ours.find(Protoss.Observer).map(_.remainingCompletionFrames).getOrElse(Protoss.Observer.buildFrames)
+          }
+        }
         get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg = bayStartFrame))
       }
       if (getReavers) {
@@ -824,6 +827,7 @@ class PvPOpening extends GameplanImperative {
     pumpObs &&= ! enemyRobo
     pumpObs &&= enemyBases < 2
     pumpObs &&= ! reaverAllIn
+    pumpObs &&= units(Protoss.Reaver) >= 2 * units(Protoss.Shuttle)
     pumpObs ||= With.fingerprints.dtRush()
     if (getObservers) once(Protoss.Observer)
     if (pumpObs) pump(Protoss.Observer, 2) else if (units(Protoss.Observer) > 1) cancel(Protoss.Observer)

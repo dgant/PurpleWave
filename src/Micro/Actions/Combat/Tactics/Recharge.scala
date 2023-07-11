@@ -7,17 +7,16 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-
 object Recharge extends Action {
   
   // Note: Recharge Shields range is 2
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.canMove
-    && With.units.countOurs(Protoss.ShieldBattery) > 0
-    && (unit.agent.toReturn.isEmpty || unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
     && unit.shieldPoints < unit.unitClass.maxShields / 3
     && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight)
+    && With.units.existsOurs(Protoss.ShieldBattery)
+    && (unit.agent.toReturn.isEmpty || unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
   )
   
   protected def validBattery(unit: UnitInfo): Boolean = (

@@ -8,7 +8,7 @@ import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double, originators: FriendlyUnitInfo*) extends Push {
-  override val tiles: Seq[Tile] = Circle((radius.toInt + 31) / 32).view.map(center.tile.add)
+  override val tiles: Seq[Tile] = Circle(Maff.div32(radius.toInt + 31)).view.map(center.tile.add)
   override def force(recipient: FriendlyUnitInfo): Option[Force] = {
     if (originators.contains(recipient)) return None
     val target = recipient.pixel

@@ -56,6 +56,7 @@ trait UnitGroup {
   def meanAttackerSpeed         : Double    = _meanAttackerSpeed()
   def meanAttackerRange         : Double    = _meanAttackerRange()
   def meanAttackerTargetDistance: Double    = _meanAttackerTargetDistance()
+  def meanAttackerThreatDistance: Double    = _meanAttackerThreatDistance()
   def meanAttackerHealth        : Double    = _meanAttackerHealth()
   def meanArmor                 : Double    = _meanArmor()
   def meanArmorAir              : Double    = _meanArmorAir()
@@ -79,6 +80,7 @@ trait UnitGroup {
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()
   def count(matcher: UnitFilter): Int = _count.getOrElseUpdate(matcher, groupUnits.count(matcher))
+  def has(matchers: UnitFilter*): Boolean = matchers.exists(count(_) > 0)
 
   private val _paceAge = 24
   private def _mobileUnits()              = groupOrderable.view.filter(_.canMove)
@@ -118,6 +120,7 @@ trait UnitGroup {
   private val _meanAttackerSpeed          = new Cache(() => Maff.mean(attackers.view.filter(_.canMove).map(_.topSpeed)))
   private val _meanAttackerRange          = new Cache(() => Maff.mean(attackers.view.map(_.pixelRangeMax)))
   private val _meanAttackerTargetDistance = new Cache(() => Maff.mean(attackers.flatMap(_.matchups.pixelsToTargetRange)))
+  private val _meanAttackerThreatDistance = new Cache(() => Maff.mean(attackers.flatMap(_.matchups.pixelsToThreatRange)))
   private val _meanAttackerHealth         = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(_.totalHealth.toDouble)))
   private val _meanArmor                  = new Cache(() => Maff.mean(Maff.orElse(attackers, groupOrderable).view.map(u => Maff.nanToZero(u.shieldPoints * u.armorShield + u.hitPoints * u.armorHealth) / u.totalHealth.toDouble)))
   private val _meanArmorAir               = new Cache(() => Maff.mean(Maff.orElse(attackers.filter(_.flying),     attackers, groupOrderable).view.map(u => Maff.nanToZero(u.shieldPoints * u.armorShield + u.hitPoints * u.armorHealth) / u.totalHealth.toDouble)))

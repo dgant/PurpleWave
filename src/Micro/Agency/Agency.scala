@@ -40,7 +40,7 @@ class Agency extends TimedTask {
     while (agentQueue.nonEmpty && timer.greenLight) {
       val agent = agentQueue.dequeue()
       val unit = agent.unit
-      unit.sleepUntil(Math.max(unit.nextOrderFrame.getOrElse(0), AttackDelay.nextSafeOrderFrame(unit)))
+      unit.sleepUntil = Math.max(unit.sleepUntil, AttackDelay.nextSafeOrderFrame(unit))
       if (unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
         val timeBefore = With.performance.frameElapsedMs
         agent.execute()

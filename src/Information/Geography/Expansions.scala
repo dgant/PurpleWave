@@ -53,7 +53,7 @@ trait Expansions {
     _safeExpansions = _preferredOurs.filter(_safeExpansions.contains)
   }
 
-  private def distanceToMultiplier(value: Double): Double = 1.0 - Maff.clamp(value / 256.0, 0.0, 0.75)
+  private def distanceToMultiplier(value: Double): Double = 1.0 - Maff.clamp(value * Maff.inv256, 0.0, 0.75)
   private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))

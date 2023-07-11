@@ -159,7 +159,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val antiGround  = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
     Seq(3, 6, 9).foreach(multiplier => {
       targets.get.foreach(target => {
-        val antiTarget = if (target.flying) antiAir else antiGround
+        val antiTarget = ?(target.flying, antiAir, antiGround)
         assigned.clear()
         var valueAssigned: Double = 0
         while (antiTarget.nonEmpty && valueAssigned < multiplier * target.subjectiveValue) {

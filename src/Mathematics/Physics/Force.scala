@@ -9,14 +9,14 @@ final case class Force(x: Double, y: Double) {
   def this() = this(0.0, 0.0)
   def this(point: AbstractPoint) = this(point.x, point.y)
   
-  @inline def unary_- = Force(-x, -y)
+  @inline def unary_-           : Force = Force(-x, -y)
   @inline def +(other: Force)   : Force = Force(x + other.x, y + other.y)
   @inline def -(other: Force)   : Force = Force(x - other.x, y - other.y)
   @inline def *(other: Force)   : Double = x * other.x + y * other.y
   @inline def *(value: Double)  : Force = Force(x * value, y * value)
   @inline def /(value: Double)  : Force = Force(x / value, y / value)
 
-  @inline def degrees: Double = radians * 180 / Math.PI
+  @inline def degrees: Double = radians * Maff.x360inv2Pi
   @inline def radians: Double = Maff.fastAtan2(y, x)
   @inline def lengthSquared: Double = x * x + y * y
   @inline def lengthSlow: Double = Math.sqrt(lengthSquared)

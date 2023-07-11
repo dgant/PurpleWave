@@ -1,7 +1,7 @@
 package Micro.Heuristics
 
 import Mathematics.Maff
-import Mathematics.Physics.{Force, ForceMath}
+import Mathematics.Physics.{Force, ForceMath, Forces}
 import Mathematics.Points.Pixel
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -54,7 +54,7 @@ object Potential {
   }
   protected def threatRepulsion(unit: FriendlyUnitInfo, threat: UnitInfo): Force = {
     val entanglement          = unit.pixelsOfEntanglement(threat)
-    val magnitudeEntanglement = 1.0 + Maff.fastTanh11(entanglement / 32.0) + Math.max(0.0, entanglement / 32.0)
+    val magnitudeEntanglement = 1.0 + Maff.fastTanh11(entanglement * Maff.inv32) + Math.max(0.0, entanglement * Maff.inv32)
     val magnitudeDamage       = threat.dpfOnNextHitAgainst(unit)
     val magnitudeFinal        = magnitudeDamage * magnitudeEntanglement
     val output                = towardsUnit(unit, threat, -magnitudeFinal)
@@ -62,11 +62,11 @@ object Potential {
   }
 
   def hardAvoidThreatRange(unit: FriendlyUnitInfo, margin: Double = 32.0): Force = {
-    Maff.maxBy(unit.matchups.threats.map(hardAvoidEntanglement(unit, _, 0.0, margin)))(_.lengthFast).getOrElse(new Force())
+    unit.matchups.threatDeepest.map(hardAvoidEntanglement(unit, _, 0.0, margin)).getOrElse(Forces.None)
   }
 
   def avoidDetection(unit: FriendlyUnitInfo): Force = {
-    if ( ! unit.cloaked) return new Force
+    if ( ! unit.cloaked) return Forces.None
     val detectors   = unit.matchups.enemies.filter(e => e.aliveAndComplete && e.unitClass.isDetector)
     val forces      = detectors.map(detector => towardsUnit(unit, detector, -1.0 / detector.pixelDistanceCenter(unit)))
     val output      = ForceMath.sum(forces).normalize
@@ -82,7 +82,7 @@ object Potential {
       .filter(_.attackers.size > 1)
       .map(g => ?(unit.flying, g.centroidKey, g.centroidGround))
       .map(towards(unit, _))
-      .getOrElse(new Force)
+      .getOrElse(Forces.None)
   }
 
   private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo, margin: Double): Double = {
@@ -95,27 +95,29 @@ object Potential {
   }
   def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
     val magnitude = collisionRepulsionMagnitude(unit, other, 6.0)
-    if (magnitude == 0) new Force else towardsUnit(unit, other, -magnitude)
+    if (magnitude == 0) Forces.None else towardsUnit(unit, other, -magnitude)
   }
   
   def avoidCollision(unit: FriendlyUnitInfo): Force = {
-    if (unit.flying) return new Force
+    if (unit.flying) return Forces.None
     val repulsions = unit.inTileRadius(3).filter(o => unit != o && o.canMove).map(collisionRepulsion(unit, _))
     ForceMath.mean(repulsions).clipAtMost(1.0)
   }
 
   def avoidSplash(unit: FriendlyUnitInfo): Force = {
+    val margin = 96
+    if (unit.matchups.threatDeepest.forall(_.pixelsToGetInRange(unit) > margin)) return Forces.None
     val splashThreats = unit.matchups.threats
       .filter(_.unitClass.dealsRadialSplashDamage)
-      .filter(_.pixelsToGetInRange(unit) < 96)
+      .filter(_.pixelsToGetInRange(unit) < margin)
       .filterNot(_.burrowed) // Ignore Spider Mines until they unburrow
       .toVector
     lazy val splashRadius25 = Maff.max(splashThreats.map(t => if (unit.flying) t.unitClass.airSplashRadius25 else t.unitClass.groundSplashRadius25)).getOrElse(0)
     lazy val splashRadius50 = Maff.max(splashThreats.map(t => if (unit.flying) t.unitClass.airSplashRadius50 else t.unitClass.groundSplashRadius50)).getOrElse(0)
     lazy val splashAllies   = unit.alliesBattle.filter(a => ! a.unitClass.isBuilding && a.flying == unit.flying)
-    if (splashThreats.isEmpty)  return new Force
-    if (splashRadius25 <= 0)    return new Force
-    if (splashAllies.isEmpty)   return new Force
+    if (splashThreats.isEmpty)  return Forces.None
+    if (splashRadius25 <= 0)    return Forces.None
+    if (splashAllies.isEmpty)   return Forces.None
     val forces  = splashAllies.map(_.pixel).map(hardAvoid(unit, _, splashRadius50, splashRadius25))
     val output  = ForceMath.sum(forces).normalize(forces.map(_.lengthFast).max)
     output

@@ -2,9 +2,10 @@ package Micro.Targeting
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Targeting.FiltersRequired.{TargetFilterEnemy, TargetFilterFocus, TargetFilterType, TargetFilterMissing, TargetFilterCanAttack, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterVsTank, TargetFilterVulture}
+import Micro.Targeting.FiltersRequired.{TargetFilterCanAttack, TargetFilterEnemy, TargetFilterFocus, TargetFilterMissing, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterType, TargetFilterVsTank, TargetFilterVulture}
 import Micro.Targeting.FiltersSituational.TargetFilterWhitelist
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 
 object Target {
 
@@ -34,22 +35,27 @@ object Target {
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    val assigned  = attacker.targetsAssigned.getOrElse(Seq.empty)
-    val matchups  = attacker.matchups.targets
-    val engaged   = attacker.team.exists(_.engagedUpon)
-    val strataUnfiltered = Seq(
-      (true, assigned.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
-      (true, matchups.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority).filter(acceleratesDemise(attacker, _))),
-      (true, assigned.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority)),
-      (true, matchups.view.filter(attacker.inRangeToAttack).filter(hasCombatPriority)),
-      (true, (if (engaged) assigned.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)) else Seq.empty)),
-      (true, (if (engaged) assigned.view.filter(hasCombatPriority) else Seq.empty)),
+    val assigned      = attacker.targetsAssigned.getOrElse(Seq.empty)
+    val matchups      = attacker.matchups.targets
+    val engaged       = attacker.team.exists(_.engagedUpon)
+    val targetInRange = attacker.matchups.targetNearest.exists(t => hasCombatPriority(t) && attacker.inRangeToAttack(t))
+    val strataUnfilteredInRange = ?(
+      targetInRange,
+      Seq(
+        (true, assigned.view.filter(hasCombatPriority).filter(attacker.inRangeToAttack).filter(acceleratesDemise(attacker, _))),
+        (true, matchups.view.filter(hasCombatPriority).filter(attacker.inRangeToAttack).filter(acceleratesDemise(attacker, _))),
+        (true, assigned.view.filter(hasCombatPriority).filter(attacker.inRangeToAttack)),
+        (true, matchups.view.filter(hasCombatPriority).filter(attacker.inRangeToAttack))),
+      Seq.empty)
+    val strataUnfiltered = strataUnfilteredInRange ++ Seq(
+      (true, ?(engaged, assigned.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)), Seq.empty)),
+      (true, ?(engaged, assigned.view.filter(hasCombatPriority),                                        Seq.empty)),
       (false, assigned),
-      (true, (if (engaged) matchups.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)) else Seq.empty)),
-      (true, (if (engaged) matchups.view.filter(hasCombatPriority) else Seq.empty)),
+      (true, ?(engaged, matchups.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)), Seq.empty)),
+      (true, ?(engaged, matchups.view.filter(hasCombatPriority),                                        Seq.empty)),
       (true, matchups))
     val stratum = strataUnfiltered.view.map(p => (p._1, legal(attacker, p._2, filters: _*))).find(_._2.nonEmpty)
-    val output = stratum.flatMap(p => if (p._1) bestUnfiltered(attacker, p._2) else p._2.headOption)
+    val output  = stratum.flatMap(p => ?(p._1, bestUnfiltered(attacker, p._2), p._2.headOption))
     output
   }
 
@@ -83,7 +89,7 @@ object Target {
   def auditScore(attacker: FriendlyUnitInfo): Vector[(UnitInfo, String, String, String)] = {
     attacker.matchups.targets.view.map(target => (
       target,
-      attacker.pixelDistanceEdge(target) / 32d,
+      attacker.pixelDistanceEdge(target) * Maff.inv32,
       target.targetValue,
       attacker.targetScore(target))).toVector
       .sortBy(-_._4)

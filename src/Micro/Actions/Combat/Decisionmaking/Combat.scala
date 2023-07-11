@@ -72,17 +72,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.agent.chooseAttackFrom()
     Commander.defaultEscalation(unit)
 
-    framesUntilShot     = Maff.min((Seq(unit.pixel) ++ unit.agent.toAttackFrom).view.flatMap(p =>  unit.matchups.threats.map(_.framesToGetInRange(unit, p)))).getOrElse(Forever())
-    framesToPokeTarget  = target.map(unit.framesToLaunchAttack(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
-    idealTargetDistance = getIdealTargetDistance
-    hasSpacetimeToPoke  = framesToPokeTarget.exists(_ < framesUntilShot) && unit.agent.toAttackFrom.forall(p => ! unit.matchups.threats.exists(t => t.inRangeToAttack(unit, p.project(t.pixel, 16))))
-    lazy val bypass     = target.isEmpty && (unit.matchups.ignorant || unit.agent.shouldFight)
+    framesUntilShot       = Maff.min((Seq(unit.pixel) ++ unit.agent.toAttackFrom).view.flatMap(p =>  unit.matchups.threats.map(_.framesToGetInRange(unit, p)))).getOrElse(Forever())
+    framesToPokeTarget    = target.map(unit.framesToLaunchAttack(_) + unit.unitClass.framesToPotshot + With.reaction.agencyMax + With.latency.latencyFrames)
+    idealTargetDistance   = getIdealTargetDistance
+    hasSpacetimeToPoke    = framesToPokeTarget.exists(_ < framesUntilShot) && unit.agent.toAttackFrom.forall(p => ! unit.matchups.threats.exists(t => t.inRangeToAttack(unit, p.project(t.pixel, 16))))
+    lazy val safePassage  = unit.matchups.ignorant || unit.topSpeedTransported >= 0.9 * group.meanTopSpeed && unit.matchups.pixelsToThreatRange.forall(_ > 32 * ?(unit.agent.receivedPushPriority() < TrafficPriorities.Bump, 2, 16))
 
     technique =
-      if ( ! unit.canMove)              Fight
-      else if (bypass)                  Walk
-      else if (unit.agent.shouldFight)  Fight
-      else                              Flee
+      if ( ! unit.canMove)                                  Fight
+      else if (unit.agent.shouldFight && target.isDefined)  Fight
+      else if (safePassage)                                 Walk
+      else                                                  Flee
 
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
@@ -332,7 +332,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def abuse(): Boolean = {
-    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.presumptiveTarget.contains(unit), 80, 16) + ?(unit.canAttack(t), Math.max(0, unit.pixelRangeAgainst(t) - unit.pixelDistanceEdge(t) - 16), 48))
+    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.unitClass.isWarrior && t.presumptiveTarget.contains(unit), 80, 16) + ?(unit.canAttack(t), Math.max(0, unit.pixelRangeAgainst(t) - unit.pixelDistanceEdge(t) - 16), 48))
     kite &&= unit.confidence11 < 0.75
     kite ||= ! attackIfReady()
     if (kite) {

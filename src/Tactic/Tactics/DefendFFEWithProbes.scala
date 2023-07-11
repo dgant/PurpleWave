@@ -22,7 +22,7 @@ class DefendFFEWithProbes extends Tactic {
   val defenders = new LockUnits(this, IsWorker)
   
   protected def probeCount: Int = {
-    val zerglings           = Seq(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEverEnemy(Zerg.Zergling)).max
+    val zerglings           = Maff.vmax(4, With.units.countEnemy(Zerg.Zergling), 8 - With.units.countEverEnemy(Zerg.Zergling))
     val cannonsComplete     = With.units.countOurs(IsAll(Protoss.PhotonCannon, IsComplete))
     val cannonsIncomplete   = With.units.countOurs(Protoss.PhotonCannon) - cannonsComplete
     val workerCount         = With.units.countOurs(IsWorker)

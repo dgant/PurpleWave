@@ -18,7 +18,7 @@ class MatchupGraph extends TimedTask {
     With.units.all.foreach(u => u.matchups = MatchupAnalysis(u))
   }
   
-  private def assignEntrants() {
+  private def assignEntrants(): Unit = {
     // Battle clustering is slow and can take 1-2 seconds.
     // Sometimes we need to include units faster than that.
     // For example: Spider mines that just popped up, or Siege Tanks/Lurkers that just started shooting at us unexpectedly.

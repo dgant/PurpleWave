@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
 import Micro.Formation._
 import Performance.Cache
@@ -15,7 +16,7 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.{IsTank, IsWorker}
+import Utilities.UnitFilters.{IsDetector, IsTank, IsWarrior, IsWorker}
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -208,8 +209,15 @@ class SquadDefendBase(base: Base) extends Squad {
   }
 
   private def emergencyDTHugs(): Boolean = {
-    val dts       = enemies.filter(Protoss.DarkTemplar)
-    val shouldHug = dts.nonEmpty && ! With.units.existsOurs(u => u.unitClass.isDetector && u.complete) && enemies.forall(e => Protoss.DarkTemplar(e) || IsWorker(e) || ! e.canAttackGround)
+    if ( ! With.enemies.exists(_.isProtoss))                      return false
+    if ( ! With.units.existsEnemy(Protoss.DarkTemplar))           return false
+    if (enemies.exists(Protoss.DarkTemplar))                      return false
+    if (With.units.existsOurs(u => IsDetector(u) && u.complete))  return false
+    lazy val enemyNearest   = Maff.minBy(enemies.view.filter(IsWarrior))(_.pixelDistanceTravelling(base.heart))
+    lazy val dts            = enemies.filter(Protoss.DarkTemplar)
+    lazy val dtApproaching  = dts.exists(_.base.exists(_.isOurs)) || base.zone.exitNow.exists(e => dts.exists(_.pixelDistanceTravelling(e.pixelCenter) < 160))
+
+    val shouldHug = enemyNearest.forall(Protoss.DarkTemplar) || dtApproaching
     if (shouldHug) {
       val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
       val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourMain.zone.exitNowOrHeart.center)
@@ -221,6 +229,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private class HugAt(pixel: Pixel) extends Action {
     override def perform(unit: FriendlyUnitInfo): Unit = {
       unit.agent.toTravel = Some(pixel)
+      Potshot.delegate(unit)
       Commander.move(unit)
     }
   }

@@ -24,6 +24,7 @@ class PvPOpening extends GameplanImperative {
   var shouldHarass        : Boolean = false
   var had2GateBeforeCore  : Boolean = false
   var hadTechBeforeRange  : Boolean = false
+  var rangeDelayed        : Boolean = false
   
   // 10-12
   var commitZealots       : Boolean = false
@@ -310,6 +311,9 @@ class PvPOpening extends GameplanImperative {
       greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
     }
 
+    rangeDelayed        =   ! Protoss.DragoonRange() && (Maff.fromBoolean(With.fingerprints.twoGate() || With.fingerprints.nexusFirst()) - Maff.fromBoolean(had2GateBeforeCore) - Maff.fromBoolean(hadTechBeforeRange) > 0)
+    had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && have(Protoss.CyberneticsCore)
+    hadTechBeforeRange  ||= have(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) && ! upgradeStarted(Protoss.DragoonRange)
     // Identify when we reach an attack timing
     atEarlyTiming ||= PvP1012()          && unitsComplete(Protoss.Zealot)  >= 3
     atEarlyTiming ||= PvPGateCoreGate()  && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
@@ -338,9 +342,8 @@ class PvPOpening extends GameplanImperative {
     shouldAttack        &&= safePushing
     shouldAttack        &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
     shouldAttack        ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
+    shouldAttack        || rangeDelayed
     shouldHarass          = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
-    had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && have(Protoss.CyberneticsCore)
-    hadTechBeforeRange  ||= have(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) && ! upgradeStarted(Protoss.DragoonRange)
 
     if (reaverAllIn) {
       shouldExpand = units(Protoss.Reaver) >= 2 && units(Protoss.Shuttle) >= 1
@@ -366,7 +369,6 @@ class PvPOpening extends GameplanImperative {
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
-    val rangeDelayed = Maff.fromBoolean(With.fingerprints.twoGate() || With.fingerprints.nexusFirst()) - Maff.fromBoolean(had2GateBeforeCore) - Maff.fromBoolean(hadTechBeforeRange) > 0
     if (shouldAttack || (shouldExpand && bases < 2) || (safeDefending && ! PvPDT() && ( ! rangeDelayed || Protoss.DragoonRange()))) {
       holdNatural()
     }
@@ -740,9 +742,7 @@ class PvPOpening extends GameplanImperative {
         once(Protoss.Observer)
       } else {
         cancel(Protoss.Observer)
-        if ( ! getObservatory) {
-          cancel(Protoss.Observatory)
-        }
+        cancel(Protoss.Observatory)
       }
       if (getReavers) {
         var bayStartFrame = With.frame - Protoss.RoboticsSupportBay.buildFrames

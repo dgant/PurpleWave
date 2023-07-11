@@ -20,7 +20,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.{GenericFriendlyUnitGroup, TFriendlyUnitGroup, UnitGroup}
 import Utilities.Time.{Forever, Seconds}
-import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot}
+import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot, IsWarrior}
 import Utilities.{?, SwapIf}
 
 final class Combat(unit: FriendlyUnitInfo) extends Action {
@@ -292,27 +292,29 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def charge(): Boolean = {
-    if ( ! target.exists(unit.inRangeToAttack) || ! attackIfReady()) {
-      // If we have an attack formation
-      if (engageFormation.isDefined && ! unit.flying && shouldChase && formationHelpsChase) {
-        unit.agent.act("Slide")
-        Commander.move(unit)
-      } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
-        t.flying
-        && unit.pixelDistanceEdge(t)          > 0.25 * unit.pixelRangeAgainst(t)
-        && unit.speedApproachingEachOther(t)  < 0
-        && unit.speedApproaching(t)           < 0.9 * unit.topSpeed)) {
-        chase()
-      } else if (breakFormationToAttack) {
-        if (shouldChase && idealDistanceForward >= 32) {
+    if (unit.ready) {
+      if ( ! target.exists(unit.inRangeToAttack) || ! attackIfReady()) {
+        // If we have an attack formation
+        if (engageFormation.isDefined && ! unit.flying && shouldChase && formationHelpsChase) {
+          unit.agent.act("Slide")
+          Commander.move(unit)
+        } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
+          t.flying
+          && unit.pixelDistanceEdge(t)          > 0.25 * unit.pixelRangeAgainst(t)
+          && unit.speedApproachingEachOther(t)  < 0
+          && unit.speedApproaching(t)           < 0.9 * unit.topSpeed)) {
           chase()
+        } else if (breakFormationToAttack) {
+          if (shouldChase && idealDistanceForward >= 32) {
+            chase()
+          } else {
+            unit.agent.act("Approach")
+            Commander.attack(unit)
+          }
         } else {
-          unit.agent.act("Approach")
-          Commander.attack(unit)
+          unit.agent.act("Move")
+          move()
         }
-      } else {
-        unit.agent.act("Move")
-        move()
       }
     }
     unit.unready
@@ -332,15 +334,29 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def abuse(): Boolean = {
-    var kite = unit.matchups.threatDeepest.exists(t => t.pixelsToGetInRange(unit) < ?(t.unitClass.isWarrior && t.presumptiveTarget.contains(unit), 80, 16) + ?(unit.canAttack(t), Math.max(0, unit.pixelRangeAgainst(t) - unit.pixelDistanceEdge(t) - 16), 48))
-    kite &&= unit.confidence11 < 0.75
-    kite ||= ! attackIfReady()
+    var minimumSpace = 16.0
+    unit.matchups.threatDeepest.foreach(t => {
+      if (IsWarrior(t)) {
+        minimumSpace += 32
+        if (t.presumptiveTarget.contains(unit)) {
+          minimumSpace += 32
+        }
+        if (t.topSpeed > unit.topSpeed) {
+          minimumSpace += 32
+        }
+      }
+    })
+    if (unit.readyForAttackOrder) {
+      minimumSpace = Math.min(minimumSpace, target.map(unit.pixelRangeAgainst).getOrElse(unit.pixelRangeMax) - 24)
+    }
+    val kite = unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace) || ! attackIfReady()
     if (kite) {
       Retreat(unit)
     }
     if (idealDistanceForward > 0) {
       chase()
     }
+    charge()
     unit.unready
   }
 

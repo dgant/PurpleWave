@@ -34,12 +34,12 @@ object ShuttleAdoptPassenger extends Action {
     val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixel) + 2 * shuttle.unitClass.framesToTurn180
     val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
     var output = 1.0
-    if (Protoss.Reaver(hailer)) output *= 1000
-    if (hailer.matchups.targetedByScarab) output *= 100
-    if (shuttle.squad.exists(hailer.squad.contains)) output *= 10
-    if (shuttle.battle.exists(hailer.battle.contains)) output *= 5
-    if (endangered) output *= 10
-    if (sojourning) output *= 2
+    if (Protoss.Reaver(hailer))                         output *= 1000
+    if (hailer.matchups.targetedByScarab)               output *= 100
+    if (shuttle.squad.exists(hailer.squad.contains))    output *= 10
+    if (shuttle.battle.exists(hailer.battle.contains))  output *= 5
+    if (endangered)                                     output *= 10
+    if (sojourning)                                     output *= 2
     output
   }
 }

@@ -40,7 +40,7 @@ object Spot extends Action {
     unit.agent.toTravel =
       if (spooky.isDefined) {
         spooky.map(_.projectFrames(48))
-      } else if (tank.exists(s => s.matchups.threatDeepest.exists(_.inRangeToAttack(s)))) {
+      } else if (tank.exists(_.matchups.engagedUpon)) {
         tank.map(_.pixel)
       } else {
         Some(Maff.weightedCentroid(Circle(8)

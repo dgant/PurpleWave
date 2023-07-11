@@ -50,7 +50,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def idealDistanceForward  : Double  = target.map(unit.pixelDistanceEdge(_) - idealTargetDistance).getOrElse(0d)
   protected def confidentEnoughToChase: Boolean = unit.confidence11 > confidenceChaseThreshold
   protected def shouldChase           : Boolean = (idealDistanceForward > 0 && confidentEnoughToChase && targetFleeing) || (target.exists(_.isAny(Terran.SiegeTankSieged, Protoss.Reaver)) && ! unit.flying && ! Protoss.Reaver(unit))
-  protected def allThreatsAbusable    : Boolean = unit.matchups.threats.forall(canAbuse)
+  protected def allThreatsAbusable    : Boolean = unit.matchups.threats.forall(t => canAbuse(t) || t.pixelsToGetInRange(unit) > 24 * 5)
   protected def nudged                : Boolean = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
   protected def nudgedTowards         : Boolean = nudged && Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
   protected def pushThrough           : Boolean = shouldEngage && engageFormation.isDefined && nudged && nudgedTowards && ! unit.flying
@@ -164,7 +164,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def readyToApproachTarget: Boolean = {
     if (target.isEmpty) return false
-    val effectiveCooldown = if (unit.transport.exists(_.flying)) 0 else unit.framesToBeReadyForAttackOrder
+    val effectiveCooldown = ? (unit.transport.exists(_.flying), 0, unit.framesToBeReadyForAttackOrder)
     if (unit.unitClass.ranged && effectiveCooldown > unit.framesToGetInRange(target.get) + 4) return false
     true
   }
@@ -371,7 +371,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
           applyForce(Forces.threat, Potential.softAvoidThreatRange(unit) * 1.5)
           moveForcefully()
         }
-      } else if (squadEngaged) {
+      } else if (assembling && formations.nonEmpty && group.groupUnits.size > 1) {
+        unit.agent.act("Assemble")
+        val targetRangeDelta  = unit.matchups.pixelsToTargetRange.getOrElse(unit.sightPixels.toDouble) - group.meanAttackerTargetDistance
+        val forwardness       = if (unit.flying) 0.0 else Maff.fastTanh11(targetRangeDelta / 96.0)
+        applyForce(Forces.travel,     Potential.towards(unit, unit.agent.destination))
+        applyForce(Forces.threat,     Potential.hardAvoidThreatRange(unit, 96.0))
+        applyForce(Forces.regrouping, Potential.regroup(unit))
+        moveForcefully()
+        restrained = target.forall(t => unit.pixelsToGetInRange(t) < unit.pixelsToGetInRangeFrom(t, unit.agent.destination))
+        restrained ||= unit.intent.toTravel.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destination, p))
+      } else {
         if (techniqueIs(Scavenge)) {
           if ( ! potshot()) {
             val framesSafe = unit.matchups.threatSoonest.map(_.framesToLaunchAttack(unit)).getOrElse(Forever())
@@ -397,19 +407,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
           applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
           moveForcefully()
         }
-      } else if (assembling && formations.nonEmpty && group.groupUnits.size > 1) {
-        unit.agent.act("Assemble")
-        val targetRangeDelta  = unit.matchups.pixelsToTargetRange.getOrElse(unit.sightPixels.toDouble) - group.meanAttackerTargetDistance
-        val forwardness       = if (unit.flying) 0.0 else Maff.fastTanh11(targetRangeDelta / 96.0)
-        applyForce(Forces.travel,     Potential.towards(unit, unit.agent.destination))
-        applyForce(Forces.threat,     Potential.hardAvoidThreatRange(unit, 96.0))
-        applyForce(Forces.regrouping, Potential.regroup(unit))
-        moveForcefully()
-        restrained = target.forall(t => unit.pixelsToGetInRange(t) < unit.pixelsToGetInRangeFrom(t, unit.agent.destination))
-        restrained ||= unit.intent.toTravel.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destination, p))
-      } else {
-        unit.agent.act("Attack")
-        charge()
       }
     }
     unit.unready

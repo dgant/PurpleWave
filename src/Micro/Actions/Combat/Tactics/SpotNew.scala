@@ -45,7 +45,7 @@ object SpotNew extends Action {
     val spooky    = detectionTarget(unit)
     val tank      = tankTarget(unit)
     val tankPixel = tank.map(t =>
-      ?(t.matchups.threatDeepest.exists(_.inRangeToAttack(t)),
+      ?(t.matchups.engagedUpon,
         t.pixel,
         Maff.weightedCentroid(Circle(unit.sightPixels / 32)
           .map(t.tile.add)

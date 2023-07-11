@@ -1,43 +1,67 @@
 package Information.Battles.Prediction.Skimulation
 
-import Information.Battles.Types.Battle
+import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.Time.Seconds
 import Utilities.UnitFilters._
 import Utilities.{?, LightYear}
 
 object Skimulator {
 
+  @inline private def distanceToEngage(unit: UnitInfo, team: Team): Double = {
+    val targets = ?(Terran.Medic(unit),
+      team.units.view.filter(_.unitClass.isOrganic),
+      Maff.orElse(unit.presumptiveTarget, team.opponent.units))
+    Maff.min(targets.view.map(unit.pixelDistanceEdge)).getOrElse(LightYear())
+  }
+
   def predict(battle: Battle): Unit = {
-    val maxEffectiveRange = Maff.max(battle.units.map(_.effectiveRangePixels)).getOrElse(0.0)
 
     // Calculate unit distance
-    battle.teams.foreach(team => team.units.foreach(unit => {
-      // Since we're deciding whether to attack into the enemy, assume the enemy can thrive by just regrouping instead of advancing
-      // Give enemies bonus range based on time before the fight gets underway
+    if (battle.isGlobal) {
+      // Assume all units are charging from a line at max distance like a dumb cinematic battle
+      val maxEffectiveRange = Maff.max(battle.units.map(_.effectiveRangePixels)).getOrElse(0.0)
+      battle.units.foreach(u => u.skimDistanceToEngage = maxEffectiveRange - u.effectiveRangePixels)
+    } else {
+      // Since we're deciding whether to attack into the enemy, assume the enemy can regroup in the time it takes for us to engage.
+      // Manifest this as giving enemies bonus range proportional to the time before the fight gets underway
       //
-      // Friendly: Distance to get in range of target
-      // Enemy: Min(Distance to get in range of target, distance to regroup)
+      // Limit the scale of this effect, since optimistic results don't hurt us until we actually get into combat
+      var enemyBonusTravelFrames = Seconds(3)()
 
-      //val floorDistance: Double = ?(unit.isEnemy, unit.pixelDistanceCenter(team.vanguardKey()), LightYear().toDouble)
-      val floorDistance: Double = LightYear().toDouble
-
-      val targets = ?(Terran.Medic(unit),
-        team.units.view.filter(_.unitClass.isOrganic),
-        Maff.orElse(unit.presumptiveTarget, team.opponent.units))
-
-      // How far does this unit have to go to get into the fight, either dealing or receiving damage?
-      unit.skimDistanceToEngage =
-        ?(battle.isGlobal,
-          maxEffectiveRange - unit.effectiveRangePixels,
-          // Assume we're attacking the closest target
-          Maff.min(targets.view.map(other =>
-            Math.min(
-              floorDistance + maxEffectiveRange - unit.effectiveRangePixels,
-              unit.pixelsToGetInRange(other))))
-            .getOrElse(LightYear()))
-    }))
+      battle.us.units.foreach(unit => {
+        unit.skimDistanceToEngage = Math.max(0.0, distanceToEngage(unit, battle.us) - unit.effectiveRangePixels)
+        enemyBonusTravelFrames    = Math.min(enemyBonusTravelFrames, unit.framesToTravelPixels(unit.skimDistanceToEngage))
+      })
+      // Do a pass of visible units first, in order to estimate reasonable values for hidden units
+      var visibleDistanceToTargetNumerator = 0d
+      var visibleDistanceToTargetDenominator = 0d
+      battle.enemy.units.foreach(unit => {
+        if (unit.visible) {
+          val distanceToTarget = distanceToEngage(unit, battle.enemy)
+          if (distanceToTarget < LightYear()) {
+            visibleDistanceToTargetNumerator    += distanceToTarget
+            visibleDistanceToTargetDenominator  += 1
+          }
+          unit.skimDistanceToEngage = Math.max(0.0, visibleDistanceToTargetNumerator - unit.effectiveRangePixels - unit.topSpeed * enemyBonusTravelFrames)
+        }
+      })
+      val visibleDistanceToTarget = visibleDistanceToTargetNumerator / Math.max(1d, visibleDistanceToTargetDenominator)
+      // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
+      battle.enemy.units.foreach(unit => {
+        if ( ! unit.visible) {
+          val distanceToTarget      = distanceToEngage(unit, battle.enemy)
+          val distanceFloor         = distanceToTarget - unit.topSpeed * With.framesSince(unit.lastSeen)
+          unit.skimDistanceToEngage = Maff.vmax(
+            0.0,
+            distanceFloor,
+            Math.min(distanceToTarget, visibleDistanceToTarget + 32 * 8) - unit.effectiveRangePixels - unit.topSpeed * enemyBonusTravelFrames)
+        }
+      })
+    }
 
     // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
     // Note that this can significantly swing our perception of hidden army strength

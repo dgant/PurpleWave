@@ -101,6 +101,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     forces.clear()
     lastFrame     = With.frame
     toAttackLast  = toAttack
+    toAttackFrom  = None
     lastPath      = None
     priority      = TrafficPriorities.None
     fightReason   = ""

@@ -18,9 +18,9 @@ class GridPathOccupancy extends AbstractGridVersionedValue[Int] {
 
   val neighborRatio = 0.25
   def addUnit(unit: UnitInfo, destination: Tile): Unit = {
-    if (unit.flying || unit.friendly.exists(_.transport.exists(_.flying))) return
+    if (unit.airborne) return
     val neighborArea = (neighborRatio * unit.unitClass.sqrtArea).toInt
-    add(destination, unit.unitClass.sqrtArea.toInt)
+    add(destination, unit.unitClass.sqrtArea)
     add(destination.add(1, 0),  neighborArea)
     add(destination.add(0, 1),  neighborArea)
     add(destination.add(-1, 0), neighborArea)

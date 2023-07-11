@@ -31,7 +31,7 @@ object ReloadScarabs extends Action {
     // Are we on ground, or safely able to land
     val canRefill = With.self.minerals >= Math.min(45, 15 * scarabsNeeded) && (unit.transport.isEmpty || unit.matchups.framesOfSafety > 24 + With.reaction.agencyMax)
     if (needRefill && canRefill) {
-      if (unit.transport.exists(_.pixelDistanceCenter(unit) < 72)) {
+      if (unit.airlifted) {
         With.logger.micro(f"$unit in ${unit.transport.get} landing to refill")
         RequestSafeLanding(unit)
       } else if (unit.bwapiUnit.getTrainingQueueCount <= Maff.fromBoolean(unit.remainingTrainFrames <= Math.max(With.reaction.agencyMax, With.latency.remainingFrames))) {

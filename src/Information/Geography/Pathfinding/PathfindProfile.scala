@@ -37,7 +37,7 @@ final class PathfindProfile(
   }
   lazy val vulnerableByAir: Boolean = {
     warnIfUnfinalized()
-    unit.map(u => u.flying || u.transport.exists(_.flying)).orElse(canCrossUnwalkable).getOrElse(true)
+    unit.map(_.airborne).orElse(canCrossUnwalkable).getOrElse(true)
   }
   lazy val vulnerableByGround: Boolean = {
     warnIfUnfinalized()

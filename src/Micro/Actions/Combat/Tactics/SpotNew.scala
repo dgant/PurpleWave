@@ -52,6 +52,7 @@ object SpotNew extends Action {
           .map(t => (t.center, With.framesSince(t.lastSeen).toDouble)))))
 
     val goals = new ArrayBuffer[Pixel]
+    goals += unit.pixel
     spooky  .foreach(spook => goals += spook.projectFrames(48))
     tank    .foreach(tank =>  goals += tank.pixel)
     if (unit.agent.isLeader) {
@@ -61,7 +62,7 @@ object SpotNew extends Action {
     }
     goals += group.attackCentroidKey
 
-    unit.agent.toTravel = Some(MicroPathing.pullTowards(unit.pixel, unit.sightPixels, goals: _*))
+    unit.agent.toTravel = Some(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
     Commander.move(unit)
   }
 

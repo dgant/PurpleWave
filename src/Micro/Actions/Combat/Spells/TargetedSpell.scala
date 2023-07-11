@@ -62,7 +62,7 @@ abstract class TargetedSpell extends Action {
   protected def onCast(caster: FriendlyUnitInfo, target: Pixel): Unit = {}
 
   private def moveInRange(caster: FriendlyUnitInfo, target: Pixel): Unit ={
-    if (caster.flying || caster.transport.exists(_.flying)) {
+    if (caster.airborne) {
       caster.agent.toTravel = Some(target)
     } else {
       caster.agent.toTravel = Maff.minBy(Ring(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling)

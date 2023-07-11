@@ -95,7 +95,7 @@ object Commander {
       pushThrough(unit, attackFrom, TrafficPriorities.Nudge)
     }
     if (unit.unready) return
-    if (unit.transport.exists(_.flying) && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
+    if (unit.airlifted && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
       requestUnload(unit); return
     }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
@@ -157,8 +157,8 @@ object Commander {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    if (With.reaction.sluggishness == 0 && unit.isAny(Terran.Dropship, Terran.ScienceVessel, Protoss.Shuttle, Protoss.Observer, Protoss.HighTemplar, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
-      val overshootDistance = if (unit.flying || unit.transport.exists(_.flying)) 288.0 else 8
+    if (With.reaction.sluggishness == 0 && unit.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+      val overshootDistance = ?(unit.airborne, 288.0, 8)
       if (to == unit.pixel) {
         val signX = Maff.signum11(Points.middle.x - to.x)
         val signY = Maff.signum11(Points.middle.y - to.y)
@@ -173,7 +173,7 @@ object Commander {
       Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
       Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
 
-    if (unit.flying || unit.transport.exists(_.flying)) return to
+    if (unit.airborne) return to
 
     // Path around terrain (if we haven't already)
     if (unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {

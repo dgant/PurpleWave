@@ -230,9 +230,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   private val _cooldownLeft: Cache[Int] = new Cache(() => {
     // Airlifted unit logic: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
-    val airlifted = friendly.exists(_.transport.exists(_.flying))
     ?(
-      airlifted && Protoss.Reaver(this),
+      Protoss.Reaver(this) && airlifted,
       30,
       Maff.vmax(
         remainingFramesUntilMoving,
@@ -400,7 +399,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lazy val enemyThreatens   = enemy.unitClass.canAttack(flying) || enemy.tile.enemyRangeAgainst(this) >= With.grids.enemyRangeAirGround.margin
     lazy val range            = pixelRangeAgainst(enemy)
     lazy val weOutrange       = ! enemyThreatens || enemy.pixelRangeAgainst(this) < range
-    lazy val rangeCenter      = range + unitClass.dimensionMin + enemy.unitClass.dimensionMin
+    lazy val goalDistance     = Math.max(16, range + unitClass.dimensionMin + enemy.unitClass.dimensionMin - Maff.clamp(cooldownLeft * enemy.speedApproaching(pixel) * Maff.nanToOne(enemy.topSpeed / topSpeed), -64, 64))
     lazy val edge             = ?(zone == enemyZone, None, zone.edgeTo(enemy.pixel))
     lazy val zoneDistance     = if (zone == enemy.zone) 0 else if (edge.isDefined && edge.get.contains(enemyZone)) 1 else 2
     lazy val wide             = zoneDistance != 1 || edge.forall(e => e.diameterPixels > 128 || enemy.pixelDistanceCenter(e.pixelCenter) > range)
@@ -425,8 +424,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     }
 
     lazy val pixelHug         = enemy.pixel.nearestTraversablePixel(this)
-    lazy val pixelRange       = enemy.pixel.project(pixel, rangeCenter).nearestTraversablePixel(this)
-    lazy val pixelSight       = enemy.pixel.project(pixel, Math.min(rangeCenter, sightPixels)).nearestTraversablePixel(this)
+    lazy val pixelRange       = enemy.pixel.project(pixel, goalDistance).nearestTraversablePixel(this)
+    lazy val pixelSight       = enemy.pixel.project(pixel, Math.min(goalDistance, sightPixels)).nearestTraversablePixel(this)
     lazy val pixelHugRange    = ?(weOutrange, pixelRange, pixelHug)
     lazy val pixelHugSight    = ?(weOutrange, pixelSight, pixelHug)
     lazy val pixelHugParadrop = ?(exhaustive, pixelParadrop.getOrElse(pixelRange), pixelRange)
@@ -483,9 +482,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   }
   private val _gatheringOrders = Seq(Orders.WaitForMinerals, Orders.MiningMinerals, Orders.WaitForGas, Orders.HarvestGas, Orders.MoveToMinerals, Orders.MoveToGas, Orders.ReturnGas, Orders.ReturnMinerals, Orders.ResetCollision)
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
-  @inline final def airborne  : Boolean = flying || friendly.exists(_.transport.exists(_.flying))
+  @inline final def airborne  : Boolean = flying || airlifted
   @inline final def gathering : Boolean = unitClass.isWorker && _gatheringOrders.contains(order)
   @inline final def carrying  : Boolean = carryingMinerals || carryingGas
+  @inline final def airlifted : Boolean = friendly.exists(_.transport.exists(_.flying))
 
   @inline final def presumptiveDestination: Pixel             = ?(isOurs, _presumeDestination,  _presumptiveDestination())
   @inline final def presumptiveStep       : Pixel             = ?(isOurs, _presumeStep,         _presumptiveStep())

@@ -1,14 +1,15 @@
 package Mathematics.Points
 
 import Lifecycle.With
+import Mathematics.Maff
 
 object Points {
   
   def middle: Pixel = Pixel(
-    With.mapPixelWidth  / 2,
-    With.mapPixelHeight / 2)
+    Maff.div2(With.mapPixelWidth),
+    Maff.div2(With.mapPixelHeight))
   
   def tileMiddle: Tile = Tile(
-    With.mapTileWidth   / 2,
-    With.mapTileHeight  / 2)
+    Maff.div2(With.mapTileWidth),
+    Maff.div2(With.mapTileHeight))
 }

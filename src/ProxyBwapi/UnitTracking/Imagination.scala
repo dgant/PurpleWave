@@ -89,7 +89,7 @@ object Imagination {
 
     // Let the trail go cold, as appropriate
     lazy val atHome     = unit.metro.exists(_.bases.exists(_.owner == unit.player))
-    lazy val hasCompany = unit.matchups.allies.exists(ally => With.framesSince(ally.lastSeen) < 24 * 20 && ally.pixelDistanceEdge(unit) < 32 * 15)
+    lazy val hasCompany = unit.matchups.allies.exists(ally => With.framesSince(ally.lastSeen) < 24 * 10 && ally.pixelDistanceEdge(unit) < 32 * 15)
     if (With.framesSince(unit.lastSeen) > 24 * 20 && ! atHome && ! hasCompany) {
       unit.changeVisibility(Visibility.InvisibleMissing)
       return

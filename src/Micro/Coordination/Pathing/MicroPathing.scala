@@ -5,7 +5,7 @@ import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Lifecycle.With
 import Mathematics.Physics.Force
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Points, Tile}
 import Mathematics.Shapes.{Circle, Ray}
 import Mathematics.{Maff, Shapes}
 import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
@@ -186,13 +186,16 @@ object MicroPathing {
     output
   }
 
-  def pullTowards(from: Pixel, leash: Double, towards: Pixel*): Pixel = {
-    var distanceCovered = 0.0
-    var output = from
-    towards.foreach(to => {
-      val distanceTo = Math.min(leash - distanceCovered, output.pixelDistance(to))
-      output = from.project(to, distanceTo)
-      distanceCovered += distanceTo
+  def pullTowards(leash: Double, towards: Pixel*): Pixel = {
+    var distanceLeft  = leash
+    val from          = towards.headOption.getOrElse(Points.middle)
+    var output        = from
+    towards.drop(1).foreach(to => {
+      if (distanceLeft > 0) {
+        val distanceTo  = Math.min(distanceLeft, output.pixelDistance(to))
+        output          = output.project(to, distanceTo)
+        distanceLeft    -= distanceTo
+      }
     })
     output
   }

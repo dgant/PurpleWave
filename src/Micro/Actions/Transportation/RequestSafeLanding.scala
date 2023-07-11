@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 object RequestSafeLanding {
 
   def apply(unit: FriendlyUnitInfo, destination: Option[Pixel] = None): Unit = {
-    if (unit.transport.exists(_.canMove)) {
+    if (unit.airlifted) {
       val goal              = destination.getOrElse(if (unit.agent.shouldFight) unit.agent.destination else unit.agent.safety)
       val distanceToGoal    = unit.pixelDistanceCenter(goal)
       val searchOriginTile  = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile

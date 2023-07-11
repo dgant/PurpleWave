@@ -67,9 +67,10 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(RoboTech)    .filter(x => commitToTech))
     shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage) || enemies(Protoss.PhotonCannon) >= 5
 
+    val reaverShuttleCombo = unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 1
     fearDeath   = ! safeDefending
     fearDeath   ||= unitsComplete(IsWarrior) < 8
-    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) < 2
+    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && ! reaverShuttleCombo
     fearDeath   &&= ! dtBraveryHome
     fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
     fearMacro   = miningBases < Math.max(2, enemyBases)
@@ -88,6 +89,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= bases > 2
     shouldAttack ||= bases > miningBases
     shouldAttack ||= ! recentlyExpandedFirst
+    shouldAttack ||= reaverShuttleCombo
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
     shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)

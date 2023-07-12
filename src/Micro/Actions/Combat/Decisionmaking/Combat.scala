@@ -226,8 +226,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def move(): Boolean = {
     if (unit.canMove) {
       if (Protoss.Reaver(unit) && unit.agent.ride.isDefined && ! unit.agent.commit && ! unit.loaded) {
-        val destination = unit.agent.destination
-        if (target.forall(unit.pixelsToGetInRange(_) > 64)) {
+        if (target.map(t => Math.min(unit.pixelsToGetInRange(t), unit.pixelsToGetInRange(t, t.projectFrames(48))) > 64).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination) > 96)) {
           BeReaver.demandPickup(unit)
         }
       }

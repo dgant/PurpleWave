@@ -5,7 +5,7 @@ import Information.Geography.NeoGeo.MapIdentifier
 import Lifecycle.With
 abstract class StarCraftMap {
   val name: String = ToString(this)
-  val nameStub: String = MapIdentifier.apply(name)
+  val nameStub: String = MapIdentifier(name)
   def apply(): Boolean = nameStub.contains(With.mapCleanName) || With.mapCleanName.contains(nameStub)
 }
 object Alchemist extends StarCraftMap

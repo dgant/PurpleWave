@@ -122,7 +122,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     toRepair  = unit.intent.toRepair
     toBoard   = unit.intent.toBoard.orElse(toBoard)
     toNuke    = unit.intent.toNuke
-    unit.intent.action.apply(unit)
+    unit.intent.action(unit)
   }
 
   /////////////

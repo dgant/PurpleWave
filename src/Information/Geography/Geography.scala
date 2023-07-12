@@ -35,7 +35,7 @@ final class Geography extends TimedTask with GeographyCache with Expansions {
   def itineraryCounterwise  (start: Base, end: Base): Iterable[Base] = Maff.itinerary(start, end, counterwiseBases)
 
   override def onRun(budgetMs: Long): Unit = {
-    UpdateZones.apply()
+    UpdateZones()
     updateExpansions()
   }
 }

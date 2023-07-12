@@ -73,7 +73,7 @@ trait GeographyBuilder {
 
     // We need zones and bases updated in order to construct metros
     //
-    UpdateZones.apply()
+    UpdateZones()
 
     // Build Metros
     //

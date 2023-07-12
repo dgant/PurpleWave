@@ -355,10 +355,17 @@ class ProtossVsTerran extends PvTOpeners {
     army()
     get(?(terranOneBase, gatewaysMax, gatewaysMin), Protoss.Gateway)
     // Crummy gas formula; in general we're counting on MacroSim to bump up the later invocation of requireGas if we really need it
-    requireGas(units(Protoss.Gateway, Protoss.RoboticsSupportBay, Protoss.Stargate, Protoss.CitadelOfAdun) / 4)
+    requireGas(
+        0.25 * units(Protoss.Gateway)
+      + 0.5 * units(Protoss.RoboticsFacility)
+      + 1.0 * units(Protoss.CitadelOfAdun)
+      + 0.5 * units(Protoss.Stargate)
+      + 1.0 * units(Protoss.ArbiterTribunal))
     approachMiningBases(3)
+    requireGas((With.gathering.gasWorkersDesired + 2) / 3)
     if ( ! armySizeLow) {
       techTwice()
+      requireGas()
     }
     get(gatewaysMax, Protoss.Gateway)
     buildCannonsAtExpansions(2)
@@ -373,8 +380,8 @@ class ProtossVsTerran extends PvTOpeners {
     get(6 * miningBases, Protoss.Gateway)
   }
 
-  def requireGas(quantity: Int = Int.MaxValue): Unit = {
-    if (With.self.gas < 500) buildGasPumps(quantity)
+  def requireGas(quantity: Double = Double.MaxValue): Unit = {
+    if (With.self.gas < 600) buildGasPumps(quantity.toInt)
   }
 
   def doArmyHighPriority(): Unit = {

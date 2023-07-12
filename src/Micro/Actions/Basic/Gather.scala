@@ -98,7 +98,7 @@ object Gather extends Action {
         } else if (bestGoal.isDefined) {
           // If we expect to die anyway
           if (unit.pixelDistanceEdge(bestGoal.get) < 32) {
-            Potshot.apply(unit)
+            Potshot(unit)
           } else {
             unit.agent.toGather = bestGoal
             Commander.gather(unit)
@@ -107,7 +107,7 @@ object Gather extends Action {
       }
 
       if (unit.base.exists(_.isOurs)) {
-        Potshot.apply(unit)
+        Potshot(unit)
       }
 
       // Run away if threatened during transfer
@@ -121,7 +121,7 @@ object Gather extends Action {
         && threatened
         && threatCloser
         && (unit.visibleToOpponents || ! unit.matchups.withinSafetyMargin || unit.zone.edges.exists(_.contains(unit.pixel)))) {
-        Retreat.apply(unit)
+        Retreat(unit)
       }
     }
 

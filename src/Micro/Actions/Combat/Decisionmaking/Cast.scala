@@ -12,7 +12,7 @@ object Cast extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.cooldownSpell < With.latency.remainingFrames) {
-      spells.foreach(_.apply(unit))
+      spells.foreach(_(unit))
     }
     if (unit.ready && unit.isAny(
       Terran.ScienceVessel,

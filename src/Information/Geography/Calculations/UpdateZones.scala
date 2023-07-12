@@ -32,7 +32,7 @@ object UpdateZones {
     With.geography.zones.foreach(_.contested = false)
     val playerBorders = Players.all
       .filterNot(_.isNeutral)
-      .map(player => (player, FindBorder.apply(player)))
+      .map(player => (player, FindBorder(player)))
       .toMap
     playerBorders.foreach(pair => pair._2.foreach(zone =>
       if ( ! zone.owner.isNeutral || zone.contested) {

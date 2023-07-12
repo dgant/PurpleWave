@@ -25,7 +25,7 @@ object Build extends Action {
     
     if (ourBuilding.exists(u => u.complete || u.unitClass.isProtoss)) {
       unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
-      Gather.apply(unit)
+      Gather(unit)
       return
     }
     
@@ -59,8 +59,8 @@ object Build extends Action {
         unit.agent.toAttack = unit.agent.toAttack.orElse(Some(blockersToKill.minBy(_.pixelDistanceEdge(unit))))
         Commander.attack(unit)
       } else if (unit.matchups.threats.exists( ! _.is(IsWorker))) {
-        FightOrFlee.apply(unit)
-        Fight.apply(unit)
+        FightOrFlee(unit)
+        Fight(unit)
       }
     }
     

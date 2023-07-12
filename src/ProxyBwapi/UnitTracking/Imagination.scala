@@ -142,18 +142,16 @@ object Imagination {
     val expectedTile      = expectedPixel.tile
     val canFly            = unit.unitClass.canFly
 
-    var positionsExplored = 0
-    @inline def isLegalPrediction(tile: Tile): Boolean = {
-      positionsExplored += 1
-      ( ! tile.visible
-        && tile.lastSeen <= unit.lastSeen
-        && (tile == observedTile || (
-          tile.tileDistanceSquared(observedTile) <= maxTilesAwaySq
-          && (canFly || (
-            tile.walkable
-            && tile.groundTiles(observedTile) <= maxTilesAway
-            && tile.units.forall(u => u.flying || u == unit))))))
-    }
+    @inline def isLegalPrediction(tile: Tile): Boolean = (
+      tile.valid
+      && ! tile.visible
+      && tile.lastSeen <= unit.lastSeen
+      && (tile == observedTile || (
+        tile.tileDistanceSquared(observedTile) <= maxTilesAwaySq
+        && (canFly || (
+          tile.walkableUnchecked
+          && tile.groundTiles(observedTile) <= maxTilesAway
+          && tile.units.forall(u => u.flying || u == unit))))))
 
     val possiblePixels =
       (Seq(expectedPixel).view.filter(p => isLegalPrediction(p.tile))
@@ -163,11 +161,6 @@ object Imagination {
             .map(_.center))
 
     val output = possiblePixels.headOption
-    if (output.isEmpty) {
-      positionsExplored += 1 // TODO: For debug breakpoints only; delete later
-    } else {
-      positionsExplored += 1 // TODO: For debug breakpoints only; delete later
-    }
     output
   }
 }

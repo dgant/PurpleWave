@@ -66,7 +66,7 @@ abstract class AbstractSearch extends Action {
           || tile.tileDistanceFast(base.townHallArea.midpoint) < 9.0))
   
     if (tilesToScout.isEmpty) return
-    val force = tilesToScout.view.map(tile => Gravity(tile.center, With.grids.lastSeen.framesSince(tile))).map(_.apply(unit.pixel)).reduce(_ + _)
+    val force = tilesToScout.view.map(tile => Gravity(tile.center, With.grids.lastSeen.framesSince(tile))).map(_(unit.pixel)).reduce(_ + _)
 
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
     unit.agent.toTravel = Some(tilesToScout.minBy(_.center.pixelDistance(target)).center)

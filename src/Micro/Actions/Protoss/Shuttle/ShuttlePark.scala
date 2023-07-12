@@ -19,7 +19,7 @@ object ShuttlePark extends Action {
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = exposedPassengers(shuttle).sortBy(_.matchups.pixelsEntangled)
+    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(_.matchups.pixelsEntangled)
     val centroid  = Maff.centroid(exposed.map(_.pixel))
     val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
     val towards   = new ArrayBuffer[Pixel]

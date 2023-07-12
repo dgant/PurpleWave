@@ -37,13 +37,16 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
   def remainingCompletionFrames: Int = {
     if (complete) return 0
     if (morphing && isAny(Zerg.Lair, Zerg.Hive, Zerg.SunkenColony, Zerg.SporeColony, Zerg.GreaterSpire, Zerg.LurkerEgg, Zerg.Cocoon)) {
-      val buildFrames = if (Zerg.LurkerEgg(this)) Zerg.Lurker.buildFrames else if (Zerg.Cocoon(this)) Zerg.Guardian.buildFrames else unitClass.buildFrames
+      val buildFrames = (
+              if (Zerg.LurkerEgg(this)) Zerg.Lurker
+        else  if (Zerg.Cocoon(this))    Zerg.Guardian
+        else                            unitClass).buildFrames
       return Math.max(1, buildFrames + lastClassChange - With.frame)
     }
     // Use both the initial projection and the up-to-date projection
     // We can't always trust the most up-to-date projection in case the unit has taken damage
-    val remainingNow      = remainingFrames(hitPoints, shieldPoints, lastSeen)
-    val remainingInitial  = remainingFrames(lastClassChangeHealth, lastClassChangeShields, frameDiscovered)
+    val remainingNow      = remainingFrames(hitPoints,              shieldPoints,           lastSeen)
+    val remainingInitial  = remainingFrames(lastClassChangeHealth,  lastClassChangeShields, lastClassChange)
     val output            = Math.min(remainingNow, remainingInitial)
     output
   }

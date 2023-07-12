@@ -42,8 +42,8 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def divide(scale: Int)          : Pixel = Pixel(x / scale, y / scale)
   @inline def clamp(margin: Int = 0)      : Pixel = {
     Pixel(
-      Maff.clamp(x, margin, With.mapPixelWidth - margin),
-      Maff.clamp(y, margin, With.mapPixelHeight - margin))
+      Maff.clamp(x, margin, With.mapPixelWidth - margin - 1),
+      Maff.clamp(y, margin, With.mapPixelHeight - margin - 1))
   }
   @inline def project(destination: Pixel, pixels: Double): Pixel = {
     if (pixels == 0) return this

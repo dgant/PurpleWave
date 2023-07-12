@@ -83,11 +83,11 @@ object BeCarrier extends Action {
           Commander.attack(unit)
         }
       } else {
-        WarmUpInterceptors.apply(unit)
+        WarmUpInterceptors(unit)
         Commander.attackMove(unit)
       }
     } else {
-      Retreat.apply(unit)
+      Retreat(unit)
     }
   }
 }

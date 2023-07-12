@@ -16,7 +16,7 @@ object Transport extends Action {
       return
     }
 
-    Evacuate.apply(transport)
-    BeShuttle.apply(transport)
+    Evacuate(transport)
+    BeShuttle(transport)
   }
 }

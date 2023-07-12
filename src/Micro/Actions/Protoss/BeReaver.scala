@@ -22,7 +22,7 @@ object BeReaver extends Action {
     if ( ! unit.agent.commit && (needlesslyEndangered || needlesslyDoomed || unit.matchups.targetedByScarab)) {
       unit.agent.act("Hop")
       demandPickup(unit)
-      Retreat.apply(unit)
+      Retreat(unit)
     } else if (needRefresh) {
       unit.agent.act("Refresh")
       demandPickup(unit)

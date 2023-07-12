@@ -70,10 +70,9 @@ object FindBases {
     val altitude      = With.game.getGroundHeight(centroid.bwapi)
     val searchRadius  = 10
     val candidates =
-      Circle
-        .apply(searchRadius)
+      Circle(searchRadius)
         .map(centroid.add)
-        .filter(tile => isLegalTownHallTile(tile, exclusions, altitude))
+        .filter(isLegalTownHallTile(_, exclusions, altitude))
     
     if (candidates.isEmpty) return None
     Some(candidates.minBy(cost(_, resources)))

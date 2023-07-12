@@ -7,7 +7,7 @@ import Information.Battles.Prediction.Simulation.Simulation
 import Information.Counting.{Accounting, MacroCounts, ProductionHistory, Projections}
 import Information.Fingerprinting.Fingerprints
 import Information.GameSense.GameSensor
-import Information.Geography.{Expansions, Geography}
+import Information.Geography.Geography
 import Information.Geography.NeoGeo.{MapIdentifier, NeoGeo}
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
@@ -23,7 +23,6 @@ import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
 import Planning.Plans.Macro.Automatic.Supplier
-import _root_.Placement.Architecture.Architecture
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -34,6 +33,7 @@ import Strategery.Strategist
 import Tactic.Squads.Squads
 import Tactic.Tactician
 import _root_.Performance.{Latency, PerformanceMonitor, ReactionTimes}
+import _root_.Placement.Architecture.Architecture
 import bwapi.Flag
 import bwta.BWTA
 
@@ -139,7 +139,7 @@ object With {
     enemies           = game.enemies.asScala.map(Players.get).toVector
     friendlies        = With.self +: game.allies.asScala.map(Players.get).toVector
     mapFileName       = game.mapFileName
-    mapCleanName      = MapIdentifier.apply(mapFileName)
+    mapCleanName      = MapIdentifier(mapFileName)
     mapClock          = MapIdentifier.clock(new Tile(With.game.self.getUnits.asScala.maxBy(_.getHitPoints).getTilePosition).center)
     mapTileWidth      = game.mapWidth
     mapTileHeight     = game.mapHeight

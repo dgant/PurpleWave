@@ -91,8 +91,7 @@ final class UnitTracker {
   def inTiles(tiles: Seq[Tile]): Seq[UnitInfo] = tiles.view.flatMap(_.units)
   def inTileRectangle(rectangle: TileRectangle): Seq[UnitInfo] = inTiles(rectangle.tiles)
   def inTileRadius(tile: Tile, tiles: Int): Seq[UnitInfo] = inTiles(
-    Circle
-      .apply(tiles)
+    Circle(tiles)
       .view
       .map(tile.add))
   def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {

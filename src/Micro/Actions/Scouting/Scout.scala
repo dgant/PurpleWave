@@ -9,13 +9,13 @@ object Scout extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.agent.isScout
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    SabotageProxy.apply(unit)
-    KnockKnock.apply(unit)
-    PreserveScout.apply(unit)
-    AttackBuilder.apply(unit)
-    BlockConstruction.apply(unit)
-    Search.apply(unit)
-    SearchWhenBored.apply(unit)
+    SabotageProxy(unit)
+    KnockKnock(unit)
+    PreserveScout(unit)
+    AttackBuilder(unit)
+    BlockConstruction(unit)
+    Search(unit)
+    SearchWhenBored(unit)
     Commander.move(unit)
   }
 }

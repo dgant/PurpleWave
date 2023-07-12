@@ -4,7 +4,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 case class IsAll(matchers: UnitFilter*) extends UnitFilter {
   
   override def apply(unit: UnitInfo): Boolean = {
-    matchers.forall(_.apply(unit))
+    matchers.forall(_(unit))
   }
   
 }

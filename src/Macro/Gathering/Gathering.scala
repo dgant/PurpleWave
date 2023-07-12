@@ -69,6 +69,9 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   // particularly so MacroSim knows to project gas availability optimistically.
   var gasIsCappedOnQuantity: Boolean = _
 
+  // A signal on how many gas pumps we can currently use
+  var gasWorkersDesired: Int = _
+
   def setWorkers(newWorkers: collection.Set[FriendlyUnitInfo]): Unit = { workers = newWorkers }
 
   def getWorkersByResource(resource: UnitInfo): Iterable[UnitInfo] = slotsByResource.get(resource).view.flatMap(_.flatMap(_.worker))
@@ -125,6 +128,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val gasWorkerTarget       = Maff.clamp(gasWorkersBaseTarget,  gasWorkersHardMinimum, gasWorkersHardMaximum)
     val gasWorkersNow         = assignments.count(_._2.resource.unitClass.isGas)
     gasWorkersToAdd           = gasWorkerTarget - gasWorkersNow
+    gasWorkersDesired         = gasWorkersBaseTarget // For setting this external signal, use the target prior to counting gas pumps
     gasIsCappedOnQuantity     = With.self.gas >= gasGoalMinimum && gasWorkersHardMaximum > 0
 
     if (doInitialSplit()) return

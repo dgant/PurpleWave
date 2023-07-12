@@ -21,7 +21,7 @@ final case class SimulationEventAttack(
       if (fatal) "(Fatal)"
       else f"leaving ${if (victim.shieldPointsInitial > 0) f"$victimShields shields + " else ""}$victimHp hp"}"
   
-  override def draw() {
+  override def draw(): Unit = {
     val size = 5
     val color = victim.realUnit.player.colorBright
     DrawMap.line(victimPixel.add(-5, -5), victimPixel.add(5, 5),  color)

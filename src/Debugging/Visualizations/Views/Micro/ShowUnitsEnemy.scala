@@ -26,7 +26,7 @@ object ShowUnitsEnemy extends DebugView {
     if (showFogged) {
       if ( ! unit.visible || unit.effectivelyCloaked) {
         val radius = unit.unitClass.dimensionMin / 2
-        DrawMap.circle(unit.pixel, radius, color)
+        DrawMap.circle(unit.pixel, radius, color, solid = true)
         if (unit.pixel != unit.pixelObserved) {
           DrawMap.circle(unit.pixelObserved, radius, color)
           DrawMap.line(

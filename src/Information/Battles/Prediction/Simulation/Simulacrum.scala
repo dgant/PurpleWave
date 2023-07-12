@@ -1,14 +1,13 @@
 package Information.Battles.Prediction.Simulation
 
 import Lifecycle.With
-import Mathematics.Points.Pixel
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
 import Utilities.?
-import Utilities.Time.Forever
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -140,13 +139,13 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
         alive = false
         addEvent(SimulationEventDeath(this))
       } else {
-        cooldownLeft = Math.max(0, cooldownLeft - 1)
-        cooldownMoving = Math.max(0, cooldownMoving - 1)
+        cooldownLeft    = Math.max(0, cooldownLeft    - 1)
+        cooldownMoving  = Math.max(0, cooldownMoving  - 1)
         if (tweenFramesLeft > 0) {
           tweenFramesDone += 1
           tweenFramesLeft -= 1
           // TODO: Account for adjusted paths from eg. moving around obstacles
-          simulation.grid.tryMove(this, if (tweenFramesLeft == 0) tweenGoal else tweenFrom.project(tweenGoal, topSpeed * tweenFramesDone))
+          simulation.grid.tryMove(this, ?(tweenFramesLeft == 0, tweenGoal, tweenFrom.project(tweenGoal, topSpeed * tweenFramesDone)))
         }
       }
     }
@@ -165,21 +164,26 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     target = targetNew
   }
 
-  @inline def tween(to: Pixel, frames: Int, reason: Option[String] = None): Unit = {
-    addEvent(SimulationEventTween(this, to, frames, reason))
-    cooldownMoving = Maff.clamp(frames, 1, With.configuration.simulationResolution)
-    cooldownLeft = Math.max(cooldownLeft, cooldownMoving)
-    tweenFrom = pixel
-    tweenGoal = to
-    tweenFramesDone = 0
-    tweenFramesLeft = cooldownMoving
-  }
   @inline def tween(to: Pixel, reason: Option[String]): Unit = {
-    tween(to, (0.999 + Maff.nanToN(pixelDistanceCenter(to) / topSpeedPossible, Forever())).toInt, reason)
+    val ableToMove = canMove && topSpeed > 0
+    tweenFramesDone = 0
+    tweenFrom       = pixel
+    if (ableToMove) {
+      val durationRequired  = (0.999 + pixelDistanceCenter(to) / topSpeed).toInt
+      tweenFramesLeft       = Maff.clamp(durationRequired, 1, 8 * With.configuration.simulationResolution)
+      tweenGoal             = ?(durationRequired >= tweenFramesLeft, to, pixel.project(to, tweenFramesLeft * topSpeed))
+      cooldownMoving        = Math.min(With.configuration.simulationResolution, tweenFramesLeft)
+    } else {
+      tweenFramesLeft       = With.configuration.simulationResolution
+      tweenGoal             = pixel
+      cooldownMoving        = tweenFramesLeft
+    }
+    addEvent(SimulationEventTween(this, to, tweenGoal, tweenFramesLeft, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
   @inline def tween(to: Pixel): Unit = {
     tween(to, None)
   }
+
   @inline def recalculateInjury(): Unit = {
     injury = _calculateInjury
   }

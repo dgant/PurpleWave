@@ -53,7 +53,9 @@ object Retreat extends Action {
     lazy val goalOrigin           = goalReturn || goalHome
     lazy val goalSafety           = ! unit.matchups.withinSafetyMargin
     lazy val forceVector = {
-      if (unit.agent.forces.isEmpty) MicroPathing.setDefaultForces(unit, goalOrigin = goalOrigin, goalSafety = goalSafety)
+      if (unit.agent.forces.isEmpty) {
+        MicroPathing.setDefaultForces(unit, goalOrigin = goalOrigin, goalSafety = goalSafety)
+      }
       unit.agent.forces.sum
     }
     lazy val force = forceVector.radians

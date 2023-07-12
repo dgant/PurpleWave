@@ -12,5 +12,5 @@ abstract class SimulationEvent(sim: Simulacrum) {
   val targetAt  : Option[Pixel]       = target.map(_.pixel)
 
   def to: Pixel
-  def draw() {}
+  def draw(): Unit = {}
 }

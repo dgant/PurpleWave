@@ -55,10 +55,17 @@ class SquadDefendBase(base: Base) extends Squad {
   })
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
-  val bastion: Cache[Pixel] = new Cache(() => Maff.minBy(
-    base.metro.zones.flatMap(_.units.view.filter(_.isOurs))
-      .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || (u.complete && u.totalHealth < 300)))
-      .map(_.pixel))(_.groundPixels(guardChoke.map(_.pixelCenter).getOrElse(vicinity))).getOrElse(vicinity))
+  val bastion: Cache[Pixel] = new Cache(() =>
+      Maff.minBy(
+        base.metro.zones
+          .flatMap(_.units.view.filter(_.isOurs))
+          .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || Protoss.ShieldBattery(u) || (u.complete && u.totalHealth < 300)))
+          .map(_.pixel))
+      (_.groundPixels(
+        guardChoke
+          .map(_.pixelCenter)
+          .getOrElse(vicinity)))
+      .getOrElse(vicinity))
 
   private var formationReturn: Formation = FormationEmpty
 
@@ -111,7 +118,7 @@ class SquadDefendBase(base: Base) extends Squad {
       if        (canScour)    scourables
       else if   (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector
       else                    enemies.filter(threateningBase)
-    setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)))
+    setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker))
 
     if (canWithdraw) {
       lastAction = "Withdraw"

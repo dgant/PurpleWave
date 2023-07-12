@@ -8,6 +8,7 @@ import Utilities.UnitFilters._
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadRazeProxies
+import Utilities.?
 import Utilities.Time.{Forever, Minutes}
 
 import scala.collection.mutable
@@ -23,7 +24,7 @@ class DefendAgainstProxy extends Tactic {
 
     // Get sorted list of proxies
     val proxies = With.units.enemy
-      .filter(e => e.likelyStillThere && e.isAny(scaryTypes: _*) && e.proxied)
+      .filter(e => e.likelyStillThere && e.isAny(scaryTypes: _*) && e.proxied && e.metro.exists(_.isOurs) || e.isAny(Protoss.PhotonCannon))
       .toVector
       .sortBy(_.remainingCompletionFrames)
       .sortBy(_.totalHealth)
@@ -60,7 +61,7 @@ class DefendAgainstProxy extends Tactic {
           && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u =>
             Protoss.Pylon(u)
               && With.grids.psi3Height.psiPoints.view.exists(p => u.tileTopLeft.add(p) == proxy.tileTopLeft))))
-      val defendersRequired   = if (isEmergency) 6 else if (isAnnoying) 2 else 1
+      val defendersRequired   = ?(isEmergency, 6, ?(isAnnoying, 2, 1))
       val defendersViable     = defendersAvailable
         .toVector
         .filter(defender =>

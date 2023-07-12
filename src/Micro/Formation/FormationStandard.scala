@@ -140,14 +140,9 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
         if (tile.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(tile.center))) output *= 10000
         output
       }
-      val bestApexTile  = Maff.minBy(goalPathTiles)(scoreApex)
-      val bestFaceTile  = bestApexTile.map(t => {
-        val apexIndex = goalPathTiles.indexOf(bestApexTile)
-        val faceIndex = apexIndex + 1 + group.meanAttackerRange.toInt / 32
-        ?(faceIndex >= goalPathTiles.length, goalPathTiles.last, goalPathTiles(faceIndex))
-      })
-      apex = bestApexTile.map(_.center).getOrElse(goal)
-      face = bestFaceTile.map(_.center).getOrElse(goal)
+      apex = Maff.minBy(goalPathTiles)(scoreApex).map(_.center).getOrElse(goal)
+      val faceIndex = goalPathTiles.indexOf(apex) + 1 + group.meanAttackerRange.toInt / 32
+      face = ?(faceIndex >= goalPathTiles.length, goalPathTiles.last, goalPathTiles(faceIndex)).center
     }
   }
 

@@ -88,13 +88,13 @@ object Potential {
   private def collisionRepulsionMagnitude(unit: FriendlyUnitInfo, other: UnitInfo, margin: Double): Double = {
     if (unit.flying) return 0.0
     if (other.flying) return 0.0
-    if (other.velocity.lengthSquared < 0.01) return 0.0
+    if (other.velocity.lengthSquared < 0.01) return 0.0 // BW will automatically path us around stationary units
     if (other.topSpeed >= unit.topSpeed && other.speedApproaching(unit) < 0) return 0.0
     val output = 1.0 - Maff.clamp(other.pixelDistanceEdge(unit) / margin, 0.0, 1.0)
     output
   }
   def collisionRepulsion(unit: FriendlyUnitInfo, other: UnitInfo): Force = {
-    val magnitude = collisionRepulsionMagnitude(unit, other, 6.0)
+    val magnitude = collisionRepulsionMagnitude(unit, other, 16.0)
     if (magnitude == 0) Forces.None else towardsUnit(unit, other, -magnitude)
   }
   

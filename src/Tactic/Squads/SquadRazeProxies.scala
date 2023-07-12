@@ -2,8 +2,8 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Utilities.UnitFilters.IsWarrior
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.UnitFilters.IsWarrior
 
 class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squad {
   private val proxyPixels   = assignments.values.toSeq.map(_.pixel).distinct
@@ -17,7 +17,7 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
       val assignee = assignments.get(unit)
       val attackTarget = if (With.units.existsEnemy(IsWarrior)) None else assignee
       unit.intend(this)
-        .setCanFlee(false)
+        .setCanFlee(unit.matchups.threats.exists(IsWarrior))
         .setTravel(assignee.map(_.pixel).getOrElse(centroidUnit))
         .setAttack(attackTarget)
     })

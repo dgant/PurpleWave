@@ -200,7 +200,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private val _proxied = new Cache(() =>
     unitClass.isBuilding
     && ! flying
-    && ?(isFriendly, With.scouting.proximity(tile) < 1 - _proxyThreshold, With.scouting.proximity(tile) > _proxyThreshold),
+    && ?(isFriendly,
+      With.scouting.proximity(tile) < 1 - _proxyThreshold || ! metro.exists(_.isOurs),
+      With.scouting.proximity(tile) >     _proxyThreshold || ! metro.exists(m => m.bases.exists(b => b.isStartLocation && (b.isEnemy || ! b.scoutedByUs) && (With.geography.enemyBases.isEmpty || With.geography.enemyBases.contains(b))))),
     240)
 
   ////////////
@@ -277,7 +279,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def canAttackAir    : Boolean = canAttack && attacksAgainstAir    > 0
   @inline final def canAttackGround : Boolean = canAttack && attacksAgainstGround > 0
-  @inline final def canBurrow: Boolean = canDoAnything && (is(Zerg.Lurker) || (player.hasTech(Zerg.Burrow) && unitClass.canBurrow))
+  @inline final def canBurrow       : Boolean = canDoAnything && (is(Zerg.Lurker) || (Zerg.Burrow(player) && unitClass.canBurrow))
 
   def confidence11: Double = _confidence()
   private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))

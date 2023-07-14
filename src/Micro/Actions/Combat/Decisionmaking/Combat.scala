@@ -324,7 +324,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       unit.agent.act("Chase")
       val to                  = target.get.pixel
       val step                = target.get.presumptiveStep
-      val chaseGoal           = if (step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to)) step else to
+      val chaseGoal           = ?(step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to), step, to)
       val extraChaseDistance  = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
       unit.agent.toTravel     = Some(unit.pixel.project(chaseGoal, idealDistanceForward + extraChaseDistance))
       move()

@@ -5,6 +5,7 @@ import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Tactic.Squads.{SquadAttack, SquadDefendBase}
 
 object ShuttleAdoptPassenger extends Action {
 
@@ -16,7 +17,17 @@ object ShuttleAdoptPassenger extends Action {
         shuttle.alliesSquad.view.filter(shouldAdopt(shuttle, _)),
         shuttle.alliesBattle.view.filter(shouldAdopt(shuttle, _)),
         With.units.ours.filter(shouldAdopt(shuttle, _)))
+
     Maff.maxBy(pickupCandidates)(c => pickupNeed(shuttle, c) / (1.0 + c.pixelDistanceSquared(shuttle))).foreach(shuttle.agent.addPassenger)
+
+    // If we're not doing something fancy, pick up new Reavers as they're born
+    if (shuttle.squad.exists(s => s.isInstanceOf[SquadAttack] || s.isInstanceOf[SquadDefendBase])) {
+      val newborns = With.units.ours
+        .filter(u => ! u.complete && Protoss.Reaver(u) && u.remainingCompletionFrames < shuttle.framesToTravelTo(u.pixel))
+        .toVector
+
+      Maff.minBy(newborns)(_.remainingCompletionFrames).foreach(shuttle.agent.addPassenger)
+    }
   }
 
   protected def shouldAdopt(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Boolean = (

@@ -21,6 +21,8 @@ import Utilities.?
 // of Brood War's glitchy unit behavior.
 //
 object Commander {
+
+  private val tryingToMoveThreshold = 32
   
   def doNothing(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return
@@ -76,49 +78,59 @@ object Commander {
   // on average issuing an attack command that arrives on the first frame that a target is available will save 7 frames
   // if you wait until a target is in range to issue attack, you save an average of 3 frames (LF3)
   // if you waited to issue attack and the tower autotargets before your order arrives, you lose at least 22 frames(cooldown)
-  private val tryingToMoveThreshold = 32
+
+  private def acceptableAttackFrom(unit: FriendlyUnitInfo, target: UnitInfo, attackFrom: Pixel): Boolean = {
+    if ( ! target.visible && target.pixelDistanceCenter(attackFrom) > 16)                         false
+    else if (unit.inRangeToAttackFrom(target, attackFrom))                                        true
+    else if (unit.pixelsToGetInRange(target) <= unit.pixelsToGetInRangeFrom(target, attackFrom))  false
+    else                                                                                          true
+  }
+
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    lazy val attackFrom = unit.agent.chooseAttackFrom().getOrElse(target.pixel.nearestTraversablePixel(unit))
-    if (unit.agent.ride.isDefined) {
-      unit.agent.setRideGoal(attackFrom)
-    }
-    leadFollower(unit, attack(_, target))
-    unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
+    unit.agent.toAttack     = Some(target)
+    unit.agent.toAttackFrom = unit.agent.toAttackFrom.filter(acceptableAttackFrom(unit, target, _))
+    lazy val attackFrom     = unit.agent.chooseAttackFrom().get
+
     if (Protoss.Reaver(unit)) {
-      if (unit.loaded) {
-        pushAway(unit, attackFrom, TrafficPriorities.Bump)
-      } else {
-        pushThrough(unit, attackFrom, TrafficPriorities.Bump)
-      }
+      if (unit.loaded)  pushAway    (unit, attackFrom, TrafficPriorities.Bump)
+      else              pushThrough (unit, attackFrom, TrafficPriorities.Bump)
     } else if ( ! target.visible || ! unit.inRangeToAttack(target)) {
       pushThrough(unit, attackFrom, TrafficPriorities.Nudge)
     }
+
+    unit.agent.setRideGoal(attackFrom)
+    leadFollower(unit, attack(_, target))
+    unit.agent.tryingToMove = unit.pixelsToGetInRange(target) > tryingToMoveThreshold
     if (unit.unready) return
+
     if (unit.airlifted && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
       requestUnload(unit); return
     }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
+
     // We shouldn't target interceptors anymore, but in case we do:
     if (Protoss.Interceptor(target)) {
       attackMove(unit, attackFrom); return
     }
+
     // When a ground unit attacks a Carrier, have it attack-move when off cooldown to ensure we burn off Interceptors even if we can't find a route to the Carrier
     if (Protoss.Carrier(target) && unit.readyForAttackOrder && ! unit.inRangeToAttack(target) && ! unit.flying) {
       attackMove(unit, attackFrom); return
     }
-    if ( ! unit.readyForAttackOrder) {
-      sleep(unit); return
-    }
+
     if (Zerg.Lurker(unit) && ! unit.burrowed) {
       move(unit, attackFrom); return
     }
-    if ( ! target.visible && ! unit.flying && target.altitude > unit.altitude) {
-      move(unit, attackFrom);return
-    }
 
     // If we should be attack-commanding
-    if (target.visible && (unit.unitClass.melee || unit.flying || ! unit.canMove || unit.pixelsToGetInRange(target) <= unit.unitClass.dimensionMax + unit.topSpeed * (With.latency.latencyFrames + With.reaction.agencyAverage))) {
+    var useAttackCommand    = unit.readyForAttackOrder || unit.inRangeToAttack(target) // Allow deliberate repositioning between shots
+    useAttackCommand      ||= unit.unitClass.melee
+    useAttackCommand      ||= ! unit.canMove
+    useAttackCommand      ||= unit.flying && unit.readyForAttackOrder // Flying units can attack directly but if repositioning between shots need a move command
+    useAttackCommand      ||= unit.framesToGetInRange(target) <= With.latency.latencyFrames + Math.max(unit.cooldownLeft, With.reaction.agencyAverage)
+    useAttackCommand      &&= target.visible
+    if (useAttackCommand) {
       lazy val moving           = unit.moving
       lazy val alreadyInRange   = unit.inRangeToAttack(target)
       lazy val overdueToAttack  = unit.cooldownLeft == 0 && With.framesSince(unit.lastFrameStartingAttack) > 2.0 * unit.cooldownMaxAirGround
@@ -131,23 +143,13 @@ object Commander {
       if (shouldOrder) {
         unit.bwapiUnit.attack(target.bwapiUnit)
         target.addFutureAttack(unit)
+        sleepAttack(unit)
+      } else {
+        sleep(unit)
       }
-      sleepAttack(unit)
       return
     }
-
-    // Otherwise, we should be move-commanding.
-    //
-    // "obviousPosition" isn't necessarily obvious:
-    //  - For example, to shoot at a unit below a cliff we often need to manually walk up to the cliff.
-    //    Neither direct attack commands nor moving to the target's pixel will achieve that.
-    // - Reavers can't shoot downhill so probably do need to go directly to the target
-    val obviousPosition = if (Protoss.Reaver(unit)) target.pixel else target.pixel.project(unit.pixel, unit.pixelRangeAgainst(target) + unit.unitClass.dimensionMin + target.unitClass.dimensionMin)
-    if (obviousPosition.traversableBy(unit) && (target.visible || obviousPosition.altitude >= target.altitude)) {
-      move(unit, obviousPosition)
-    } else {
-      move(unit, attackFrom)
-    }
+    move(unit, attackFrom)
   }
 
   /**
@@ -271,6 +273,7 @@ object Commander {
 
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, rightClick(_, target))
+    unit.agent.tryingToMove = unit.pixelDistanceEdge(target) > tryingToMoveThreshold
     if (unit.agent.ride.contains(target)) {
       unit.agent.wantsPickup = true
     } else {
@@ -287,18 +290,18 @@ object Commander {
       if (With.framesSince(unit.agent.lastStim) < 24) return
       unit.agent.lastStim = With.frame
     }
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     unit.bwapiUnit.useTech(tech.bwapiTech)
     sleep(unit)
   }
 
   def useTechOnUnit(unit: FriendlyUnitInfo, tech: Tech, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapiUnit)
     if (tech == Protoss.ArchonMeld || tech == Protoss.DarkArchonMeld) {
       sleep(unit, 48)
@@ -309,9 +312,9 @@ object Commander {
 
   def useTechOnPixel(unit: FriendlyUnitInfo, tech: Tech, target: Pixel): Unit = {
     unit.agent.setRideGoal(target)
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     unit.bwapiUnit.useTech(tech.bwapiTech, target.bwapi)
     if (tech == Terran.SpiderMinePlant) {
       sleep(unit, 12)
@@ -322,17 +325,16 @@ object Commander {
 
   def repair(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.setRideGoal(target.pixel)
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
-    unit.bwapiUnit.repair(target.bwapiUnit)
+    if (autoUnload(unit))   return
     sleep(unit, 24)
   }
 
   def returnCargo(unit: FriendlyUnitInfo): Unit = {
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     if (unit.carrying) {
       unit.bwapiUnit.returnCargo()
       sleepReturnCargo(unit)
@@ -342,9 +344,9 @@ object Commander {
   def gather(unit: FriendlyUnitInfo): Unit = unit.agent.toGather.foreach(gather(unit, _))
   private def gather(unit: FriendlyUnitInfo, resource: UnitInfo): Unit = {
     unit.agent.setRideGoal(resource.pixel)
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     if (unit.carrying) {
       // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
@@ -409,7 +411,7 @@ object Commander {
   }
 
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass): Unit = {
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
     // Don't auto-unload! We have a separate process for building Scarabs in loaded Reavers
     unit.bwapiUnit.build(unitClass.bwapiType)
@@ -418,9 +420,9 @@ object Commander {
 
   def build(unit: FriendlyUnitInfo, unitClass: UnitClass, tile: Tile): Unit = {
     unit.agent.setRideGoal(tile.center)
-    if (unit.unready) return
+    if (unit.unready)       return
     if (autoUnburrow(unit)) return
-    if (autoUnload(unit)) return
+    if (autoUnload(unit))   return
     if (unit.pixelDistanceSquared(tile.center) > Math.pow(32.0 * 5.0, 2)) {
       move(unit, tile.center)
       return
@@ -526,7 +528,7 @@ object Commander {
     lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuild.map(_.tileArea.add(unit.intent.toBuildTile.get).center).getOrElse(unit.intent.toBuildTile.get.center))
     if (unit.flying) return
     if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
-    if (unit.intent.toFinish.isDefined)             unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toFinish.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toRepair.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toBuildTile.isDefined)                      unit.agent.escalatePriority(?(buildDistance < 128, TrafficPriorities.Shove, TrafficPriorities.Bump))
     if (unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)

@@ -23,11 +23,11 @@ object ShuttlePark extends Action {
     val centroid  = Maff.centroid(exposed.map(_.pixel))
     val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
     val towards   = new ArrayBuffer[Pixel]
-    exposed.foreach(ally  => towards += ally.pixel.project(centroid, Shuttling.pickupRadiusCenter(ally)))
+    exposed.foreach(ally  => towards += ally.pixel)
     threat.foreach(threat => towards += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
 
     if (towards.nonEmpty) {
-      val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge + Shuttling.pickupRadiusCenter(exposed.head), towards: _*)
+      val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge, towards: _*)
       shuttle.agent.toTravel = Some(to)
       if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
         Retreat.delegate(shuttle)

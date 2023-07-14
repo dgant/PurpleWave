@@ -355,7 +355,7 @@ class PvPOpening extends GameplanImperative {
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
-    if (shouldAttack || (shouldExpand && bases < 2) || (safeDefending && ! PvPDT() && ( ! rangeDelayed || Protoss.DragoonRange()))) {
+    if (shouldAttack || (shouldExpand && bases < 2) || (safeDefending && ! PvPDT() && ( ! rangeDelayed || Protoss.DragoonRange()) && enemyHasShown(Protoss.Dragoon))) {
       holdNatural()
     }
 

@@ -55,8 +55,8 @@ object Skimulator {
           if (distanceToTarget < LightYear()) {
             visibleDistanceToTargetNumerator    += distanceToTarget
             visibleDistanceToTargetDenominator  += 1
+            unit.skimDistanceToEngage = Math.max(0.0, distanceToTarget - unit.effectiveRangePixels - unit.topSpeed * enemyBonusTravelFrames)
           }
-          unit.skimDistanceToEngage = Math.max(0.0, visibleDistanceToTargetNumerator - unit.effectiveRangePixels - unit.topSpeed * enemyBonusTravelFrames)
         }
       })
       val visibleDistanceToTarget = visibleDistanceToTargetNumerator / Math.max(1d, visibleDistanceToTargetDenominator)

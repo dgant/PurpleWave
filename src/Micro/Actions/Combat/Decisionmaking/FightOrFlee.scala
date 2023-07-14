@@ -48,8 +48,16 @@ object FightOrFlee extends Action {
     decide(false, "BideSiege",  () => Terran.SiegeTankUnsieged(u) && ! With.blackboard.wantToAttack() && u.matchups.groupVs.has(Protoss.Dragoon) && ! With.self.hasTech(Terran.SiegeMode) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && u.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
     decide(false, "CarrierVuln",() => Protoss.Carrier(u) && u.matchups.threats.exists(t => ! t.flying && t.pixelsToGetInRange(u) < 32))
     decide(true,  "CarrierTrap",() => Protoss.Carrier(u) && u.matchups.groupOf.airToAirStrength >= u.matchups.groupVs.airToAirStrength || u.matchups.groupVs.has(Terran.Battlecruiser, Protoss.Carrier))
-    decide(true,  "Workers",    () => u.canAttack && u.matchups.groupVs.attacksGround && u.matchups.groupOf.has(IsWorker) && u.matchups.targets.exists(_.canAttackGround) && u.matchups.allies.flatMap(_.friendly).exists(a => IsWorker(a) && (a.matchups.targetsInRange ++ a.orderTarget).exists(t => t.isEnemy && a.framesToGetInRange(t) <= 4 + u.framesToGetInRange(t))))
     decide(true,  "Raze",       () => ((IsTank(u) && Terran.SiegeMode()) || u.isAny(Protoss.Reaver, Zerg.Guardian) && u.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding)))
+    decide(true,  "Miners",     () => ! IsWorker(u)
+      && u.canAttack
+      && u.matchups.groupVs.attacksGround
+      && u.matchups.groupOf.has(IsWorker)
+      && u.matchups.targets.exists(
+        _.presumptiveTarget.exists(a =>
+          IsWorker(a) && a.friendly.exists(f =>
+            f.agent.toGather.exists(_.pixelDistanceEdge(f) <= 96)))))
+
     decide(true,  "Energized",  () =>
       u.unitClass.maxShields > 20
       && With.frame < Minutes(10)()

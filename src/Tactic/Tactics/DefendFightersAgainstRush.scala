@@ -3,7 +3,7 @@ package Tactic.Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.ResourceLocks.LockUnits
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountUpTo
@@ -27,15 +27,15 @@ class DefendFightersAgainstRush extends Tactic {
     if (fighters.size > 9)    return
     if (cannons.nonEmpty)     return
     if (threatening.isEmpty)  return
+    if (With.self.isProtoss && ! aggressors.exists(_.isAny(Terran.Marine, Zerg.Zergling))) return // Avoid pulling Probes vs. Zealots; let our units come to us if they want
     
     val workersNeeded   = 1 + 3 * (aggressors.map(_.unitClass.mineralValue).sum - fighters.map(_.unitClass.mineralValue).sum) / 100.0
     val workerCap       = workers.size - 4 - With.blackboard.workersPulled()
     val workersToFight  = Maff.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
 
-
-    defenders.counter = CountUpTo(workersToFight.toInt)
-    defenders.preference = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
+    defenders.counter     = CountUpTo(workersToFight.toInt)
+    defenders.preference  = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
     defenders.acquire()
     defenders.units.foreach(_.intend(this)
       .setCanFlee(false)

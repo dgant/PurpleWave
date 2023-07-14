@@ -106,7 +106,13 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   }
   private def findTargetPath: TilePath = {
     if (goal == threatOrigin) return goalPath
-    new PathfindProfile(vanguardCentroid.walkableTile, Some(threatOrigin.walkableTile), lengthMaximum = Some(0),  employGroundDist = true, costImmobility = 1.5, repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
+    new PathfindProfile(
+      vanguardCentroid.walkableTile,
+      Some(threatOrigin.walkableTile),
+      lengthMaximum = Some(0),
+      employGroundDist = true,
+      costImmobility = 1.5,
+      repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight))).find
   }
 
   private def parameterize(): Unit = {
@@ -130,19 +136,19 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       } else if (goalTowardsTarget) {
         stepTiles = Math.min(stepTiles, Math.max(1, stepTilesEngage)) // Don't try to move past the enemy
       }
-      val maxTilesToGoal = vanguardCentroid.tile.groundTiles(goal) - 1
-      val minTilesToGoal = maxTilesToGoal - stepTiles
-      def scoreApex(tile: Tile): Double = {
-        val distance = tile.groundTiles(goal)
-        var output = distance - minTilesToGoal
-        if (distance > maxTilesToGoal) output *= 10
-        if (output < 0) output *= -100
-        if (tile.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(tile.center))) output *= 10000
+      def scoreApex(i: Int, tile: Tile): Double = {
+        var output = stepTiles - i
+        if (output < 0) output *= 1000
+        output = Math.abs(output)
+        if (tile.zone.edges.exists(e => e.radiusPixels < groupWidthPixels / 4 && e.contains(tile.center))) output *= 100
         output
       }
-      apex = Maff.minBy(goalPathTiles)(scoreApex).map(_.center).getOrElse(goal)
-      val faceIndex = goalPathTiles.indexOf(apex.tile) + 1 + group.meanAttackerRange.toInt / 32
-      face = ?(faceIndex >= goalPathTiles.length, goalPathTiles.last, goalPathTiles(faceIndex)).center
+      val apexI = Maff.minBy(goalPathTiles.indices)(i => scoreApex(i, goalPathTiles(i)))
+      apex      = apexI.map(goalPathTiles(_).center).getOrElse(goal)
+      face      = targetNear
+        .map(_.pixel)
+        .orElse(apexI.map(_ + 1 + Maff.div32(group.meanAttackerRange.toInt)).flatMap(goalPathTiles.drop(_).lastOption).map(_.center))
+        .getOrElse(goal)
     }
   }
 

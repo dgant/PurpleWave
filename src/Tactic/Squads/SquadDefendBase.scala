@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Actions.Action
+import Micro.Actions.{Action, Idle}
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
 import Micro.Formation._
@@ -27,31 +27,42 @@ class SquadDefendBase(base: Base) extends Squad {
 
   val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.base.filter(_.isOurs).forall(base==), CountEverything)
 
-  val zoneAndChoke = new Cache(() => {
-    val zone        = base.zone
-    val muscleZone  = With.scouting.enemyMuscleOrigin.zone
-    var output      = (zone, zone.exitNow)
-    if ( ! muscleZone.bases.exists(_.owner.isUs)) {
-      val possiblePath = With.paths.zonePath(zone, muscleZone)
-      possiblePath.foreach(path => {
-        val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).indices.map(i => {
-          val step          = path.steps(i)
-          val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
-          val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 6
-          val altitudeDiff  = Maff.signum101(step.to.centroid.altitude - step.from.centroid.altitude)
-          val altitudeMult  = Math.pow(altitudeValue, altitudeDiff)
-          val distanceFrom  = step.edge.pixelCenter.groundPixels(With.geography.home)
-          val distanceTo    = step.edge.pixelCenter.groundPixels(With.scouting.enemyThreatOrigin)
-          val distanceMult  = distanceFrom / Math.max(1.0, distanceFrom + distanceTo)
-          val width         = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
-          val score         = width * turtlePenalty * altitudeMult * distanceMult // * (3 + i)
-          (step, score)
+  val plugEdge = new Cache(() =>
+    base.metro.bases
+      .find(_.isStartLocation)
+      .filter(unused => ! With.enemies.exists(_.isZerg) && units.count(u => With.framesSince(u.frameDiscovered) > 240) <= 1)
+      .filter(_.zone.exitNow.isDefined)
+      .map(main => (main.zone, main.zone.exitNow)))
+
+  val zoneAndChoke: Cache[(Zone, Option[Edge])] = new Cache(() => {
+    if (plugEdge().isDefined) {
+      plugEdge().get
+    } else {
+      val zone        = base.zone
+      val muscleZone  = With.scouting.enemyMuscleOrigin.zone
+      var output      = (zone, zone.exitNow)
+      if ( ! muscleZone.bases.exists(_.owner.isUs)) {
+        val possiblePath = With.paths.zonePath(zone, muscleZone)
+        possiblePath.foreach(path => {
+          val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).indices.map(i => {
+            val step          = path.steps(i)
+            val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
+            val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 6
+            val altitudeDiff  = Maff.signum101(step.to.centroid.altitude - step.from.centroid.altitude)
+            val altitudeMult  = Math.pow(altitudeValue, altitudeDiff)
+            val distanceFrom  = step.edge.pixelCenter.groundPixels(With.geography.home)
+            val distanceTo    = step.edge.pixelCenter.groundPixels(With.scouting.enemyThreatOrigin)
+            val distanceMult  = distanceFrom / Math.max(1.0, distanceFrom + distanceTo)
+            val width         = Maff.clamp(step.edge.radiusPixels, 32 * 3, 32 * 16)
+            val score         = width * turtlePenalty * altitudeMult * distanceMult // * (3 + i)
+            (step, score)
+          })
+          val scoreBest = Maff.minBy(stepScores)(_._2)
+          scoreBest.foreach(s => output = (s._1.from, Some(s._1.edge)))
         })
-        val scoreBest = Maff.minBy(stepScores)(_._2)
-        scoreBest.foreach(s => output = (s._1.from, Some(s._1.edge)))
-      })
+      }
+      output
     }
-    output
   })
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
@@ -120,7 +131,12 @@ class SquadDefendBase(base: Base) extends Squad {
       else                    enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker))
 
-    if (canWithdraw) {
+    if (plugEdge().isDefined) {
+      val plugPixel = plugEdge().get._2.get.pixelCenter
+      lastAction = "Plug"
+      formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
+      units.foreach(_.intend(this).setAction(new Plug(plugPixel)))
+    } else if (canWithdraw) {
       lastAction = "Withdraw"
       if (canScour) {
         formations += formationScour
@@ -238,6 +254,26 @@ class SquadDefendBase(base: Base) extends Squad {
       unit.agent.toTravel = Some(pixel)
       Potshot.delegate(unit)
       Commander.move(unit)
+    }
+  }
+
+  private class Plug(pixel: Pixel) extends Action {
+    override def perform(unit: FriendlyUnitInfo): Unit = {
+      if (unit.matchups.threats.exists(IsWarrior) || (unit.unitClass.ranged && unit.matchups.targets.exists(_.base.exists(_.isStartLocation)))) {
+        Idle.perform(unit)
+      } else {
+        var to = pixel
+        Potshot.delegate(unit)
+        if (unit.pixel == pixel) {
+          Commander.hold(unit)
+          return
+        } else if (unit.seeminglyStuck) {
+          to = plugEdge().get._1.centroid.center.walkablePixel
+        }
+        unit.agent.toTravel = Some(to)
+        unit.agent.toReturn = Some(to)
+        Commander.move(unit)
+      }
     }
   }
 }

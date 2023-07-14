@@ -102,6 +102,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
 
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
 
+  lazy val hitPointsHealthRatio : Double = maxHitPoints / (maxHitPoints + maxShields)
+  lazy val shieldsHealthRatio   : Double = maxShields   / (maxHitPoints + maxShields)
+
   // Via http://www.starcraftai.com/wiki/Regeneration
   lazy val repairHpPerFrame: Double = if (isMechanical) 0.9 * maxHitPoints / Math.max(1.0, buildFrames) else 0.0
 
@@ -131,13 +134,16 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Reaver) 60
     else cooldownZeroBecomesInfinity(groundDamageCooldownRaw)
 
-  lazy val attacksGround: Boolean = effectiveGroundDamage > 0
-  lazy val attacksAir: Boolean = effectiveAirDamage > 0
-  lazy val canAttack: Boolean = attacksGround || attacksAir
+  lazy val cooldownMax    : Int = Math.max(?(attacksGround, groundDamageCooldown, 0), ?(attacksAir, airDamageCooldown, 0))
+  lazy val cooldownOnDrop : Int = ?(this == Protoss.Reaver, 30, cooldownMax)
 
-  def canAttack(flyingTarget: Boolean): Boolean = ?(flyingTarget, attacksAir, attacksGround)
-  def canAttack(enemy: UnitClass): Boolean = if (enemy.isFlyer) attacksAir else attacksGround
-  def canAttack(enemy: UnitInfo): Boolean = if (enemy.flying) attacksAir else attacksGround
+  lazy val attacksGround: Boolean = effectiveGroundDamage > 0
+  lazy val attacksAir   : Boolean = effectiveAirDamage > 0
+  lazy val canAttack    : Boolean = attacksGround || attacksAir
+
+  def canAttack(flyingTarget: Boolean): Boolean = ?(flyingTarget,   attacksAir, attacksGround)
+  def canAttack(enemy: UnitClass)     : Boolean = ?(enemy.isFlyer,  attacksAir, attacksGround)
+  def canAttack(enemy: UnitInfo)      : Boolean = ?(enemy.flying,   attacksAir, attacksGround)
 
   lazy val pixelRangeGround: Double =
     if (this == Terran.Bunker) Terran.Marine.pixelRangeGround + 32.0

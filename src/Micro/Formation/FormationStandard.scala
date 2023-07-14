@@ -13,8 +13,8 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.FriendlyUnitGroup
-import Utilities.{?, LightYear}
 import Utilities.Time.Minutes
+import Utilities.{?, LightYear}
 
 //noinspection ComparingUnrelatedTypes
 //Disabling spurious IntelliJ warnings
@@ -113,15 +113,15 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     if (style == FormationStyleGuard) {
       val guardDepth  = 32 * expectRangeTiles
       val guardRadius = guardDepth + edge.map(_.radiusPixels).getOrElse(32d)
-      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(_.groundPixels(zone.centroid)), guardDepth)).getOrElse(apex)
+      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(p => p.groundPixels(zone.centroid) + 0.01 * p.pixelDistance(zone.centroid.center)), guardDepth)).getOrElse(apex)
       face = apex.project(face, guardRadius) // Extend the face outwards to broaden our arc
     } else if (goalPath.pathExists) {
-      // Engage: Walk far enough to be in range
-      // March: Walk far enough to advance our army
+      // Engage:    Walk far enough to be in range
+      // March:     Walk far enough to advance our army
       // Disengage: Walk far enough to be comfortable outside enemy range
       // Move all the way past any narrow choke except one that's in our goal
       stepTilesPace   = Maff.clamp(group.meanTopSpeed * 24 / 32 + 6 * Math.max(0.0, 1 - 2.0 * group.pace01), 1, 8).toInt
-      stepTilesCross  = firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0)
+      stepTilesCross  = ?(firstEdge.exists(_.diameterPixels < groupWidthPixels * 2.5), firstEdgeIndex.flatMap(i => goalPathTiles.indices.drop(i).find(j => ! firstEdge.exists(_.contains(goalPathTiles(j))))).getOrElse(0), 0)
       stepTilesEngage = Maff.min(goalPathTiles.indices.filter(goalPathTiles(_).enemyVulnerabilityGround >= With.grids.enemyVulnerabilityGround.margin)).getOrElse(LightYear())
       stepTilesEvade  = 1 + groupWidthTiles + vanguardCentroid.tile.enemyRangeGround
       stepTiles       = Math.max(stepTilesPace, stepTilesCross)
@@ -141,7 +141,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
         output
       }
       apex = Maff.minBy(goalPathTiles)(scoreApex).map(_.center).getOrElse(goal)
-      val faceIndex = goalPathTiles.indexOf(apex) + 1 + group.meanAttackerRange.toInt / 32
+      val faceIndex = goalPathTiles.indexOf(apex.tile) + 1 + group.meanAttackerRange.toInt / 32
       face = ?(faceIndex >= goalPathTiles.length, goalPathTiles.last, goalPathTiles(faceIndex)).center
     }
   }

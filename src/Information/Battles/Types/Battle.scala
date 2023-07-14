@@ -34,7 +34,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   // Simulation is expensive and gets less accurate as team sizes increase
   lazy val skimWeight: Double = ?(isGlobal || With.reaction.sluggishness > 0, 1.0, {
-    val output = teams.map(_.units.size).min / 30.0 + frameCreated.toDouble / Minutes(20)() - 0.2
+    val output = frameCreated.toDouble / Minutes(20)() - 0.2
     if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
   })
   lazy val simWeight        : Double                = 1.0 - skimWeight

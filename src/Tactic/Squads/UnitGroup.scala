@@ -21,13 +21,13 @@ trait UnitGroup {
   def detectors         : Seq[UnitInfo] = _detectors().view
   def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
   def arbiters          : Seq[UnitInfo] = _arbiters().view
-  def attackersCasters  : Seq[UnitInfo] = groupOrderable.view.filter(_.unitClass.attacksOrCasts)
+  def warriorsCasters   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.unitClass.isWarrior || u.unitClass.castsSpells)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
   def attackersCloaky   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker))
   def battles           : Set[Battle]   = _battles()
   def battleEnemies     : Set[UnitInfo] = _battleEnemies()
   def roadblocks        : Set[UnitInfo] = _roadblocks()
-  def attackersCastersCount     : Int       = _attackersCastersCount()
+  def warriorsCastersCount     : Int       = _warriorsCastersCount()
   def attackersBioCount         : Int       = _attackersBioCount()
   def stormCount                : Int       = _stormCount()
   def airToAirStrength          : Int       = _airToAirStrength()
@@ -92,7 +92,7 @@ trait UnitGroup {
   private val _battles                    = new Cache(() => groupUnits.flatMap(_.battle).toSet)
   private val _battleEnemies              = new Cache(() => battles.flatMap(_.enemy.units))
   private val _roadblocks                 = new Cache(() => battleEnemies.filter(e => Math.max(keyDistanceTo(e.pixel), e.pixelDistanceTravelling(destinationConsensus)) < destinationDistance))
-  private val _attackersCastersCount      = new Cache(() => attackersCasters.size)
+  private val _warriorsCastersCount       = new Cache(() => warriorsCasters.size)
   private val _attackersBioCount          = new Cache(() => attackersBio.size)
   private val _stormCount                 = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
   private val _attacksAir                 = new Cache(() => attackers.exists(_.canAttackAir))
@@ -106,7 +106,7 @@ trait UnitGroup {
   private val _engagingOn                 = new Cache(() => groupOrderable.exists(_.matchups.engagingOn))
   private val _engagedUpon                = new Cache(() => groupOrderable.exists(_.matchups.engagedUpon))
   private val _volleyConsensus            = new Cache(() => Maff.modeOpt(attackers.flatMap(_.matchups.wantsToVolley)).getOrElse(false))
-  private val _widthPixels                = new Cache(() => attackersCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
+  private val _widthPixels                = new Cache(() => warriorsCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
   private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
   private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
@@ -134,11 +134,11 @@ trait UnitGroup {
   private val _engagingOn01               = new Cache(() => Maff.mean(attackers.view.map(a => Maff.toInt(a.matchups.engagingOn).toDouble)))
   private val _engagedUpon01              = new Cache(() => Maff.mean(attackers.view.map(a => Maff.toInt(a.matchups.engagedUpon).toDouble)))
   private val _pace01                     = new Cache(() => Maff.clamp(groupOrderable.view.map(u => (u.pixel - u.previousPixel(_paceAge)) / Math.max(0.01, u.topSpeed)).foldLeft(Pixel(0, 0))(_ + _).length / _paceAge / groupOrderable.length, -1, 1))
-  private val _combatValueAir             = new Cache(() => attackersCasters.filter(_.flying).map(_.subjectiveValue).sum)
-  private val _combatValueGround          = new Cache(() => attackersCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
+  private val _combatValueAir             = new Cache(() => warriorsCasters.filter(_.flying).map(_.subjectiveValue).sum)
+  private val _combatValueGround          = new Cache(() => warriorsCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
   private val _airToAirStrength           = new Cache(() => attackers.filterNot(Protoss.Interceptor).filterNot(Zerg.Guardian).map(u => u.friendly.filter(Protoss.Carrier).map(_.interceptorCount).getOrElse(u.unitClass.supplyRequired)).sum)
-  private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.attackersCastersCount * 4 >= With.units.groupVs(u).attackersCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
+  private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.warriorsCastersCount * 4 >= With.units.groupVs(u).warriorsCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker
   protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(

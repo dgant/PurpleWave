@@ -15,7 +15,17 @@ object Skimulator {
     val targets = ?(Terran.Medic(unit),
       team.units.view.filter(_.unitClass.isOrganic),
       Maff.orElse(unit.presumptiveTarget, team.opponent.units))
-    Maff.min(targets.view.map(unit.pixelDistanceEdge)).getOrElse(LightYear())
+
+    unit.skimTarget = None
+    var output = LightYear().toDouble
+    targets.foreach(target => {
+      val distance = unit.pixelDistanceEdge(target)
+      if (distance < output) {
+        output = distance
+        unit.skimTarget = Some(target)
+      }
+    })
+    output
   }
 
   def predict(battle: Battle): Unit = {
@@ -99,10 +109,14 @@ object Skimulator {
 
       // Count basic upgrades
       // We do mean(1, multiplier) to acknowledge that half of a unit's contribution to the fight is just tanking.
-      // With better modeling of damage dropoff that might not be necessary
-      unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne((team.meanDamageOnHit - unit.unitClass.armor) / (opponent.meanDamageOnHit - (unit.armorHealth - unit.unitClass.armor))))
-      if      (unit.unitClass.effectiveAirDamage    > 0)  unit.skimStrength *= Maff.vmean(1.0,  Maff.nanToOne((unit.damageOnHitAir.toDouble    - opponent.meanArmorAir)    / (unit.unitClass.effectiveAirDamage    - opponent.meanArmorAir)))
-      else if (unit.unitClass.effectiveGroundDamage > 0)  unit.skimStrength *= Maff.vmean(1.0,  Maff.nanToOne((unit.damageOnHitGround.toDouble - opponent.meanArmorGround) / (unit.unitClass.effectiveGroundDamage - opponent.meanArmorGround)))
+      unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(
+        (unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.armorHealth)      + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit - unit.armorShield)) /
+        (unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.unitClass.armor)  + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit))))
+
+      // Units with different anti-air and anti-group attacks are primarily anti-air
+      unit.skimTarget.foreach(t => unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(
+        ?(t.flying, unit.damageOnHitAir,                unit.damageOnHitGround).toDouble /
+        ?(t.flying, unit.unitClass.effectiveAirDamage,  unit.unitClass.effectiveGroundDamage))))
 
       // Consider high ground advantage
       if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
@@ -169,7 +183,7 @@ object Skimulator {
       incapable ||= unit.unitClass.canBeStormed && unit.underStorm // Units under storm are presumably preoccupied with dodging
       incapable ||= unit.lockedDown
       incapable ||= unit.underDarkSwarm && unit.unitClass.affectedByDarkSwarm
-      if (incapable) { unit.skimStrength *= -0.25 } // Encourage fighting when units are disabled!
+      if (incapable) { unit.skimStrength *= ?(unit.isFriendly, 0.0, -0.25) } // Encourage fighting when enemies are disabled!
     }))
 
     // Calculate team properties

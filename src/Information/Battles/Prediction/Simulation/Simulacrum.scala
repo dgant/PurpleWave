@@ -164,7 +164,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     target = targetNew
   }
 
-  @inline def tween(to: Pixel, reason: Option[String]): Unit = {
+  @inline def tween(to: => Pixel, reason: Option[String]): Unit = {
+    if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
     tweenFramesDone = 0
     tweenFrom       = pixel
@@ -180,8 +181,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     }
     addEvent(SimulationEventTween(this, to, tweenGoal, tweenFramesLeft, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
-  @inline def tween(to: Pixel): Unit = {
-    tween(to, None)
+
+  @inline def stop(): Unit = {
+    // Would it be helpful for this to emit an event?
+    tweenFramesLeft = 0
+    cooldownMoving  = 0
   }
 
   @inline def recalculateInjury(): Unit = {

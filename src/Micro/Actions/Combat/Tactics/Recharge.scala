@@ -27,7 +27,7 @@ object Recharge extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(validBattery)
+    var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(b => validBattery(b) && unit.pixelDistanceTravelling(b.pixel) < 32 * 30)
     if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
 
     val battery = Maff.minBy(batteries)(_.pixelDistanceEdge(unit))

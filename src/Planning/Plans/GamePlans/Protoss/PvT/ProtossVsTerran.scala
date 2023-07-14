@@ -293,6 +293,7 @@ class ProtossVsTerran extends PvTOpeners {
     shouldAttack  ||= enemyMiningBases > miningBases
     shouldAttack  ||= frame > Minutes(10)()
     shouldAttack  ||= pushMarines
+    shouldAttack  ||= haveComplete(Protoss.Reaver) && haveComplete(Protoss.Shuttle) && safePushing
 
     status(f"Eco$ecoScoreUs,$ecoScoreFoe=$ecoEdge")
     status(f"${gatewaysMin}-${gatewaysMax}gate")

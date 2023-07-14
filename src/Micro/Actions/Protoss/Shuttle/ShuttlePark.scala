@@ -26,11 +26,13 @@ object ShuttlePark extends Action {
     exposed.foreach(ally  => towards += ally.pixel.project(centroid, Shuttling.pickupRadiusCenter(ally)))
     threat.foreach(threat => towards += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
 
-    val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge + Shuttling.pickupRadiusCenter(exposed.head))
-    shuttle.agent.toTravel = Some(to)
-    if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
-      Retreat.delegate(shuttle)
+    if (towards.nonEmpty) {
+      val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge + Shuttling.pickupRadiusCenter(exposed.head), towards: _*)
+      shuttle.agent.toTravel = Some(to)
+      if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
+        Retreat.delegate(shuttle)
+      }
+      Commander.move(shuttle)
     }
-    Commander.move(shuttle)
   }
 }

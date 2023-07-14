@@ -254,59 +254,46 @@ class PvPOpening extends GameplanImperative {
     /////////////////////////////
 
     if (PvPRobo()) {
-      val enemyCitadel = enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0
-      getReavers = PvPReaver() || units(Protoss.RoboticsSupportBay, Protoss.Shuttle) > 0 || enemyStrategy(With.fingerprints.fourGateGoon)
-      getObservatory = true
-      getObservers = true
-      if (PvPObs()) {
-        reaverAllIn ||= enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)
-        reaverAllIn ||= With.fingerprints.twoGate() && enemyBases > 1
-        reaverAllIn ||= With.fingerprints.twoGate() && (enemies(Protoss.CitadelOfAdun) > 0 || enemyHasUpgrade(Protoss.ZealotSpeed))
-        // TODO: Also all-in vs. 1 Gate Core Expand
-        getReavers ||= reaverAllIn
-        getReavers ||= enemyStrategy(With.fingerprints.fourGateGoon)
-        if (reaverAllIn) {
-          getObservatory  &&= enemyCitadel
-          getObservers    &&= enemyCitadel
-        }
-      }
-      if (units(Protoss.RoboticsSupportBay, Protoss.Shuttle) == 0) {
-        shuttleFirst = getReavers // Let's try always getting Shuttle first
-      }
-      if (enemyCitadel) {
-        shuttleFirst = false
+      val enemyCitadel  = enemyDarkTemplarLikely || enemies(Protoss.CitadelOfAdun) > 0
+      // TODO: Also all-in vs. 1 Gate Core Expand
+      reaverAllIn     ||= enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.dtRush)
+      reaverAllIn     ||= With.fingerprints.twoGate() && enemyBases > 1
+      reaverAllIn     ||= With.fingerprints.twoGate() && (enemyHasShown(Protoss.CitadelOfAdun) || enemyHasUpgrade(Protoss.ZealotSpeed))
+      getReavers        = PvPReaver()
+      getReavers      ||= reaverAllIn
+      getReavers      ||= have(Protoss.RoboticsSupportBay, Protoss.Reaver, Protoss.Shuttle)
+      getReavers      ||= enemyStrategy(With.fingerprints.fourGateGoon)
+
+      // Look for reasons to avoid making an Observer.
+      // It's okay to switch even if we already started an Observatory or Observers,
+      // because we can cancel and switch out of them at any time.
+
+      getObservatory    = true
+      getObservers      = true
+      if (With.fingerprints.dtRush()) { // Yep, get those Observers
+      } else if (shuttleSpeed) { // This strategy demands a ton of gas; we can't afford the Observer
+        getObservatory  = false
+        getObservers    = false
+      } else if (enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) { // We have all the intel we need to act, and can rule out DT
+        getObservatory  = false
+        getObservers    = false
+      } else if (PvPObs()) { // Obs is what we're here for!
+      } else if ( ! With.fingerprints.dragoonRange() && With.units.enemy.exists(e => Protoss.Dragoon(e) && e.lastSeen > GameTime(5, 15)())) { // If Dragoon range is supiciously absent we should prepare for DT
+      } else if (enemyRecentStrategy(With.fingerprints.dtRush)) { // Don't overthink it
       } else {
-        // Look for reasons to avoid making an Observer.
-        // Don't stop to check if we already started an Observatory or Observers
-        // because we can cancel and switch out of them at any time.
-        if (shuttleSpeed) {
-          // This strategy demands a ton of gas; we can't afford the Observer
-          getObservatory  = false
-          getObservers    = false
-        } else if (enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.robo, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
-          // These builds generally let us rule out DT entirely
-          getObservatory  = false
-          getObservers    = false
-        } else if (With.strategy.isFixedOpponent) {
-          // Obs is probably what we're here for, so let's not get too cute
-        } else if ( ! With.fingerprints.dragoonRange() && With.units.enemy.exists(e => Protoss.Dragoon(e) && e.lastSeen > GameTime(5, 15)())) {
-          // If Dragoon range is supiciously absent we should prepare for DT
-        } else if (trackRecordLacks(With.fingerprints.dtRush)) {
-          getObservatory  = false
-          getObservers    = false
-        } else if (enemyRecentStrategy(With.fingerprints.dtRush)) {
-          getObservatory = true
-          getObservers = true
-        } else if (enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)) {
-          getObservatory  = roll("SpeculativeObservatory",  0.25)
-          getObservers    = getObservatory
-        } else {
-          getObservatory  =                   roll("SpeculativeObservatory",  ?(trackRecordLacks(With.fingerprints.fourGateGoon), 0.8, 0.4))
-          getObservers    = getObservatory && roll("SpeculativeObservers",    ?(trackRecordLacks(With.fingerprints.fourGateGoon), 1.0, 0.75)) // So the probability of obs is the *joint* probability
-        }
+        var p = 1.0
+        p *= ?(enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon),  0.7, 1.0)
+        p *= ?(trackRecordLacks(With.fingerprints.dtRush),                                            0.7, 1.0)
+        getObservatory  =                   roll("SpeculativeObservatory",  p)
+        getObservers    = getObservatory && roll("SpeculativeObservers",   p) // So the probability of obs is the *joint* probability
       }
-      shuttleFirst &&= getReavers
-      shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && units(Protoss.Observatory, Protoss.Observer) == 0 && roll("ShuttleSpeedRush", 0.0)
+      getObservatory  ||= enemyCitadel
+      getObservers    ||= enemyCitadel
+      getReavers      ||= ! getObservatory && ! have(Protoss.Observatory)
+      if ( ! have(Protoss.RoboticsSupportBay, Protoss.Shuttle)) {
+        shuttleFirst = getReavers && ! enemyCitadel
+      }
+      shuttleSpeed = shuttleFirst && PvPGateCoreTech() && ! getObservatory && ! getObservers && ! have(Protoss.Observatory, Protoss.Observer) && roll("ShuttleSpeedRush", 0.0)
     } else if (PvPDT()) {
       greedyDT = units(Protoss.TemplarArchives) > 0 && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
     }
@@ -342,29 +329,28 @@ class PvPOpening extends GameplanImperative {
     shouldAttack        &&= safePushing
     shouldAttack        &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
     shouldAttack        ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
-    shouldAttack        || rangeDelayed
     shouldHarass          = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
     if (reaverAllIn) {
       shouldExpand = units(Protoss.Reaver) >= 2 && units(Protoss.Shuttle) >= 1
     } else if (PvPRobo()) {
-      shouldExpand = unitsComplete(Protoss.Reaver) > 0
-      shouldExpand ||= ! getReavers && unitsComplete(IsWarrior) >= ?(enemyBases > 1, 6, 12)
-      shouldExpand &&= PvPIdeas.pvpSafeToMoveOut
-      shouldExpand &&= ! shuttleSpeed
-      shouldExpand &&= Protoss.DragoonRange()
-      shouldExpand ||= unitsComplete(Protoss.Reaver) > 1
+      shouldExpand    = unitsComplete(Protoss.Reaver) > 0
+      shouldExpand  ||= ! getReavers && unitsComplete(IsWarrior) >= ?(enemyBases > 1, 6, 12)
+      shouldExpand  &&= PvPIdeas.pvpSafeToMoveOut
+      shouldExpand  &&= ! shuttleSpeed
+      shouldExpand  &&= Protoss.DragoonRange()
+      shouldExpand  ||= unitsComplete(Protoss.Reaver) > 1
     } else if (PvPDT()) {
-      shouldExpand = atMainTiming
-      shouldExpand ||= units(Protoss.DarkTemplar) > 0 && (PvPIdeas.pvpSafeAtHome || With.scouting.enemyProximity < 0.75)
-      shouldExpand ||= greedyDT
+      shouldExpand    = atMainTiming
+      shouldExpand  ||= units(Protoss.DarkTemplar) > 0 && (PvPIdeas.pvpSafeAtHome || With.scouting.enemyProximity < 0.75)
+      shouldExpand  ||= greedyDT
     } else if (PvP3GateGoon()) {
-      shouldExpand = atMainTiming
-      shouldExpand &&= unitsComplete(IsWarrior) >= 6
-      shouldExpand &&= PvPIdeas.pvpSafeAtHome
+      shouldExpand    = atMainTiming
+      shouldExpand  &&= units(IsWarrior) >= 9
+      shouldExpand  &&= PvPIdeas.pvpSafeAtHome
     } else if (PvP4GateGoon()) {
-      shouldExpand = atMainTiming && ! mainTimingClosed && unitsEver(IsWarrior) >= 20
-      shouldExpand || unitsComplete(IsWarrior) >= ?(safePushing, ?(PvPIdeas.enemyContained, 14, 20), 28)
+      shouldExpand    = atMainTiming && ! mainTimingClosed && unitsEver(IsWarrior) >= 20
+      shouldExpand  ||= unitsComplete(IsWarrior) >= ?(safePushing, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 

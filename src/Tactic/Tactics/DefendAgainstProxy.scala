@@ -98,7 +98,6 @@ class DefendAgainstProxy extends Tactic {
     defenders.matcher = _.friendly.exists(defendersAssigned.contains)
     defenders.acquire()
     if (defenders.units.isEmpty) return
-    With.blackboard.status.set(With.blackboard.status.get :+ "DefendingProxy")
     val squad = new SquadRazeProxies(defendersAssigned.toMap)
     squad.addUnits(defenders.units)
   }

@@ -20,15 +20,15 @@ final class Simulation {
   var engaged         : Boolean               = false
 
   def reset(newBattle: Battle): Unit = {
-    battle = newBattle
-    realUnits.clear()
-    realUnitsOurs.clear()
-    realUnitsEnemy.clear()
+    battle            = newBattle
+    realUnits       .clear()
+    realUnitsOurs   .clear()
+    realUnitsEnemy  .clear()
     realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
     realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
     realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
-    enemyVanguard = battle.enemy.vanguardKey()
-    engaged = battle.units.exists(_.matchups.engagedUpon)
+    enemyVanguard     = battle.enemy.vanguardKey()
+    engaged           = battle.units.exists(_.matchups.engagedUpon)
     simulacra.foreach(_.reset(this))
   }
 

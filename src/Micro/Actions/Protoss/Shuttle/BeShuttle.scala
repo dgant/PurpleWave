@@ -1,15 +1,11 @@
 package Micro.Actions.Protoss.Shuttle
 
 import Mathematics.Maff
-import Mathematics.Points.Pixel
 import Micro.Actions.Action
-import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
-import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-
-import scala.collection.mutable.ArrayBuffer
+import Utilities.?
 
 object BeShuttle extends Action {
 
@@ -19,29 +15,61 @@ object BeShuttle extends Action {
     if (ShuttleDitchPassengers(shuttle)) return
     if (ShuttleAdoptPassenger(shuttle)) return
 
-    val allHailers    = shuttle.agent.passengersPrioritized.filter(p => ! p.loaded && p.orderTarget.contains(shuttle))
-    val closeHailers  = allHailers.filter(_.pixelDistanceEdge(shuttle) < 256)
-
     // Emergency pickups
-    val emergencyHailers = Maff.orElse(
-      closeHailers.filter(_.doomed),
-      closeHailers.filter(_.matchups.engagedUpon),
-      closeHailers.filter(_.matchups.pixelsToThreatRange.exists(_ < 64)))
-    val emergencyHailer = Maff.minBy(emergencyHailers)(_.pixelDistanceEdge(shuttle))
-    emergencyHailer.foreach(u => { pickup(shuttle, u); return })
+    val hailers           = shuttle.agent.passengersPrioritized.filter(p => ! p.loaded && p.agent.wantsPickup)
+    val hailersMostUrgent = Maff.orElse(
+      hailers.filter(_.doomed),
+      hailers.filter(_.matchups.engagedUpon),
+      hailers.filter(_.matchups.pixelsToThreatRange.exists(_ < 64)),
+      hailers)
+    val emergencyHailer = Maff.minBy(hailersMostUrgent)(_.pixelDistanceEdge(shuttle))
+    emergencyHailer.foreach(u => {
+      pickup(shuttle, u)
+      shuttle.agent.act("EmergencyPickup")
+      return
+    })
 
     // Urgent dropoffs
+    /*
     val allDropoffs   = shuttle.agent.passengersPrioritized.filter(p => p.loaded && p.agent.rideGoal.isDefined)
     val urgentDropoff = Maff.minBy(allDropoffs.filter(p => p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined))(p => shuttle.pixelDistanceCenter(p.agent.rideGoal.get))
-    urgentDropoff.foreach(u => { heed(shuttle, u); return })
+    urgentDropoff.foreach(u => {
+      deliver(shuttle, u)
+      shuttle.agent.act("UrgentDropoff")
+      return
+    })
+    */
 
-    // Ordinary pickups
-    val ordinaryHailer = Maff.minBy(allHailers)(_.pixelDistanceEdge(shuttle))
-    ordinaryHailer.foreach(p => { pickup(shuttle, p); return })
+    // Ordinary pickups/dropoffs/parking
+    val quests = shuttle.agent.passengersPrioritized.flatMap(p => {
+      val goal = p.agent.rideGoal
+      if (p.loaded) {
+        goal.map(g => (
+          p,
+          "Deliver",
+          shuttle.pixelDistanceCenter(g),
+          () => deliver(shuttle, p)))
+      } else if (goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0))) {
+        goal.map(g => (
+          p,
+          "Pickup",
+          shuttle.pixelDistanceEdge(p) - p.pixelDistanceCenter(g) * Maff.nanToOne(shuttle.topSpeed / p.topSpeed),
+          () => pickup(shuttle, p)))
+      } else if (p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
+        goal.map(g => (
+          p,
+          "Park",
+          shuttle.pixelDistanceEdge(p) + 160,
+          () => ShuttlePark(shuttle)))
+      } else None
+    })
 
-    // Ordinary dropoffs
-    val ordinaryDropoff = allDropoffs.headOption
-    ordinaryDropoff.foreach(p => { heed(shuttle, p); return })
+    val quest = Maff.minBy(quests)(_._3)
+    quest.foreach(q => {
+      q._4()
+      shuttle.agent.act(q._2)
+      return
+    })
 
     ShuttlePark(shuttle)
     ShuttleAwait(shuttle)
@@ -56,26 +84,8 @@ object BeShuttle extends Action {
 
   // Heed a passenger's ride goal
   //
-  private def heed(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
+  private def deliver(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
     shuttle.agent.toTravel = passenger.agent.rideGoal
-    Commander.move(shuttle)
-  }
-
-  // Park over our landed passengers
-  //
-  private def park(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(_.matchups.pixelsEntangled)
-    val centroid  = Maff.centroid(exposed.map(_.pixel))
-    val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
-    val towards   = new ArrayBuffer[Pixel]
-    exposed.foreach(ally  => towards += ally.pixel.project(centroid, Shuttling.pickupRadiusCenter(ally)))
-    threat.foreach(threat => towards += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
-
-    val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge + Shuttling.pickupRadiusCenter(exposed.head))
-    shuttle.agent.toTravel = Some(to)
-    if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
-      Retreat.delegate(shuttle)
-    }
     Commander.move(shuttle)
   }
 }

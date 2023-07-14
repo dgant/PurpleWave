@@ -15,9 +15,14 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
     With.recruiter.available.exists(reaverLock.matcher)
-    && (With.geography.enemyBases.exists(_.zone.island) || MacroFacts.unitsComplete(Protoss.Reaver) >= 3 && MacroFacts.unitsComplete(Protoss.Shuttle) >= 2)
     && (
-      (With.enemies.forall(_.isTerran) && With.frame < Minutes(9)() && ! MacroFacts.enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.bio))
+      With.enemies.forall(_.isTerran)
+        || With.geography.enemyBases.exists(_.zone.island)
+        || (MacroFacts.unitsComplete(Protoss.Reaver) >= 3 && MacroFacts.unitsComplete(Protoss.Shuttle) >= 2))
+    && (
+      (With.enemies.forall(_.isTerran)
+        && With.frame < Minutes(9)()
+        && ! MacroFacts.enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.bio))
       || (
         // Will their base be empty?
         (With.scouting.enemyProximity > 0.35 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))

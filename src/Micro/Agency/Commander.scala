@@ -246,6 +246,9 @@ object Commander {
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     if (autoUnburrow(unit)) return
+    if (unit.pixelDistanceCenter(destination) <= 8) {
+      requestUnload(unit)
+    }
     val to = getAdjustedDestination(unit, destination)
     if (Terran.Medic(unit) && unit.agent.shouldFight) {
       attackMove(unit, to)
@@ -268,7 +271,9 @@ object Commander {
 
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     leadFollower(unit, rightClick(_, target))
-    if ( ! unit.agent.ride.contains(target)) {
+    if (unit.agent.ride.contains(target)) {
+      unit.agent.wantsPickup = true
+    } else {
       unit.agent.setRideGoal(target.pixel)
     }
     if (unit.unready) return

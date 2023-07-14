@@ -39,7 +39,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def target                : Option[UnitInfo]  = unit.agent.toAttack
   protected def formations            : Seq[Formation]    = unit.squad.map(_.formations).getOrElse(Seq.empty)
   protected def engageFormation       : Option[Formation] = formations.dropRight(1).headOption.filter(_.placements.contains(unit))
-  protected def squadEngaged          : Boolean = unit.squad.map(_.engagedUpon).getOrElse(unit.matchups.engagedUpon)
+  protected def squadEngagedUpon      : Boolean = unit.squad.map(_.engagedUpon).getOrElse(unit.matchups.engagedUpon)
+  protected def squadEngagingOn       : Boolean = unit.squad.map(_.engagingOn).getOrElse(unit.matchups.engagingOn)
   protected def fightConsensus        : Boolean = unit.squad.map(_.fightConsensus).getOrElse(unit.agent.shouldFight)
   protected def assembling            : Boolean = false && engageFormation.isDefined && ! group.engagedUpon && Math.max(0.25, group.confidence11) < 0.95 - group.restrainedFrames / Seconds(10)()
   protected def targetFleeing         : Boolean = target.exists(t => t.canMove && Maff.isTowards(unit.pixel, t.pixel, t.angleRadians))
@@ -55,7 +56,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def nudgedTowards         : Boolean = nudged && Maff.isTowards(unit.pixel, unit.agent.destination, unit.agent.receivedPushForce().radians)
   protected def pushThrough           : Boolean = shouldEngage && engageFormation.isDefined && nudged && nudgedTowards && ! unit.flying
   protected def ground10              : Double  = ?(unit.flying, 0, 1)
-  protected def abroad10              : Double  = ?(unit.zone.owner.isUs, 0, 1)
   protected def shouldRetreat         : Boolean = techniqueIs(Fallback, Flee, Excuse)
   protected def shouldEngage          : Boolean = techniqueIs(Fight, Abuse, Scavenge)
   protected def canAbuse(t: UnitInfo) : Boolean = unit.canAttack(t) && ( ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
@@ -79,9 +79,9 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     lazy val safePassage  = unit.matchups.ignorant || unit.topSpeedTransported >= 0.9 * group.meanTopSpeed && unit.matchups.pixelsToThreatRange.forall(_ > 32 * ?(unit.agent.receivedPushPriority() < TrafficPriorities.Bump, 2, 16))
 
     technique =
-      if ( ! unit.canMove)                                  Fight
-      else if (unit.agent.shouldFight && target.isDefined)  Fight
-      else if (safePassage)                                 Walk
+            if ( ! unit.canMove)                            Fight
+      else  if (unit.agent.shouldFight && target.isDefined) Fight
+      else  if (safePassage)                                Walk
       else                                                  Flee
 
     transition(Aim,       ! unit.canMove)
@@ -164,8 +164,8 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def readyToApproachTarget: Boolean = {
     if (target.isEmpty) return false
-    val effectiveCooldown = ?(unit.airlifted, 0, unit.framesToBeReadyForAttackOrder)
-    if (unit.unitClass.ranged && effectiveCooldown > unit.framesToGetInRange(target.get) + 4) return false
+    if (unit.unitClass.melee) return true
+    if (?(unit.airlifted, 0, unit.framesToBeReadyForAttackOrder) > unit.framesToGetInRange(target.get) + 4) return false
     true
   }
 
@@ -227,7 +227,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (unit.canMove) {
       if (Protoss.Reaver(unit) && unit.agent.ride.isDefined && ! unit.agent.commit && ! unit.loaded) {
         if (target.map(t => Math.min(unit.pixelsToGetInRange(t), unit.pixelsToGetInRange(t, t.projectFrames(48))) > 64).getOrElse(unit.pixelDistanceTravelling(unit.agent.destination) > 96)) {
-          BeReaver.demandPickup(unit)
+          BeReaver.clickShuttle(unit)
         }
       }
       Commander.move(unit)
@@ -361,20 +361,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def engage(): Boolean = {
     if (unit.ready) {
-      breakFormationToAttack  = engageFormation.isEmpty || target.exists(targ =>
-        // If we're not ready to attack yet, just slide into formation
-        (readyToApproachTarget || unit.unitClass.melee)
-        && unit.battle.isDefined
+      breakFormationToAttack  = engageFormation.isEmpty
+      breakFormationToAttack ||= target.exists(targ =>
+        // Maintain formation if we're not ready to attack yet
+        readyToApproachTarget
+        // Maintain formation until arriving at a fight or the destinatation
+        && (unit.battle.isDefined || unit.pixelDistanceEdge(targ) <= unit.sightPixels)
+        // Maintain formation while flanking
         && ! engageFormation.exists(_.flanking)
-        && (
-          // Break if we are already in range
-          unit.inRangeToAttack(targ)
-            // Break if we're just pillaging
-            || unit.confidence11 > 0.75
-            // Break if the fight has already begun and the formation isn't helping us
-            || (squadEngaged && ! formationHelpsEngage)
-            // Break if we are closer to range than the formation, and already pretty close
-            || (targetDistanceHere < 32 + Math.min(targetDistanceThere, 32 * 8) && Maff.isTowards(unit.pixel, targ.pixel, unit.pixel.radiansTo(unit.agent.destination)))))
+        // Maintain formation until battle breaks out
+        && ( ! formationHelpsEngage || squadEngagedUpon))
+      breakFormationToAttack ||= target.exists(unit.pixelsToGetInRange(_) < Math.max(0, 128 * unit.confidence11))
 
       unit.agent.toAttackFrom = Maff.orElse(SwapIf(breakFormationToAttack, engageFormation.flatMap(_(unit)).toIterable, unit.agent.toAttackFrom.toIterable)).headOption
       if (pushThrough) {
@@ -411,7 +408,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
               moveForcefully()
             }
           }
-        } else if (readyToApproachTarget || unit.unitClass.melee || ! unit.matchups.wantsToVolley.contains(true) || shouldChase) {
+        } else if (readyToApproachTarget || ! unit.matchups.wantsToVolley.contains(true) || shouldChase) {
           unit.agent.act("Engage")
           charge()
         } else {

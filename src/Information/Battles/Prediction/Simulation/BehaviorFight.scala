@@ -27,23 +27,37 @@ object BehaviorFight extends SimulacrumBehavior {
     // TODO: Non-Lurker Unburrow
 
     val target    = simulacrum.target.get
+    val threat    = simulacrum.threat
     val distance  = simulacrum.pixelDistanceEdge(target)
     val range     = simulacrum.pixelRangeAgainst(target)
+
+    // Update the target's threat (to help it kite)
     if (target.threat.forall(_.pixelsToGetInRange(target) > distance - range)) {
       target.threat = Some(simulacrum)
     }
-    if ((simulacrum.unitClass.abuseAllowed || simulacrum.unitClass == Protoss.Reaver)
+
+    // Kite
+    if (threat.isDefined
       && simulacrum.cooldownLeft > 0
-      && simulacrum.threat.isDefined
+      && (simulacrum.unitClass.abuseAllowed || simulacrum.unitClass == Protoss.Reaver)
       && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {
       val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - distance
       if (freeDistance > 0) {
-        simulacrum.tween(simulacrum.threat.get.pixel.project(simulacrum.pixel, simulacrum.threat.get.pixelDistanceEdge(simulacrum) + freeDistance * 0.5), Some("Kiting"))
+        simulacrum.tween(
+          threat.get.pixel.project(
+            simulacrum.pixel,
+            threat.get.pixelDistanceEdge(simulacrum) + freeDistance * 0.5),
+          Some("Kiting"))
         return
       }
     }
+
+    // Fire!
     if (distance <= range) {
       simulacrum.simulation.engaged = true
+      simulacrum.tweenGoal          = simulacrum.pixel
+      simulacrum.tweenFramesLeft    = 0
+      simulacrum.stop()
       if (simulacrum.cooldownLeft <= 0) {
         simulacrum.dealDamageTo(target)
       } else {

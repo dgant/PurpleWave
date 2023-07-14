@@ -23,6 +23,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastFrame     : Int = 0
   var lastStim      : Int = 0
   var lastCloak     : Int = 0
+  var run           : Int = 0
   var tryingToMove  : Boolean = false
 
   ///////////////
@@ -41,6 +42,7 @@ class Agent(val unit: FriendlyUnitInfo) {
   var shouldFight   : Boolean                   = false
   var commit        : Boolean                   = false
   var wantsUnload   : Boolean                   = false
+  var wantsPickup   : Boolean                   = false
   var priority      : TrafficPriority           = TrafficPriorities.None
   val forces        : ForceMap                  = new ForceMap
   val combat        : Combat                    = new Combat(unit)
@@ -99,6 +101,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     if ( ! unit.isFriendly) return // Mind Control
 
     forces.clear()
+    run           += 1
     lastFrame     = With.frame
     toAttackLast  = toAttack
     toAttackFrom  = None
@@ -107,6 +110,7 @@ class Agent(val unit: FriendlyUnitInfo) {
     fightReason   = ""
     tryingToMove  = false
     wantsUnload   = false
+    wantsPickup   = false
     actions.clear()
     unit.orderTarget.foreach(_.removeDamage(unit))
 
@@ -152,13 +156,17 @@ class Agent(val unit: FriendlyUnitInfo) {
   // Ridesharing //
   /////////////////
 
-  private var _ride: Option[FriendlyUnitInfo] = None
-  private val _passengers: ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
-  private var _rideGoal: Option[Pixel] = None
-  def ride: Option[FriendlyUnitInfo] = _ride
-  def passengers: Seq[FriendlyUnitInfo] = (_passengers ++ unit.loadedUnits).distinct
-  def passengersPrioritized: Seq[FriendlyUnitInfo] = passengers.sortBy(p => - p.unitClass.subjectiveValue - p.energy / 250.0 + p.frameDiscovered / 1e6)
-  def passengerSize: Int = passengers.view.map(_.unitClass.spaceRequired).sum
+  private val _passengers : ArrayBuffer[FriendlyUnitInfo] = new ArrayBuffer[FriendlyUnitInfo]
+  private var _ride       : Option[FriendlyUnitInfo]      = None
+  private var _rideGoal   : Option[Pixel]                 = None
+
+  def passengers            : Seq[FriendlyUnitInfo]     = (_passengers ++ unit.loadedUnits).distinct
+  def passengersPrioritized : Seq[FriendlyUnitInfo]     = passengers.sortBy(p => - p.unitClass.subjectiveValue - p.energy / 250.0 + p.frameDiscovered / 1e6)
+  def passengerSize         : Int                       = passengers.view.map(_.unitClass.spaceRequired).sum
+  def ride                  : Option[FriendlyUnitInfo]  = _ride
+  def rideGoal              : Option[Pixel]             = _rideGoal
+  def isPrimaryPassenger    : Boolean                   = ride.exists(_.agent.passengersPrioritized.headOption.contains(unit))
+
   def addPassenger(passenger: FriendlyUnitInfo): Unit = {
     if (passengerSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
     passenger.agent.ride.foreach(_.agent.removePassenger(passenger))
@@ -174,9 +182,10 @@ class Agent(val unit: FriendlyUnitInfo) {
     val all = passengers.toVector
     all.foreach(removePassenger)
   }
-  def rideGoal: Option[Pixel] = _rideGoal
-  def setRideGoal(to: Pixel): Unit = { _rideGoal = Some(to) }
-  def isPrimaryPassenger: Boolean = unit.transport.exists(_.agent.passengersPrioritized.headOption.contains(unit))
+  def setRideGoal(to: Pixel): Unit = {
+    _rideGoal = Some(to)
+  }
+
 
   ///////////////
   // Targeting //

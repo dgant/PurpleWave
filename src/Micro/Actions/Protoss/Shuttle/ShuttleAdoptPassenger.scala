@@ -24,7 +24,7 @@ object ShuttleAdoptPassenger extends Action {
     shuttle.canTransport(passenger)
       && passenger.transport.isEmpty
       && passenger.agent.ride.forall(shuttle==)
-      && passenger.unitClass.spaceRequired + shuttle.agent.passengers.view.map(_.unitClass.spaceRequired).sum <= shuttle.unitClass.spaceProvided
+      && passenger.unitClass.spaceRequired + shuttle.agent.passengerSize <= shuttle.unitClass.spaceProvided
     // Do we want to adopt this passenger?
       && (passenger.isAny(Protoss.Reaver, Protoss.HighTemplar) || passenger.matchups.targetedByScarab)
       && (shuttle.agent.passengers.isEmpty || shuttle.agent.passengers.headOption.map(_.squad).getOrElse(shuttle.squad).forall(passenger.squad.contains))

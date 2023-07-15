@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Coordination.Pathing.MicroPathing
-import Micro.Coordination.Pushing.{CircularPush, Push, TrafficPriorities, TrafficPriority, UnitLinearGroundPush}
+import Micro.Coordination.Pushing._
 import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -105,7 +105,9 @@ object Commander {
     if (unit.unready) return
 
     if (unit.airlifted && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
-      requestUnload(unit); return
+      requestUnload(unit);
+      sleep(unit) //  Although we're not doing anything, it's important to sleep here so we don't keep executing and change our ride goal
+      return
     }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
 
@@ -159,7 +161,7 @@ object Commander {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    if (With.reaction.sluggishness == 0 && unit.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen)) {
+    if (With.reaction.sluggishness == 0 && (unit.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen) || unit.loadedUnits.nonEmpty)) {
       val overshootDistance = ?(unit.airborne, 288.0, 8)
       if (to == unit.pixel) {
         val signX = Maff.signum11(Points.middle.x - to.x)
@@ -243,15 +245,16 @@ object Commander {
 
   def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
   private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
-    unit.agent.setRideGoal(destination)
-    leadFollower(unit, move(_, destination))
-    unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
+    val to = getAdjustedDestination(unit, destination)
+    unit.agent.setRideGoal(to)
+    leadFollower(unit, move(_, to))
+    unit.agent.tryingToMove = unit.pixelDistanceCenter(to) > tryingToMoveThreshold
     if (unit.unready) return
     if (autoUnburrow(unit)) return
-    if (unit.pixelDistanceCenter(destination) <= 8) {
+    if (unit.pixelDistanceCenter(to) <= 8) {
       requestUnload(unit)
     }
-    val to = getAdjustedDestination(unit, destination)
+
     if (Terran.Medic(unit) && unit.agent.shouldFight) {
       attackMove(unit, to)
     } else if (unit.pixelDistanceCenter(to) > 3) {
@@ -268,6 +271,7 @@ object Commander {
         pushThrough(unit, to, TrafficPriorities.None)
       }
     }
+
     sleep(unit)
   }
 

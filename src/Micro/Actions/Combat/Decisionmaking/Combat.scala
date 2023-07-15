@@ -252,6 +252,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def dodge(): Boolean = {
     if (unit.ready) {
       unit.agent.escalatePriority(TrafficPriorities.Shove) // Just lower than the dodge itself
+      unit.agent.forces(Forces.threat) = Potential.followPushes(unit)
       if (MicroPathing.setWaypointForcefully(unit)) {
         move()
       }

@@ -25,8 +25,16 @@ abstract class PvZ1BaseAllIn extends PvZ1BaseOpenings {
       if (timingAttack || needToAllIn) {
         attack()
         aggression(1.5)
-      } else if ((opening == Open910 || opening == Open1012) && safePushing && unitsEver(IsWarrior) >= 5) {
-        attack()
+      } else {
+        var canAttackEarly    = opening == Open910
+        canAttackEarly      ||= opening == Open1012
+        canAttackEarly      ||= opening == OpenZZCoreZ    && With.fingerprints.twelveHatch()
+        canAttackEarly      &&= unitsEver(IsWarrior) >= 5 || With.fingerprints.twelveHatch()
+        canAttackEarly      &&= safePushing
+        canAttackEarly      &&= ! With.fingerprints.twoHatchMain()
+        if (canAttackEarly) {
+          attack()
+        }
       }
       if (needToAllIn) {
         status("NeedToAllIn")

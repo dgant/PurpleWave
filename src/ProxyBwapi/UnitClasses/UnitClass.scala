@@ -214,14 +214,14 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val buildUnitsSpent: Vector[UnitClass] = _buildUnitsSpent
 
   lazy val macroSubstitutes: Seq[UnitClass] =
-    if (this == Zerg.Spire) Seq(Zerg.GreaterSpire)
-    else if (this == Zerg.Hatchery) Seq(Zerg.Lair, Zerg.Hive)
-    else if (this == Zerg.Lair) Seq(Zerg.Hive)
-    else Seq.empty
+          if (this == Zerg.Spire)     Seq(Zerg.GreaterSpire)
+    else  if (this == Zerg.Hatchery)  Seq(Zerg.Hive, Zerg.Lair)
+    else  if (this == Zerg.Lair)      Seq(Zerg.Hive)
+    else                              Seq.empty
   lazy val withMacroSubstitutes: Seq[UnitClass] = Seq(this) ++ macroSubstitutes
-  lazy val isHatchlike: Boolean = macroSubstitutes.contains(Zerg.Hatchery)
-  lazy val isLairlike: Boolean = macroSubstitutes.contains(Zerg.Lair)
-  lazy val isSpirelike: Boolean = macroSubstitutes.contains(Zerg.Spire)
+  lazy val isHatchlike  : Boolean = withMacroSubstitutes.contains(Zerg.Hatchery)
+  lazy val isLairlike   : Boolean = withMacroSubstitutes.contains(Zerg.Lair)
+  lazy val isSpirelike  : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
   lazy val isTank: Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
 
   private def _buildUnitsEnabling: Vector[UnitClass] = {

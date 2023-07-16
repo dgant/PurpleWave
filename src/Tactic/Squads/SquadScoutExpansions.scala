@@ -69,6 +69,7 @@ class SquadScoutExpansions extends Squad {
     && With.tactics.scoutWithWorkers.scoutingAbandoned)
 
   def launch(): Unit = {
+    if ( ! With.blackboard.scoutExpansions()) return
     if ( ! scoutZergThird) {
       if (With.frame < frameToScout()) return
       if ( ! With.blackboard.wantToAttack() && ! With.blackboard.wantToHarass()) return

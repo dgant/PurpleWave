@@ -1,7 +1,7 @@
 package Mathematics.Shapes
 
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.Pixel
 
 object Ray {
 
@@ -16,8 +16,9 @@ object Ray {
     val dy                = to.y - from.y
     val velocityX         = dx.toDouble
     val velocityY         = dy.toDouble
+    val invVelocityX      = 1.0 / velocityX
+    val invVelocityY      = 1.0 / velocityY
     val tileCount         = 1 + from.tile.tileDistanceManhattan(to.tile)
-    val output            = new Array[Tile](tileCount)
     val lengthSquaredGoal = dx * dx + dy * dy
     var lengthSquaredNow  = 0
     var x                 = from.x
@@ -37,11 +38,11 @@ object Ray {
       if (hasNext) {
         val nextXCrossing   = x + signX * Math.abs(32 - Maff.mod32(Math.abs(x)))
         val nextYCrossing   = y + signY * Math.abs(32 - Maff.mod32(Math.abs(y)))
-        val timeToNextX     = (nextXCrossing - x) / velocityX
-        val timeToNextY     = (nextYCrossing - y) / velocityY
+        val timeToNextX     = (nextXCrossing - x) * invVelocityX
+        val timeToNextY     = (nextYCrossing - y) * invVelocityY
         val deltaTime       = Math.min(timeToNextX, timeToNextY)
-        x                   = Math.ceil(x + velocityX * deltaTime).toInt
-        y                   = Math.ceil(y + velocityY * deltaTime).toInt
+        x                   = (0.999 + x + velocityX * deltaTime).toInt
+        y                   = (0.999 + y + velocityY * deltaTime).toInt
         lengthSquaredNow    = Maff.squared(x - from.x) + Maff.squared(y - from.y)
         if (Maff.mod32(x) == 0 && Maff.mod32(y) == 0) {
           // We landed right on the corner of the grid, which would cause us to skip a corner tile.

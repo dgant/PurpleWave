@@ -23,6 +23,7 @@ class Blackboard {
   val aggressionRatio         : Property[Double]            = add(new Property(1.0))
   val wantToAttack            : Property[Boolean]           = add(new Property(false))
   val wantToHarass            : Property[Boolean]           = add(new Property(false))
+  val scoutExpansions         : Property[Boolean]           = add(new Property(true))
   val maximumScouts           : Property[Int]               = add(new Property(0))
   val gasWorkerFloor          : Property[Int]               = add(new Property(0))      // Require at least this many gas workers
   val gasWorkerCeiling        : Property[Int]               = add(new Property(200))    // Require no more than this many gas workers (unless saturated on minerals)

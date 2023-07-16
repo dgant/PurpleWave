@@ -161,6 +161,8 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
       get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
     }
     scoutOn(Protoss.Pylon)
+    With.blackboard.scoutExpansions.set(false)
     status(anticipateSpeedlings,  "Speedlings")
+    status(opening.toString)
   }
 }

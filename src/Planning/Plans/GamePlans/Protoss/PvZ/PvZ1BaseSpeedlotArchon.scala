@@ -21,13 +21,14 @@ class PvZ1BaseSpeedlotArchon extends PvZ1BaseAllIn {
           Protoss.Assimilator,
           Protoss.CyberneticsCore,
           Protoss.Dragoon, // One, to deny scouting
-          Protoss.CitadelOfAdun,
-          Protoss.TemplarArchives,
-          Protoss.Forge)
+          Protoss.Forge,
+          Protoss.CitadelOfAdun)
         get(Protoss.GroundDamage)
         get(Protoss.ZealotSpeed)
-        get(5, Protoss.Gateway)
+        get(Protoss.TemplarArchives)
+        get(4, Protoss.Gateway)
       })
+    get(5, Protoss.Gateway)
 
     timingAttack  ||= Protoss.GroundDamage() && Protoss.ZealotSpeed() && units(Protoss.Archon) >= 2
     needToAllIn     = mutalisksInBase || mutalisksImminent

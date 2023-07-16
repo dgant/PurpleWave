@@ -23,9 +23,10 @@ class PvZ1Base4GateGoon extends PvZ1BaseAllIn {
         get(Protoss.DragoonRange)
         get(4, Protoss.Gateway)
       })
+    pump(Protoss.Zealot)
 
     timingAttack  ||= Protoss.DragoonRange() && unitsComplete(Protoss.Dragoon) >= 12
-    needToAllIn   ||= mutalisksInBase
+    needToAllIn   ||= Protoss.DragoonRange() && mutalisksInBase
     allInLogic()
   }
 }

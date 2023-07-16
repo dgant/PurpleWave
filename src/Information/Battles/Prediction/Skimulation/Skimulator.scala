@@ -166,7 +166,7 @@ object Skimulator {
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Ghost(unit)         && Terran.Lockdown(player))       * casts100  * Maff.clamp(team.opponent.count(IsMechWarrior)   / 1,  1.0, 1.0))
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.HighTemplar(unit)  && Protoss.PsionicStorm(player))  * casts75   * Maff.clamp(team.opponent.count(IsWarrior)       / 8,  1.0, 2.0))
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.DarkArchon(unit)   && Protoss.Maelstrom(player))     * casts100  * Maff.clamp(team.opponent.count(IsBioWarrior)    / 4,  1.0, 4.0))
-      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 4.0))
+      unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 8.0))
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Corsair(unit)      && Protoss.DisruptionWeb(player)) * casts125  * Maff.clamp(team.opponent.count(IsGroundWarrior) / 4,  1.0, 3.0))
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Queen(unit)           && Zerg.Ensnare(player))          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 12, 1.0, 2.0))
       unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 4.0))

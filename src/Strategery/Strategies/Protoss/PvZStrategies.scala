@@ -2,7 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.PvZ2022
+import Planning.Plans.GamePlans.Protoss.PvZ.{PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon, PvZ2022}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -13,6 +13,18 @@ abstract class PvZStrategy extends Strategy {
 
 object PvZ2022 extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ2022)
+}
+
+object PvZ1Base4GateGoon extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1Base4GateGoon)
+}
+
+object PvZ1BaseGoonReaver extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1BaseGoonReaver)
+}
+
+object PvZ1BaseSpeedlotArchon extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1BaseSpeedlotArchon)
 }
 
 abstract class PvZFFEOpening extends PvZStrategy {

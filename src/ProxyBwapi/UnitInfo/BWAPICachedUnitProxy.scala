@@ -262,8 +262,8 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def changeUnitType(unitClassNew: UnitClass): Unit = {
     if (unitClassNew != _unitClass) {
       _lastClassChange        = With.frame
-      _lastClassChangeHealth  = hitPoints
-      _lastClassChangeShields = shieldPoints
+      _lastClassChangeHealth  = bwapiUnit.getHitPoints
+      _lastClassChangeShields = bwapiUnit.getShields
       _unitClass              = unitClassNew
       updateGridsIfNecessary(onChange = true)
     }

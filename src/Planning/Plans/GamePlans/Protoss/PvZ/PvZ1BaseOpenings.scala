@@ -1,15 +1,25 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
+import Debugging.SimpleString
 import Lifecycle.With
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.IsWarrior
 
-abstract class PvZ2022Openings extends GameplanImperative {
+abstract class PvZ1BaseOpenings extends GameplanImperative {
+
+  protected trait   Opening       extends SimpleString
+  protected object  Open910       extends Opening
+  protected object  Open1012      extends Opening
+  protected object  OpenZZCoreZ   extends Opening
+  protected object  OpenGateNexus extends Opening
+
+  protected var opening: Opening = Open1012
 
   protected def reactVs4Pool(): Unit = {
-    if (enemyStrategy(With.fingerprints.fourPool) && unitsComplete(IsWarrior) < 5) {
+    if (With.fingerprints.fourPool() && unitsComplete(IsWarrior) < 5) {
       once(8, Protoss.Probe)
       once(Protoss.Pylon)
       once(9, Protoss.Probe)
@@ -68,6 +78,12 @@ abstract class PvZ2022Openings extends GameplanImperative {
     once(17, Protoss.Probe)
     once(5, Protoss.Zealot)
     once(18, Protoss.Probe)
+    once(4, Protoss.Pylon)
+    once(Protoss.Assimilator)
+    once(19, Protoss.Probe)
+    once(Protoss.CyberneticsCore)
+    once(7, Protoss.Zealot)
+    once(21, Protoss.Probe)
   }
   protected def openZZCoreZ(): Unit = {
     once(8, Protoss.Probe)
@@ -118,5 +134,31 @@ abstract class PvZ2022Openings extends GameplanImperative {
     output &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway) + units(Protoss.CyberneticsCore) < 3) // At some point, stop reacting to speedlings
     _previouslyAnticipatedSpeedlings = output
     output
+  }
+
+  protected def open(allowExpanding: Boolean): Unit = {
+    if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && ! have(Protoss.Assimilator)) {
+      if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool)) {
+        opening = Open910
+      } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && allowExpanding && roll("SwapGateNexus", 0.75)) {
+        opening = OpenGateNexus
+      } else if (With.fingerprints.overpool() || With.fingerprints.twelveHatch()) {
+        opening = OpenZZCoreZ
+      }
+    }
+    opening match {
+      case Open910      => open910()
+      case Open1012     => open1012()
+      case OpenZZCoreZ  => openZZCoreZ()
+      case _            => openGateNexus()
+    }
+    if (bases <= 1 && anticipateSpeedlings) {
+      get(3, Protoss.Zealot)
+      get(Protoss.Forge)
+      get(7, Protoss.Zealot)
+      get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
+    }
+    scoutOn(Protoss.Pylon)
+    status(anticipateSpeedlings,  "Speedlings")
   }
 }

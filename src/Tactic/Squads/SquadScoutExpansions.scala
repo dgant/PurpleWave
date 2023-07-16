@@ -83,22 +83,26 @@ class SquadScoutExpansions extends Squad {
       Maff.maxBy(units)(_.squadAge).map(_.framesToTravelTo(b.heart))
       .getOrElse(b.heart.groundTiles(With.geography.home)))
 
-    vicinity = toScoutBaseSorted.head.heart.center
-
-    lock.counter = CountOne
-    lock.matcher = ?(With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65, matchAll, matchFlying)
+    vicinity        = toScoutBaseSorted.head.heart.center
+    lock.counter    = CountOne
+    lock.matcher    = ?(With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65, matchAll, matchFlying)
     lock.preference = PreferClose(vicinity)
     lock.acquire()
   }
 
   def run(): Unit = {
     units.foreach(u => {
-      val targetsHere = u.base.toSeq.filter(_.isEnemy).flatMap(_.enemies)
-      val targetsThere = vicinity.base.toSeq.flatMap(_.enemies)
+      val targetsHere   = u.base.toSeq.filter(_.isEnemy).flatMap(_.enemies)
+      val targetsThere  = vicinity.base.toSeq.flatMap(_.enemies)
       u.intend(this)
         .setCanSneak(true)
         .setTravel(Some(vicinity))
-        .setTargets(SquadAutomation.rankForArmy(this, (targetsHere ++ targetsThere).toSet.toVector))
+        .setTargets(SquadAutomation.rankForArmy(
+          this,
+          (targetsHere ++ targetsThere)
+            .filter(_.caughtBy(u))
+            .toSet
+            .toVector))
     })
   }
 }

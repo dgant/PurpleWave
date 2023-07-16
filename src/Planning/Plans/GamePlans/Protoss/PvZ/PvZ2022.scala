@@ -1,10 +1,9 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
-import Debugging.SimpleString
 import Lifecycle.With
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendHall
-import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.Access.PlacementQuery
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -12,43 +11,15 @@ import Utilities.?
 import Utilities.Time.GameTime
 import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
-class PvZ2022 extends PvZ2022Openings {
-
-  private trait Opening extends SimpleString
-  private object Open910 extends Opening
-  private object Open1012 extends Opening
-  private object OpenZZCoreZ extends Opening
-  private object OpenGateNexus extends Opening
-  private var opening: Opening = Open1012
+class PvZ2022 extends PvZ1BaseOpenings {
 
   override def executeBuild(): Unit = {
-    if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && units(Protoss.Assimilator) == 0) {
-      if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
-        opening = Open910
-      } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && roll("SwapGateNexus", 0.65)) {
-        opening = OpenGateNexus
-      } else if (With.fingerprints.overpool() && roll("SwapZZCoreZ", 0.65)) {
-        opening = OpenZZCoreZ
-      }
-    }
-    opening match {
-      case Open910 => open1012()
-      case Open1012 => open1012()
-      case OpenZZCoreZ => openZZCoreZ()
-      case _ => openGateNexus()
-    }
-    if (bases <= 1 && anticipateSpeedlings) {
-      get(3, Protoss.Zealot)
-      get(Protoss.Forge)
-      get(7, Protoss.Zealot)
-      get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
-    }
+    open(allowExpanding = true)
   }
 
   private def getStorm = With.configuration.humanMode
 
   override def executeMain(): Unit = {
-    scoutOn(Protoss.Pylon)
     new MeldArchons(?(getStorm, 49, 250)).update()
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
@@ -88,10 +59,10 @@ class PvZ2022 extends PvZ2022Openings {
       expandOnce()
     }
 
-    if (enemyHydralisksLikely) status("Hydras")
-    if (enemyMutalisksLikely) status("Mutas")
-    if (enemyLurkersLikely) status("Lurkers")
-    if (anticipateSpeedlings) status("Speedlings")
+    status(enemyHydralisksLikely, "Hydras")
+    status(enemyMutalisksLikely,  "Mutas")
+    status(enemyLurkersLikely,    "Lurkers")
+    status(anticipateSpeedlings,  "Speedlings")
     status(f"${targetMiningBases}base")
 
     if (enemyMutalisksLikely || (
@@ -116,8 +87,8 @@ class PvZ2022 extends PvZ2022Openings {
     if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeDefending, 12, 18) && miningBases > 1)  techStage2()
     if (safeVsMutalisk && unitsComplete(IsWarrior) >= ?(safeDefending, 18, 24) && miningBases > 1)  techStage3()
 
-    pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 5, 1))
-    if (enemyMutalisksLikely) get(Protoss.Stargate)
+    pump(Protoss.Observer, ?(enemyLurkersLikely || enemyHasTech(Zerg.Burrow), 3, 1))
+    if (enemyMutalisksLikely)    get(Protoss.Stargate)
     pumpRatio(Protoss.Corsair, ?(enemyMutalisksLikely, 1, 5), 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
     if (enemyLurkersLikely || (safeDefending && frame > GameTime(8, 30)())) {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
@@ -127,6 +98,7 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemyMutalisksLikely && units(Protoss.Corsair) > 1) upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 1.5), Enemy(Zerg.Lurker, 1.25), Friendly(Protoss.Corsair, -1.5), Friendly(Protoss.Archon, 2.0)))
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Enemy(Zerg.Mutalisk, 3.0), Enemy(Zerg.Lurker, 2.5), Enemy(Zerg.Hydralisk, -0.5), Enemy(Zerg.Zergling, -0.25)))
+    pumpShuttleAndReavers(6)
     if (enemyLurkersLikely && safeDefending) {
       upgradeContinuously(Protoss.ObserverSpeed)
     }
@@ -172,19 +144,22 @@ class PvZ2022 extends PvZ2022Openings {
     if (enemyMutalisksLikely || ! enemyHydralisksLikely) {
       get(Protoss.Stargate)
     }
+    if (enemies(Zerg.Mutalisk) >= 13) get(Maff.vmin(miningBases, gasPumps, 3), Protoss.Stargate)
+    if (enemies(Zerg.Mutalisk) >= 7)  get(Maff.vmin(miningBases, gasPumps, 2), Protoss.Stargate)
+    else if (enemyMutalisksLikely)    get(Protoss.Stargate)
     get(Protoss.CitadelOfAdun)
     get(Protoss.ZealotSpeed)
     if (gas < 300) buildGasPumps()
   }
 
   private def techStage3(): Unit = {
+    get(Protoss.RoboticsFacility, Protoss.Shuttle, Protoss.Observatory, Protoss.Observer, Protoss.RoboticsSupportBay)
+    get(2, Protoss.Reaver)
     get(Protoss.TemplarArchives)
     once(2, Protoss.HighTemplar)
     if (getStorm) {
       get(Protoss.PsionicStorm)
     }
-    get(Protoss.RoboticsFacility, Protoss.Observatory)
-    once(2, Protoss.Observer)
   }
 
   private def addProduction(): Unit = {

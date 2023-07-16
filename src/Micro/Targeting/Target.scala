@@ -34,7 +34,7 @@ object Target {
     target.doomFrameAbsolute > With.frame + attacker.framesToConnectDamage(target) + 24
   }
 
-  def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
+  def defaultTargets(attacker: FriendlyUnitInfo, filters: TargetFilter*): (Boolean, Seq[UnitInfo]) = {
     val assigned      = attacker.targetsAssigned.getOrElse(Seq.empty)
     val matchups      = attacker.matchups.targets
     val engaged       = attacker.team.exists(_.engagedUpon)
@@ -54,9 +54,18 @@ object Target {
       (true, ?(engaged, matchups.view.filter(hasCombatPriority).filter(acceleratesDemise(attacker, _)), Seq.empty)),
       (true, ?(engaged, matchups.view.filter(hasCombatPriority),                                        Seq.empty)),
       (true, matchups))
-    val stratum = strataUnfiltered.view.map(p => (p._1, legal(attacker, p._2, filters: _*))).find(_._2.nonEmpty)
-    val output  = stratum.flatMap(p => ?(p._1, bestUnfiltered(attacker, p._2), p._2.headOption))
-    output
+
+    // Returns (rank by score?, targets)
+    strataUnfiltered.view
+      .map(p => (p._1, legal(attacker, p._2, filters: _*))).find(_._2.nonEmpty)
+      .getOrElse((false, Seq.empty))
+  }
+
+  def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
+    val targets = defaultTargets(attacker, filters: _*)
+    ?(targets._1,
+      bestUnfiltered(attacker, legal(attacker, targets._2, filters: _*)),
+      targets._2.headOption)
   }
 
   def best(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {
@@ -77,21 +86,25 @@ object Target {
   }
 
   def auditLegality(attacker: FriendlyUnitInfo, additionalFiltersRequired: TargetFilter*): Vector[(UnitInfo, Vector[(Boolean, TargetFilter)])] = {
-    attacker.matchups.targets
+    defaultTargets(attacker)._2
       .map(target => (
         target,
         (filtersRequired(attacker) ++ additionalFiltersRequired.filter(_.appliesTo(attacker)))
-          .map(filter => (filter.legal(attacker, target), filter)).toVector.sortBy(_._1)
+          .map(filter => (filter.legal(attacker, target), filter))
+          .toVector
+          .sortBy(_._1)
       ))
       .toVector
   }
 
   def auditScore(attacker: FriendlyUnitInfo): Vector[(UnitInfo, String, String, String)] = {
-    attacker.matchups.targets.view.map(target => (
-      target,
-      attacker.pixelDistanceEdge(target) * Maff.inv32,
-      target.targetValue,
-      attacker.targetScore(target))).toVector
+    defaultTargets(attacker)._2
+      .map(target => (
+        target,
+        attacker.pixelDistanceEdge(target) * Maff.inv32,
+        target.targetValue,
+        attacker.targetScore(target)))
+      .toVector
       .sortBy(-_._4)
       .map(s =>
         (s._1,

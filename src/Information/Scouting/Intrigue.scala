@@ -9,9 +9,10 @@ import Utilities.CountMap
 
 trait Intrigue {
   def baseScouts(base: Base): Int = baseScoutMap(base)
-  def baseIntrigue: Map[Base, Double] = baseIntrigueRaw.map(p => (p._1, p._2 / Math.pow(100.0, baseScouts(p._1))))
-  def baseIntrigueRaw: Map[Base, Double] = cacheBaseIntrigueInitial()
-  def enemyHome: Tile = mostBaselikeEnemyTileCache()
+
+  def baseIntrigue    : Map[Base, Double] = baseIntrigueRaw.map(p => (p._1, p._2 / Math.pow(100.0, baseScouts(p._1))))
+  def baseIntrigueRaw : Map[Base, Double] = cacheBaseIntrigueInitial()
+  def enemyHome       : Tile              = enemyHomeCache()
 
   def registerScout(base: Base): Unit = {
     baseScoutMap(base) += 1
@@ -43,7 +44,7 @@ trait Intrigue {
     output
   }
 
-  private val mostBaselikeEnemyTileCache = new Cache(() =>
+  private val enemyHomeCache = new Cache(() =>
     With.units.enemy
       .view
       .filter(unit => unit.likelyStillThere && ! unit.flying && unit.unitClass.isBuilding)

@@ -379,18 +379,18 @@ class PvPOpening extends GameplanImperative {
         (if (zAfterCore) status("CoreZ") else status("NZCore"))
       }
     }
-    if (sevenZealot)    status("SevenZealots")
-    if (commitZealots)  status("CommitZealots")
-    if (shuttleFirst)   status("ShuttleFirst")
-    if (shuttleSpeed)   status("ShuttleSpeed")
-    if (getObservers)   status("Obs")
-    if (getObservatory) status("Observatory")
-    if (getReavers)     status("Reaver")
-    if (reaverAllIn)    status("ReaverAllIn")
-    if (greedyDT)       status("GreedyDT")
-    if (shouldAttack)   status("Attack")
-    if (shouldHarass)   status("Harass")
-    if (shouldExpand)   status("Expand")
+    status(sevenZealot,     "SevenZealots")
+    status(commitZealots,   "CommitZealots")
+    status(shuttleFirst,    "ShuttleFirst")
+    status(shuttleSpeed,    "ShuttleSpeed")
+    status(getObservers,    "Obs")
+    status(getObservatory,  "Observatory")
+    status(getReavers,      "Reaver")
+    status(reaverAllIn,     "ReaverAllIn")
+    status(greedyDT,        "GreedyDT")
+    status(shouldAttack,    "Attack")
+    status(shouldHarass,    "Harass")
+    status(shouldExpand,    "Expand")
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }

@@ -48,9 +48,14 @@ object ShowUnitsEnemy extends DebugView {
     }
     if (showCountdown) {
       if ( ! unit.complete && unit.remainingCompletionFrames > 0) {
-        val time = new Frames(unit.remainingCompletionFrames)
-        val pctHp = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
-        DrawMap.labelBox(Array(time.toString, "%02f".format(pctHp) + "%"), Pixel(unit.x, unit.bottom), drawBackground = true, unit.teamColor)
+        val timeLeft  = Frames(unit.remainingCompletionFrames)
+        val timeEnd   = Frames(unit.completionFrame)
+        val pctHp     = unit.hitPoints.toDouble / unit.unitClass.maxHitPoints
+        DrawMap.labelBox(
+          Array(
+            f"$timeLeft ($timeEnd)",
+            "%02f".format(pctHp) + "%"),
+          Pixel(unit.x, unit.bottom), drawBackground = true, unit.teamColor)
       }
     }
   }

@@ -373,6 +373,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         // Maintain formation until battle breaks out
         && ( ! formationHelpsEngage || squadEngagedUpon))
       breakFormationToAttack ||= target.exists(unit.pixelsToGetInRange(_) < Math.max(0, 128 * unit.confidence11))
+      breakFormationToAttack ||= With.yolo.active
 
       unit.agent.toAttackFrom = Maff.orElse(SwapIf(breakFormationToAttack, engageFormation.flatMap(_(unit)).toIterable, unit.agent.toAttackFrom.toIterable)).headOption
       if (pushThrough) {

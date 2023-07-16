@@ -2,11 +2,12 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, Points}
+import Mathematics.Points.{Pixel, Points, Tile}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
 import Planning.Predicates.MacroFacts
 import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsBuilding
 
 class SquadAttack extends Squad {
   override def toString: String = f"$mode ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"
@@ -14,6 +15,7 @@ class SquadAttack extends Squad {
   override def launch(): Unit = {} // This squad receives its units from Tactician
 
   trait AttackMode
+  object YOLO        extends AttackMode { override val toString = "AllIn"    }
   object RazeBase     extends AttackMode { override val toString = "Raze"     }
   object RazeProxy    extends AttackMode { override val toString = "Deprox"   }
   object PushMain     extends AttackMode { override val toString = "Push"     }
@@ -34,12 +36,25 @@ class SquadAttack extends Squad {
     .map(_.center))
 
   def chooseMode(): AttackMode = {
-    val proxies       = With.units.enemy.filter(_.proxied).toVector
-    val basesOccupied = units.view.flatMap(_.base).filter(_.isEnemy).toSet
+    val proxies             = With.units.enemy.filter(_.proxied).toVector
+    val enemyBasesOccupied  = units.view.flatMap(_.base).filter(_.isEnemy).toSet
 
-    if (basesOccupied.nonEmpty) {
+    if (With.yolo.active) {
+      lazy val enemyBuilding  = Maff.minBy(With.units.enemy.filter(IsBuilding))(b => attackKeyDistanceTo(b.pixel))
+      lazy val neutralBase    = Maff.minBy(With.geography.bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Minutes(2)()))(b => attackKeyDistanceTo(b.heart.center))
+      lazy val tilesSparse    = (0 until With.mapTileWidth by 4).flatMap(x => (0 until With.mapTileHeight by 4).map(y => Tile(x, y)).filter(t => With.framesSince(t.lastSeen) > Minutes(2)()))
+      lazy val tile           = Maff.minBy(tilesSparse)(t => attackKeyDistanceTo(t.center))
+
+      mode                    = YOLO
+      vicinity                = enemyBuilding.map(_.pixel)
+        .orElse(neutralBase.map(_.heart.center))
+        .orElse(tile.map(_.center))
+        .getOrElse(With.scouting.enemyHome.center)
+      setTargets(SquadAutomation.rankForArmy(this, With.units.enemy.filter(e => IsBuilding(e) || e.matchups.pixelsToTargetRange.exists(_ <= 0) || e.matchups.pixelsToThreatRange.exists(_ <= 0)).toVector))
+
+    } else if (enemyBasesOccupied.nonEmpty) {
       mode      = RazeBase
-      vicinity  = basesOccupied.map(_.heart.center).minBy(attackKeyDistanceTo)
+      vicinity  = enemyBasesOccupied.map(_.heart.center).minBy(attackKeyDistanceTo)
       setTargets(SquadAutomation.rankedAround(this))
 
     } else if (proxies.nonEmpty) {

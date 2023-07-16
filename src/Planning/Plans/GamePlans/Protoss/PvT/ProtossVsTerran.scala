@@ -180,7 +180,7 @@ class ProtossVsTerran extends PvTOpeners {
     }
   }
   object TechArbiter extends TechTransition {
-    def started: Boolean = profited || units(Protoss.ArbiterTribunal) > 0
+    def started: Boolean = profited || have(Protoss.ArbiterTribunal)
     def profited: Boolean = unitsEver(Protoss.Arbiter) > 0
     def perform(): Unit = {
       get(Protoss.DragoonRange)
@@ -234,7 +234,7 @@ class ProtossVsTerran extends PvTOpeners {
     val goFastReaver  = PvT1BaseReaver() || ( ! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
     val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5 && ! counterBio && (enemyBases > 1 || enemies(Terran.CommandCenter) > 1)
     val goReaver      = goFastCarrier && ! have(Protoss.TemplarArchives)
-    val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && ! With.fingerprints.bio.recently && roll("Carrier", 0.5)
+    val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && roll("Carrier", 1.0)
 
     techs.clear()
     TechDarkTemplar     (goDT && ! PvT29Arbiter())

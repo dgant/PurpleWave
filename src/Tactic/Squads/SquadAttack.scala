@@ -50,7 +50,7 @@ class SquadAttack extends Squad {
         .orElse(neutralBase.map(_.heart.center))
         .orElse(tile.map(_.center))
         .getOrElse(With.scouting.enemyHome.center)
-      setTargets(SquadAutomation.rankForArmy(this, With.units.enemy.filter(e => IsBuilding(e) || e.matchups.pixelsToTargetRange.exists(_ <= 0) || e.matchups.pixelsToThreatRange.exists(_ <= 0)).toVector))
+      setTargets(SquadAutomation.rankForArmy(this, With.units.enemy.filter(e => IsBuilding(e) || e.matchups.pixelsToThreatRange.exists(_ <= 0)).toVector))
 
     } else if (enemyBasesOccupied.nonEmpty) {
       mode      = RazeBase

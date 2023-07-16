@@ -166,9 +166,10 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
   @inline final def transport               : Option[FriendlyUnitInfo] = _transport
   final def readProxy(): Unit = {
     if (With.frame == 0 || bwapiUnit.exists()) {
+      _lastSeen               = With.frame
+      _player                 = Players.get(bwapiUnit.getPlayer)
       changeUnitType(UnitClasses.get(bwapiUnit.getType))
       changeVisibility(Visibility.Visible)
-      _player                 = Players.get(bwapiUnit.getPlayer)
       _pixelObserved          = new Pixel(bwapiUnit.getPosition)
       changePixel(_pixelObserved)
       _complete               = bwapiUnit.isCompleted
@@ -273,7 +274,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
     if (_visibility != visibilityNew) {
       _visibility = visibilityNew
       _visibility match {
-        case Visibility.Visible           => _burrowed = bwapiUnit.isBurrowed ; _alive = true; _lastSeen = With.frame
+        case Visibility.Visible           => _burrowed = bwapiUnit.isBurrowed ; _alive = true;
         case Visibility.InvisibleBurrowed => _burrowed = true                 ; _alive = true; _detected = false
         case Visibility.InvisibleNearby   => _burrowed = false                ; _alive = true; _detected = false
         case Visibility.InvisibleMissing  => _burrowed = false                ; _alive = true; _detected = false

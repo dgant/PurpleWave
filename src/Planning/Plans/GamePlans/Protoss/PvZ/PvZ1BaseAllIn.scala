@@ -40,5 +40,5 @@ abstract class PvZ1BaseAllIn extends PvZ1BaseOpenings {
     && (enemiesComplete(Zerg.Spire) > 0
       || With.units.enemy.exists(e => Zerg.Lair(e) && With.framesSince(e.lastClassChange) >= Zerg.Lair.buildFrames + Zerg.Spire.buildFrames)))
 
-  protected def mutalisksInBase: Boolean = With.geography.ourBases.exists(_.enemies.exists(Zerg.Mutalisk))
+  protected def mutalisksInBase: Boolean = With.geography.ourBases.exists(_.enemies.exists(e => Zerg.Mutalisk(e) && e.visible))
 }

@@ -1,7 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Planning.Plans.Macro.Protoss.MeldArchons
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.SwapIf
 import Utilities.UnitFilters.IsWarrior
 
@@ -10,7 +10,9 @@ class PvZ1BaseGoonReaver extends PvZ1BaseAllIn {
   override def executeMain(): Unit = {
     new MeldArchons()()
     pump(Protoss.Observer, 1)
-    pumpShuttleAndReavers()
+    if ( ! needToAllIn) {
+      pump(Protoss.Reaver)
+    }
 
     SwapIf(
       unitsComplete(IsWarrior) >= 9, {
@@ -30,8 +32,13 @@ class PvZ1BaseGoonReaver extends PvZ1BaseAllIn {
           Protoss.RoboticsSupportBay,
           Protoss.Reaver)
         get(Protoss.DragoonRange)
-        get(3, Protoss.Gateway)
+        get(2, Protoss.Gateway)
       })
+      get(3, Protoss.Gateway)
+
+    if (enemiesComplete(Zerg.SunkenColony) > 0 && ! timingAttack) {
+      aggression(0.75)
+    }
 
     timingAttack ||= unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 1 && Protoss.DragoonRange()
     needToAllIn     = mutalisksInBase

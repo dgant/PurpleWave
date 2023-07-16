@@ -31,6 +31,7 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
       pumpWorkers()
       pump(Protoss.Zealot)
       cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
+      get(2, Protoss.Gateway)
     }
   }
   protected def open910(): Unit = {
@@ -125,13 +126,14 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
     output &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
     output &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
     output ||= enemyStrategy(speedlingStrategies: _*)
-    output ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(4, 0)()
-    output ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(4, 30)()
+    output ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(3, 15)()
+    output ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(3, 30)()
+    output ||= enemiesShown(Zerg.Zergling) > 16
     output ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
     output &&= ! enemyHydralisksLikely
     output &&= ! enemyMutalisksLikely
     output &&= ! enemyLurkersLikely
-    output &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway) + units(Protoss.CyberneticsCore) < 3) // At some point, stop reacting to speedlings
+    output &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.Stargate) < 3) // At some point, stop reacting to speedlings
     _previouslyAnticipatedSpeedlings = output
     output
   }

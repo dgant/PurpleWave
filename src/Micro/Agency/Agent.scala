@@ -162,6 +162,8 @@ class Agent(val unit: FriendlyUnitInfo) {
 
   def passengers            : Seq[FriendlyUnitInfo]     = (_passengers ++ unit.loadedUnits).distinct
   def passengersPrioritized : Seq[FriendlyUnitInfo]     = passengers.sortBy(p => - p.unitClass.subjectiveValue - p.energy / 250.0 + p.frameDiscovered / 1e6)
+  def hailers               : Seq[FriendlyUnitInfo]     = passengers            .filter(p => ! p.loaded && p.agent.wantsPickup)
+  def hailersPrioritized    : Seq[FriendlyUnitInfo]     = passengersPrioritized .filter(p => ! p.loaded && p.agent.wantsPickup)
   def passengerSize         : Int                       = passengers.view.map(_.unitClass.spaceRequired).sum
   def ride                  : Option[FriendlyUnitInfo]  = _ride
   def rideGoal              : Option[Pixel]             = _rideGoal

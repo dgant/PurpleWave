@@ -119,7 +119,15 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
     once(2,  Protoss.Gateway)
   }
 
-  private val speedlingStrategies = Vector(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.ninePoolHatch, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain, With.fingerprints.oneHatchGas)
+  private val speedlingStrategies = Vector(
+    With.fingerprints.fourPool,
+    With.fingerprints.ninePoolGas,
+    With.fingerprints.ninePoolHatch,
+    With.fingerprints.overpoolGas,
+    With.fingerprints.tenHatchPoolGas,
+    With.fingerprints.twoHatchMain,
+    With.fingerprints.oneHatchGas)
+
   private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
     var output = enemyRecentStrategy(speedlingStrategies: _*)

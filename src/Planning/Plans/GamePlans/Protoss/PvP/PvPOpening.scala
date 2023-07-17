@@ -157,7 +157,7 @@ class PvPOpening extends GameplanImperative {
       PvP1012.swapOut()
       PvP3Zealot.swapOut()
       PvP5Zealot.swapOut()
-      (if (Seq(Heartbreak, Roadkill).exists(_()) || roll("1012ToGateCoreGate", 0.35)) PvPGateCoreGate else PvPGateCoreRange).swapIn()
+      ?(Stream(Heartbreak, Roadkill).exists(_()) || roll("1012ToGateCoreGate", 0.35), PvPGateCoreGate, PvPGateCoreRange).swapIn()
     }
     // Goon+Obs is the strongest punishment against badly hidden DT openers.
     // A glimpse of Citadel doesn't sufficiently justify switching into Obs for its own sake,

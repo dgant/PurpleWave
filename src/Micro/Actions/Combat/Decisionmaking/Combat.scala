@@ -152,9 +152,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     val radians         = unit.agent.forces.sum.radians
     val forceGoal       = MicroPathing.getWaypointInDirection(unit, radians).orElse(unit.agent.toTravel)
     unit.agent.toTravel = forceGoal.orElse(unit.agent.toTravel)
-    if (forceGoal.isEmpty) {
-      With.logger.micro(f"$unit found no waypoint towards ${Math.toDegrees(radians)} degrees.")
-    }
+    if (forceGoal.isEmpty) { With.logger.micro(f"$unit found no waypoint towards ${Math.toDegrees(radians)} degrees.") }
     move()
   }
 
@@ -292,29 +290,32 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def charge(): Boolean = {
-    if (unit.ready) {
-      if ( ! target.exists(unit.inRangeToAttack) || ! attackIfReady()) {
-        // If we have an attack formation
-        if (engageFormation.isDefined && ! unit.flying && shouldChase && formationHelpsChase) {
-          unit.agent.act("Slide")
-          Commander.move(unit)
-        } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
-          t.flying
-          && unit.pixelDistanceEdge(t)          > 0.25 * unit.pixelRangeAgainst(t)
-          && unit.speedApproachingEachOther(t)  < 0
-          && unit.speedApproaching(t)           < 0.9 * unit.topSpeed)) {
+    if (unit.ready && ( ! target.exists(unit.inRangeToAttack) || ! attackIfReady())) {
+      // If we have an attack formation
+      if (engageFormation.isDefined && ! unit.flying && shouldChase && formationHelpsChase) {
+        unit.agent.act("Slide")
+        unit.agent.escalatePriority(TrafficPriorities.Nudge)
+        move()
+
+
+      } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
+        t.flying
+        && unit.pixelDistanceEdge(t)          > 0.25 * unit.pixelRangeAgainst(t)
+        && unit.speedApproachingEachOther(t)  < 0
+        && unit.speedApproaching(t)           < 0.9 * unit.topSpeed)) {
+        unit.agent.act("Dogfight")
+        chase()
+
+      } else if (breakFormationToAttack) {
+        if (shouldChase && idealDistanceForward >= 32) {
           chase()
-        } else if (breakFormationToAttack) {
-          if (shouldChase && idealDistanceForward >= 32) {
-            chase()
-          } else {
-            unit.agent.act("Approach")
-            Commander.attack(unit)
-          }
         } else {
-          unit.agent.act("Move")
-          move()
+          unit.agent.act("Approach")
+          Commander.attack(unit)
         }
+      } else {
+        unit.agent.act("Move")
+        move()
       }
     }
     unit.unready
@@ -328,6 +329,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       val chaseGoal           = ?(step.traversableBy(unit) && unit.pixelDistanceSquared(step) >= unit.pixelDistanceSquared(to), step, to)
       val extraChaseDistance  = Math.max(0, unit.pixelDistanceCenter(chaseGoal) - unit.pixelDistanceCenter(to))
       unit.agent.toTravel     = Some(unit.pixel.project(chaseGoal, idealDistanceForward + extraChaseDistance))
+      unit.agent.escalatePriority(TrafficPriorities.Nudge)
       move()
     }
     unit.unready
@@ -349,8 +351,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (unit.readyForAttackOrder) {
       minimumSpace = Math.min(minimumSpace, target.map(unit.pixelRangeAgainst).getOrElse(unit.pixelRangeMax) - 24)
     }
-    val kite = unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace) || ! attackIfReady()
-    if (kite) {
+    if (unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace) || ! attackIfReady()) {
       Retreat(unit)
     }
     if (idealDistanceForward > 0) {
@@ -395,32 +396,33 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         moveForcefully()
         restrained = target.forall(t => unit.pixelsToGetInRange(t) < unit.pixelsToGetInRangeFrom(t, unit.agent.destination))
         restrained ||= unit.intent.toTravel.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destination, p))
-      } else {
-        if (techniqueIs(Scavenge)) {
-          if ( ! potshot()) {
-            val framesSafe = unit.matchups.threatSoonest.map(_.framesToLaunchAttack(unit)).getOrElse(Forever())
-            val framesToAttack = target.map(unit.framesToLaunchAttack).getOrElse(0)
-            unit.agent.act("Snipe")
-            if (framesToAttack >= framesSafe || ! attackIfReady()) {
-              unit.agent.act("Lurk")
-              unit.agent.escalatePriority(TrafficPriorities.Bump) // Stronger than attackers, less than full retreaters
-              applyForce(Forces.travel,   Potential.towardsTarget(unit))
-              applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, Math.max(unit.topSpeed * framesToAttack, 64.0)))
-              applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10)
-              moveForcefully()
-            }
+      } else if (techniqueIs(Scavenge)) {
+        if ( ! potshot()) {
+          unit.agent.act("Snipe")
+          val framesSafe      = unit.matchups.threatSoonest.map(_.framesToLaunchAttack(unit)).getOrElse(Forever())
+          val framesToAttack  = target.map(unit.framesToLaunchAttack).getOrElse(0)
+          if (framesToAttack >= framesSafe || ! attackIfReady()) {
+            unit.agent.act("Lurk")
+            unit.agent.escalatePriority(TrafficPriorities.Bump) // Stronger than attackers, less than full retreaters
+            applyForce(Forces.target,   Potential.towardsTarget(unit))
+            applyForce(Forces.threat,   Potential.hardAvoidThreatRange(unit, Math.max(unit.topSpeed * framesToAttack, 64.0)))
+            applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10)
+            moveForcefully()
           }
-        } else if (readyToApproachTarget || ! unit.matchups.wantsToVolley.contains(true) || shouldChase) {
-          unit.agent.act("Engage")
-          charge()
-        } else {
-          unit.agent.act("Reposition")
-          val urgency01 = Math.max(0.0, (unit.cooldownMaxAirGround - unit.cooldownLeft).toDouble / (unit.cooldownMaxAirGround))
-          applyForce(Forces.travel,   Potential.towardsTarget(unit) * urgency01)
-          applyForce(Forces.threat,   Potential.softAvoidThreatRange(unit))
-          applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
-          moveForcefully()
         }
+      } else if (readyToApproachTarget || ! unit.matchups.wantsToVolley.contains(true) || shouldChase) {
+        unit.agent.act("Engage")
+        charge()
+      } else {
+        unit.agent.act("Reposition")
+        val urgency01 = Math.max(0.0, (unit.cooldownMaxAirGround - unit.cooldownLeft).toDouble / (unit.cooldownMaxAirGround))
+        // Haven't tried this out; might help with sliding into formation
+        // engageFormation.flatMap(_(unit)).foreach(f => applyForce(Forces.travel, Potential.towards(unit, f)))
+        applyForce(Forces.target,   Potential.towardsTarget(unit) * urgency01)
+        applyForce(Forces.threat,   Potential.softAvoidThreatRange(unit))
+        applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
+
+        moveForcefully()
       }
     }
     unit.unready

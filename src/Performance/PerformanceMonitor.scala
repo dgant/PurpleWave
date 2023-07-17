@@ -1,7 +1,6 @@
 package Performance
 
 import Lifecycle.{PurpleBWClient, With}
-import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import Utilities.?
 import Utilities.Time.{Forever, Seconds}
@@ -20,6 +19,9 @@ class PerformanceMonitor {
   var framesOver10000       : Int   = 0
   var lastTaskWarningFrame  : Int   = -1
   var gameStartMs           : Long  = 0
+  val startMillis           : Long  = systemMillis
+  var lastStopwatchMillis   : Long  = startMillis
+  var lastStopwatchFrames   : Int   = With.frame
 
   def startFrame(): Unit = {
     frameStartMs = systemMillis
@@ -40,7 +42,7 @@ class PerformanceMonitor {
   // https://www.geeksforgeeks.org/java-system-nanotime-vs-system-currenttimemillis/
   def systemMillis        : Long    = System.nanoTime / 1000000
   def frameMaxMs          : Long    = frameTimes.max
-  def frameMeanMs         : Long    = frameTimes.view.map(Math.min(_, 100L)).sum / Math.min(Math.max(1, With.frame), frameTimes.length)
+  def frameMeanMs         : Long    = frameTimes.iterator.map(Math.min(_, 100L)).sum / Math.min(Math.max(1, With.frame), frameTimes.length)
   def frameElapsedMs      : Long    = Math.max(0, systemMillis - frameStartMs)
   def msBeforeTarget      : Long    = ?(With.frame == 0, Forever(), With.configuration.frameTargetMs - ?(frameHitBreakpoint, 0, frameElapsedMs))
   def msBeforeLimit       : Long    = ?(With.frame == 0, Forever(), With.configuration.frameLimitMs  - ?(frameHitBreakpoint, 0, frameElapsedMs))
@@ -60,4 +62,13 @@ class PerformanceMonitor {
     framesOverShort     >= 320
     || framesOver1000   >= 10
     || framesOver10000  >= 1)
+
+  def wallClockDurationMillis: Long = systemMillis  - startMillis
+  def stopwatchDurationMillis: Long = systemMillis  - lastStopwatchMillis
+  def stopwatchDurationFrames: Int  = With.frame    - lastStopwatchFrames
+
+  def resetStopwatch(): Unit = {
+    lastStopwatchMillis = systemMillis
+    lastStopwatchFrames = With.frame
+  }
 }

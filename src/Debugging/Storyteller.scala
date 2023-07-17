@@ -120,6 +120,10 @@ class Storyteller {
       logStrategyEvaluation()
       logStrategyInterest()
     }
+    if (With.performance.stopwatchDurationMillis > 60 * 1000) {
+      With.logger.debug(f"Wall clock: ${With.performance.wallClockDurationMillis / 60 / 1000} minutes elapsed. Checkpoint game speed: ${Decimal(1000d / 24 * With.performance.stopwatchDurationFrames / With.performance.stopwatchDurationMillis)}x. Total game speed: ${Decimal(1000d / 24 * With.frame / With.performance.wallClockDurationMillis)}x")
+      With.performance.resetStopwatch()
+    }
     if (performanceThresholds.exists(_._1() == With.frame)) {
       tell("Storyteller moving to more intermittent updates")
     }

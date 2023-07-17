@@ -16,14 +16,13 @@ object BeShuttle extends Action {
     if (ShuttleAdoptPassenger(shuttle)) return
 
     // Emergency pickups
-    val hailers           = shuttle.agent.passengersPrioritized.filter(p => ! p.loaded && p.agent.wantsPickup)
+    val hailers = shuttle.agent.hailersPrioritized
     val hailersMostUrgent = Maff.orElse(
       hailers.filter(_.doomed),
       hailers.filter(_.likelyDoomed),
       hailers.filter(_.likelyDoomedInFrames < 24),
       hailers.filter(_.matchups.engagedUpon),
-      hailers.filter(_.matchups.pixelsToThreatRange.exists(_ < 64)),
-      hailers)
+      hailers.filter(_.matchups.pixelsToThreatRange.exists(_ < 64)))
     val emergencyHailer = Maff.minBy(hailersMostUrgent)(_.pixelDistanceEdge(shuttle))
     emergencyHailer.foreach(u => {
       pickup(shuttle, u)

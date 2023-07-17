@@ -8,6 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.{GenericUnitGroup, UnitGroup}
 import Utilities.?
+import Utilities.UnitFilters.IsWorker
 
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
@@ -56,6 +57,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def inRangeOfTank               : Boolean           = _inRangeOfTank()
   def targetedByScarab            : Boolean           = _targetedByScarab()
   def withinSafetyMargin          : Boolean           = _withinSafetyMargin()
+  def threateningMiners           : Boolean           = _threateningMiners()
   def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
   def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
@@ -74,6 +76,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _inTankRange          = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
   private val _inRangeOfTank        = new Cache(() => targetsInRange.exists(Terran.SiegeTankSieged))
   private val _withinSafetyMargin   = new Cache(() => pixelsEntangled <= ?(me.flying && me.topSpeed > groupVs.maxAttackerSpeedVsAir, -64, -safetyMargin))
+  private val _threateningMiners    = new Cache(() => targets.exists(t => IsWorker(t) && t.friendly.flatMap(_.intent.toGather).orElse(t.orderTarget).exists(r => r.unitClass.isResource && me.pixelDistanceEdge(r) + me.pixelDistanceEdge(t) < 160 + 2 * me.pixelRangeGround)))
   private val _targetedByScarab     = new Cache(() => me.battle.exists(_.scarabTargets.exists(_._2 == me)))
   private val _framesToLive         = new Cache(() => me.likelyDoomedInFrames)
   private val _wantsToVolley        = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated

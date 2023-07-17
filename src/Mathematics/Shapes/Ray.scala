@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 object Ray {
 
   @inline final def apply(from: Pixel, lengthPixels: Double, radians: Double): Iterator[Pixel] = {
-    apply(from, from.radiateRadians(radians, lengthPixels))
+    apply(from, from.radiateRadians(radians, lengthPixels).clamp())
   }
 
   case class Generator(from: Pixel, to: Pixel) extends Iterator[Pixel] {
@@ -23,6 +23,7 @@ object Ray {
     var lengthSquaredNow  = 0
     var x                 = from.x
     var y                 = from.y
+    var at                = from
 
     var cornerSkip: Option[Pixel] = None
 
@@ -41,8 +42,8 @@ object Ray {
         val timeToNextX     = (nextXCrossing - x) * invVelocityX
         val timeToNextY     = (nextYCrossing - y) * invVelocityY
         val deltaTime       = Math.min(timeToNextX, timeToNextY)
-        x                   = (0.999 + x + velocityX * deltaTime).toInt
-        y                   = (0.999 + y + velocityY * deltaTime).toInt
+        x                   = Math.ceil(x + velocityX * deltaTime).toInt
+        y                   = Math.ceil(y + velocityY * deltaTime).toInt
         lengthSquaredNow    = Maff.squared(x - from.x) + Maff.squared(y - from.y)
         if (Maff.mod32(x) == 0 && Maff.mod32(y) == 0) {
           // We landed right on the corner of the grid, which would cause us to skip a corner tile.

@@ -26,7 +26,7 @@ class SquadWorkerScout extends Squad {
         With.geography.enemyBases.flatMap(b => Vector(b) ++ b.natural ++ b.naturalOf).distinct,
         With.scouting.enemyMain.toVector),
       With.geography.startBases.filterNot(_.scoutedByUs),
-      With.geography.neutralBases)(! _.island).toVector
+      With.geography.neutralBases)( ! _.island).toVector
 
     scoutingAbandoned ||= scouts.exists( ! _.alive)
     scoutingAbandoned ||= basesToScout.isEmpty

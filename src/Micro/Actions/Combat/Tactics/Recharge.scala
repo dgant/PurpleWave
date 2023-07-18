@@ -15,7 +15,7 @@ object Recharge extends Action {
     unit.canMove
     && unit.shieldPoints < unit.unitClass.maxShields
     && With.units.existsOurs(Protoss.ShieldBattery)
-    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight)
+    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight || unit.matchups.pixelsToTargetRange.forall(_ > 320))
     && ( ! unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
   )
   

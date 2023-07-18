@@ -106,7 +106,8 @@ class Storyteller {
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
     new Story[Iterable[Squad]]          ("Active squads",       () => With.squads.all.toVector,                                                                                    _.mkString(", "), expand = true),
     new Story                           ("Attack squad",        () => With.tactics.attackSquad.toString),
-    new Story                           ("Pulling workers",     () => With.tactics.defenseSquads.values.exists(_.workerLock.units.nonEmpty).toString)
+    new Story                           ("Pulling workers",     () => With.tactics.defenseSquads.values.exists(_.workerLock.units.nonEmpty).toString),
+    new Story                           ("Main fully scouted",  () => With.scouting.enemyMainFullyScouted)
   )
 
   private var firstLog: Boolean = true

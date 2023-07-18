@@ -92,7 +92,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       && unit.matchups.threatDeepest.exists(t => unit.canAttack(t) && unit.pixelRangeAgainst(t) >= t.pixelRangeAgainst(unit))
       && unit.totalHealth * 2.0 <= group.meanAttackerHealth
       && unit.totalHealth * 3.0 <= unit.matchups.threatsInPixels(96).map(_.damageOnNextHitAgainst(unit)).sum)
-    transition(Fallback,  unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver))
+    transition(Fallback,  unit.isAny(Terran.SiegeTankUnsieged, Terran.Goliath, Protoss.Reaver) && ! unit.airborne)
     transition(Fallback,
       Protoss.Dragoon(unit)
       && unit.agent.receivedPushPriority() < TrafficPriorities.Shove

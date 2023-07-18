@@ -147,7 +147,7 @@ object Skimulator {
       if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
       if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size * Maff.inv8
       if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(IsGroundWarrior) / 12, 1.0, 2.5)
-      if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.count(Protoss.Shuttle) / team.count(Protoss.Reaver), 1.0, if (Protoss.ShuttleSpeed(unit.player)) 2.0 else 1.5)
+      if (Protoss.Reaver(unit))                                           unit.skimStrength *= ?(unit.friendly.map(_.agent.ride.isDefined).getOrElse(team.units.exists(u => Protoss.Shuttle(u) && u.pixelDistanceEdge(u) < 160)), ?(Protoss.ShuttleSpeed(unit.player), 2.0, 1.5), 1.0)
       if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
       if (Protoss.Dragoon(unit) && Protoss.DragoonRange(player))          unit.skimStrength *= 1.5
       if (Zerg.Zergling(unit)   && Zerg.ZerglingSpeed(player))            unit.skimStrength *= 1.2

@@ -25,59 +25,41 @@ object PvP1012 extends PvPStrategy {
 object PvP3Zealot extends PvPStrategy {
   // You're advantaged when arriving with 3 zealots vs fewer than 3 combat units, which ideally is NZCore but is probably okay vs coreZ too
   whitelistVs(With.fingerprints.coreBeforeZ)
+  // This blacklist essentially bans it, at time of writing
+  blacklistVs(With.fingerprints.twoGate)
 }
 object PvP5Zealot extends PvPStrategy
-object PvPGateCoreRange extends PvPStrategy {
-  // No restrictions; Preserve this as our "Always valid" choice
-}
-object PvPGateCoreGate extends PvPStrategy {
-  whitelistVs(
-    With.fingerprints.proxyGateway,
-    With.fingerprints.twoGate99,
-    With.fingerprints.twoGate)
-}
-object PvPGateCoreTech extends PvPStrategy {
-  setEntranceInverted(false)
-  setEntranceFlat(false)
-}
-object PvP1015 extends PvPStrategy {
-  setEntranceRamped(false)
-  blacklistVs(
-    With.fingerprints.twoGate99,
-    With.fingerprints.proxyGateway,
-    With.fingerprints.mannerPylon)
-  blacklistOn(MapGroups.badForMassGoon: _*)
-}
+object PvPGateCore extends PvPStrategy
 
 ////////////////////////
 // Main continuations //
 ////////////////////////
 
 object PvPRobo extends PvPStrategy {
-  addChoice(PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech, PvP1015)
+  addChoice(PvPGateCore)
   addChoice(PvPObs, PvPReaver)
   // No restrictions; Preserve this as our "Always valid" choice
 }
 object PvPReaver extends PvPStrategy
 object PvPObs extends PvPStrategy
 object PvPDT extends PvPStrategy {
-  addChoice(PvP1012, PvPGateCoreRange, PvPGateCoreGate, PvPGateCoreTech, PvP1015)
+  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
   setRushTilesMinimum(200) // Maybe extend if ramp is high ground
-  setMinimumGamesVsOpponent(1)
-  addChoice(PvPGateCoreRange, PvPGateCoreGate, PvP1015)
+  setMinimumGamesVsOpponent(2)
+  addChoice(PvPGateCore)
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
-  addChoice(PvP1012, PvPGateCoreRange, PvPGateCoreGate)
+  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
   blacklistOn(MapGroups.badForMassGoon: _*)
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
-  addChoice(PvP1012, PvPGateCoreRange, PvPGateCoreGate)
+  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
   blacklistOn(MapGroups.badForMassGoon: _*)
 }

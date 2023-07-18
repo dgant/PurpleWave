@@ -89,7 +89,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     // Prefer flanking the enemy over attacking them through a nasty choke
     if (choke.exists(c => c.to == threatOrigin.zone && c.edge.badness(group, vanguardCentroid.zone) > 1.5)) {
       val paths = zonePathEnd.edges.flatMap(e => With.paths.zonePath(zonePathStart, zonePathEnd, Seq(e))).filter(_.steps.nonEmpty)
-      val best = Maff.minBy(paths)(p => p.length * p.steps.last.edge.badness(group, p.steps.last.from))
+      val best  = Maff.minBy(paths)(p => p.length * p.steps.last.edge.badness(group, p.steps.last.from))
       if (best.exists(b => zonePathToMarch.exists(_.length < b.length))) {
         _flanking = true
       }

@@ -77,6 +77,9 @@ trait EconomicModel {
   def ourLostGas              : Double = _ourLostGas
   def enemyLostMinerals       : Double = _enemyLostMinerals
   def enemyLostGas            : Double = _enemyLostGas
+  def netDamageMinerals       : Double = _enemyLostMinerals - _ourLostMinerals
+  def netDamageGas            : Double = _enemyLostGas - _ourLostGas
+  def netDamage               : Double = netDamageMinerals + 1.5 * netDamageGas
   def ourWorkerMinerals       : Double = 50 * With.units.countOurs(IsWorker)
   def enemyWorkerMinerals     : Double = 50 * With.units.countEnemy(IsWorker)
   def ourProductionMinerals   : Double = _ourProductionMinerals

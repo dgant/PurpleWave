@@ -22,4 +22,7 @@ trait Convert {
   @inline final def signum101 (value: Int)    : Int = if (value < 0) -1 else if (value == 0) 0 else 1
   @inline final def signum101 (value: Double) : Int = if (value < 0) -1 else if (value == 0) 0 else 1
   @inline final def signum11  (value: Int)    : Int = if (value < 0) -1 else 1
+
+  @inline final def or1(output: Double, predicate: Boolean): Double = ?(predicate, output, 1.0)
+  @inline final def or0(output: Double, predicate: Boolean): Double = ?(predicate, output, 0.0)
 }

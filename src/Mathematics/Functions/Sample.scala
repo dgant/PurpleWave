@@ -36,6 +36,10 @@ trait Sample {
     Some(sample(seq))
   }
 
+  final def sampleWeightedValues[T](values: (T, Double)*): Option[T] = {
+    sampleWeighted[(T, Double)](values, _._2).map(_._1)
+  }
+
   @inline final def softmaxSample[T](seq: Seq[T], extract: (T) => Double): Option[T] = {
     val softmaxed: Seq[(T, Double)] = softmax(seq, extract)
     sampleWeighted[(T, Double)](softmaxed, v => v._2).map(_._1)

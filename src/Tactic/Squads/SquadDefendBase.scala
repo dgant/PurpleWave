@@ -1,5 +1,6 @@
 package Tactic.Squads
 
+import Debugging.Visualizations.Forces
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
@@ -7,7 +8,9 @@ import Mathematics.Points.Pixel
 import Micro.Actions.{Action, Idle}
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
 import Micro.Formation._
+import Micro.Heuristics.Potential
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -234,7 +237,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private def emergencyDTHugs(): Boolean = {
     if ( ! With.enemies.exists(_.isProtoss))                      return false
     if ( ! With.units.existsEnemy(Protoss.DarkTemplar))           return false
-    if (enemies.exists(Protoss.DarkTemplar))                      return false
+    if ( ! enemies.exists(Protoss.DarkTemplar))                   return false
     if (With.units.existsOurs(u => IsDetector(u) && u.complete))  return false
     lazy val enemyNearest   = Maff.minBy(enemies.view.filter(IsWarrior))(_.pixelDistanceTravelling(base.heart))
     lazy val dts            = enemies.filter(Protoss.DarkTemplar)
@@ -264,15 +267,20 @@ class SquadDefendBase(base: Base) extends Squad {
       } else {
         var to = pixel
         Potshot.delegate(unit)
-        if (unit.pixel == pixel) {
-          Commander.hold(unit)
-          return
-        } else if (unit.seeminglyStuck) {
-          to = plugEdge().get._1.centroid.center.walkablePixel
+        unit.agent.forces(Forces.pushing) = Potential.followPushes(unit)
+        if (unit.agent.forces.sum.lengthSquared > 0) {
+          MicroPathing.moveForcefully(unit)
+        } else {
+          if (unit.pixel == pixel) {
+            Commander.hold(unit)
+            return
+          } else if (unit.seeminglyStuck) {
+            to = plugEdge().get._1.centroid.center.walkablePixel
+          }
+          unit.agent.toTravel = Some(to)
+          unit.agent.toReturn = Some(to)
+          Commander.move(unit)
         }
-        unit.agent.toTravel = Some(to)
-        unit.agent.toReturn = Some(to)
-        Commander.move(unit)
       }
     }
   }

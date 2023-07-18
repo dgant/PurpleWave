@@ -90,6 +90,6 @@ trait BaseInference {
         || main.townHallTile.y - t.y < 4 // Extends 5 up; ditto
         || main.townHallTile.y - t.y > -6) // Extends 7 down; ditto
     val tilesSeen = scoutableTiles.count(_.explored)
-    _enemyMainScouted = tilesSeen >= scoutableTiles.size * 0.9
+    _enemyMainScouted = tilesSeen >= scoutableTiles.size * 0.85
   }
 }

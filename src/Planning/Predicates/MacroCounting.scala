@@ -170,9 +170,13 @@ trait MacroCounting {
 
   def enemies(matchers: UnitFilter*): Int =  With.units.countEnemy(IsAny(matchers: _*))
 
+  def enemiesHave(matchers: UnitFilter*): Boolean = matchers.exists(With.units.existsEnemy(_))
+
   def enemiesComplete(matchers: UnitFilter*): Int = With.units.countEnemy(IsAll(IsComplete, IsAny(matchers: _*)))
 
   def enemiesCompleteFor(frames: Int, matchers: UnitFilter*): Int = With.units.countEnemy(IsAll(IsCompleteFor(frames), IsAny(matchers: _*)))
+
+  def enemiesHaveComplete(matchers: UnitFilter*): Boolean = matchers.exists(m => With.units.existsEnemy(IsAll(IsComplete, m)))
 
   def enemiesShown(unitClasses: UnitClass*): Int = unitClasses.view.map(With.unitsShown.allEnemies(_)).sum
 

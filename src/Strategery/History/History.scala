@@ -16,7 +16,7 @@ class History {
   def currentEnemyName      : String  = With.configuration.playbook.enemyName
   
   var message = new mutable.ArrayBuffer[String]
-  def onStart() {
+  def onStart(): Unit = {
     message += "Good luck on " + currentMapName + ", " + currentEnemyName + "!"
     message += " "
     
@@ -42,7 +42,7 @@ class History {
     }
   }
   
-  def onEnd(weWon: Boolean) {
+  def onEnd(weWon: Boolean): Unit = {
     val thisGame = HistoricalGame(
       timestamp       = System.currentTimeMillis,
       startLocations  = With.geography.startLocations.size,

@@ -12,7 +12,7 @@ object Opponents {
 
   // AIIDE  2022
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
-  val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT,PvPGateCoreTech))
+  val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   val mcrave      : Opponent = add("McRave",        defaultPvZ)
   val microwave   : Opponent = add("Microwave",     defaultPvZ)
   val steamhammer : Opponent = add("Steamhammer",   defaultPvZ)
@@ -23,7 +23,6 @@ object Opponents {
   val ualbertabot : Opponent = add("UAlbertaBot",   StrategySelectionFixed(PvR2Gate4Gate))
 
   // COG 2022
-  val betastar    : Opponent = add("BetaStar",      StrategySelectionFixed(PvPRobo, PvPGateCoreTech))
   val xiaoyi      : Opponent = add("XIAOYI",        defaultPvT)
 
   // Aliased

@@ -12,7 +12,7 @@ class Fingerprints {
 
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
 
-  def status: Seq[String] = all.filter(_()).map(_.toString.replaceAll("Fingerprint", ""))
+  def status: Seq[String] = all.filter(_()).map(_.toString.replaceAll("Finger", ""))
 
   def relevant: Seq[Fingerprint] =
     Seq(

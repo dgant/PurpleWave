@@ -13,11 +13,31 @@ trait Reduce {
     val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(min, value))
   }
-
   @inline final def clamp(value: Double, bound1: Double, bound2: Double): Double = {
     val min = Math.min(bound1, bound2)
     val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(value, min))
+  }
+
+  @inline final def betweenI(value: Int, bound1: Int, bound2: Int): Boolean = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    value >= min && value <= max
+  }
+  @inline final def betweenE(value: Int, bound1: Int, bound2: Int): Boolean = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    value > min && value < max
+  }
+  @inline final def betweenI(value: Double, bound1: Double, bound2: Double): Boolean = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    value >= min && value <= max
+  }
+  @inline final def betweenE(value: Double, bound1: Double, bound2: Double): Boolean = {
+    val min = Math.min(bound1, bound2)
+    val max = Math.max(bound1, bound2)
+    value > min && value < max
   }
 
   @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.dropRight(1).find(_.nonEmpty).getOrElse(x.last)

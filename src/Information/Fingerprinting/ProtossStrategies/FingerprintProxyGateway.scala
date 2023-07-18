@@ -3,6 +3,7 @@ package Information.Fingerprinting.ProtossStrategies
 import Information.Fingerprinting.Fingerprint
 import Information.Fingerprinting.Generic._
 import Lifecycle.With
+import Mathematics.Maff
 import Utilities.UnitFilters.{IsAll, IsProxied}
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.GameTime
@@ -16,11 +17,10 @@ class FingerprintProxyGateway extends FingerprintAnd(
     new FingerprintCompleteBy(IsAll(Protoss.Gateway, IsProxied), GameTime(5,  0)),
     new Fingerprint {
       override protected def investigate: Boolean = (
-        With.frame > GameTime(1, 30)()
-        && With.frame < GameTime(4, 0)()
-        && With.units.countEnemy(Protoss.Gateway) == 0
-        && With.units.countEnemy(Protoss.Forge) == 0
-        && With.scouting.enemyMainFullyScouted)
+        Maff.betweenI(With.frame, GameTime(1, 30)(), GameTime(4, 0)())
+        &&  ! With.units.existsEnemy(Protoss.Gateway)
+        &&  ! With.units.existsEnemy(Protoss.Forge)
+        &&  With.scouting.enemyMainFullyScouted)
       override protected val reason: String = "Main empty"
     })) {
 

@@ -69,7 +69,7 @@ object StarCraftMaps {
 
 object MapGroups {
   val badForProxying: Vector[StarCraftMap] = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
-  val badForMassGoon: Vector[StarCraftMap] = Vector(Aztec, CircuitBreaker, Destination, MatchPoint, Roadrunner)
+  val badForMassGoon: Vector[StarCraftMap] = Vector(Destination, Roadrunner)
   val narrowRamp    : Vector[StarCraftMap] = Vector(Plasma, ThirdWorld)
 }
 

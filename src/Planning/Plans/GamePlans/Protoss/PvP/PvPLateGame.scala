@@ -46,15 +46,15 @@ class PvPLateGame extends GameplanImperative {
   private def skimEquivalent(unit: UnitInfo): Double = unit.subjectiveValue * Protoss.Zealot.skimulationValue / Protoss.Zealot.subjectiveValue
 
   override def executeBuild(): Unit = {
-    expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && enemies(IsWarrior) == 0 && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
+    expectCarriers = enemyCarriersLikely || (With.fingerprints.forgeFe() && ! enemiesHave(IsWarrior) && (With.frame > Minutes(8)() || enemies(Protoss.PhotonCannon) > 3))
 
     lazy val nonStrengthUs              = unitsNotStrengthening(With.self).map(skimEquivalent).sum
     lazy val nonStrengthEnemy           = unitsNotStrengthening(With.enemy).map(skimEquivalent).sum
     lazy val estimatedArmyDifferential  = With.battles.globalAttack.differential + nonStrengthEnemy - nonStrengthUs
     lazy val commitToTech               = productionCapacity >= 5 && saturated
     primaryTech = primaryTech
-      .orElse(Some(RoboTech)    .filter(x => units(Protoss.RoboticsFacility) > 0))
-      .orElse(Some(TemplarTech) .filter(x => units(Protoss.TemplarArchives) > 0))
+      .orElse(Some(RoboTech)    .filter(x => have(Protoss.RoboticsFacility)))
+      .orElse(Some(TemplarTech) .filter(x => have(Protoss.TemplarArchives)))
       .orElse(Some(TemplarTech) .filter(x => With.units.ours.filter(Protoss.CitadelOfAdun).exists( ! _.knownToOpponents)))
       .orElse(Some(RoboTech)    .filter(x => enemyDarkTemplarLikely))
       .orElse(Some(RoboTech)    .filter(x => With.fingerprints.cannonRush()))
@@ -75,12 +75,13 @@ class PvPLateGame extends GameplanImperative {
     fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
     fearMacro   = miningBases < Math.max(2, enemyBases)
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
-    fearContain ||= enemyDarkTemplarLikely && unitsComplete(Protoss.Observer) == 0
+    fearContain ||= enemyDarkTemplarLikely && ! haveComplete(Protoss.Observer)
     shouldExpand = productionCapacity >= targetProductionCapacity
+    shouldExpand ||= unitsComplete(Protoss.Reaver) >= 4  && unitsComplete(Protoss.Shuttle) >= 2
     shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
     shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
-    shouldExpand ||= unitsComplete(IsWarrior) >= miningBases * 18
+    shouldExpand ||= unitsComplete(IsWarrior) + unitsComplete(Protoss.Reaver) >= miningBases * 18
     shouldExpand ||= miningBases < 2 && frame > Minutes(10)()
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
@@ -91,15 +92,15 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= ! recentlyExpandedFirst
     shouldAttack ||= reaverShuttleCombo
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
-    shouldAttack ||= dtBraveryAbroad && enemiesComplete(Protoss.PhotonCannon) == 0
+    shouldAttack ||= dtBraveryAbroad && ! enemiesHaveComplete(Protoss.PhotonCannon)
     shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     shouldAttack ||= estimatedArmyDifferential > 3 * Protoss.Dragoon.skimulationValue
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
     shouldAttack &&= ! fearDeath
     shouldAttack ||= shouldExpand && With.geography.safeExpansions.isEmpty
-    if (units(Protoss.RoboticsFacility) * units(Protoss.TemplarArchives) == 0) {
+    if ( ! have(Protoss.RoboticsFacility) || ! have(Protoss.TemplarArchives)) {
       shouldSecondaryTech = miningBases > 2
-      shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && unitsComplete(Protoss.Shuttle) > 0)
+      shouldSecondaryTech ||= (unitsComplete(Protoss.Reaver) > 2 && haveComplete(Protoss.Shuttle))
       shouldSecondaryTech ||= enemyDarkTemplarLikely && primaryTech.contains(TemplarTech)
       shouldSecondaryTech ||= unitsComplete(IsWarrior) >= 30
       shouldSecondaryTech &&= productionCapacity >= 7
@@ -107,11 +108,11 @@ class PvPLateGame extends GameplanImperative {
       shouldSecondaryTech &&= gasPumps > 1
       shouldSecondaryTech &&= miningBases > 1
       shouldSecondaryTech &&= ! fearDeath
-      shouldSecondaryTech ||= units(Protoss.RoboticsSupportBay) > 0 && units(Protoss.TemplarArchives) > 0
+      shouldSecondaryTech ||= have(Protoss.RoboticsSupportBay) && have(Protoss.TemplarArchives)
       shouldSecondaryTech ||= primaryTech.contains(RoboTech) && gas > 800
       shouldSecondaryTech ||= unitsComplete(IsWarrior) >= 40
     }
-    if (primaryTech.contains(TemplarTech) && units(Protoss.TemplarArchives) > 0 && enemyDarkTemplarLikely && ! fearDeath) {
+    if (primaryTech.contains(TemplarTech) && have(Protoss.TemplarArchives) && enemyDarkTemplarLikely && ! fearDeath) {
       primaryTech = Some(RoboTech)
     }
 
@@ -205,9 +206,9 @@ class PvPLateGame extends GameplanImperative {
     if (expectCarriers) {
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
-    if (enemies(Protoss.Observer) == 0 || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
+    if ( ! enemiesHave(Protoss.Observer) || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
       pump(Protoss.DarkTemplar, 1)
-      if (unitsComplete(Protoss.DarkTemplar) == 0) {
+      if ( ! haveComplete(Protoss.DarkTemplar)) {
         once(2, Protoss.DarkTemplar)
       }
     }
@@ -229,11 +230,11 @@ class PvPLateGame extends GameplanImperative {
       if (recentlyExpandedFirst || ! shouldAttack) {
         pump(Protoss.Reaver, 2)
       }
-      pumpShuttleAndReavers(2, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
+      pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     }
     pump(Protoss.Observer, 2)
     if (shouldReaver) {
-      pumpShuttleAndReavers(6, shuttleFirst = unitsComplete(Protoss.RoboticsSupportBay) == 0)
+      pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     }
 
     if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
@@ -247,13 +248,13 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doAddProduction(): Unit = {
-    if (units(Protoss.RoboticsFacility) > 0 && shouldReaver) {
+    if (have(Protoss.RoboticsFacility) && shouldReaver) {
       get(Protoss.RoboticsSupportBay)
     }
-    if (units(Protoss.CitadelOfAdun) > 0 && ! enemyRobo) {
+    if (have(Protoss.CitadelOfAdun) && ! enemyRobo) {
       get(Protoss.TemplarArchives)
     }
-    get(?(units(Protoss.RoboticsSupportBay) > 0, 4, 6), Protoss.Gateway)
+    get(?(have(Protoss.RoboticsSupportBay), 4, 6), Protoss.Gateway)
     get(targetGateways + miningBases, Protoss.Gateway)
   }
 
@@ -307,7 +308,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doTemplar(): Unit = {
-    if (units(Protoss.Observer, Protoss.Observatory) == 0) {
+    if ( ! have(Protoss.Observer, Protoss.Observatory)) {
       get(Protoss.Forge)
     }
     get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
@@ -329,7 +330,7 @@ class PvPLateGame extends GameplanImperative {
 
   private def doUpgrades(): Unit = {
     get(Protoss.Forge)
-    if (units(Protoss.TemplarArchives) > 0) {
+    if (have(Protoss.TemplarArchives)) {
       upgradeContinuously(Protoss.GroundDamage)
       upgradeContinuously(Protoss.GroundArmor)
     } else {
@@ -347,8 +348,8 @@ class PvPLateGame extends GameplanImperative {
     if (addForge) {
       get(Protoss.Forge)
     }
-    if (addForge || units(Protoss.Forge) > 0) {
-      if (units(Protoss.Observer) == 0) {
+    if (addForge || have(Protoss.Forge)) {
+      if ( ! have(Protoss.Observer)) {
         buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
       }
       With.geography.ourBasesAndSettlements.view

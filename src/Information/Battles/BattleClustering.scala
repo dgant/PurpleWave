@@ -8,6 +8,7 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
+import Utilities.UnitFilters.IsWarrior
 
 import scala.collection.mutable
 
@@ -114,6 +115,20 @@ class BattleClustering {
     clustersAtWar.foreach(_.measureCentroid())
     clustersAtWar.foreach(_.measureSquads(squadEnemies))
 
+    // If there are no war clusters, try to make one
+    if (clustersAtWar.isEmpty) {
+      val armyFriendly  = Maff.maxBy(clustersAtPeace.filter(c => c.strengthFriendly  > 0  && c.units.exists(u => IsWarrior(u) && u.isFriendly)))(_.strengthFriendly)
+      val armyEnemy     = Maff.maxBy(clustersAtPeace.filter(c => c.strengthEnemy     > 0  && c.units.exists(u => IsWarrior(u) && u.isEnemy)))(_.strengthEnemy)
+      armyFriendly.foreach(f =>
+        armyEnemy.foreach(e => {
+          f.units.addAll(e.units)
+          e.units.clear()
+          clustersAtWar.add(f)
+          clustersAtPeace.remove(f)
+          clustersAtPeace.remove(e)
+        }))
+    }
+
     // Transfer units from peace clusters to war clusters
     clustersAtPeace.foreach(peaceCluster => {
       var i = 0
@@ -142,8 +157,7 @@ class BattleClustering {
     // Re-assess peace clusters; some may still be eligible for battles
     clustersAtPeace.foreach(_.measureBattleEligibility())
 
-
-    // Step 4: Generate battles based on the clusters
+    // Step 6: Generate battles based on the clusters
     With.battles.nextBattlesLocal = (clustersAtWar.view ++ clustersAtPeace.view.filter(_.battleEligible))
       .map(cluster =>
         new Battle(

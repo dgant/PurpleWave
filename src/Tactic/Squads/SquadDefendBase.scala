@@ -153,6 +153,9 @@ class SquadDefendBase(base: Base) extends Squad {
       scour()
     } else if (canGuard) {
       lastAction = "Guard"
+      if (targets.nonEmpty) {
+        formations += formationScour
+      }
       formations += formationGuard
       SquadAutomation.send(this)
     } else {
@@ -247,7 +250,9 @@ class SquadDefendBase(base: Base) extends Squad {
     if (shouldHug) {
       val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
       val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourMain.zone.exitNowOrHeart.center)
-      units.foreach(_.intend(this).setAction(new HugAt(target)))
+      val pixels    = With.units.ours.filter(u => u.unitClass.isDetector && ! u.flying).map(_.pixel).toSeq ++ Seq(target)
+      val pixel     = pixels.minBy(p => dts.map(_.pixelDistanceTravelling(p)).min)
+      units.foreach(_.intend(this).setAction(new HugAt(pixel)))
     }
     shouldHug
   }

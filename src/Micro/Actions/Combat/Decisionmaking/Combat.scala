@@ -276,10 +276,10 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def potshot(): Boolean = {
     if (unit.ready && unit.readyForAttackOrder) {
-      val potshotTarget = Maff.orElse(
+      val potshotTarget = Maff.orElseFiltered(
           Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).filter(TargetFilterPotshot.legal(unit, _)),
           target.filter(TargetFilterPotshot.legal(unit, _)),
-          Target.best(unit, TargetFilterPotshot)).headOption
+          Target.best(unit, TargetFilterPotshot))(unit.canAttack).headOption
       unit.agent.toAttack = potshotTarget.orElse(target)
       if (potshotTarget.exists(TargetFilterPotshot.legal(unit, _))) {
         unit.agent.act("Potshot")
@@ -421,7 +421,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         applyForce(Forces.target,   Potential.towardsTarget(unit) * urgency01)
         applyForce(Forces.threat,   Potential.softAvoidThreatRange(unit))
         applyForce(Forces.leaving,  Potential.towards(unit, unit.agent.safety) * ground10 * (1 - urgency01))
-
         moveForcefully()
       }
     }

@@ -80,16 +80,16 @@ class PvPOpening extends GameplanImperative {
 
     if (sequence == null) {
       sequence = if (PvP1012()) GCGate else {
-        var wRange  =   1.0
         var wTech   =   1.0
-        var wGate   =   5.0
-        wTech       *=  Maff.or1(5,     With.strategy.isRamped)
+        var wGate   =   1.0
+        wTech       *=  (With.geography.startLocations.length - 1)
         wTech       *=  Maff.or1(0,     With.strategy.isFlat || With.strategy.isInverted)
         wTech       *=  Maff.or1(0,     PvP3GateGoon() || PvP4GateGoon() ||  PvPGateCore())
-        wGate       *=  Maff.or1(1000,  enemyRecentStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99))
+        wGate       *=  Maff.or1(2,     enemyRecentStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99))
+        wGate       *=  Maff.or1(1000,  enemyRecentStrategy(With.fingerprints.twoGate))
         wGate       *=  Maff.or1(.0001, enemyRecentStrategy(With.fingerprints.oneGateCore))
         Maff.sampleWeightedValues(
-          (GCRange, wRange),
+          (GCRange, 1.0),
           (GCTech,  wTech),
           (GCGate,  wGate)).getOrElse(GCRange)
       }

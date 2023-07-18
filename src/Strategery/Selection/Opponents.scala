@@ -10,20 +10,16 @@ object Opponents {
   val defaultPvP = StrategySelectionGreedy()
   val defaultPvZ = StrategySelectionGreedy()
 
-  // AIIDE  2022
+  // COG 2023
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   val mcrave      : Opponent = add("McRave",        defaultPvZ)
   val microwave   : Opponent = add("Microwave",     defaultPvZ)
-  val steamhammer : Opponent = add("Steamhammer",   defaultPvZ)
   val cunybot     : Opponent = add("CUNYbot",       defaultPvZ)
-  val styx        : Opponent = add("Styx",          defaultPvZ)
-  val dragon      : Opponent = add("Dragon",        defaultPvT)
-  val pylonpuller : Opponent = add("PylonPuller",   defaultPvP)
-  val ualbertabot : Opponent = add("UAlbertaBot",   StrategySelectionFixed(PvR2Gate4Gate))
-
-  // COG 2022
   val xiaoyi      : Opponent = add("XIAOYI",        defaultPvT)
+
+  // AIIDE 2022
+  val ualbertabot : Opponent = add("UAlbertaBot",   StrategySelectionFixed(PvR2Gate4Gate))
 
   // Aliased
   //val adias       : Opponent = add("adias")
@@ -33,7 +29,7 @@ object Opponents {
   // Aliases
   val bryanweber        : Opponent = add("Bryan Weber",         cunybot.policy)
   val mcravez           : Opponent = add("McRaveZ",             mcrave.policy)
-  val styxz             : Opponent = add("StyxZ",               styx.policy)
+  //val styxz             : Opponent = add("StyxZ",               styx.policy)
   //val chriscoxe         : Opponent = add("Chris Coxe",          zzzkbot.policy)
   val davechurchill     : Opponent = add("Dave Churchill",      ualbertabot.policy)
   //val saida             : Opponent = add("SAIDA",               adias.policy)

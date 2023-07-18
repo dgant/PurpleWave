@@ -177,7 +177,7 @@ class PvPOpening extends GameplanImperative {
     // A glimpse of Citadel doesn't sufficiently justify switching into Obs for its own sake,
     // as the Citadel could be a fake and the investment is a lot less than making even one Observer,
     // but a switch into full-blown Robotics at least lets us benefit from the investment if the Citadel was a fake
-    if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && ! enemiesHave(Protoss.CitadelOfAdun) && units(Protoss.Gateway) < 3) {
+    if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && enemiesHave(Protoss.CitadelOfAdun) && units(Protoss.Gateway) < 3) {
       if (roll("SwapGateIntoRoboVsCitadel", 0.3)) {
         PvPCoreExpand.swapOut()
         PvP3GateGoon.swapOut()
@@ -382,7 +382,7 @@ class PvPOpening extends GameplanImperative {
       // Amp up aggression to ensure we can get down our ramp
       aggression(1.0 + 0.25 * unitsComplete(Protoss.Reaver))
     }
-    PvPIdeas.considerMonitoring()
+    PvPIdeas.monitorSafely()
 
     /////////////
     // Logging //

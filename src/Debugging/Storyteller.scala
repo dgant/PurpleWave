@@ -195,7 +195,7 @@ class Storyteller {
         DrawScreen.padTable(
           Vector(Vector("Action", "Invocations", "Mean (ms)", "Total (secs)"))
           ++ With.agents.actionPerformance.toVector.sortBy(- _._2.meanMs).map(p => Vector(
-            p._1.name,
+            p._1,
             p._2.invocations.toString,
             formatterMs.format(p._2.meanMs),
             formatterMs.format(p._2.totalMs.toInt / 1000))))))

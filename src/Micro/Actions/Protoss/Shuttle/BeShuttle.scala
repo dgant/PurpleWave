@@ -42,7 +42,7 @@ object BeShuttle extends Action {
     */
 
     // Ordinary pickups/dropoffs/parking
-    val fighting = shuttle.agent.passengers.exists(p => p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined)
+    val fighting = shuttle.agent.passengers.exists(p => p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined || (p.battle.isDefined && p.agent.shouldFight))
     val quests = shuttle.agent.passengersPrioritized.flatMap(p => {
       val goal = p.agent.rideGoal
       if (p.loaded) {
@@ -59,7 +59,7 @@ object BeShuttle extends Action {
         goal.map(g => (
           p,
           "Pickup",
-          shuttle.pixelDistanceEdge(p) - ?(fighting, 0, p.pixelDistanceCenter(g) * Maff.nanToOne(shuttle.topSpeed / p.topSpeed)),
+          shuttle.pixelDistanceEdge(p) * Maff.or1(0.05, fighting),
           () => pickup(shuttle, p)))
       } else if (p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
 

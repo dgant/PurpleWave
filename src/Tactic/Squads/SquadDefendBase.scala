@@ -153,7 +153,7 @@ class SquadDefendBase(base: Base) extends Squad {
       scour()
     } else if (canGuard) {
       lastAction = "Guard"
-      if (targets.nonEmpty) {
+      if (targets.exists(_.nonEmpty)) {
         formations += formationScour
       }
       formations += formationGuard
@@ -257,7 +257,7 @@ class SquadDefendBase(base: Base) extends Squad {
     shouldHug
   }
 
-  private class HugAt(pixel: Pixel) extends Action {
+  private case class HugAt(pixel: Pixel) extends Action {
     override def perform(unit: FriendlyUnitInfo): Unit = {
       unit.agent.toTravel = Some(pixel)
       Potshot.delegate(unit)
@@ -265,7 +265,7 @@ class SquadDefendBase(base: Base) extends Squad {
     }
   }
 
-  private class Plug(pixel: Pixel) extends Action {
+  private case class Plug(pixel: Pixel) extends Action {
     override def perform(unit: FriendlyUnitInfo): Unit = {
       if (unit.matchups.threats.exists(IsWarrior) || (unit.unitClass.ranged && unit.matchups.targets.exists(_.base.exists(_.isStartLocation)))) {
         Idle.perform(unit)

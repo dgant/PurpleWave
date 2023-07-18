@@ -20,14 +20,14 @@ object ShuttlePark extends Action {
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(_.matchups.pixelsEntangled)
-    val centroid  = Maff.centroid(exposed.map(_.pixel))
+    val centroid  = Maff.centroid(Maff.orElse(exposed.map(_.pixel), Seq(shuttle.pixel)))
     val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
-    val towards   = new ArrayBuffer[Pixel]
-    exposed.foreach(ally  => towards += ally.pixel)
-    threat.foreach(threat => towards += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
+    val goals     = new ArrayBuffer[Pixel]
+    exposed.foreach(ally  => goals += ally.pixel)
+    threat.foreach(threat => goals += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
 
-    if (towards.nonEmpty) {
-      val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge, towards: _*)
+    if (goals.nonEmpty) {
+      val to = MicroPathing.pullTowards(Shuttling.pickupRadiusEdge, goals: _*)
       shuttle.agent.toTravel = Some(to)
       if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
         Retreat.delegate(shuttle)

@@ -41,7 +41,7 @@ class MissionStormDrop extends MissionDrop {
   override protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
     targets.foreach(ts => setTargets(ts.filter(t => t.unitClass.isWorker || units.exists(u => t.canAttack(u) && t.inRangeToAttack(u)))))
-    transports.foreach(_.intend(this).setAction(new ActionRaidTransport))
+    transports.foreach(_.intend(this).setAction(ActionRaidTransport))
     passengers.foreach(_.intend(this).setTravel(vicinity))
     passengers.foreach(_.agent.commit = true)
   }

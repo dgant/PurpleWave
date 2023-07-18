@@ -147,20 +147,22 @@ class PvPLateGame extends GameplanImperative {
       }
     }
 
-    if (PvPIdeas.recentlyExpandedFirst) status("Pioneer")
-    if (dtBraveryHome) status("DTBraveHome")
-    if (dtBraveryAbroad) status("DTBraveAbroad")
-    if (fearDeath) status("FearDeath")
-    if (fearMacro) status("FearMacro")
-    if (fearContain) status("FearContain")
-    if (expectCarriers) status("ExpectCarriers")
-    if (shouldReaver) status("Reaver")
-    if (shouldSecondaryTech) status("2Tech")
-    if (shouldExpand) status("Expand")
-    if (shouldAttack) { status("Attack"); attack() }
-    if (shouldHarass) { status("Harass"); harass() }
+    status(PvPIdeas.recentlyExpandedFirst,  "Pioneer")
+    status(dtBraveryHome,                   "DTBraveHome")
+    status(dtBraveryAbroad,                 "DTBraveAbroad")
+    status(fearDeath,                       "FearDeath")
+    status(fearMacro,                       "FearMacro")
+    status(fearContain,                     "FearContain")
+    status(expectCarriers,                  "ExpectCarriers")
+    status(shouldReaver,                    "Reaver")
+    status(shouldSecondaryTech,             "2Tech")
+    status(shouldExpand,                    "Expand")
+    status(shouldAttack,                    "Attack")
+    status(shouldHarass,                    "Harass")
+    if (shouldAttack) attack()
+    if (shouldHarass) harass()
     primaryTech.map(_.toString.replaceAll("Tech", "")).foreach(status)
-    PvPIdeas.considerMonitoring()
+    PvPIdeas.monitorSafely()
   }
 
   override def executeMain(): Unit = {

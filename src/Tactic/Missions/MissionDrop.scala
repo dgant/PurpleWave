@@ -183,31 +183,31 @@ abstract class MissionDrop extends Mission {
     }
   }
   private def assemble(): Unit = {
-    transports.foreach(_.intend(this).setAction(new ActionAssembleTransport))
-    passengers.foreach(_.intend(this).setAction(new ActionAssemblePassenger))
+    transports.foreach(_.intend(this).setAction(ActionAssembleTransport))
+    passengers.foreach(_.intend(this).setAction(ActionAssemblePassenger))
   }
   private def travel(): Unit = {
-    transports.foreach(_.intend(this).setAction(new ActionTravelTransport))
+    transports.foreach(_.intend(this).setAction(ActionTravelTransport))
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
   private def land(): Unit = {
-    transports.foreach(_.intend(this).setAction(new ActionLandTransport))
-    passengers.foreach(_.intend(this).setAction(new ActionLandPassenger))
+    transports.foreach(_.intend(this).setAction(ActionLandTransport))
+    passengers.foreach(_.intend(this).setAction(ActionLandPassenger))
   }
   protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
-    transports.foreach(_.intend(this).setAction(new ActionRaidTransport))
+    transports.foreach(_.intend(this).setAction(ActionRaidTransport))
     passengers.foreach(_.intend(this).setTravel(vicinity))
     passengers.foreach(_.agent.commit = true)
   }
   private def evacuate(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this).setAction(new ActionEvacuateTransport))
-    passengers.foreach(_.intend(this).setAction(new ActionEvacuatePassenger))
+    transports.foreach(_.intend(this).setAction(ActionEvacuateTransport))
+    passengers.foreach(_.intend(this).setAction(ActionEvacuatePassenger))
   }
   private def escape(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this).setAction(new ActionEscapeTransport))
+    transports.foreach(_.intend(this).setAction(ActionEscapeTransport))
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
 
@@ -238,7 +238,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionAssembleTransport extends Action {
+  object ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       passengers.foreach(transport.agent.addPassenger)
       val unloaded = passengers.filterNot(_.loaded)
@@ -263,7 +263,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionAssemblePassenger extends Action {
+  object ActionAssemblePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       passenger.agent.toTravel = Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)
       passenger.agent.toReturn = passenger.agent.toTravel
@@ -273,7 +273,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionTravelTransport extends Action {
+  object ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       lazy val pathValueChanged = pathValues.indices.take(path.get.length).find(i =>
             path.get.tiles.get(i).enemyRange != pathValues(i).enemyRange
@@ -308,7 +308,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionLandTransport extends Action {
+  object ActionLandTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
@@ -324,31 +324,31 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionLandPassenger extends Action {
+  object ActionLandPassenger extends Action {
     override protected def perform(unit: FriendlyUnitInfo): Unit = {
       if ( ! unit.loaded) Idle.delegate(unit)
     }
   }
 
-  class ActionRaidTransport extends Action {
+  object ActionRaidTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      if (passengers.isEmpty) new ActionEscapeTransport().delegate(transport) else {
+      if (passengers.isEmpty) ActionEscapeTransport.delegate(transport) else {
         transport.agent.toTravel = Some(Maff.centroid(Maff.orElse(passengers.view.filterNot(_.loaded), passengers.view).map(_.pixel)))
         Commander.move(transport)
       }
     }
   }
 
-  class ActionEvacuateTransport extends Action {
+  object ActionEvacuateTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengers.filterNot(_.loaded)
-      if (unloaded.isEmpty) new ActionEscapeTransport().delegate(transport) else {
+      if (unloaded.isEmpty) ActionEscapeTransport.delegate(transport) else {
         Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(Maff.centroid(unloaded.view.map(_.pixel)))))
       }
     }
   }
 
-  class ActionEvacuatePassenger extends Action {
+  object ActionEvacuatePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       if (transports.isEmpty) {
         passenger.agent.commit = true
@@ -360,7 +360,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  class ActionEscapeTransport extends Action {
+  object ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       transport.agent.toTravel = Some(transport.agent.home)
       Retreat.delegate(transport)

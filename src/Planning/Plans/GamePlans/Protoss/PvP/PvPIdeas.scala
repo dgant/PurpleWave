@@ -28,7 +28,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def recentlyExpandedFirst: Boolean = With.scouting.weExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)()
 
-  def considerMonitoring(): Unit = {
+  def monitorSafely(): Unit = {
     With.blackboard.monitorBases.set(
       ! enemyRobo
       && enemies(Protoss.Observer, Protoss.DarkTemplar) == 0

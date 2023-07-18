@@ -84,7 +84,7 @@ object Skimulator {
       battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimDistanceToEngage = Maff.clamp(u.skimDistanceToEngage - u.topSpeed * With.framesSince(u.lastSeen), u.skimDistanceToEngage, enemyMeanVisibleDistance))
     }
 
-    battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Maff.meanOpt(team.units.view.filter(IsWarrior).map(_.skimDistanceToEngage)).getOrElse(LightYear()))
+    battle.teams.foreach(team => team.skimMeanWarriorDistanceToEngage = Math.min(320d, Maff.medianOpt(team.units.view.filter(IsWarrior).map(_.skimDistanceToEngage)).getOrElse(LightYear().toDouble)))
     battle.teams.foreach(team => team.units.foreach(unit => {
       // Calculate speed, accounting reasonably for immobile units
       val speed                 = Math.max(unit.topSpeed, if (unit.isFriendly) 0 else if (IsTank(unit) && ! unit.visible) Terran.SiegeTankUnsieged.topSpeed else Protoss.Reaver.topSpeed * 0.25)

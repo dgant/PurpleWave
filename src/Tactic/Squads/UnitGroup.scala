@@ -27,7 +27,7 @@ trait UnitGroup {
   def battles           : Set[Battle]   = _battles()
   def battleEnemies     : Set[UnitInfo] = _battleEnemies()
   def roadblocks        : Set[UnitInfo] = _roadblocks()
-  def warriorsCastersCount     : Int       = _warriorsCastersCount()
+  def warriorsCastersCount      : Int       = _warriorsCastersCount()
   def attackersBioCount         : Int       = _attackersBioCount()
   def stormCount                : Int       = _stormCount()
   def airToAirStrength          : Int       = _airToAirStrength()

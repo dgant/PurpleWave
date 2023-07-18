@@ -2,8 +2,10 @@ package Mathematics.Functions
 
 import Utilities.?
 
+import scala.reflect.ClassTag
+
 trait Convert {
-  def kast[T](o: Any): Option[T] = ?(o.isInstanceOf[T], Some(o.asInstanceOf[T]), None)
+  def kast[T](o: Any)(implicit tag: ClassTag[T]): Option[T] = ?(o.isInstanceOf[T], Some(o.asInstanceOf[T]), None)
 
   @inline final def fromBoolean (value: Boolean)    : Int     = if (value) 1 else 0
   @inline final def toBoolean   (value: Int)        : Boolean = value != 0

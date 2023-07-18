@@ -448,7 +448,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Protoss.Scout)             0.75
     else if (this == Protoss.Carrier)           7
     else if (this == Protoss.Arbiter)           0.5
-    else if (this == Protoss.Reaver)            2.0
+    else if (this == Protoss.Reaver)            3.0
     else if (this == Protoss.PhotonCannon)      1
     else if (this == Zerg.Zergling)             0.25
     else if (this == Zerg.Hydralisk)            0.75

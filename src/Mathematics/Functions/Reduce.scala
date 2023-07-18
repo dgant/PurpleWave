@@ -2,6 +2,9 @@ package Mathematics.Functions
 
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
+import Utilities.?
+
+import scala.collection.mutable
 
 trait Reduce {
 
@@ -23,7 +26,22 @@ trait Reduce {
   @inline final def ??[T >: Null](x: T*): T = x.find(_ != null).orNull
 
   @inline final def mode[T](values: Traversable[T]): T = values.groupBy(x => x).maxBy(_._2.size)._1
-  @inline final def modeOpt[T](values: Traversable[T]): Option[T] = if (values.isEmpty) None else Some(Maff.mode(values))
+  @inline final def modeOpt[T](values: Traversable[T]): Option[T] = ?(values.isEmpty, None, Some(Maff.mode(values)))
+
+  @inline final def median[T: Ordering](values: Traversable[T]): T = {
+    val pq = new mutable.PriorityQueue[T]
+    pq ++= values
+    val halfLength = Maff.div2(pq.length)
+    var i = 0
+    while (i < halfLength) {
+      pq.dequeue()
+      i += 1
+    }
+    pq.dequeue()
+  }
+  @inline final def medianOpt[T: Ordering](values: Traversable[T]): Option[T] = {
+    ?(values.isEmpty, None,  Some(median(values)))
+  }
 
   @inline final def mean(values: TraversableOnce[Double]): Double = {
     if (values.isEmpty) 0.0 else {

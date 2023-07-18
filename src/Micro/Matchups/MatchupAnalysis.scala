@@ -76,7 +76,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _inTankRange          = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
   private val _inRangeOfTank        = new Cache(() => targetsInRange.exists(Terran.SiegeTankSieged))
   private val _withinSafetyMargin   = new Cache(() => pixelsEntangled <= ?(me.flying && me.topSpeed > groupVs.maxAttackerSpeedVsAir, -64, -safetyMargin))
-  private val _threateningMiners    = new Cache(() => targets.exists(t => IsWorker(t) && t.friendly.flatMap(_.intent.toGather).orElse(t.orderTarget).exists(r => r.unitClass.isResource && me.pixelDistanceEdge(r) + me.pixelDistanceEdge(t) < 160 + 2 * me.pixelRangeGround)))
+  private val _threateningMiners    = new Cache(() => targets.exists(t => IsWorker(t) && t.friendly.flatMap(_.intent.toGather).orElse(t.orderTarget).exists(r => r.unitClass.isResource && r.base.exists(t.base.contains) && me.pixelDistanceEdge(r) + me.pixelDistanceEdge(t) < 160 + 2 * me.pixelRangeGround)))
   private val _targetedByScarab     = new Cache(() => me.battle.exists(_.scarabTargets.exists(_._2 == me)))
   private val _framesToLive         = new Cache(() => me.likelyDoomedInFrames)
   private val _wantsToVolley        = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated

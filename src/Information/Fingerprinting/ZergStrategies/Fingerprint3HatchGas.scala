@@ -1,7 +1,7 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic.{FingerprintAnd, FingerprintGasCompleteBy, FingerprintNot, FingerprintOr}
-import Information.Fingerprinting.Strategies.ZergTimings
+import Information.Fingerprinting.ZergStrategies.ZergTimings.ThreeHatchGasCompleteBy
 import Lifecycle.With
 import Utilities.Time.Seconds
 
@@ -11,4 +11,4 @@ class Fingerprint3HatchGas extends FingerprintAnd(
   new FingerprintOr(
     With.fingerprints.twelveHatchHatch,
     With.fingerprints.twelveHatchPoolHatch,
-    new FingerprintGasCompleteBy(ZergTimings.ThreeHatchGasCompleteBy + Seconds(25))))
+    new FingerprintGasCompleteBy(ThreeHatchGasCompleteBy + Seconds(25))))

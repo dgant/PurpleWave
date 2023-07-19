@@ -2,6 +2,7 @@ package Lifecycle
 
 import Debugging._
 import Placement.JBWEBWrapper
+import Utilities.?
 import bwapi.{DefaultBWListener, Player}
 import jbweb.Walls
 
@@ -69,7 +70,7 @@ class PurpleWave extends DefaultBWListener {
   
   override def onEnd(isWinner: Boolean): Unit = {
     tryCatch(() => {
-      With.logger.debug("Game ended in " + (if (isWinner) "victory" else "defeat"))
+      With.logger.debug(f"Game ended in ${?(isWinner, "victory", "defeat")}")
       With.history.onEnd(isWinner)
       With.gathering.onEnd()
       With.storyteller.onEnd()

@@ -29,6 +29,7 @@ abstract class PvZ1BaseAllIn extends PvZ1BaseOpenings {
         var canAttackEarly    = opening == Open910
         canAttackEarly      ||= opening == Open1012
         canAttackEarly      ||= opening == OpenZZCoreZ    && With.fingerprints.twelveHatch()
+        canAttackEarly      ||= haveComplete(Protoss.Scout,  Protoss.DarkTemplar)
         canAttackEarly      &&= unitsEver(IsWarrior) >= 5 || With.fingerprints.twelveHatch()
         canAttackEarly      &&= safePushing
         canAttackEarly      &&= ! With.fingerprints.twoHatchMain()

@@ -37,6 +37,7 @@ object PvTZZCoreZ       extends PvTStrategy {
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
 }
 object PvT910 extends PvTStrategy {
+  setMinimumGamesVsOpponent(3)
   whitelistVs(
     With.fingerprints.workerRush,
     With.fingerprints.proxyRax,

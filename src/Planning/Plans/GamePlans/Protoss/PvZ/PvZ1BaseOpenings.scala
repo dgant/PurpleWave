@@ -150,7 +150,7 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
     if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && ! have(Protoss.Assimilator)) {
       if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool)) {
         opening = Open910
-      } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && allowExpanding && roll("SwapGateNexus", 0.75)) {
+      } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && allowExpanding) {
         opening = OpenGateNexus
       } else if (With.fingerprints.overpool() || With.fingerprints.twelveHatch()) {
         opening = OpenZZCoreZ
@@ -170,7 +170,7 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
     }
     scoutOn(Protoss.Pylon)
     With.blackboard.scoutExpansions.set(false)
-    status(anticipateSpeedlings,  "Speedlings")
+    status(anticipateSpeedlings, "Speedlings")
     status(opening.toString)
   }
 }

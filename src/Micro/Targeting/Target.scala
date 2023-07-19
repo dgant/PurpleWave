@@ -2,7 +2,7 @@ package Micro.Targeting
 
 import Lifecycle.With
 import Mathematics.Maff
-import Micro.Targeting.FiltersRequired.{TargetFilterCanAttack, TargetFilterEnemy, TargetFilterFocus, TargetFilterMissing, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterType, TargetFilterVsTank, TargetFilterVulture}
+import Micro.Targeting.FiltersRequired.{TargetFilterAntiAir, TargetFilterCanAttack, TargetFilterEnemy, TargetFilterFocus, TargetFilterMissing, TargetFilterReaver, TargetFilterRush, TargetFilterScourge, TargetFilterStayCloaked, TargetFilterType, TargetFilterVsTank, TargetFilterVulture}
 import Micro.Targeting.FiltersSituational.TargetFilterWhitelist
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
@@ -17,6 +17,7 @@ object Target {
     TargetFilterFocus,
     TargetFilterStayCloaked,
     TargetFilterScourge,
+    TargetFilterAntiAir,
     TargetFilterReaver,
     TargetFilterRush,
     TargetFilterVulture,
@@ -78,7 +79,9 @@ object Target {
 
   def legal(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], filters: TargetFilter*): Seq[UnitInfo] = {
     val allFilters = filtersRequired(attacker) ++ filters
-    targets.view.filter(target => With.yolo.active || allFilters.forall(_.legal(attacker, target)))
+    targets.view.filter(target => ?(With.yolo.active,
+      TargetFilterType.legal(attacker, target),
+      allFilters.forall(_.legal(attacker, target))))
   }
 
   def filtersRequired(attacker: FriendlyUnitInfo): Seq[TargetFilter] = {

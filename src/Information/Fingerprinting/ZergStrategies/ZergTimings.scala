@@ -1,4 +1,4 @@
-package Information.Fingerprinting.Strategies
+package Information.Fingerprinting.ZergStrategies
 
 import Utilities.Time.{GameTime, Seconds}
 
@@ -34,7 +34,7 @@ object ZergTimings {
   object TenHatch9Pool_PoolCompleteBy             extends GameTime(2, 37)
   object TenHatch9Pool8Gas_GasCompleteBy          extends GameTime(2, 23) // Speculative. Didn't have a replay to measure. Estimated based on 14 seconds of 12h11p10 and overpool8gas
   object TwelveHatch_HatchCompleteBy              extends GameTime(3, 0)
-  object TwelveHatch11Pool_PoolCompleteBy         extends GameTime(2, 55)
+  object TwelveHatch11Pool_PoolCompleteBy         extends GameTime(2, 51)
   object TwelveHatch11Pool10Gas_GasCompleteBy     extends GameTime(2, 38)
   object TwelveHatch11Pool13Hatch_HatchCompleteBy extends GameTime(3, 50)
   object TwelveHatch12Pool_PoolCompleteBy         extends GameTime(2, 56)

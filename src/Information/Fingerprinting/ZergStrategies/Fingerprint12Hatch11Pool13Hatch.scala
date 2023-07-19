@@ -1,7 +1,7 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
-import Information.Fingerprinting.Strategies.ZergTimings
+import Information.Fingerprinting.ZergStrategies.ZergTimings.TwelveHatch12Pool_GasCompleteBy
 import Lifecycle.With
 import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.Races.Zerg
@@ -16,4 +16,4 @@ class Fingerprint12Hatch11Pool13Hatch extends FingerprintAnd(
     // Match 12h11p followed by no gas (maybe there's a 3rd hatch we haven't seen, especially if it's at an expansion)
     new FingerprintAnd(
       With.fingerprints.twelveHatchPool,
-      new FingerprintGasEmptyUntil(ZergTimings.TwelveHatch12Pool_GasCompleteBy - Frames(Zerg.Extractor.buildFrames) + Seconds(15)))))
+      new FingerprintGasEmptyUntil(TwelveHatch12Pool_GasCompleteBy - Frames(Zerg.Extractor.buildFrames) + Seconds(15)))))

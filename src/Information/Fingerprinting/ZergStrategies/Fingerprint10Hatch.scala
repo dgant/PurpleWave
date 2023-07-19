@@ -1,7 +1,6 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic.{FingerprintCompleteBy, FingerprintOr}
-import Information.Fingerprinting.Strategies.ZergTimings
 import Lifecycle.With
 import Utilities.UnitFilters.IsHatchlike
 import Utilities.Time.Seconds

@@ -1,7 +1,7 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
-import Information.Fingerprinting.Strategies.ZergTimings
+import Information.Fingerprinting.ZergStrategies.ZergTimings.Overpool11Hatch_HatchCompleteBy
 import Lifecycle.With
 import Utilities.UnitFilters.IsHatchlike
 import ProxyBwapi.Races.Zerg
@@ -12,4 +12,4 @@ class FingerprintOverpoolHatch extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.overpoolGas),
   new FingerprintOr(
     new FingerprintCompleteBy(IsHatchlike, ZergTimings.Overpool11Hatch_HatchCompleteBy + Seconds(10)),
-    new FingerprintGasEmptyUntil(ZergTimings.Overpool11Hatch_HatchCompleteBy - Frames(Zerg.Hatchery.buildFrames))))
+    new FingerprintGasEmptyUntil(Overpool11Hatch_HatchCompleteBy - Frames(Zerg.Hatchery.buildFrames))))

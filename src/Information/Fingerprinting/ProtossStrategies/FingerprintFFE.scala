@@ -6,11 +6,9 @@ import Mathematics.Maff
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.GameTime
-import Utilities.UnitFilters._
 import bwapi.Race
 
 abstract class FingerprintFFE extends FingerprintAnd(
-  new FingerprintRace(Race.Protoss),
   new FingerprintNot(With.fingerprints.proxyGateway),
   new FingerprintNot(With.fingerprints.cannonRush),
   new FingerprintNot(With.fingerprints.twoGate),

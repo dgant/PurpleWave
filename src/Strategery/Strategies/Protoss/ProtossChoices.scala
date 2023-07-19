@@ -86,11 +86,11 @@ object ProtossChoices {
   )
 
   val vsZerg_OpenersTransitioningFrom_1GateCore = Vector(
-    PvZ2022, PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon
+    PvZ2022, PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon, PvZ1BaseStargate
   )
 
   val vsZerg_OpenersTransitioningFrom_2Gate = Vector(
-    PvZ2022, PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon
+    PvZ2022, PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon, PvZ1BaseStargate
   )
 
   val vsZerg_Openers: Vector[Strategy] = (vsZerg_NeverVsRandom ++ vsZerg_OpenersTransitioningFrom_1GateCore ++ vsZerg_OpenersTransitioningFrom_2Gate).distinct

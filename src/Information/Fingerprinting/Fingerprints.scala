@@ -146,6 +146,7 @@ class Fingerprints {
   lazy val overpoolHatch        = addFingerprint(new FingerprintOverpoolHatch)
   lazy val twelvePool           = addFingerprint(new Fingerprint12Pool)
   lazy val twelvePoolGas        = addFingerprint(new Fingerprint12Pool11Gas)
+  lazy val hatchFirst           = addFingerprint(new FingerprintHatchFirst)
   lazy val tenHatch             = addFingerprint(new Fingerprint10Hatch)
   lazy val tenHatchPool         = addFingerprint(new Fingerprint10Hatch9Pool)
   lazy val tenHatchPoolGas      = addFingerprint(new Fingerprint10Hatch9Pool8Gas)

@@ -145,10 +145,13 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       }
       val apexI = Maff.minBy(goalPathTiles.indices)(i => scoreApex(i, goalPathTiles(i)))
       apex      = apexI.map(goalPathTiles(_).center).getOrElse(goal)
-      face      = targetNear
-        .map(_.pixel)
-        .orElse(apexI.map(_ + 1 + Maff.div32(group.meanAttackerRange.toInt)).flatMap(goalPathTiles.drop(_).lastOption).map(_.center))
-        .getOrElse(goal)
+      face      = targetNear.map(_.pixel).getOrElse(?(
+        style == FormationStyleDisengage,
+        vanguardCentroid,
+        apexI
+          .map(_ + 1 + Maff.div32(group.meanAttackerRange.toInt))
+          .flatMap(goalPathTiles.drop(_).lastOption).map(_.center)
+          .getOrElse(?(style == FormationStyleDisengage, vanguardCentroid, goal))))
     }
   }
 

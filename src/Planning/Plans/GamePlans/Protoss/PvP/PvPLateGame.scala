@@ -93,7 +93,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= reaverShuttleCombo
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && ! enemiesHaveComplete(Protoss.PhotonCannon)
-    shouldAttack ||= With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl)) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    shouldAttack ||= (With.scouting.ourMuscleOrigin.metro.exists(_.isEnemy) || With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl))) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     shouldAttack ||= estimatedArmyDifferential > 3 * Protoss.Dragoon.skimulationValue
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
     shouldAttack &&= ! fearDeath

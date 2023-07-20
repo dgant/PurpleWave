@@ -12,7 +12,7 @@ object Opponents {
 
   // COG 2023
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
-  val stardust    : Opponent = add("Stardust",      StrategySelectionRandom) //new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
+  val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
   val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))
   val cunybot     : Opponent = add("CUNYbot",       StrategySelectionFixed(PvZ1BaseSpeedlotArchon))

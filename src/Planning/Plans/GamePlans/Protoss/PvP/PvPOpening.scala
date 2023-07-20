@@ -357,6 +357,7 @@ class PvPOpening extends GameplanImperative {
     } else if (PvPRobo()) {
       shouldExpand    = haveComplete(Protoss.Reaver)
       shouldExpand  ||= ! getReavers && unitsComplete(IsWarrior) >= ?(enemyBases > 1, 6, 12)
+      shouldExpand  ||= enemyRobo
       shouldExpand  &&= PvPIdeas.pvpSafeToMoveOut
       shouldExpand  &&= ! shuttleSpeed
       shouldExpand  &&= Protoss.DragoonRange()

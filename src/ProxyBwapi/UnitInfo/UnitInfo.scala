@@ -395,6 +395,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     // Dragoon	narrow	flat    	invisible  	HugSight
 
     lazy val enemyZone        = enemy.zone
+    lazy val enemyTile        = enemy.tile
     lazy val enemyAltitude    = enemy.altitude
     lazy val enemyVisible     = enemy.visible
     lazy val enemyDistance    = pixelDistanceEdge(enemy)
@@ -410,17 +411,21 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lazy val flat             = ! uphill && ! downhill
     lazy val isReaver         = is(Protoss.Reaver)
     lazy val isMelee          = unitClass.melee
+    lazy val formations       = friendly.flatMap(_.squad).map(_.formations).getOrElse(Seq.empty)
+    lazy val formationPixel   = ?(friendly.exists(_.agent.shouldFight), formations.headOption, formations.lastOption).flatMap(_.apply(friendly.get))
 
     lazy val pixelParadrop = {
-      Arc(enemy.pixel, pixel, effectiveRangePixels, 32)
+      val origin = formationPixel.getOrElse(pixel)
+      Arc(enemy.pixel, origin, effectiveRangePixels, 32)
         .map(_.asPixel)
         .find(spot => {
-          val spotTile = spot.tile
-          var output = spotTile.valid
+          val spotTile  = spot.tile
+          var output    = spotTile.valid
           output &&= spotTile.walkable
           output &&= (wide || spotTile.zone == enemyZone)
           output &&= spotTile.altitude >= enemyAltitude || enemy.visible
           output &&= spotTile.enemyRange < With.grids.enemyRangeAirGround.margin
+          output &&= ! spotTile.zone.island || spotTile.zone == enemyZone || spotTile.zone.edges.exists(_.zones.contains(enemyZone))
           output
         })
     }

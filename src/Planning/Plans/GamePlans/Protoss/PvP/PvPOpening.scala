@@ -299,8 +299,8 @@ class PvPOpening extends GameplanImperative {
       } else if (enemyRecentStrategy(With.fingerprints.dtRush)) { // Don't overthink it
       } else {
         var p = 1.0
-        p *= ?(enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon),  0.7, 1.0)
-        p *= ?(trackRecordLacks(With.fingerprints.dtRush),                                            0.7, 1.0)
+        p *= ?(enemyRecentStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.robo),  0.6, 1.0)
+        p *= ?(trackRecordLacks(With.fingerprints.dtRush),                                                                    0.6, 1.0)
         getObservatory  =                   roll("SpeculativeObservatory",  p)
         getObservers    = getObservatory && roll("SpeculativeObservers",   p) // So the probability of obs is the *joint* probability
       }
@@ -391,7 +391,6 @@ class PvPOpening extends GameplanImperative {
       // Amp up aggression to ensure we can get down our ramp
       aggression(1.0 + 0.25 * unitsComplete(Protoss.Reaver))
     }
-    PvPIdeas.monitorSafely()
 
     /////////////
     // Logging //
@@ -428,6 +427,7 @@ class PvPOpening extends GameplanImperative {
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }
     if (shouldHoldNatural) { holdNatural() }
+    PvPIdeas.monitorSafely()
 
     ////////////////////////////
     // Emergency DT reactions //

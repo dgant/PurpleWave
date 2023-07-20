@@ -1,6 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
+import Planning.Predicates.MacroFacts
 import Strategery.Strategies.Strategy
 import Strategery._
 import bwapi.Race
@@ -49,21 +50,27 @@ object PvPDT extends PvPStrategy {
   blacklistVs(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
-  setRushTilesMinimum(200) // Maybe extend if ramp is high ground
   setMinimumGamesVsOpponent(3)
   addChoice(PvPGateCore)
+  addRequirement(() =>
+    rushTilesMinimum >= 200
+    || MapGroups.strongNatural.exists(_())
+    ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo)
+    || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
-  blacklistOn(MapGroups.badForMassGoon: _*)
+  addRequirement(() => entranceInverted
+    || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
-  blacklistOn(MapGroups.badForMassGoon: _*)
+  addRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
+  addRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
 }
 
 //////////////

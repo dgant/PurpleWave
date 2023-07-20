@@ -25,7 +25,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
     With.blackboard.monitorBases.set(
       ! enemyRobo
       && ! enemiesHave(Protoss.Observer, Protoss.DarkTemplar)
-      && (have(Protoss.Observer) || ! enemyRecentStrategy(With.fingerprints.dtRush)))
+      && ( ! enemyRecentStrategy(With.fingerprints.dtRush) || With.fingerprints.fourGateGoon() || With.fingerprints.threeGateGoon()))
   }
 
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)

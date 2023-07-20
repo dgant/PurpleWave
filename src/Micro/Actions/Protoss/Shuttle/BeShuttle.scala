@@ -42,7 +42,12 @@ object BeShuttle extends Action {
     */
 
     // Ordinary pickups/dropoffs/parking
-    val fighting = shuttle.agent.passengers.exists(p => p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined || (p.battle.isDefined && p.agent.shouldFight))
+    val fightRadius = 320
+    val fighting = shuttle.agent.passengers.exists(p =>
+      p.agent.toAttack.isDefined
+      || p.agent.toAttackFrom.isDefined
+      || p.matchups.pixelsToThreatRange.exists(_ < fightRadius)
+      || p.matchups.enemies.exists(e => Protoss.Shuttle(e) && e.pixelDistanceEdge(p) < fightRadius))
     val quests = shuttle.agent.passengersPrioritized.flatMap(p => {
       val goal = p.agent.rideGoal
       if (p.loaded) {

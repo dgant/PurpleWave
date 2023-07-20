@@ -12,6 +12,7 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Formation._
 import Micro.Heuristics.Potential
 import Performance.Cache
+import Planning.Predicates.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -227,26 +228,33 @@ class SquadDefendBase(base: Base) extends Squad {
     // If we don't really want to fight, wait until they push into the base
     && (enemy.flying || With.blackboard.wantToAttack() || enemy.metro.contains(base.metro)))
 
-  private val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude))
+  private val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude || e.orderTarget.filter(_.isFriendly).exists(_.base.contains(base))))
+
   private def threateningBase(enemy: UnitInfo): Boolean = {
-    if (enemy.zone == base.zone) return true
+    var output    = enemy.zone == base.zone
     // If they're between the bastion and the base
-    if ( ! enemy.flying && enemy.pixelDistanceTravelling(base.zone.centroid) < bastion().groundPixels(base.zone.centroid)) return true
+    // COG2023: Disabling this check due to suspicion it procs prematurely in small bases
+    //output      ||= ! enemy.flying && enemy.pixelDistanceTravelling(base.zone.centroid) < bastion().groundPixels(base.zone.centroid)
     // If they can assault our base from outside it
-    if (enemyHasVision() && base.zone.units.view.filter(enemy.inRangeToAttack).exists(u => u.unitClass.melee || ! base.zone.edges.exists(_.contains(u.pixel)))) return true
-    false
+    output      ||= enemyHasVision() && enemies.exists(e =>
+      e.presumptiveTarget.flatMap(_.friendly).exists(t =>
+        e.pixelsToGetInRange(t, ?(t.squad.contains(this), t.pixel, t.agent.toReturn.getOrElse(t.pixel))) < 32
+        && (t.base.contains(base) || t.squad.contains(this))
+        && (e.inRangeToAttack(t) || e.speedApproaching(t) > 0)))
+    output
   }
 
   private def emergencyDTHugs(): Boolean = {
-    if ( ! With.enemies.exists(_.isProtoss))                      return false
-    if ( ! With.units.existsEnemy(Protoss.DarkTemplar))           return false
-    if ( ! enemies.exists(Protoss.DarkTemplar))                   return false
-    if (With.units.existsOurs(u => IsDetector(u) && u.complete))  return false
     lazy val enemyNearest   = Maff.minBy(enemies.view.filter(IsWarrior))(_.pixelDistanceTravelling(base.heart))
     lazy val dts            = enemies.filter(Protoss.DarkTemplar)
     lazy val dtApproaching  = dts.exists(_.base.exists(_.isOurs)) || base.zone.exitNow.exists(e => dts.exists(_.pixelDistanceTravelling(e.pixelCenter) < 160))
 
-    val shouldHug = enemyNearest.forall(Protoss.DarkTemplar) || dtApproaching
+    var shouldHug   = With.enemies.exists(_.isProtoss)
+    shouldHug     &&= With.units.existsEnemy(Protoss.DarkTemplar)
+    shouldHug     &&= enemies.exists(Protoss.DarkTemplar)
+    shouldHug     &&= ! MacroFacts.haveComplete(IsDetector)
+    shouldHug     &&= enemyNearest.forall(Protoss.DarkTemplar) || dtApproaching
+
     if (shouldHug) {
       val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
       val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourMain.zone.exitNowOrHeart.center)
@@ -254,6 +262,7 @@ class SquadDefendBase(base: Base) extends Squad {
       val pixel     = pixels.minBy(p => dts.map(_.pixelDistanceTravelling(p)).min)
       units.foreach(_.intend(this).setAction(new HugAt(pixel)))
     }
+
     shouldHug
   }
 

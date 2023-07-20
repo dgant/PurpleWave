@@ -23,12 +23,10 @@ import Utilities.UnitFilters.UnitFilter
 
 trait MacroActions {
   def status(text: String): Unit = With.blackboard.status.set(With.blackboard.status() :+ text)
-  def status(predicate: Boolean, text: String): Unit = if (predicate) status(text)
+  def status(predicate: Boolean, text: => String): Unit = if (predicate) status(text)
   def recordRequestedBases(): Unit = {
     val max = Maff.max(With.scheduler.requests.view.flatMap(_._2).filter(_.unit.exists(_.isTier1TownHall)).map(_.quantity)).getOrElse(0)
-    if (max > 0) {
-      status(f"${max}base")
-    }
+    status(max > 0, f"${max}base")
   }
 
   def attack(): Unit = With.blackboard.wantToAttack.set(true)

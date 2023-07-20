@@ -6,7 +6,7 @@ import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import Planning.Plans.GamePlans.All.MacroActions
-import Planning.Predicates.{MacroCounting, MacroFacts}
+import Planning.Predicates.MacroCounting
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._
@@ -14,13 +14,6 @@ import Utilities.?
 import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
 
 object PvPIdeas extends MacroActions with MacroCounting {
-  def enemyLowUnitStrategy: Boolean = enemyBases > 1 || enemyStrategy(
-    With.fingerprints.nexusFirst,
-    With.fingerprints.gatewayFe,
-    With.fingerprints.forgeFe,
-    With.fingerprints.robo,
-    With.fingerprints.dtRush,
-    With.fingerprints.cannonRush)
 
   def attackFirstZealot: Boolean = trackRecordLacks(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
 
@@ -31,22 +24,22 @@ object PvPIdeas extends MacroActions with MacroCounting {
   def monitorSafely(): Unit = {
     With.blackboard.monitorBases.set(
       ! enemyRobo
-      && enemies(Protoss.Observer, Protoss.DarkTemplar) == 0
-      && (units(Protoss.Observer) > 1 || ! enemyRecentStrategy(With.fingerprints.dtRush)))
+      && ! enemiesHave(Protoss.Observer, Protoss.DarkTemplar)
+      && (have(Protoss.Observer) || ! enemyRecentStrategy(With.fingerprints.dtRush)))
   }
 
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
   def dtBraveryHome   : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestArrival(Protoss.Observer)
   def pvpSafeToMoveOut: Boolean = {
-    var output = safePushing
-    output ||= dtBraveryAbroad
-    output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer) > 0
+    var output    = safePushing
+    output      ||= dtBraveryAbroad
+    output      &&= ! enemiesHave(Protoss.DarkTemplar) || haveComplete(Protoss.Observer)
     output
   }
   def pvpSafeAtHome: Boolean = {
     var output = safeDefending
     output ||= dtBraveryHome
-    output &&= enemies(Protoss.DarkTemplar) == 0 || unitsComplete(Protoss.Observer, Protoss.PhotonCannon) > 0
+    output &&= ! enemiesHave(Protoss.DarkTemplar) || haveComplete(Protoss.Observer, Protoss.PhotonCannon)
     output
   }
 
@@ -56,14 +49,20 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   private def makeObservers(): Unit = {
     pump(Protoss.Observer, ?(enemyHasShown(Protoss.DarkTemplar), 2, 1))
+    // If we got caught with our pants down -- DT at our base and no Observer at home -- make another one
+    if (With.units.enemy.filter(Protoss.DarkTemplar).filter(_.visible).exists(dt =>
+        With.units.ours.filter(Protoss.RoboticsFacility).exists(robo =>
+          With.units.ours.filter(Protoss.Observer).forall(obs =>
+            obs.framesToTravelTo(robo.pixel) > dt.framesToGetInRange(robo) + Protoss.Observer.buildFrames)))) {
+      status("DTPantsDown")
+      pump(Protoss.Observer, maximumConcurrently = 1)
+      cancel(Protoss.Shuttle, Protoss.Reaver)
+    }
   }
 
-  def preferObserverForDetection: Boolean = {
-    detectWithObserverOrCannon(auditing = true)
-  }
-  def requireTimelyDetection(): Boolean = {
-    detectWithObserverOrCannon(auditing = false)
-  }
+  def preferObserverForDetection  : Boolean = detectWithObserverOrCannon(auditing = true)
+  def requireTimelyDetection()    : Boolean = detectWithObserverOrCannon(auditing = false)
+
   private def detectWithObserverOrCannon(auditing: Boolean): Boolean = {
     // Performance shortcut
     if (With.units.existsOurs(Protoss.Observer, Protoss.Observatory)) {
@@ -71,7 +70,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       return true
     }
     var expectEarliestArrival = enemyDarkTemplarLikely || With.fingerprints.rampBlock()
-    if (units(Protoss.Forge) > 0) {
+    if (have(Protoss.Forge)) {
       expectEarliestArrival ||= enemyRecentStrategy(With.fingerprints.dtRush)
       expectEarliestArrival ||= ! With.fingerprints.dragoonRange()
     }
@@ -83,7 +82,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
     lazy val dtPrecedesCannon    = framesUntilArrival - cannonSafetyFrames  < framesUntilUnit(Protoss.PhotonCannon)
     lazy val dtPrecedesObserver  = framesUntilArrival                       < framesUntilObserver
     lazy val cannonsAreReady = (
-      MacroFacts.unitsComplete(Protoss.PhotonCannon) > 0
+      haveComplete(Protoss.PhotonCannon)
       && With.units.ours.filter(Protoss.PhotonCannon).forall(_.complete)
       && Some(With.geography.ourNatural)
         .filter(_.isOurs)
@@ -99,8 +98,8 @@ object PvPIdeas extends MacroActions with MacroCounting {
         || (cannonsAreReady && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base sooner rather than later
 
     if (auditing) return goObserver
-    if (enemyContained) status(f"Containing")
-    if (enemyDarkTemplarLikely) status(f"ExpectDT@${Frames(expectedArrival)}")
+    status(enemyContained,          "Containing")
+    status(enemyDarkTemplarLikely, f"ExpectDT@${Frames(expectedArrival)}")
 
     if (goObserver) {
       if (enemyDarkTemplarLikely) {
@@ -118,7 +117,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
             cancel(Protoss.Dragoon)
           }
         }
-        if (units(Protoss.Observer) == 0 && With.units.ours.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver)).forall(_.remainingCompletionFrames > framesUntilUnit(Protoss.Observatory))) {
+        if ( ! have(Protoss.Observer) && With.units.ours.filter(_.isAny(Protoss.Shuttle, Protoss.Reaver)).forall(_.remainingCompletionFrames > framesUntilUnit(Protoss.Observatory))) {
           cancel(Protoss.Shuttle, Protoss.Reaver)
         }
       }

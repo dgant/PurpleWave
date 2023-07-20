@@ -25,6 +25,7 @@ class PvPOpening extends GameplanImperative {
   var shouldExpand        : Boolean = false
   var shouldAttack        : Boolean = false
   var shouldHarass        : Boolean = false
+  var shouldHoldNatural   : Boolean = false
   var had2GateBeforeCore  : Boolean = false
   var hadTechBeforeRange  : Boolean = false
   var rangeDelayed        : Boolean = false
@@ -42,6 +43,7 @@ class PvPOpening extends GameplanImperative {
   var reaverAllIn         : Boolean = false
   var shuttleFirst        : Boolean = false
   var shuttleSpeed        : Boolean = false
+  var doSneakyRobo        : Boolean = true
   // DT
   var greedyDT            : Boolean = false
   var cannonExpand        : Boolean = false
@@ -55,7 +57,7 @@ class PvPOpening extends GameplanImperative {
   def gctech  : Boolean       = sequence == GCTech
   def gcgate  : Boolean       = sequence == GCGate
   def ggcore  : Boolean       = sequence == GGC
-  var sequence: CoreSequence  = null
+  var sequence: CoreSequence  = _
 
   override def activated: Boolean = true
   override def completed: Boolean = {
@@ -64,15 +66,14 @@ class PvPOpening extends GameplanImperative {
     complete
   }
 
-  private var doSneakyRobo = true
   private def sneakyRobo(): Unit = {
-    if (doSneakyRobo && units(Protoss.Probe) >= 17 && ! scoutCleared) {
-      doSneakyRobo = false
-    }
+    doSneakyRobo &&= units(Protoss.Probe) < 17 || scoutCleared
     if (doSneakyRobo) {
       get(Protoss.RoboticsFacility)
     } else {
-      get(Protoss.DragoonRange)
+      ?(With.strategy.isRamped,
+        get(2, Protoss.Gateway),
+        get(Protoss.DragoonRange))
     }
   }
 
@@ -94,6 +95,8 @@ class PvPOpening extends GameplanImperative {
           (GCGate,  wGate)).getOrElse(GCRange)
       }
     }
+
+    PvPGateCore() // Make sure we activate it if selected
 
     /////////////////////
     // Update strategy //
@@ -304,12 +307,14 @@ class PvPOpening extends GameplanImperative {
       getObservatory  ||= enemyCitadel
       getObservers    ||= enemyCitadel
       getReavers      ||= ! getObservatory && ! have(Protoss.Observatory)
-      if ( ! have(Protoss.RoboticsSupportBay, Protoss.Shuttle)) {
+      if ( ! have(Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Observatory)) {
         shuttleFirst = getReavers && ! enemyCitadel
       }
       shuttleSpeed = shuttleFirst && gctech && ! getObservatory && ! getObservers && ! have(Protoss.Observatory, Protoss.Observer) && roll("ShuttleSpeedRush", 0.0)
     } else if (PvPDT()) {
-      greedyDT = have(Protoss.TemplarArchives) && ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush) && roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
+      greedyDT    = have(Protoss.TemplarArchives)
+      greedyDT  &&= ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush)
+      greedyDT  &&= roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
     }
 
     had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && ! have(Protoss.CyberneticsCore)
@@ -371,9 +376,13 @@ class PvPOpening extends GameplanImperative {
     shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
-    if (shouldAttack || (shouldExpand && bases < 2) || (safeDefending && ! PvPDT() && ( ! rangeDelayed || Protoss.DragoonRange()) && enemyHasShown(Protoss.Dragoon))) {
-      holdNatural()
-    }
+    shouldHoldNatural   = safeDefending
+    shouldHoldNatural  &&= enemyBases > 1 || ! PvPDT()    || unitsComplete(Protoss.DarkTemplar) > 0
+    shouldHoldNatural  &&= enemyBases > 1 || ! getReavers || unitsComplete(Protoss.Reaver) > 0
+    shouldHoldNatural  &&= ! rangeDelayed || Protoss.DragoonRange()
+    shouldHoldNatural  &&= enemyHasShown(Protoss.Dragoon)
+    shouldHoldNatural ||= shouldAttack
+    shouldHoldNatural ||= shouldExpand && bases < 2
 
     // Chill vs. 2-Gate until we're ready to defend
     if ( ! PvP1012() && With.fingerprints.twoGate() && unitsEver(IsAll(Protoss.Dragoon, IsComplete)) == 0) {
@@ -404,6 +413,7 @@ class PvPOpening extends GameplanImperative {
     status(getReavers,        "Reaver")
     status(reaverAllIn,       "ReaverAllIn")
     status(greedyDT,          "GreedyDT")
+    status(doSneakyRobo,      "SneakyRobo")
     status(atEarlyTiming,     "Timing1")
     status(earlyTimingClosed, "Timing1Done")
     status(atMainTiming,      "Timing2")
@@ -413,10 +423,11 @@ class PvPOpening extends GameplanImperative {
     status(shouldAttack,      "Attack")
     status(shouldHarass,      "Harass")
     status(shouldExpand,      "Expand")
-
+    status(shouldHoldNatural, "HoldNat")
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }
+    if (shouldHoldNatural) { holdNatural() }
 
     ////////////////////////////
     // Emergency DT reactions //
@@ -642,7 +653,9 @@ class PvPOpening extends GameplanImperative {
 
           if (gctech) {
             once(17, Protoss.Probe)
-            if (PvPDT()) sneakyCitadel() else if (PvPRobo()) sneakyRobo() else get(Protoss.DragoonRange)
+            if      (PvPDT())   sneakyCitadel()
+            else if (PvPRobo()) sneakyRobo()
+            else                get(Protoss.DragoonRange)
             once(18, Protoss.Probe)
             once(2, Protoss.Dragoon)
             once(3, Protoss.Pylon)
@@ -734,7 +747,7 @@ class PvPOpening extends GameplanImperative {
           With.units.ours
             .find(Protoss.Shuttle)
             .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
-            .getOrElse(if (shuttleFirst) Forever() else 0)))
+            .getOrElse(?(shuttleFirst, Forever(), 0))))
         once(Protoss.Observer)
       } else {
         cancel(Protoss.Observer)
@@ -802,8 +815,8 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       }
       if (shouldExpand) {
-        if (PvP4GateGoon() && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
-          // PvPIdeas should be telling us when we need this anyway, but until it does so correctly, this is the workaround.
+        pumpWorkers(oversaturate = true)
+        if (PvP4GateGoon() && enemyBases < 2) {
           buildCannonsAtNatural(1)
         }
         expand()

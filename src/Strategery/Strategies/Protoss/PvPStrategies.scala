@@ -41,14 +41,16 @@ object PvPRobo extends PvPStrategy {
   // No restrictions; Preserve this as our "Always valid" choice
 }
 object PvPReaver extends PvPStrategy
-object PvPObs extends PvPStrategy
+object PvPObs extends PvPStrategy {
+  whitelistVs(With.fingerprints.dtRush) // Until we make better use of the Obs
+}
 object PvPDT extends PvPStrategy {
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.robo)
 }
 object PvPCoreExpand extends PvPStrategy {
   setRushTilesMinimum(200) // Maybe extend if ramp is high ground
-  setMinimumGamesVsOpponent(2)
+  setMinimumGamesVsOpponent(3)
   addChoice(PvPGateCore)
 }
 object PvP3GateGoon extends PvPStrategy {

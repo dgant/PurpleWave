@@ -8,6 +8,7 @@ import ProxyBwapi.Races.Terran
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountOne
+import Utilities.UnitFilters.IsWarrior
 import Utilities.UnitPreferences.PreferClose
 
 class SquadEjectScout extends Squad {
@@ -21,9 +22,10 @@ class SquadEjectScout extends Squad {
     .getOrElse(Maff.minBy(tilesToConsider())(With.grids.lastSeen.get).getOrElse(With.geography.home).center))
 
   def launch(): Unit = {
-    if (With.frame > Minutes(8)()) return
-    if (MacroFacts.scoutCleared) return
-    if (targetScout().isEmpty) return
+    if (With.frame > Minutes(8)())                                    return
+    if (MacroFacts.scoutCleared)                                      return
+    if (targetScout().isEmpty)                                        return
+    if (With.geography.ourBases.exists(_.enemies.exists(IsWarrior)))  return
 
     lock.matcher = unit => (
       unit.canMove

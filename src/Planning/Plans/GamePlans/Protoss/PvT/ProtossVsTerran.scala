@@ -4,6 +4,7 @@ package Planning.Plans.GamePlans.Protoss.PvT
 import Debugging.SimpleString
 import Lifecycle.With
 import Mathematics.Maff
+import Placement.Access.PlaceLabels
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
@@ -137,9 +138,8 @@ class ProtossVsTerran extends PvTOpeners {
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
       buildGasPumps(2)
-      if (gasPumps > 1) {
-        // This tends to get slotted in prematurely when we're gas-starved
-        get(?(counterBio, 2, 1), Protoss.Forge)
+      if (gasPumps > 1 && units(Protoss.Gateway) >= 3) {
+        get(?(counterBio, 2, 1), Protoss.Forge) // This tends to get slotted in prematurely when we're gas-starved
       }
       get(Protoss.TemplarArchives)
       get(Protoss.GroundDamage)
@@ -362,6 +362,9 @@ class ProtossVsTerran extends PvTOpeners {
     maintainMiningBases(4)
     recordRequestedBases()
     techOnce()
+    if (With.enemies.exists(Terran.WraithCloak(_))) {
+      buildCannonsAtBases(1, PlaceLabels.DefendHall)
+    }
     army()
     get(?(terranOneBase, gatewaysMax, gatewaysMin), Protoss.Gateway)
     // Crummy gas formula; in general we're counting on MacroSim to bump up the later invocation of requireGas if we really need it
@@ -403,13 +406,13 @@ class ProtossVsTerran extends PvTOpeners {
       pump(Protoss.DarkTemplar, 1)
     }
     pump(Protoss.Observer, 1)
-    pumpRatio(Protoss.Dragoon, 4, 10, Seq(Flat(2), Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 1.0))) // Don't get caught with pants totally down against harassment
+    pumpRatio(Protoss.Dragoon, 4, 16, Seq(Flat(6), Enemy(Terran.Vulture, .75), Enemy(Terran.Wraith, 1.0))) // Don't get caught with pants totally down against harassment
     if (TechReavers.queued) pumpShuttleAndReavers(?(With.fingerprints.bio(), 2, 6), shuttleFirst = TechReavers.order < TechObservers.order)
     pump(Protoss.Carrier, 4)
   }
 
   def doArmyNormalPriority(): Unit = {
-    pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .6), Enemy(Terran.Wraith, 0.5), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
+    pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .75), Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
     pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 3), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
     if (TechCarrier.started && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 1)) {
       pump(Protoss.Observer, 8)

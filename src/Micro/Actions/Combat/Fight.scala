@@ -16,7 +16,7 @@ object Fight extends Action {
     Follow(unit)
     StrategicNuke(unit)
     Cast(unit)
-    SpotNew(unit)
+    Spot(unit)
     Stim(unit)
     EmergencyBunk(unit)
     Root(unit)

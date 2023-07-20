@@ -6,6 +6,7 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
 import Utilities.Time.Forever
@@ -91,6 +92,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     val distanceMineralBases = mineralSlots.view
       .filter(s =>
         ! isValidBase(s._1)
+        &&   ( ! With.enemies.exists(_.isTerran) || ! With.units.existsEnemy(Terran.Vulture) || s._1.metro.bases.contains(With.geography.ourMain))
         &&   s._1.mineralsLeft > 0
         && ! s._1.owner.isEnemy
         &&   s._1.townHall.forall(_.isOurs)) // With unoccupied/incomplete bases

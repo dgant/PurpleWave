@@ -21,12 +21,29 @@ object BeReaver extends Action {
     lazy val needRefresh          = unit.cooldownLeft > cooldownOnLanding + 2 * With.latency.latencyFrames // Reaver cooldown resets to 30 when dropped: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
     lazy val needlesslyEndangered = needRefresh && (inRangeOfPlebian || ! canShoot)
     lazy val needlesslyDoomed     = unit.cooldownLeft >= unit.doomedInFrames
+
+    // Dodge danger
     if ( ! unit.agent.commit && (needlesslyEndangered || needlesslyDoomed || unit.matchups.targetedByScarab)) {
       unit.agent.act("Hop")
       clickShuttle(unit)
+
+    // Hopping in and out of a Shuttle actually shortens your cooldown by forcing it to reset to 30
     } else if (needRefresh) {
       unit.agent.act("Refresh")
       clickShuttle(unit)
+
+    // Try to land next to lead passenger
+    } else if (
+      unit.agent.shouldFight
+      && (unit.scarabs > 0 || unit.trainee.exists(_.remainingCompletionFrames < cooldownOnLanding + With.latency.latencyFrames))
+      && unit.tile.walkable
+      && unit.agent.ride.exists(_.agent.passengersPrioritized.headOption.exists(r =>
+        Protoss.Reaver(r)
+        && r != unit
+        && r.agent.shouldFight
+        && ! r.loaded
+        && r.pixelDistanceEdge(unit) < 32))) {
+        Commander.requestUnload(unit)
     }
   }
 

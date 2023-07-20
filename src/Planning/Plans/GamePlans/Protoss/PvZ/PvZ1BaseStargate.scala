@@ -29,6 +29,7 @@ class PvZ1BaseStargate extends PvZ1BaseAllIn {
           Protoss.CyberneticsCore,
           Protoss.Stargate)
         get(2, Protoss.Stargate)
+        get(2, Protoss.Gateway)
       })
 
     timingAttack  ||= unitsComplete(IsWarrior) >= 30

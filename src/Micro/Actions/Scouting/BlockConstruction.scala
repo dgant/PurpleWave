@@ -5,8 +5,9 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Orders
-import Utilities.UnitFilters.IsWarrior
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 
 object BlockConstruction extends Action {
   
@@ -14,23 +15,33 @@ object BlockConstruction extends Action {
     blockableBuilders(unit).nonEmpty
       && ! unit.flying
       && ! unit.matchups.threats.exists(IsWarrior)
-      && With.geography.enemyBases.nonEmpty
-      && (unit.hitPoints > 10 || ! unit.base.exists(_.owner.isEnemy))
-  )
+      && With.geography.enemyBases.nonEmpty)
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    val builder = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
-    val destination = builder.targetPixel.getOrElse(builder.pixel)
+    val builder         = blockableBuilders(unit).minBy(_.pixelDistanceEdge(unit))
+    val builderTarget   = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixel)
+    val destination     = builderTarget.base
+      .filter(b => b.naturalOf.isDefined && b.townHall.isEmpty)
+      .map(_.townHallArea.center)
+      .getOrElse(unit.pixel.project(builder.pixel, unit.pixelDistanceCenter(builder) + 48))
+
+
+    unit.agent.toTravel = Some(destination)
+    unit.agent.toReturn = Some(destination)
     unit.agent.toAttack = Some(builder)
-    
-    if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
-      unit.agent.toTravel = Some(unit.pixel.project(builder.pixel, unit.pixelDistanceCenter(builder) + 48))
+
+    if (unit.matchups.threatsInPixels(32).exists(builder !=)) {
+      Retreat.delegate(unit)
+
+    } else if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
       Commander.move(unit)
-    }
-    else if (unit.readyForAttackOrder
-      || unit.totalHealth > builder.totalHealth
-      || unit.pixelDistanceEdge(builder) > 8) {
+
+    } else if (unit.readyForAttackOrder
+      || unit.totalHealth >= builder.totalHealth + ?(unit.cooldownLeft == builder.cooldownLeft, 0, ?(unit.cooldownLeft < builder.cooldownLeft, 5, -5))
+      || unit.pixelsToGetInRange(builder) > 0) {
+
       Commander.attack(unit)
+
     } else {
       Retreat.delegate(unit)
     }
@@ -50,13 +61,17 @@ object BlockConstruction extends Action {
       lazy val hasMoveOrder         = builder.order == Orders.Move
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
       lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixel)
+      lazy val sittingOnExpansion   = builder.base.exists(b => b.naturalOf.forall(b => b.isStartLocation && ! b.isOurs) && b.townHallArea.contains(builder.pixel))
       lazy val movingToRelevantBase = (
         hasRelevantOrder
         && targetPixel.base.exists(base =>
           base.townHall.isEmpty
           && (base.owner.isEnemy
-            || (base.owner.isNeutral && ! base.isStartLocation && (unit.player.isZerg || base.naturalOf.exists(_.owner.isEnemy))))))
-      val output                    = builder.unitClass.isWorker && (hasBuildOrder || movingToRelevantBase)
+            || (base.owner.isNeutral
+              && ! base.isStartLocation
+              && (unit.player.isZerg || base.naturalOf.exists(_.owner.isEnemy))))))
+
+      val output = IsWorker(builder) && (hasBuildOrder || movingToRelevantBase || sittingOnExpansion)
       output
     })
   }

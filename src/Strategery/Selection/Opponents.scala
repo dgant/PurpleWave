@@ -6,17 +6,17 @@ object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
-  val defaultPvT = new StrategySelectionRecommended(StrategySelectionGreedy(), PvT28Nexus)
-  val defaultPvP = StrategySelectionGreedy()
-  val defaultPvZ = StrategySelectionGreedy()
+  val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
 
   // COG 2023
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",      StrategySelectionRandom) //new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
-  val microwave   : Opponent = add("Microwave",     defaultPvZ)
-  val cunybot     : Opponent = add("CUNYbot",       defaultPvZ)
-  val xiaoyi      : Opponent = add("XIAOYI",        defaultPvT)
+  val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))
+  val cunybot     : Opponent = add("CUNYbot",       StrategySelectionFixed(PvZ1BaseSpeedlotArchon))
+  val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))
 
   // AIIDE 2022
   val ualbertabot : Opponent = add("UAlbertaBot",   StrategySelectionFixed(PvR2Gate4Gate))

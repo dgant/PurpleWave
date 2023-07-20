@@ -152,7 +152,7 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
         opening = Open910
       } else if (With.fingerprints.twelveHatch() && ! With.fingerprints.twoHatchMain() && ! With.fingerprints.twoHatchGas() && allowExpanding) {
         opening = OpenGateNexus
-      } else if (With.fingerprints.overpool() || With.fingerprints.twelveHatch()) {
+      } else if (With.fingerprints.overpool() || (With.fingerprints.hatchFirst() && ! enemyRecentStrategy(With.fingerprints.tenHatch)) || ! enemyRecentStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.tenHatch)) {
         opening = OpenZZCoreZ
       }
     }
@@ -164,8 +164,9 @@ abstract class PvZ1BaseOpenings extends GameplanImperative {
     }
     if (bases <= 1 && anticipateSpeedlings) {
       get(3, Protoss.Zealot)
-      get(Protoss.Forge)
+      get(2, Protoss.Gateway)
       get(7, Protoss.Zealot)
+      get(Protoss.Forge)
       get(2, Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireLabelYes(PlaceLabels.DefendEntrance))
     }
     scoutOn(Protoss.Pylon)

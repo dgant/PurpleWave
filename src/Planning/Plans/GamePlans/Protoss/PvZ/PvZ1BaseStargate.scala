@@ -1,8 +1,9 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
+import Mathematics.Maff
 import Planning.Plans.Macro.Protoss.MeldArchons
-import ProxyBwapi.Races.Protoss
-import Utilities.SwapIf
+import ProxyBwapi.Races.{Protoss, Zerg}
+import Utilities.{?, SwapIf}
 import Utilities.UnitFilters.IsWarrior
 
 class PvZ1BaseStargate extends PvZ1BaseAllIn {
@@ -13,6 +14,12 @@ class PvZ1BaseStargate extends PvZ1BaseAllIn {
 
     SwapIf(
       unitsComplete(IsWarrior) >= 9, {
+        if (units(Protoss.Corsair, Protoss.Scout) >= 2) {
+          pump(Protoss.Dragoon, 2) // Anti-Scourge
+        }
+        if ( ! enemyHydralisksLikely) {
+          pump(Protoss.Corsair, ?(enemyMutalisksLikely, Maff.clamp(enemies(Zerg.Mutalisk) + 2, 5, 16), 3))
+        }
         pump(Protoss.Scout)
         pump(Protoss.Zealot)
       }, {
@@ -21,13 +28,11 @@ class PvZ1BaseStargate extends PvZ1BaseAllIn {
           Protoss.Assimilator,
           Protoss.CyberneticsCore,
           Protoss.Stargate)
-        get(2, Protoss.Gateway)
         get(2, Protoss.Stargate)
       })
-    get(3, Protoss.Gateway)
 
     timingAttack  ||= unitsComplete(IsWarrior) >= 30
-    needToAllIn     = mutalisksInBase || mutalisksImminent
+    needToAllIn     = mutalisksInBase
     allInLogic()
   }
 }

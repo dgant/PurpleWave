@@ -13,9 +13,9 @@ object Opponents {
   // COG 2023
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
-  val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
-  val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))
-  val cunybot     : Opponent = add("CUNYbot",       StrategySelectionFixed(PvZ1BaseSpeedlotArchon))
+  //val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
+  //val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))
+  //val cunybot     : Opponent = add("CUNYbot",       StrategySelectionFixed(PvZ1BaseSpeedlotArchon))
   val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))
 
   // AIIDE 2022
@@ -23,6 +23,8 @@ object Opponents {
 
   // Aliased
   //val adias       : Opponent = add("adias")
+  val cunybot       : Opponent = add("CUNYbot")
+  val mcrave        : Opponent = add("McRave")
   //val ualbertabot : Opponent = add("UAlbertaBot")
   //val zzzkbot     : Opponent = add("ZZZKBot")
 

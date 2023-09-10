@@ -11,7 +11,6 @@ import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Plans.Scouting.{ScoutAt, ScoutOn}
 import Planning.Predicates.MacroFacts
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -33,12 +32,16 @@ trait MacroActions {
   def harass(): Unit = With.blackboard.wantToHarass.set(true)
   def allIn(): Unit = { With.blackboard.yoloing.set(true); attack() }
 
+  def scout(scoutCount: Int = 1): Unit = {
+    With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
+  }
   def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Unit = {
-    new ScoutOn(unitMatcher, scoutCount = scoutCount, quantity = quantity).update()
+    if (With.units.ours.count(unitMatcher) >= quantity) scout(scoutCount)
   }
-  def scoutAt(minimumSupply: Int, maxScouts: Int = 1): Unit = {
-    new ScoutAt(minimumSupply = minimumSupply, maxScouts = maxScouts).update()
+  def scoutAt(minimumSupply: Int, scoutCount: Int = 1): Unit = {
+    if (MacroFacts.supplyUsed200 >= minimumSupply) scout(scoutCount)
   }
+
   def aggression(value: Double): Unit = {
     With.blackboard.aggressionRatio.set(value)
   }

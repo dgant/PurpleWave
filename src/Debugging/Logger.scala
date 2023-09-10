@@ -1,8 +1,8 @@
 package Debugging
 
 import java.io.{File, PrintWriter}
-
 import Lifecycle.With
+import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
 
 import scala.collection.mutable
@@ -21,7 +21,7 @@ class Logger {
       opponents = With.enemies.map(_.name).mkString("-")
     } catch { case exception: Exception => }
     
-    val filename = With.bwapiData.write + opponents + (if (errorOcurred) ".error" else ".normal") + ".log.txt"
+    val filename = f"${With.bwapiData.write}$opponents${?(errorOcurred, ".error", ".normal")}.log.txt"
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))
@@ -93,7 +93,8 @@ class Logger {
       System.err.println(logMessage)
     }
     if (chat && With.configuration.debugging && With.manners != null) {
-      With.manners.chat(message)
+      // Only send ASCII characters. No idea if this is necessary but seems like a good idea.
+      With.manners.chat(message.replaceAll("[^\\x00-\\x7F]", ""))
     }
   }
   

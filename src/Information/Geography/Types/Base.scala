@@ -15,8 +15,8 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
   val isStartLocation         : Boolean           = With.geography.startLocations.contains(townHallTile)
   val townHallArea            : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   val zone                    : Zone              = With.geography.zoneByTile(townHallTile)
-  val bases                   : Seq[Base]         = Seq(this)
-  val zones                   : Seq[Zone]         = Seq(zone)
+  val bases                   : Vector[Base]      = Vector(this)
+  val zones                   : Vector[Zone]      = Vector(zone)
   val economicValue           : Cache[Double]     = new Cache(() => units.view.filter(u => u.unitClass.isBuilding || u.unitClass.isWorker).map(_.subjectiveValue).sum)
   var natural                 : Option[Base]      = None
   var naturalOf               : Option[Base]      = None
@@ -100,17 +100,19 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
     output.filter(_.valid)
   }
 
-  def description: String = (
+  def description : String = (
     if      (this == With.geography.ourMain)    "Our main"
-    else if (this == With.geography.ourNatural) "Our natural"
+    else if (this == With.geography.ourNatural) f"Our ${adjective}natural"
     else(
         (     if (isEnemy)  "Enemy"
         else  if (isOurs)   "Our"
         else  if (isAlly)   "Ally"
         else                "Neutral")
-      + (     if (isStartLocation     && ! isOurs)  " main"
-        else  if (naturalOf.isDefined && ! isOurs)  " natural"
-        else                                        " base")))
+      + " "
+      + adjective
+      + (     if (isStartLocation     && ! isOurs)  "main"
+        else  if (naturalOf.isDefined && ! isOurs)  "natural"
+        else                                        "base")))
 
-  override def toString: String = f"$description $name, ${zone.name} $heart"
+  override def toString: String = f"$arrow $description $name, ${zone.name} $heart"
 }

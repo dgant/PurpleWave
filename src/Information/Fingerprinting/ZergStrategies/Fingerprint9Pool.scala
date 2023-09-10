@@ -1,19 +1,15 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic._
+import Information.Fingerprinting.ZergStrategies.ZergTimings.{Latest_NinePool_PoolCompleteBy, Latest_NinePool_ZerglingArrivesBy, Latest_NinePool_ZerglingCompleteBy}
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
-import Utilities.Time.GameTime
 
 class Fingerprint9Pool extends FingerprintOr(
   With.fingerprints.ninePoolGas,
   new FingerprintAnd(
     new FingerprintNot(With.fingerprints.fourPool),
     new FingerprintOr(
-      new FingerprintArrivesBy(Zerg.Zergling,       GameTime(2, 50)),
-      new FingerprintCompleteBy(Zerg.Zergling,      GameTime(2, 20)),
-      new FingerprintCompleteBy(Zerg.SpawningPool,  GameTime(2, 2)))))
-      // 9 Pool and Overpool are hard to differentiate because there's only a ~9 second difference
-      // to acquire the extra 100 minerals that Overpool requires for its Spawning Pool.
-      // The boundary for 9 Pool completion looks to be around 1:58;
-      // the extra four seconds should avoid false negatives
+      new FingerprintCompleteBy(Zerg.SpawningPool,  Latest_NinePool_PoolCompleteBy),
+      new FingerprintCompleteBy(Zerg.Zergling,      Latest_NinePool_ZerglingCompleteBy),
+      new FingerprintArrivesBy(Zerg.Zergling,       Latest_NinePool_ZerglingArrivesBy))))

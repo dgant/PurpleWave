@@ -62,7 +62,7 @@ class Storyteller {
   val stories: Seq[IStory] = Seq(
     new Story                           ("Frame 0 (secs)",      () => With.frame0ms / 1000),
     new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                              _.map(_.name).mkString(", ")),
-    new Story[Iterable[Int]]            (rushDistance,          () => With.geography.rushDistances,                                                                                _.map(_.toString).mkString(", ")),
+    new Story[Iterable[Int]]            ("Rush distances",      () => With.geography.rushDistances,                                                                                _.map(_.toString).mkString(", ")),
     new Story                           ("Mean rush distance",  () => With.strategy.rushDistanceMean),
     new Story                           ("Playbook",            () => With.configuration.playbook),
     new Story                           ("Policy",              () => With.configuration.playbook.policy),
@@ -204,15 +204,16 @@ class Storyteller {
       + DrawScreen.tableToString(
         DrawScreen.padTable(
           Vector(
-            Vector("A* pathfinds:", With.paths.aStarPathfinds.toString),
-            Vector("Exploration maxed:", With.paths.aStarExplorationMaxed.toString),
-            Vector("Over 1ms:", With.paths.aStarOver1ms.toString),
-            Vector("Max ms:", (With.paths.aStarNanosMax / 1e6).toString),
-            Vector("Mean ms:", formatterMs.format(With.paths.aStarNanosTotal / 1e6d / With.paths.aStarPathfinds)),
-            Vector("Path length, max:", With.paths.aStarPathLengthMax.toString),
-            Vector("Path length, mean:", formatterMs.format(With.paths.aStarPathLengthTotal.toDouble / With.paths.aStarPathfinds)),
-            Vector("Tiles explored, max:", With.paths.aStarTilesExploredMax.toString),
-            Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal / With.paths.aStarPathfinds).toString)))))
+            Vector("A* pathfinds:",         With.paths.aStarPathfinds),
+            Vector("Exploration maxed:",    With.paths.aStarExplorationMaxed),
+            Vector("Over 1ms:",             With.paths.aStarOver1ms),
+            Vector("Max ms:",               (With.paths.aStarNanosMax / 1e6)),
+            Vector("Mean ms:",              formatterMs.format(With.paths.aStarNanosTotal / 1e6d / With.paths.aStarPathfinds)),
+            Vector("Path length, max:",     With.paths.aStarPathLengthMax),
+            Vector("Path length, mean:",    formatterMs.format(With.paths.aStarPathLengthTotal.toDouble / With.paths.aStarPathfinds)),
+            Vector("Tiles explored, max:",  With.paths.aStarTilesExploredMax),
+            Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal / With.paths.aStarPathfinds)))
+        .map(_.map(_.toString)))))
   }
 
   private def fmtMem(value: Long): String = f"${value / 1000000} MB"
@@ -249,13 +250,13 @@ class Storyteller {
     try {
       tell(f"This copy of PurpleWave came from Git revision ${Source.fromFile(f"${With.bwapiData.ai}revision.txt").getLines.mkString}")
     } catch { case exception: Exception => tell("No deployment Git revision available") }
-    tell("JBWAPI autocontinue: " + Main.jbwapiConfiguration.getAutoContinue)
-    tell("JBWAPI debugConnection: " + Main.jbwapiConfiguration.getDebugConnection)
-    tell("JBWAPI async: " + Main.jbwapiConfiguration.getAsync)
-    tell("JBWAPI async unsafe: " + Main.jbwapiConfiguration.getAsyncUnsafe)
+    tell("JBWAPI autocontinue: "            + Main.jbwapiConfiguration.getAutoContinue)
+    tell("JBWAPI debugConnection: "         + Main.jbwapiConfiguration.getDebugConnection)
+    tell("JBWAPI async: "                   + Main.jbwapiConfiguration.getAsync)
+    tell("JBWAPI async unsafe: "            + Main.jbwapiConfiguration.getAsyncUnsafe)
     tell("JBWAPI async frame buffer size: " + Main.jbwapiConfiguration.getAsyncFrameBufferCapacity)
-    tell("JBWAPI unlimited frame zero: " + Main.jbwapiConfiguration.getUnlimitedFrameZero)
-    tell("JBWAPI max frame duration: " + Main.jbwapiConfiguration.getMaxFrameDurationMs + "ms")
+    tell("JBWAPI unlimited frame zero: "    + Main.jbwapiConfiguration.getUnlimitedFrameZero)
+    tell("JBWAPI max frame duration: "      + Main.jbwapiConfiguration.getMaxFrameDurationMs + "ms")
     tell(f"Map file: ${With.mapFileName}")
     tell(f"Map hash: ${With.game.mapHash}")
     tell(f"Map id: ${With.mapCleanName}")

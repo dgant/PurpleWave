@@ -1,10 +1,10 @@
 package Information.Fingerprinting.ZergStrategies
 
 import Information.Fingerprinting.Generic.{FingerprintArrivesBy, FingerprintCompleteBy, FingerprintOr}
+import Information.Fingerprinting.ZergStrategies.ZergTimings.{Latest_FourPool_PoolCompleteBy, Latest_FourPool_ZerglingArrivesBy, Latest_FourPool_ZerglingCompleteBy}
 import ProxyBwapi.Races.Zerg
-import Utilities.Time.GameTime
 
 class Fingerprint4Pool extends FingerprintOr(
-  new FingerprintArrivesBy(Zerg.Zergling,       GameTime(2, 42)),
-  new FingerprintCompleteBy(Zerg.Zergling,      GameTime(2, 12)),
-  new FingerprintCompleteBy(Zerg.SpawningPool,  GameTime(1, 40)))
+  new FingerprintCompleteBy(Zerg.SpawningPool,  Latest_FourPool_PoolCompleteBy),
+  new FingerprintArrivesBy(Zerg.Zergling,       Latest_FourPool_ZerglingCompleteBy),
+  new FingerprintCompleteBy(Zerg.Zergling,      Latest_FourPool_ZerglingArrivesBy))

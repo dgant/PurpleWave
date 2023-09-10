@@ -17,10 +17,11 @@ abstract class PvPStrategy extends Strategy {
 
 object PvP1012 extends PvPStrategy {
   addChoice(PvP3Zealot, PvP5Zealot)
-  whitelistVs(
-    With.fingerprints.nexusFirst,
-    With.fingerprints.proxyGateway,
-    With.fingerprints.twoGate99)
+  addRequirement(() =>
+    rushTilesMinimum <= PvPGateCore.criticalRushDistance // Important, because we prohibit GateCore below this
+    || With.fingerprints.nexusFirst.recently
+    || With.fingerprints.proxyGateway.recently
+    || With.fingerprints.twoGate99.recently)
 }
 
 object PvP3Zealot extends PvPStrategy {
@@ -30,7 +31,10 @@ object PvP3Zealot extends PvPStrategy {
   blacklistVs(With.fingerprints.twoGate)
 }
 object PvP5Zealot extends PvPStrategy
-object PvPGateCore extends PvPStrategy
+object PvPGateCore extends PvPStrategy {
+  val criticalRushDistance = 150
+  setRushTilesMinimum(criticalRushDistance)
+}
 
 ////////////////////////
 // Main continuations //
@@ -55,7 +59,7 @@ object PvPCoreExpand extends PvPStrategy {
   addRequirement(() =>
     rushTilesMinimum >= 200
     || MapGroups.strongNatural.exists(_())
-    ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo)
+    ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
 }
 object PvP3GateGoon extends PvPStrategy {

@@ -40,6 +40,7 @@ class PurpleWave extends DefaultBWListener {
         With.lambdas.onFrame()
         With.tasks.run(With.performance.msBeforeTarget)
         With.storyteller.onFrame()
+        WriteMapCSV()
         With.performance.endFrame()
         With.camera.onRun(24000)
         With.visualization.onRun(24000)

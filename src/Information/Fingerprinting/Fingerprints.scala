@@ -81,7 +81,11 @@ class Fingerprints {
       oneHatchGas,
       twoHatchGas,
       threeHatchGas,
-      twoHatchMain
+      twoHatchMain,
+      oneHatchMuta,
+      twoHatchMuta,
+      threeHatchMuta,
+      zerglingsOnly
     ) else Seq.empty)
 
   private def addFingerprint(fingerprint: Fingerprint): Fingerprint = {
@@ -159,5 +163,9 @@ class Fingerprints {
   lazy val twoHatchGas          = addFingerprint(new Fingerprint2HatchGas)
   lazy val threeHatchGas        = addFingerprint(new Fingerprint3HatchGas)
   lazy val twoHatchMain         = addFingerprint(new Fingerprint2HatchMain)
+  lazy val oneHatchMuta         = addFingerprint(new Fingerprint1HatchMuta)
+  lazy val twoHatchMuta         = addFingerprint(new Fingerprint2HatchMuta)
+  lazy val threeHatchMuta       = addFingerprint(new Fingerprint3HatchMuta)
   lazy val threeHatchHydra      = addFingerprint(new Fingerprint3HatchHydra)
+  lazy val zerglingsOnly        = addFingerprint(new FingerprintZerglingOnly)
 }

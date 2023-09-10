@@ -2,7 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.{PvZ1Base4GateGoon, PvZ1BaseGoonReaver, PvZ1BaseSpeedlotArchon, PvZ1BaseStargate, PvZ2022}
+import Planning.Plans.GamePlans.Protoss.PvZ.{PvZ1BaseReactive, PvZ2022}
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -15,6 +15,11 @@ object PvZ2022 extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ2022)
 }
 
+object PvZ1BaseReactive extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1BaseReactive)
+}
+
+/*
 object PvZ1Base4GateGoon extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ1Base4GateGoon)
 }
@@ -30,6 +35,7 @@ object PvZ1BaseSpeedlotArchon extends PvZStrategy {
 object PvZ1BaseStargate extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ1BaseStargate)
 }
+*/
 
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)

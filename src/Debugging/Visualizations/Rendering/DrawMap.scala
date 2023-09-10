@@ -10,7 +10,7 @@ object DrawMap {
   
   def text(
     origin  : Pixel,
-    text    : String): Unit = {
+    text    : => String): Unit = {
     if (irrelevant(origin)) return
     With.game.drawTextMap(origin.bwapi, text)
   }
@@ -91,7 +91,7 @@ object DrawMap {
   }
   
   def label(
-    text            : String,
+    text            : => String,
     position        : Pixel,
     drawBackground  : Boolean = false,
     backgroundColor : Color = Colors.DefaultGray,
@@ -102,7 +102,7 @@ object DrawMap {
   }
 
   def labelDot(
-    text            : String,
+    text            : => String,
     position        : Pixel,
     backgroundColor : Color = Colors.DefaultGray): Unit = {
     if (irrelevant(position)) return
@@ -114,7 +114,7 @@ object DrawMap {
   }
   
   def labelBox(
-    textLines       : TraversableOnce[String],
+    textLines       : => TraversableOnce[String],
     position        : Pixel,
     drawBackground  : Boolean = false,
     backgroundColor : Color = Colors.DefaultGray,
@@ -170,13 +170,13 @@ object DrawMap {
   def drawSkull(pixel: Pixel, colorDark: Color = Colors.DarkGray, colorBright: Color = Colors.BrightGray, f: Int = 1): Unit = {
     circle(pixel, 5 * f, colorBright,  solid = true)
     circle(pixel, 5 * f, colorDark,    solid = false)
-    box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 6 * f), colorBright, solid = true)
-    box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 6 * f), colorDark,   solid = false)
-    box(pixel.add(-3 * f, 0 * f), pixel.add(1 + 3 * f, 3 * f), colorBright, solid = true)
+    box(pixel.add(-3 * f, 0), pixel.add(1 + 3 * f, 6 * f), colorBright, solid = true)
+    box(pixel.add(-3 * f, 0), pixel.add(1 + 3 * f, 6 * f), colorDark,   solid = false)
+    box(pixel.add(-3 * f, 0), pixel.add(1 + 3 * f, 3 * f), colorBright, solid = true)
 
     if (f == 1) {
-      box(pixel.add(-2 * f, -2 * f), pixel.add(0 * f, 0 * f), Color.Black, solid = true)
-      box(pixel.add( 1 * f, -2 * f), pixel.add(3 * f, 0 * f), Color.Black, solid = true)
+      box(pixel.add(-2 * f, -2 * f), pixel.add(0,     0), Color.Black, solid = true)
+      box(pixel.add( 1 * f, -2 * f), pixel.add(3 * f, 0), Color.Black, solid = true)
     } else {
       circle(pixel.add(-2 * f, -1 * f), f, Color.Black, solid = true)
       circle(pixel.add( 2 * f, -1 * f), f, Color.Black, solid = true)

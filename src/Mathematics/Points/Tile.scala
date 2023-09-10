@@ -78,11 +78,23 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(center, other.center)
   }
+  @inline def groundPixelsBidirectional(other: Pixel): Double = {
+    (groundPixels(other) + other.groundPixels(this)) / 2
+  }
+  @inline def groundPixelsBidirectional(other: Tile): Double = {
+    (groundPixels(other) + other.groundPixels(this)) / 2
+  }
   @inline def groundTiles(other: Tile): Int = {
     With.paths.groundTilesManhattan(this, other)
   }
   @inline def groundTiles(other: Pixel): Int = {
     With.paths.groundTilesManhattan(this, other.tile)
+  }
+  @inline def groundTilesBidirectional(other: Tile): Int = {
+    (groundTiles(other) + other.groundTiles(this)) / 2
+  }
+  @inline def groundTilesBidirectional(other: Pixel): Int = {
+    groundTilesBidirectional(other.tile)
   }
   @inline def travelPixelsFor(other: Pixel, unit: UnitInfo): Double = {
     unit.pixelDistanceTravelling(center, other)

@@ -7,9 +7,12 @@ import Mathematics.Maff
 import Mathematics.Points.{Direction, Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import bwta.Region
 
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
+  lazy  val zones             : Vector[Zone]        = Vector(this)
+  lazy  val bases             : Vector[Base]        = With.geography.bases.filter(_.townHallTile.zone == this)
   lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
   lazy  val metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
   lazy  val entranceOriginal  : Option[Edge]        = UpdateZones.calculateEntrance(this)
@@ -17,27 +20,17 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(if(bases.length == 1) bases.head.heart else centroid)
   lazy  val exitDirection     : Option[Direction]   = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
   lazy  val isStartLocation   : Boolean             = bases.exists(_.isStartLocation)
-  var contested       : Boolean           = false
-  var walledIn        : Boolean           = false
-  var exitNow         : Option[Edge]      = None
-  var entranceNow     : Option[Edge]      = None
+  var contested               : Boolean             = false
+  var walledIn                : Boolean             = false
+  var exitNow                 : Option[Edge]        = None
+  var entranceNow             : Option[Edge]        = None
 
-  private val _zones: Seq[Zone] = Seq(this)
-  def zones: Seq[Zone] = _zones
+  var _units: Vector[UnitInfo] = _
+  def setUnits(argUnits: Vector[UnitInfo]): Unit = _units = argUnits
+  def units: Vector[UnitInfo] = _units
 
-  private lazy val _bases: Vector[Base] = With.geography.bases.filter(_.townHallTile.zone == this)
-  def bases: Seq[Base] = _bases
-
-  private var _units: Vector[UnitInfo] = _
-  def setUnits(argUnits: Vector[UnitInfo]): Unit = {
-    _units = argUnits
-  }
-  def units: Seq[UnitInfo] = _units
-
-  private var _owner: PlayerInfo = if (tiles.contains(new Tile(With.game.self.getStartLocation))) With.self else With.neutral
-  def setOwner(argOwner: PlayerInfo): Unit = {
-    _owner = argOwner
-  }
+  private var _owner: PlayerInfo = ?(tiles.contains(new Tile(With.game.self.getStartLocation)), With.self, With.neutral)
+  def setOwner(argOwner: PlayerInfo): Unit = _owner = argOwner
   def owner: PlayerInfo = _owner
 
   def heart           : Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
@@ -46,7 +39,7 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
 
   def edgeTo(to: Pixel) : Option[Edge] = Maff.minBy(edges)(_.pixelCenter.groundPixels(to))
 
-  override def toString: String = f"$name ${if (bases.nonEmpty) f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) " else ""}$centroid"
+  override def toString: String = f"$name ${?(bases.nonEmpty, f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) ", "")}$centroid"
 
   /////////////////////
   // Wall generation //
@@ -62,6 +55,6 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   lazy val wallPerimeterACloserToEntrance : Boolean       = wallPerimeterA == Seq(wallPerimeterA, wallPerimeterB).minBy(wp => Maff.min(wp.view.map(_.pixelDistance(entranceOriginal.map(_.pixelCenter).getOrElse(centroid.center)))).getOrElse(0d))
   lazy val wallPerimeterEntrance          : Vector[Tile]  = if (wallPerimeterACloserToEntrance) wallPerimeterA else wallPerimeterB
   lazy val wallPerimeterExit              : Vector[Tile]  = if (wallPerimeterACloserToEntrance) wallPerimeterB else wallPerimeterA
-  lazy val wallPerimeterHall              : Vector[Tile]  = _bases.flatMap(_.townHallArea.tilesAtEdge)
-  lazy val wallPerimeterGas               : Vector[Tile]  = _bases.flatMap(_.gas.flatMap(_.tileArea.tilesAtEdge))
+  lazy val wallPerimeterHall              : Vector[Tile]  = bases.flatMap(_.townHallArea.tilesAtEdge)
+  lazy val wallPerimeterGas               : Vector[Tile]  = bases.flatMap(_.gas.flatMap(_.tileArea.tilesAtEdge))
 }

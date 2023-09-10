@@ -15,6 +15,15 @@ import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior}
 
 class PvPOpening extends GameplanImperative {
 
+  // Some build references:
+  // CoreZ  Robo    Range   Speed Shuttle Double Reaver (2p Ramped):    https://youtu.be/5kvNatT3PuU?t=3340
+  // NZCore Range   Gate    Robo  Shuttle Reaver        (4p Inverted):  https://youtu.be/5kvNatT3PuU?t=4400
+  // NZCore Range   Gate    Robo  Shuttle Reaver        (4p Inverted):  https://youtu.be/dCn9WWIk4so?t=4658 (Same build as above) Shuttle > Reaver > Observatory > Reaver > Expand > Obs
+  // NZCore Range   Citadel                             (4p Inverted):  https://youtu.be/5kvNatT3PuU?t=4423
+  // CoreZ  Range   Robo    Gate  Obs     Gate          (4p Inverted):  https://youtu.be/dCn9WWIk4so?t=4658 (After seeing Robo) Shuttle > Reaver > Reaver > All-In
+  // ZCoreZ Range   Citadel Gate  Archives              (2p Ramped):    https://youtu.be/dCn9WWIk4so?t=6884 Gate Robo
+  // CoreZ  Range   2Goon   Nexus Robo    GateGate      (2p Ramped):    https://youtu.be/dCn9WWIk4so?t=6884 Obs
+
   var complete            : Boolean = false
   var atEarlyTiming       : Boolean = false
   var atMainTiming        : Boolean = false
@@ -124,8 +133,7 @@ class PvPOpening extends GameplanImperative {
       }
     } else {
       if ( ! have(Protoss.CyberneticsCore)) {
-        zBeforeCore = enemyRecentStrategy(With.fingerprints.twoGate99, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
-        zBeforeCore &&= ! gctech
+        zBeforeCore = enemyRecentStrategy(With.fingerprints.twoGate99, With.fingerprints.proxyGateway, With.fingerprints.mannerPylon, With.fingerprints.gasSteal, With.fingerprints.cannonRush)
         zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
         zBeforeCore ||= With.fingerprints.twoGate()
         zBeforeCore ||= gcgate
@@ -133,8 +141,8 @@ class PvPOpening extends GameplanImperative {
       if ( ! haveComplete(Protoss.CyberneticsCore)) {
         zAfterCore = true
         zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)
-        zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal)
-        zAfterCore ||= gcgate|| gctech || PvPDT()
+        zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal, With.fingerprints.cannonRush)
+        zAfterCore ||= gcgate || gctech || PvPDT()
       }
       if (units(Protoss.Gateway) < 2 && ! have(Protoss.RoboticsFacility, Protoss.CitadelOfAdun) && ! anyUpgradeStarted(Protoss.DragoonRange, Protoss.AirDamage)) {
         if (With.fingerprints.twoGate() || With.fingerprints.proxyGateway() || With.fingerprints.nexusFirst()) {
@@ -315,6 +323,7 @@ class PvPOpening extends GameplanImperative {
       greedyDT    = have(Protoss.TemplarArchives)
       greedyDT  &&= ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush)
       greedyDT  &&= roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
+      shouldExpand  ||= enemyStrategy(With.fingerprints.forgeFe)
     }
 
     had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && ! have(Protoss.CyberneticsCore)
@@ -348,7 +357,7 @@ class PvPOpening extends GameplanImperative {
     shouldAttack        ||= timingVsProxy
     shouldAttack        &&= safePushing
     shouldAttack        ||= timingVs2Gate
-    shouldAttack        &&= ! enemiesHave(Protoss.DarkTemplar) || haveComplete(Protoss.Observer)
+    shouldAttack        &&= ! enemiesHave(Protoss.DarkTemplar) || unitsComplete(Protoss.Observer) > 1
     shouldAttack        ||= With.units.ours.exists(_.agent.commit) && With.frame < Minutes(5)() // Ensure that committed Zealots keep wanting to attack
     shouldHarass          = upgradeStarted(Protoss.ShuttleSpeed) && unitsComplete(Protoss.Reaver) > 1
 
@@ -378,10 +387,10 @@ class PvPOpening extends GameplanImperative {
 
     // If we want to expand, make sure we control our natural
     shouldHoldNatural   = safeDefending
-    shouldHoldNatural  &&= enemyBases > 1 || ! PvPDT()    || unitsComplete(Protoss.DarkTemplar) > 0
-    shouldHoldNatural  &&= enemyBases > 1 || ! getReavers || unitsComplete(Protoss.Reaver) > 0
-    shouldHoldNatural  &&= ! rangeDelayed || Protoss.DragoonRange()
-    shouldHoldNatural  &&= enemyHasShown(Protoss.Dragoon)
+    shouldHoldNatural &&= enemyBases > 1 || ! PvPDT()    || unitsComplete(Protoss.DarkTemplar) > 0
+    shouldHoldNatural &&= enemyBases > 1 || ! getReavers || unitsComplete(Protoss.Reaver) > 0
+    shouldHoldNatural &&= ! rangeDelayed || Protoss.DragoonRange()
+    shouldHoldNatural &&= enemyHasShown(Protoss.Dragoon)
     shouldHoldNatural ||= shouldAttack
     shouldHoldNatural ||= shouldExpand && bases < 2
 

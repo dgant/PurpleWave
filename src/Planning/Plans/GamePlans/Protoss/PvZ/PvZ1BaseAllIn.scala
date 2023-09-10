@@ -11,6 +11,9 @@ abstract class PvZ1BaseAllIn extends PvZ1BaseOpenings {
 
   override def executeBuild(): Unit = {
     open(allowExpanding = false)
+    if (units(Protoss.Probe) >= 15) {
+      requireMiningBases(1)
+    }
   }
 
   protected def allInLogic(): Unit = {

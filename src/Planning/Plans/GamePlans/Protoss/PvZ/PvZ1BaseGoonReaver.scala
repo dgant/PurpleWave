@@ -11,7 +11,7 @@ class PvZ1BaseGoonReaver extends PvZ1BaseAllIn {
     new MeldArchons()()
     pump(Protoss.Observer, 1)
     if ( ! needToAllIn) {
-      pump(Protoss.Reaver)
+      pumpShuttleAndReavers(shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     }
 
     SwapIf(

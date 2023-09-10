@@ -85,12 +85,20 @@ trait MacroCounting {
     With.units.countEverOurs(_.isAny(matchers: _*))
   }
 
+  def existsEver(matchers: UnitFilter*): Boolean = {
+    matchers.exists(unitsEver(_) > 0)
+  }
+
   def have(matchers: UnitFilter*): Boolean = {
     With.units.existsOurs(matchers: _*)
   }
 
   def haveComplete(matchers: UnitFilter*): Boolean = {
     With.units.existsOurs(IsAll(IsComplete, IsAny(matchers: _*)))
+  }
+
+  def haveEver(matchers: UnitFilter*): Boolean = {
+    matchers.exists(With.units.existsEverOurs(_))
   }
 
   def framesUntilUnit(unitClass: UnitClass): Int = {

@@ -6,8 +6,9 @@ import Lifecycle.With
 import Utilities.Time.Seconds
 
 class Fingerprint3HatchGas extends FingerprintAnd(
-  new FingerprintNot(With.fingerprints.oneHatchGas),
-  new FingerprintNot(With.fingerprints.twoHatchGas),
+  new FingerprintNot(
+    With.fingerprints.oneHatchGas,
+    With.fingerprints.twoHatchGas),
   new FingerprintOr(
     With.fingerprints.twelveHatchHatch,
     With.fingerprints.twelveHatchPoolHatch,

@@ -1,54 +1,70 @@
 package Micro.Agency
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.ActionPerformance
 import Performance.Tasks.TimedTask
 import Performance.Timer
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.?
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class Agency extends TimedTask {
 
   withAlwaysSafe(true)
 
   var lastQueueCompletion = 0
-  val agentQueue          = new mutable.Queue[Agent]
+  var agentIndex          = 0
+  val agents              = new ArrayBuffer[Agent]
   val cycleLengths        = new mutable.Queue[Int]
   val actionPerformance   = new mutable.HashMap[String, ActionPerformance]()
 
-  override def isComplete: Boolean = agentQueue.isEmpty
+  override def isComplete: Boolean = agents.isEmpty
 
   override def onRun(budgetMs: Long): Unit = {
 
     val timer = new Timer(budgetMs)
 
-    if (agentQueue.isEmpty) {
+    if (agentIndex >= agents.length) {
       cycleLengths.enqueue(With.framesSince(lastQueueCompletion))
       while (cycleLengths.sum > With.reaction.runtimeQueueDuration) { cycleLengths.dequeue() }
       lastQueueCompletion = With.frame
 
       With.coordinator.onAgentCycle()
-      agentQueue ++= With.units.ours.view
-        .filter(u => u.alive && (u.complete || u.unitClass.isBuilding) && u.unitClass.orderable)
+
+      agentIndex = 0
+      agents.clear()
+      agents ++= With.units.ours
+        .filter(u =>
+          u.unitClass.orderable
+          && ?(
+            u.unitClass.isBuilding,
+            ! u.complete  ||  ! u.isAny(Terran.SupplyDepot, Protoss.Pylon),
+              u.complete) ||    u.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon))
         .map(_.agent)
-        .toVector
-        .sortBy(_.unit.frameDiscovered) // Start with a stable order
-        .sortBy(- _.unit.matchups.pixelsEntangled) // Units in trouble get first dibs on things
-        .sortBy(_.unit.unitClass.isTransport) // Make transports go after their passengers so they know what passengers want
+
+      Maff.sortStablyInPlaceBy(agents, 0, agents.length)(a =>
+        Maff.or1(1e5, a.unit.unitClass.isTransport)
+        - a.unit.matchups.pixelsEntangled)
     }
 
-    while (agentQueue.nonEmpty && timer.greenLight) {
-      val agent = agentQueue.dequeue()
-      val unit = agent.unit
-      unit.sleepUntil = Math.max(unit.sleepUntil, AttackDelay.nextSafeOrderFrame(unit))
-      if (unit.unitClass.orderable && agent.unit.alive && agent.unit.ready) {
+    while (agentIndex < agents.length && timer.greenLight) {
+      val agent       =   agents(agentIndex)
+      val unit        =   agent.unit
+      agentIndex      +=  1
+      unit.sleepUntil =   Math.max(unit.sleepUntil, AttackDelay.nextSafeOrderFrame(unit))
+
+      if (unit.alive && unit.ready) {
         val timeBefore = With.performance.frameElapsedMs
         agent.execute()
         agent.toAttack.foreach(_.addTargeter(unit))
+
         if (With.configuration.enablePerformancePauses && timer.redLight && With.performance.frameBrokeLimit) {
           val timeAfter = With.performance.frameElapsedMs
           val timeDelta = timeAfter - timeBefore
-          With.logger.performance(f"${unit.unitClass} broke ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actions.isEmpty) agent.lastAction.get else agent.actions.mkString(", ")}")
+          With.logger.performance(f"${unit} crossed ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actions.isEmpty) agent.lastAction.get else agent.actions.mkString(", ")}")
         }
       }
     }

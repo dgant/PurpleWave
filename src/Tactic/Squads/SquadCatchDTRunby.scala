@@ -23,6 +23,7 @@ class SquadCatchDTRunby extends Squad {
   }
 
   override def run(): Unit = {
+    setTargets(vicinity.zone.metro.map(_.zones).getOrElse(Seq(vicinity.zone)).flatMap(_.enemies.view.filter(Protoss.DarkTemplar)))
     units.foreach(_.intend(this).setTravel(vicinity))
   }
 }

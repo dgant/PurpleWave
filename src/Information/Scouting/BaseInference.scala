@@ -14,10 +14,11 @@ trait BaseInference {
   def weExpandedFirst           : Boolean       = _firstExpansionFrameUs < _firstExpansionFrameEnemy && With.scouting.enemyNatural.forall(b => b.mineralsLeft >= With.geography.ourNatural.mineralsLeft)
   def enemyExpandedFirst        : Boolean       = _firstExpansionFrameEnemy < _firstExpansionFrameUs
   def enemyMainFullyScouted     : Boolean       = _enemyMainScouted
-  private var _firstEnemyMain: Option[Base] = None
-  private var _firstExpansionFrameEnemy: Int = Forever()
-  private var _firstExpansionFrameUs: Int = Forever()
-  private var _enemyMainScouted: Boolean = false
+
+  private var _firstEnemyMain           : Option[Base] = None
+  private var _firstExpansionFrameEnemy : Int = Forever()
+  private var _firstExpansionFrameUs    : Int = Forever()
+  private var _enemyMainScouted         : Boolean = false
 
   def enemyNaturalPossiblyMining: Boolean = {
     // Recent observations are proof

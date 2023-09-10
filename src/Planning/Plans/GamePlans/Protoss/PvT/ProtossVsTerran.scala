@@ -135,12 +135,11 @@ class ProtossVsTerran extends PvTOpeners {
     def profited: Boolean = started && upgradeStarted(Protoss.GroundDamage)
     def perform(): Unit = {
       get(Protoss.DragoonRange)
+      get(3, Protoss.Gateway) //  Upgrading with anything less is silly
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
       buildGasPumps(2)
-      if (gasPumps > 1 && units(Protoss.Gateway) >= 3) {
-        get(?(counterBio, 2, 1), Protoss.Forge) // This tends to get slotted in prematurely when we're gas-starved
-      }
+      get(?(counterBio, 2, 1), Protoss.Forge) // This tends to get slotted in prematurely when we're gas-starved
       get(Protoss.TemplarArchives)
       get(Protoss.GroundDamage)
       if (counterBio) get(Protoss.GroundArmor)
@@ -158,6 +157,7 @@ class ProtossVsTerran extends PvTOpeners {
       get(Protoss.ZealotSpeed)
       buildGasPumps(2)
       get(Protoss.TemplarArchives)
+      get(5, Protoss.Gateway) // Storm with anything less is silly
       once(2, Protoss.HighTemplar)
       get(Protoss.PsionicStorm)
       get(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)

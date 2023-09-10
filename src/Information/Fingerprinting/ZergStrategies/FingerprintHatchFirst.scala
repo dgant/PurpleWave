@@ -8,12 +8,16 @@ import ProxyBwapi.Races.Zerg
 import Utilities.Time.Seconds
 
 class FingerprintHatchFirst extends FingerprintAnd(
-  new FingerprintNot(With.fingerprints.fourPool),
-  new FingerprintNot(With.fingerprints.ninePool),
-  new FingerprintNot(With.fingerprints.overpool),
-  new FingerprintNot(With.fingerprints.twelvePool),
+
+  new FingerprintNot(
+    With.fingerprints.fourPool,
+    With.fingerprints.ninePool,
+    With.fingerprints.overpool,
+    With.fingerprints.twelvePool),
+
   new FingerprintOr(
-    new FingerprintCompleteBy(HatchCriterion, TwelveHatch_HatchCompleteBy + Seconds(10)),
+    With.fingerprints.tenHatch,
+    new FingerprintCompleteBy(IsNonStartingHatch, TwelveHatch_HatchCompleteBy + Seconds(10)),
     new Fingerprint {
       override protected def investigate: Boolean = {
         With.units.enemy.exists(u => Zerg.SpawningPool(u) && ! u.complete && u.completionFrame > TenHatch9Pool_PoolCompleteBy() - Seconds(3)())

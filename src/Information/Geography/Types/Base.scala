@@ -12,7 +12,6 @@ import Utilities.Time.{Forever, Minutes}
 
 final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile]) extends Geo {
   lazy val metro              : Metro             = With.geography.metros.find(_.bases.contains(this)).get
-  val isStartLocation         : Boolean           = With.geography.startLocations.contains(townHallTile)
   val townHallArea            : TileRectangle     = Protoss.Nexus.tileArea.add(townHallTile)
   val zone                    : Zone              = With.geography.zoneByTile(townHallTile)
   val bases                   : Vector[Base]      = Vector(this)

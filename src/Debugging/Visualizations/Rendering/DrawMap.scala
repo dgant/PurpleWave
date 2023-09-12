@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Rendering
 
+import Debugging.Asciify
 import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.Maff
@@ -12,7 +13,7 @@ object DrawMap {
     origin  : Pixel,
     text    : => String): Unit = {
     if (irrelevant(origin)) return
-    With.game.drawTextMap(origin.bwapi, text)
+    With.game.drawTextMap(origin.bwapi, Asciify(text))
   }
   
   def line(
@@ -110,7 +111,7 @@ object DrawMap {
     val height = 11
     val radius = 1 + Math.max(width, height) / 2
     circle(position, radius, backgroundColor, solid = true)
-    With.game.drawTextMap(position.x - width / 2, position.y - height / 2, text)
+    With.game.drawTextMap(position.x - width / 2, position.y - height / 2, Asciify(text))
   }
   
   def labelBox(
@@ -153,7 +154,7 @@ object DrawMap {
     With.game.drawTextMap(
       textX,
       textY,
-      textLines.mkString("\n"))
+      textLines.map(Asciify.apply).mkString("\n"))
   }
   
   def tileRectangle(rectangle: TileRectangle, color: Color, margin: Int = 0): Unit = {

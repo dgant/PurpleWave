@@ -12,18 +12,11 @@ case class Metro(bases: Vector[Base]) extends Geo {
 
   val main    : Option[Base] = bases.find(_.isStartLocation)
   val natural : Option[Base] = main.flatMap(_.natural)
-  val zones   : Vector[Zone] = With.geography.zones.filter(zone =>
-    zone.bases.forall(bases.contains)
-    || (
-      zone.bases.isEmpty
-      && {
-        val centroid = zone.centroid
-        With.paths
-          .aStar(centroid, With.geography.startLocations.maxBy(_.groundTiles(centroid)))
-          .tiles
-          .exists(_.exists(_.base.exists(bases.contains)))
-      })
-  )
+  val zones   : Vector[Zone] = {
+    val baseZones = bases.flatMap(_.zones)
+    val pathZones = bases.flatMap(b1 => bases.flatMap(b2 => With.paths.aStar(b1.heart, b2.heart).tiles.getOrElse(Seq.empty).map(_.zone)))
+    (baseZones ++ pathZones).distinct
+  }
   val tiles: Set[Tile] = zones.flatMap(_.tiles.view).toSet
 
   var name: String = ""
@@ -35,8 +28,7 @@ case class Metro(bases: Vector[Base]) extends Geo {
     ?(owners.length == 1, owners.head, With.neutral)
   }
 
-  lazy val isStartLocation  : Boolean   = bases.exists(_.isStartLocation)
-  lazy val heart            : Tile      = main.orElse(natural).map(_.heart).getOrElse(Maff.exemplarTiles(bases.map(_.heart)))
+  lazy val heart: Tile = main.orElse(natural).map(_.heart).getOrElse(Maff.exemplarTiles(bases.map(_.heart)))
 
   override def toString: String = f"$arrow $name ${?(island, " Island", "")}${?(main.isDefined, " main", "")}: ${bases.map(_.toString).mkString(" >> ")}"
 }

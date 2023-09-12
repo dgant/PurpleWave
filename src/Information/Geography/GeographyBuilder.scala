@@ -99,6 +99,7 @@ trait GeographyBuilder {
         }
       }
     }
+    _metros.foreach(_.name = metroNames.next())
   }
 
   private def metroDistance(origin: Metro, other: Metro): Double = {

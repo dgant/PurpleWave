@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 
 object ShowBulletsAsHearts extends DebugView {
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.game.getBullets.asScala
       .filter(bullet => bullet.isVisible && bullet.exists && bullet.getPlayer != null)
       .foreach(bullet => {

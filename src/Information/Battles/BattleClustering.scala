@@ -32,7 +32,7 @@ class BattleClustering {
     speed               = Maff.max(With.units.playerOwned.map(_.topSpeed)).getOrElse(0)
     speedRange          = (With.reaction.clusteringMax * speed).toInt
     tankRange           = ?(Players.all.exists(Terran.SiegeMode(_)), 32 * 11, 0)
-    rangePixels         = 2 * speedRange + Math.max(tankRange, With.units.playerOwned.map(_.effectiveRangePixels).max.toInt)
+    rangePixels         = 2 * speedRange + Math.max(tankRange, Maff.max(With.units.playerOwned.map(_.effectiveRangePixels)).getOrElse(0.0).toInt)
     rangePixelsSquared  = rangePixels * rangePixels
 
     // Cluster units, as fixed-radius nearest neighbors.

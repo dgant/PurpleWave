@@ -39,7 +39,9 @@ object ConfigurationLoader {
     }
     With.logger.debug("Using configuration file " + configFile.getName)
     try {
-      val configText    = scala.io.Source.fromFile(configFile).mkString
+      val configSource  = scala.io.Source.fromFile(configFile)
+      val configText    = configSource.mkString
+      configSource.close()
       val config        = Json.read(configText)
       val human         = getOrDefault(config, "human",         false)
       val ladder        = getOrDefault(config, "ladder",        false)

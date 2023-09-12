@@ -14,17 +14,18 @@ trait Geo {
   def units           : Seq[UnitInfo]
   def bases           : Vector[Base]
   def zones           : Vector[Zone]
-  def isStartLocation : Boolean
 
+  lazy val isStartLocation  : Boolean         = bases.map(_.townHallTile).exists(With.geography.startLocations.contains)
   lazy val isCross          : Boolean         = ! With.geography.startBases.sortBy(With.geography.ourMain.groundDistance).exists(bases.contains)
   lazy val island           : Boolean         = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val isInterior       : Boolean         = zones.forall(z => z.metro.exists(m => ! m.airlocks.exists(_.zones.contains(z))))
   lazy val isBackyard       : Boolean         = zones.forall(z => z.metro.exists(m => ! m.airlocks.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
+  lazy val isPocket         : Boolean         = isInterior && ! isStartLocation
   lazy val radians          : Double          = Points.middle.radiansTo(heart.center)
   lazy val rushDistanceMin  : Double          = Maff.max(rushDistances).getOrElse(0)
   lazy val rushDistanceMax  : Double          = Maff.max(rushDistances).getOrElse(0)
   lazy val arrow            : String          = RadianArrow(Points.tileMiddle.radiansTo(heart))
-  lazy val adjective        : String          = if (island) "island " else if (isBackyard) "backyard " else if (isInterior) "pocket " else ""
+  lazy val adjective        : String          = if (island) "island " else if (isBackyard) "backyard " else if (isPocket) "pocket " else ""
   lazy val centroid         : Tile            = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles))
   lazy val boundary         : TileRectangle   = new TileRectangle(tiles)
   lazy val border           : Set[Tile]       = tiles.filter( ! _.adjacent8.forall(tiles.contains))

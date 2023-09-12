@@ -94,7 +94,7 @@ class Logger {
     }
     if (chat && With.configuration.debugging && With.manners != null) {
       // Only send ASCII characters. No idea if this is necessary but seems like a good idea.
-      With.manners.chat(message.replaceAll("[^\\x00-\\x7F]", ""))
+      With.manners.chat(Asciify(message))
     }
   }
   

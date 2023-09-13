@@ -1,12 +1,12 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
-import Mathematics.Maff
 import Planning.Compositor
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.{?, SwapIf}
 import Utilities.Time.{GameTime, Minutes}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import Utilities.{?, SwapIf}
 
 import scala.collection.mutable
 
@@ -57,19 +57,20 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     consider(Gates910,  poolMaxRecently <= timing4p)
   }
 
+  def on(c: Composition*): Boolean = c.exists(composition.contains)
+  def go(c: Composition, p: Boolean): Unit = if(p && ! composition.contains(c)) composition :+= c
+  def goo(c: Composition, max: Int, p: Boolean = true): Unit = go(c, composition.length <= max && p)
+
   protected def chooseComposition(): Unit = {
     val static = enemies(Zerg.CreepColony, Zerg.SunkenColony)
 
     composition = Seq.empty
 
-    def on(c: Composition*): Boolean = c.exists(composition.contains)
-    def go(c: Composition, p: Boolean): Unit = if(p && ! composition.contains(c)) composition :+= c
-    def goo(c: Composition, max: Int, p: Boolean = true): Unit = go(c, composition.length <= max && p)
-
-    go (Goon,         upgradeStarted(Protoss.DragoonRange))
-    go (Speedlot,     have(Protoss.Forge))
     go (Stargate,     have(Protoss.Stargate))
-    go (Reaver,       have(Protoss.Shuttle, Protoss.RoboticsSupportBay) || (have(Protoss.RoboticsFacility) && ! on(Goon, Speedlot, Stargate)))
+    go (Speedlot,     have(Protoss.Forge))
+    go (Goon,         upgradeStarted(Protoss.DragoonRange))
+    go (Reaver,       have(Protoss.Shuttle, Protoss.RoboticsSupportBay))
+    goo(Reaver,   0,  have(Protoss.RoboticsFacility))
     goo(Reaver,   0,  enemyHydralisksLikely)
     goo(Reaver,   0,  enemyLurkersLikely)
     goo(Speedlot, 0,  anticipateSpeedlings)
@@ -79,13 +80,33 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     goo(Reaver,   0,  static > 1)
     goo(Goon,     0)
     goo(Stargate, 1,  enemyMutalisksLikely && ! on(Goon))
-    goo(Reaver,   1,  static > 2)
-    goo(Reaver,   1,  on(Stargate) && enemyHydralisksLikely)
-    goo(Reaver,   2,  on(Stargate) && enemyHydralisksLikely)
+    goo(Goon,     1,  enemyMutalisksLikely && on(Stargate))
+    goo(Reaver,   1,  enemyHydralisksLikely && on(Stargate))
+    goo(Speedlot, 1,  With.fingerprints.threeHatchGas() && on(Reaver))
+    goo(Reaver,   2,  static > 2)
+    goo(Goon,     2,  enemyMutalisksLikely && on(Reaver))
+    goo(Reaver,   2,  units(Protoss.Zealot, Protoss.Dragoon) > 24)
   }
 
   protected def capGas(): Unit = {
     if (have(Protoss.TemplarArchives)) return
+    if (anticipateSpeedlings && units(IsWarrior) < 9 && units(Protoss.Gateway) < 3) {
+      gasWorkerCeiling(0)
+    } else if ( ! have(Protoss.CyberneticsCore)) {
+      gasWorkerCeiling(1)
+    } else if (composition.headOption.contains(Goon) && units(Protoss.Gateway) < 4) {
+      gasWorkerCeiling(1)
+      gasLimitCeiling(150)
+    } else if (composition.headOption.contains(Speedlot) && ! have(Protoss.CitadelOfAdun)) {
+      gasWorkerCeiling(1)
+      gasLimitCeiling(200)
+    } else if (composition.headOption.contains(Stargate) && ! have(Protoss.Stargate)) {
+      gasWorkerCeiling(1)
+      gasLimitCeiling(200)
+    } else if (composition.headOption.contains(Reaver) && ! have(Protoss.RoboticsFacility)) {
+      gasWorkerCeiling(2)
+      gasLimitCeiling(200)
+    }
   }
   protected def obsVsLurker(): Unit = {
     if (enemyHasShown(Zerg.Lurker, Zerg.LurkerEgg)) {
@@ -139,6 +160,10 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
   def buildTech(): Unit = {
     get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    if (units(Protoss.Gateway) >= 5 || units(IsWorker) > 35) {
+      buildGasPumps()
+    }
+
     composition.foreach {
       case Goon =>
         get(Protoss.DragoonRange)
@@ -186,10 +211,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     var weighHydralisks =   1.0   * countHydralisks
     var weighMutalisks  =   2.0   * countMutalisks
     var weighSunkens    =   4.0   * countSunkens
-    val denominator     =   weighZerglings + weighHydralisks + weighMutalisks + weighSunkens
-    weighZerglings      /=  Maff.nanToOne(denominator)
-    weighHydralisks     /=  Maff.nanToOne(denominator)
-    weighMutalisks      /=  Maff.nanToOne(denominator)
+    val denominator     =   Math.max(0.01, weighZerglings + weighHydralisks + weighMutalisks + weighSunkens)
+    weighZerglings      /=  denominator
+    weighHydralisks     /=  denominator
+    weighMutalisks      /=  denominator
+    weighSunkens        /=  denominator
 
     val weighZealots  = weighZerglings  + weighSunkens
     val weighDragoons = weighHydralisks + weighMutalisks
@@ -205,7 +231,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       compositor.setNeed(Protoss.Dragoon, weighDragoons)
       compositor.setGoal(Protoss.Dragoon, 6 + enemies(Zerg.Mutalisk) + enemies(Zerg.Hydralisk))
     } else {
-      val goonsVsScourge = ?(composition.contains(Stargate) && enemyHasShown(Zerg.Scourge), 2, 0)
+      val goonsVsScourge = ?(composition.contains(Stargate) && enemyHasShown(Zerg.Scourge), 2, 1)
       compositor.setNeed(Protoss.Dragoon, 5.0)
       compositor.capGoal(Protoss.Dragoon, goonsVsScourge)
     }
@@ -229,8 +255,8 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
     compositor.produceAndPump()
 
-    pump(Protoss.Scout)
     pump(Protoss.HighTemplar)
+    pump(Protoss.Scout)
     pump(Protoss.Zealot)
     pump(Protoss.Gateway, 5 * miningBases - units(Protoss.Stargate) - units(Protoss.RoboticsSupportBay))
     requireMiningBases(2) // Unlikely to happen but maybe useful if we run out of building room at home

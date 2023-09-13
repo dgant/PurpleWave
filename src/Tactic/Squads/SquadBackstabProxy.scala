@@ -1,7 +1,7 @@
 package Tactic.Squads
 
 import Lifecycle.With
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferClose

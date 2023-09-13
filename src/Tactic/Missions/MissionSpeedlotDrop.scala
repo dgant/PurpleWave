@@ -1,7 +1,7 @@
 package Tactic.Missions
 
 import Lifecycle.With
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.CountExactly
 import Utilities.UnitFilters.IsAll

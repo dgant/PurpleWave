@@ -6,12 +6,12 @@ import Macro.Requests._
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
+import Planning.MacroFacts
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Macro.Automatic.Rounding.Rounding
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{BuildOnce, BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Expanding.BuildGasPumps
-import Planning.Predicates.MacroFacts
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech

@@ -2,7 +2,7 @@ package Tactic.Tactics
 
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.Seconds

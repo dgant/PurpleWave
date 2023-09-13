@@ -2,7 +2,7 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.Protoss
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsMobileDetector

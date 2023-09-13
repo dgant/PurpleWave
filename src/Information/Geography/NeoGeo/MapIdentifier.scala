@@ -8,6 +8,10 @@ object MapIdentifier {
     mapString.toLowerCase
       .replaceAll(".scm", "")
       .replaceAll(".scx", "")
+      .replaceAll("kespa", "")
+      .replaceAll("iccup", "")
+      .replaceAll("neo", "")
+      .replaceAll("new", "")
       .replaceAll("[^a-z]", "")
   }
 

@@ -1,7 +1,6 @@
 package Planning.Plans.GamePlans.All
 
-import Planning.Plan
-import Planning.Predicates.MacroCounting
+import Planning.{MacroCounting, Plan}
 
 abstract class GameplanImperative extends Plan with Modal with MacroCounting with MacroActions  {
   def activated: Boolean = true

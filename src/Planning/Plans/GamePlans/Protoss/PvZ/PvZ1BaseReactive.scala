@@ -1,8 +1,11 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
+import Mathematics.Maff
+import Planning.Compositor
+import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.?
+import Utilities.{?, SwapIf}
 import Utilities.Time.{GameTime, Minutes}
 
 import scala.collection.mutable
@@ -14,7 +17,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   // TODO: Cap gas workers
 
   protected var economy     : Economy           = Neutral
-  protected var opening     : Opening           = _
+  protected var opening     : Opening           = Gates1012
   protected var composition : Seq[Composition]  = Seq.empty
 
   protected def chooseOpening(): Unit = {
@@ -64,7 +67,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     def goo(c: Composition, max: Int, p: Boolean = true): Unit = go(c, composition.length <= max && p)
 
     go (Goon,         upgradeStarted(Protoss.DragoonRange))
-    go (Speedlot,     have(Protoss.CitadelOfAdun))
+    go (Speedlot,     have(Protoss.Forge))
     go (Stargate,     have(Protoss.Stargate))
     go (Reaver,       have(Protoss.Shuttle, Protoss.RoboticsSupportBay) || (have(Protoss.RoboticsFacility) && ! on(Goon, Speedlot, Stargate)))
     goo(Reaver,   0,  enemyHydralisksLikely)
@@ -82,7 +85,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   }
 
   protected def capGas(): Unit = {
-
+    if (have(Protoss.TemplarArchives)) return
   }
   protected def obsVsLurker(): Unit = {
     if (enemyHasShown(Zerg.Lurker, Zerg.LurkerEgg)) {
@@ -92,6 +95,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   }
 
   override def executeBuild(): Unit = {
+    new MeldArchons()()
     chooseOpening()
     chooseComposition()
     capGas()
@@ -111,20 +115,124 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       get(7, Protoss.Zealot)
       get(3, Protoss.Gateway)
     }
-    if (opening == Gates910 || opening == Gates910) scoutOn(Protoss.Gateway, 2) else scoutOn(Protoss.Pylon)
+    if      (enemyRecentStrategy(With.fingerprints.twelveHatch))  scoutOn(Protoss.Pylon)
+    else if (opening == Gates910 || opening == Gates1012)         scoutOn(Protoss.Gateway, 2)
+    else                                                          scoutOn(Protoss.Pylon)
   }
 
+  private val compositor = new Compositor
   override def executeMain(): Unit = {
     With.blackboard.scoutExpansions.set(false)
     status(economy)
     status(opening)
     status(composition.mkString(""))
     status(anticipateSpeedlings, "Speedlings")
+
     obsVsLurker()
     requireMiningBases(?(frame > Minutes(10)(), 2, 1))
-    pump(Protoss.Dragoon, ?(have(Protoss.Stargate) && enemiesHave(Zerg.Scourge), 2, 1))
+
+    SwapIf(
+      safeDefending || supplyUsed200 > 30,
+      buildArmy(),
+      buildTech())
+  }
+
+  def buildTech(): Unit = {
+    get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    composition.foreach {
+      case Goon =>
+        get(Protoss.DragoonRange)
+        if (composition.length == 1) {
+          get(4, Protoss.Gateway)
+        }
+      case Speedlot =>
+        get(Protoss.Forge)
+        get(Protoss.CitadelOfAdun)
+        get(Protoss.GroundDamage)
+        get(Protoss.ZealotSpeed)
+        get(Protoss.TemplarArchives)
+        get(Protoss.DarkTemplar)
+        get(2, Protoss.HighTemplar)
+        if (composition.length == 1) {
+          get(5, Protoss.Gateway)
+        }
+      case Reaver =>
+        get(Protoss.RoboticsFacility)
+        SwapIf(
+          safeDefending,
+          {
+            get(Protoss.RoboticsSupportBay)
+            get(2, Protoss.Reaver)
+          },
+          get(Protoss.Shuttle))
+        if (composition.length == 1) {
+          get(2, Protoss.Gateway)
+        }
+      case Stargate =>
+        get(Protoss.Stargate)
+        get(2, Protoss.Gateway)
+        if (composition.length == 1) {
+          get(2, Protoss.Stargate)
+        }
+    }
+  }
+
+  def buildArmy(): Unit = {
+    val countZerglings  =   Math.max(enemies(Zerg.Zergling),  ?(enemyHydralisksLikely, 0, Math.max(8, 4 + enemies(Zerg.Zergling))))
+    val countHydralisks =   Math.max(enemies(Zerg.Hydralisk), ?(enemyHydralisksLikely, 4, 0))
+    val countMutalisks  =   Math.max(enemies(Zerg.Mutalisk),  ?(enemyMutalisksLikely && ! enemyHydralisksLikely,  8, 0))
+    val countSunkens    =   enemies(Zerg.SunkenColony) * 2 * Math.max(0, confidenceDefending01 - 0.5)
+    var weighZerglings  =   0.25  * countZerglings
+    var weighHydralisks =   1.0   * countHydralisks
+    var weighMutalisks  =   2.0   * countMutalisks
+    var weighSunkens    =   4.0   * countSunkens
+    val denominator     =   weighZerglings + weighHydralisks + weighMutalisks + weighSunkens
+    weighZerglings      /=  Maff.nanToOne(denominator)
+    weighHydralisks     /=  Maff.nanToOne(denominator)
+    weighMutalisks      /=  Maff.nanToOne(denominator)
+
+    val weighZealots  = weighZerglings  + weighSunkens
+    val weighDragoons = weighHydralisks + weighMutalisks
+    val weighArchons  = weighZerglings  + weighMutalisks  + Math.max(0, units(Protoss.HighTemplar) % 2 + (gas - 100) / 150)
+    val weighReavers  = weighHydralisks + weighSunkens
+    val weighCorsairs = weighMutalisks
+    val weighScouts   = weighZerglings  + weighSunkens
+
+    compositor.reset()
+    compositor.setNeed(Protoss.Zealot, weighZealots)
+    compositor.setGoal(Protoss.Zealot, 0.35 * countZerglings)
+    if (composition.contains(Goon)) {
+      compositor.setNeed(Protoss.Dragoon, weighDragoons)
+      compositor.setGoal(Protoss.Dragoon, 6 + enemies(Zerg.Mutalisk) + enemies(Zerg.Hydralisk))
+    } else {
+      val goonsVsScourge = ?(composition.contains(Stargate) && enemyHasShown(Zerg.Scourge), 2, 0)
+      compositor.setNeed(Protoss.Dragoon, 5.0)
+      compositor.capGoal(Protoss.Dragoon, goonsVsScourge)
+    }
+
+    if (composition.contains(Reaver)) {
+      compositor.setNeed(Protoss.Reaver,  weighReavers)
+      compositor.setNeed(Protoss.Shuttle, weighReavers * 4)
+      compositor.setGoal(Protoss.Reaver,  6)
+      compositor.capGoal(Protoss.Shuttle,  units(Protoss.Reaver) / 2)
+    }
+
+    if (have(Protoss.TemplarArchives)) {
+      compositor.setNeed(Protoss.HighTemplar, weighArchons)
+      compositor.setGoal(Protoss.HighTemplar, 4)
+    }
+
+    if (have(Protoss.Stargate)) {
+      compositor.setNeed(Protoss.Corsair, weighCorsairs)
+      compositor.capGoal(Protoss.Corsair, Math.max(countMutalisks, ?(enemyHydralisksLikely, 1, 3)))
+    }
+
+    compositor.produceAndPump()
 
     pump(Protoss.Scout)
+    pump(Protoss.HighTemplar)
     pump(Protoss.Zealot)
+    pump(Protoss.Gateway, 5 * miningBases - units(Protoss.Stargate) - units(Protoss.RoboticsSupportBay))
+    requireMiningBases(2) // Unlikely to happen but maybe useful if we run out of building room at home
   }
 }

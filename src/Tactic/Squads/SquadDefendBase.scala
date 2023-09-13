@@ -12,7 +12,7 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Formation._
 import Micro.Heuristics.Potential
 import Performance.Cache
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

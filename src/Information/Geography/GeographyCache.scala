@@ -4,7 +4,7 @@ import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Utilities.UnitFilters.IsTank
 
 trait GeographyCache extends GeographyBuilder {

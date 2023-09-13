@@ -1,4 +1,4 @@
-package Planning.Predicates
+package Planning
 
 import Information.Fingerprinting.Fingerprint
 import Information.Geography.Types.Base

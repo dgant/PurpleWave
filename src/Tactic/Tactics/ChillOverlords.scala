@@ -3,7 +3,7 @@ package Tactic.Tactics
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Circle
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

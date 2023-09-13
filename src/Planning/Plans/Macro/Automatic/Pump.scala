@@ -2,8 +2,7 @@ package Planning.Plans.Macro.Automatic
 
 import Lifecycle.With
 import Macro.Requests.Get
-import Planning.Plan
-import Planning.Predicates.MacroFacts
+import Planning.{MacroFacts, Plan}
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.UnitFilters._

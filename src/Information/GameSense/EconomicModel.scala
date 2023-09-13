@@ -2,7 +2,7 @@ package Information.GameSense
 
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass

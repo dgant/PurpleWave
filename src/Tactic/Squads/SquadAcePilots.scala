@@ -3,7 +3,7 @@ package Tactic.Squads
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop

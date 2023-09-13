@@ -1,6 +1,7 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicates.{MacroFacts, Predicate}
+import Planning.MacroFacts
+import Planning.Predicates.Predicate
 import ProxyBwapi.Techs.Tech
 
 case class TechStarted(tech: Tech) extends Predicate {

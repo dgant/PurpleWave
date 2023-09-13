@@ -1,6 +1,7 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicates.{MacroFacts, Predicate}
+import Planning.MacroFacts
+import Planning.Predicates.Predicate
 import Utilities.UnitFilters.{IsAnything, UnitFilter}
 
 case class UnitsAtMost(quantity: Int, matcher: UnitFilter = IsAnything, complete: Boolean = false) extends Predicate {

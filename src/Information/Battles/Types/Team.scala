@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.UnitGroup

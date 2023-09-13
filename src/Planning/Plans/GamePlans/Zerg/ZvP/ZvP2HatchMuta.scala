@@ -11,12 +11,12 @@ import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMinin
 import Planning.Plans.Placement.BuildSunkensAtNatural
 import Planning.Predicates.Compound._
 import Planning.Predicates.Economy.{GasAtLeast, MineralsAtLeast}
-import Planning.Predicates.{MacroFacts, Predicate}
+import Planning.Predicates.Predicate
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAll, IsComplete, IsAny}
-import Planning.Plan
+import Planning.{MacroFacts, Plan}
 import Planning.Plans.GamePlans.All.GameplanTemplate
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta

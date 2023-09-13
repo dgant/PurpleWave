@@ -1,6 +1,7 @@
 package Planning.Predicates.Strategy
 
-import Planning.Predicates.{MacroFacts, Predicate}
+import Planning.MacroFacts
+import Planning.Predicates.Predicate
 import Strategery.StarCraftMap
 
 case class OnMap(maps: StarCraftMap*) extends Predicate {

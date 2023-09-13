@@ -5,7 +5,7 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsBuilding
 

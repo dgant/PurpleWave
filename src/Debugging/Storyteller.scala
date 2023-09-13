@@ -4,7 +4,7 @@ import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformance
 import Lifecycle.{Main, PurpleBWClient, With}
 import Mathematics.Maff
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}

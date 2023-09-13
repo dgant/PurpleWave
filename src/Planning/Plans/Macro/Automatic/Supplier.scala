@@ -5,7 +5,7 @@ import Macro.Allocation.Prioritized
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import Performance.CacheForever
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

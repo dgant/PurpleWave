@@ -1,6 +1,7 @@
 package Planning.Predicates.Milestones
 
-import Planning.Predicates.{MacroFacts, Predicate}
+import Planning.MacroFacts
+import Planning.Predicates.Predicate
 import ProxyBwapi.Upgrades.Upgrade
 
 case class UpgradeComplete(upgrade: Upgrade, level: Int = 1, withinFrames: Int = 0) extends Predicate {

@@ -3,7 +3,7 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import Utilities.?
 import Utilities.Time.Minutes

@@ -6,7 +6,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import Planning.Predicates.MacroFacts
+import Planning.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import Utilities.?

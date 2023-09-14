@@ -1,6 +1,6 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.Colors
+import Debugging.Visualizations.{Colors, Hues}
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
@@ -10,11 +10,11 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 object ShowSquads extends DebugView {
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     With.squads.all.filter(_.units.nonEmpty).foreach(renderSquadMap)
   }
   
-  def renderSquadMap(squad: Squad) {
+  def renderSquadMap(squad: Squad): Unit = {
     val color = squadColors(squad.hashCode % squadColors.length)
     squad.units.foreach(unit =>
       DrawMap.label(
@@ -35,14 +35,14 @@ object ShowSquads extends DebugView {
         val targetColor = Colors.BrightYellow
         DrawMap.crosshair(q.head.pixel, q.head.unitClass.dimensionMax / 2, targetColor)
         while (i < q.size - 1) {
-          DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.BrightRed)
+          DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.hsv(Hues.Red, 255, 255 * i / squad.targets.size))
           i += 1
         }
       }
     })
   }
   
-  override def renderScreen() {
+  override def renderScreen(): Unit = {
     val table =
       Vector(Vector("Goal", "", "Vicinity", "", "", "Recruits", "",  "Targets", "", "Enemies")) ++
       With.squads.all.map(squad =>

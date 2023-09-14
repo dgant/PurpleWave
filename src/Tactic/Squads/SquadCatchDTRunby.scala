@@ -13,7 +13,7 @@ class SquadCatchDTRunby extends Squad {
   def launch(): Unit = {
     if ( ! With.enemies.exists(_.isProtoss))  return
     if ( ! MacroFacts.enemyDarkTemplarLikely) return
-    addEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
+    setEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
     setTargets(enemies)
     vicinity        = Maff.minBy(With.geography.ourBases.map(_.heart.center))(heart => Maff.min(enemies.map(_.pixelDistanceCenter(heart))).getOrElse(heart.pixelDistance(With.scouting.enemyHome.center))).getOrElse(With.geography.home.center)
     lock.matcher    = IsMobileDetector

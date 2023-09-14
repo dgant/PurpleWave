@@ -161,7 +161,7 @@ class Tactician extends TimedTask {
 
     // Assign division to each squad
     squadsDefending.foreach(p => p._2.vicinity = Maff.centroid(p._2.enemies.view.map(_.pixel)))
-    squadsDefending.foreach(p => p._2.addEnemies(p._1.enemies))
+    squadsDefending.foreach(p => p._2.setEnemies(p._1.enemies))
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(IsRecruitableForCombat))

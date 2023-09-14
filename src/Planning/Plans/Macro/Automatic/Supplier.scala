@@ -47,6 +47,7 @@ class Supplier extends Prioritized {
     simSupplyHalls  = 0
     simFrames       = 0
     simMins         = With.self.minerals
+    simGas          = With.self.gas
 
     halls           = With.units.ours.filter(IsTownHall).toVector
     producers       = With.units.ours.filter(_.isAny(productionTypes: _*)).toVector
@@ -59,10 +60,10 @@ class Supplier extends Prioritized {
     while(consumers.nonEmpty && simSupplyUsed < appetite) {
       val consumer = consumers.head
       advanceTo(consumer.framesToReady())
-      consumed += ((simFrames, consumer.unitClass))
-      simSupplyUsed += consumer.unitClass.supplyRequired
-      simMins -= consumer.unitClass.mineralPrice
-      simGas -= consumer.unitClass.gasPrice
+      consumed          += ((simFrames, consumer.unitClass))
+      simSupplyUsed     += consumer.unitClass.supplyRequired
+      simMins           -= consumer.unitClass.mineralPrice
+      simGas            -= consumer.unitClass.gasPrice
       consumer.cooldown += consumer.unitClass.buildFrames
       updateSim()
     }
@@ -133,8 +134,8 @@ class Supplier extends Prioritized {
     val framesToReady = new CacheForever(() =>
       Math.ceil(Seq(
         cooldown,
-        if (unitClass.mineralPrice  <= simMins) 0.0 else Maff.nanToN((unitClass.mineralPrice  - simMins) / incomeMins, Forever()),
-        if (unitClass.gasPrice      <= simGas)  0.0 else Maff.nanToN((unitClass.gasPrice      - simGas) / incomeMins, Forever()))
+        if (unitClass.mineralPrice  <= Math.max(0, simMins)) 0.0 else Maff.nanToN((unitClass.mineralPrice  - simMins) / incomeMins, Forever()),
+        if (unitClass.gasPrice      <= Math.max(0, simGas))  0.0 else Maff.nanToN((unitClass.gasPrice      - simGas)  / incomeGas,  Forever()))
       .max).toInt)
 
     override def toString: String = f"$unitClass: Cooldown = $cooldown, Ready = ${framesToReady()}"

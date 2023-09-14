@@ -29,9 +29,9 @@ trait MacroActions {
     status(max > 0, f"${max}base")
   }
 
-  def attack(): Unit = With.blackboard.wantToAttack.set(true)
-  def harass(): Unit = With.blackboard.wantToHarass.set(true)
-  def allIn(): Unit = { With.blackboard.yoloing.set(true); attack() }
+  def attack(value: Boolean = true) : Unit = if (value) With.blackboard.wantToAttack.set(true)
+  def harass(value: Boolean = true) : Unit = if (value) With.blackboard.wantToHarass.set(true)
+  def allIn(value: Boolean = true)  : Unit = if (value) { With.blackboard.yoloing.set(true); attack() }
 
   def scout(scoutCount: Int = 1): Unit = {
     With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))

@@ -53,8 +53,11 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   }
 
   @inline final def enemies: Seq[UnitInfo] = _enemiesNow
-  @inline final def addEnemies(enemies: Iterable[UnitInfo]): Unit = enemies.foreach(addEnemy)
-  @inline final def addEnemy(enemy: UnitInfo): Unit = {
+  @inline final def setEnemies(enemies: Iterable[UnitInfo]): Unit = {
+    enemies.foreach(addEnemy)
+    qualityCounter.alignFriendlyQualities()
+  }
+  @inline private final def addEnemy(enemy: UnitInfo): Unit = {
     commission()
     if ( ! _enemiesNext.contains(enemy)) {
       _enemiesNext += enemy

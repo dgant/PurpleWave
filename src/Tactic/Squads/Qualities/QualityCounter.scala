@@ -5,27 +5,39 @@ import Utilities.UnitFilters.UnitFilter
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.{?, CountMap}
 
-class QualityCounter {
+final class QualityCounter {
 
-  val qualitiesEnemy          = new CountMap[Quality]
-  val qualitiesFriendly       = new CountMap[Quality]
-  private val unitsPossessed  = new CountMap[UnitFilter]
+  val qualitiesEnemy          : CountMap[Quality]     = new CountMap[Quality]
+  val qualitiesFriendly       : CountMap[Quality]     = new CountMap[Quality]
+  var qualitiesUseful         : Set[Quality]          = Set.empty
+  private val unitsPossessed  : CountMap[UnitFilter]  = new CountMap[UnitFilter]
 
   def clear(): Unit = {
     qualitiesEnemy.clear()
     qualitiesFriendly.clear()
+    qualitiesUseful = Set.empty
     unitsPossessed.clear()
   }
 
-  def countUnit(unit: UnitInfo): Unit = {
-    ?(unit.isFriendly, Qualities.friendly, Qualities.enemy).foreach(countUnitQuality(unit, _))
+  @inline def countUnit(unit: UnitInfo): Unit = {
+    ?(unit.isFriendly, Qualities.friendly, Qualities.enemy)
+      .filter(q => unit.isEnemy || qualitiesUseful.contains(q))
+      .foreach(countUnitQuality(unit, _))
   }
 
-  private def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
+  @inline private def countUnitQuality(unit: UnitInfo, quality: Quality): Unit = {
     ?(unit.isFriendly, qualitiesFriendly, qualitiesEnemy)(quality) += ?(quality(unit), unit.subjectiveValue.toInt, 0)
   }
 
-  def utility(unit: FriendlyUnitInfo): Double = {
+  /**
+    * Performance-optimizing step:
+    * Make the keyset of qualitiesFriendly match the qualities we actually care about
+    */
+  def alignFriendlyQualities(): Unit = {
+    qualitiesUseful = qualitiesEnemy.iterator.filter(_._2 > 0).flatMap(_._1.counteredBy).toSet
+  }
+
+  @inline def utility(unit: FriendlyUnitInfo): Double = {
     var max = 0.0
     val qfi = qualitiesFriendly.iterator
     while (qfi.hasNext) {

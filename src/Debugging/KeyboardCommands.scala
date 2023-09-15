@@ -45,7 +45,7 @@ object KeyboardCommands {
       case "t"          => With.configuration.trackUnit = ! With.configuration.trackUnit
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
 
-      case _            => With.grids.select(text) || With.visualization.tryToggle(text)
+      case _            => With.grids.parseCommand(text) || With.visualization.parseCommand(text) || With.performance.parseCommand(text)
     }
     With.game.sendText(text)
   }

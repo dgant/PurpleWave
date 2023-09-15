@@ -111,7 +111,7 @@ class Visualization extends TimedTask {
     }
   }
   
-  def tryToggle(viewName: String): Boolean = {
+  def parseCommand(viewName: String): Boolean = {
     val matches = knownViews.filter(_.name.toLowerCase.contains(viewName.toLowerCase))
     val matched = matches.size == 1
     if (matched) {

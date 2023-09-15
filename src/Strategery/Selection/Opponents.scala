@@ -8,7 +8,7 @@ object Opponents {
 
   val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvZ: StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive)
 
   // COG 2023
   val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())

@@ -9,8 +9,8 @@ import Utilities.Time.{FrameCount, GameTime, Seconds}
   * Many of these are likely unused but it's handy to have them on record.
   */
 object ZergTimings {
-  object OneHatchGasCompleteBy                    extends GameTime(2, 20)
-  object TwoHatchGasCompleteBy                    extends GameTime(2, 36)
+  object OneHatchGasCompleteBy                    extends GameTime(1, 24)
+  object TwoHatchGasCompleteBy                    extends GameTime(2, 23)
   object ThreeHatchGasCompleteBy                  extends GameTime(3, 10)
 
   object FourPool_PoolCompleteBy                  extends GameTime(1, 32)

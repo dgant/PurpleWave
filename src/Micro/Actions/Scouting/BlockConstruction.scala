@@ -5,9 +5,9 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.Orders
-import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
 object BlockConstruction extends Action {
   
@@ -61,7 +61,7 @@ object BlockConstruction extends Action {
       lazy val hasMoveOrder         = builder.order == Orders.Move
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder
       lazy val targetPixel          = builder.orderTargetPixel.orElse(builder.targetPixel).getOrElse(builder.pixel)
-      lazy val sittingOnExpansion   = builder.base.exists(b => b.naturalOf.forall(b => b.isStartLocation && ! b.isOurs) && b.townHallArea.contains(builder.pixel))
+      lazy val sittingOnExpansion   = builder.base.exists(b => b.townHall.isEmpty && b.naturalOf.forall( ! _.isOurs) && b.townHallArea.contains(builder.pixel))
       lazy val movingToRelevantBase = (
         hasRelevantOrder
         && targetPixel.base.exists(base =>

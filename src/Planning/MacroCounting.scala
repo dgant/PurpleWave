@@ -138,7 +138,7 @@ trait MacroCounting {
   }
 
   def killPotential: Boolean = {
-    confidenceAttacking11 > 1.0 - Math.min(0.3, With.scouting.ourProximity)
+    confidenceAttacking11 > 0.5
   }
 
   def safeSkirmishing: Boolean = {

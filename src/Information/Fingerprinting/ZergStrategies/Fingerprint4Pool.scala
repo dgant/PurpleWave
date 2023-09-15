@@ -6,5 +6,5 @@ import ProxyBwapi.Races.Zerg
 
 class Fingerprint4Pool extends FingerprintOr(
   new FingerprintCompleteBy(Zerg.SpawningPool,  Latest_FourPool_PoolCompleteBy),
-  new FingerprintArrivesBy(Zerg.Zergling,       Latest_FourPool_ZerglingCompleteBy),
-  new FingerprintCompleteBy(Zerg.Zergling,      Latest_FourPool_ZerglingArrivesBy))
+  new FingerprintArrivesBy(Zerg.Zergling,       Latest_FourPool_ZerglingArrivesBy),
+  new FingerprintCompleteBy(Zerg.Zergling,      Latest_FourPool_ZerglingCompleteBy))

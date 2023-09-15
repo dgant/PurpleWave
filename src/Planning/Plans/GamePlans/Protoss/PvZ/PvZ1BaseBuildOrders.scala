@@ -24,9 +24,37 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
       get(2, Protoss.Gateway)
     }
   }
+  protected def openVsSpeedlings(): Unit = {
+    if (unitsComplete(Protoss.Gateway) < 3) {
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
+    }
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(3, Protoss.Pylon)
+    once(17, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(3, Protoss.Gateway)
+    once(7, Protoss.Zealot)
+    once(4, Protoss.Pylon)
+    once(19, Protoss.Probe)
+    once(10, Protoss.Zealot)
+    once(21, Protoss.Probe)
+    once(13, Protoss.Zealot)
+  }
   protected def open910(): Unit = {
     if (unitsEver(Protoss.Gateway) < 2) {
-      cancel(Protoss.Assimilator, Protoss.Nexus)
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
     }
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
@@ -57,7 +85,7 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
   }
   protected def open1012(): Unit = {
     if (unitsEver(Protoss.Gateway) < 2) {
-      cancel(Protoss.Assimilator, Protoss.Nexus)
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
     }
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
@@ -175,18 +203,19 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
 
   private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
-    var output = enemyRecentStrategy(speedlingStrategies: _*)
-    output &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
-    output &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
-    output ||= enemyStrategy(speedlingStrategies: _*)
-    output ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(3, 15)()
-    output ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(3, 30)()
-    output ||= enemiesShown(Zerg.Zergling) > 16
-    output ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
-    output &&= ! enemyHydralisksLikely
-    output &&= ! enemyMutalisksLikely
-    output &&= ! enemyLurkersLikely
-    output &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.Stargate) < 3) // At some point, stop reacting to speedlings
+    var output  =   With.fingerprints.zerglingsOnly.recently
+    output      ||  enemyRecentStrategy(speedlingStrategies: _*)
+    output      &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
+    output      &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
+    output      ||= enemyStrategy(speedlingStrategies: _*)
+    output      ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(3, 15)()
+    output      ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(3, 30)()
+    output      ||= enemiesShown(Zerg.Zergling) > 16
+    output      ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
+    output      &&= ! enemyHydralisksLikely
+    output      &&= ! enemyMutalisksLikely
+    output      &&= ! enemyLurkersLikely
+    output      &&= (_previouslyAnticipatedSpeedlings || units(Protoss.Gateway, Protoss.CyberneticsCore, Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.Stargate) < 3) // At some point, stop reacting to speedlings
     _previouslyAnticipatedSpeedlings = output
     output
   }

@@ -21,20 +21,20 @@ class BattleProcessSwap extends BattleProcessState {
     val unitsGlobalOurs   = With.units.ours  .view.filter(BattleFilters.global)
     val unitsGlobalEnemy  = With.units.enemy.view.filter(BattleFilters.global)
     With.battles.nextBattleGlobalDefend = new Battle(
-      unitsGlobalOurs.filter(BattleFilters.defending).toVector,
-      unitsGlobalEnemy.filter(BattleFilters.defending).toVector,
+      unitsGlobalOurs   .filter(BattleFilters.defending).toVector,
+      unitsGlobalEnemy  .filter(BattleFilters.defending).toVector,
       isGlobal = true)
     With.battles.nextBattleGlobalAttack = new Battle(
-      unitsGlobalOurs.filter(BattleFilters.attacking).toVector,
-      unitsGlobalEnemy.filter(BattleFilters.attacking).toVector,
+      unitsGlobalOurs   .filter(BattleFilters.attacking).toVector,
+      unitsGlobalEnemy  .filter(BattleFilters.attacking).toVector,
       isGlobal = true)
     With.battles.nextBattleGlobalSlug = new Battle(
-      unitsGlobalOurs.filter(BattleFilters.slugging).toVector,
-      unitsGlobalEnemy.filter(BattleFilters.slugging).toVector,
+      unitsGlobalOurs   .filter(BattleFilters.slugging).toVector,
+      unitsGlobalEnemy  .filter(BattleFilters.slugging).toVector,
       isGlobal = true)
     With.battles.nextBattleGlobalSkirmish = new Battle(
-      unitsGlobalOurs.filter(BattleFilters.skirmish).toVector,
-      unitsGlobalEnemy.filter(BattleFilters.skirmish).toVector,
+      unitsGlobalOurs   .filter(BattleFilters.skirmish).toVector,
+      unitsGlobalEnemy  .filter(BattleFilters.skirmish).toVector,
       isGlobal = true)
 
 

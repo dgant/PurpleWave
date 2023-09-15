@@ -69,7 +69,7 @@ class Grids extends TimedTask {
 
   private var _selected: Option[Grid] = None
   def selected: Option[Grid] = _selected
-  def select(code: String): Boolean = {
+  def parseCommand(code: String): Boolean = {
     _selected = all.find("g" + _.code == code).orElse(With.geography.zones.find("g" + _.name.toLowerCase == code.toLowerCase).map(_.distanceGrid))
     if (_selected.isDefined) {
       With.manners.chat(f"Selected ${_selected.get.getClass.getSimpleName.replace("Grid", "")}")

@@ -35,6 +35,7 @@ final class QualityCounter {
     */
   def alignFriendlyQualities(): Unit = {
     qualitiesUseful = qualitiesEnemy.iterator.filter(_._2 > 0).flatMap(_._1.counteredBy).toSet
+    qualitiesUseful.foreach(qualitiesFriendly(_) = 0)
   }
 
   @inline def utility(unit: FriendlyUnitInfo): Double = {

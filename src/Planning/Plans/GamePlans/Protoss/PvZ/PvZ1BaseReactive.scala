@@ -78,6 +78,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     goo(Reaver,   0,  enemyHydralisksLikely)
     goo(Reaver,   0,  enemyLurkersLikely)
     goo(Speedlot, 0,  anticipateSpeedlings)
+    goo(Goon,     0,  enemyMutalisksLikely && units(Protoss.Gateway) >= 3)
     goo(Stargate, 0,  enemyMutalisksLikely)
     goo(Stargate, 0,  With.fingerprints.twoHatchGas())
     goo(Speedlot, 0,  With.fingerprints.threeHatchGas())
@@ -97,7 +98,8 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     if (anticipateSpeedlings && units(IsWarrior) < 9 && units(Protoss.Gateway) < 3) {
       gasWorkerCeiling(0)
     } else if ( ! have(Protoss.CyberneticsCore)) {
-      gasWorkerCeiling(1)
+      gasWorkerCeiling(2)
+      gasLimitCeiling(200)
     } else if (composition.length > 1) {
     } else if (composition.headOption.contains(Goon) && units(Protoss.Gateway) < 4) {
       gasWorkerCeiling(2)
@@ -232,6 +234,9 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       case Stargate =>
         get(Protoss.Stargate)
         get(2, Protoss.Gateway)
+        if ( ! enemyHydralisksLikely) {
+          get(Protoss.Corsair)
+        }
         if ( ! on(Goon)) {
           get(Protoss.CitadelOfAdun)
           get(Protoss.ZealotSpeed)

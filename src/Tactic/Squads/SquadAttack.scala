@@ -64,7 +64,9 @@ class SquadAttack extends Squad {
 
     } else if (MacroFacts.killPotential) {
       mode      = PushMain
-      vicinity  = With.scouting.enemyHome.center
+      vicinity  =
+        Maff.minBy(With.units.enemy.filter(IsBuilding).filterNot(_.flying).map(_.pixel))(keyDistanceTo).orElse(
+        Maff.minBy(With.units.enemy.filter(IsBuilding)                    .map(_.pixel))(keyDistanceTo)).getOrElse(With.scouting.enemyHome.center)
       setTargets(SquadAutomation.rankedEnRoute(this))
 
     } else if (MacroFacts.safePushing && With.scouting.enemyProximity > 0.5) {

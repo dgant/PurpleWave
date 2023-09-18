@@ -4,7 +4,7 @@ import Macro.Requests.RequestBuildable
 import Planning.Plan
 import Planning.Plans.Army._
 import Planning.Plans.Compound.If
-import Planning.Plans.Macro.Automatic.{PumpWorkers, RequireSufficientSupply}
+import Planning.Plans.Macro.Automatic.{PumpWorkers, SupplierPlan}
 import Planning.Plans.Macro.BuildOrders.{BuildOrder, RequireEssentials}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import Planning.Plans.Scouting._
@@ -19,7 +19,7 @@ abstract class GameplanTemplate extends Plan with Modal {
   def emergencyPlans        : Seq[Plan]       = Vector.empty
   def buildPlans            : Seq[Plan]       = Vector.empty
   def buildOrderPlan        : Plan            = new BuildOrder(buildOrder: _*)
-  def supplyPlan            : Plan            = new RequireSufficientSupply
+  def supplyPlan            : Plan            = new SupplierPlan
   def workerPlan            : Plan            = new If(Not(new WeAreZerg), new PumpWorkers)
   def scoutPlan             : Plan            = new ConsiderScoutingWithWorker
   def attackPlan            : Plan            = new ConsiderAttacking

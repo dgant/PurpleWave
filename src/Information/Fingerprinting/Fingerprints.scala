@@ -167,5 +167,6 @@ class Fingerprints {
   lazy val twoHatchMuta         = addFingerprint(new Fingerprint2HatchMuta)
   lazy val threeHatchMuta       = addFingerprint(new Fingerprint3HatchMuta)
   lazy val threeHatchHydra      = addFingerprint(new Fingerprint3HatchHydra)
+  lazy val speedBeforeLair      = addFingerprint(new FingerprintSpeedBeforeLair)
   lazy val zerglingsOnly        = addFingerprint(new FingerprintZerglingOnly)
 }

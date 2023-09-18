@@ -54,6 +54,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastFrameTakingDamage       : Int = - Forever()
   var lastFrameStartingAttack     : Int = - Forever()
   var lastFrameHarvested          : Int = - Forever()
+  var lastFrameMiningGas          : Int = - Forever()
+  var firstFrameMiningGas         : Int =   Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastHitPoints               : Int = _
   @inline final def completionFrameFull: Int = completionFrame +  unitClass.framesToFinishCompletion
@@ -63,8 +65,16 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def update(): Unit = {
     if (visibleToOpponents) _frameKnownToOpponents = Math.min(_frameKnownToOpponents, With.frame)
     // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
-    if (Math.max(cooldownGround, cooldownAir) > lastCooldown) lastFrameStartingAttack = With.frame
-    if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) lastFrameTakingDamage = With.frame
+    if (Math.max(cooldownGround, cooldownAir) > lastCooldown) {
+      lastFrameStartingAttack = With.frame
+    }
+    if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) {
+      lastFrameTakingDamage = With.frame
+    }
+    if (isEnemy && visible && unitClass.isWorker && orderTarget.exists(t => t.unitClass.isGas && t.player == player && t.complete)) {
+      lastFrameMiningGas  = With.frame
+      firstFrameMiningGas = Math.min(firstFrameMiningGas, With.frame)
+    }
     if (complete) {
       // If the unit class changes (eg. Geyser -> Extractor) update the completion frame
       if (unitClass != lastUnitClass) completionFrame = With.frame

@@ -154,8 +154,8 @@ object MicroPathing {
     if (unit.agent.forces.forall(_._2.lengthSquared == 0)) {
       unit.agent.forces(Forces.travel)  = Potential.towards(unit, unit.agent.destination)
     }
-    unit.agent.forces(Forces.spacing) = Potential.preferSpacing(unit)
-    unit.agent.forces(Forces.pushing) = Potential.followPushes(unit)
+    unit.agent.forces(Forces.spacing)   = Potential.preferSpacing(unit)
+    unit.agent.forces(Forces.pushing)   = Potential.followPushes(unit)
   }
 
   def getPushForces(unit: FriendlyUnitInfo): Seq[(Push, Force)] = {

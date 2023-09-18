@@ -1,6 +1,6 @@
 package Mathematics.Points
 
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
@@ -97,6 +97,9 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def base: Option[Base] = {
     tile.base
+  }
+  @inline def metro: Option[Metro] = {
+    tile.metro
   }
   @inline def groundPixels(other: Tile): Double = {
     With.paths.groundPixels(this, other.center)

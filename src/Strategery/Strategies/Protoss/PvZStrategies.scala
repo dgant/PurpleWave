@@ -2,7 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.{PvZ1BaseReactive, PvZ2022}
+import Planning.Plans.GamePlans.Protoss.PvZ.PvZ1BaseReactive
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -11,13 +11,18 @@ abstract class PvZStrategy extends Strategy {
   setEnemyRace(Race.Zerg)
 }
 
-object PvZ2022 extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ2022)
-}
-
 object PvZ1BaseReactive extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ1BaseReactive)
+  setChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
+  setChoice(PvZMuscle,  PvZExpand,  PvZTech)
 }
+
+object PvZMuscle    extends PvZStrategy
+object PvZExpand    extends PvZStrategy
+object PvZTech      extends PvZStrategy
+object PvZGoon      extends PvZStrategy
+object PvZReaver    extends PvZStrategy
+object PvZSpeedlot  extends PvZStrategy
 
 /*
 object PvZ1Base4GateGoon extends PvZStrategy {

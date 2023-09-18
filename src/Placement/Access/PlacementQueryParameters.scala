@@ -25,17 +25,17 @@ class PlacementQueryParameters {
   override def equals(other: Any): Boolean = {
     if ( ! other.isInstanceOf[PlacementQueryParameters]) return false
     val otherParameters = other.asInstanceOf[PlacementQueryParameters]
-    if (width     != otherParameters.width)     return false
-    if (height    != otherParameters.height)    return false
-    if (building  != otherParameters.building)  return false
+    if (width     != otherParameters.width)                     return false
+    if (height    != otherParameters.height)                    return false
+    if (building  != otherParameters.building)                  return false
     if ( ! labelYes.forall(otherParameters.labelYes.contains))  return false
     if ( ! otherParameters.labelYes.forall(labelYes.contains))  return false
-    if ( ! zone.forall(otherParameters.zone.contains))    return false
-    if ( ! otherParameters.zone.forall(zone.contains))    return false
-    if ( ! base.forall(otherParameters.base.contains))    return false
-    if ( ! otherParameters.base.forall(base.contains))    return false
-    if ( ! tile.forall(otherParameters.tile.contains))    return false
-    if ( ! otherParameters.tile.forall(tile.contains))    return false
+    if ( ! zone.forall(otherParameters.zone.contains))          return false
+    if ( ! otherParameters.zone.forall(zone.contains))          return false
+    if ( ! base.forall(otherParameters.base.contains))          return false
+    if ( ! otherParameters.base.forall(base.contains))          return false
+    if ( ! tile.forall(otherParameters.tile.contains))          return false
+    if ( ! otherParameters.tile.forall(tile.contains))          return false
     true
   }
 

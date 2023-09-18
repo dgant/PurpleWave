@@ -32,10 +32,14 @@ class SquadWorkerScout extends Squad {
     scoutingAbandoned ||= basesToScout.isEmpty
 
     // Abandon scouting when we have a closer unit approaching
-    scoutingAbandoned ||= With.blackboard.wantToAttack() && scouts.nonEmpty && With.units.ours.exists(u =>
-      u.complete
-      && ! IsWorker(u)
-      && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)())))
+    scoutingAbandoned ||= (
+      With.blackboard.wantToAttack()
+      && scouts.nonEmpty
+      && vicinity.metro.exists(m => ! scouts.exists(_.metro.contains(m)))
+      && With.units.ours.exists(u =>
+        u.complete
+        && ! IsWorker(u)
+        && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)()))))
 
     // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
     scoutingAbandoned ||= ( ! ZvE4Pool() && ! ZvT1HatchHydra() && With.units.enemy.exists(_.isAll(

@@ -11,7 +11,7 @@ object Opponents {
   val defaultPvZ: StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive)
 
   // COG 2023
-  val bananabrain : Opponent = add("BananaBrain",   StrategySelectionGreedy())
+  val bananabrain : Opponent = add("BananaBrain",   defaultPvP)
   val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   //val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
   //val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))

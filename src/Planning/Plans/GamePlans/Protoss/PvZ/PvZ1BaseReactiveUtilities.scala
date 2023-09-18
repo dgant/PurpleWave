@@ -6,9 +6,9 @@ import Lifecycle.With
 
 abstract class PvZ1BaseReactiveUtilities extends PvZ1BaseBuildOrders {
   protected trait   Economy extends SimpleString
-  protected object  Aggro   extends Economy
-  protected object  Greedy  extends Economy
-  protected object  Neutral extends Economy
+  protected object  Muscle  extends Economy
+  protected object  Expand  extends Economy
+  protected object  Tech    extends Economy
 
   protected trait   Opening     extends SimpleString
   protected object  Gates910    extends Opening

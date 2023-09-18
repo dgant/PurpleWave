@@ -186,6 +186,9 @@ class PvPLateGame extends GameplanImperative {
     if (saturated && gas < 500) {
       buildGasPumps()
     }
+    if (units(Protoss.Zealot) >= 5) {
+      upgradeContinuously(Protoss.ZealotSpeed)
+    }
     if (fearDeath) {
       trainArmy()
       addProduction()

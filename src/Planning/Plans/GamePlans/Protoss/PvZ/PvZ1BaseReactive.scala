@@ -1,23 +1,22 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
+import Placement.Access.PlaceLabels
 import Planning.Compositor
 import Planning.Plans.Macro.Protoss.MeldArchons
+import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Protoss.{PvZExpand, PvZGoon, PvZMuscle, PvZReaver, PvZSpeedlot, PvZTech}
 import Utilities.Time.{GameTime, Minutes}
-import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsHatchlike, IsWarrior, IsWorker}
 import Utilities.{?, SwapIf}
 
 import scala.collection.mutable
 
 class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
-  // TODO: No gas during 4-gate reaction
-  // TODO: No gas during speedling emergency
-  // TODO: Cap gas workers
-
+  protected def economy       : Economy           = ?(PvZMuscle(), Muscle, ?(PvZExpand(), Expand, Tech))
   protected var timingAttack  : Boolean           = false
-  protected var economy       : Economy           = Neutral
   protected var opening       : Opening           = Gates1012
   protected var composition   : Seq[Composition]  = Seq.empty
 
@@ -34,11 +33,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     def consider(candidate: Opening, predicate: => Boolean): Unit = if (allowed.contains(candidate) && predicate) opening = candidate
 
     allowed ++= (economy match {
-      case Aggro  =>  Seq(Gates1012,  Gates910,   CoreZ,    ZCoreZ,     ZZCoreZ,    GateNexus,  NexusFirst)
-      case Greedy =>  Seq(NexusFirst, GateNexus,  CoreZ,    ZCoreZ,     ZZCoreZ,    Gates1012,  Gates910)
-      case _      =>  Seq(CoreZ,      ZCoreZ,     ZZCoreZ,  NexusFirst, GateNexus,  Gates1012,  Gates910) })
+      case Muscle =>  Seq(Gates1012,  Gates910,   CoreZ,    ZCoreZ,     ZZCoreZ,    GateNexus,  NexusFirst)
+      case Expand =>  Seq(NexusFirst, GateNexus,  CoreZ,    ZCoreZ,     ZZCoreZ,    Gates1012,  Gates910)
+      case Tech   =>  Seq(CoreZ,      ZCoreZ,     ZZCoreZ,  NexusFirst, GateNexus,  Gates1012,  Gates910) })
 
-    // Khala advises: Vs. 9 Pool, ZZCoreZ; otherwise, ZCoreZ.
+    // Per Khala: Vs. 9 Pool, ZZCoreZ; Vs. Hatch-first, CoreZ; otherwise, ZCoreZ.
 
     if (haveComplete(Protoss.Gateway))      ban(NexusFirst)
     if (haveEver(Protoss.Zealot))           ban(NexusFirst, CoreZ)
@@ -47,23 +46,23 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     if (anticipateSpeedlings)               ban(NexusFirst, GateNexus,  CoreZ,      ZCoreZ, ZZCoreZ)
     if (poolMin         <= timing4p)        ban(NexusFirst, GateNexus,  CoreZ,      ZCoreZ, ZZCoreZ)
     if (poolMin         <= timing9p)        ban(NexusFirst, GateNexus,  CoreZ,      ZCoreZ)
-    if (poolMin         <= timingOp)        ban(NexusFirst, CoreZ)
-    if (poolMin         <= timing12p)       ban(NexusFirst)
+    if (poolMin         <= timingOp)        ban(NexusFirst,             CoreZ)
+    if (poolMin         <= timing12p)       ban(NexusFirst,             CoreZ)
     if (pool.exists(_   >= timing10h))      ban(ZCoreZ,     ZZCoreZ,    Gates1012,  Gates910)
     if (With.fingerprints.gasSteal())       ban(ZZCoreZ,    ZCoreZ,     CoreZ)
 
     if (allowed.isEmpty) return
     opening = allowed.head
 
-    consider(GateNexus, poolMax         >= timingOp && economy == Greedy)
+    consider(GateNexus, poolMax         >= timingOp && economy == Expand)
     consider(Gates1012, poolMinRecently <= timing4p)
     consider(Gates910,  poolMaxRecently <= timing4p)
   }
 
   def opened(o: Opening*): Boolean = o.contains(opening)
-  def on(c: Composition*): Boolean = c.exists(composition.contains)
-  def go(c: Composition, p: Boolean): Unit = if(p && ! composition.contains(c)) composition :+= c
-  def goo(c: Composition, max: Int, p: Boolean = true): Unit = go(c, composition.length <= max && p)
+  def on  (c: Composition*)                               : Boolean = c.exists(composition.contains)
+  def go  (c: Composition,            p: Boolean = true)  : Unit    = if (p && ! composition.contains(c)) composition :+= c
+  def goo (c: Composition, max: Int,  p: Boolean = true)  : Unit    = go(c, composition.length <= max && p)
 
   protected def chooseComposition(): Unit = {
     val static = enemies(Zerg.CreepColony, Zerg.SunkenColony)
@@ -71,45 +70,35 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     composition = Seq.empty
 
     go (Stargate,     have(Protoss.Stargate))
-    go (Reaver,       have(Protoss.Shuttle, Protoss.RoboticsSupportBay))
-    go (Goon,         upgradeStarted(Protoss.DragoonRange) || units(Protoss.Dragoon) > 3)
+    go (Reaver,       have(Protoss.RoboticsFacility, Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Reaver))
     go (Speedlot,     have(Protoss.CitadelOfAdun) || (have(Protoss.Forge) && ! enemyLurkersLikely))
-    goo(Reaver,   0,  have(Protoss.RoboticsFacility))
-    goo(Reaver,   0,  enemyHydralisksLikely)
-    goo(Reaver,   0,  enemyLurkersLikely)
+    go (Goon,         upgradeComplete(Protoss.DragoonRange) || units(Protoss.Dragoon) > 3)
+    goo(Reaver,   0,  have(Protoss.RoboticsFacility) || enemyHydralisksLikely || enemyLurkersLikely)
     goo(Speedlot, 0,  anticipateSpeedlings)
     goo(Goon,     0,  enemyMutalisksLikely && units(Protoss.Gateway) >= 3)
     goo(Stargate, 0,  enemyMutalisksLikely)
-    goo(Stargate, 0,  With.fingerprints.twoHatchGas())
-    goo(Speedlot, 0,  With.fingerprints.threeHatchGas())
+    goo(Stargate, 0,  With.fingerprints.twoHatchGas()   && enemyHasShown(Zerg.Lair))
+    goo(Speedlot, 0,  With.fingerprints.threeHatchGas() && enemies(IsHatchlike) > 2)
     goo(Reaver,   0,  static > 1)
-    goo(Goon,     0)
-    goo(Stargate, 1,  enemyMutalisksLikely && ! on(Goon))
-    goo(Goon,     1,  enemyMutalisksLikely && on(Stargate))
-    goo(Reaver,   1,  enemyHydralisksLikely && on(Stargate))
+    goo(Goon,     0,  PvZGoon())
+    goo(Reaver,   0,  PvZReaver())
+    goo(Speedlot, 0,  PvZSpeedlot())
+    goo(Stargate, 1,  enemyMutalisksLikely              && ! on(Goon))
+    goo(Goon,     1,  enemyMutalisksLikely              && on(Stargate))
+    goo(Reaver,   1,  enemyHydralisksLikely             && on(Stargate))
     goo(Speedlot, 1,  With.fingerprints.threeHatchGas() && on(Reaver))
+    goo(Speedlot, 1,  miningBases > 1)
     goo(Reaver,   2,  static > 2)
-    goo(Goon,     2,  enemyMutalisksLikely && on(Reaver))
+    goo(Goon,     2,  enemyMutalisksLikely)
     goo(Reaver,   2,  units(Protoss.Zealot, Protoss.Dragoon) > 24)
+    goo(Reaver,   3,  have(Protoss.RoboticsFacility))
   }
 
   protected def capGas(): Unit = {
     if (have(Protoss.TemplarArchives)) return
     if (anticipateSpeedlings && units(IsWarrior) < 9 && units(Protoss.Gateway) < 3) {
       gasWorkerCeiling(0)
-    } else if ( ! have(Protoss.CyberneticsCore)) {
-      gasWorkerCeiling(2)
-      gasLimitCeiling(200)
-    } else if (composition.length > 1) {
-    } else if (composition.headOption.contains(Goon) && units(Protoss.Gateway) < 4) {
-      gasWorkerCeiling(2)
-      gasLimitCeiling(200)
-    } else if (composition.headOption.contains(Speedlot) && ! have(Protoss.CitadelOfAdun)) {
-      gasWorkerCeiling(2)
-      gasLimitCeiling(200)
-    } else if (composition.headOption.contains(Stargate) && ! have(Protoss.Stargate)) {
-      gasLimitCeiling(250)
-    } else if (composition.headOption.contains(Reaver) && ! have(Protoss.RoboticsFacility)) {
+    } else if (composition.length == 1 && ! on(Speedlot)) {
       gasLimitCeiling(300)
     }
   }
@@ -144,13 +133,13 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
         case _          => open1012()
       }
     }
-
     scoutOn(Protoss.Pylon)
-    /*
-    if      (enemyRecentStrategy(With.fingerprints.twelveHatch))  scoutOn(Protoss.Pylon)
-    else if (opening == Gates910 || opening == Gates1012)         scoutOn(Protoss.Gateway, 2)
-    else                                                          scoutOn(Protoss.Pylon)
-    */
+
+    if ( ! haveEver(Protoss.Forge))               PvZSpeedlot .deactivate()
+    if ( ! haveEver(Protoss.RoboticsFacility))    PvZReaver   .deactivate()
+    if ( ! upgradeStarted(Protoss.DragoonRange))  PvZGoon     .deactivate()
+    if (With.geography.maxMiningBasesOurs < 2)    PvZExpand   .deactivate()
+    if ( ! haveEver(Protoss.Assimilator))         PvZTech     .deactivate()
   }
 
   private val compositor = new Compositor
@@ -161,14 +150,14 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     canAttackEarly      ||= opened(ZZCoreZ, ZCoreZ)  && enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
     canAttackEarly      ||= haveComplete(Protoss.Scout,  Protoss.DarkTemplar)
     canAttackEarly      &&= unitsComplete(IsWarrior) >= 3 || unitsEver(IsWarrior) >= 5 || With.fingerprints.twelveHatch()
-    canAttackEarly      &&= confidenceAttacking11 > 0.2
+    canAttackEarly      &&= confidenceAttacking11 > 0.2 + 0.1 * enemiesComplete(Zerg.SunkenColony)
     canAttackEarly      &&= ! With.fingerprints.twoHatchMain()
 
     val needToPushLurkers = enemyLurkersLikely && ! haveComplete(Protoss.PhotonCannon, Protoss.Observer)
 
     timingAttack ||= unitsComplete(IsWarrior) >= 24 // Safety valve in case build gets disrupted somehow
     timingAttack ||= unitsComplete(Protoss.Reaver) >= 2     && haveComplete(Protoss.Shuttle)
-    timingAttack ||= upgradeComplete(Protoss.ZealotSpeed)   && upgradeComplete(Protoss.GroundDamage)
+    timingAttack ||= upgradeComplete(Protoss.ZealotSpeed)   && upgradeComplete(Protoss.GroundDamage) && haveComplete(Protoss.Archon)
     timingAttack ||= upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Dragoon) >= 10
     timingAttack ||= haveComplete(Protoss.Scout)
 
@@ -188,7 +177,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       buildArmy(),
       buildTech())
 
-    pump(Protoss.Gateway, 5 * miningBases - units(Protoss.Stargate) - units(Protoss.RoboticsSupportBay))
+    if (PvZExpand()) {
+      get(Math.max(2, 3 - units(Protoss.RoboticsFacility, Protoss.Stargate)), Protoss.Gateway)
+      requireMiningBases(2)
+    }
+    get(5 * miningBases - units(Protoss.RoboticsFacility, Protoss.Stargate), Protoss.Gateway)
     requireMiningBases(2) // Unlikely to happen but maybe useful if we run out of building room at home
   }
 
@@ -200,22 +193,37 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
     composition.foreach {
       case Goon =>
+        cancelRoboUnlessLurker()
+        cancelAlternative(Protoss.CitadelOfAdun, Protoss.Forge)
         get(Protoss.DragoonRange)
-        if (composition.length == 1) {
-          get(4, Protoss.Gateway)
-        }
       case Speedlot =>
+        cancelRoboUnlessLurker()
+        cancelRangeUnlessGoons()
+        val makeCorsairs = ! anticipateSpeedlings && ! enemyHydralisksLikely
+        if (makeCorsairs) {
+          get(Protoss.Stargate)
+          get(Protoss.Corsair)
+        } else {
+          cancelAlternative(Protoss.Stargate)
+        }
         get(Protoss.Forge)
         get(Protoss.GroundDamage)
+        if (makeCorsairs) {
+          get(2, Protoss.Corsair)
+        }
         get(Protoss.CitadelOfAdun)
         get(Protoss.ZealotSpeed)
-        get(Protoss.TemplarArchives)
-        get(Protoss.DarkTemplar)
-        get(2, Protoss.HighTemplar)
-        if (composition.length == 1) {
-          get(5, Protoss.Gateway)
+        if (enemyMutalisksLikely) {
+          buildCannonsAtMain(2, PlaceLabels.DefendAir)
         }
+        get(Protoss.TemplarArchives)
+        if (have(Protoss.Corsair) || (anticipateSpeedlings && ! safeDefending)) {
+          get(Protoss.DarkTemplar)
+        }
+        get(2, Protoss.HighTemplar)
       case Reaver =>
+        cancelAlternative(Protoss.Stargate, Protoss.CitadelOfAdun, Protoss.Forge)
+        cancelRangeUnlessGoons()
         get(Protoss.RoboticsFacility)
         SwapIf(
           safeDefending,
@@ -228,22 +236,38 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
             get(Protoss.Shuttle)
             get(Protoss.ZealotSpeed)
           })
-        if (composition.length == 1) {
-          get(2, Protoss.Gateway)
-        }
       case Stargate =>
+        cancelRoboUnlessLurker()
+        cancelRangeUnlessGoons()
+        cancelAlternative(Protoss.Forge)
         get(Protoss.Stargate)
-        get(2, Protoss.Gateway)
-        if ( ! enemyHydralisksLikely) {
+        if (enemyMutalisksLikely || ! enemyHydralisksLikely) {
           get(Protoss.Corsair)
         }
-        if ( ! on(Goon)) {
+        if (enemyMutalisksLikely) {
+          get(Protoss.DragoonRange)
+        } else {
           get(Protoss.CitadelOfAdun)
           get(Protoss.ZealotSpeed)
         }
-        if (enemyMutalisksLikely && ! on(Goon, Speedlot)) {
-          get(2, Protoss.Stargate)
-        }
+    }
+  }
+
+  private def cancelAlternative(buildables: Buildable*): Unit = {
+    if (composition.length <= 1) {
+      cancel(buildables: _*)
+    }
+  }
+
+  private def cancelRoboUnlessLurker(): Unit = {
+    if (composition.length <= 1 && ! enemyLurkersLikely) {
+      cancel(Protoss.RoboticsFacility)
+    }
+  }
+
+  private def cancelRangeUnlessGoons(): Unit = {
+    if (composition.length <= 1 && units(Protoss.Dragoon) < 3) {
+      cancel(Protoss.DragoonRange)
     }
   }
 
@@ -300,7 +324,9 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     compositor.produceAndPump()
 
     pump(Protoss.HighTemplar)
-    pump(Protoss.Scout)
+    if ( ! enemyHydralisksLikely) {
+      pump(Protoss.Scout)
+    }
     pump(Protoss.Zealot)
   }
 }

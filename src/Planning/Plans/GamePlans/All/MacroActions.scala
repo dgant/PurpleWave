@@ -81,7 +81,7 @@ trait MacroActions {
     new PumpWorkers(oversaturate, maximumTotal, maximumConcurrently).update()
   }
   def pumpSupply(): Unit = {
-    new RequireSufficientSupply().update()
+    new SupplierPlan().update()
   }
   def pumpRatio(
     unitClass     : UnitClass,

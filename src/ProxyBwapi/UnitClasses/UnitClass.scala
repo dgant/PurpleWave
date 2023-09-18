@@ -4,6 +4,7 @@ import Information.GameSense.Budgets
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile, TileRectangle}
+import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}

@@ -195,23 +195,20 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
   private val speedlingStrategies = Vector(
     With.fingerprints.fourPool,
     With.fingerprints.ninePoolGas,
-    With.fingerprints.ninePoolHatch,
     With.fingerprints.overpoolGas,
     With.fingerprints.tenHatchPoolGas,
     With.fingerprints.twoHatchMain,
-    With.fingerprints.oneHatchGas)
+    With.fingerprints.oneHatchGas,
+    With.fingerprints.speedBeforeLair)
 
   private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
-    var output  =   With.fingerprints.zerglingsOnly.recently
-    output      ||  enemyRecentStrategy(speedlingStrategies: _*)
+    var output  =   With.fingerprints.zerglingsOnly.recently || enemyRecentStrategy(speedlingStrategies: _*)
     output      &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
-    output      &&= ! enemyStrategy(With.fingerprints.overpool, With.fingerprints.twelvePool, With.fingerprints.twelveHatch)
     output      ||= enemyStrategy(speedlingStrategies: _*)
     output      ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(3, 15)()
     output      ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(3, 30)()
     output      ||= enemiesShown(Zerg.Zergling) > 16
-    output      ||= enemyHasUpgrade(Zerg.ZerglingSpeed)
     output      &&= ! enemyHydralisksLikely
     output      &&= ! enemyMutalisksLikely
     output      &&= ! enemyLurkersLikely

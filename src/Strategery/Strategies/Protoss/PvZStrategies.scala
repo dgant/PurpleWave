@@ -24,24 +24,6 @@ object PvZGoon      extends PvZStrategy
 object PvZReaver    extends PvZStrategy
 object PvZSpeedlot  extends PvZStrategy
 
-/*
-object PvZ1Base4GateGoon extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1Base4GateGoon)
-}
-
-object PvZ1BaseGoonReaver extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1BaseGoonReaver)
-}
-
-object PvZ1BaseSpeedlotArchon extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1BaseSpeedlotArchon)
-}
-
-object PvZ1BaseStargate extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1BaseStargate)
-}
-*/
-
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }

@@ -1,12 +1,11 @@
 package Information.Battles.ProcessingStates
 
 import Information.Battles.BattleFilters
-import Information.Battles.Types.Division
+import Information.Battles.Types.{Division, DivisionRadius}
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
-
 
 class BattleProcessDivisions extends BattleProcessState {
   override def step(): Unit = {
@@ -30,7 +29,6 @@ class BattleProcessDivisions extends BattleProcessState {
         battle.enemy.centroidGround.groundPixels(z.heart)))
 
     // Associate each group of enemies with the nearest base
-    val baseRelevancePixels = 32 * 32
     val enemiesAll = With.units.enemy.view.filter(BattleFilters.local)
     val enemiesEmbattled = battles.view.map(_.enemy.units)
     val enemiesUnbattled = (enemiesAll.toSet -- battles.view.flatMap(_.enemy.units.view.flatMap(_.foreign)))
@@ -46,7 +44,7 @@ class BattleProcessDivisions extends BattleProcessState {
                 .flatMap(bases =>
                   Maff.minBy(bases
                     .map(base => (base, distance(enemy, base)))
-                    .filter(p => p._2 < baseRelevancePixels || enemy.base.contains(p._1)))(_._2)
+                    .filter(p => p._2 <  DivisionRadius.inner || enemy.base.contains(p._1)))(_._2)
                     .map(_._1)))
             .toSet))
       .toVector

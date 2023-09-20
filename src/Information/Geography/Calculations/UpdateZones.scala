@@ -1,7 +1,7 @@
 package Information.Geography.Calculations
 
 import Information.Geography.Pathfinding.PathfindProfile
-import Information.Geography.Types.{Edge, Zone}
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Players.Players
@@ -48,26 +48,11 @@ object UpdateZones {
       .getOrElse(With.geography.home)
   }
 
-  def calculateExit(zone: Zone): Option[Edge] = {
-    val enemyZone = zone.bases.exists(_.isEnemy) && ! zone.bases.exists(_.isOurs)
-    // Take the edge closest to opposing production
-    Maff.minBy(zone.edges)(edge =>
-        Maff.orElse(
-          (if (enemyZone) Seq(With.geography.ourMain.heart)   else With.scouting.enemyMain.map(_.heart).toSeq),
-          (if (enemyZone) Seq(With.scouting.ourThreatOrigin)  else Seq(With.scouting.enemyThreatOrigin)))
-        .map(edge.distanceGrid.get))
-  }
-  def calculateEntrance(zone: Zone): Option[Edge] = {
-    Maff.minBy(zone.edges)(edge => With.geography.startLocations.map(edge.distanceGrid.get).min)
-  }
-
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
   private def updateZone(zone: Zone): Unit = {
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
     zone.bases.foreach(UpdateBase(_))
-    zone.exitNow = calculateExit(zone)
-    zone.entranceNow = calculateEntrance(zone)
   
     val exitBuildings = zone.exitOriginal.map(exit =>
       zone.units

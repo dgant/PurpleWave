@@ -36,10 +36,10 @@ class Visualization extends TimedTask {
     ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
-    //ShowStoryteller,
     ShowJudgment,
 
     // Temporary views
+    ShowZones,
     ShowExpansions
   )
 

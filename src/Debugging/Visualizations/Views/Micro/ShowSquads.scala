@@ -1,12 +1,12 @@
 package Debugging.Visualizations.Views.Micro
 
-import Debugging.Visualizations.{Colors, Hues}
+import Debugging.EnumerateUnits
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.DebugView
+import Debugging.Visualizations.{Colors, Hues}
 import Lifecycle.With
 import Mathematics.Maff
 import Tactic.Squads.Squad
-import ProxyBwapi.UnitInfo.UnitInfo
 
 object ShowSquads extends DebugView {
   
@@ -35,7 +35,7 @@ object ShowSquads extends DebugView {
         val targetColor = Colors.BrightYellow
         DrawMap.crosshair(q.head.pixel, q.head.unitClass.dimensionMax / 2, targetColor)
         while (i < q.size - 1) {
-          DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.hsv(Hues.Red, 255, 255 * i / q.size))
+          DrawMap.arrow(q(i).pixel, q(i + 1).pixel, Colors.hsv(Hues.Red, 255, 255 - 255 * i / q.size))
           i += 1
         }
       }
@@ -52,30 +52,13 @@ object ShowSquads extends DebugView {
           squad.vicinity.base.map(_.toString).getOrElse(squad.vicinity.tile.toString),
           "",
           "",
-          enumerateUnits(squad.units),
+          EnumerateUnits(squad.units),
           "",
-          enumerateUnits(squad.targets.getOrElse(Seq.empty)),
+          EnumerateUnits(squad.targets.getOrElse(Seq.empty)),
           "",
-          enumerateUnits(squad.enemies)))
+          EnumerateUnits(squad.enemies)))
     DrawScreen.table(5, 7 * With.visualization.lineHeightSmall, table)
   }
-  
-  def enumerateUnits(units: Iterable[UnitInfo]): String = {
-    
-    val counts = units
-      .toVector
-      .map(_.unitClass)
-      .groupBy(x => x)
-    
-    val output = counts
-      .toSeq
-      .sortBy(-_._2.size)
-      .map(p => p._2.size + p._1.abbr)
-      .mkString(".")
-    
-    output
-  }
-  
   
   lazy val squadColors = Vector(
     Colors.MidnightRed,

@@ -1,5 +1,6 @@
 package Information.Battles.Types
 
+import Debugging.EnumerateUnits
 import Information.Geography.Types.Base
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.UnitGroup
@@ -16,4 +17,6 @@ case class Division(enemies: Iterable[UnitInfo], bases: Set[Base]) extends UnitG
   def merge(other: Division): Division = Division(enemies ++ other.enemies, bases ++ other.bases)
 
   override def groupUnits: Seq[UnitInfo] = enemies.toSeq
+
+  override def toString: String = f"Division: $bases, ${EnumerateUnits(enemies)}"
 }

@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Battles
 
+import Debugging.EnumerateUnits
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Maff
@@ -20,7 +20,7 @@ object ShowDivisions extends DebugView {
     DrawScreen.column(x1, y, "Division bases: " +: rows1.map(_.map(_.toString).mkString))
   }
   
-  private def renderScreenUnits(units: Iterable[UnitInfo]): String = f"${units.size}: ${ShowSquads.enumerateUnits(units)}"
+  private def renderScreenUnits(units: Iterable[UnitInfo]): String = f"${units.size}: ${EnumerateUnits(units)}"
   
   override def renderMap(): Unit = {
     With.battles.divisions.foreach(division => {

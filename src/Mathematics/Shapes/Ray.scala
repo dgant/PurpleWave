@@ -27,7 +27,7 @@ object Ray {
 
     var cornerSkip: Option[Pixel] = None
 
-    override def hasNext: Boolean = cornerSkip.isEmpty && lengthSquaredNow < lengthSquaredGoal - 0.0001
+    override def hasNext: Boolean = cornerSkip.isDefined || lengthSquaredNow < lengthSquaredGoal
 
     override def next(): Pixel = {
       if (cornerSkip.isDefined) {

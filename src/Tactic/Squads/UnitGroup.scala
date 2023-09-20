@@ -1,5 +1,6 @@
 package Tactic.Squads
 
+import Debugging.EnumerateUnits
 import Information.Battles.Types.{Battle, GroupCentroid}
 import Lifecycle.With
 import Mathematics.Maff
@@ -149,4 +150,6 @@ trait UnitGroup {
     groupOrderable.view.filter(_.likelyStillThere),
     groupOrderable.view.filter(_.likelyStillThere),
     groupUnits)
+
+  override def toString: String = f"Group: $EnumerateUnits(groupUnits)"
 }

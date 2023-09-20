@@ -170,7 +170,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     status(anticipateSpeedlings, "Speedlings")
 
     detectionVsLurker()
+
     requireMiningBases(?(frame > Minutes(10)(), 2, 1))
+    if (timingAttack && With.scouting.enemyProximity < 0.75 && (PvZExpand() || PvZMuscle())) {
+      requireMiningBases(2)
+    }
 
     SwapIf(
       supplyUsed200 >= 60  - 30 * confidenceDefending01 - 4 * units(Protoss.Gateway),

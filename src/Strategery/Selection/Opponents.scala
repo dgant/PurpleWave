@@ -8,23 +8,25 @@ object Opponents {
 
   val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive)
+  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
+  val aggroPvZ  : StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive, PvZSpeedlot, PvZMuscle)
+
+  // AIIDE 2023
+  val bananabrain : Opponent = add("BananaBrain",     defaultPvP)
+  val stardust    : Opponent = add("Stardust",        new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
+  val steamhammer : Opponent = add("Steamhammer",     aggroPvZ)
+  val microwave   : Opponent = add("Microwave",       aggroPvZ)
+  val infestedart : Opponent = add("InfestedArtosis", aggroPvZ)
+  val dragon      : Opponent = add("Dragon",          defaultPvT)
+  val ualbertabot : Opponent = add("UAlbertaBot",     StrategySelectionFixed(PvR2Gate4Gate))
+  val mcrave      : Opponent = add("McRave",          StrategySelectionFixed(PvZ1BaseReactive, PvZSpeedlot, PvZTech))
 
   // COG 2023
-  val bananabrain : Opponent = add("BananaBrain",   defaultPvP)
-  val stardust    : Opponent = add("Stardust",      new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
-  //val mcrave      : Opponent = add("McRave",        StrategySelectionFixed(PvZ1BaseStargate))
-  //val microwave   : Opponent = add("Microwave",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseGoonReaver))
-  //val cunybot     : Opponent = add("CUNYbot",       StrategySelectionFixed(PvZ1BaseSpeedlotArchon))
   val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))
-
-  // AIIDE 2022
-  val ualbertabot : Opponent = add("UAlbertaBot",   StrategySelectionFixed(PvR2Gate4Gate))
 
   // Aliased
   //val adias       : Opponent = add("adias")
   val cunybot       : Opponent = add("CUNYbot")
-  val mcrave        : Opponent = add("McRave")
   //val ualbertabot : Opponent = add("UAlbertaBot")
   //val zzzkbot     : Opponent = add("ZZZKBot")
 

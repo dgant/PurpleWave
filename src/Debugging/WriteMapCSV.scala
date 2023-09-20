@@ -18,8 +18,8 @@ object WriteMapCSV {
     val startMetros       = With.geography.metros.filter(_.main.isDefined)
     val startMetroSizeMin = Maff.min(startMetros.map(_.bases.length)).getOrElse(0)
     val startMetroSizeMax = Maff.max(startMetros.map(_.bases.length)).getOrElse(0)
-    val airlocksMin       = Maff.min(startMetros.map(_.airlocks.size)).getOrElse(0)
-    val airlocksMax       = Maff.max(startMetros.map(_.airlocks.size)).getOrElse(0)
+    val airlocksMin       = Maff.min(startMetros.map(_.exits.size)).getOrElse(0)
+    val airlocksMax       = Maff.max(startMetros.map(_.exits.size)).getOrElse(0)
     val exitWidths        = With.geography.startBases.flatten(_.zone.exitOriginal.map(_.diameterPixels))
 
     append("File",                    With.mapFileName)

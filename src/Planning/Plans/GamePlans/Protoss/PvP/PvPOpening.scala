@@ -78,6 +78,7 @@ class PvPOpening extends GameplanImperative {
   private def sneakyRobo(): Unit = {
     doSneakyRobo &&= units(Protoss.Probe) < 17 || scoutCleared
     if (doSneakyRobo) {
+      status("SneakyRobo")
       get(Protoss.RoboticsFacility)
     } else {
       ?(With.strategy.isRamped,
@@ -87,7 +88,6 @@ class PvPOpening extends GameplanImperative {
   }
 
   override def executeBuild(): Unit = {
-
     if (sequence == null) {
       sequence = if (PvP1012()) GCGate else {
         var wTech   =   1.0
@@ -312,8 +312,9 @@ class PvPOpening extends GameplanImperative {
         getObservatory  =                   roll("SpeculativeObservatory",  p)
         getObservers    = getObservatory && roll("SpeculativeObservers",   p) // So the probability of obs is the *joint* probability
       }
-      getObservatory  ||= enemyCitadel
-      getObservers    ||= enemyCitadel
+      val dtSmell = enemyCitadel || enemyHasShown(Protoss.Forge, Protoss.PhotonCannon) || With.sense.netDamage > 2 * Protoss.Dragoon.subjectiveValue
+      getObservatory  ||= dtSmell
+      getObservers    ||= dtSmell
       getReavers      ||= ! getObservatory && ! have(Protoss.Observatory)
       if ( ! have(Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Observatory)) {
         shuttleFirst = getReavers && ! enemyCitadel
@@ -422,7 +423,6 @@ class PvPOpening extends GameplanImperative {
     status(getReavers,        "Reaver")
     status(reaverAllIn,       "ReaverAllIn")
     status(greedyDT,          "GreedyDT")
-    status(doSneakyRobo,      "SneakyRobo")
     status(atEarlyTiming,     "Timing1")
     status(earlyTimingClosed, "Timing1Done")
     status(atMainTiming,      "Timing2")
@@ -821,7 +821,7 @@ class PvPOpening extends GameplanImperative {
     // 3/4-Gate Goon
     } else {
       get(Protoss.DragoonRange)
-      if (With.scouting.ourProximity < 0.5 && confidenceSlugging11 > 0.25 && ! With.fingerprints.robo() && With.sense.netDamage > 400) {
+      if (With.scouting.ourProximity < 0.5 && safePushing && ! With.fingerprints.robo() && With.sense.netDamage > 400) {
         get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       }
       if (shouldExpand) {

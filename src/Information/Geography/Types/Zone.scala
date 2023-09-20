@@ -1,10 +1,9 @@
 package Information.Geography.Types
 
-import Information.Geography.Calculations.UpdateZones
 import Information.Grids.Movement.GridGroundDistance
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Direction, Pixel, Tile}
+import Mathematics.Points.Tile
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
@@ -13,16 +12,10 @@ import bwta.Region
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
         val zones             : Vector[Zone]        = Vector(this)
   lazy  val bases             : Vector[Base]        = With.geography.bases.filter(_.townHallTile.zone == this)
-  lazy  val edges             : Vector[Edge]        = With.geography.edges.filter(_.zones.contains(this))
   lazy  val metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
-  lazy  val entranceOriginal  : Option[Edge]        = UpdateZones.calculateEntrance(this)
-  lazy  val exitOriginal      : Option[Edge]        = Maff.minBy(edges)(e => With.geography.startBases.map(_.heart).map(e.distanceGrid.get).max)
-  lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(if(bases.length == 1) bases.head.heart else centroid)
-  lazy  val exitDirection     : Option[Direction]   = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
+  lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(?(bases.length == 1, bases.head.heart, centroid))
   var contested               : Boolean             = false
   var walledIn                : Boolean             = false
-  var exitNow                 : Option[Edge]        = None
-  var entranceNow             : Option[Edge]        = None
 
   var _units: Vector[UnitInfo] = _
   def setUnits(argUnits: Vector[UnitInfo]): Unit = _units = argUnits
@@ -35,8 +28,6 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   def heart           : Tile = bases.sortBy(_.mineralsLeft).sortBy(_.owner.isNeutral).headOption.map(_.heart).getOrElse(centroid)
   def downtown        : Tile = heart.center.midpoint(exitOriginal.map(_.pixelCenter).getOrElse(heart.center)).walkableTile
   def exitNowOrHeart  : Tile = exitNow.map(_.pixelCenter.walkableTile).getOrElse(heart)
-
-  def edgeTo(to: Pixel) : Option[Edge] = Maff.minBy(edges)(_.pixelCenter.groundPixels(to))
 
   override def toString: String = f"$name ${if (bases.nonEmpty) f"(${bases.map(b => f"${b.name} - ${b.description}").mkString(", ")}) " else ""}$centroid"
 

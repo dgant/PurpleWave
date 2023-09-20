@@ -9,7 +9,7 @@ import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Strategery.Strategies.Protoss.{PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
+import Strategery.Strategies.Protoss.{PvP1012, PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
 import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
@@ -93,8 +93,11 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= reaverShuttleCombo
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && ! enemiesHaveComplete(Protoss.PhotonCannon)
-    shouldAttack ||= (With.scouting.ourMuscleOrigin.metro.exists(_.isEnemy) || With.geography.enemyBases.exists(_.natural.exists(With.scouting.weControl))) && employing(PvP3GateGoon, PvP4GateGoon) && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    shouldAttack ||= ! With.geography.enemyBases.exists(_.scoutedByUs)
     shouldAttack ||= estimatedArmyDifferential > 3 * Protoss.Dragoon.skimulationValue
+    shouldAttack ||= With.frame < Minutes(8)() && PvP1012()       && ! With.fingerprints.twoGate()
+    shouldAttack ||= With.frame < Minutes(8)() && PvP3GateGoon()  && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
+    shouldAttack ||= With.frame < Minutes(8)() && PvP4GateGoon()  && ! With.fingerprints.fourGateGoon()
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
     shouldAttack &&= ! fearDeath
     shouldAttack ||= shouldExpand && With.geography.safeExpansions.isEmpty
@@ -361,7 +364,7 @@ class PvPLateGame extends GameplanImperative {
         .filterNot(_.isOurMain)
         .filterNot(_.isOurNatural)
         .foreach(base => {
-          val coverHall = base.zone.edges.exists(_.pixelCenter.pixelDistance(base.townHallArea.center) > 32 * 15)
+          val coverHall = base.edges.exists(_.pixelCenter.pixelDistance(base.townHallArea.center) > 32 * 15)
           buildDefensesAt(1, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
         })
     }

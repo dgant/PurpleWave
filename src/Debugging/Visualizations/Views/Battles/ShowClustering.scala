@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Battles
 
+import Debugging.EnumerateUnits
 import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
-import Debugging.Visualizations.Views.Micro.ShowSquads
 import Debugging.Visualizations.Views.DebugView
 import Information.Battles.Types.Battle
 import Lifecycle.With
@@ -22,7 +22,7 @@ object ShowClustering extends DebugView {
   }
   
   private def describeUnits(units: Seq[UnitInfo]): String = {
-    f"(${units.size}) ${ShowSquads.enumerateUnits(units)}"
+    f"(${units.size}) ${EnumerateUnits(units)}"
   }
   
   override def renderMap(): Unit = {

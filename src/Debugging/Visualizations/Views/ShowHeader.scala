@@ -17,6 +17,7 @@ object ShowHeader extends DebugView {
     With.game.drawTextScreen(165, 1 * h, clock)
     With.game.drawTextScreen(205, 1 * h, f"${With.frame}")
     With.game.drawTextScreen(245, 1 * h, f"${With.configuration.frameLimitMs}ms: ${With.performance.framesOverShort}/320 ${With.performance.framesOver1000}/10 ${With.performance.framesOver10000}/1")
+    With.game.drawTextScreen(365, 1 * h, f"A:${With.reaction.agencyAverage} C:${With.reaction.clusteringAverage} P:${With.reaction.planningAverage}")
     With.game.drawTextScreen(5,   2 * h, MapIdentifier(With.game.mapFileName))
     With.game.drawTextScreen(125, 2 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
     With.game.drawTextScreen(5,   3 * h, With.blackboard.status.get.mkString(", "))

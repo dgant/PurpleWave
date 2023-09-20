@@ -97,6 +97,6 @@ object ShowRushDistances extends DebugView {
         Vector(
           "Ramp width",
           "")
-        ++ With.geography.ourMain.zone.edges.map(_.radiusPixels.toInt.toString)))
+        ++ With.geography.ourMain.edges.map(_.radiusPixels.toInt.toString)))
   }
 }

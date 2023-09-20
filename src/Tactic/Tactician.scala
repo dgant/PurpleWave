@@ -1,12 +1,13 @@
 package Tactic
 
+import Information.Battles.Types.{Division, DivisionRadius}
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
 import Planning.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Missions._
 import Tactic.Production.Produce
 import Tactic.Squads._
@@ -19,7 +20,7 @@ import Utilities.UnitFilters._
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
-class Tactician extends TimedTask {
+final class Tactician extends TimedTask {
   private val missions          = new ArrayBuffer[Mission]()
   private val priorityTactics   = new ArrayBuffer[Tactic]()
   private val backgroundTactics = new ArrayBuffer[Tactic]()
@@ -132,36 +133,69 @@ class Tactician extends TimedTask {
     })
   }
 
+  @inline private def defenseDanger(e: UnitInfo): Double = {
+    if (IsWorker(e))
+      0.35
+    else if (Protoss.Observer(e) && e.matchups.groupVs.mobileDetectors.isEmpty)
+      0.0
+    else if (e.flying && (Zerg.Overlord(e) || e.unitClass.isFlyingBuilding) && ! e.matchups.groupVs.attacksAir)
+      0.0
+    else if (e.unitClass.attacksOrCastsOrDetectsOrTransports)
+      1.0
+    else
+      0.0
+  }
+
+  @inline private def defenseDistance(e: UnitInfo): Double = {
+    Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).map(e.pixelDistanceTravelling).min
+  }
+
+  private class DefenseDivision(val division: Division) extends UnitGroup {
+
+    val enemyDistances: Vector[(UnitInfo, Double)] = division
+      .enemies
+      .filter(defenseDanger(_) > 0)
+      .map(e => (e, defenseDistance(e)))
+      .toVector
+
+    // Our approach to choosing relevant enemies is flawed because it can cut off portions of a cluster
+    val       enemiesInner : Vector[UnitInfo] = enemyDistances.view.filter(_._2 < DivisionRadius.inner).map(_._1).toVector
+    lazy val  enemiesOuter : Vector[UnitInfo] = enemyDistances.view.filter(_._2 < DivisionRadius.outer).map(_._1).toVector
+
+    val needsDefense: Boolean = enemiesInner.view.map(defenseDanger).sum >= 1.0
+
+    lazy val base: Base =
+      adjustDefenseBase(division.bases
+        .toVector
+        .sortBy( - _.economicValue())
+        .sortBy( ! _.isEnemy)
+        .sortBy( ! _.isOurs)
+        .minBy( ! _.plannedExpoRecently)) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
+
+    override def groupUnits: Seq[UnitInfo] = enemiesInner
+  }
+
   private def adjustDefenseBase(base: Base): Base = {
     base.natural.filter(b => b.isOurs || b.plannedExpoRecently).getOrElse(base)
   }
 
   private def runCoreTactics(): Unit = {
 
-    // Sort defense divisions by descending distance from home.
-    // The further the base is, the pickier we must be about which defenders we bring along.
-    var divisionsToDefend = With.battles.divisions.filter(_.bases.exists(b => (b.isOurs || b.plannedExpoRecently) && ! b.isEnemy))
-    divisionsToDefend = divisionsToDefend
-      .filterNot(d =>
-        // TODO: Old checks which we should probably generalize better
-        (d.enemies.size < 3 && d.enemies.forall(e => (e.unitClass.isWorker || ! e.canAttack) && ! e.isTransport))
-        || d.enemies.forall(e => Protoss.Observer(e) && e.matchups.groupVs.mobileDetectors.isEmpty))
-      .sortBy(d => - ?(d.attackers.nonEmpty, d.attackCentroidGround, d.centroidGround).walkablePixel.groundPixels(With.geography.home))
+    val defenseDivisions = With.battles.divisions
+      .filter(d => d.bases.exists(b => (b.isOurs || b.plannedExpoRecently) && ! b.isEnemy))
+      .map(new DefenseDivision(_))
 
-    // Pick a squad for each
-    val squadsDefending = divisionsToDefend.map(d => (d, defenseSquads({
-      val base = d.bases
-        .toVector
-        .sortBy( - _.economicValue())
-        .sortBy( ! _.isEnemy)
-        .sortBy( ! _.isOurs)
-        .minBy( ! _.plannedExpoRecently)
-      adjustDefenseBase(base) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
-    }))).distinct
+    val defenseDivisionsActive = defenseDivisions
+      .filter(_.needsDefense)
+      .sortBy(_.attackKeyDistanceTo((With.geography.home.center)))
+
+    val squadsDefending = defenseDivisionsActive.map(d => (d, defenseSquads(d.base))).distinct
 
     // Assign division to each squad
-    squadsDefending.foreach(p => p._2.vicinity = Maff.centroid(p._2.enemies.view.map(_.pixel)))
-    squadsDefending.foreach(p => p._2.setEnemies(p._1.enemies))
+    squadsDefending.foreach(p => {
+      p._2.setEnemies(p._1.enemiesOuter)
+      p._2.vicinity = p._1.attackCentroidKey
+    })
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(IsRecruitableForCombat))
@@ -188,7 +222,7 @@ class Tactician extends TimedTask {
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
-        && ! divisionsToDefend.exists(_.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
+        && ! defenseDivisionsActive.exists(_.division.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.ourUnits).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
       val qualifiedClasses = if (With.enemies.exists(_.isTerran))
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)

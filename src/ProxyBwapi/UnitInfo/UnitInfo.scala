@@ -211,8 +211,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     unitClass.isBuilding
     && ! flying
     && ?(isFriendly,
-      With.scouting.proximity(tile) < 1 - _proxyThreshold || ! metro.exists(_.isOurs),
-      With.scouting.proximity(tile) >     _proxyThreshold || ! metro.exists(m => m.bases.exists(b => b.isStartLocation && (b.isEnemy || ! b.scoutedByUs) && (With.geography.enemyBases.isEmpty || With.geography.enemyBases.contains(b))))),
+      With.scouting.proximity(tile) < 1 - _proxyThreshold || ! metro.exists(_.bases.exists(_.isOurs)),
+      With.scouting.proximity(tile) >     _proxyThreshold || ! metro.exists(_.bases.exists(_.isEnemy) || With.geography.enemyBases.isEmpty)),
     240)
 
   ////////////

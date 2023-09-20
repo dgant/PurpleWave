@@ -39,10 +39,10 @@ trait BaseInference {
   }
 
   protected def updateBaseInference(): Unit = {
-    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.find(_.owner.isEnemy))
-    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.startBases.view.filter(_.owner.isNeutral).find(_.naturalOf.exists(_.owner.isEnemy)))
+    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.mains.find(_.owner.isEnemy))
+    _firstEnemyMain = _firstEnemyMain.orElse(With.geography.mains.view.filter(_.owner.isNeutral).find(_.naturalOf.exists(_.owner.isEnemy)))
     if (_firstEnemyMain.isEmpty) {
-      val possibleMains = With.geography.startBases.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scoutedByUs)
+      val possibleMains = With.geography.mains.filterNot(_.owner.isUs).filter(base => base.owner.isEnemy || ! base.scoutedByUs)
       // Infer possible mains from process of elimination
       if (possibleMains.size == 1) {
         _firstEnemyMain = possibleMains.headOption
@@ -50,7 +50,7 @@ trait BaseInference {
       }
       // Infer main by creep
       else if (With.frame < Minutes(5)() && With.enemies.exists(_.isZerg)) {
-        val newlyCreepedBases = With.geography.startBases.filter(b => b.owner.isNeutral && b.zone.tiles.exists(_.creep))
+        val newlyCreepedBases = With.geography.mains.filter(b => b.owner.isNeutral && b.zone.tiles.exists(_.creep))
         if (newlyCreepedBases.size == 1) {
           _firstEnemyMain = newlyCreepedBases.headOption
           With.logger.debug("Inferred enemy main from presence of creep: " + _firstEnemyMain.get.toString)
@@ -59,7 +59,7 @@ trait BaseInference {
       // Infer main by Overlord
       else if (With.frame < GameTime(2, 30)()) {
         val overlords = With.units.enemy.filter(Zerg.Overlord)
-        val overlordMains = overlords.map(overlord => (overlord, With.geography.startBases.filter(base =>
+        val overlordMains = overlords.map(overlord => (overlord, With.geography.mains.filter(base =>
           base.owner.isNeutral
           && overlord.framesToTravelTo(base.townHallArea.center) < With.frame + Seconds(5)()
         )))

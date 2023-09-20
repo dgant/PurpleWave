@@ -21,5 +21,5 @@ class Fingerprint12Hatch extends FingerprintAnd(
     With.fingerprints.hatchFirst))
 
 private object IsNonStartingHatch extends UnitFilter {
-  override def apply(unit: UnitInfo): Boolean = unit.unitClass.isTownHall && ! unit.base.exists(b => b.isStartLocation && b.townHallTile == unit.tileTopLeft)
+  override def apply(unit: UnitInfo): Boolean = unit.unitClass.isTownHall && ! unit.base.exists(b => b.isMain && b.townHallTile == unit.tileTopLeft)
 }

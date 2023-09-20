@@ -17,12 +17,13 @@ trait Geo {
   def bases           : Vector[Base]
   def zones           : Vector[Zone]
 
-  lazy val isStartLocation  : Boolean           = bases.map(_.townHallTile).exists(With.geography.startLocations.contains)
-  lazy val isCross          : Boolean           = ! With.geography.startBases.sortBy(With.geography.ourMain.groundDistance).exists(bases.contains)
-  lazy val island           : Boolean           = With.geography.startBases.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
+  lazy val isMain           : Boolean           = bases.map(_.townHallTile).exists(With.geography.startLocations.contains)
+  lazy val isNatural        : Boolean           = bases.exists(_.naturalOf.isDefined)
+  lazy val isCross          : Boolean           = ! With.geography.mains.sortBy(With.geography.ourMain.groundDistance).exists(bases.contains)
+  lazy val island           : Boolean           = With.geography.mains.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val isInterior       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z))))
   lazy val isBackyard       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
-  lazy val isPocket         : Boolean             = isInterior && ! isStartLocation && ! island
+  lazy val isPocket         : Boolean             = isInterior && ! isMain && ! island
   lazy val radians          : Double            = Points.middle.radiansTo(heart.center)
   lazy val rushDistanceMin  : Double            = Maff.max(rushDistances).getOrElse(0)
   lazy val rushDistanceMax  : Double            = Maff.max(rushDistances).getOrElse(0)
@@ -34,9 +35,9 @@ trait Geo {
   lazy val selfAndChildren  : Vector[Geo]       = (Vector[Geo](this) ++ zones ++ bases).distinct
   lazy val edges            : Vector[Edge]      = With.geography.edges.filter(_.zones.exists(zones.contains))
   lazy val exits            : Vector[Edge]      = edges.filter(_.zones.exists( ! zones.contains(_))).distinct
-  lazy val rushDistances    : Vector[Double]    = With.geography.metros.filter(_.isStartLocation).filterNot(_.selfAndChildren.contains(this)).map(groundDistance)
+  lazy val rushDistances    : Vector[Double]    = With.geography.metros.filter(_.isMain).filterNot(_.selfAndChildren.contains(this)).map(groundDistance)
   lazy val entranceOriginal : Option[Edge]      = _entranceCache()
-  lazy val exitOriginal     : Option[Edge]      = Maff.minBy(exits)(e => With.geography.startBases.map(_.heart).map(e.distanceGrid.get).max)
+  lazy val exitOriginal     : Option[Edge]      = Maff.minBy(exits)(e => With.geography.mains.map(_.heart).map(e.distanceGrid.get).max)
   lazy val exitDirection    : Option[Direction] = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
 
   lazy val groundPixelsToBases: Map[Base, Double] = With.geography.bases.map(b => (b, b.heart.groundPixels(heart))).toMap

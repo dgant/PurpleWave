@@ -77,20 +77,24 @@ trait GeographyBuilder {
 
     // Build Metros
     //
-    val mainMetros = With.geography.startBases.map(main => Metro(Vector(main) ++ main.natural))
-    val otherMetros = With.geography.bases
-      .filterNot(base => mainMetros.exists(_.bases.contains(base)))
-      .sortBy(base => With.geography.startLocations.map(_.groundPixels(base.heart)).min)
-      .map(base => Metro(Vector(base)))
-    _metros = mainMetros ++ otherMetros
+    _metros = With.geography.mains.map(main => new Metro(Vector(main) ++ main.natural))
+
+    With.geography.bases
+      .filterNot(base => _metros.exists(_.bases.contains(base)))
+      .sortBy   (base => With.geography.startLocations.map(_.groundPixels(base.heart)).min)
+      .foreach(base =>
+        if ( ! _metros.exists(_.bases.contains(base))) {
+          _metros :+= new Metro(Vector(base))
+        })
+
     var i = 0
     while(i < metros.length) {
       val metro = _metros(i)
       if (metro.main.isDefined) {
         i += 1
       } else {
-        val closestMetro = _metros.take(i).minBy(metroDistance(_, metro))
-        val closestMetroDistance = metroDistance(closestMetro, metro)
+        val closestMetro          = _metros.take(i).minBy(metroDistance(_, metro))
+        val closestMetroDistance  = metroDistance(closestMetro, metro)
         if (closestMetroDistance < 32 * 30) {
           val j = _metros.indexOf(closestMetro)
           _metros = _metros.take(j) ++ Vector(closestMetro.merge(metro)) ++ _metros.drop(j + 1).filterNot(metro==)

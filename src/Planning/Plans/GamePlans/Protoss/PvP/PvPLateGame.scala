@@ -41,7 +41,7 @@ class PvPLateGame extends GameplanImperative {
     .filter(u =>
       ! u.alive
       || u.isAny(Protoss.Nexus, Protoss.Forge, Protoss.PhotonCannon, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer))
-    .filterNot(u => Protoss.Nexus(u) && u.base.exists(_.isStartLocation))
+    .filterNot(u => Protoss.Nexus(u) && u.base.exists(_.isMain))
 
   private def skimEquivalent(unit: UnitInfo): Double = unit.subjectiveValue * Protoss.Zealot.skimulationValue / Protoss.Zealot.subjectiveValue
 
@@ -57,9 +57,8 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech) .filter(x => have(Protoss.TemplarArchives)))
       .orElse(Some(TemplarTech) .filter(x => With.units.ours.filter(Protoss.CitadelOfAdun).exists( ! _.knownToOpponents)))
       .orElse(Some(RoboTech)    .filter(x => enemyDarkTemplarLikely))
-      .orElse(Some(RoboTech)    .filter(x => With.fingerprints.cannonRush()))
-      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) >= 5))
-      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) >= 2 && roll("RoboVsCannon", 0.7)))
+      .orElse(Some(RoboTech)    .filter(x => enemyStrategy(With.fingerprints.dtRush, With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.cannonRush)))
+      .orElse(Some(RoboTech)    .filter(x => enemies(Protoss.PhotonCannon) >= 2))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && bases > 2))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && ! enemyRobo && roll("PrimaryTechTemplar", 0.4)))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && units(Protoss.Zealot) >= 5))

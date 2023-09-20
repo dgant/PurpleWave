@@ -31,13 +31,13 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     }
   }
 
-  lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.startBases.filterNot(_.owner.isUs).map(_.heart.groundPixels(tile)).sum)
+  lazy val waitingPoint: Tile = With.geography.allTiles.minBy(tile => With.geography.mains.filterNot(_.owner.isUs).map(_.heart.groundPixels(tile)).sum)
   def findStartLocation(): Unit = {
     // 2-Player: We know where they are. Go SMOrc.
     // 3-player: Scout one base with one probe while keeping the others in the middle.
     // 4-player: Scout two bases with one probe while keeping the others in the middle.
     
-    val possibleStarts = With.geography.startBases.filter(base => base.lastFrameScoutedByUs <= 0 && ! base.owner.isUs)
+    val possibleStarts = With.geography.mains.filter(base => base.lastFrameScoutedByUs <= 0 && ! base.owner.isUs)
     
     if (possibleStarts.isEmpty) {
       // Defensive handling of situation that makes no sense
@@ -67,9 +67,9 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
     val unscoutedBases =
       With.geography.bases
         .filter( ! _.owner.isUs)
-        .filter(_.isStartLocation || haveSeenABase) //Only search non-start locations until we've killed the first
+        .filter(_.isMain || haveSeenABase) //Only search non-start locations until we've killed the first
         .sortBy(_.heart.tileDistanceFast(With.geography.home))
-        .sortBy( ! _.isStartLocation)
+        .sortBy( ! _.isMain)
         .sortBy(_.lastFrameScoutedByUs)
   
     val unassignedScouts = new mutable.HashSet[FriendlyUnitInfo] ++ fighters.units

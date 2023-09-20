@@ -17,9 +17,9 @@ trait GeographyCache extends GeographyBuilder {
 
   protected val ourMainCache: Cache[Base] = new Cache(() =>
     Maff.orElse(
-      geo.ourBases.filter(_.isStartLocation),
+      geo.ourBases.filter(_.isMain),
       geo.ourBases,
-      geo.startBases).minBy(b => b.heart.groundTiles(With.self.startTile) + b.heart.tileDistanceFast(With.self.startTile) / 1000.0))
+      geo.mains).minBy(b => b.heart.groundTiles(With.self.startTile) + b.heart.tileDistanceFast(With.self.startTile) / 1000.0))
 
   protected val ourNaturalCache: Cache[Base] = new Cache(() =>
     geo.ourMain.natural.filter(_.naturalOf.exists(_.isOurs))

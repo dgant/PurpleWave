@@ -33,7 +33,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   val plugEdge = new Cache(() =>
     base.metro.bases
-      .find(_.isStartLocation)
+      .find(_.isMain)
       .filter(unused => ! With.enemies.exists(_.isZerg) && units.count(u => With.framesSince(u.frameDiscovered) > 240) <= 1)
       .filter(_.zone.exitNow.isDefined)
       .map(main => (main.zone, main.zone.exitNow)))
@@ -276,7 +276,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private case class Plug(pixel: Pixel) extends Action {
     override def perform(unit: FriendlyUnitInfo): Unit = {
-      if (unit.matchups.threats.exists(IsWarrior) || (unit.unitClass.ranged && unit.matchups.targets.exists(_.base.exists(_.isStartLocation)))) {
+      if (unit.matchups.threats.exists(IsWarrior) || (unit.unitClass.ranged && unit.matchups.targets.exists(_.base.exists(_.isMain)))) {
         Idle.perform(unit)
       } else {
         var to = pixel

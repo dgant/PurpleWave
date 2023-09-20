@@ -68,7 +68,7 @@ object BlockConstruction extends Action {
           base.townHall.isEmpty
           && (base.owner.isEnemy
             || (base.owner.isNeutral
-              && ! base.isStartLocation
+              && ! base.isMain
               && (unit.player.isZerg || base.naturalOf.exists(_.owner.isEnemy))))))
 
       val output = IsWorker(builder) && (hasBuildOrder || movingToRelevantBase || sittingOnExpansion)

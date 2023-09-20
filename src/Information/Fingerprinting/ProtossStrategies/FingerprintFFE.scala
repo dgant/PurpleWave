@@ -19,7 +19,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     def couldBeWall(unit: UnitInfo) = unit.base.forall(_.naturalOf.isDefined) && ! unit.proxied
     lazy val forge                  = With.units.enemy.find(u => Protoss.Forge(u)    && couldBeWall(u))
     lazy val gateway                = With.units.enemy.find(u => Protoss.Gateway(u)  && couldBeWall(u))
-    lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isStartLocation))
+    lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isMain))
     lazy val cannonsWalled          = With.units.enemy.view.filter(u => Protoss.PhotonCannon(u) && couldBeWall(u)).toVector
     lazy val buildingsProxied       = With.units.enemy.view.filter(_.proxied).toVector
     lazy val zealot                 = With.units.enemy.view.filter(Protoss.Zealot).toVector

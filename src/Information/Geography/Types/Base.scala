@@ -109,9 +109,9 @@ final class Base(val name: String, val townHallTile: Tile, val tiles: Set[Tile])
         else                "Neutral")
       + " "
       + adjective
-      + (     if (isStartLocation     && ! isOurs)  "main"
+      + (     if (isMain     && ! isOurs)  "main"
         else  if (naturalOf.isDefined && ! isOurs)  "natural"
         else                                        "base")))
 
-  override def toString: String = f"$arrow $description $name, ${zone.name} $heart"
+  override def toString: String = f"$arrow $description $name, ${zone.name}${if (metro.bases.length < 2) "" else f", ${metro.name} "} $heart"
 }

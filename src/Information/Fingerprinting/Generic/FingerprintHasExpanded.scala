@@ -10,7 +10,7 @@ class FingerprintHasExpanded(by: Int = Forever()) extends Fingerprint {
   override def investigate: Boolean = With.frame < by && With.enemies.exists(e => {
     var output = e.bases.size > 1
     output ||= With.units.enemy.exists(u => Terran.CommandCenter(u) && u.player == e && ! u.base.exists(_.townHallTile == u.tileTopLeft))
-    output ||= e.bases.exists( ! _.isStartLocation)
+    output ||= e.bases.exists( ! _.isMain)
     output
   })
 }

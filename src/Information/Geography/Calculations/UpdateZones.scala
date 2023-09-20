@@ -19,7 +19,7 @@ object UpdateZones {
   
     if (With.frame == 0) {
       With.geography
-        .startBases
+        .mains
         .foreach(startLocationBase =>
           Maff.minBy(With.geography.bases.view.filterNot(_.gas.isEmpty).filterNot(startLocationBase==))(_.zone.heart.groundTiles(startLocationBase.zone.heart))
             .foreach(natural => {

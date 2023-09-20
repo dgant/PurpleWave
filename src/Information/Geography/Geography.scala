@@ -11,8 +11,8 @@ import Planning.MacroFacts
 import scala.collection.JavaConverters._
 
 final class Geography extends TimedTask with GeographyCache with Expansions {
-  lazy val startBases         : Vector[Base]  = bases.filter(_.isStartLocation)
-  lazy val startLocations     : Vector[Tile]  = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
+  lazy val mains              : Vector[Base] = bases.filter(_.isMain)
+  lazy val startLocations     : Vector[Tile] = With.game.getStartLocations.asScala.map(new Tile(_)).toVector
   lazy val rushDistances      : Vector[Int]   = startLocations.flatMap(s1 => startLocations.filterNot(s1==).map(s1.groundPixelsBidirectional).map(_.toInt)).sorted
   lazy val clockwiseBases     : Vector[Base]  = With.geography.bases.sortBy(b => Points.middle.radiansTo(b.townHallArea.center))
   lazy val counterwiseBases   : Vector[Base]  = clockwiseBases.reverse

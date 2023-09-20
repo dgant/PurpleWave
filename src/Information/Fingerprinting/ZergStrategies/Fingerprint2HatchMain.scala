@@ -7,7 +7,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 class Fingerprint2HatchMain extends Fingerprint {
   override protected def investigate: Boolean = {
-    hatcheries.forall(_.base.exists(_.isStartLocation)) && hatcheries.size > 1
+    hatcheries.forall(_.base.exists(_.isMain)) && hatcheries.size > 1
   }
 
   override def reason: String = hatcheries.mkString(", ")

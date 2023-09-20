@@ -236,6 +236,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def walk(): Boolean = {
     unit.agent.shouldFight = true // This encourages the unit to use its forward formation rather than its retreat formation
     unit.agent.fightReason = "Walking"
+
     if (unit.intent.canSneak) {
       MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     } else if (unit.agent.receivedPushPriority() > unit.agent.priority) {

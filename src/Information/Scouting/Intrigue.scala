@@ -39,7 +39,7 @@ trait Intrigue {
     val hearts              = Vector(heartMain, heartNatural)
     val distanceFromEnemy   = 32.0 * 32.0 + Maff.min(enemyHearts.map(_.groundPixels(heartMain))).getOrElse(With.mapPixelWidth.toDouble)
     val informationAge      = 1.0 + With.framesSince(base.lastFrameScoutedByUs)
-    val startPositionBonus  = if (base.isStartLocation && base.lastFrameScoutedByUs <= 0) 100.0 else 1.0
+    val startPositionBonus  = if (base.isMain && base.lastFrameScoutedByUs <= 0) 100.0 else 1.0
     val output              = startPositionBonus * informationAge / distanceFromEnemy
     output
   }

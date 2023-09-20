@@ -30,7 +30,7 @@ class SquadInitialOverlordScout extends Squad {
       // Vs Random:  Scout main with nearest scout
 
       // Sort by ENTRANCE distance to encourage seeing critical buildings and flying over armies leaving the base
-      val candidateBases = With.geography.startBases.filterNot(_.owner.isUs).filterNot(_.scoutedByUs)
+      val candidateBases = With.geography.mains.filterNot(_.owner.isUs).filterNot(_.scoutedByUs)
       candidateBases.sortBy(main => {
         val base = main.natural.filter(!_.scoutedByUs && With.enemy.isProtoss).getOrElse(main)
         base.zone.exitOriginal

@@ -56,7 +56,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases
     .flatMap(baseA => With.geography.bases.map(baseB => (baseA, baseB)))
     .map(basePair => (basePair, basePair._1.heart.walkableTile.groundPixels(basePair._2.heart.walkableTile))).toMap
-  private lazy val naturalCost = With.geography.startBases.view.map(b => baseCosts(b, b.natural.getOrElse(b))).max
+  private lazy val naturalCost = With.geography.mains.view.map(b => baseCosts(b, b.natural.getOrElse(b))).max
 
   private val assignments = new mutable.HashMap[FriendlyUnitInfo, Slot]()
   private var workers: collection.Set[FriendlyUnitInfo] = mutable.Set.empty

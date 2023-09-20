@@ -118,7 +118,7 @@ trait EconomicModel {
   private var lastUpdate: Int = 0
   protected def updateEconomicModel(): Unit = {
     val deadEnemyWorkers = With.units.deadEnemy.count(IsWorker)
-    val unscouted = With.geography.startBases.exists( ! _.scoutedByUs) && ! With.geography.enemyBases.exists(_.isStartLocation)
+    val unscouted = With.geography.mains.exists( ! _.scoutedByUs) && ! With.geography.enemyBases.exists(_.isMain)
     if ( ! unscouted && With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(_.resources.forall(r => With.framesSince(r.lastSeen) < 4 * Terran.SCV.buildFrames))) {
       _enemyWorkerSnapshotDead    = deadEnemyWorkers
       _enemyWorkerSnapshot        = With.units.countEnemy(IsWorker)

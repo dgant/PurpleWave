@@ -13,8 +13,8 @@ abstract class PvZStrategy extends Strategy {
 
 object PvZ1BaseReactive extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvZ1BaseReactive)
-  setChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
-  setChoice(PvZMuscle,  PvZExpand,  PvZTech)
+  addChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
+  addChoice(PvZMuscle,  PvZExpand,  PvZTech)
 }
 
 object PvZMuscle    extends PvZStrategy

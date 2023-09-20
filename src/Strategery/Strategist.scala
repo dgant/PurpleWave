@@ -99,9 +99,9 @@ class Strategist {
   lazy val rushDistanceMin  : Int     = Maff.min(With.geography.rushDistances).getOrElse(rushDistanceMean)
   lazy val rushDistanceMax  : Int     = Maff.max(With.geography.rushDistances).getOrElse(rushDistanceMean)
   lazy val rushDistanceMean : Int     = Maff.mean(With.geography.rushDistances.map(_.toDouble)).toInt
-  lazy val isIslandMap      : Boolean = With.geography.startBases.forall(base1 => With.geography.startBases.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
+  lazy val isIslandMap      : Boolean = With.geography.mains.forall(base1 => With.geography.mains.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
   lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly) && With.game.getGameType != GameType.Top_vs_Bottom
-  lazy val isMoneyMap       : Boolean = With.geography.startBases.forall(b => b.minerals.length >= 16 && b.mineralsLeft > 1500 * 40)
+  lazy val isMoneyMap       : Boolean = With.geography.mains.forall(b => b.minerals.length >= 16 && b.mineralsLeft > 1500 * 40)
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
     .zipWithIndex

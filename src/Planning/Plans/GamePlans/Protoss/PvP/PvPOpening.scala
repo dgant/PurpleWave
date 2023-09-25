@@ -455,7 +455,7 @@ class PvPOpening extends GameplanImperative {
       && ! With.fingerprints.proxyGateway()
       && ! With.units.enemy.filter(Protoss.CyberneticsCore).exists(With.frame - _.completionFrame > Protoss.Dragoon.buildFrames - Seconds(5)())) {
       if (PvP1012()) {
-        if ( ! foundEnemyBase && ! PvPIdeas.attackFirstZealot) {
+        if ( ! foundEnemyBase) {
           scoutOn(Protoss.Gateway, quantity = 2)
         }
       } else if (starts > 3 || enemyRecentStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)) {

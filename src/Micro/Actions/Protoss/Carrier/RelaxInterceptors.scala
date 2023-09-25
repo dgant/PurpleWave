@@ -18,7 +18,7 @@ object RelaxInterceptors extends Action {
     val friendlyTargets = unit.interceptors.flatMap(_.orderTarget.filter(_.isFriendly))
     val nearestTarget = Maff.minBy(friendlyTargets)(_.pixelDistanceCenter(unit))
     nearestTarget.foreach(t => {
-      unit.agent.toTravel = Some(t.pixel.project(unit.pixel, 32 * 12))
+      unit.agent.decision.set(t.pixel.project(unit.pixel, 32 * 12))
       Commander.move(unit)
     })
   }

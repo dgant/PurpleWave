@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import ProxyBwapi.Races.Terran
-import Utilities.?
+import Utilities.{?, SomeIf}
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsSpeedling, IsTank, IsWorker}
 import bwapi.Color
@@ -63,7 +63,7 @@ object JudgmentModifiers {
         && ally.matchups.threats.exists(t => t.pixelDistanceEdge(g) - t.pixelRangeAgainst(ally) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(IsWorker)
     val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
-    if (workersRatio > 0) Some(JudgmentModifier(targetDelta = -workersRatio / 2.0)) else None
+    SomeIf(workersRatio > 0, JudgmentModifier(targetDelta = -workersRatio / 2.0))
   }
 
   // Avoid fighting
@@ -81,7 +81,7 @@ object JudgmentModifiers {
     val valueUsGround   = ourCombatUnits.filterNot(_.flying).map(_.subjectiveValue).sum
     val ratioUsGround   = Maff.nanToZero(valueUsGround / valueUs)
     val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.4)
-    if (enemyBonus > 0) Some(JudgmentModifier(speedMultiplier = 1 - enemyBonus)) else None
+    SomeIf(enemyBonus > 0, JudgmentModifier(speedMultiplier = 1 - enemyBonus))
   }
 
   // Avoid disengaging

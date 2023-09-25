@@ -91,7 +91,7 @@ object Bust extends Action {
           && ! unit.matchups.threats.exists(_.inRangeToAttack(unit, station)))
 
       if (station.exists(_.pixelDistance(unit.pixel) > ?(unit.pixel == unit.previousPixel(4), 8, 0))) {
-        unit.agent.toTravel = station
+        unit.agent.decision.set(station)
         Commander.move(unit)
       }
     }

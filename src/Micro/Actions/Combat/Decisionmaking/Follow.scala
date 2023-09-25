@@ -16,7 +16,7 @@ object Follow extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val maybeLeader = unit.agent.leader()
-    unit.agent.toTravel = maybeLeader.map(_.pixel).orElse(unit.agent.toTravel)
+    unit.agent.decision.set(maybeLeader.map(_.pixel))
     maybeLeader
       .filter(leader =>
         unit.pixelDistanceCenter(leader) < Maff.vmax(256, Maff.min(unit.matchups.threats.view.map(_.pixelsToGetInRange(unit).toInt)).getOrElse(0))

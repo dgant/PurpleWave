@@ -25,7 +25,7 @@ object Root extends Action {
     // Do root if we're a tank in the closest third of our squad's rooters to the destination
     // Do unroot if our destination is far away
         
-    private def distanceToGoal(u: FriendlyUnitInfo): Double = u.pixelDistanceTravelling(unit.agent.destination)
+    private def distanceToGoal(u: FriendlyUnitInfo): Double = u.pixelDistanceTravelling(unit.agent.destinationFinal())
     private val pushSpacing = 32.0 * 3.0
     private def framesToRoot = 18 + With.reaction.agencyAverage
     
@@ -41,14 +41,14 @@ object Root extends Action {
     private lazy val visibleTargets         = unit.matchups.targets.filter(notHiddenUphill)
     private lazy val visibleTargetsInRange  = unit.matchups.targetsInRange.filter(notHiddenUphill)
     private lazy val threatsButNoTargets    = unit.matchups.threats.nonEmpty && visibleTargets.isEmpty
-    private lazy val insideNarrowChoke      = unit.zone.edges.exists(e => e.radiusPixels < 32.0 * 4.0 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
+    private lazy val insideNarrowChoke      = unit.zone.edges.exists(e => e.radiusPixels < 32 * 4 && unit.pixelDistanceCenter(e.pixelCenter) < e.radiusPixels)
     private lazy val beingPickedUp          = unit.agent.toBoard.isDefined
     private lazy val outOfCombat            = unit.battle.isEmpty
     private lazy val inTheWay               = With.coordinator.pushes.get(unit).exists(p => p.force(unit).isDefined)
     private lazy val retreating             = ! unit.agent.shouldFight
     private lazy val protectingBase         = unit.alliesBattle.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)
     private lazy val insideTurretRange      = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
-    private lazy val nearFormationPoint     = unit.agent.toReturn.exists(unit.pixelDistanceCenter(_) < 32.0 * 6.0)
+    private lazy val nearFormationPoint     = unit.agent.station.pixel.exists(_.pixelDistance(unit.pixel) < 32 * 6)
     private lazy val turretsInRange         = visibleTargetsInRange.exists(_.unitClass.isStaticDefense)
     private lazy val buildingInRange        = visibleTargetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets          = unit.matchups.enemies.filter(e => unit.canAttack(e) && e.unitClass.attacksOrCastsOrDetectsOrTransports)
@@ -57,8 +57,8 @@ object Root extends Action {
     private lazy val girdForCombat          = targetsInRange.nonEmpty || targetsNearingRange.size > 3
     private lazy val artilleryOutOfRange    = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
     private lazy val duckForCover           = false && (weAreALurker && unit.matchups.groupVs.detectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us
-    private lazy val letsKillThemAlready    = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64.0)
-    private lazy val destinationFarAway     = unit.pixelDistanceCenter(unit.agent.destination) > 32.0 * 4.0 && ! nearFormationPoint
+    private lazy val letsKillThemAlready    = weAreALurker && unit.agent.toAttack.exists(_.pixelDistanceEdge(unit) < 64)
+    private lazy val destinationFarAway     = unit.pixelDistanceCenter(unit.agent.destinationFinal()) > 32 * 4 && ! nearFormationPoint
     private lazy val hugged                 = weAreATank && unit.matchups.threats.exists(t => ! t.flying && t.pixelDistanceEdge(unit) <= 96) && unit.matchups.targets.nonEmpty && unit.matchups.targets.forall(_.pixelDistanceEdge(unit) <= 96)
     
     lazy val mustBeUnrooted: Boolean = (
@@ -85,8 +85,8 @@ object Root extends Action {
       ||  (destinationFarAway               )
     )
     
-    lazy val shouldRoot     = ! mustBeUnrooted && ( ! weAreRooted && wantsToRoot    && ! mustNotRoot)
-    lazy val shouldUnroot   =   mustBeUnrooted || (   weAreRooted && wantsToUnroot  && ! wantsToRoot)
+    lazy val shouldRoot   : Boolean = ! mustBeUnrooted && ( ! weAreRooted && wantsToRoot    && ! mustNotRoot)
+    lazy val shouldUnroot : Boolean =   mustBeUnrooted || (   weAreRooted && wantsToUnroot  && ! wantsToRoot)
   
     override def allowed(unit: FriendlyUnitInfo): Boolean = (
       (weAreALurker || (weAreATank && With.self.hasTech(Terran.SiegeMode)))

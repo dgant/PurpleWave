@@ -94,8 +94,8 @@ object Build extends Action {
       movePixel = movePixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16 - 7)
     }
 
-    unit.agent.toTravel = Some(movePixel)
-    if (unit.pixelDistanceTravelling(movePixel) > 256 + ?(unit.agent.lastPath.isEmpty, 0, 256)) {
+    unit.agent.decision.set(movePixel)
+    if (unit.pixelDistanceTravelling(movePixel) > 256 + ?(unit.agent.path.isEmpty, 0, 256)) {
       MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     }
     Commander.move(unit)

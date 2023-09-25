@@ -20,11 +20,10 @@ object ShuttleAwait extends Action {
       .headOption
     roboticsFacility.foreach(robo => {
       val roboCorner = robo.bottomLeft.add(0, 16)
-      shuttle.agent.toTravel = Some(roboCorner)
-      shuttle.agent.toReturn = Some(roboCorner)
-      val framesToRobotics = shuttle.framesToTravelTo(roboCorner)
-      val framesToReaver = robo.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Reaver.buildFrames)
-
+      shuttle.agent.redoubt.set(roboCorner)
+      shuttle.agent.decision.set(roboCorner)
+      val framesToRobotics  = shuttle.framesToTravelTo(roboCorner)
+      val framesToReaver    = robo.trainee.map(_.remainingCompletionFrames).getOrElse(Protoss.Reaver.buildFrames)
       // Protect the Shuttle unless it's imminently needed to rescue a Reaver
       if (shuttle.matchups.framesOfSafety < 48 && (framesToRobotics < framesToReaver || robo.matchups.enemies.isEmpty)) {
         Retreat(shuttle)

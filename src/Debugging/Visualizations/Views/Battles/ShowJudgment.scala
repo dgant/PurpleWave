@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Views.Battles
 
+import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.DebugView
 import Information.Battles.Types.Battle
 import Lifecycle.With
@@ -23,7 +24,7 @@ object ShowJudgment extends DebugView {
       val sp = s + " " * (smax - s.length)
       val w = 95
       With.game.drawBoxScreen(x, yb, x + w + 2 * mx + 1, yb + 2 * my + With.visualization.lineHeightSmall + 1, p._1.color, true)
-      With.game.drawTextScreen(x + mx, yb + my, sp)
+      DrawScreen.text(x + mx, yb + my, sp)
     })
   }
 }

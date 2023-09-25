@@ -504,33 +504,32 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def carrying  : Boolean = carryingMinerals || carryingGas
   @inline final def airlifted : Boolean = friendly.exists(_.transport.exists(_.flying))
 
-  @inline final def presumptiveDestination: Pixel             = ?(isOurs, _presumeDestination,  _presumptiveDestination())
-  @inline final def presumptiveStep       : Pixel             = ?(isOurs, _presumeStep,         _presumptiveStep())
-  @inline final def presumptiveTarget     : Option[UnitInfo]  = ?(isOurs, _presumeTarget,       _presumptiveTarget())
-  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveStep, framesToLookAhead * topSpeed)
-  private val _presumptiveDestination = new KeyedCache(() => _presumeDestination, () => friendly.map(_.agent.destination))
-  private val _presumptiveStep        = new KeyedCache(() => _presumeStep,        () => (presumptiveDestination, pixel), 240)
-  private val _presumptiveTarget      = new KeyedCache(() => _presumeTarget,      () => friendly.map(_.agent.toAttack))
-  private def _presumeDestination: Pixel =
+  @inline final def presumptiveDestinationFinal : Pixel = friendly.map(_.agent.destinationFinal()).getOrElse(_presumptiveDestinationCache())
+  @inline final def presumptiveDestinationNext  : Pixel = friendly.map(_.agent.destinationNext()).map(pixel.projectUpTo(_, MicroPathing.waypointDistancePixels)).getOrElse(_presumptiveStepCache())
+  @inline final def presumptiveTarget     : Option[UnitInfo]  = friendly.flatMap(_.agent.toAttack).orElse(_presumptiveTargetCache())
+  private val _presumptiveDestinationCache = new Cache(() =>
     ?(canMove,
-      friendly.map(f => f.intent.destination.getOrElse(f.agent.destination))
-        .orElse(targetPixel)
-        .orElse(orderTargetPixel)
-        .orElse(presumptiveTarget.map(pixelToFireAtSimple))
-        .getOrElse(pixel),
-      pixel)
-  private def _presumeStep: Pixel =
-    ?(canMove,
-      MicroPathing.getWaypointToPixel(this, presumptiveDestination),
-      pixel)
-  private def _presumeTarget: Option[UnitInfo] =
-              friendly.flatMap(_.agent.toAttack     .filter(isEnemyOf))
+      targetPixel
+      .orElse(orderTargetPixel)
+      .orElse(presumptiveTarget.map(pixelToFireAtSimple))
+      .getOrElse(pixel),
+      pixel))
+  private val _presumptiveStepCache = new KeyedCache(
+    () => ?(canMove,
+      MicroPathing.getWaypointToPixel(this, presumptiveDestinationFinal),
+      pixel),
+    () => presumptiveDestinationFinal)
+  private val _presumptiveTargetCache = new KeyedCache(
+    () =>friendly.flatMap(_.agent.toAttack          .filter(isEnemyOf))
       .orElse(friendly.flatMap(_.agent.toAttackLast).filter(isEnemyOf))
       .orElse(friendly.flatMap(_.intent.toAttack)   .filter(isEnemyOf))
       .orElse(target                                .filter(isEnemyOf))
       .orElse(orderTarget                           .filter(isEnemyOf))
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
-      .orElse(matchups.targetNearest)
+      .orElse(matchups.targetNearest),
+    () =>friendly.flatMap(_.agent.toAttack))
+
+  @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveDestinationNext, framesToLookAhead * topSpeed)
 
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]

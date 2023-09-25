@@ -1,7 +1,6 @@
 
 package Micro.Agency
 
-import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Physics.{ForceMap, ForceMath}
@@ -10,11 +9,10 @@ import Micro.Actions.Combat.Decisionmaking.Combat
 import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.?
 
 import scala.collection.mutable.ArrayBuffer
 
-class Agent(val unit: FriendlyUnitInfo) {
+class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
 
   /////////////
   // History //
@@ -24,16 +22,13 @@ class Agent(val unit: FriendlyUnitInfo) {
   var lastStim      : Int = 0
   var lastCloak     : Int = 0
   var run           : Int = 0
-  var tryingToMove  : Boolean = false
+  var tryingToMove  : Boolean = false // TODO: Can we infer this from destinations?
 
   ///////////////
   // Decisions //
   ///////////////
 
-  var toTravel      : Option[Pixel]             = None
-  var toReturn      : Option[Pixel]             = None
   var toNuke        : Option[Pixel]             = None
-  var toAttackFrom  : Option[Pixel]             = None
   var toAttack      : Option[UnitInfo]          = None
   var toAttackLast  : Option[UnitInfo]          = None
   var toGather      : Option[UnitInfo]          = None
@@ -48,44 +43,11 @@ class Agent(val unit: FriendlyUnitInfo) {
   val combat        : Combat                    = new Combat(unit)
 
   /////////////////
-  // Suggestions //
-  /////////////////
-
-  // Ideally consistent with the Intention logic
-  def destination: Pixel = toTravel
-    .orElse(toBoard.map(_.pixel))
-    .orElse(toAttackFrom)
-    .orElse(toAttack.orElse(toGather).orElse(toRepair).orElse(unit.intent.toFinish).map(unit.pixelToFireAtSimple))
-    .orElse(toNuke)
-    .orElse(unit.intent.toBuildTile.map(_.center))
-    .orElse(unit.intent.toScoutTiles.headOption.map(_.center))
-    .getOrElse(safety)
-  def safety: Pixel = ride.filterNot(unit.transport.contains).map(_.pixel)
-    .orElse(toReturn)
-    .getOrElse(home)
-  def home: Pixel = _home()
-  private val _home = new Cache[Pixel](() =>
-    Maff.minBy(
-      With.geography.ourBases.filter(base =>
-        base.scoutedByEnemy
-        || base.naturalOf.exists(_.scoutedByEnemy)
-        || base == With.geography.ourNatural
-        || base == With.geography.ourMain))(base =>
-      unit.pixelDistanceTravelling(base.heart)
-      // Retreat into main
-      + ?(base.naturalOf.filter(_.isOurs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base)), 32 * 40, 0))
-    .map(_.heart.center)
-    .getOrElse(With.geography.home.center))
-
-  def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
-
-  /////////////////
   // Diagnostics //
   /////////////////
 
-  var fightReason : String              = ""
-  var lastPath    : Option[TilePath]    = None
-  var lastAction  : Option[String]      = None
+  var fightReason : String           = ""
+  var lastAction  : Option[String]   = None
   val actions     : ArrayBuffer[String] = new ArrayBuffer[String]()
 
   def act(value: String): Unit = {
@@ -101,11 +63,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     if ( ! unit.isFriendly) return // Mind Control
 
     forces.clear()
+    resetDestinations()
+
     run           += 1
     lastFrame     = With.frame
     toAttackLast  = toAttack
-    toAttackFrom  = None
-    lastPath      = None
     priority      = TrafficPriorities.None
     fightReason   = ""
     tryingToMove  = false
@@ -119,8 +81,6 @@ class Agent(val unit: FriendlyUnitInfo) {
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
     unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
 
-    toTravel  = unit.intent.toTravel
-    toReturn  = unit.intent.toReturn
     toAttack  = unit.intent.toAttack
     toGather  = unit.intent.toGather
     toRepair  = unit.intent.toRepair
@@ -188,13 +148,11 @@ class Agent(val unit: FriendlyUnitInfo) {
     _rideGoal = Some(to)
   }
 
+  ///////////
+  // Other //
+  ///////////
 
-  ///////////////
-  // Targeting //
-  ///////////////
+  def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
 
-  def chooseAttackFrom(): Option[Pixel] = {
-    toAttackFrom = toAttackFrom.orElse(toAttack.map(unit.pixelToFireAtExhaustive))
-    toAttackFrom
-  }
+  def choosePerch(): Destination = perch.set(toAttack.map(unit.pixelToFireAtExhaustive))
 }

@@ -35,7 +35,7 @@ object Spot extends Action {
     // TODO: This logic is sloppy and doesn't handle our various use cases well
     if (unit.matchups.pixelsEntangled > -96 && unit.totalHealth < 400) {
       if ( ! IsWarrior(unit)) {
-        unit.agent.toReturn = groupSupported(unit).map(_.attackCentroidKey)
+        unit.agent.redoubt.set(groupSupported(unit).map(_.attackCentroidKey))
         Retreat.delegate(unit)
       }
       return
@@ -62,7 +62,7 @@ object Spot extends Action {
     }
     goals += group.attackCentroidKey
 
-    unit.agent.toTravel = Some(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
+    unit.agent.decision.set(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
     Commander.move(unit)
   }
 

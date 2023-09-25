@@ -9,9 +9,9 @@ import Utilities.?
 
 object RequestSafeLanding {
 
-  def apply(unit: FriendlyUnitInfo, destination: Option[Pixel] = None): Unit = {
+  def apply(unit: FriendlyUnitInfo, to: Option[Pixel] = None): Unit = {
     if (unit.airlifted) {
-      val goal              = destination.getOrElse(?(unit.agent.shouldFight, unit.agent.destination, unit.agent.safety))
+      val goal              = to.getOrElse(?(unit.agent.shouldFight, unit.agent.destinationNext(), unit.agent.safety))
       val distanceToGoal    = unit.pixelDistanceCenter(goal)
       val searchOriginTile  = unit.pixel.project(goal, Math.min(distanceToGoal, 96)).tile
       val landingOption     = Spiral(6)

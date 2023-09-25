@@ -20,5 +20,5 @@ trait TFriendlyUnitGroup {
   private val _restrainedFrames     = new Cache(() => Maff.mean(groupFriendlyAttackers.filter(_.battle.isDefined).map(_.agent.combat.restrainedFrames)))
   private val _confidence11         = new Cache(() => Maff.mean(Maff.orElse(groupFriendlyOrderable.filter(_.battle.isDefined), groupFriendlyOrderable).map(_.confidence11)))
   private val _fightConsensus       = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(u => u.agent.shouldFight || u.battle.forall(_.judgement.exists(_.unitShouldFight(u))))).getOrElse(true))
-  private val _homeConsensus        = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.home)).getOrElse(With.geography.home.center))
+  private val _homeConsensus        = new Cache(() => Maff.modeOpt(groupFriendlyOrderable.view.map(_.agent.defaultHome)).getOrElse(With.geography.home.center))
 }

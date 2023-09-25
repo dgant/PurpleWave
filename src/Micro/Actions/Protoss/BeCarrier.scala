@@ -56,7 +56,7 @@ object BeCarrier extends Action {
         if (interceptorsActive) {
           val chasePixel = unit.agent.toAttack.get.projectFrames(48)
           val chasingAlready = unit.speedApproaching(chasePixel) > unit.topSpeed / 2
-          unit.agent.toTravel = Some(chasePixel)
+          unit.agent.decision.set(chasePixel)
 
           // Chase with impunity, or if target is leaving leash range
           if ( ! chasingAlready && (interceptorSafetyMargin > 32 || unit.pixelDistanceEdge(target.get) > 32 * 9)) {
@@ -75,7 +75,7 @@ object BeCarrier extends Action {
 
           // Hold leash
           } else {
-            unit.agent.toTravel = unit.agent.toAttack.map(_.pixel.project(unit.agent.home, 7.5 * 32))
+            unit.agent.decision.set(unit.agent.toAttack.map(_.pixel.project(unit.agent.defaultHome, 7.5 * 32)))
             Commander.move(unit)
           }
         } else {

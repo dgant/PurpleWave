@@ -7,6 +7,7 @@ import Lifecycle.With
 import Performance.Cache
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.SomeIf
 import bwapi.{GameType, Player, Race}
 
 case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
@@ -14,7 +15,7 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   private var permanentRace: Option[Race] = None
   def raceCurrent: Race = raceCurrentCache()
   private val raceCurrentCache = new Cache(() => {
-    permanentRace = permanentRace.orElse(if (Array(Race.Terran, Race.Protoss, Race.Zerg).contains(raceInitial)) Some(raceInitial) else None)
+    permanentRace = permanentRace.orElse(SomeIf(Array(Race.Terran, Race.Protoss, Race.Zerg).contains(raceInitial), raceInitial))
     permanentRace = permanentRace.orElse(With.units.all.find(_.player == this).map(_.unitClass.race))
     permanentRace.getOrElse(raceInitial)
   })

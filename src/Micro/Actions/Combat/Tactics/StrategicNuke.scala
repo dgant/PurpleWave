@@ -12,7 +12,7 @@ object StrategicNuke extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val target = unit.agent.toNuke.get
-    unit.agent.toTravel = Some(target)
+    unit.agent.decision.set(target)
     
     lazy val haveANuke = With.units.existsOurs(IsAll(Terran.NuclearMissile, IsComplete))
     if (unit.pixelDistanceCenter(target) < 11.0 * 32.0 && haveANuke) {

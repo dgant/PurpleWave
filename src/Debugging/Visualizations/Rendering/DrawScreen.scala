@@ -1,5 +1,6 @@
 package Debugging.Visualizations.Rendering
 
+import Debugging.Asciify
 import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.Maff
@@ -8,16 +9,20 @@ import bwapi.Color
 
 object DrawScreen {
 
-  def column(x: Int, y: Int, text: Iterable[String]): Unit = {
-    column(x, y, text.mkString("\n"))
+  def text(x: Int, y: Int, s: String): Unit = {
+    With.game.drawTextScreen(x, y, Asciify(s))
   }
 
-  def column(x: Int, y: Int, text: String): Unit = {
-    With.game.drawTextScreen(x, y, text)
+  def text(pixel: Pixel, s: String): Unit = {
+    text(pixel.x, pixel.y, s)
   }
 
-  def text(pixel: Pixel, text: String): Unit = {
-    With.game.drawTextScreen(pixel.x, pixel.y, text)
+  def column(x: Int, y: Int, s: Iterable[String]): Unit = {
+    column(x, y, s.mkString("\n"))
+  }
+
+  def column(x: Int, y: Int, s: String): Unit = {
+    text(x, y, s)
   }
   
   def table(x: Int, y: Int, cells: Iterable[Iterable[String]]): Unit = {
@@ -26,7 +31,7 @@ object DrawScreen {
   
   def tableRow(x: Int, y: Int, rowIndex: Int, row: Iterable[String]): Unit = {
     row.zipWithIndex.foreach(pair =>
-      With.game.drawTextScreen(
+      text(
         x + pair._2 * 60,
         y + rowIndex * 13,
         pair._1))
@@ -78,7 +83,7 @@ object DrawScreen {
     
     With.game.drawBoxScreen(start.bwapi, end.bwapi, color0, true)
     With.game.drawBoxScreen(innerBorderStart.bwapi, innerBorderEnd.bwapi, color1, true)
-    With.game.drawTextScreen(start.add(margin, 0).bwapi, label)
+    text(start.add(margin, 0), label)
     
     curves.foreach(curve => {
       var i = 0
@@ -104,7 +109,7 @@ object DrawScreen {
         val height = (item._1 * argHeight / total).toInt
         labelY = Math.min(labelY - With.visualization.lineHeightSmall, y - height / 2 - With.visualization.lineHeightSmall / 2)
         With.game.drawBoxScreen(x, y - height, x + width, y, item._2, true)
-        With.game.drawTextScreen(x + width + 1, labelY, item._3)
+        text(x + width + 1, labelY, item._3)
         y -= height
       })
       x += width + column.map(_._3.length * 5 + 1).max.toInt

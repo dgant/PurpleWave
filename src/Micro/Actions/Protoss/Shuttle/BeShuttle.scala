@@ -45,7 +45,7 @@ object BeShuttle extends Action {
     val fightRadius = 320
     val fighting = shuttle.agent.passengers.exists(p =>
       p.agent.toAttack.isDefined
-      || p.agent.toAttackFrom.isDefined
+      || p.agent.perch.isDefined
       || p.matchups.pixelsToThreatRange.exists(_ < fightRadius)
       || p.matchups.enemies.exists(e => Protoss.Shuttle(e) && e.pixelDistanceEdge(p) < fightRadius))
     val quests = shuttle.agent.passengersPrioritized.flatMap(p => {
@@ -66,7 +66,7 @@ object BeShuttle extends Action {
           "Pickup",
           shuttle.pixelDistanceEdge(p) * Maff.or1(0.05, fighting),
           () => pickup(shuttle, p)))
-      } else if (p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
+      } else if (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
 
         goal.map(g => (
           p,
@@ -90,14 +90,14 @@ object BeShuttle extends Action {
   // Pick up a passenger
   //
   private def pickup(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
-    shuttle.agent.toTravel = Some(passenger.pixel)
+    shuttle.agent.decision.set(passenger.pixel)
     Commander.rightClick(shuttle, passenger)
   }
 
   // Heed a passenger's ride goal
   //
   private def deliver(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
-    shuttle.agent.toTravel = passenger.agent.rideGoal
+    shuttle.agent.decision.set(passenger.agent.rideGoal)
     Commander.move(shuttle)
   }
 }

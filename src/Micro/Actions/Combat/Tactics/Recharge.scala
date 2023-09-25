@@ -33,7 +33,7 @@ object Recharge extends Action {
     val battery = Maff.minBy(batteries)(_.pixelDistanceEdge(unit))
     if (battery.isEmpty) return
     
-    unit.agent.toTravel = battery.map(_.pixel.project(unit.pixel, 40))
+    unit.agent.decision.set(battery.map(_.pixel.project(unit.pixel, 40)))
   
     // Shield battery range is 2 tiles.
     // Don't right click it from too far -- that gets you killed en route.

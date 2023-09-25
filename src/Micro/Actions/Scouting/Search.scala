@@ -69,10 +69,10 @@ abstract class AbstractSearch extends Action {
     val force = tilesToScout.view.map(tile => Gravity(tile.center, With.grids.lastSeen.framesSince(tile))).map(_(unit.pixel)).reduce(_ + _)
 
     val target = unit.pixel.add(force.normalize(64.0).toPoint)
-    unit.agent.toTravel = Some(tilesToScout.minBy(_.center.pixelDistance(target)).center)
+    unit.agent.decision.set(tilesToScout.minBy(_.center.pixelDistance(target)).center)
 
     val profile               = new PathfindProfile(unit.tile)
-    profile.end               = Some(unit.agent.destination.tile)
+    profile.end               = Some(unit.agent.destinationNext().tile)
     profile.employGroundDist  = ! unit.flying
     profile.costOccupancy     = 0.01
     profile.costRepulsion     = 5
@@ -82,10 +82,10 @@ abstract class AbstractSearch extends Action {
     profile.alsoUnwalkable    = bannedTiles
     val path                  = profile.find
 
-    if (unit.zone == unit.agent.destination.zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {
-      unit.agent.forces(Forces.travel) = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destination))
+    if (unit.zone == unit.agent.destinationNext().zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {
+      unit.agent.forces(Forces.travel) = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destinationNext()))
       unit.agent.forces(Forces.threat) = Potential.hardAvoidThreatRange(unit)
-      unit.agent.toTravel = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians).orElse(unit.agent.toTravel)
+      unit.agent.destinationNext.setWaypoint(MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians))
     } else {
       MicroPathing.tryMovingAlongTilePath(unit, path)
     }

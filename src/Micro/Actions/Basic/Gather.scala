@@ -126,12 +126,8 @@ object Gather extends Action {
     }
 
     // Take safe/hidden route to expansion
-    if (unit.metro != resource.metro && ! unit.carrying) {
-      val nextZone = Maff.minBy(unit.zone.edges)(_.pixelCenter.groundPixels(resource.zone.centroid))
-      unit.agent.toTravel = MicroPathing.getWaypointAlongTilePath(unit, MicroPathing.getSneakyPath(unit, Some(resource.tile.walkableTile)))
-      if (unit.agent.toTravel.isDefined) {
-        Commander.move(unit)
-      }
+    if (unit.metro != resource.metro && ! unit.carrying && unit.agent.decision.setAsWaypoint(MicroPathing.getWaypointAlongTilePath(unit, MicroPathing.getSneakyPath(unit, Some(resource.tile.walkableTile)))).isDefined) {
+      Commander.move(unit)
     }
 
     // Benzene travel hack

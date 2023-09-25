@@ -22,7 +22,7 @@ object Crack extends Action {
     && ! unit.team.exists(_.engagedUpon)
     && unit.base.exists(_.isOurs)
     && unit.matchups.framesOfSafety > unit.cooldownMaxGround
-    && unit.pixelDistanceCenter(unit.agent.destination) < unit.pixelRangeMax
+    && unit.pixelDistanceCenter(unit.agent.destinationFinal()) < unit.pixelRangeMax
     && unit.readyForAttackOrder
     && egg(unit).isDefined)
 

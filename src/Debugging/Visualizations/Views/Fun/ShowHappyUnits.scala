@@ -1,7 +1,7 @@
 package Debugging.Visualizations.Views.Fun
 
 import Debugging.Visualizations.Colors
-import Debugging.Visualizations.Rendering.DrawMap
+import Debugging.Visualizations.Rendering.{DrawMap, DrawScreen}
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -22,9 +22,9 @@ object ShowHappyUnits extends DebugView {
       .sortBy(_.flying)
       .foreach(renderUnit)
     
-    With.game.drawTextScreen(408, 4, "Candy: ")
-    With.game.drawTextScreen(481, 4, "Soda: ")
-    With.game.drawTextScreen(541, 4, "Friends: ")
+    DrawScreen.text(408, 4, "Candy: ")
+    DrawScreen.text(481, 4, "Soda: ")
+    DrawScreen.text(541, 4, "Friends: ")
   }
   
   def renderUnit(unit:UnitInfo) {

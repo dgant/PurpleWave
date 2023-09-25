@@ -9,6 +9,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.{UnitClass, UnitClasses}
 import ProxyBwapi.UnitTracking.Visibility
 import ProxyBwapi.Upgrades.Upgrade
+import Utilities.SomeIfO
 
 import scala.collection.JavaConverters._
 
@@ -228,13 +229,13 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
         _matrixPoints         = bwapiUnit.getDefenseMatrixPoints
         _energy               = bwapiUnit.getEnergy
         _scarabs              = bwapiUnit.getScarabCount
-        _techProducing        = if (_teching) ConvertBWAPI.tech(bwapiUnit.getTech) else None
-        _upgradeProducing     = if (_upgrading) ConvertBWAPI.upgrade(bwapiUnit.getUpgrade) else None
+        _techProducing        = SomeIfO(_teching,    ConvertBWAPI.tech     (bwapiUnit.getTech))
+        _upgradeProducing     = SomeIfO(_upgrading,  ConvertBWAPI.upgrade  (bwapiUnit.getUpgrade))
         _trainingQueue        = if (training) (0 until bwapiUnit.getTrainingQueueCount).map(i => UnitClasses.get(bwapiUnit.getTrainingQueueAt(i))) else Seq.empty
         _interceptorCount     = if (unitClass == Protoss.Carrier) bwapiUnit.getInterceptorCount else 0
         _interceptors         = if (_interceptorCount > 0) bwapiUnit.getInterceptors.asScala.flatMap(With.units.get) else Seq.empty // TODO: Slow because JBWAPI checks every unit for every carrier
         _buildType            = UnitClasses.get(bwapiUnit.getBuildType)
-        _transport            = if (loaded) With.units.get(bwapiUnit.getTransport).flatMap(_.friendly) else None
+        _transport            = SomeIfO(loaded, With.units.get(bwapiUnit.getTransport).flatMap(_.friendly))
       } else {
         _scarabs              = if (unitClass == Protoss.Reaver) 5 else 0
         _hitPoints            = if (_detected || ( ! _cloaked && ! _burrowed)) bwapiUnit.getHitPoints           else if (_hitPoints == 0) _unitClass.maxHitPoints else _hitPoints

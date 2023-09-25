@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Spiral
+import Utilities.{SomeIf, SomeIfO}
 import bwta.{BWTA, Region}
 
 import scala.collection.JavaConverters.collectionAsScalaIterableConverter
@@ -30,7 +31,7 @@ trait GeographyBuilder {
   @inline final def zoneByTile      (tile: Tile)  : Zone          = _zoneByTile(Maff.clamp(tile.i, 0, _zoneByTile.length - 1))
   @inline final def zoneByValidTile (i: Int)      : Zone          = _zoneByTile(i)
   @inline final def zoneByValidTile (tile: Tile)  : Zone          = _zoneByTile(tile.i)
-  @inline final def baseByTile      (tile: Tile)  : Option[Base]  = if (tile.valid) _baseByTile(tile.i) else None
+  @inline final def baseByTile      (tile: Tile)  : Option[Base]  = SomeIfO(tile.valid, _baseByTile(tile.i))
   @inline final def baseByValidTile (i: Int)      : Option[Base]  = _baseByTile(i)
   @inline final def baseByValidTile (tile: Tile)  : Option[Base]  = _baseByTile(tile.i)
 

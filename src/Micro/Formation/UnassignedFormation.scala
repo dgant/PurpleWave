@@ -5,6 +5,7 @@ import Mathematics.Points.Pixel
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactic.Squads.FriendlyUnitGroup
+import Utilities.SomeIf
 
 import scala.collection.mutable.ListBuffer
 
@@ -17,11 +18,12 @@ case class UnassignedFormation(style: FormationStyle, slots: Map[UnitClass, Iter
     val unitsLeft = new ListBuffer[FriendlyUnitInfo]
     unitsLeft ++= classUnits
     pixels.flatMap(pixel =>
-      if (unitsLeft.nonEmpty) {
-        val unit = unitsLeft.minBy(_.pixelDistanceSquared(pixel))
-        unitsLeft -= unit
-        Some((unit, pixel))
-      } else None
+      SomeIf(
+        unitsLeft.nonEmpty, {
+          val unit = unitsLeft.minBy(_.pixelDistanceSquared(pixel))
+          unitsLeft -= unit
+          (unit, pixel)
+        })
     ).toMap
   }
 

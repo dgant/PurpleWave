@@ -243,7 +243,7 @@ abstract class MissionDrop extends Mission {
       passengers.foreach(transport.agent.addPassenger)
       val unloaded = passengers.filterNot(_.loaded)
       if (unloaded.isEmpty) {
-        transport.agent.toTravel = Some(vicinity)
+        transport.agent.decision.set(vicinity)
         Idle.delegate(transport)
       } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
@@ -253,7 +253,7 @@ abstract class MissionDrop extends Mission {
             Commander.rightClick(transport, toPickup)
           } else {
             // Let Commander overshoot the Shuttle to keep it moving
-            transport.agent.toTravel = Some(toPickup.pixel)
+            transport.agent.decision.set(toPickup.pixel)
             Commander.move(transport)
           }
         } else {
@@ -265,8 +265,9 @@ abstract class MissionDrop extends Mission {
 
   object ActionAssemblePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
-      passenger.agent.toTravel = Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)
-      passenger.agent.toReturn = passenger.agent.toTravel
+      passenger.agent.redoubt.set(
+        passenger.agent.decision.set(
+          Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)))
       ReloadScarabs.delegate(passenger)
       Potshot.delegate(passenger)
       Retreat.delegate(passenger)
@@ -298,8 +299,8 @@ abstract class MissionDrop extends Mission {
         MicroPathing.tryMovingAlongTilePath(transport, path.get)
       } else {
         With.logger.debug(f"$this: No path available to $vicinity")
-        transport.agent.toTravel = Some(vicinity)
-        transport.agent.toReturn = Some(vicinity)
+        transport.agent.origin.set(vicinity)
+        transport.agent.terminus.set(vicinity)
         if (transport.matchups.pixelsEntangled > -64) {
           Retreat.delegate(transport)
         }
@@ -319,7 +320,7 @@ abstract class MissionDrop extends Mission {
             && passenger.matchups.threats.exists(t => t.inRangeToAttack(passenger, runway) && ! t.inRangeToAttack(passenger))))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRange > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
-      transport.agent.toTravel = Some(runway)
+      transport.agent.decision.set(runway)
       Commander.move(transport)
     }
   }
@@ -333,7 +334,7 @@ abstract class MissionDrop extends Mission {
   object ActionRaidTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       if (passengers.isEmpty) ActionEscapeTransport.delegate(transport) else {
-        transport.agent.toTravel = Some(Maff.centroid(Maff.orElse(passengers.view.filterNot(_.loaded), passengers.view).map(_.pixel)))
+        transport.agent.decision.set(Maff.centroid(Maff.orElse(passengers.view.filterNot(_.loaded), passengers.view).map(_.pixel)))
         Commander.move(transport)
       }
     }
@@ -362,7 +363,7 @@ abstract class MissionDrop extends Mission {
 
   object ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      transport.agent.toTravel = Some(transport.agent.home)
+      transport.agent.terminus.set(Some(transport.agent.defaultHome))
       Retreat.delegate(transport)
       Commander.move(transport)
     }

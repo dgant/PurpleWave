@@ -83,7 +83,7 @@ object BeVulture extends Action {
     if (vulture.pixelDistanceEdge(target) < 32) {
       placeMine(vulture, vulture.projectFrames(1))
     } else {
-      vulture.agent.toTravel = Some(
+      vulture.agent.decision.set(
         vulture.pixel
           .project(target.pixel, vulture.pixelDistanceEdge(target) + 64)
           .walkableTile

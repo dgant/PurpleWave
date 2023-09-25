@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.?
+import Utilities.{?, SomeIf}
 import bwapi.Position
 
 final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
@@ -141,7 +141,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     tile.altitudeUnchecked
   }
 
-  @inline private def nwtTest(tile: Tile): Option[Tile] = if (tile.walkable) Some(tile) else None
+  @inline private def nwtTest(tile: Tile): Option[Tile] = SomeIf(tile.walkable, tile)
   @inline private def nwtFlip(xFirst: Boolean, t0: Tile, t1: Tile): Option[Tile] =
     if (xFirst) nwtTest(t0).orElse(nwtTest(t1))
     else        nwtTest(t1).orElse(nwtTest(t0))

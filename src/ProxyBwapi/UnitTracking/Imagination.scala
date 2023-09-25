@@ -136,7 +136,7 @@ object Imagination {
     val maxTilesAwaySq    = maxTilesAway * maxTilesAway
     val observedPixel     = unit.pixelObserved
     val observedTile      = observedPixel.tile
-    val goalPixel         = ?(With.framesSince(unit.lastSeen) < Seconds(5)() || ! IsWarrior(unit), unit.presumptiveDestination, destination())
+    val goalPixel         = ?(With.framesSince(unit.lastSeen) < Seconds(5)() || ! IsWarrior(unit), unit.presumptiveDestinationFinal, destination())
     val goalTile          = goalPixel.tile
     val expectedPixel     = observedPixel.projectUpTo(goalPixel, maxPixelsAway).clamp()
     val expectedTile      = expectedPixel.tile

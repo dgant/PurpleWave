@@ -1,6 +1,7 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 
@@ -43,8 +44,8 @@ object ShowGas extends DebugView {
         if (isBad) {
           With.game.drawBoxScreen(x0, y0, x1, y1, Colors.BrightRed, false)
         }
-        With.game.drawTextScreen(x0, yText, count.toString)
-        With.game.drawTextScreen(x0 + 48, yText, label)
+        DrawScreen.text(x0, yText, count.toString)
+        DrawScreen.text(x0 + 48, yText, label)
 
     })
   }

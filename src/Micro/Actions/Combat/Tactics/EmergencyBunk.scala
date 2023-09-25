@@ -23,10 +23,10 @@ object EmergencyBunk extends Action {
     With.self.isTerran && unit.canMove && openBunkersFor(unit).nonEmpty
   }
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val openBunkers         = openBunkersFor(unit)
     val openBunkersEngaged  = openBunkers.filter(_.matchups.targetsInRange.nonEmpty)
-    val openBunkersInForm   = openBunkers.filter(bunker => unit.agent.toReturn.exists(_.pixelDistance(bunker.pixel) < 32.0 * 10.0))
+    val openBunkersInForm   = openBunkers.filter(bunker => unit.agent.safety.pixelDistance(bunker.pixel) < 32.0 * 10.0)
     val openBunkerToEnter   = Maff.minBy(openBunkersEngaged)(_.pixelDistanceEdge(unit))
     
     if (openBunkerToEnter.isDefined) {

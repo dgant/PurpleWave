@@ -8,6 +8,7 @@ import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Generation.Fit
 import Placement.Templating._
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.SomeIfO
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -24,7 +25,7 @@ trait Fits {
   private val byLabelYes    = new mutable.HashMap[PlaceLabel, ArrayBuffer[Foundation]]
 
   def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else new PointNothing
-  def get(tile: Tile)               : Option[Foundation]  = if (tile.valid) byTile(tile.i) else None
+  def get(tile: Tile)               : Option[Foundation]  = SomeIfO(tile.valid, byTile(tile.i))
   def get(width: Int, height: Int)  : Seq[Foundation]     = byDimensions.getOrElse((width, height), Seq.empty)
   def get(zone: Zone)               : Seq[Foundation]     = byZone.getOrElse(zone, Seq.empty)
   def get(base: Base)               : Seq[Foundation]     = byBase.getOrElse(base, Seq.empty)

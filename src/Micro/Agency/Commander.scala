@@ -88,9 +88,8 @@ object Commander {
 
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
-    unit.agent.toAttack     = Some(target)
-    unit.agent.toAttackFrom = unit.agent.toAttackFrom.filter(acceptableAttackFrom(unit, target, _))
-    lazy val attackFrom     = unit.agent.chooseAttackFrom().get
+    unit.agent.toAttack = Some(target)
+    lazy val attackFrom = unit.agent.perch.pixel.filter(acceptableAttackFrom(unit, target, _)).getOrElse(unit.agent.choosePerch()())
 
     if (Protoss.Reaver(unit)) {
       if (unit.loaded)  pushAway    (unit, attackFrom, TrafficPriorities.Bump)
@@ -157,7 +156,7 @@ object Commander {
   /**
     * Adjust the unit's destination to ensure successful execution of the move.
     */
-  def getAdjustedDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
+  def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
@@ -216,13 +215,13 @@ object Commander {
     to
   }
 
-  def attackMove(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(attackMove(unit, _))
+  def attackMove(unit: FriendlyUnitInfo): Unit = attackMove(unit, unit.agent.destinationNext())
   private def attackMove(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
     unit.agent.setRideGoal(destination)
     leadFollower(unit, attackMove(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
-    val to = getAdjustedDestination(unit, destination)
+    val to = adjustDestination(unit, destination)
     autoUnburrowUnlessLurkerInRangeOf(unit, to)
     val alreadyAttackMovingThere = unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
@@ -231,21 +230,21 @@ object Commander {
     sleepAttack(unit)
   }
 
-  def patrol(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(patrol(unit, _))
+  def patrol(unit: FriendlyUnitInfo): Unit = patrol(unit, unit.agent.destinationNext())
   private def patrol(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
     unit.agent.setRideGoal(destination)
     leadFollower(unit, patrol(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
-    val to = getAdjustedDestination(unit, destination)
+    val to = adjustDestination(unit, destination)
     autoUnburrowUnlessLurkerInRangeOf(unit, to)
     unit.bwapiUnit.patrol(to.bwapi)
     sleepAttack(unit)
   }
 
-  def move(unit: FriendlyUnitInfo): Unit = unit.agent.toTravel.foreach(move(unit, _))
+  def move(unit: FriendlyUnitInfo): Unit = move(unit, unit.agent.destinationNext())
   private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
-    val to = getAdjustedDestination(unit, destination)
+    val to = adjustDestination(unit, destination)
     unit.agent.setRideGoal(to)
     leadFollower(unit, move(_, to))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(to) > tryingToMoveThreshold

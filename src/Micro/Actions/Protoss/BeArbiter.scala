@@ -28,13 +28,13 @@ object BeArbiter extends Action {
       Retreat.delegate(arbiter)
       return
     }
-    val goal                              = arbiter.team.map(_.vanguardAll()).getOrElse(arbiter.agent.destination)
+    val goal                              = arbiter.team.map(_.vanguardAll()).getOrElse(arbiter.agent.destinationNext())
     val goalDistanceSquared               = arbiter.pixelDistanceSquared(goal)
     val seniorArbiters                    = arbiter.alliesSquad.filter(_.squadAge > arbiter.squadAge)
     val umbrellables                      = arbiter.alliesSquad.filter(needsUmbrella)
     val umbrellablesUncovered             = umbrellables.filterNot(u => seniorArbiters.exists(_.pixelDistanceCenter(u) < cloakRadiusPixels))
     val umbrellable                       = Maff.minBy(umbrellables)(_.pixelDistanceSquared(goal))
-    arbiter.agent.toTravel                = umbrellable.map(_.pixel).orElse(arbiter.agent.toTravel)
+    arbiter.agent.station.set(umbrellable.map(_.pixel).getOrElse(arbiter.agent.destinationNext()))
     arbiter.agent.forces(Forces.travel)   = Potential.towardsDestination(arbiter)
     arbiter.agent.forces(Forces.spacing)  = Potential.hardAvoidThreatRange(arbiter)
     if (seniorArbiters.nonEmpty) {
@@ -43,7 +43,7 @@ object BeArbiter extends Action {
         .clipAtMost(1.0)
     }
     MicroPathing.setWaypointForcefully(arbiter)
-    if (arbiter.pixelDistanceCenter(arbiter.agent.destination) < 48 && arbiter.matchups.pixelsEntangled < 0) {
+    if (arbiter.pixelDistanceCenter(arbiter.agent.destinationNext()) < 48 && arbiter.matchups.pixelsEntangled < 0) {
       Potshot.delegate(arbiter)
     }
     Commander.move(arbiter)

@@ -8,21 +8,18 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object Heal extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.is(Terran.Medic)
-    && (unit.battle.isDefined || unit.agent.toReturn.isEmpty)
-  )
+  override def allowed(unit: FriendlyUnitInfo): Boolean = Terran.Medic(unit) && unit.battle.isDefined
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val targets = validTargets(unit)
     val target  = Maff.minBy(targets)(patient =>
       if (unit.battle.isDefined && unit.matchups.threats.nonEmpty)
         patient.pixelDistanceEdge(unit)
       else
-        patient.pixelDistanceCenter(unit.agent.destination))
+        patient.pixelDistanceCenter(unit.agent.destinationNext()))
     
     target.foreach(someTarget => {
-      unit.agent.toTravel = Some(unit.pixel.project(someTarget.pixel, unit.pixelDistanceEdge(someTarget) - 16.0))
+      unit.agent.perch.set(unit.pixel.project(someTarget.pixel, unit.pixelDistanceEdge(someTarget) - 16.0))
       if (someTarget.pixelDistanceCenter(unit) < 96.0) {
         Commander.attackMove(unit)
       }
@@ -37,7 +34,6 @@ object Heal extends Action {
         && ! u.beingHealed
         && ! u.is(Terran.Medic)
         && (u.hitPoints < u.unitClass.maxHitPoints|| u.matchups.threats.nonEmpty))
-
       .toVector
   }
   

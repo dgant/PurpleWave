@@ -1,6 +1,7 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Utilities.Time.Seconds
@@ -52,7 +53,7 @@ object ShowMacroSim extends DebugView {
     var j = 1
     while (j < steps.size) {
       val x0 = x0i(j)
-      With.game.drawTextScreen(x0, y0 - With.visualization.lineHeightSmall * j - 2, steps(j).toString)
+      DrawScreen.text(x0, y0 - With.visualization.lineHeightSmall * j - 2, steps(j).toString)
       j += 1
     }
   }

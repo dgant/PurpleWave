@@ -78,7 +78,7 @@ object ShowUnitsFriendly extends DebugView {
     }
 
     if (showPaths && (unit.selected || unit.transport.exists(_.selected) || With.units.selected.isEmpty)) {
-      unit.agent.lastPath.foreach(_.renderMap(unit.unitColor, Some(origin)))
+      unit.agent.path.foreach(_.renderMap(unit.unitColor, Some(origin)))
     }
 
     if (showForces) {
@@ -106,9 +106,9 @@ object ShowUnitsFriendly extends DebugView {
     if (showOrder)        drawNextLabel(unit.order.toString)
 
     if (showDistance) {
-      DrawMap.arrow(origin, agent.destination, Color.Black)
+      DrawMap.arrow(origin, agent.destinationFinal(), Color.Black)
       DrawMap.label(
-        unit.pixelDistanceTravelling(unit.agent.destination).toInt.toString,
+        unit.pixelDistanceTravelling(unit.agent.destinationFinal()).toInt.toString,
         unit.pixel.add(0, 21),
         drawBackground = true,
         Color.Black)

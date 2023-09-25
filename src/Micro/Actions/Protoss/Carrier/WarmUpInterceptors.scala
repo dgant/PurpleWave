@@ -11,7 +11,7 @@ object WarmUpInterceptors extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.interceptors.exists(i => i.complete && i.order == Orders.Nothing)
     && unit.matchups.targets.isEmpty
-    && unit.pixelDistanceCenter(unit.agent.destination) < 32.0 * 5.0)
+    && unit.pixelDistanceCenter(unit.agent.destinationFinal()) < 32.0 * 5.0)
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     def isLegal(target: UnitInfo): Boolean = (

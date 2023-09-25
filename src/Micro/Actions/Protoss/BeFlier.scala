@@ -31,12 +31,14 @@ object BeFlier extends Action {
       // TODO: Sniping scourge that aren't facing us
       // TODO: Triangle juking of scourge
 
-      val safety = Maff.minBy(With.units.ours.view.filter(u => u.canAttackAir && ! u.flying))(_.pixelDistanceEdge(unit))
       unit.agent.forces(Forces.threat) = Potential.towardsUnit(unit, scourge.minBy(_.pixelDistanceEdge(unit)), -1)
+
+      val safety = Maff.minBy(With.units.ours.view.filter(u => u.canAttackAir && ! u.flying))(_.pixelDistanceEdge(unit))
       safety.foreach(s => unit.agent.forces(Forces.regrouping) = Potential.towardsUnit(unit, s, 1))
+
       val waypoint = MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians)
       if (waypoint.isDefined) {
-        unit.agent.toTravel = waypoint
+        unit.agent.destinationNext.set(waypoint)
         Commander.move(unit)
       }
     }

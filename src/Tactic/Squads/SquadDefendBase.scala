@@ -231,14 +231,17 @@ class SquadDefendBase(base: Base) extends Squad {
   private val enemyHasVision: Cache[Boolean] = new Cache(() => enemies.exists(e => e.flying || e.altitude >= base.heart.altitude || e.orderTarget.filter(_.isFriendly).exists(_.base.contains(base))))
 
   private def threateningBase(enemy: UnitInfo): Boolean = {
-    var output    = enemy.zone == base.zone
+    var output = enemy.zone == base.zone
     // If they're between the bastion and the base
     // COG2023: Disabling this check due to suspicion it procs prematurely in small bases
     //output      ||= ! enemy.flying && enemy.pixelDistanceTravelling(base.zone.centroid) < bastion().groundPixels(base.zone.centroid)
     // If they can assault our base from outside it
-    output      ||= enemyHasVision() && enemies.exists(e =>
+    output ||= enemyHasVision() && enemies.exists(e =>
       e.presumptiveTarget.flatMap(_.friendly).exists(t =>
-        e.pixelsToGetInRange(t, ?(t.squad.contains(this), t.pixel, t.agent.toReturn.getOrElse(t.pixel))) < 32
+        e.pixelsToGetInRange(t, ?(
+          t.squad.contains(this),
+          t.pixel,
+          t.agent.safety)) < 32
         && (t.base.contains(base) || t.squad.contains(this))
         && (e.inRangeToAttack(t) || e.speedApproaching(t) > 0)))
     output
@@ -268,7 +271,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
   private case class HugAt(pixel: Pixel) extends Action {
     override def perform(unit: FriendlyUnitInfo): Unit = {
-      unit.agent.toTravel = Some(pixel)
+      unit.agent.decision.set(pixel)
       Potshot.delegate(unit)
       Commander.move(unit)
     }
@@ -291,8 +294,8 @@ class SquadDefendBase(base: Base) extends Squad {
           } else if (unit.seeminglyStuck) {
             to = plugEdge().get._1.centroid.center.walkablePixel
           }
-          unit.agent.toTravel = Some(to)
-          unit.agent.toReturn = Some(to)
+          unit.agent.redoubt.set(to)
+          unit.agent.decision.set(to)
           Commander.move(unit)
         }
       }

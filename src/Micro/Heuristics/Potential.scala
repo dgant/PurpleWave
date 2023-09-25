@@ -22,11 +22,11 @@ object Potential {
   }
 
   def towardsDestination(unit: FriendlyUnitInfo): Force = {
-    towards(unit, unit.agent.destination)
+    towards(unit, unit.agent.destinationNext())
   }
 
   def towardsTarget(unit: FriendlyUnitInfo): Force = {
-    val target    = unit.agent.chooseAttackFrom().getOrElse(unit.agent.destination)
+    val target    = unit.agent.choosePerch().pixel.getOrElse(unit.agent.destinationNext())
     val distance  = unit.pixelDistanceTravelling(target)
     towards(unit, target).normalize(Maff.clamp(Maff.nanToInfinity(32.0 / distance), 0.0, 1.0))
   }

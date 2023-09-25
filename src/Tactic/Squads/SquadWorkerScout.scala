@@ -71,9 +71,13 @@ class SquadWorkerScout extends Squad {
     val enemyHasCombatUnits = With.units.enemy.exists(u => u.canAttack && ! IsWorker(u))
     val orderedScouts       = scouts.sortBy(s => basesToScout.view.map(_.townHallTile).map(s.pixelDistanceTravelling).min)
     val basesToScoutQueue   = new UnorderedBuffer[Base]()
+
     orderedScouts.indices.foreach(i => {
       if (basesToScoutQueue.isEmpty) {
         basesToScoutQueue.addAll(basesToScout)
+
+        // For bookkeeping/debugging; vicinity is not actually used
+        basesToScoutQueue.headOption.foreach(b => vicinity = b.heart.center)
       }
       val scout     = orderedScouts(i)
       val base      = Maff
@@ -88,8 +92,6 @@ class SquadWorkerScout extends Squad {
           if (explored) bases.flatMap(_.tiles.view.filter(t => t.buildable && With.grids.enemyRangeGround(t) <= With.grids.enemyRangeGround.margin))
           else          Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling)))
     })
-    // For bookkeeping/debugging; vicinity is not actually used
-    vicinity = orderedScouts.head.agent.destination
   }
 
   override def run(): Unit = {}

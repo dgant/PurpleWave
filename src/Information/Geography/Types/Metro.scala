@@ -15,7 +15,7 @@ class Metro(private val seedBases: Vector[Base]) extends Geo {
   lazy val zones: Vector[Zone] = {
     var output: Set[Zone] = Set.empty
     output ++= seedBases.flatMap(_.zones)
-    output ++= seedBases.flatMap(b1 => bases.flatMap(b2 => ZonesConnecting(b1, b2)))
+    output ++= seedBases.flatMap(b1 => seedBases.flatMap(b2 => ZonesConnecting(b1, b2)))
 
     var proceed = true
     while (proceed) {

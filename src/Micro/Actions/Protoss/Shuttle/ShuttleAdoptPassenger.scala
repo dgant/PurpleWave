@@ -43,7 +43,7 @@ object ShuttleAdoptPassenger extends Action {
 
   protected def pickupNeed(shuttle: FriendlyUnitInfo, hailer: FriendlyUnitInfo): Double = {
     val endangered = hailer.matchups.framesOfSafety < shuttle.framesToTravelTo(hailer.pixel) + 2 * shuttle.unitClass.framesToTurn180
-    val sojourning = hailer.agent.toTravel.exists(_.pixelDistance(hailer.pixel) > 32.0 * 20)
+    val sojourning = hailer.agent.destinationFinal().pixelDistance(hailer.pixel) > 32.0 * 20
     var output = 1.0
     if (Protoss.Reaver(hailer))                         output *= 1000
     if (hailer.matchups.targetedByScarab)               output *= 100

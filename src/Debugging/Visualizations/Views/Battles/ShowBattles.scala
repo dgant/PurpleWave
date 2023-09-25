@@ -92,8 +92,8 @@ object ShowBattles extends DebugView {
     val skimBarY1 = skimBarY0 + 12
     With.game.drawBoxScreen(skimBarX0, skimBarY0, skimBarX1, skimBarY1, Color.Black, true)
     With.game.drawBoxScreen(skimBarX1, skimBarY0, skimBarX2, skimBarY1, Color.White, true)
-    With.game.drawTextScreen(skimBarX0 - 19, skimBarY0 + 1, "Skim")
-    With.game.drawTextScreen(skimBarX2 + 1, skimBarY0 + 1, "Sim")
+    DrawScreen.text(skimBarX0 - 19, skimBarY0 + 1, "Skim")
+    DrawScreen.text(skimBarX2 + 1, skimBarY0 + 1, "Sim")
     if (battle.skimulated) renderSkimulationScreen(battle)
     if (battle.simulated) renderSimulationScreen(battle)
   }

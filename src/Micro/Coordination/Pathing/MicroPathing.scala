@@ -13,7 +13,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pushing.Push
 import Micro.Heuristics.Potential
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Utilities.?
+import Utilities.{?, SomeIf}
 
 import scala.collection.SeqView
 
@@ -21,7 +21,7 @@ object MicroPathing {
 
   def getSimplePath(unit: FriendlyUnitInfo, to: Option[Tile] = None): TilePath = {
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = to.orElse(unit.agent.toTravel.map(_.tile))
+    pathfindProfile.end               = to.orElse(unit.agent.destinationNext.pixel.map(_.tile))
     pathfindProfile.employGroundDist  = ! unit.flying
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.find
@@ -29,7 +29,7 @@ object MicroPathing {
 
   def getSneakyPath(unit: FriendlyUnitInfo, to: Option[Tile] = None): TilePath = {
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = to.orElse(unit.agent.toTravel.map(_.tile))
+    pathfindProfile.end               = to.orElse(unit.agent.destinationNext.pixel.map(_.tile))
     pathfindProfile.employGroundDist  = ! unit.flying
     pathfindProfile.unit              = Some(unit)
     pathfindProfile.costEnemyVision   = 5
@@ -41,12 +41,12 @@ object MicroPathing {
   def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
     val pathLengthMinimum             = 7
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = if (preferHome) Some(unit.agent.safety.tile) else None
+    pathfindProfile.end               = SomeIf(preferHome, unit.agent.safety.tile)
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsEntangled + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)
     pathfindProfile.employGroundDist  = true
-    pathfindProfile.costOccupancy     = if (unit.flying) 0 else 3
+    pathfindProfile.costOccupancy     = ?(unit.flying, 0, 3)
     pathfindProfile.costRepulsion     = 3
     pathfindProfile.costThreat        = 6
     pathfindProfile.repulsors         = getPathfindingRepulsors(unit)
@@ -68,17 +68,18 @@ object MicroPathing {
   def getGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Pixel = {
     if (from.pixelDistance(rawGoal) < 32) return rawGoal
     val goal              = rawGoal.walkablePixel
-    val lineWaypoint      = if (Ray(from, goal).forall(_.walkable)) Some(from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels))) else None
+    val lineWaypoint      = SomeIf(Ray(from, goal).forall(_.walkable), from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels)))
     lazy val hillPath     = DownhillPathfinder.decend(from.tile, goal.tile)
     lazy val hillWaypoint = hillPath.map(path => path.last.center.add(from.offsetFromTileCenter))
     lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
   }
 
   def getWaypointAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Option[Pixel] = {
-    if (path.pathExists) {
-      val currentIndex = path.tiles.get.indices.minBy(i => path.tiles.get(i).center.pixelDistanceSquared(unit.pixel))
-      Some(path.tiles.get.take(currentIndex + waypointDistanceTiles).last.center)
-    } else None
+    SomeIf(
+      path.pathExists, {
+        val currentIndex = path.tiles.get.indices.minBy(i => path.tiles.get(i).center.pixelDistanceSquared(unit.pixel))
+        path.tiles.get.take(currentIndex + waypointDistanceTiles).last.center
+      })
   }
 
   def moveForcefully(unit: FriendlyUnitInfo): Unit = {
@@ -87,9 +88,7 @@ object MicroPathing {
   }
 
   def setWaypointForcefully(unit: FriendlyUnitInfo): Boolean = {
-    val waypoint = MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))
-    unit.agent.toTravel = waypoint.orElse(unit.agent.toTravel)
-    waypoint.isDefined
+    unit.agent.forced.setAsWaypoint(MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))).isDefined
   }
 
   // More rays = more accurate movement, but more expensive
@@ -130,11 +129,12 @@ object MicroPathing {
   }
 
   def tryMovingAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Unit = {
-    val waypoint = getWaypointAlongTilePath(unit, path).map(_.add(unit.pixel.offsetFromTileCenter))
-    if (waypoint.isDefined) {
-      unit.agent.toTravel = waypoint
-      Commander.move(unit)
-    }
+    getWaypointAlongTilePath(unit, path)
+      .map(_.add(unit.pixel.offsetFromTileCenter))
+      .foreach(waypoint => {
+        unit.agent.decision.set(waypoint)
+        Commander.move(unit)
+      })
   }
 
   def getPathfindingRepulsors(unit: FriendlyUnitInfo, maxThreats: Int = 10): IndexedSeq[PathfindRepulsor] = {
@@ -151,8 +151,8 @@ object MicroPathing {
     unit.agent.forces(Forces.sneaking)  = Potential.avoidDetection(unit)
     unit.agent.forces(Forces.travel)    = Potential.towards(unit, unit.agent.safety)  * Maff.toInt(goalOrigin)
     unit.agent.forces(Forces.threat)    = Potential.hardAvoidThreatRange(unit)        * Maff.toInt(goalSafety)
-    if (unit.agent.forces.forall(_._2.lengthSquared == 0)) {
-      unit.agent.forces(Forces.travel)  = Potential.towards(unit, unit.agent.destination)
+    if (unit.agent.forces.allZero) {
+      unit.agent.forces(Forces.travel)  = Potential.towards(unit, unit.agent.destinationNext())
     }
     unit.agent.forces(Forces.spacing)   = Potential.preferSpacing(unit)
     unit.agent.forces(Forces.pushing)   = Potential.followPushes(unit)

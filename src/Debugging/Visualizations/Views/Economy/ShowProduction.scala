@@ -1,6 +1,7 @@
 package Debugging.Visualizations.Views.Economy
 
 import Debugging.Visualizations.Colors
+import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import ProxyBwapi.Races.Zerg
@@ -76,7 +77,7 @@ object ShowProduction extends DebugView {
         drawNumerator()
         drawDenominator()
       }
-      With.game.drawTextScreen(7, y0, p.name)
+      DrawScreen.text(7, y0, p.name)
     })
   }
 }

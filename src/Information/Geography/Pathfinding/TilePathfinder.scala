@@ -185,7 +185,7 @@ trait TilePathfinder {
         profile.unit
           .flatMap(_.friendly)
           .map(_.agent)
-          .foreach(_.lastPath = Some(output))
+          .foreach(_.path = Some(output))
 
         return output
       }

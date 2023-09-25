@@ -63,9 +63,9 @@ abstract class TargetedSpell extends Action {
 
   private def moveInRange(caster: FriendlyUnitInfo, target: Pixel): Unit ={
     if (caster.airborne) {
-      caster.agent.toTravel = Some(target)
+      caster.agent.decision.set(target)
     } else {
-      caster.agent.toTravel = Maff.minBy(Ring(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling)
+      caster.agent.decision.set(Maff.minBy(Ring(castRangeTiles).map(target.tile.add).map(_.center))(caster.pixelDistanceTravelling))
     }
     Commander.move(caster)
   }

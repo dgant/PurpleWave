@@ -11,6 +11,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.IndexedSet
 import Tactic.Squads.Qualities.QualityCounter
 import Tactic.Tactics.Tactic
+import Utilities.?
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -27,7 +28,6 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   private var _enemiesNow     = new ArrayBuffer[UnitInfo]
   private var _enemiesNext    = new ArrayBuffer[UnitInfo]
 
-
   def commission(): Unit = {
     if ( ! With.squads.isCommissioned(this)) {
       With.squads.commission(this)
@@ -36,13 +36,15 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     }
   }
 
-  final def candidateValue(candidate: FriendlyUnitInfo): Double = {
+  @inline final def candidateValue(candidate: FriendlyUnitInfo): Double = {
     commission()
     qualityCounter.utility(candidate)
   }
 
-  @inline final def units: Seq[FriendlyUnitInfo] = _unitsNow
-  @inline final def unitsNext: Seq[FriendlyUnitInfo] = _unitsNext
+
+  @inline final def groupFriendlyUnits  : Seq[FriendlyUnitInfo] = units
+  @inline final def units               : Seq[FriendlyUnitInfo] = _unitsNow
+  @inline final def unitsNext           : Seq[FriendlyUnitInfo] = _unitsNext
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {
     commission()
@@ -84,6 +86,10 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     _enemiesNext = swapEnemies
   }
 
+  @inline final def formationEngage     : Option[Formation] = formations.dropRight(1).headOption
+  @inline final def formationDisengage  : Option[Formation] = formations.lastOption
+  @inline final def formation           : Option[Formation] = ?(fightConsensus, formationEngage.orElse(formationDisengage), formationDisengage)
+
   def run(): Unit
 
   def leader(unitClass: UnitClass): Option[FriendlyUnitInfo] = leaders().get(unitClass)
@@ -91,7 +97,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
 
-  final def groupFriendlyUnits: Seq[FriendlyUnitInfo] = units
+
 
   override def toString: String = ToString(this).replace("Squad", "")
 }

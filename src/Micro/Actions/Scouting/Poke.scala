@@ -22,7 +22,7 @@ object Poke extends Action {
       || unit.matchups.threats.size <= 5
       || unit.totalHealth > 25))
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     val targets = unit.matchups.targets.filter(IsWorker)
     if (targets.isEmpty) return
 
@@ -38,7 +38,7 @@ object Poke extends Action {
     
     if (otherThreats.exists(_.pixelDistanceEdge(unit) < 32)) {
       unit.agent.toGather = With.geography.ourBases.headOption.flatMap(_.minerals.headOption)
-      unit.agent.toTravel = Some(With.geography.home.center)
+      unit.agent.decision.set(With.geography.home.center)
       Commander.gather(unit)
       Commander.move(unit)
     }
@@ -46,14 +46,12 @@ object Poke extends Action {
     lazy val targetDistance = unit.pixelRangeAgainst(target) + target.unitClass.radialHypotenuse + unit.unitClass.radialHypotenuse
     lazy val targetPosition = target.pixel.project(target.zone.exitOriginal.map(_.pixelCenter).getOrElse(unit.pixel), targetDistance)
     unit.agent.toAttack = Some(target)
-    unit.agent.toTravel = Some(targetPosition)
+    unit.agent.decision.set(targetPosition)
     if ( ! unit.is(Terran.SCV) && framesToWait > 0) {
       if (framesToWait > framesAway && ! target.gathering) {
         Retreat.delegate(unit)
       }
-      else {
-        Commander.move(unit)
-      }
+      Commander.move(unit)
     }
     Commander.attack(unit)
   }

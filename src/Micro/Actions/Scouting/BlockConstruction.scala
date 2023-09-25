@@ -26,8 +26,8 @@ object BlockConstruction extends Action {
       .getOrElse(unit.pixel.project(builder.pixel, unit.pixelDistanceCenter(builder) + 48))
 
 
-    unit.agent.toTravel = Some(destination)
-    unit.agent.toReturn = Some(destination)
+    unit.agent.redoubt.set(destination)
+    unit.agent.decision.set(destination)
     unit.agent.toAttack = Some(builder)
 
     if (unit.matchups.threatsInPixels(32).exists(builder !=)) {

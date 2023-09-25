@@ -2,6 +2,7 @@ package Information.Geography.Pathfinding
 
 import Lifecycle.With
 import Mathematics.Points.Tile
+import Utilities.SomeIf
 
 final class TileState(val tile: Tile) {
   val i: Int = tile.i
@@ -39,7 +40,7 @@ final class TileState(val tile: Tile) {
   }
   @inline def enqueued        : Boolean       = _enqueuedStamp == With.paths.stampCurrent
   @inline def visited         : Boolean       = _visitedStamp == With.paths.stampCurrent
-  @inline def cameFrom        : Option[Tile]  = if (enqueued && _cameFrom.i != i) Some(_cameFrom) else None
+  @inline def cameFrom        : Option[Tile]  = SomeIf(enqueued && _cameFrom.i != i, _cameFrom)
   @inline def costFromStart   : Double        = _costFromStart
   @inline def costToEndFloor  : Double        = _costToEndFloor
   @inline def pathLength      : Double        = _pathLength

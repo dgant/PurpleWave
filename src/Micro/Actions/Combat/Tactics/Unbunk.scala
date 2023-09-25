@@ -13,10 +13,9 @@ object Unbunk extends Action {
     && ! unit.agent.toBoard.exists(unit.transport.contains)
     && unit.transport.exists(Terran.Bunker)
     && unit.transport.get.matchups.targetsInRange.isEmpty
-    && unit.agent.toReturn.forall(_.pixelDistance(unit.pixel) > 32.0 * 7.0)
-  )
+    && unit.pixelDistanceTravelling(unit.agent.destinationNext()) > 32.0 * 7.0)
   
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override protected def perform(unit: FriendlyUnitInfo): Unit = {
     Commander.unload(unit.transport.get, unit)
   }
 }

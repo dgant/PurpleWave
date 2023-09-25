@@ -7,25 +7,22 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-
 object OccupyBunker extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo) = (
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.self.isTerran
-    && unit.agent.toReturn.isDefined
     && EmergencyBunk.classAllowedToBunk(unit)
     && unit.transport.isEmpty
     && unit.matchups.threatsInRange.isEmpty)
   
-  override def perform(unit: FriendlyUnitInfo) {
-    val destination = unit.agent.toReturn.get
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     
     val bunkers = With.units
-      .inTileRadius(destination.tile, 5)
+      .inTileRadius(unit.agent.origin().tile, 5)
       .filter(bunker =>
-        bunker.isOurs
+        Terran.Bunker(bunker)
+        && bunker.isOurs
         && bunker.complete
-        && bunker.is(Terran.Bunker)
         && bunker.friendly.get.loadedUnits.size < 4)
   
     Maff.minBy(bunkers)(_.pixelDistanceEdge(unit)).foreach(Commander.rightClick(unit, _))

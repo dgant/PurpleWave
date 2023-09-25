@@ -21,7 +21,7 @@ object Retreat extends Action {
     def apply(unit: FriendlyUnitInfo): Boolean = {
       if (unit.ready) {
         unit.agent.toAttack = None // Affects traffic prioritization
-        unit.agent.toTravel = Some(to)
+        unit.agent.decision.set(to)
         if (With.configuration.debugging) {
           unit.agent.act(f"Retreat$name")
         }
@@ -47,7 +47,7 @@ object Retreat extends Action {
     lazy val enemySieging         = unit.matchups.enemies.exists(_.isAny(IsTank, Zerg.Lurker)) && ! unit.base.exists(_.owner.isEnemy)
     lazy val goalSidestep         = Protoss.DarkTemplar(unit) || (enemySieging && ! enemyCloser && ! enemySooner)
     lazy val safetyIsSafe         = unit.agent.safety.tile.enemyRangeAgainst(unit) < Math.max(1, unit.tile.enemyRangeAgainst(unit))
-    lazy val goalCircle           = unit.matchups.threats.forall(unit.effectiveRangePixels > _.effectiveRangePixels + 32) && unit.zone == unit.agent.home.zone
+    lazy val goalCircle           = unit.matchups.threats.forall(unit.effectiveRangePixels > _.effectiveRangePixels + 32) && unit.zone == unit.agent.defaultHome.zone
     lazy val goalReturn           = ! unit.agent.isScout && ! goalSidestep && (unit.zone == unit.agent.safety.zone && unit.pixelDistanceCenter(unit.agent.safety) >= 32 * unit.agent.safety.tile.enemyRangeAgainst(unit) && Shapes.Ray(unit.pixel, unit.agent.safety).forall(_.tile.enemyRangeAgainst(unit) <= unit.tile.enemyRangeAgainst(unit)))
     lazy val goalHome             = ! unit.agent.isScout && ! goalSidestep && (unit.zone != unit.agent.safety.zone && (enemyCloser || enemySooner))
     lazy val goalOrigin           = goalReturn || goalHome
@@ -63,11 +63,6 @@ object Retreat extends Action {
     if (unit.agent.ride.exists(_.pixelDistanceEdge(unit) <= Shuttling.pickupRadiusEdge + 32) && unit.matchups.targetsInRange.isEmpty) {
       Commander.rightClick(unit, unit.agent.ride.get)
       return RetreatPlan(unit, unit.agent.ride.get.pixel, "Hail")
-    }
-
-    // If the return point didn't meet our criteria, let the unit retreat all the way home
-    if ( ! goalReturn) {
-      unit.agent.toReturn = None
     }
 
     // Against melee rush: Retreat directly to heart so workers can help

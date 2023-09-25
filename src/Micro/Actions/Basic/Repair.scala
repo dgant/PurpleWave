@@ -18,7 +18,7 @@ object Repair extends Action {
     if (target.totalHealth < target.unitClass.maxHitPoints) {
       Commander.repair(unit, target)
     } else {
-      unit.agent.toTravel = Some(target.pixel.project(unit.pixel, 48))
+      unit.agent.decision.set(target.pixel.project(unit.pixel, 48))
       Commander.move(unit)
     }
   }

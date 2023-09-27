@@ -73,7 +73,7 @@ class Template extends TemplateFilter {
           case 'Y' => null
           case 'Z' => null
           case '0' => null
-          case '1' => null
+          case '1' => new TemplatePointRequirement(Protoss.Pylon).withLabels(Important, Supply, FirstPylon)
           case '2' => new TemplatePointRequirement(2, 2)
           case '3' => new TemplatePointRequirement(3, 2)
           case '4' => new TemplatePointRequirement(4, 3)

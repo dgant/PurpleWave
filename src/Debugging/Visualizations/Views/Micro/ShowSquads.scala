@@ -48,8 +48,8 @@ object ShowSquads extends DebugView {
       With.squads.all.map(squad =>
         Vector(
           squad.toString,
-          "",
           squad.vicinity.base.map(_.toString).getOrElse(squad.vicinity.tile.toString),
+          "",
           "",
           "",
           EnumerateUnits(squad.units),

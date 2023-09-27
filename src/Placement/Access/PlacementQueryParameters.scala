@@ -125,6 +125,7 @@ class PlacementQueryParameters {
     lazy val foundationTileZone = foundation.tile.zone
     val distancePixels = zone.view.map(_.groundPixelsToZones(foundationTileZone)).max
     0.25 * Maff.clamp(1 - distancePixels * inv256x32, 0.0, 1.0)
+    //?(foundation.tile.metro.exists(m => zone.exists(_.metro.contains(m))), 0.75, 0.25) * Maff.clamp(1 - distancePixels * inv256x32, 0.0, 1.0)
   }
   protected def scoreBase(foundation: Foundation): Double = {
     if (base.isEmpty) return 1.0

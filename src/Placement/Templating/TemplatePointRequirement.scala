@@ -9,12 +9,12 @@ import scala.collection.mutable.ArrayBuffer
 
 class TemplatePointRequirement(val buildings: UnitClass*) {
   val labels = new ArrayBuffer[PlaceLabel]
-  val buildableBefore : Boolean = true
-  val walkableBefore  : Boolean = true
-  val buildableAfter  : Boolean = false
-  val walkableAfter   : Boolean = false
-  var width   : Int = Maff.max(buildings.map(_.tileWidth)).getOrElse(1)
-  var height  : Int = Maff.max(buildings.map(_.tileHeight)).getOrElse(1)
+  val buildableBefore : Boolean   = true
+  val walkableBefore  : Boolean   = true
+  val buildableAfter  : Boolean   = false
+  val walkableAfter   : Boolean   = false
+  var width           : Int       = Maff.max(buildings.map(_.tileWidth)).getOrElse(1)
+  var height          : Int       = Maff.max(buildings.map(_.tileHeight)).getOrElse(1)
 
   def this(argWidth: Int, argHeight: Int) {
     this()

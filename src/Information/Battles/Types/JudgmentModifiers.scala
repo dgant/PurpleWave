@@ -141,7 +141,7 @@ object JudgmentModifiers {
     val enemies   = battleLocal.enemy.units.length
     val caught    = battleLocal.us.units.count(u => u.matchups.threatDeepest.exists(t => t.isAny(IsSpeedling, Terran.Vulture) && t.inRangeToAttack(u) && t.topSpeed > u.topSpeed))
     val allies    = battleLocal.us.units.length
-    val score     = Maff.nanToZero(catchers / enemies * caught / allies)
+    val score     = Maff.nanToZero(catchers.toDouble / enemies * caught / allies)
     ?(score <= 0, None, Some(JudgmentModifier(targetDelta =  -score)))
   }
 }

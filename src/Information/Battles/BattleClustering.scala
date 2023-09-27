@@ -119,7 +119,6 @@ class BattleClustering {
       armyFriendly.foreach(f =>
         armyEnemy.foreach(e => {
           f.units.addAll(e.units)
-          e.units.clear()
           f.invalidateMetrics()
           e.invalidateMetrics()
           clustersAtWar.add(f)

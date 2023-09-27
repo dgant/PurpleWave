@@ -18,6 +18,7 @@ final class Cluster(val units: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[U
   def merge(other: Cluster): Unit = {
     invalidateMetrics()
     units.addAll(other.units)
+    other.units.clear()
   }
 
   def intersects(other: Cluster): Boolean = (

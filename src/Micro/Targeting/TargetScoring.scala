@@ -127,10 +127,11 @@ object TargetScoring {
     var output = false
     output ||= target.unitClass.isDetector
     output ||= Terran.Comsat(target)
+    output ||= Terran.Academy(target)           && ! With.units.existsEnemy(Terran.Comsat, Terran.ScienceVessel, Terran.ScienceFacility)
+    output ||= Terran.EngineeringBay(target)    && ! With.units.existsEnemy(Terran.Comsat, Terran.ScienceVessel, Terran.ScienceFacility, Terran.MissileTurret)
     output ||= Protoss.RoboticsFacility(target) && ! With.units.existsEnemy(Protoss.Observer)
-    output ||= Protoss.Forge(target)            && ! With.units.existsEnemy(Protoss.PhotonCannon)
-    output ||= Terran.EngineeringBay(target)    && ! With.units.existsEnemy(Terran.MissileTurret)
-    output ||= Terran.Academy(target)           && ! With.units.existsEnemy(Terran.Comsat)
+    output ||= Protoss.Forge(target)            && ! With.units.existsEnemy(Protoss.Observer, Protoss.Observatory, Protoss.PhotonCannon)
+    output ||= Zerg.CreepColony(target)         && With.units.existsEverEnemy(Zerg.SporeColony, Zerg.EvolutionChamber)
     output
   }
 

@@ -23,7 +23,7 @@ trait Geo {
   lazy val island           : Boolean           = With.geography.mains.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val isInterior       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z))))
   lazy val isBackyard       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
-  lazy val isPocket         : Boolean             = isInterior && ! isMain && ! island
+  lazy val isPocket         : Boolean           = isInterior && ! isMain && ! island
   lazy val radians          : Double            = Points.middle.radiansTo(heart.center)
   lazy val rushDistanceMin  : Double            = Maff.max(rushDistances).getOrElse(0)
   lazy val rushDistanceMax  : Double            = Maff.max(rushDistances).getOrElse(0)

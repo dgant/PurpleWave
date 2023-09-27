@@ -4,6 +4,7 @@ import Debugging.SimpleString
 
 object PlaceLabels {
   trait PlaceLabel extends SimpleString
+  object FirstPylon           extends PlaceLabel
   object Important            extends PlaceLabel
   object Unimportant          extends PlaceLabel
   object TownHall             extends PlaceLabel

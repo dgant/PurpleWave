@@ -7,7 +7,7 @@ import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.?
+import Utilities.{?, SomeIf}
 
 class PlacementQuery {
   var requirements  = new PlacementQueryParameters
@@ -33,8 +33,8 @@ class PlacementQuery {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
     requirements.building = Some(building).filter(_.isGas)
-    requirements.labelYes = if (building.isTownHall) Seq(PlaceLabels.TownHall)  else Seq.empty
-    requirements.labelNo  = if (building.isTownHall) Seq.empty                  else Seq(PlaceLabels.TownHall)
+    requirements.labelYes = ?(building.isTownHall, Seq(PlaceLabels.TownHall), Seq.empty) ++ SomeIf(building == Protoss.Pylon && ! With.units.existsOurs(Protoss.Pylon), PlaceLabels.FirstPylon)
+    requirements.labelNo  = ?(building.isTownHall, Seq.empty,                 Seq(PlaceLabels.TownHall))
     requirements.zone     = Seq.empty
     requirements.base     = Seq.empty
     requirements.tile     = Seq.empty

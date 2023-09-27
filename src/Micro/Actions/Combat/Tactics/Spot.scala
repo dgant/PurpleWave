@@ -55,12 +55,18 @@ object Spot extends Action {
     goals += unit.pixel
     spooky  .foreach(spook => goals += spook.projectFrames(48))
     tank    .foreach(tank =>  goals += tank.pixel)
+    if (group.attackers.exists( ! _.flying)) {
+      goals += group.attackCentroidKey
+    }
+    if (goals.isEmpty) {
+      return
+    }
     if (unit.agent.isLeader) {
       goals += group.destinationNext
     } else {
       goals += Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.destinationNext)
     }
-    goals += group.attackCentroidKey
+
 
     unit.agent.decision.set(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
     Commander.move(unit)

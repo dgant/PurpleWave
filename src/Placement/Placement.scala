@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.{Direction, Points}
 import Placement.Generation.{Fit, Fitter, Templates}
 import Placement.Walls.WallDesigner
+import Utilities.?
 
 class Placement extends Fitter {
 
@@ -21,15 +22,15 @@ class Placement extends Fitter {
       .foreach(_.tileArea.tiles.map(Fit(_, Templates.walkway)).foreach(index))
 
     // Fit closer zones first, so in case of tiebreaks we prefer closer zones
-    val basesSorted = With.geography.bases.sortBy(_.heart.groundTiles(With.geography.home))
-    val zonesSorted = With.geography.zones.sortBy(_.heart.groundTiles(With.geography.home))
+    val basesSorted = With.geography.bases.sortBy(b => b.heart.groundTiles(With.geography.home))
+    val zonesSorted = With.geography.zones.sortBy(z => z.heart.groundTiles(With.geography.home))
 
     basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
     //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
     if (With.self.isProtoss && With.enemies.exists(_.isZerg)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }
-    basesSorted.foreach(base => fitAndIndexConstrained(5, 1, if (base.isMain) Templates.mainBases else Templates.bases, base))
+    basesSorted.foreach(base => fitAndIndexConstrained(5, 1, ?(base.isMain, Templates.mainBases, Templates.bases), base))
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
@@ -45,7 +46,9 @@ class Placement extends Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    fitAndIndexProximity(1, 1, Templates.batterycannon,  exitTile,      zone, 10)
+    if ( ! zone.isBackyard && ! zone.island) {
+      fitAndIndexProximity(1, 1, Templates.batterycannon,  exitTile,      zone, 10)
+    }
     fitAndIndexProximity(0, 1, Templates.initialLayouts, zone.downtown, zone)
     fitAndIndexRectangle(2, 1, Templates.tech,           cornerBack,    bounds, directionToFront)
     fitAndIndexRectangle(3, 1, Templates.gateways,       cornerFront,   bounds, directionToBack)

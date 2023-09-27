@@ -3,7 +3,7 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 import Lifecycle.With
 import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.Time.{GameTime, Minutes}
+import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
 
 abstract class PvZ1BaseBuildOrders extends GameplanImperative {
@@ -206,9 +206,9 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     var output  =   With.fingerprints.zerglingsOnly.recently || enemyRecentStrategy(speedlingStrategies: _*)
     output      &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
     output      ||= enemyStrategy(speedlingStrategies: _*)
-    output      ||= enemiesShown(Zerg.Zergling) > 10 && With.frame < GameTime(3, 15)()
-    output      ||= enemiesShown(Zerg.Zergling) > 12 && With.frame < GameTime(3, 30)()
-    output      ||= enemiesShown(Zerg.Zergling) > 16
+    output      ||= enemiesShown(Zerg.Zergling) >= 20
+    output      &&= enemies(Zerg.CreepColony, Zerg.SunkenColony) > 1
+    output      ||= enemiesShown(Zerg.Zergling) >= 30
     output      &&= ! enemyHydralisksLikely
     output      &&= ! enemyMutalisksLikely
     output      &&= ! enemyLurkersLikely

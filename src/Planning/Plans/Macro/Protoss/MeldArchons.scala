@@ -31,6 +31,6 @@ class MeldArchons(maxEnergy: Int = 251) extends Plan {
       .setCounter(CountUpTo(templarToMeld))
       .release()
       .acquire()
-      .foreach(_.intend(this).setShouldMeld(true).setTravel(With.geography.home.center))
+      .foreach(_.intend(this).setShouldMeld(true).setTerminus(With.geography.home.center))
   }
 }

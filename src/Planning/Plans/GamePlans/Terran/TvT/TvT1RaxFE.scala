@@ -31,8 +31,6 @@ class TvT1RaxFE extends GameplanTemplate {
   override def scoutPlan = new ScoutAt(12)
   override def attackPlan = new If(new EnemyStrategy(With.fingerprints.fourteenCC), new AttackAndHarass)
 
-  val naturalZone: Zone = With.geography.ourNatural.zone
-
   override def buildOrder: Seq[RequestBuildable] = Seq(
     Get(9, Terran.SCV),
     Get(Terran.SupplyDepot),

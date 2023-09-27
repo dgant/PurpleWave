@@ -176,8 +176,8 @@ class SquadDefendBase(base: Base) extends Squad {
       .traversiblePixel(scourer)
     scourer.intend(this)
       .setTargets(target)
-      .setTravel(where)
-      .setReturnTo(SquadAutomation.getReturn(scourer, squad))
+      .setTerminus(where)
+      .setRedoubt(SquadAutomation.getReturn(scourer, squad))
   }
 
   def scour(): Unit = {

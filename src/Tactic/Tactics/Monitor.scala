@@ -28,7 +28,7 @@ class Monitor extends Tactic {
     val naturals = bases.flatMap(_.natural.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(25)()))
     bases = Maff.orElse(naturals, bases).toVector
     scouts.units.foreach(_.intend(this)
-      .setTravel(With.geography.home.center)
+      .setTerminus(With.geography.home.center)
       .setScout(bases.flatMap(_.zone.tiles.filter(t => t.enemyRangeAir <= 0 && ( ! cloaked || ! t.enemyDetectedUnchecked)))))
   }
 }

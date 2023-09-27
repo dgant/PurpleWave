@@ -96,7 +96,7 @@ class AttackWithWorkers(counter: UnitCounter = CountEverything) extends Plan {
   
   def tickle(unit: FriendlyUnitInfo, target: Pixel): Unit = {
     unit.intend(this)
-      .setTravel(target)
+      .setTerminus(target)
       .setCanTickle(true)
   }
 }

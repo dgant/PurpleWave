@@ -154,5 +154,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
 
   def isScout: Boolean = unit.intent.toScoutTiles.nonEmpty
 
-  def choosePerch(): Destination = perch.set(toAttack.map(unit.pixelToFireAtExhaustive))
+  def choosePerch(): Destination = perch.set(perch.pixel.orElse(toAttack.map(unit.pixelToFireAtExhaustive)))
+
+  override def toString: String = f"${lastAction.mkString} ${toAttack.map(t => f"$t ").mkString}${super.toString}"
 }

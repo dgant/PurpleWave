@@ -197,7 +197,7 @@ abstract class MissionDrop extends Mission {
   protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
     transports.foreach(_.intend(this).setAction(ActionRaidTransport))
-    passengers.foreach(_.intend(this).setTravel(vicinity))
+    passengers.foreach(_.intend(this).setTerminus(vicinity))
     passengers.foreach(_.agent.commit = true)
   }
   private def evacuate(): Unit = {
@@ -299,8 +299,8 @@ abstract class MissionDrop extends Mission {
         MicroPathing.tryMovingAlongTilePath(transport, path.get)
       } else {
         With.logger.debug(f"$this: No path available to $vicinity")
-        transport.agent.origin.set(vicinity)
-        transport.agent.terminus.set(vicinity)
+        transport.agent.redoubt.set(vicinity)
+        transport.agent.decision.set(vicinity)
         if (transport.matchups.pixelsEntangled > -64) {
           Retreat.delegate(transport)
         }
@@ -363,7 +363,7 @@ abstract class MissionDrop extends Mission {
 
   object ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      transport.agent.terminus.set(Some(transport.agent.defaultHome))
+      transport.agent.decision.set(transport.agent.defaultHome)
       Retreat.delegate(transport)
       Commander.move(transport)
     }

@@ -113,8 +113,7 @@ object Gather extends Action {
       // Run away if threatened during transfer
       lazy val zoneNow        = unit.zone
       lazy val zoneTo         = resource.zone
-      lazy val mainAndNatural = Vector(With.geography.ourMain, With.geography.ourNatural).map(_.zone)
-      lazy val transferring   = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! (mainAndNatural.contains(zoneNow) && mainAndNatural.contains(zoneTo))
+      lazy val transferring   = ! unit.base.exists(_.owner.isUs) && zoneNow != zoneTo && ! With.geography.ourMetro.zones.contains(zoneNow) && With.geography.ourMetro.zones.contains(zoneTo)
       lazy val threatened     = unit.battle.isDefined && unit.matchups.framesOfSafety < combatWindow && ! unit.matchups.threats.forall(IsWorker)
       lazy val threatCloser   = unit.matchups.threats.exists(_.pixelDistanceCenter(resource.pixel) < unit.pixelDistanceCenter(resource.pixel))
       if (transferring

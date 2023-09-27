@@ -34,6 +34,6 @@ class DefendAgainstWorkerRush extends Tactic {
       .acquire()
       .foreach(_.intend(this)
         .setCanFlee(false)
-        .setTravel(attackingCentroid))
+        .setTerminus(attackingCentroid))
   }
 }

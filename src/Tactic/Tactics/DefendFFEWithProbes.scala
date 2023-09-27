@@ -101,8 +101,8 @@ class DefendFFEWithProbes extends Tactic {
 
       workers.foreach(_.intend(this)
         .setCanFlee(false)
-        .setTravel(toDefend)
-        .setReturnTo(toDefend))
+        .setTerminus(toDefend)
+        .setRedoubt(toDefend))
 
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))

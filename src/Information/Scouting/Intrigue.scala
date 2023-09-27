@@ -49,7 +49,9 @@ trait Intrigue {
       .view
       .filter(unit => unit.likelyStillThere && ! unit.flying && unit.unitClass.isBuilding)
       .toVector
-      .sortBy(unit => ! unit.unitClass.isTownHall)
+      .sortBy(_.frameDiscovered)
+      .sortBy( ! _.base.exists(_.isMain))
+      .sortBy( ! _.unitClass.isTownHall)
       .map(_.tile)
       .headOption
       .getOrElse(cacheBaseIntrigueInitial().maxBy(_._2)._1.townHallArea.midpoint))

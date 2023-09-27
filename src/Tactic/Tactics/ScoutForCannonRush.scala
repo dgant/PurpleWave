@@ -17,14 +17,7 @@ class ScoutForCannonRush extends Tactic {
   lazy val previouslyCannonRushed: Boolean = With.strategy.enemyFingerprints(5).contains(With.fingerprints.cannonRush.toString)
 
   private val maxScoutDistance: Int = 32 * 25
-  lazy val tilesToScout: Vector[Tile] = With.geography.allTiles.filter(tile => {
-    val i = tile.i
-    (
-      With.grids.buildableTerrain.getUnchecked(tile.i)
-      && With.geography.ourMain.zone.distanceGrid.getUnchecked(i)     < maxScoutDistance
-      && With.geography.ourNatural.zone.distanceGrid.getUnchecked(i)  < maxScoutDistance
-    )
-  })
+  lazy val tilesToScout: Vector[Tile] = With.geography.allTiles.filter(tile => tile.buildableUnchecked && (tile.metro.exists(_.isOurs) || With.geography.ourFoyer.zone.distanceGrid.getUnchecked(tile.i)  < maxScoutDistance))
 
   def launch(): Unit = {
     val gettingCannonRushed = With.fingerprints.cannonRush() || (
@@ -47,6 +40,6 @@ class ScoutForCannonRush extends Tactic {
     scouts
       .setPreference(PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center)))
       .acquire()
-      .foreach(_.intend(this).setTravel(With.geography.home.center).setScout(tilesToScout))
+      .foreach(_.intend(this).setTerminus(With.geography.home.center).setScout(tilesToScout))
   }
 }

@@ -60,7 +60,7 @@ class PylonBlock extends Plan {
           currencyLock.acquire()
           blocker.intend(this).setBuild(Protoss.Pylon).setBuildTile(tileToBlock)
         } else {
-          blocker.intend(this).setCanFight(false).setTravel(tileToBlock.center)
+          blocker.intend(this).setCanFight(false).setTerminus(tileToBlock.center)
         }
       })
     })

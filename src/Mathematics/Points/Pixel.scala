@@ -84,6 +84,13 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def pixelDistanceChebyshev(other: Pixel): Int = {
     Math.max(Math.abs(x - other.x), Math.abs(y - other.y))
   }
+  @inline def expand(distance: Int): Array[Pixel] = {
+    Array(
+      Pixel(x - distance, y - distance),
+      Pixel(x + distance, y - distance),
+      Pixel(x - distance, y + distance),
+      Pixel(x + distance, y + distance))
+  }
   @inline def tile: Tile = {
     // This handles negative coordinates correctly AND is potentially an optimization:
     // https://stackoverflow.com/questions/18560844/does-java-optimize-division-by-powers-of-two-to-bitshifting

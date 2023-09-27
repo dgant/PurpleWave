@@ -24,7 +24,7 @@ trait Tugging {
   def enemyControls           (pixel  : Pixel)  : Boolean     = deltaMuscle11(pixel) < - 0.75 || (enemyProximity  >= proximity(pixel) && (ourProximity   > proximity(pixel) || ! MacroFacts.safePushing))
   def weControl               (tile   : Tile)   : Boolean     = weControl(tile.center)
   def enemyControls           (tile   : Tile)   : Boolean     = enemyControls(tile.center)
-  def weControlOurNatural                       : Boolean     = _weControlOurNatural()
+  def weControlOurFoyer                         : Boolean     = _weControlOurFoyer()
   def weControl               (base   : Base)   : Boolean     = controlPoints(base).count(weControl) > controlPoints(base).count(enemyControls)
   def weControl               (zone   : Zone)   : Boolean     = controlPoints(zone).count(weControl) > controlPoints(zone).count(enemyControls)
   def enemyControls           (base   : Base)   : Boolean     = controlPoints(base).count(weControl) < controlPoints(base).count(enemyControls)
@@ -40,11 +40,11 @@ trait Tugging {
   def ourThreatOrigin   : Tile = _ourThreatOrigin()
   def ourMuscleOrigin   : Tile = _ourMuscleOrigin()
 
-  private val _tugStart             = new Cache(() => With.geography.home)
-  private val _tugEnd               = new Cache(() => With.scouting.enemyHome)
-  private val _ourProximity         = new Cache(() => proximity(ourMuscleOrigin))
-  private val _enemyProximity       = new Cache(() => proximity(enemyMuscleOrigin))
-  private val _weControlOurNatural  = new Cache(() => weControl(With.geography.ourNatural))
+  private val _tugStart           = new Cache(() => With.geography.home)
+  private val _tugEnd             = new Cache(() => With.scouting.enemyHome)
+  private val _ourProximity       = new Cache(() => proximity(ourMuscleOrigin))
+  private val _enemyProximity     = new Cache(() => proximity(enemyMuscleOrigin))
+  private val _weControlOurFoyer  = new Cache(() => weControl(With.geography.ourFoyer))
 
   private lazy val productionWeight = 5 * Terran.Marine.subjectiveValue
   private val _enemyThreatOrigin = new Cache(() => {

@@ -1,7 +1,9 @@
 package Tactic.Squads
 
 import Lifecycle.With
+import Performance.Cache
 import Performance.Tasks.TimedTask
+import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -14,6 +16,9 @@ class Squads extends TimedTask {
   private var _batchNext: SquadBatch = SquadBatch(1)
 
   def all: Seq[Squad] = _batchActive.squads
+
+  def enemies: Map[Squad, Set[UnitInfo]] = _enemies()
+  private val _enemies = new Cache(() => all.filter(_.enemies.nonEmpty).map(s => (s, s.enemies.toSet)).toMap)
 
   @inline final def isCommissioned(squad: Squad): Boolean = squad.batchId == _batchNext.id
   @inline final def commission(squad: Squad): Unit = {

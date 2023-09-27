@@ -80,8 +80,8 @@ object SquadAutomation {
     output
   }
 
-  def send(squad: Squad, defaultReturn: Option[Pixel] = None): Unit = {
-    sendUnits(squad, squad.unintended, defaultReturn)
+  def send(squad: Squad, defaultRedoubt: Option[Pixel] = None): Unit = {
+    sendUnits(squad, squad.unintended, defaultRedoubt)
   }
 
   def sendUnits(squad: Squad, units: Iterable[FriendlyUnitInfo], defaultReturn: Option[Pixel] = None): Unit = {
@@ -89,8 +89,8 @@ object SquadAutomation {
       lazy val finalTravel = getTravel(unit, squad, defaultReturn)
       lazy val finalReturn = getReturn(unit, squad, defaultReturn)
       unit.intend(squad)
-        .setTravel(?(squad.fightConsensus, finalTravel, finalReturn))
-        .setReturnTo(finalReturn)
+        .setTerminus(?(squad.fightConsensus, finalTravel, finalReturn))
+        .setRedoubt(finalReturn)
     })
   }
 
@@ -104,7 +104,8 @@ object SquadAutomation {
 
   def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel =
     // Rush scenarios: Send army directly to vicinity
-    Some(squad.vicinity).filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
+    Some(squad.vicinity)
+      .filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
       .orElse(?(squad.hasGround, None, Some(squad.vicinity)))
       .orElse(
         squad
@@ -121,19 +122,19 @@ object SquadAutomation {
   def targetAndSend(squad: Squad): Unit = targetAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def targetAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     target(squad)
-    send(squad, defaultReturn = Some(from))
+    send(squad, defaultRedoubt = Some(from))
   }
 
   def targetFormAndSend(squad: Squad): Unit = targetFormAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def targetFormAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     target(squad)
     squad.formations = form(squad, from, to)
-    send(squad, defaultReturn = Some(from))
+    send(squad, defaultRedoubt = Some(from))
   }
 
   def formAndSend(squad: Squad): Unit = formAndSend(squad, from = squad.homeConsensus, to = squad.vicinity)
   def formAndSend(squad: Squad, from: Pixel, to: Pixel): Unit = {
     squad.formations = form(squad, from, to)
-    send(squad, defaultReturn = Some(from))
+    send(squad, defaultRedoubt = Some(from))
   }
 }

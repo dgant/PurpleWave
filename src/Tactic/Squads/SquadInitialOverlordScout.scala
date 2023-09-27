@@ -76,7 +76,7 @@ class SquadInitialOverlordScout extends Squad {
       val base = bases()(i % bases().size)
       val goal = base.townHallArea.tiles.minBy(overlord.pixelDistanceTravelling)
       overlord.intend(this)
-        .setTravel(goal.center)
+        .setTerminus(goal.center)
         .setScout(?(goal.explored, base.tiles.view.filter(_.buildable).toVector, Seq.empty))
     })
   }

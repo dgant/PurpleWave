@@ -50,7 +50,7 @@ class PvZ2022 extends PvZ1BaseOpenings {
     shouldAttack ||= miningBases < targetMiningBases
     shouldAttack ||= targetMiningBases > 2
     shouldAttack ||= bases > 2
-    shouldAttack ||= With.geography.ourBases.exists(b => With.geography.ourMain != b && With.geography.ourNatural != b)
+    shouldAttack ||= With.geography.ourMetros.size > 1
     if (enemies(Zerg.Mutalisk) > 0 || (enemyMutalisksLikely && enemiesComplete(Zerg.Spire) > 0)) {
       shouldAttack &&= unitsComplete(Protoss.PhotonCannon) >= 2 * bases || unitsComplete(Protoss.Corsair) >= 4 || unitsComplete(Protoss.Dragoon) >= 16
     }

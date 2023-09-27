@@ -31,6 +31,6 @@ class SquadBackstabProxy extends Squad {
   override def run(): Unit = {
     setTargets(With.units.enemy.filter(IsWorker).toVector)
     if (targets.exists(_.isEmpty)) targets = None
-    units.foreach(_.intend(this).setTravel(vicinity))
+    units.foreach(_.intend(this).setTerminus(vicinity))
   }
 }

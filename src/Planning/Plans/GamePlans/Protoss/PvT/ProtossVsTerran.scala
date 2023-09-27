@@ -347,7 +347,7 @@ class ProtossVsTerran extends PvTOpeners {
     // Expand //
     ////////////
 
-    if (With.scouting.weControlOurNatural) {
+    if (With.scouting.weControlOurFoyer) {
       approachMiningBases(2)
     }
     if ( ! encroaching && shouldAttack) {

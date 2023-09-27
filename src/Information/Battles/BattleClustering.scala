@@ -111,18 +111,17 @@ class BattleClustering {
     // So after granular clustering, we transfer units from irrelevant clusters to relevant clusters
     //
     // Identify squad-consensus battles in order to bias units towards relevant clusters
-    val squadEnemies = With.squads.all.filter(_.enemies.nonEmpty).map(s => (s, s.enemies.toSet)).toMap
-    clustersAtWar.foreach(_.measureCentroid())
-    clustersAtWar.foreach(_.measureSquads(squadEnemies))
 
     // If there are no war clusters, try to make one
     if (clustersAtWar.isEmpty) {
-      val armyFriendly  = Maff.maxBy(clustersAtPeace.filter(c => c.strengthFriendly  > 0  && c.units.exists(u => IsWarrior(u) && u.isFriendly)))(_.strengthFriendly)
-      val armyEnemy     = Maff.maxBy(clustersAtPeace.filter(c => c.strengthEnemy     > 0  && c.units.exists(u => IsWarrior(u) && u.isEnemy)))(_.strengthEnemy)
+      val armyFriendly  = Maff.maxBy(clustersAtPeace.filter(c => c.strengthFriendly  > 0  && c.units.exists(u => IsWarrior(u) && u.isFriendly )))(_.strengthFriendly)
+      val armyEnemy     = Maff.maxBy(clustersAtPeace.filter(c => c.strengthEnemy     > 0  && c.units.exists(u => IsWarrior(u) && u.isEnemy    )))(_.strengthEnemy)
       armyFriendly.foreach(f =>
         armyEnemy.foreach(e => {
           f.units.addAll(e.units)
           e.units.clear()
+          f.invalidateMetrics()
+          e.invalidateMetrics()
           clustersAtWar.add(f)
           clustersAtPeace.remove(f)
           clustersAtPeace.remove(e)
@@ -139,23 +138,22 @@ class BattleClustering {
         // We could potentially restrict this to just combat units, for performance if nothing else
         if (unit.isFriendly) {
           val squadCluster      = unit.friendly.flatMap(_.squad).flatMap(s => Maff.maxBy(clustersAtWar.filter(_.squadCounts.contains(s)))(_.squadCounts(s)))
-          bestCluster           = squadCluster.orElse(Maff.minBy(clustersAtWar)(_.hullCentroid.map(unit.pixelDistanceTravelling).get))
+          bestCluster           = squadCluster.orElse(Maff.minBy(clustersAtWar)(c => unit.pixelDistanceTravelling(c.hullCentroid)))
         } else {
-          val eligibleClusters  = Maff.orElse(clustersAtWar.filter(_.squadCounts.keys.exists(squadEnemies.get(_).exists(_.contains(unit)))), clustersAtWar)
-          bestCluster           = Maff.minBy(eligibleClusters)(_.hullCentroid.map(unit.pixelDistanceTravelling).get)
+          val eligibleClusters  = Maff.orElse(clustersAtWar.filter(_.squadCounts.keys.exists(With.squads.enemies.get(_).exists(_.contains(unit)))), clustersAtWar)
+          bestCluster           = Maff.minBy(eligibleClusters)(c => unit.pixelDistanceTravelling(c.hullCentroid))
         }
 
         bestCluster.foreach(warCluster => {
           peaceCluster.units.remove(unit)
           warCluster.units.add(unit)
+          peaceCluster.invalidateMetrics()
+          warCluster.invalidateMetrics()
           i -= 1
         })
         i += 1
       }
     })
-
-    // Re-assess peace clusters; some may still be eligible for battles
-    clustersAtPeace.foreach(_.measureBattleEligibility())
 
     // Step 6: Generate battles based on the clusters
     With.battles.nextBattlesLocal = (clustersAtWar.view ++ clustersAtPeace.view.filter(_.battleEligible))
@@ -175,10 +173,6 @@ class BattleClustering {
   private def identifyPeacefulAndWarlikeClusters(): Unit = {
     clustersAtWar  .clear()
     clustersAtPeace.clear()
-    clusters.foreach(c => {
-      c.measureStrength()
-      ?(c.atWar, clustersAtWar, clustersAtPeace).add(c)
-    })
-
+    clusters.foreach(c => ?(c.atWar, clustersAtWar, clustersAtPeace).add(c))
   }
 }

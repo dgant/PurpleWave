@@ -113,7 +113,7 @@ class SquadAttack extends Squad {
         Maff.minBy(unintended.filter(_.canAttackGround))(_.framesToTravelTo(base.heart.center)).foreach(camper =>
           camper.intend(this)
             //.setCanSneak(true) Too non-performant
-            .setTravel(base.heart.center)
+            .setTerminus(base.heart.center)
             .setTargets(base.enemies)))
     }
     if (Seq(ContainArmy, ClearMap).contains(mode)) {
@@ -125,7 +125,7 @@ class SquadAttack extends Squad {
     }
 
     if (faster) {
-      units.foreach(_.intent.toReturn = midmap())
+      units.foreach(_.intent.redoubt = midmap())
     }
   }
 }

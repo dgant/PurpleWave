@@ -83,7 +83,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     bases = With.geography.bases.filter(isValidBase) // Geography.ourBases may not be valid on frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
       val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
-      workers.foreach(_.intend(this, new Intention().setTravel(goal)))
+      workers.foreach(_.intend(this, new Intention().setTerminus(goal)))
       return
     }
 
@@ -100,7 +100,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
       .filter(p => mineralSlotCount < 14 || (
         p._3 <= 1.5 * naturalCost // Distance mine only if it's safe or we're desperate
         && With.scouting.enemyProximity < 0.75
-        && (With.scouting.weControlOurNatural || p._1.townHall.exists(_.isOurs))))
+        && (With.scouting.weControlOurFoyer || p._1.townHall.exists(_.isOurs))))
       .toVector
       .sortBy(m => m._3 * ?(m._1.townHall.exists(_.remainingCompletionFrames < 60 * 24), 1.0, 10.0)) // Sort the closest, preferring bases likely to complete soon anyway
     val distanceMineralBasesNeeded = distanceMineralBases.indices.find(i => distanceMineralBases.take(i).view.map(_._2.size).sum > 5).getOrElse(distanceMineralBases.size)
@@ -199,7 +199,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         ?(longDistanceMinerals.isEmpty,
           Maff.minBy(With.units.ours.filter(_.unitClass.isGas))(gas => worker.pixelDistanceTravelling(gas.pixel.walkableTile)),
           Some(longDistanceMinerals(worker.id % longDistanceMinerals.length)))) // TODO: If we use multiple distance bases this logic will cause long-distance-distance mining
-      .setTravel(Maff.sampleSet(nearestBase(worker).metro.bases.maxBy(_.heart.groundPixels(With.scouting.enemyThreatOrigin)).tiles).center))
+      .setTerminus(Maff.sampleSet(nearestBase(worker).metro.bases.maxBy(_.heart.groundPixels(With.scouting.enemyThreatOrigin)).tiles).center))
     assignments.foreach(a => a._1.intend(this).setGather(a._2.resource))
   }
 

@@ -1,6 +1,6 @@
 package Information.Geography
 
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
@@ -10,10 +10,11 @@ import Utilities.UnitFilters.IsTank
 trait GeographyCache extends GeographyBuilder {
   private def geo: Geography = With.geography
 
-  protected val enemyBasesCache     : Cache[Vector[Base]] = new Cache(() => geo.bases.filter(_.isEnemy))
-  protected val ourZonesCache       : Cache[Vector[Zone]] = new Cache(() => geo.zones.filter(_.isOurs))
-  protected val ourBasesCache       : Cache[Vector[Base]] = new Cache(() => geo.bases.filter(_.isOurs))
-  protected val ourSettlementsCache : Cache[Vector[Base]] = new Cache(() => getSettlements)
+  protected val enemyBasesCache     : Cache[Vector[Base]]   = new Cache(() => geo.bases.filter(_.isEnemy))
+  protected val ourZonesCache       : Cache[Vector[Zone]]   = new Cache(() => geo.zones.filter(_.isOurs))
+  protected val ourBasesCache       : Cache[Vector[Base]]   = new Cache(() => geo.bases.filter(_.isOurs))
+  protected val ourMetrosCache      : Cache[Vector[Metro]]  = new Cache(() => ourBasesCache().map(_.metro).distinct)
+  protected val ourSettlementsCache : Cache[Vector[Base]]   = new Cache(() => getSettlements)
 
   protected val ourMainCache: Cache[Base] = new Cache(() =>
     Maff.orElse(
@@ -25,6 +26,10 @@ trait GeographyCache extends GeographyBuilder {
     geo.ourMain.natural.filter(_.naturalOf.exists(_.isOurs))
     .orElse(geo.bases.find(_.naturalOf.exists(_.isOurs)))
     .getOrElse(geo.bases.filterNot(geo.ourMain==).minBy(_.townHallTile.groundPixels(geo.ourMain.townHallTile))))
+
+  protected val ourFoyerCache: Cache[Base] = new Cache(() =>
+    ourMainCache().metro.bases.minBy(b =>
+      b.exitNow.map(_.pixelCenter.walkableTile.groundPixels(With.scouting.enemyHome))))
 
   protected def getSettlements: Vector[Base] = (
     Vector.empty

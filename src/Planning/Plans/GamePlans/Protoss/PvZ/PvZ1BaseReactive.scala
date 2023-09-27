@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
-  protected def economy       : Economy           = ?(PvZMuscle(), Muscle, ?(PvZExpand(), Expand, Tech))
+  protected def economy       : Economy           = ?(PvZTech(committedTech), Tech, ?(PvZExpand(committedExpand), Expand, Muscle))
   protected var timingAttack  : Boolean           = false
   protected var opening       : Opening           = Gates1012
   protected var composition   : Seq[Composition]  = Seq.empty
@@ -80,9 +80,9 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     goo(Stargate, 0,  With.fingerprints.twoHatchGas()   && enemyHasShown(Zerg.Lair))
     goo(Speedlot, 0,  With.fingerprints.threeHatchGas() && enemies(IsHatchlike) > 2)
     goo(Reaver,   0,  static > 1)
-    goo(Goon,     0,  PvZGoon())
-    goo(Reaver,   0,  PvZReaver())
-    goo(Speedlot, 0,  PvZSpeedlot())
+    goo(Goon,     0,  PvZGoon     (committedGoon))
+    goo(Reaver,   0,  PvZReaver   (committedReaver))
+    goo(Speedlot, 0,  PvZSpeedlot (committedSpeedlot))
     goo(Stargate, 1,  enemyMutalisksLikely              && ! on(Goon))
     goo(Goon,     1,  enemyMutalisksLikely              && on(Stargate))
     goo(Reaver,   1,  enemyHydralisksLikely             && on(Stargate))
@@ -114,6 +114,12 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     }
   }
 
+  private def committedSpeedlot = haveEver(Protoss.Forge)
+  private def committedReaver   = haveEver(Protoss.RoboticsFacility)
+  private def committedGoon     = upgradeStarted(Protoss.DragoonRange)
+  private def committedTech     = haveEver(Protoss.Assimilator)
+  private def committedExpand   = With.geography.maxMiningBasesOurs >= 2
+
   override def executeBuild(): Unit = {
     new MeldArchons()()
     chooseOpening()
@@ -135,11 +141,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     }
     scoutOn(Protoss.Pylon)
 
-    if ( ! haveEver(Protoss.Forge))               PvZSpeedlot .deactivate()
-    if ( ! haveEver(Protoss.RoboticsFacility))    PvZReaver   .deactivate()
-    if ( ! upgradeStarted(Protoss.DragoonRange))  PvZGoon     .deactivate()
-    if (With.geography.maxMiningBasesOurs < 2)    PvZExpand   .deactivate()
-    if ( ! haveEver(Protoss.Assimilator))         PvZTech     .deactivate()
+    if ( ! committedSpeedlot) PvZSpeedlot .deactivate()
+    if ( ! committedReaver)   PvZReaver   .deactivate()
+    if ( ! committedGoon)     PvZGoon     .deactivate()
+    if ( ! committedExpand)   PvZExpand   .deactivate()
+    if ( ! committedTech)     PvZTech     .deactivate()
   }
 
   private val compositor = new Compositor
@@ -155,14 +161,18 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
     val needToPushLurkers = enemyLurkersLikely && ! haveComplete(Protoss.PhotonCannon, Protoss.Observer)
 
+    val allIn = enemiesHave(Zerg.Mutalisk) && ! haveComplete(Protoss.Corsair) && unitsComplete(Protoss.Dragoon) < 6
+
     timingAttack ||= unitsComplete(IsWarrior) >= 24 // Safety valve in case build gets disrupted somehow
     timingAttack ||= unitsComplete(Protoss.Reaver) >= 2     && haveComplete(Protoss.Shuttle)
     timingAttack ||= upgradeComplete(Protoss.ZealotSpeed)   && upgradeComplete(Protoss.GroundDamage) && haveComplete(Protoss.Archon)
     timingAttack ||= upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Dragoon) >= 10
     timingAttack ||= haveComplete(Protoss.Scout)
 
-    attack(canAttackEarly || timingAttack || needToPushLurkers)
-    status(canAttackEarly && ! timingAttack, "EarlyAttack")
+    aggression(?(allIn || timingAttack, 1.5, 0.75))
+    attack(allIn || canAttackEarly || timingAttack || needToPushLurkers)
+    status(allIn || canAttackEarly && ! timingAttack, "EarlyAttack")
+    status(allIn, "AllIn")
     status(timingAttack, "TimingAttack")
     status(economy)
     status(opening)
@@ -172,7 +182,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     detectionVsLurker()
 
     requireMiningBases(?(frame > Minutes(10)(), 2, 1))
-    if (timingAttack && With.scouting.enemyProximity < 0.75 && (PvZExpand() || PvZMuscle())) {
+    if (timingAttack && With.scouting.enemyProximity < 0.75 && (PvZExpand(committedExpand) || PvZMuscle())) {
       requireMiningBases(2)
     }
 
@@ -181,7 +191,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       buildArmy(),
       buildTech())
 
-    if (PvZExpand()) {
+    if (PvZExpand(committedExpand)) {
       get(Math.max(2, 3 - units(Protoss.RoboticsFacility, Protoss.Stargate)), Protoss.Gateway)
       requireMiningBases(2)
     }

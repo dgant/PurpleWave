@@ -21,9 +21,11 @@ final class Geography extends TimedTask with GeographyCache with Expansions {
 
   def ourMain                 : Base          = ourMainCache()
   def ourNatural              : Base          = ourNaturalCache()
+  def ourFoyer                : Base          = ourFoyerCache()
   def ourMetro                : Metro         = ourMain.metro
   def ourZones                : Vector[Zone]  = ourZonesCache()
   def ourBases                : Vector[Base]  = ourBasesCache()
+  def ourMetros               : Vector[Metro] = ourMetrosCache()
   def ourMiningBases          : Vector[Base]  = ourBases.filter(MacroFacts.isMiningBase)
   def ourBasesAndSettlements  : Vector[Base]  = (ourBases ++ ourSettlementsCache()).distinct
   def enemyBases              : Vector[Base]  = enemyBasesCache()

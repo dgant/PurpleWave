@@ -87,7 +87,7 @@ class SquadWorkerScout extends Squad {
       val explored  = base.townHallArea.tiles.exists(_.explored)
       bases.foreach(basesToScoutQueue.remove)
       scout.intend(this)
-        .setTravel(base.townHallArea.cornerPixels.minBy(scout.pixelDistanceTravelling))
+        .setTerminus(base.townHallArea.cornerPixels.minBy(scout.pixelDistanceTravelling))
         .setScout(
           if (explored) bases.flatMap(_.tiles.view.filter(t => t.buildable && With.grids.enemyRangeGround(t) <= With.grids.enemyRangeGround.margin))
           else          Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling)))

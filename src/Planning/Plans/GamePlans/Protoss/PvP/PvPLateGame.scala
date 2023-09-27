@@ -68,7 +68,7 @@ class PvPLateGame extends GameplanImperative {
 
     val reaverShuttleCombo = unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 1
     fearDeath   = ! safeDefending
-    fearDeath   ||= unitsComplete(IsWarrior) < 8
+    fearDeath   ||= unitsComplete(IsWarrior) < 8 && ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst)
     fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && ! reaverShuttleCombo
     fearDeath   &&= ! dtBraveryHome
     fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
@@ -357,14 +357,14 @@ class PvPLateGame extends GameplanImperative {
     }
     if (addForge || have(Protoss.Forge)) {
       if ( ! have(Protoss.Observer)) {
-        buildCannonsAtNatural(1, PlaceLabels.DefendEntrance)
+        buildCannonsAtFoyer(1, PlaceLabels.DefendEntrance)
       }
       With.geography.ourBasesAndSettlements.view
         .filterNot(_.isOurMain)
         .filterNot(_.isOurNatural)
         .foreach(base => {
           val coverHall = base.edges.exists(_.pixelCenter.pixelDistance(base.townHallArea.center) > 32 * 15)
-          buildDefensesAt(1, Protoss.PhotonCannon, Seq(if (coverHall) PlaceLabels.DefendHall else PlaceLabels.DefendEntrance), Seq(base))
+          buildDefensesAt(1, Protoss.PhotonCannon, Seq(?(coverHall, PlaceLabels.DefendHall, PlaceLabels.DefendEntrance)), Seq(base))
         })
     }
   }

@@ -18,7 +18,7 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
       val attackTarget = if (With.units.existsEnemy(IsWarrior)) None else assignee
       unit.intend(this)
         .setCanFlee(unit.matchups.threats.exists(IsWarrior))
-        .setTravel(assignee.map(_.pixel).getOrElse(centroidUnit))
+        .setTerminus(assignee.map(_.pixel).getOrElse(centroidUnit))
         .setAttack(attackTarget)
     })
   }

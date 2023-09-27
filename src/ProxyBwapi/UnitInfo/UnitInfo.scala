@@ -205,6 +205,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     arrivalTime
   })
 
+  @inline final def proximity: Double = With.scouting.proximity(tile)
   @inline final def proxied: Boolean = _proxied()
   private val _proxyThreshold = 0.42
   private val _proxied = new Cache(() =>
@@ -212,8 +213,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && ! flying
     && ?(isFriendly,
       With.scouting.proximity(tile) < 1 - _proxyThreshold || ! metro.exists(_.bases.exists(_.isOurs)),
-      With.scouting.proximity(tile) >     _proxyThreshold || ! metro.exists(_.bases.exists(_.isEnemy) || With.geography.enemyBases.isEmpty)),
-    240)
+      With.scouting.proximity(tile) >     _proxyThreshold || {
+        val b = base.getOrElse(With.geography.bases.minBy(_.groundPixels(tile)))
+        b.isOurs || b.groundPixels(tile) > 32 * 20
+      }),
+      240)
 
   ////////////
   // Combat //

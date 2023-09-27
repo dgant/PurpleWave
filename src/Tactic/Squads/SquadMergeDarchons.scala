@@ -21,6 +21,6 @@ class SquadMergeDarchons extends Squad {
     val partyCentral = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.enemyThreatOrigin)).map(_.heart).getOrElse(With.geography.home).center
     lock.units.foreach(_.intend(this)
       .setShouldMeld(true)
-      .setTravel(partyCentral))
+      .setTerminus(partyCentral))
   }
 }

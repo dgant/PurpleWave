@@ -26,8 +26,8 @@ class Metro(private val seedBases: Vector[Base]) extends Geo {
         .diff(output)
         .filterNot(z => z.isMain || z.isNatural)
         .filter(z =>
-          output.map(_.groundDistance(z)).min
-          <= With.geography.mains.filterNot(seedBases.contains).map(_.groundDistance(z)).min)
+          output.map(_.groundPixels(z)).min
+          <= With.geography.mains.filterNot(seedBases.contains).map(_.groundPixels(z)).min)
 
       adjacentZones
         .foreach(adjacentZone => {

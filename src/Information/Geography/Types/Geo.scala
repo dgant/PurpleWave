@@ -19,7 +19,7 @@ trait Geo {
 
   lazy val isMain           : Boolean           = bases.map(_.townHallTile).exists(With.geography.startLocations.contains)
   lazy val isNatural        : Boolean           = bases.exists(_.naturalOf.isDefined)
-  lazy val isCross          : Boolean           = ! With.geography.mains.sortBy(With.geography.ourMain.groundDistance).exists(bases.contains)
+  lazy val isCross          : Boolean           = ! With.geography.mains.sortBy(With.geography.ourMain.groundPixels).exists(bases.contains)
   lazy val island           : Boolean           = With.geography.mains.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val isInterior       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z))))
   lazy val isBackyard       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
@@ -35,7 +35,7 @@ trait Geo {
   lazy val selfAndChildren  : Vector[Geo]       = (Vector[Geo](this) ++ zones ++ bases).distinct
   lazy val edges            : Vector[Edge]      = With.geography.edges.filter(_.zones.exists(zones.contains))
   lazy val exits            : Vector[Edge]      = edges.filter(_.zones.exists( ! zones.contains(_))).distinct
-  lazy val rushDistances    : Vector[Double]    = With.geography.metros.filter(_.isMain).filterNot(_.selfAndChildren.contains(this)).map(groundDistance)
+  lazy val rushDistances    : Vector[Double]    = With.geography.metros.filter(_.isMain).filterNot(_.selfAndChildren.contains(this)).map(groundPixels)
   lazy val entranceOriginal : Option[Edge]      = _entranceCache()
   lazy val exitOriginal     : Option[Edge]      = Maff.minBy(exits)(e => With.geography.mains.map(_.heart).map(e.distanceGrid.get).max)
   lazy val exitDirection    : Option[Direction] = exitOriginal.map(_.pixelCenter.subtract(heart.center).direction)
@@ -54,7 +54,9 @@ trait Geo {
   def exitNow       : Option[Edge]  = _exitCache()
 
   def airDistance     (other: Geo)  : Double        = heart.pixelDistance(other.heart)
-  def groundDistance  (other: Geo)  : Double        = heart.groundPixelsBidirectional(other.heart)
+  def groundPixels    (other: Geo)  : Double        = heart.groundPixelsBidirectional(other.heart)
+  def groundPixels    (to: Pixel)   : Double        = heart.groundPixels(to)
+  def groundPixels    (to: Tile)    : Double        = heart.groundPixels(to)
   def edgeTo          (to: Pixel)   : Option[Edge]  = Maff.minBy(exits)(_.pixelCenter.groundPixels(to))
 
   private val _entranceCache  = new Cache(() => Maff.minBy(exits)(edge => With.geography.startLocations.map(edge.distanceGrid.get).min))

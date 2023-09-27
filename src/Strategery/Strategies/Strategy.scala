@@ -5,7 +5,7 @@ import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
-import Utilities.LightYear
+import Utilities.{?, LightYear}
 import bwapi.Race
 
 abstract class Strategy extends SimpleString {
@@ -92,7 +92,7 @@ abstract class Strategy extends SimpleString {
     * versus those that didn't impact it at all (a late game strategy for a game lasting three minutes, for example)
     */
   def activate(): Boolean = { With.strategy.activate(this) }
-  def apply(): Boolean = activate()
+  def apply(shouldActivate: Boolean = true): Boolean = ?(shouldActivate, activate(), isActive)
 
   /**
     * Flag a strategy as inactive, in order to avoid crediting it with our success/failure this game

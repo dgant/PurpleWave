@@ -56,9 +56,9 @@ object Spot extends Action {
     spooky  .foreach(spook => goals += spook.projectFrames(48))
     tank    .foreach(tank =>  goals += tank.pixel)
     if (unit.agent.isLeader) {
-      goals += group.stepConsensus
+      goals += group.destinationNext
     } else {
-      goals += Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.stepConsensus)
+      goals += Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.destinationNext)
     }
     goals += group.attackCentroidKey
 

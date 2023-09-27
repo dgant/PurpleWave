@@ -395,7 +395,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         applyForce(Forces.regrouping, Potential.regroup(unit))
         moveForcefully()
         restrained = target.forall(t => unit.pixelsToGetInRange(t) < unit.pixelsToGetInRangeFrom(t, unit.agent.destinationNext()))
-        restrained ||= unit.intent.toTravel.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destinationNext(), p))
+        restrained ||= unit.intent.terminus.exists(p => unit.pixelDistanceTravelling(p) < unit.pixelDistanceTravelling(unit.agent.destinationNext(), p))
       } else if (techniqueIs(Scavenge)) {
         if ( ! potshot()) {
           unit.agent.act("Snipe")

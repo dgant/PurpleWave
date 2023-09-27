@@ -1,10 +1,11 @@
 package Planning.Plans.GamePlans.Terran.TvT
 
-import Information.Geography.Types.Zone
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
+import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
+import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
@@ -12,10 +13,8 @@ import Planning.Plans.Placement.BuildBunkersAtNatural
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
-import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
-import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
 import Planning.Predicates.Predicate
+import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT14CC
 
@@ -25,9 +24,7 @@ class TvT14CC extends GameplanTemplate {
   override val completionCriteria: Predicate = new Latch(new And(new UnitsAtLeast(1, Terran.Bunker, complete = true), new UnitsAtLeast(2, Terran.Refinery)))
 
   override def scoutPlan = new ScoutOn(Terran.CommandCenter, quantity = 2)
-  override def attackPlan = NoPlan()
-
-  val naturalZone: Zone = With.geography.ourNatural.zone
+  override def attackPlan: Plan = NoPlan()
 
   override def buildOrder: Seq[RequestBuildable] = Seq(
     Get(9, Terran.SCV),

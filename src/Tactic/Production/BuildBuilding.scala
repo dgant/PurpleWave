@@ -142,14 +142,14 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
           builder.get.intend(this)
             .setCanFight(false)
             .setBuildTile(desiredTile)
-            .setTravel(desiredTile.map(_.center))
+            .setTerminus(desiredTile.map(_.center))
         } else {
           orderedTile = desiredTile
           builder.get.intend(this)
             .setCanFight(false)
             .setBuild(?(hasSpent || currencyLock.satisfied, Some(buildingClass), None))
             .setBuildTile(orderedTile)
-            .setTravel(orderedTile.map(_.center))
+            .setTerminus(orderedTile.map(_.center))
         }
       } else if (buildingClass.isTerran) {
         builder.get.intend(this)

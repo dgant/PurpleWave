@@ -19,7 +19,10 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def enemyContained: Boolean = With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(b => (Seq(b) ++ b.natural).exists(With.scouting.weControl))
 
-  def recentlyExpandedFirst: Boolean = With.scouting.weExpandedFirst && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)()
+  def recentlyExpandedFirst: Boolean = (
+    With.scouting.weExpandedFirst
+    && ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
+    && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)())
 
   def monitorSafely(): Unit = {
     With.blackboard.monitorBases.set(
@@ -84,7 +87,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
     lazy val cannonsAreReady = (
       haveComplete(Protoss.PhotonCannon)
       && With.units.ours.filter(Protoss.PhotonCannon).forall(_.complete)
-      && Some(With.geography.ourNatural)
+      && Some(With.geography.ourFoyer)
         .filter(_.isOurs)
         .getOrElse(With.geography.ourMain)
         .ourUnits
@@ -95,7 +98,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       With.units.existsOurs(Protoss.RoboticsFacility) // It's part of our plan already
         || ( ! dtPrecedesObserver && ! PvPDT()) // Observers are just better if we can swing them
         || (dtPrecedesCannon && ! With.units.existsOurs(Protoss.Forge)) // Cannons are awful once DTs are already inside your base; Obs is better
-        || (cannonsAreReady && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourNatural.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base sooner rather than later
+        || (cannonsAreReady && enemyHasShown(Protoss.DarkTemplar) && ! With.geography.ourFoyer.ourUnits.exists(Protoss.PhotonCannon))) // We need to leave our base sooner rather than later
 
     if (auditing) return goObserver
     status(enemyContained,          "Containing")
@@ -125,7 +128,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
       // If DTs are already here, spam cannons and pray one sticks
       if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {
         get(Protoss.Forge)
-        val bestBase    = Some(With.geography.ourNatural).filter(_.ourUnits.exists(u => Protoss.PhotonCannon(u) && u.complete)).getOrElse(With.geography.ourMain)
+        val bestBase    = Some(With.geography.ourFoyer).filter(_.ourUnits.exists(u => Protoss.PhotonCannon(u) && u.complete)).getOrElse(With.geography.ourMain)
         val holdNatural = bestBase.naturalOf.isDefined && ! With.strategy.isMoneyMap
         val bestTile    = ?(holdNatural, bestBase.zone.exitNowOrHeart, ?(cannonsAreReady, bestBase.zone.exitNowOrHeart, bestBase.heart))
         val label       = ?(holdNatural || cannonsAreReady, DefendEntrance, DefendHall)
@@ -141,7 +144,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
         status("DTPrecedesCannon")
         get(Protoss.Forge)
         if ( ! With.strategy.isMoneyMap) {
-          requestTower(Protoss.PhotonCannon, 1, With.geography.ourNatural,  DefendEntrance, 0)
+          requestTower(Protoss.PhotonCannon, 1, With.geography.ourFoyer,  DefendEntrance, 0)
         }
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, 0)
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendHall,     0)
@@ -151,7 +154,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
         val cannonMinStartFrame = expectedArrival - Protoss.PhotonCannon.buildFramesFull - cannonSafetyFrames
         val forgeMinStartFrame  = earliestArrival - Protoss.Forge.buildFramesFull
         val pylonMinStartFrame  = earliestArrival - Protoss.Pylon.buildFramesFull
-        val naturalPylonNow     = With.units.ours.filter(Protoss.Pylon).forall(_.complete) && With.scouting.weControlOurNatural && With.units.ours.count(Protoss.Pylon) > 3
+        val naturalPylonNow     = With.units.ours.filter(Protoss.Pylon).forall(_.complete) && With.scouting.weControlOurFoyer && With.units.ours.count(Protoss.Pylon) > 3
         val doForgeCannon       = dtArePossibility && (PvPDT() || enemyHasShown(Protoss.CitadelOfAdun))
 
         status(f"DTAfterCannon@${Frames(forgeMinStartFrame)}-${Frames(pylonMinStartFrame)}-${Frames(cannonMinStartFrame)}")
@@ -162,11 +165,11 @@ object PvPIdeas extends MacroActions with MacroCounting {
           get(RequestUnit(Protoss.Forge, minStartFrameArg = forgeMinStartFrame))
         }
         if ( ! With.strategy.isMoneyMap) {
-          requestTower(Protoss.Pylon,         1, With.geography.ourNatural,   DefendEntrance, if (naturalPylonNow) 0 else pylonMinStartFrame)
+          requestTower(Protoss.Pylon,         1, With.geography.ourFoyer,   DefendEntrance, if (naturalPylonNow) 0 else pylonMinStartFrame)
         }
         if (doForgeCannon) {
-          requestTower(Protoss.PhotonCannon,  1, With.geography.ourNatural,   DefendEntrance, cannonMinStartFrame)
-          requestTower(Protoss.PhotonCannon,  1, With.geography.ourMain,      DefendEntrance, cannonMinStartFrame)
+          requestTower(Protoss.PhotonCannon,  1, With.geography.ourFoyer,   DefendEntrance, cannonMinStartFrame)
+          requestTower(Protoss.PhotonCannon,  1, With.geography.ourMain,    DefendEntrance, cannonMinStartFrame)
         }
       }
     }

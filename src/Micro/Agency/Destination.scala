@@ -1,10 +1,13 @@
 package Micro.Agency
 
 import Mathematics.Points.{Pixel, Tile}
+import Micro.Agency.Destinations.DestinationLevel
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-class Destination(val unit: FriendlyUnitInfo, val level: Int) {
+class Destination(val unit: FriendlyUnitInfo, val destinationType: DestinationLevel) {
+  val level: Int = destinationType.level
+
   var pixelRaw      : Option[Pixel] = None
   var pixelWaypoint : Option[Pixel] = None
   var pixelAdjusted : Option[Pixel] = None
@@ -73,4 +76,7 @@ class Destination(val unit: FriendlyUnitInfo, val level: Int) {
         .map(Commander.adjustDestination(unit, _)))
     this
   }
+
+  private def fp(s: String, p: Option[Pixel]): String = p.map(pp => f"$s: $pp ").mkString
+  override def toString: String = f"$destinationType ${fp("R", pixelRaw)}${fp("W", pixelWaypoint)}${fp("A", pixelAdjusted)}"
 }

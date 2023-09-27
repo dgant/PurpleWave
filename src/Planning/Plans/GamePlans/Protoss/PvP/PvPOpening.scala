@@ -324,7 +324,6 @@ class PvPOpening extends GameplanImperative {
       greedyDT    = have(Protoss.TemplarArchives)
       greedyDT  &&= ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush)
       greedyDT  &&= roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
-      shouldExpand  ||= enemyStrategy(With.fingerprints.forgeFe)
     }
 
     had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && ! have(Protoss.CyberneticsCore)
@@ -384,7 +383,8 @@ class PvPOpening extends GameplanImperative {
       shouldExpand    = atMainTiming && ! mainTimingClosed && unitsEver(IsWarrior) >= 20
       shouldExpand  ||= unitsComplete(IsWarrior) >= ?(safePushing, ?(PvPIdeas.enemyContained, 14, 20), 28)
     }
-    shouldExpand ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
+    shouldExpand  ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe) && ! With.fingerprints.cannonRush()
+    shouldExpand  ||= unitsComplete(IsWarrior) >= 30 // We will get contained if we wait too long
 
     // If we want to expand, make sure we control our natural
     shouldHoldNatural   = safeDefending
@@ -436,16 +436,8 @@ class PvPOpening extends GameplanImperative {
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }
-    if (shouldHoldNatural) { holdNatural() }
+    if (shouldHoldNatural) { holdFoyer() }
     PvPIdeas.monitorSafely()
-
-    ////////////////////////////
-    // Emergency DT reactions //
-    ////////////////////////////
-
-    if ( ! greedyDT) {
-      PvPIdeas.requireTimelyDetection()
-    }
 
     //////////////
     // Scouting //
@@ -495,6 +487,14 @@ class PvPOpening extends GameplanImperative {
     once(10, Protoss.Probe)
     once(Protoss.Gateway)
 
+    //////////////////////
+    // React against DT //
+    //////////////////////
+
+    if ( ! greedyDT) {
+      PvPIdeas.requireTimelyDetection()
+    }
+
     ///////////////////////
     // React against 9-9 //
     ///////////////////////
@@ -536,11 +536,46 @@ class PvPOpening extends GameplanImperative {
       return
     }
 
+    //////////////////////
+    // React against FE //
+    //////////////////////
+
+    val shouldFESafe    = shouldExpand && (With.fingerprints.forgeFe() || With.fingerprints.gatewayFe()) && (enemiesHave(Protoss.PhotonCannon) || enemyBases >= 2)
+    val shouldFEGreedy  = shouldFESafe && With.fingerprints.forgeFe() && (enemies(Protoss.PhotonCannon) > 1 || enemyBases >= 2)
+    val shouldFE        = shouldFESafe || shouldFEGreedy
+    if (shouldFE && unitsEver(Protoss.Nexus) < 2 && minerals < 300) {
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.DragoonRange)
+    }
+    if (shouldFEGreedy) {
+      get(15, Protoss.Probe)
+      get(2, Protoss.Nexus)
+      get(2, Protoss.Pylon)
+      get(16, Protoss.Probe)
+      get(Protoss.Assimilator)
+      get(17, Protoss.Probe)
+      get(Protoss.CyberneticsCore)
+    } else if (shouldFESafe) {
+      get(12, Protoss.Probe)
+      get(2, Protoss.Pylon)
+      get(13, Protoss.Probe)
+      get(Protoss.Zealot)
+      get(15, Protoss.Probe)
+      get(2, Protoss.Zealot)
+      get(17, Protoss.Probe)
+      get(2, Protoss.Nexus)
+      get(18, Protoss.Probe)
+      get(3, Protoss.Zealot)
+      get(19, Protoss.Probe)
+      get(Protoss.Assimilator)
+      get(20, Protoss.Probe)
+      get(Protoss.CyberneticsCore)
+    }
+
     ////////////
     // 2-Gate //
     ////////////
 
-    if (PvP1012()) { // https://liquipedia.net/starcraft/2_Gate_(vs._Protoss)
+    else if (PvP1012()) { // https://liquipedia.net/starcraft/2_Gate_(vs._Protoss)
       once(12,  Protoss.Probe)
       once(2,   Protoss.Gateway)
       once(13,  Protoss.Probe)
@@ -784,7 +819,7 @@ class PvPOpening extends GameplanImperative {
         once(Protoss.Shuttle)
       }
       get(Protoss.DragoonRange)
-      if (shouldExpand && (With.scouting.weControlOurNatural || units(Protoss.Reaver) > 1)) {
+      if (shouldExpand && (With.scouting.weControlOurFoyer || units(Protoss.Reaver) > 1)) {
         expand()
       }
       trainRoboUnits()
@@ -827,7 +862,7 @@ class PvPOpening extends GameplanImperative {
       if (shouldExpand) {
         pumpWorkers(oversaturate = true)
         if (PvP4GateGoon() && enemyBases < 2) {
-          buildCannonsAtNatural(1)
+          buildCannonsAtFoyer(1)
         }
         expand()
       }
@@ -866,12 +901,12 @@ class PvPOpening extends GameplanImperative {
     }
   }
 
-  private def holdNatural(): Unit = {
-    With.blackboard.basesToHold.set(Vector(With.geography.ourNatural))
+  private def holdFoyer(): Unit = {
+    With.blackboard.basesToHold.set(Vector(With.geography.ourFoyer))
   }
 
   private def expand(): Unit = {
-    if ( ! With.scouting.enemyControls(With.geography.ourNatural)) {
+    if ( ! With.scouting.enemyControls(With.geography.ourFoyer)) {
       requireMiningBases(2)
     }
   }

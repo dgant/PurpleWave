@@ -163,42 +163,51 @@ trait MacroActions {
     buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourMain))
   }
   def buildDefenseAtNatural(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filter(_.isOurNatural))
+    buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourNatural))
+  }
+  def buildDefenseAtFoyer(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
+    buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourFoyer))
   }
   def buildDefenseAtExpansions(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
     buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.isOurMain).filterNot(_.isOurNatural))
   }
   def buildDefenseAtOpenings(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.natural.exists(_.isOurs)))
+    buildDefensesAt(count, defenseClass, labels, With.geography.ourMetros.flatMap(m => m.exits.flatMap(_.zones.flatMap(_.bases)).filter(m.bases.contains)))
   }
   def buildCannonsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Protoss.PhotonCannon,   labels)
+  def buildCannonsAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Protoss.PhotonCannon,   labels)
   def buildBatteriesAtBases       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Protoss.ShieldBattery,  labels)
   def buildBatteriesAtMain        (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Protoss.ShieldBattery,  labels)
   def buildBatteriesAtNatural     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Protoss.ShieldBattery,  labels)
+  def buildBatteriesAtFoyer       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Protoss.ShieldBattery,  labels)
   def buildBatteriesAtExpansions  (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Protoss.ShieldBattery,  labels)
   def buildBatteriesAtOpenings    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Protoss.ShieldBattery,  labels)
   def buildBunkersAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Terran.Bunker,          labels)
   def buildBunkersAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Terran.Bunker,          labels)
   def buildBunkersAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Terran.Bunker,          labels)
+  def buildBunkersAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Terran.Bunker,          labels)
   def buildBunkersAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Terran.Bunker,          labels)
   def buildBunkersAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Terran.Bunker,          labels)
   def buildTurretsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Terran.MissileTurret,   labels)
   def buildTurretsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Terran.MissileTurret,   labels)
   def buildTurretsAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Terran.MissileTurret,   labels)
+  def buildTurretsAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Terran.MissileTurret,   labels)
   def buildTurretsAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Terran.MissileTurret,   labels)
   def buildTurretsAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Terran.MissileTurret,   labels)
   def buildSunkensAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SunkenColony,      labels)
   def buildSunkensAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SunkenColony,      labels)
   def buildSunkensAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SunkenColony,      labels)
+  def buildSunkensAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SunkenColony,      labels)
   def buildSunkensAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SunkenColony,      labels)
   def buildSunkensAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SunkenColony,      labels)
   def buildSporesAtBases          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SporeColony,       labels)
   def buildSporesAtMain           (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SporeColony,       labels)
   def buildSporesAtNatural        (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SporeColony,       labels)
+  def buildSporesAtFoyer          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SporeColony,       labels)
   def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels)
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
 

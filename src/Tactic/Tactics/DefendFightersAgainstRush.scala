@@ -39,7 +39,7 @@ class DefendFightersAgainstRush extends Tactic {
     defenders.acquire()
     defenders.units.foreach(_.intend(this)
       .setCanFlee(false)
-      .setTravel(target)
+      .setTerminus(target)
       .setTargets(aggressors))
   }
 

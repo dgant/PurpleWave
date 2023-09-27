@@ -92,7 +92,7 @@ class SquadDarkTemplar extends Squad {
     val goBerserk       = nearestMiner < 256 || nearestMiner < nearestDetector + 64 || nearestMiner < nearestThreat + 64
     dt.intend(this)
       .setCanFlee( ! goBerserk)
-      .setTravel(base.heart.center)
+      .setTerminus(base.heart.center)
       .setTargets(baseTargets)
   }
 
@@ -123,12 +123,12 @@ class SquadDarkTemplar extends Squad {
           }
           intendDTToBase(dt, base)
         } else {
-          dt.intend(this).setTravel(base.heart.center).setTargets(base.enemies)
+          dt.intend(this).setTerminus(base.heart.center).setTargets(base.enemies)
         }
       }
 
       if (iDt == 0) {
-        vicinity = dt.intent.toTravel.get
+        vicinity = dt.intent.terminus.get
       }
       iDt += 1
       dts.remove(dt)

@@ -48,7 +48,7 @@ class DefendAgainstProxy extends Tactic {
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
       val isAnnoying          = proxy.unitClass.isGas || proxy.base.exists(_.resourcePathTiles.exists(proxy.tileArea.contains))
-      val isCloseEnoughToPull = Seq(With.geography.ourMain, With.geography.ourNatural).exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
+      val isCloseEnoughToPull = With.geography.ourMetro.bases.exists(_.townHallArea.midpoint.groundPixels(proxy.tile) < 32 * 21)
       val mustPull            = proxy.dpfGround > 0 && With.geography.ourBases.exists(_.resourcePathTiles.exists(t => proxy.pixelDistanceEdge(t.center) < proxy.effectiveRangePixels))
       val framesBeforeDamage  = Maff
         .min(With.units.enemy.filter(u =>

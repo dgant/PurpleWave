@@ -28,6 +28,6 @@ class PopulateBunkers extends Plan {
   }
   
   private def updateBunker(bunker: FriendlyUnitInfo): Unit = {
-    bunkerLocks(bunker).acquire().foreach(_.intend(this).setTravel(bunker.pixel).setBoard(bunker))
+    bunkerLocks(bunker).acquire().foreach(_.intend(this).setTerminus(bunker.pixel).setBoard(bunker))
   }
 }

@@ -33,7 +33,7 @@ class PlacementQuery {
     requirements.width    = Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
     requirements.building = Some(building).filter(_.isGas)
-    requirements.labelYes = ?(building.isTownHall, Seq(PlaceLabels.TownHall), Seq.empty) ++ SomeIf(building == Protoss.Pylon && ! With.units.existsOurs(Protoss.Pylon), PlaceLabels.FirstPylon)
+    requirements.labelYes = ?(building.isTownHall, Seq(PlaceLabels.TownHall), Seq.empty)
     requirements.labelNo  = ?(building.isTownHall, Seq.empty,                 Seq(PlaceLabels.TownHall))
     requirements.zone     = Seq.empty
     requirements.base     = Seq.empty

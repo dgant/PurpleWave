@@ -170,8 +170,15 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     once(13, Protoss.Probe)
     once(2,  Protoss.Nexus)
     once(Protoss.Zealot)
+    once(14, Protoss.Probe)
+    once(2, Protoss.Pylon)
     once(15, Protoss.Probe)
+    once(2, Protoss.Zealot)
+    once(16, Protoss.Probe)
     once(2,  Protoss.Gateway)
+    once(17, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(18, Protoss.Probe)
   }
   protected def openNexusFirst(): Unit = {
     if (unitsEver(Protoss.Nexus) < 2) {

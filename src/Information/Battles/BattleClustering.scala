@@ -30,7 +30,7 @@ class BattleClustering {
 
   def recalculate(): Unit = {
     speed               = Maff.max(With.units.playerOwned.map(_.topSpeed)).getOrElse(0)
-    speedRange          = (With.reaction.clusteringMax * speed).toInt
+    speedRange          = ((With.reaction.clusteringMax + With.configuration.simulationFrames) * speed).toInt
     tankRange           = ?(Players.all.exists(Terran.SiegeMode(_)), 32 * 11, 0)
     rangePixels         = 2 * speedRange + Math.max(tankRange, Maff.max(With.units.playerOwned.map(_.effectiveRangePixels)).getOrElse(0.0).toInt)
     rangePixelsSquared  = rangePixels * rangePixels
@@ -76,7 +76,7 @@ class BattleClustering {
       var n = m + 1
       while (n < clusters.length) {
         if (clusters(m).intersects(clusters(n))) {
-          clusters(m).merge(clusters(n))
+          clusters(m).absorb(clusters(n))
           clusters.removeAt(n)
 
         } else {
@@ -91,13 +91,15 @@ class BattleClustering {
     // Step 3: Try inventing a war if none exists
     // If the granularity of our clustering has meant that there are *no* wars
     if (clustersAtWar.isEmpty) {
-      val clusterFriendly = Maff.maxBy(clustersAtPeace.filter(_.friendlyEligible))(_.units.count(_.isFriendly))
-      val clusterEnemy    = Maff.maxBy(clustersAtPeace.filter(_.enemyEligible))   (_.units.count(_.isEnemy))
+      val clusterEnemy    = Maff.maxBy(clustersAtPeace                                  .filter(_.enemyEligible))   (_.units.count(_.isEnemy))
+      val clusterFriendly = Maff.maxBy(clustersAtPeace.filterNot(clusterEnemy.contains) .filter(_.friendlyEligible))(_.units.count(_.isFriendly))
       clusterFriendly.foreach(friendly =>
         clusterEnemy.foreach(enemy => {
-          friendly.merge(enemy)
-          clusters.remove(enemy)
-          identifyPeacefulAndWarlikeClusters()
+          if (friendly != enemy) {
+            friendly.absorb(enemy)
+            clusters.remove(enemy)
+            identifyPeacefulAndWarlikeClusters()
+          }
         }))
     }
 
@@ -118,9 +120,7 @@ class BattleClustering {
       val armyEnemy     = Maff.maxBy(clustersAtPeace.filter(c => c.strengthEnemy     > 0  && c.units.exists(u => IsWarrior(u) && u.isEnemy    )))(_.strengthEnemy)
       armyFriendly.foreach(f =>
         armyEnemy.foreach(e => {
-          f.units.addAll(e.units)
-          f.invalidateMetrics()
-          e.invalidateMetrics()
+          f.absorb(e)
           clustersAtWar.add(f)
           clustersAtPeace.remove(f)
           clustersAtPeace.remove(e)

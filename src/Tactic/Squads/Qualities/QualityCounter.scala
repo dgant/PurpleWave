@@ -34,6 +34,7 @@ final class QualityCounter {
     * Make the keyset of qualitiesFriendly match the qualities we actually care about
     */
   def alignFriendlyQualities(): Unit = {
+    qualitiesFriendly.clear()
     qualitiesUseful = qualitiesEnemy.iterator.filter(_._2 > 0).flatMap(_._1.counteredBy).toSet
     qualitiesUseful.foreach(qualitiesFriendly(_) = 0)
   }
@@ -43,18 +44,20 @@ final class QualityCounter {
     val qfi = qualitiesFriendly.iterator
     while (qfi.hasNext) {
       val (qf, qfc) = qfi.next()
-      val qei = qualitiesEnemy.iterator
-      while (qei.hasNext) {
-        val (qe, qec) = qei.next()
-        var i = 0
-        while (i <  qe.counteredBy.length) {
-          if (qf == qe.counteredBy(i)) {
-            // We have thoroughly surpassed the required value: 0.0
-            // We are already at exact match value: 1.0
-            // We have no existing value: 2.0
-            max = Math.max(max, 1 + Maff.nanToZero(Maff.clamp((qec - qfc * qe.counterScaling) / qec, -1, 1)))
+      if (qf(unit)) {
+        val qei = qualitiesEnemy.iterator
+        while (qei.hasNext) {
+          val (qe, qec) = qei.next()
+          var i = 0
+          while (i <  qe.counteredBy.length) {
+            if (qf == qe.counteredBy(i)) {
+              // We have thoroughly surpassed the required value: 0.0
+              // We are already at exact match value: 1.0
+              // We have no existing value: 2.0
+              max = Math.max(max, 1 + Maff.nanToZero(Maff.clamp((qec - qfc * qe.counterScaling) / qec, -1, 1)))
+            }
+            i += 1
           }
-          i += 1
         }
       }
     }

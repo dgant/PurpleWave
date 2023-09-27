@@ -1,7 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
-import Placement.Access.PlaceLabels._
+import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, Defensive, ProxyGround}
 import Placement.Templating.Template
 import bwapi.Race
 
@@ -217,7 +217,7 @@ object Templates {
         "-------------",
         "-4xxx-3xxRxx-",
         "-xxxx-xxxxxx-", // Extra column is because Citadel right of that top Gateway can trap units
-        "-xxxx-1x3Ix--",
+        "-xxxx-Px3Ix--",
         "-4xxx-xxxxx-",
         "-xxxx-2xTxx-",
         "-xxxx-xxxxx-",
@@ -228,7 +228,7 @@ object Templates {
         "------------",
         "-RxxTxx4xxx-",
         "-xxxxxxxxxx-",
-        "--3Ix1xxxxx-",
+        "--3IxPxxxxx-",
         "x-xxxxx4xxx-",
         "x-2x3xxxxxx-",
         "x-xxxxxxxxx-",
@@ -236,7 +236,7 @@ object Templates {
     new Template()
       .from(
         "----------",
-        "-Rxx1xTxx-",
+        "-RxxPxTxx-",
         "-xxxxxxxx-",
         "-4xxx4xxx-",
         "-xxxxxxxx-",
@@ -244,7 +244,7 @@ object Templates {
         "----------"),
     new Template()
       .from(
-        "-Rxx1xTxx",
+        "-RxxPxTxx",
         "-xxxxxxxx",
         "-4xxx4xxx",
         "-xxxxxxxx-",

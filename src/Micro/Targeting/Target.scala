@@ -80,7 +80,7 @@ object Target {
   def legal(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], filters: TargetFilter*): Seq[UnitInfo] = {
     val allFilters = filtersRequired(attacker) ++ filters
     targets.view.filter(target => ?(With.yolo.active,
-      TargetFilterType.legal(attacker, target),
+      attacker.canAttack(target) && TargetFilterType.legal(attacker, target),
       allFilters.forall(_.legal(attacker, target))))
   }
 

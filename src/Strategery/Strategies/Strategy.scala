@@ -92,7 +92,7 @@ abstract class Strategy extends SimpleString {
     * versus those that didn't impact it at all (a late game strategy for a game lasting three minutes, for example)
     */
   def activate(): Boolean = { With.strategy.activate(this) }
-  def apply(shouldActivate: Boolean = true): Boolean = ?(shouldActivate, activate(), isActive)
+  def apply(shouldActivate: Boolean = true): Boolean = { ?(shouldActivate, activate(), selected) }
 
   /**
     * Flag a strategy as inactive, in order to avoid crediting it with our success/failure this game
@@ -115,7 +115,8 @@ abstract class Strategy extends SimpleString {
     */
   def swapOut(): Unit = { With.strategy.swapOut(this) }
 
-  def isActive: Boolean = { With.strategy.isActive(this) }
+  def active    : Boolean = { With.strategy.isActive(this) }
+  def selected  : Boolean = { With.strategy.isSelected(this) }
 
   def legality    : StrategyLegality    = With.strategy.legalities(this)
   def evaluation  : StrategyEvaluation  = With.strategy.evaluations(this)

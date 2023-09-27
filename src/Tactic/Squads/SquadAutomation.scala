@@ -38,6 +38,7 @@ object SquadAutomation {
       + t.pixelDistanceCenter(squad.centroidKey)
       + t.pixelDistanceCenter(squad.vicinity))
   }
+
   def unrankedEnRouteTo(group: FriendlyUnitGroup, to: Pixel): Set[UnitInfo] = {
     val combatEnemiesInRoute = group.battleEnemies.filter(e =>
       ! Protoss.Interceptor(e)
@@ -45,10 +46,14 @@ object SquadAutomation {
       && group.canAttack(e)
       && (
         TargetFilterFocus.canTargetAsRoadblock(group, e)
-        || group.meanAttackerSpeed > 1.2 * e.topSpeed))
+        || e.matchups.engagingOn
+        || (group.canBeAttackedBy(e)
+          && ! e.unitClass.isBuilding
+          && group.meanAttackerSpeed > 1.2 * e.topSpeed)))
     val around = unrankedAround(group, to)
     combatEnemiesInRoute ++ around
   }
+
   def unrankedAround(group: FriendlyUnitGroup, to: Pixel): Vector[UnitInfo] = {
     to.base.getOrElse(to.zone).enemies
       .filter(_.likelyStillThere)

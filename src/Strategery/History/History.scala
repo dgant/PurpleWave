@@ -53,8 +53,8 @@ class History {
       won             = weWon,
       tags = (
         Vector(Frames(With.frame).toString)
-        ++ With.strategy.selected.filter(_.isActive).map(_.toString)
-        ++ With.strategy.selected.filterNot(_.isActive).map(s => f"[$s]").toVector
+        ++ With.strategy.selected.filter(_.active).map(_.toString)
+        ++ With.strategy.selected.filterNot(_.active).map(s => f"[$s]").toVector
         ++ With.fingerprints.all.filter(_()).map(_.toString).sorted).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)
   }

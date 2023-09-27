@@ -168,6 +168,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     timingAttack ||= upgradeComplete(Protoss.ZealotSpeed)   && upgradeComplete(Protoss.GroundDamage) && haveComplete(Protoss.Archon)
     timingAttack ||= upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Dragoon) >= 10
     timingAttack ||= haveComplete(Protoss.Scout)
+    timingAttack ||= enemyMutalisksLikely
 
     aggression(?(allIn || timingAttack, 1.5, 0.75))
     attack(allIn || canAttackEarly || timingAttack || needToPushLurkers)
@@ -178,6 +179,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     status(opening)
     status(composition.mkString(""))
     status(anticipateSpeedlings, "Speedlings")
+    With.blackboard.scoutExpansions.set(enemyBases == 0 || supplyUsed200 >= 100)
 
     detectionVsLurker()
 

@@ -47,7 +47,7 @@ class Agency extends TimedTask {
 
       Maff.sortStablyInPlaceBy(agents, 0, agents.length)(a =>
         Maff.or1(1e5, a.unit.unitClass.isTransport)
-        - a.unit.matchups.pixelsEntangled)
+        - ?(a.unit.unitClass.isWarrior, a.unit.matchups.pixelsToThreatRange.getOrElse(0.0), 0.0))
     }
 
     while (agentIndex < agents.length && timer.greenLight) {

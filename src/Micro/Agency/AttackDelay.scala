@@ -1,7 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object AttackDelay {
@@ -54,9 +54,11 @@ object AttackDelay {
   */
   
   def framesToWaitAfterIssuingAttackOrder(unit: FriendlyUnitInfo): Int = {
-    if (unit.is(Protoss.Carrier)) {
+    if (Protoss.Carrier(unit)) {
       // Need a better answer than this
       return 24
+    } else if (unit.flying && unit.isAny(Terran.Wraith, Terran.Battlecruiser, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) {
+      return 1
     }
     Math.max(2, unit.unitClass.stopFrames)
   }

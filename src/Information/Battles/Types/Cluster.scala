@@ -15,7 +15,10 @@ final class Cluster(val units: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[U
     new ClusterMetrics(this)
   }
 
-  def merge(other: Cluster): Unit = {
+  def absorb(other: Cluster): Unit = {
+    if (other == this) {
+      return
+    }
     invalidateMetrics()
     units.addAll(other.units)
     other.units.clear()

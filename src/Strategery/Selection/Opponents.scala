@@ -19,7 +19,7 @@ object Opponents {
   val infestedart : Opponent = add("InfestedArtosis", aggroPvZ)
   val dragon      : Opponent = add("Dragon",          defaultPvT)
   val ualbertabot : Opponent = add("UAlbertaBot",     StrategySelectionFixed(PvR2Gate4Gate))
-  val mcrave      : Opponent = add("McRave",          StrategySelectionFixed(PvZ1BaseReactive, PvZSpeedlot, PvZTech))
+  val mcrave      : Opponent = add("McRave",          StrategySelectionFixed(PvZ1BaseReactive, PvZGoon, PvZExpand))
 
   // COG 2023
   val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))

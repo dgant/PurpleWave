@@ -12,7 +12,7 @@ object Opponents {
   val aggroPvZ  : StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive, PvZSpeedlot, PvZMuscle)
 
   // AIIDE 2023
-  val bananabrain : Opponent = add("BananaBrain",     defaultPvP)
+  val bananabrain : Opponent = add("BananaBrain",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvPRobo, PvPReaver))
   val stardust    : Opponent = add("Stardust",        new StrategySelectionRecommended(StrategySelectionGreedy(), PvPDT))
   val steamhammer : Opponent = add("Steamhammer",     aggroPvZ)
   val microwave   : Opponent = add("Microwave",       aggroPvZ)

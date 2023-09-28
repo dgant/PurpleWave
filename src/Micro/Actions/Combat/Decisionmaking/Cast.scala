@@ -21,7 +21,7 @@ object Cast extends Action {
       Protoss.HighTemplar,
       Zerg.Defiler,
       Zerg.Queen)) {
-      unit.agent.shouldFight = false
+      unit.agent.shouldFight &&= unit.unitClass.spells.exists(s => s() && unit.energy >= s.energyCost - 2)
     }
   }
   

@@ -226,7 +226,7 @@ class PvPLateGame extends GameplanImperative {
 
     if (techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ZealotSpeed)) {
       pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
-      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-1), Friendly(IsWarrior, 1.0 / 4.0)))
+      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-4), Friendly(IsWarrior, 1.0 / 4.0)))
       if (shouldHarass) {
         pump(Protoss.Shuttle, 1)
       }
@@ -325,7 +325,7 @@ class PvPLateGame extends GameplanImperative {
     }
     if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
       doUpgrades()
-      val readyForStorm = techStarted(Protoss.PsionicStorm) || ((gasPumps > 1 || gas >= gasThreshold) && (unitsComplete(IsWarrior) >= 24 || enemyStrategy(With.fingerprints.robo, With.fingerprints.dtRush)))
+      val readyForStorm = techStarted(Protoss.PsionicStorm) || ((gasPumps > 1 || gas >= gasThreshold) &&(unitsComplete(IsWarrior) >= 30))
       if (readyForStorm) {
         status("Ready4Storm")
         get(Protoss.PsionicStorm)

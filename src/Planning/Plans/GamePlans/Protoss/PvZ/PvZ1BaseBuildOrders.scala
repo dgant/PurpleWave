@@ -83,7 +83,7 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     once(5, Protoss.Pylon)
     once(19, Protoss.Probe)
   }
-  protected def open1012(): Unit = {
+  protected def open1012Gas(): Unit = {
     if (unitsEver(Protoss.Gateway) < 2) {
       cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
     }
@@ -110,6 +110,31 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     once(7, Protoss.Zealot)
     once(21, Protoss.Probe)
   }
+  protected def open1012Expand(): Unit = {
+    if (unitsEver(Protoss.Gateway) < 2) {
+      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
+    }
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(16, Protoss.Probe)
+    once(3, Protoss.Pylon)
+    once(17, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(18, Protoss.Probe)
+    once(2, Protoss.Nexus)
+    once(19, Protoss.Probe)
+    once(7, Protoss.Zealot)
+  }
+
   protected def openCoreZ(): Unit = {
     once(8, Protoss.Probe)
     once(Protoss.Pylon)

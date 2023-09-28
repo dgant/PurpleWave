@@ -27,7 +27,7 @@ abstract class PvZ1BaseOpenings extends PvZ1BaseBuildOrders {
     }
     opening match {
       case Open910      => open910()
-      case Open1012     => open1012()
+      case Open1012     => open1012Gas()
       case OpenZZCoreZ  => openZZCoreZ()
       case _            => openGateNexus()
     }

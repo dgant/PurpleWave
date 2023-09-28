@@ -130,13 +130,13 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     } else {
       opening match {
         case Gates910   => open910()
-        case Gates1012  => open1012()
+        case Gates1012  => ?(economy == Expand, open1012Expand(), open1012Gas())
         case CoreZ      => openCoreZ()
         case ZCoreZ     => openZCoreZ()
         case ZZCoreZ    => openZZCoreZ()
         case GateNexus  => openGateNexus()
         case NexusFirst => openNexusFirst()
-        case _          => open1012()
+        case _          => open1012Gas()
       }
     }
     scoutOn(Protoss.Pylon)

@@ -1,6 +1,5 @@
 package Planning.Plans.GamePlans.Protoss.PvR
 
-import Planning.Plans.Compound._
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.GamePlans.Protoss.ProtossBuilds
 import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas

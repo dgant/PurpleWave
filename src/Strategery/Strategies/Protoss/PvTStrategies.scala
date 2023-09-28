@@ -1,7 +1,8 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Planning.MacroFacts
+import Planning.Plans.GamePlans.Protoss.PvT.PvTCustom
+import Planning.{MacroFacts, Plan}
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -89,4 +90,8 @@ object PvT4Gate extends PvTStrategyNoZealot {
 object PvTProxy2Gate extends PvTStrategy {
   blacklistOn(MapGroups.badForProxying: _*)
   blacklistVs(With.fingerprints.wallIn)
+}
+
+object PvTCustom extends PvTStrategy {
+  override def gameplan: Option[Plan] = Some(new PvTCustom)
 }

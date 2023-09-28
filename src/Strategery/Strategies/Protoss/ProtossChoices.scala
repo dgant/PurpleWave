@@ -39,7 +39,8 @@ object ProtossChoices {
     PvT1015,
     PvT1BaseReaver,
     PvT29Arbiter,
-    PvT4Gate
+    PvT4Gate,
+    PvTCustom
   )
 
   val vsTerran_OpenersTransitioningFrom_2Gate = Vector(

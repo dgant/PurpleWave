@@ -131,7 +131,7 @@ class PvPLateGame extends GameplanImperative {
           get(3, Protoss.Gateway)
         }
       } else if (PvPDT() && ! With.fingerprints.dtRush()) {
-        pump(Protoss.DarkTemplar, 1)
+        safePumpDT()
         pumpSupply()
         get(Protoss.DragoonRange)
         get(5, Protoss.Gateway)
@@ -209,12 +209,19 @@ class PvPLateGame extends GameplanImperative {
     tech2()
   }
 
+  private def safePumpDT(): Unit = {
+    // Dumb hack fix for seeing DTs getting spammed before AIIDE 2023 deadline
+    if (have(Protoss.TemplarArchives) && ! have(Protoss.DarkTemplar)) {
+      get(Protoss.DarkTemplar)
+    }
+  }
+
   private def doTrainArmy(): Unit = {
     if (expectCarriers) {
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
     if ( ! enemiesHave(Protoss.Observer) || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
-      pump(Protoss.DarkTemplar, 1)
+      safePumpDT()
       if ( ! haveComplete(Protoss.DarkTemplar)) {
         once(2, Protoss.DarkTemplar)
       }

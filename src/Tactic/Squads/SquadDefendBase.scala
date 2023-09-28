@@ -139,7 +139,10 @@ class SquadDefendBase(base: Base) extends Squad {
       val plugPixel = plugEdge().get._2.get.pixelCenter
       lastAction = "Plug"
       formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
-      units.foreach(_.intend(this).setAction(new Plug(plugPixel)))
+      units.foreach(_.intend(this)
+        .setRedoubt(plugPixel)
+        .setTerminus(plugPixel)
+        .setAction(Plug(plugPixel)))
     } else if (canWithdraw) {
       lastAction = "Withdraw"
       if (canScour) {

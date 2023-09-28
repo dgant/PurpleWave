@@ -17,7 +17,7 @@ object Opponents {
   val steamhammer : Opponent = add("Steamhammer",     aggroPvZ)
   val microwave   : Opponent = add("Microwave",       aggroPvZ)
   val infestedart : Opponent = add("InfestedArtosis", aggroPvZ)
-  val dragon      : Opponent = add("Dragon",          defaultPvT)
+  val dragon      : Opponent = add("Dragon",          StrategySelectionFixed(PvTCustom))
   val ualbertabot : Opponent = add("UAlbertaBot",     StrategySelectionFixed(PvR2Gate4Gate))
   val mcrave      : Opponent = add("McRave",          StrategySelectionFixed(PvZ1BaseReactive, PvZGoon, PvZExpand))
 

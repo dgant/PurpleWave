@@ -2,7 +2,7 @@ package Placement
 
 import Lifecycle.With.game
 import bwta.BWTA
-import jbweb.{Blocks, JBWEB, Stations, Walls}
+import jbweb.{Blocks, JBWEB, Stations}
 
 object JBWEBWrapper {
 

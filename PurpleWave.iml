@@ -11,11 +11,11 @@
       <excludeFolder url="file://$MODULE_DIR$/bwapi-data" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="scala-sdk-2.12.6" level="application" />
     <orderEntry type="library" exported="" name="commons-lang3-3.8.1" level="project" />
     <orderEntry type="library" exported="" name="jna-5.1.0" level="project" />
     <orderEntry type="library" exported="" name="jna-platform-5.1.0" level="project" />
+    <orderEntry type="library" exported="" name="scala-sdk-2.12.18" level="application" />
   </component>
 </module>

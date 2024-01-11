@@ -33,7 +33,7 @@ class Logger {
   private val lastInstance = new mutable.HashMap[String, Int]
 
   /**
-    * Looks the same as the next method, except I set a debugging breakpoint in that one but not thihs one
+    * Looks the same as the next method, except I set a debugging breakpoint in that one but not this one
     */
   def quietlyOnException(exception: Exception): Unit = {
     error("An exception was thrown on frame " + With.frame)

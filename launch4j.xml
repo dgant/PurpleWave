@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>console</headerType>
+  <jar>C:\Users\d\AppData\Roaming\scbw\bots\PurpleDev\PurpleWave.jar</jar>
+  <outfile>C:\Users\d\AppData\Roaming\scbw\bots\PurpleDev\PurpleWave.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <singleInstance>
+    <mutexName>PurpleWave StarCraft AI</mutexName>
+    <windowTitle>PurpleWave StarCraft AI</windowTitle>
+  </singleInstance>
+  <classPath>
+    <mainClass>Lifecycle.Main</mainClass>
+    <cp>Lifecycle.Main</cp>
+  </classPath>
+  <jre>
+    <path>./jre</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>21</minVersion>
+    <maxVersion>99</maxVersion>
+    <initialHeapSize>1536</initialHeapSize>
+    <maxHeapSize>1536</maxHeapSize>
+    <opt>-XX:MaxGCPauseMillis=15 </opt>
+    <opt>--add-opens=java.base/java.nio=ALL-UNNAMED</opt>
+    <opt>-Dcom.sun.management.jmxremote=true</opt>
+    <opt>-Dcom.sun.management.jmxremote.port=20000</opt>
+    <opt>-Dcom.sun.management.jmxremote.ssl=false</opt>
+    <opt>-Dcom.sun.management.jmxremote.authenticate=false</opt>
+  </jre>
+  <messages>
+    <startupErr>An error occurred while starting PurpleWave.</startupErr>
+    <jreNotFoundErr>Failed to find PurpleWave&apos;s Java Runtime Environment, which should be located in [current working directory]\jre\.</jreNotFoundErr>
+    <jreVersionErr>The version of Java Runtime Environment being used to run PurpleWave is incorrect.</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An instance  of PurpleWave is already running. Only one copy can run at a time.
+
+If PurpleWave is not joining games, consider killing the current instance via Task Manager.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>

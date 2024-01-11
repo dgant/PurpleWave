@@ -7,6 +7,7 @@ import java.lang.management.ManagementFactory
 import scala.collection.JavaConverters._
 
 object Main {
+
   private val JBWAPIClientDataSizeBytes =  33017048
   private val botRequiredDataSizeBytes  = 650 * 1000 * 1000
   private val memoryFree  : Long            = Math.min(Runtime.getRuntime.maxMemory, Runtime.getRuntime.totalMemory)

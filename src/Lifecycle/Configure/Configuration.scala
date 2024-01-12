@@ -43,6 +43,7 @@ class Configuration {
   // Battles //
   /////////////
 
+  var simulationAsynchronous        = true
   var simulationFrames              = Seconds(15)()
   var simulationResolution          = 8
   var simulationDamageValueRatio    = 0.1

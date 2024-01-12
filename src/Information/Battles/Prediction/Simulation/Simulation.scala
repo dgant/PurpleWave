@@ -8,6 +8,7 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.{Future, Promise}
 
 final class Simulation {
   val resolution      : Int                   = With.configuration.simulationResolution
@@ -18,6 +19,7 @@ final class Simulation {
   val grid            : SimulationGrid        = new SimulationGrid
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
+  var future          : Option[Future[Unit]]  = None
 
   def reset(newBattle: Battle): Unit = {
     battle            = newBattle
@@ -29,6 +31,7 @@ final class Simulation {
     realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
     enemyVanguard     = battle.enemy.vanguardKey()
     engaged           = battle.units.exists(_.matchups.engagedUpon)
+    future            = None
     simulacra.foreach(_.reset(this))
   }
 
@@ -45,6 +48,20 @@ final class Simulation {
     } else if (battle.simulationFrames - battle.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
       checkpoint()
     }
+  }
+
+  def runAsynchronously(): Future[Unit] = {
+    val promise = Promise[Unit]()
+    val priorityNow = Thread.currentThread().getPriority
+    val prioritySim = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
+    new Thread(() => {
+      Thread.currentThread().setPriority(prioritySim)
+      while ( ! battle.simulationComplete) {
+        step()
+      }
+      promise.success(())
+    })
+    promise.future
   }
 
   @inline private def simulatable(unit: UnitInfo): Boolean = (

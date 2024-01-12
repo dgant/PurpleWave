@@ -4,6 +4,8 @@ import Information.Battles.Prediction.Skimulation.Skimulator
 import Information.Battles.Types.Battle
 import Lifecycle.With
 
+import scala.concurrent.Promise
+
 class BattleProcessPredict extends BattleProcessState {
 
   var battles: Seq[Battle] = _
@@ -17,7 +19,38 @@ class BattleProcessPredict extends BattleProcessState {
 
       if (battle.predictionComplete) return
 
-      if ( ! battle.skimulationComplete) {
+      if ( ! battle.simulationComplete) {
+        if (With.simulation.battle != battle) {
+          With.simulation.reset(battle)
+        }
+
+        /////////////////////////////
+        // Simulate asynchronously //
+        /////////////////////////////
+
+        if (With.configuration.simulationAsynchronous) {
+          if (With.simulation.future.isEmpty) {
+            val promise     = Promise[Unit]()
+            val priorityNow = Thread.currentThread().getPriority
+            val prioritySim = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
+            new Thread(() => {
+              Thread.currentThread().setPriority(prioritySim)
+              while ( ! battle.simulationComplete) {
+                step()
+              }
+              promise.success(())
+            })
+            With.simulation.future = Some(promise.future)
+          }
+
+        ////////////////////////////
+        // Simulate synchronously //
+        ////////////////////////////
+
+        } else {
+          With.simulation.step()
+        }
+      } else if ( ! battle.skimulationComplete) {
         Skimulator.predict(battle)
         battle.skimulationComplete = true
 
@@ -28,11 +61,6 @@ class BattleProcessPredict extends BattleProcessState {
             u.skimPresenceDisplay = u.skimPresence
           })
         }
-      } else {
-        if (With.simulation.battle != battle) {
-          With.simulation.reset(battle)
-        }
-        With.simulation.step()
       }
       return
     }

@@ -12,7 +12,10 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   @inline final def unitHealthMax       (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.hitPointsInitial
   @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPoints + simulacrum.shieldPoints
   @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
-  
+
+  val weightLife    = 1.0
+  val weightHealth  = 0.1
+
   val us  = simulation.realUnitsOurs
   val foe = simulation.realUnitsEnemy
 
@@ -56,9 +59,7 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val ratioHealthValueLostUs    : Double = Maff.nanToZero(healthValueLostUs    / healthValueMaxUs)
   val ratioHealthValueLostEnemy : Double = Maff.nanToZero(healthValueLostEnemy / healthValueMaxEnemy)
   val ratioHealthValueLostNet   : Double = ratioHealthValueLostEnemy - ratioHealthValueLostUs
-  val weightLife    = 1.0
-  val weightHealth  = 0.1
-  val totalScore                 : Double = if (With.performance.disqualificationDanger)
+  val totalScore                : Double = if (With.performance.disqualificationDanger)
     Maff.weightedMean(Seq(
       (valueLostRatio,           weightLife),
       (healthValueLostRatio,     weightHealth)))

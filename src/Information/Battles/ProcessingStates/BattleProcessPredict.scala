@@ -30,17 +30,18 @@ class BattleProcessPredict extends BattleProcessState {
 
         if (With.configuration.simulationAsynchronous) {
           if (With.simulation.future.isEmpty) {
-            val promise     = Promise[Unit]()
-            val priorityNow = Thread.currentThread().getPriority
-            val prioritySim = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
-            new Thread(() => {
-              Thread.currentThread().setPriority(prioritySim)
-              while ( ! battle.simulationComplete) {
-                step()
+            val promise             = Promise[Unit]()
+            val priorityNow         = Thread.currentThread().getPriority
+            val prioritySim         = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
+            With.simulation.future  = Some(promise.future)
+            val thread              = new Thread(() => {
+              while ( ! With.simulation.battle.simulationComplete) {
+                With.simulation.step()
               }
               promise.success(())
             })
-            With.simulation.future = Some(promise.future)
+            thread.setPriority(prioritySim)
+            thread.start()
           }
 
         ////////////////////////////

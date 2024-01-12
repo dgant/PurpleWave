@@ -109,6 +109,7 @@ class Visualization extends TimedTask {
     } else {
       views += view
     }
+    With.manners.chat(f"${if (views.contains(view)) "Enabled" else "Disabled"} $view")
   }
   
   def parseCommand(viewName: String): Boolean = {

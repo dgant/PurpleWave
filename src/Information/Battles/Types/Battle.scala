@@ -9,7 +9,6 @@ import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.?
 import Utilities.Time.Minutes
 
 import scala.collection.mutable
@@ -34,15 +33,13 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   // Simulation is expensive and gets less accurate as team sizes increase
   lazy val skimWeight: Double = {
-    ?(With.configuration.simulationAsynchronous,
-      0.0,
-      ?(isGlobal || With.reaction.sluggishness > 0,
-        1.0,
-        {
-          //1.0 // AIIDE 2023: Trying 100% skim. Our larger clusters lead to dumb stuff like scouts on one side of the map dying and affecting fight results on the other side
-          val output = frameCreated.toDouble / Minutes(20)() - 0.2
-          if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
-        }))
+    if      (isGlobal)                                  1.0
+    else if (With.configuration.simulationAsynchronous) 0.0
+    else if (With.reaction.sluggishness > 0)            1.0
+    else {
+      val output = frameCreated.toDouble / Minutes(20)() - 0.2
+      if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
+    }
   }
   lazy val simWeight        : Double                = 1.0 - skimWeight
   lazy val simulated        : Boolean               = simWeight > 0

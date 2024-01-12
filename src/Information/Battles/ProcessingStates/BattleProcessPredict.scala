@@ -12,22 +12,17 @@ class BattleProcessPredict extends BattleProcessState {
 
   override def step(): Unit = {
     val unpredicted = With.battles.nextBattles.find( ! _.predictionComplete)
+
     if (unpredicted.isDefined) {
       val battle = unpredicted.get
-      battle.simulationComplete   ||= ! battle.simulated
-      battle.skimulationComplete  ||= ! battle.skimulated
-
-      if (battle.predictionComplete) return
 
       if ( ! battle.simulationComplete) {
         if (With.simulation.battle != battle) {
           With.simulation.reset(battle)
         }
 
-        /////////////////////////////
-        // Simulate asynchronously //
-        /////////////////////////////
-
+        // Simulate asynchronously
+        //
         if (With.configuration.simulationAsynchronous) {
           if (With.simulation.future.isEmpty) {
             val promise             = Promise[Unit]()
@@ -43,15 +38,17 @@ class BattleProcessPredict extends BattleProcessState {
             thread.setPriority(prioritySim)
             thread.start()
           }
-
-        ////////////////////////////
-        // Simulate synchronously //
-        ////////////////////////////
-
         } else {
+
+          // Simulate synchronously
+          //
           With.simulation.step()
         }
-      } else if ( ! battle.skimulationComplete) {
+      }
+
+      // Skimulate
+      //
+      if ( ! battle.skimulationComplete && (battle.simulationComplete || With.simulation.future.isDefined)) {
         Skimulator.predict(battle)
         battle.skimulationComplete = true
 
@@ -63,6 +60,7 @@ class BattleProcessPredict extends BattleProcessState {
           })
         }
       }
+
       return
     }
 

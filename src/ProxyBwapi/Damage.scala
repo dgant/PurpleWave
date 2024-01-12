@@ -1,29 +1,32 @@
 package ProxyBwapi
 
+import ProxyBwapi.Size.{Large, Medium}
+
 object Damage {
   
   trait Type {
-    def ratioAgainst(sizeType: Size.Type): Double = Damage.scaleBySize(this, sizeType)
+    val damageAgainstLarge : Double = this match {
+      case Concussive => 0.25
+      case _          => 1.0
+    }
+    val damageAgainstMedium: Double = this match {
+      case Concussive => 0.5
+      case Explosive  => 0.75
+      case _          => 1.0
+    }
+    val damageAgainstSmall: Double  = this match {
+      case Concussive => 1.0
+      case Explosive  => 0.25
+      case _          => 0.5
+    }
+
+    @inline final def apply(size: Size.Type): Double =
+      if      (size == Large)   damageAgainstLarge
+      else if (size == Medium)  damageAgainstMedium
+      else                      damageAgainstSmall
   }
   
   object Normal     extends Type
   object Concussive extends Type
   object Explosive  extends Type
-  
-  def scaleBySize(damageType: Type, sizeType: Size.Type): Double =
-    damageType match {
-      case Concussive =>
-        sizeType match {
-          case Size.Large   => 0.25
-          case Size.Medium  => 0.5
-          case _            => 1.0
-        }
-      case Explosive =>
-        sizeType match {
-          case Size.Small   => 0.5
-          case Size.Medium  => 0.75
-          case _            => 1.0
-        }
-      case _ => 1.0
-    }
 }

@@ -116,12 +116,46 @@ trait Reduce {
     }
   }
 
-  @inline final def minBy[A, B: Ordering](values: TraversableOnce[A])(feature: A => B): Option[A] = {
-    values.reduceOption(Ordering.by(feature).min)
+  @inline final def minBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
+    // The Scala-y implementation would be:
+    //   values.reduceOption(Ordering.by(feature).min)
+    // but this is a performance critical function so we're unrolling it.
+    var first           = true
+    var output      : A = null.asInstanceOf[A]
+    var outputValue : B = null.asInstanceOf[B]
+    values.foreach(next => {
+      val nextValue = feature(next)
+      if (first) {
+        first = false
+        output      = next
+        outputValue = feature(next)
+      } else if (ordering.compare(nextValue, outputValue) < 0) {
+        output      = next
+        outputValue = nextValue
+      }
+    })
+    if (first) None else Some(output)
   }
 
-  @inline final def maxBy[A, B: Ordering](values: TraversableOnce[A])(feature: A => B): Option[A] = {
-    values.reduceOption(Ordering.by(feature).max)
+  @inline final def maxBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
+    // The Scala-y implementation would be:
+    //   values.reduceOption(Ordering.by(feature).min)
+    // but this is a performance critical function so we're unrolling it.
+    var first           = true
+    var output      : A = null.asInstanceOf[A]
+    var outputValue : B = null.asInstanceOf[B]
+    values.foreach(next => {
+      val nextValue = feature(next)
+      if (first) {
+        first = false
+        output      = next
+        outputValue = feature(next)
+      } else if (ordering.compare(nextValue, outputValue) > 0) {
+        output      = next
+        outputValue = nextValue
+      }
+    })
+    if (first) None else Some(output)
   }
 
   @inline final def takeN[T](number: Int, iterable: Iterable[T])(implicit ordering: Ordering[T]): IndexedSeq[T] = {

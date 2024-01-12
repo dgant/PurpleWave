@@ -20,9 +20,6 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val teams        : Vector[Team]  = Vector(us, enemy)
   lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
-  var simulationComplete  : Boolean = false
-  var skimulationComplete : Boolean = false
-
   def predictionComplete: Boolean = With.simulation.future.forall(_.isCompleted) && simulationComplete && skimulationComplete
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
@@ -33,13 +30,13 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   // Simulation is expensive and gets less accurate as team sizes increase
   lazy val skimWeight: Double = {
+    lazy val weight = frameCreated.toDouble / Minutes(20)() - 0.2
     if      (isGlobal)                                  1.0
     else if (With.configuration.simulationAsynchronous) 0.0
     else if (With.reaction.sluggishness > 0)            1.0
-    else {
-      val output = frameCreated.toDouble / Minutes(20)() - 0.2
-      if (output < 0.1) 0.0 else if (output > 0.9) 1.0 else output
-    }
+    else if (weight > 0.9)                              1.0
+    else if (weight < 0.1)                              0.0
+    else                                                weight
   }
   lazy val simWeight        : Double                = 1.0 - skimWeight
   lazy val simulated        : Boolean               = simWeight > 0
@@ -49,6 +46,9 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val judgmentModifiers: Seq[JudgmentModifier] = if (isGlobal) Seq.empty else JudgmentModifiers(this)
   lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal
   def      differential     : Double                = judgement.map(j => skimWeight * differentialSkim + simWeight * j.scoreSim11 * (us.skimStrengthTotal + enemy.skimStrengthTotal) / 2.0).getOrElse(differentialSkim)
+
+  var simulationComplete  : Boolean = ! simulated
+  var skimulationComplete : Boolean = ! skimulated
 
   ////////////////////////
   // Simulation results //

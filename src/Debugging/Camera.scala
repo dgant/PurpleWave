@@ -35,7 +35,7 @@ class Camera extends TimedTask {
     interestBattle * obscurityUnit * interestActivity * interestNovelty
   }
 
-  override def onRun(budgetMs: Long) {
+  override def onRun(budgetMs: Long): Unit = {
     // Enable autocamera until we interact with the screen
     val mousePosition = new Pixel(With.game.getMousePosition)
     if (mousePosition.x > 10 && mousePosition.x < 630 && mousePosition.y > 10 && mousePosition.y < 470) {
@@ -78,20 +78,20 @@ class Camera extends TimedTask {
     visibleUnits  = With.units.inTileRectangle(visibleArea).filter(_.visible).toSet
   }
   
-  def focusOn(unit: UnitInfo) {
+  def focusOn(unit: UnitInfo): Unit = {
     if (With.framesSince(focusFrame) < refocusLimit) return
     focusUnit = unit
     focusFrame = With.frame
     tweenFrom = focus
   }
   
-  def setCameraSpeed(speed: Int) {
+  def setCameraSpeed(speed: Int): Unit = {
     if (With.configuration.cameraDynamicSpeed) {
       With.game.setLocalSpeed(speed)
     }
   }
   
-  def tween() {
+  def tween(): Unit = {
     if (focusUnit != null && focusUnit.alive) {
       focus = focusUnit.pixel
       focusUnit.battle.map(_.focus).foreach(battleFocus => focus = battleFocus.project(focusUnit.pixel, Math.max(0, focusUnit.pixelDistanceCenter(battleFocus) - 220)))

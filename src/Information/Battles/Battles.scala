@@ -29,17 +29,17 @@ class Battles extends TimedTask {
   var nextBattleGlobalSkirmish  : Battle                = new Battle(isGlobal = true)
   var nextBattlesLocal          : Vector[Battle]        = Vector.empty
   var nextDivisions             : Vector[Division]      = Vector.empty
+  var lastEstimationCompletion  : Int                   = 0
+
+  val stateTasks          = new StateTasks
+  val clustering          = new BattleClustering
+  val estimationRuntimes  = new mutable.Queue[Int]
 
   def nextBattles: Seq[Battle] = nextBattlesLocal ++ Seq(
     nextBattleGlobalDefend,
     nextBattleGlobalAttack,
     nextBattleGlobalSlug,
     nextBattleGlobalSkirmish)
-
-  val clustering = new BattleClustering
-
-  var lastEstimationCompletion = 0
-  val estimationRuntimes = new mutable.Queue[Int]
 
   private var _processingState: BattleProcessState = new BattleProcessInitial
   def setProcessingState(newState: BattleProcessState): Unit = {
@@ -48,7 +48,6 @@ class Battles extends TimedTask {
 
   override def isComplete: Boolean = framesSinceRunning < 1 && _processingState.isFinalStep
 
-  val stateTasks = new StateTasks
   override def onRun(budgetMs: Long): Unit = {
     val timer = new Timer(budgetMs)
     while (timer.greenLight) {

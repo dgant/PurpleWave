@@ -54,10 +54,10 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   var judgement: Option[BattleJudgment] = None
   var simulationFrames = 0
   var simulationDeaths = 0.0
-  var simulationReport = new mutable.HashMap[UnitInfo, ReportCard]
-  var simulationEvents: Iterable[SimulationEvent] = Iterable.empty
-  val simulationCheckpoints: mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
-  def simulationLog: String = simulationEvents.map(_.toString).mkString("\n")
+  var simulationReport                                                  = new mutable.HashMap[UnitInfo, ReportCard]
+  def simulationLog         : String                                    = simulationEvents.map(_.toString).mkString("\n")
+  var simulationEvents      : Iterable[SimulationEvent]                 = Iterable.empty
+  val simulationCheckpoints : mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
 
   //////////////
   // Features //

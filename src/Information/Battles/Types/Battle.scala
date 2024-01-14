@@ -92,7 +92,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   def auditSim: Vector[SimulationEvent] = simulationEvents.filter(e =>
     // Only units which are trying to fight
-    (e.simulacrum.damageDealt > 0 || e.simulacrum.damageReceived > 0 || e.simulacrum.target.exists(_.isEnemyOf(e.simulacrumat .realUnit)))
+    (e.simulacrum.damageDealt > 0 || e.simulacrum.damageReceived > 0 || e.simulacrum.target.exists(_.isEnemyOf(e.simulacrum.realUnit)))
     // Only events which communicate action
     && (e.isInstanceOf[SimulationEventAttack]
       || e.isInstanceOf[SimulationEventDeath]

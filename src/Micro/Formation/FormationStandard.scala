@@ -2,7 +2,7 @@ package Micro.Formation
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Information.Geography.Pathfinding.Types.TilePath
+import Information.Geography.Pathfinding.Types.{TilePath, ZonePathNode}
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
@@ -95,7 +95,17 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       }
       zonePathToMarch = best
     }
-    val waypoint = zonePathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
+
+    //val waypoint = zonePathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
+    // TODO: Extract this new waypointing logic
+    var waypoint = goal.walkableTile
+    val waypointDistance = 32 * 5
+    def beyondEdge(zpn: ZonePathNode): Pixel = zpn.edge.pixelCenter.project(zpn.to.centroid.center, Math.min(32 * 12, zpn.edge.radiusPixels) + waypointDistance).walkablePixel
+    if (zonePathToMarch.isDefined) {
+      val zp = zonePathToMarch.get
+      zp.steps.view.map(beyondEdge).find(_.groundPixels(vanguardCentroid) > waypointDistance).map(_.tile).foreach(waypoint = _)
+    }
+
     new PathfindProfile(
       vanguardCentroid.walkableTile,
       Some(waypoint),

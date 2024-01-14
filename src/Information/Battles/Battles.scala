@@ -50,7 +50,7 @@ class Battles extends TimedTask {
 
   override def onRun(budgetMs: Long): Unit = {
     val timer = new Timer(budgetMs)
-    while (timer.greenLight && With.simulation.future.forall(_.isCompleted)) {
+    while (timer.greenLight && ! With.simulation.simulatingAsynchronously) {
       val task = stateTasks.get(_processingState)
       if (task.safeToRun(timer.remaining)) {
         task.runFunction = _processingState.step

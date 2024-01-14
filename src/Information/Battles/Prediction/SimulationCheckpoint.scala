@@ -16,16 +16,17 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val weightLife    = 1.0
   val weightHealth  = 0.1
 
-  val us  = simulation.realUnitsOurs
-  val foe = simulation.realUnitsEnemy
+  private val us  = simulation.realUnitsOurs
+  private val foe = simulation.realUnitsEnemy
 
   val framesIn                  : Int    = simulation.battle.simulationFrames
+  val aggression                : Double = With.blackboard.aggressionRatio()
   val valueTotalUs              : Double = CPCount(us,   valueMax)
   val valueTotalEnemy           : Double = CPCount(foe,  valueMax)
   val valueLeftUs               : Double = CPCount(us,   valueLeft)
   val valueLeftEnemy            : Double = CPCount(foe,  valueLeft)
-  val valueLostUs               : Double = valueTotalUs    - valueLeftUs
-  val valueLostEnemy            : Double = valueTotalEnemy - valueLeftEnemy
+  val valueLostUs               : Double =  valueTotalUs    - valueLeftUs
+  val valueLostEnemy            : Double = (valueTotalEnemy - valueLeftEnemy) * aggression
   val valueLostRatio            : Double = Maff.nanToZero(2 * valueLostEnemy / (valueLostUs + valueLostEnemy) - 1)
   val valueLostUsHere           : Double = valueLostUs     - previous.map(_.valueLostUs)    .getOrElse(0.0)
   val valueLostEnemyHere        : Double = valueLostEnemy  - previous.map(_.valueLostEnemy) .getOrElse(0.0)
@@ -34,8 +35,8 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val healthMaxEnemy            : Double = CPCount(foe,  unitHealthMax)
   val healthLeftUs              : Double = CPCount(us,   unitHealthLeft)
   val healthLeftEnemy           : Double = CPCount(foe,  unitHealthLeft)
-  val healthLostUs              : Double = healthMaxUs     - healthLeftUs
-  val healthLostEnemy           : Double = healthMaxEnemy  - healthLeftEnemy
+  val healthLostUs              : Double =  healthMaxUs     - healthLeftUs
+  val healthLostEnemy           : Double = (healthMaxEnemy  - healthLeftEnemy) * aggression
   val healthLostRatio           : Double = Maff.nanToZero(2 * healthLostEnemy / (healthLostUs + healthLostEnemy) - 1)
   val healthLostUsHere          : Double = healthLostUs    - previous.map(_.healthLostUs)   .getOrElse(0.0)
   val healthLostEnemyHere       : Double = healthLostEnemy - previous.map(_.healthLostEnemy).getOrElse(0.0)
@@ -44,8 +45,8 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val healthValueMaxEnemy       : Double = CPCount(foe,  unitHealthValueMax)
   val healthValueLeftUs         : Double = CPCount(us,   unitHealthValueLeft)
   val healthValueLeftEnemy      : Double = CPCount(foe,  unitHealthValueLeft)
-  val healthValueLostUs         : Double = healthValueMaxUs    - healthValueLeftUs
-  val healthValueLostEnemy      : Double = healthValueMaxEnemy - healthValueLeftEnemy
+  val healthValueLostUs         : Double =  healthValueMaxUs    - healthValueLeftUs
+  val healthValueLostEnemy      : Double = (healthValueMaxEnemy - healthValueLeftEnemy) * aggression
   val healthValueLostUsHere     : Double = healthValueLostUs     - previous.map(_.healthValueLostUs)    .getOrElse(0.0)
   val healthValueLostEnemyHere  : Double = healthValueLostEnemy  - previous.map(_.healthValueLostEnemy) .getOrElse(0.0)
   val healthValueDecisiveness   : Double = Math.max(Maff.nanToZero(healthValueLostUsHere / healthValueMaxUs), Maff.nanToZero(healthValueLostEnemyHere / healthValueMaxEnemy))

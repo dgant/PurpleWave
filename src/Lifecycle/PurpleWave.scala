@@ -75,6 +75,7 @@ class PurpleWave extends DefaultBWListener {
       With.history.onEnd(isWinner)
       With.gathering.onEnd()
       With.storyteller.onEnd()
+      With.simulation.onEnd()
       With.manners.onEnd(isWinner)
       With.logger.flush()
     })

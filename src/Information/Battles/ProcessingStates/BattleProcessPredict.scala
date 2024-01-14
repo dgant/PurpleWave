@@ -4,10 +4,7 @@ import Information.Battles.Prediction.Skimulation.Skimulator
 import Information.Battles.Types.Battle
 import Lifecycle.With
 
-import scala.concurrent.Promise
-
 class BattleProcessPredict extends BattleProcessState {
-
   var battles: Seq[Battle] = _
 
   override def step(): Unit = {
@@ -24,22 +21,8 @@ class BattleProcessPredict extends BattleProcessState {
         // Simulate asynchronously
         //
         if (With.configuration.simulationAsynchronous) {
-          if (With.simulation.future.isEmpty) {
-            val promise             = Promise[Unit]()
-            val priorityNow         = Thread.currentThread().getPriority
-            val prioritySim         = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
-            With.simulation.future  = Some(promise.future)
-            val thread              = new Thread(() => {
-              while ( ! With.simulation.battle.simulationComplete) {
-                With.simulation.step()
-              }
-              promise.success(())
-            })
-            thread.setPriority(prioritySim)
-            thread.start()
-          }
+          With.simulation.runAsynchronously()
         } else {
-
           // Simulate synchronously
           //
           With.simulation.step()
@@ -48,7 +31,7 @@ class BattleProcessPredict extends BattleProcessState {
 
       // Skimulate
       //
-      if ( ! battle.skimulationComplete && (battle.simulationComplete || With.simulation.future.isDefined)) {
+      if ( ! battle.skimulationComplete && (battle.simulationComplete || With.simulation.simulatingAsynchronously)) {
         Skimulator.predict(battle)
         battle.skimulationComplete = true
 

@@ -1,6 +1,6 @@
 package Information.Battles.Types
 
-import Information.Battles.Prediction.Simulation.{ReportCard, SimulationEvent}
+import Information.Battles.Prediction.Simulation._
 import Information.Battles.Prediction.SimulationCheckpoint
 import Information.Geography.Types.Edge
 import Lifecycle.With
@@ -20,7 +20,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val teams        : Vector[Team]  = Vector(us, enemy)
   lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
-  def predictionComplete: Boolean = With.simulation.future.forall(_.isCompleted) && simulationComplete && skimulationComplete
+  def predictionComplete: Boolean = simulationComplete && skimulationComplete
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
 
@@ -47,6 +47,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal
   def      differential     : Double                = judgement.map(j => skimWeight * differentialSkim + simWeight * j.scoreSim11 * (us.skimStrengthTotal + enemy.skimStrengthTotal) / 2.0).getOrElse(differentialSkim)
 
+  @volatile
   var simulationComplete  : Boolean = ! simulated
   var skimulationComplete : Boolean = ! skimulated
 
@@ -84,4 +85,16 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
       .filter(Protoss.Scarab)
       .filter(_.orderTarget.isDefined)
       .map(s => (s, s.orderTarget.get))))
+
+  ///////////////
+  // Debugging //
+  ///////////////
+
+  def auditSim: Vector[SimulationEvent] = simulationEvents.filter(e =>
+    // Only units which are trying to fight
+    (e.simulacrum.damageDealt > 0 || e.simulacrum.damageReceived > 0 || e.simulacrum.target.exists(_.isEnemyOf(e.simulacrumat .realUnit)))
+    // Only events which communicate action
+    && (e.isInstanceOf[SimulationEventAttack]
+      || e.isInstanceOf[SimulationEventDeath]
+      || e.isInstanceOf[SimulationEventTween])).toVector
 }

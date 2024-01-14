@@ -8,7 +8,6 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{Future, Promise}
 
 final class Simulation {
   val resolution      : Int                   = With.configuration.simulationResolution
@@ -19,7 +18,6 @@ final class Simulation {
   val grid            : SimulationGrid        = new SimulationGrid
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
-  var future          : Option[Future[Unit]]  = None
 
   def reset(newBattle: Battle): Unit = {
     battle            = newBattle
@@ -31,7 +29,6 @@ final class Simulation {
     realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
     enemyVanguard     = battle.enemy.vanguardKey()
     engaged           = battle.units.exists(_.matchups.engagedUpon)
-    future            = None
     simulacra.foreach(_.reset(this))
   }
 
@@ -50,24 +47,10 @@ final class Simulation {
     }
   }
 
-  def runAsynchronously(): Future[Unit] = {
-    val promise = Promise[Unit]()
-    val priorityNow = Thread.currentThread().getPriority
-    val prioritySim = Math.max(priorityNow - 1, Thread.MIN_PRIORITY)
-    new Thread(() => {
-      Thread.currentThread().setPriority(prioritySim)
-      while ( ! battle.simulationComplete) {
-        step()
-      }
-      promise.success(())
-    })
-    promise.future
-  }
-
   @inline private def simulatable(unit: UnitInfo): Boolean = (
-    ! unit.unitClass.isSpell
-    && ! unit.stasised
-    && ! unit.invincible
+        ! unit.unitClass.isSpell
+    &&  ! unit.stasised
+    &&  ! unit.invincible
     && unit.isNone(Protoss.Interceptor, Protoss.Scarab, Zerg.Egg, Zerg.Larva))
 
   private def cleanup(): Unit = {
@@ -88,4 +71,34 @@ final class Simulation {
   def simulacraEnemy  : Seq[Simulacrum] = realUnitsEnemy  .view.map(_.simulacrum)
   def simulacraAlliesOf(sim: Simulacrum): Seq[Simulacrum] = (if (sim.isFriendly) simulacraOurs else simulacraEnemy).filterNot(sim==)
   def simulacraEnemiesOf(sim: Simulacrum): Seq[Simulacrum] = if (sim.isFriendly) simulacraEnemy else simulacraOurs
+
+  ////////////////
+  // Asynchrony //
+  ////////////////
+
+  private var thread: Thread = _
+  @volatile private var terminateThread: Boolean = _
+  @volatile var simulatingAsynchronously = false
+  def runAsynchronously(): Unit = {
+    if (thread == null) {
+      thread = new Thread(() => {
+        while ( ! terminateThread) {
+          if (simulatingAsynchronously) {
+            while ( ! battle.simulationComplete) {
+              step()
+            }
+            simulatingAsynchronously = false
+          }
+          Thread.onSpinWait()
+        }
+      })
+      thread.setName("CombatSimulation")
+      thread.setPriority(Math.max(Thread.currentThread().getPriority - 1, Thread.MIN_PRIORITY))
+      thread.start()
+    }
+    simulatingAsynchronously = true
+  }
+  def onEnd(): Unit = {
+    terminateThread = true
+  }
 }

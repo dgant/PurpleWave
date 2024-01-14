@@ -1,6 +1,5 @@
 package Information.Battles.Types
 
-import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
@@ -29,8 +28,7 @@ class BattleJudgment(battle: Battle) {
     if ( ! battle.simulated) return 0.0
     // This can happen when all simulated enemies run away and nobody does any damage
     if (battle.simulationCheckpoints.lastOption.forall(metric => metric.healthLostUs <= 0)) return 1.0
-    val average = Maff.weightedMean(battle.simulationCheckpoints.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness)))
-    Maff.clamp(With.blackboard.aggressionRatio() * (1.0 + average) - 1.0, -1.0, 1.0)
+    Maff.weightedMean(battle.simulationCheckpoints.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness)))
   }
 
   private def calculateTarget: Double = {

@@ -31,16 +31,10 @@ class Visualization extends TimedTask {
     // Evergreen views
     ShowHeader,
     ShowGrids,
-    ShowUtilization,
     ShowHealthAndCooldown,
-    ShowUnitPaths,
     ShowUnitsFriendly,
     ShowUnitsEnemy,
     ShowJudgment,
-
-    // Temporary views
-    ShowZones,
-    ShowExpansions
   )
 
   lazy val knownViews: Vector[DebugView] = Vector[DebugView](

@@ -224,7 +224,7 @@ object DrawMap {
     val sy  = s.y
     val ex  = e.x
     val ey  = e.y
-    (4 to 32 by 4).foreach(d => {
+    (0 until 32 by 8).foreach(d => {
       line(sx + d, sy, ex, ey - d, color)
       line(ex - d, sy, sx, ey - d, color)
       line(sx + d, ey, ex, sy + d, color)

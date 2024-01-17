@@ -1,6 +1,7 @@
 package Micro.Actions.Scouting
 
 import Debugging.Visualizations.Forces
+import Debugging.Visualizations.Views.Micro.ShowPathfinding
 import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -75,12 +76,12 @@ abstract class AbstractSearch extends Action {
     val profile               = new PathfindProfile(unit.tile)
     profile.end               = Some(unit.agent.destinationNext().tile)
     profile.employGroundDist  = ! unit.flying
-    profile.costOccupancy     = 0.01
     profile.costRepulsion     = 5
     profile.repulsors         = MicroPathing.getPathfindingRepulsors(unit)
     profile.lengthMaximum     = Some(20)
     profile.unit              = Some(unit)
     profile.alsoUnwalkable    = bannedTiles
+    profile.debug             = ShowPathfinding.inUse && unit.selected
     val path                  = profile.find
 
     if (unit.zone == unit.agent.destinationNext().zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {

@@ -500,7 +500,7 @@ class PvPOpening extends GameplanImperative {
     ///////////////////////
 
     if (enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate99)
-      && With.frame < Minutes(5)()
+      && With.frame < Minutes(7)()
       && unitsComplete(IsWarrior) < 7
       // If they just make a few Zealots and stop, we don't want to overreact and die to, say, a DT swap
       && ! enemiesHave(Protoss.CyberneticsCore)) {
@@ -529,11 +529,13 @@ class PvPOpening extends GameplanImperative {
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)
       get(Protoss.ShieldBattery)
+      if (With.units.enemy.exists(u => Protoss.Gateway(u) && u.proximity > 0.7)) {
+        get(3, Protoss.Gateway)
+      }
       get(Protoss.Assimilator)
       get(Protoss.CyberneticsCore)
       get(3, Protoss.Gateway)
       get(Protoss.DragoonRange)
-      return
     }
 
     //////////////////////

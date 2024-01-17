@@ -72,7 +72,7 @@ trait TilePathfinder {
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
       val diff = toState.repulsion - fromState.get.repulsion
-      profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff))
+      profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff)) * Math.max(toState.repulsion, fromState.get.repulsion)
     }
     val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
     val output = costSoFar + costDistance + costEnemyVision + costImmobility + costOccupancy + costRepulsion + costThreat

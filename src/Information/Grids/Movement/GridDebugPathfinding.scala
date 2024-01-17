@@ -36,13 +36,13 @@ final class GridDebugPathfinding extends GridVersionedInt {
   }
 
   def drawMap(): Unit = {
-    With.viewport.areaTiles.tiles.foreach(tile => {
+    With.viewport.areaTiles.expand(16, 16).tiles.foreach(tile => {
       val v = get(tile)
       if (v > 0) {
         val color = v match {
           case Path   => Colors.BrightGreen
-          case Start  => Colors.BrightYellow
-          case End    => Colors.BrightBlue
+          case Start  => Colors.NeonViolet
+          case End    => Colors.NeonTeal
           case _      => Colors.BrightRed
         }
         DrawMap.hatchTile(tile, color)

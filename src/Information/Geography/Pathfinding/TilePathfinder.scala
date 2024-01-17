@@ -150,6 +150,8 @@ trait TilePathfinder {
     val lengthMaximum         = profile.lengthMaximum.getOrElse(Double.PositiveInfinity)
     val threatMaximum         = profile.threatMaximum.getOrElse(Int.MaxValue)
     val repulsion             = profile.repulsors.nonEmpty
+    val useDebugGrid          = profile.debug && With.grids.debugPathfinding.lock()
+    val debugTilePath         = (tp: TilePath) => { if (useDebugGrid) { With.grids.debugPathfinding.setPath(tp) }; tp }
     startTileState.setVisited()
     startTileState.setEnqueued()
     startTileState.setCameFrom        (startTile)
@@ -165,6 +167,7 @@ trait TilePathfinder {
       val bestTileState = horizon.dequeue()
       val bestTile      = bestTileState.tile
       bestTileState.setVisited()
+      if (useDebugGrid) { With.grids.debugPathfinding.visit(bestTile) }
 
       // Are we done?
       val atProfileEnd = endExists && (endI == bestTileState.i || (endDistanceMaxTiles > 0 && endTile.tileDistanceFast(bestTile) <= endDistanceMaxTiles && (profile.crossUnwalkable || endTile.groundPixels(bestTile) <= endDistanceMaxPixels)))
@@ -182,12 +185,9 @@ trait TilePathfinder {
           costFromStart(profile, bestTileState.tile),
           Some(assemblePath(bestTileState)))
 
-        profile.unit
-          .flatMap(_.friendly)
-          .map(_.agent)
-          .foreach(_.path = Some(output))
+        profile.unit.flatMap(_.friendly).map(_.agent).foreach(_.path = Some(output))
 
-        return output
+        return debugTilePath(output)
       }
 
       val neigborTiles = bestTileState.tile.adjacent8
@@ -227,7 +227,8 @@ trait TilePathfinder {
         i += 1
       }
     }
-    failure(startTile)
+
+    debugTilePath(failure(startTile))
   }
 
   private def assemblePath(end: TileState): IndexedSeq[Tile] = {

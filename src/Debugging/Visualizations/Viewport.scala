@@ -6,12 +6,18 @@ import Performance.Cache
 
 class Viewport {
   
-  def start   : Pixel = startCache()
-  def end     : Pixel = endcache()
-  def center  : Pixel = start.midpoint(end)
-  def area    : PixelRectangle = rectangleCache()
+  def start       : Pixel = _start()
+  def end         : Pixel = _end()
+  def center      : Pixel = start.midpoint(end)
+  def areaPixels  : PixelRectangle  = _areaPixels()
+  def areaTiles   : TileRectangle   = _areaTiles()
+
+  private val _start      = new Cache(() => new Pixel(With.game.getScreenPosition))
+  private val _end        = new Cache(() => start.add(With.configuration.conservativeViewportWidth, With.configuration.conservativeViewportHeight))
+  private val _areaPixels = new Cache(() => PixelRectangle(start, end))
+  private val _areaTiles  = new Cache(() => TileRectangle(start.tile, end.add(31, 31).tile))
   
-  def centerOn(pixel: Pixel) {
+  def centerOn(pixel: Pixel): Unit = {
     With.game.setScreenPosition(
       pixel.subtract(
         With.configuration.cameraViewportWidth  / 2,
@@ -29,10 +35,4 @@ class Viewport {
   def contains(tile: Tile): Boolean = {
     contains(tile.center)
   }
-
-  val rectangleTight: Cache[TileRectangle] = new Cache(() => TileRectangle(start.tile, start.add(640, 440).tile))
-  
-  private val startCache  = new Cache(() => new Pixel(With.game.getScreenPosition))
-  private val endcache    = new Cache(() => start.add(With.configuration.conservativeViewportWidth, With.configuration.conservativeViewportHeight))
-  private val rectangleCache = new Cache(() => PixelRectangle(start, end))
 }

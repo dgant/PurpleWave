@@ -15,7 +15,9 @@ class SquadCatchDTRunby extends Squad {
     if ( ! MacroFacts.enemyDarkTemplarLikely) return
     setEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
     setTargets(enemies)
-    vicinity        = Maff.minBy(With.geography.ourBases.map(_.heart.center))(heart => Maff.min(enemies.map(_.pixelDistanceCenter(heart))).getOrElse(heart.pixelDistance(With.scouting.enemyHome.center))).getOrElse(With.geography.home.center)
+    val bases = With.geography.ourBases.filter(_.workerCount > 1)
+    if (bases.isEmpty) return
+    vicinity        = Maff.minBy(bases.map(_.heart.center))(heart => Maff.min(enemies.map(_.pixelDistanceCenter(heart))).getOrElse(heart.pixelDistance(With.scouting.enemyHome.center))).getOrElse(With.geography.home.center)
     lock.matcher    = IsMobileDetector
     lock.counter    = CountOne
     lock.preference = PreferClose(vicinity)

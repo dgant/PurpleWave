@@ -66,6 +66,7 @@ class Grids extends TimedTask {
 
   // Other
   val formationSlots              = add("fs",   new GridFormationSlots)
+  val debugPathfinding            = add("dp",   new GridDebugPathfinding)
 
   private var _selected: Option[Grid] = None
   def selected: Option[Grid] = _selected

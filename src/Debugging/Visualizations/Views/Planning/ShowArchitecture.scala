@@ -10,7 +10,7 @@ import bwapi.Color
 object ShowArchitecture extends DebugView {
 
   override def renderMap(): Unit = {
-    With.viewport.rectangleTight().tiles.foreach(tile => {
+    With.viewport.areaTiles.tiles.foreach(tile => {
       if (tile.valid) {
         val reservation = With.groundskeeper.tileReservations(tile.i)
         if (reservation.renewed) {
@@ -40,7 +40,7 @@ object ShowArchitecture extends DebugView {
   }
 
   def renderArchitectureMap(): Unit = {
-    val tiles = With.viewport.rectangleTight().tiles.filter(_.valid)
+    val tiles = With.viewport.areaTiles.tiles.filter(_.valid)
 
     def drawExclusions(exclusions: GridExclusion, color: Color, radius: Int): Unit = {
       tiles.map(exclusions.get).filter(_.nonEmpty).distinct.foreach(exclusion =>

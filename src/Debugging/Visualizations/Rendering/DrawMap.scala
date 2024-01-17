@@ -23,6 +23,15 @@ object DrawMap {
     if (irrelevant(start, end)) return
     With.game.drawLineMap(start.bwapi, end.bwapi, color)
   }
+
+  def line(
+    startX: Int,
+    startY: Int,
+    endX: Int,
+    endY: Int,
+    color: Color): Unit = {
+    line(Pixel(startX, startY), Pixel(endX, endY), color)
+  }
   
   def arrow(
     start : Pixel,
@@ -205,6 +214,22 @@ object DrawMap {
     box(pixel.add( -1,  r1), pixel.add( 1,   r3), color)
     box(pixel.add(-r3,  -1), pixel.add(-r1,   1), color)
     box(pixel.add( r1,  -1), pixel.add( r3,   1), color)
+  }
+
+  def hatchTile(tile: Tile, color: Color): Unit = {
+    if (irrelevant(tile.center)) return
+    val s   = tile.topLeftPixel
+    val e   = tile.bottomRightPixel
+    val sx  = s.x
+    val sy  = s.y
+    val ex  = e.x
+    val ey  = e.y
+    (4 to 32 by 4).foreach(d => {
+      line(sx + d, sy, ex, ey - d, color)
+      line(ex - d, sy, sx, ey - d, color)
+      line(sx + d, ey, ex, sy + d, color)
+      line(ex - d, ey, sx, sy + d, color)
+    })
   }
   
   def irrelevant(points: Pixel*): Boolean = {

@@ -1,15 +1,28 @@
 package Micro.Actions.Protoss.Shuttle
 
+import Debugging.SimpleString
 import Mathematics.Maff
+import Mathematics.Points.Pixel
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
 
+import scala.collection.mutable.ArrayBuffer
+
 object BeShuttle extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = Protoss.Shuttle(unit)
+
+  trait QuestType extends SimpleString
+  object Deliver  extends QuestType
+  object Hover    extends QuestType
+  object Pickup   extends QuestType
+
+  case class ShuttleQuest(passenger: FriendlyUnitInfo, quest: QuestType, multiplier: Double, baseCost: Double, perform: () => Unit) {
+    val finalCost: Double = baseCost * multiplier
+  }
 
   protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     if (ShuttleDitchPassengers(shuttle)) return
@@ -30,56 +43,44 @@ object BeShuttle extends Action {
       return
     })
 
-    // Urgent dropoffs
-    /*
-    val allDropoffs   = shuttle.agent.passengersPrioritized.filter(p => p.loaded && p.agent.rideGoal.isDefined)
-    val urgentDropoff = Maff.minBy(allDropoffs.filter(p => p.agent.toAttack.isDefined || p.agent.toAttackFrom.isDefined))(p => shuttle.pixelDistanceCenter(p.agent.rideGoal.get))
-    urgentDropoff.foreach(u => {
-      deliver(shuttle, u)
-      shuttle.agent.act("UrgentDropoff")
-      return
-    })
-    */
-
     // Ordinary pickups/dropoffs/parking
     val fightRadius = 320
-    val fighting = shuttle.agent.passengers.exists(p =>
+    val passengersFighting =  shuttle.agent.passengers.filter(p =>
       p.agent.toAttack.isDefined
       || p.agent.perch.isDefined
       || p.matchups.pixelsToThreatRange.exists(_ < fightRadius)
       || p.matchups.enemies.exists(e => Protoss.Shuttle(e) && e.pixelDistanceEdge(p) < fightRadius))
-    val quests = shuttle.agent.passengersPrioritized.flatMap(p => {
+    val anyoneFighting = passengersFighting.nonEmpty
+
+    val quests = new ArrayBuffer[ShuttleQuest]
+    shuttle.agent.passengersPrioritized.foreach(p => {
       val goal = p.agent.rideGoal
+      val m = ?(passengersFighting.contains(p) || ! anyoneFighting, 1, 10)
+
+      def add(transform: Pixel => ShuttleQuest): Unit = { quests ++= goal.map(transform) }
+
+      // Deliver passenger
       if (p.loaded) {
 
-        goal.map(g => (
-          p,
-          "Deliver",
-          shuttle.pixelDistanceCenter(g),
-          () => deliver(shuttle, p)))
-      } else if (
-          goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0))
-          && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
+        add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g), () => deliver(shuttle, p)))
 
-        goal.map(g => (
-          p,
-          "Pickup",
-          shuttle.pixelDistanceEdge(p) * Maff.or1(0.05, fighting),
-          () => pickup(shuttle, p)))
+      // Pickup passenger
+      } else if (goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
+
+        add(g => ShuttleQuest(p, Pickup, m, shuttle.pixelDistanceEdge(p), () => pickup(shuttle, p)))
+
+      // Hover over passenger
       } else if (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
 
-        goal.map(g => (
-          p,
-          "Park",
-          shuttle.pixelDistanceEdge(p) + 160,
-          () => ShuttlePark(shuttle)))
-      } else None
+        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark(shuttle)))
+
+      }
     })
 
-    val quest = Maff.minBy(quests)(_._3)
+    val quest = Maff.minBy(quests)(_.finalCost)
     quest.foreach(q => {
-      q._4()
-      shuttle.agent.act(q._2)
+      q.perform()
+      shuttle.agent.act(q.quest.toString)
       return
     })
 

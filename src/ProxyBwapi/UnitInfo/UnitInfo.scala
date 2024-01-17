@@ -212,12 +212,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     unitClass.isBuilding
     && ! flying
     && ?(isFriendly,
-      With.scouting.proximity(tile) < 1 - _proxyThreshold || ! metro.exists(_.bases.exists(_.isOurs)),
-      With.scouting.proximity(tile) >     _proxyThreshold || {
-        val b = base.getOrElse(With.geography.bases.minBy(_.groundPixels(tile)))
-        b.isOurs || b.groundPixels(tile) > 32 * 20
-      }),
-      240)
+      With.scouting.proximity(tile) < 1 - _proxyThreshold
+        || ! metro.exists(_.bases.exists(_.isOurs)),
+      With.scouting.proximity(tile) >     _proxyThreshold + ?(base.exists(_.owner == player), 0.25, 0)
+        || base.orElse(Maff.minBy(With.geography.bases)(_.groundPixels(tile))).exists(b => b.isOurs || b.groundPixels(tile) > 32 * 20)),
+    240)
 
   ////////////
   // Combat //
@@ -561,8 +560,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def effectivelyCloaked: Boolean = _effectivelyCloaked()
   private val _effectivelyCloaked = new Cache(() =>
     cloakedOrBurrowed
+      && bwapiUnit.getAcidSporeCount == 0
       && ! ensnared
       && ! plagued
+      && ! maelstrommed
       && ! ?(isOurs,
       tile.enemyDetected
         || matchups.enemies.exists(_.orderTarget.contains(this))

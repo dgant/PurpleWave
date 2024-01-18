@@ -10,7 +10,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Tactic.Squads.UnitGroup
+import Tactic.Squads.{Squad, UnitGroup}
 import Utilities.?
 import Utilities.UnitFilters.{IsTank, IsWarrior}
 
@@ -52,21 +52,19 @@ object Spot extends Action {
           .map(t => (t.center, With.framesSince(t.lastSeen).toDouble)))))
 
     val goals = new ArrayBuffer[Pixel]
-    goals += unit.pixel
     spooky  .foreach(spook => goals += spook.projectFrames(48))
     tank    .foreach(tank =>  goals += tank.pixel)
     if (group.attackers.exists( ! _.flying)) {
       goals += group.attackCentroidKey
     }
-    if (goals.isEmpty) {
-      return
-    }
+    if (goals.isEmpty) return
+
+    goals += unit.pixel
     if (unit.agent.isLeader) {
       goals += group.destinationNext
     } else {
       goals += Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.destinationNext)
     }
-
 
     unit.agent.decision.set(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
     Commander.move(unit)

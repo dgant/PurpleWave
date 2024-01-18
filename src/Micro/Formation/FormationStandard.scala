@@ -2,7 +2,7 @@ package Micro.Formation
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
-import Debugging.Visualizations.Views.Micro.ShowPathfinding
+import Debugging.Visualizations.Views.Micro.ShowFormations
 import Information.Geography.Pathfinding.Types.{TilePath, ZonePathNode}
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.{Edge, Zone}
@@ -114,7 +114,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       employGroundDist = true,
       costImmobility = 1.5,
       repulsors = Vector(PathfindRepulsor(Points.middle, -0.1, With.mapPixelHeight)),
-      debug = ShowPathfinding.inUse && units.exists(_.selected)
+      debug = ShowFormations.inUse && units.exists(_.selected)
     ).find
   }
   private def findTargetPath: TilePath = {

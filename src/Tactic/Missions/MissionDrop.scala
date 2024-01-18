@@ -226,6 +226,7 @@ abstract class MissionDrop extends Mission {
     profile.canEndUnwalkable    = Some(true)
     profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
     profile.repulsors           = Vector(PathfindRepulsor(Points.middle, 1.0, 32 * mapEdgeMarginTiles))
+    profile.debug               = true
     path = Some(profile.find)
     pathItineraryBase = itinerary.headOption.orNull
     if (path.get.pathExists) {

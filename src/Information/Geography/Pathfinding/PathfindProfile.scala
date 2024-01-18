@@ -60,7 +60,7 @@ final class PathfindProfile(
   def find: TilePath = {
     finalized = true
     start = ?(canCrossUnwalkable.orElse(unit.map(_.flying)).getOrElse(false), start, start.walkableTile)
-    end = end.map(e => if (endUnwalkable) e else e.walkableTile)
+    end = end.map(e => ?(endUnwalkable, e, e.walkableTile))
     With.paths.aStar(this)
   }
 

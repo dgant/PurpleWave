@@ -18,6 +18,7 @@ object ShowTileInfo extends DebugView {
 
     val pathfindProfile = new PathfindProfile(With.geography.home.walkableTile)
     pathfindProfile.end = Some(walkableTile)
+    pathfindProfile.debug = true
     val path = pathfindProfile.find
     if (path.pathExists) {
       path.tiles.foreach(tiles => {

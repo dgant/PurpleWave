@@ -1,5 +1,6 @@
 package Information.Geography.Pathfinding
 
+import Debugging.Visualizations.Views.Micro.ShowPathfinding
 import Information.Geography.Pathfinding.Types.TilePath
 import Lifecycle.With
 import Mathematics.Maff
@@ -150,7 +151,7 @@ trait TilePathfinder {
     val lengthMaximum         = profile.lengthMaximum.getOrElse(Double.PositiveInfinity)
     val threatMaximum         = profile.threatMaximum.getOrElse(Int.MaxValue)
     val repulsion             = profile.repulsors.nonEmpty
-    val useDebugGrid          = profile.debug && With.grids.debugPathfinding.lock()
+    val useDebugGrid          = profile.debug && ShowPathfinding.inUse && With.grids.debugPathfinding.lock()
     val debugTilePath         = (tp: TilePath) => { if (useDebugGrid) { With.grids.debugPathfinding.setPath(tp) }; tp }
     startTileState.setVisited()
     startTileState.setEnqueued()

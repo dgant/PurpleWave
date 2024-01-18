@@ -53,6 +53,7 @@ object ConfigurationLoader {
       val debugging     = getOrDefault(config, "debugging",     false)
       val debugginglive = getOrDefault(config, "debugginglive", false)
       val logstd        = getOrDefault(config, "logstd",        false)
+      val multiCPU      = getOrDefault(config, "multiCPU",      true)
       val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
       val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameLimitMs)
 
@@ -78,6 +79,7 @@ object ConfigurationLoader {
       if (debugging)            { setDebugMode() }
       if (debugginglive)        { setDebugLiveMode() }
       if (logstd)               { With.configuration.logstd = true }
+      With.configuration.simulationAsynchronous = multiCPU
 
       Seq(
         ("Human",           human.toString),

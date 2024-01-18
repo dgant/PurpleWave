@@ -6,7 +6,7 @@
   <outfile>C:\Users\d\AppData\Roaming\scbw\bots\PurpleDev\PurpleWave.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
-  <chdir>.</chdir>
+  <chdir></chdir>
   <priority>normal</priority>
   <downloadUrl></downloadUrl>
   <supportUrl></supportUrl>
@@ -23,7 +23,7 @@
     <cp>Lifecycle.Main</cp>
   </classPath>
   <jre>
-    <path>./jre</path>
+    <path>./bwapi-data/AI/jre</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>true</requires64Bit>
     <minVersion>21</minVersion>

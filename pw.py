@@ -103,7 +103,7 @@ def stage():
     subprocess.run(["date"], stdout=timestamp_file, text=True)
 
   log("Building EXE with Launch4J")
-  subprocess.run(file_launch4j + " "+  path_pw("launch4j.xml"))
+  subprocess.run(file_launch4j + " "+  path_configs("launch4j.xml"))
   
   log()
   log("Populate local testing")

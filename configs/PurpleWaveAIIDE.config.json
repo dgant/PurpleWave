@@ -1,0 +1,15 @@
+{
+"human"           : false,
+"ladder"          : false,
+"livestream"      : false,
+"tournament"      : true,
+"roundrobin"      : true,
+"elimination"     : false,
+"pretraining"     : false,
+"debugging"       : false,
+"debugginglive"   : false,
+"logstd"          : false,
+"framemstarget"   : 25,
+"framemslimit"    : 35,
+"comments"        : "AIIDE limit is 55ms. Treating the limit as lower due to 16ms timer resolution"
+}

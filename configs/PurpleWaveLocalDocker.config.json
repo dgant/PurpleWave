@@ -1,0 +1,14 @@
+{
+"human"           : false,
+"ladder"          : true,
+"livestream"      : false,
+"tournament"      : false,
+"roundrobin"      : true,
+"elimination"     : false,
+"pretraining"     : false,
+"debugging"       : true,
+"debugginglive"   : false,
+"logstd"          : true,
+"framemstarget"   : 25,
+"framemslimit"    : 30
+}

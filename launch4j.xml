@@ -39,8 +39,8 @@
   </jre>
   <messages>
     <startupErr>An error occurred while starting PurpleWave.</startupErr>
-    <jreNotFoundErr>Failed to find PurpleWave&apos;s Java Runtime Environment, which should be located in [current working directory]\jre\.</jreNotFoundErr>
-    <jreVersionErr>The version of Java Runtime Environment being used to run PurpleWave is incorrect.</jreVersionErr>
+    <jreNotFoundErr>Failed to find PurpleWave&apos;s Java Runtime Environment, which should be located in a directory named "jre" next to PurpleWave.exe.</jreNotFoundErr>
+    <jreVersionErr>The version of Java Runtime Environment being used to run PurpleWave is incorrect, or the operating system may be 32-bit.</jreVersionErr>
     <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
     <instanceAlreadyExistsMsg>An instance  of PurpleWave is already running. Only one copy can run at a time.
 

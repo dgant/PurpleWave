@@ -1,3 +1,5 @@
+#!/
+
 import argparse
 import contextlib
 import subprocess
@@ -7,15 +9,13 @@ import os
 
 def main():
   parser = argparse.ArgumentParser(description="Compile, stage, and package PurpleWave and its JREs.")
-  parser.add_argument('--all',     action='store_true',    help='Perform all steps')
-  parser.add_argument('--makejre', action='store_true',    help='Step 1: (Skipped by default) Package lightweight JRE using jdeps+jlink')
-  parser.add_argument('--copyjre', action='store_true',    help='Step 2: (Skipped by default) Copy packaged JRE to the specified target directory')
-  parser.add_argument('--stage',   action='store_false',   help='Step 3: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
-  parser.add_argument('--package', action='store_false',   help='Step 4: Re-zip directories')
+  parser.add_argument('--all',     action='store_true', default=False,  help='Perform all steps')
+  parser.add_argument('--jre',     action='store_true', default=False,  help='Step 1: (Skipped by default) Package lightweight JRE using jdeps+jlink, then stage them for packaging')
+  parser.add_argument('--stage',   action='store_true', default=True,   help='Step 2: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
+  parser.add_argument('--package', action='store_true', default=True,   help='Step 3: Re-zip directories')
   args = parser.parse_args()
-  if args.all or args.makejre:
+  if args.all or args.jre:
     makejre()
-  if args.all or args.copyjre:
     copyjre()
   if args.all or args.stage:
     stage()
@@ -29,12 +29,13 @@ def pathjoin(*args):
   return result  
 
 file_launch4j = "c:/Program Files (x86)/Launch4j/Launch4jc.exe"
+dir_jre       = "c:/p/graalvm-jdk"
 dir_bwapidata = "c:/p/bw/bwapi-data/"
 java_version  = "21"
 dir_pw        = "c:/p/pw"
 dir_bots      = "c:/Users/d/AppData/Roaming/scbw/bots/"
 dir_out       = pathjoin(dir_pw,  "out/")
-dir_configs   = pathjoin(dir_out, "configs/")
+dir_configs   = pathjoin(dir_pw,  "configs/")
 dir_staging   = pathjoin(dir_out, "staging/")
 
 def path_pw(path):
@@ -64,8 +65,7 @@ def rmtree(dir):
 def makejre():
   log()
   log("MAKING JRE")
-  jdeps = path_configs(pathjoin("graalvm-jdk", "bin", "jdeps.exe"))
-
+  jdeps = pathjoin(dir_jre, "bin", "jdeps.exe")
   log(jdeps)
   jdeps_stdout = subprocess.run(
     [ jdeps,
@@ -83,7 +83,7 @@ def makejre():
   print(modules)
   logf(rmtree, path_staging("jre"))
   
-  jlink = path_configs(pathjoin("graalvm-jdk", "bin", "jlink.exe"))
+  jlink = pathjoin(dir_jre, "bin", "jlink.exe")
   log(jlink)
   subprocess.run(
     [ jlink,
@@ -105,6 +105,7 @@ def stage():
   log("STAGING")
   log("Post-build steps")
   logf(shutil.copy2, file_jar, dir_staging)
+  
   with open(path_staging("revision.txt"), 'w') as revision_file:
     subprocess.run(["git", "rev-parse", "HEAD"], stdout=revision_file, text=True, cwd=dir_pw)
   with open(path_staging("timestamp.txt"), 'w') as timestamp_file:
@@ -126,7 +127,7 @@ def stage():
     log(name)
     dir_bot_bwapidata = path_bots(name)
     populate_bwapidata(dir_bot_bwapidata)
-    
+    logf(shutil.copy2, path_configs("PurpleWaveLocalDocker.config.json"),  pathjoin(dir_bot_bwapidata, "ai"))    
     # Customize bot.json
     bot_json = pathjoin(dir_bot_bwapidata, "bot.json")
     content = ""
@@ -139,14 +140,16 @@ def populate_bwapidata(dir_bwapidata):
   dir_ai = pathjoin(dir_bwapidata, "ai")
   log(dir_bwapidata)
   log(dir_ai)
-  logf(os.makedirs,                                                      dir_ai, exist_ok=True)
-  logf(shutil.copy2, path_staging("PurpleWave.jar"),                     dir_ai)
-  logf(shutil.copy2, path_staging("PurpleWave.exe"),                     dir_ai)
-  logf(shutil.copy2, path_staging("timestamp.txt"),                      dir_ai)
-  logf(shutil.copy2, path_staging("revision.txt"),                       dir_ai)
-  logf(shutil.copy2, path_configs("PurpleWaveLocalDocker.config.json"),  dir_ai)
-  logf(shutil.copy2, path_configs("bot.json"),                           dir_bwapidata)
-  logf(shutil.copy2, path_configs("bwapi.dll"),                          dir_bwapidata)
+  logf(os.makedirs,                                   dir_ai, exist_ok=True)
+  logf(shutil.copy2, path_staging("PurpleWave.jar"),  dir_ai)
+  logf(shutil.copy2, path_staging("PurpleWave.exe"),  dir_ai)
+  logf(shutil.copy2, path_staging("timestamp.txt"),   dir_ai)
+  logf(shutil.copy2, path_staging("revision.txt"),    dir_ai)  
+  logf(shutil.copy2, path_configs("run_proxy.bat"),   dir_ai)
+  logf(shutil.copy2, path_configs("run64.bat"),       dir_ai)
+  logf(shutil.copy2, path_configs("run32.bat"),       dir_ai)
+  logf(shutil.copy2, path_configs("bot.json"),        dir_bwapidata)
+  logf(shutil.copy2, path_configs("bwapi.dll"),       dir_bwapidata)
 
 def package():
   log()

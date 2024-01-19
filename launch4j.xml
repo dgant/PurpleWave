@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>console</headerType>
-  <jar>C:\Users\d\AppData\Roaming\scbw\bots\PurpleDev\PurpleWave.jar</jar>
-  <outfile>C:\Users\d\AppData\Roaming\scbw\bots\PurpleDev\PurpleWave.exe</outfile>
+  <jar>C:\p\pw\out\staging\PurpleWave.jar</jar>
+  <outfile>C:\p\pw\out\staging\PurpleWave.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>

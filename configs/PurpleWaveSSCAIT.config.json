@@ -9,7 +9,8 @@
 "debugging"       : false,
 "debugginglive"   : false,
 "logstd"          : false,
-"framemstarget"   : 40,
+"multiCPU"        : false,
+"framemstarget"   : 42,
 "framemslimit"    : 60,
-"comments"        : "SSCAIT limit is 85ms. Treating the limit as lower due to 16ms timer resolution"
+"comments"        : "SSCAIT enforces an 85ms frame duration. We set the limit lower due to 16ms timer resolution. We expect enough JVM memory for a framebuffer, but I don't know yet if we can dictate our memory ceiling through run_proxy.bat. This configuration is optimized for the SSCAIT elimination tournament, rather than the round-robin or ongoing ladder. SSCAIT VMs may have either 1 or 2 CPUs."
 }

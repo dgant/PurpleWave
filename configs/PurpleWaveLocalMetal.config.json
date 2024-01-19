@@ -9,7 +9,8 @@
 "debugging"       : true,
 "debugginglive"   : true,
 "logstd"          : true,
-"framemstarget"   : 25,
-"framemslimit"    : 30,
-"comments"        : "AIIDE limit is 55ms. Treating the limit as lower due to 16ms timer resolution"
+"multiCPU"        : true,
+"framemstarget"   : 35,
+"framemslimit"    : 35,
+"comments"        : ""
 }

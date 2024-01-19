@@ -9,7 +9,8 @@
 "debugging"       : false,
 "debugginglive"   : false,
 "logstd"          : false,
-"framemstarget"   : 25,
-"framemslimit"    : 30,
-"comments"        : "SCHNAIL limit is 55ms. Treating the limit as lower due to 16ms timer resolution"
+"multiCPU"        : true,
+"framemstarget"   : 35,
+"framemslimit"    : 35,
+"comments"        : "SCHNAIL enforces a 55ms frame duration. We expect enough JVM memory for a framebuffer, and can dictate our memory ceiling through run_proxy.bat. Treating the limit as lower due to 16ms timer resolution"
 }

@@ -1,0 +1,16 @@
+{
+"human"           : false,
+"ladder"          : true,
+"livestream"      : false,
+"tournament"      : false,
+"roundrobin"      : false,
+"elimination"     : false,
+"pretraining"     : false,
+"debugging"       : false,
+"debugginglive"   : false,
+"logstd"          : false,
+"multiCPU"        : false,
+"framemstarget"   : 42,
+"framemslimit"    : 60,
+"comments"        : "BASIL does not enforce per-frame limits, but does cap games at 30 minutes. We are memory-capped which means a small framebuffer, but without per-frame limits this doesn't matter much. Here we explicitly target 42ms (real-time) speed. BASIL promises only one CPU per bot, though the bot observes 8 in practice."
+}

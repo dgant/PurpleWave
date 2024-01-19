@@ -89,7 +89,7 @@ final class Simulation {
             }
             simulatingAsynchronously = false
           }
-          Thread.onSpinWait()
+          Thread.`yield`() // Ideally Thread.onSpinWait() but that's Java 9+
         }
       })
       thread.setName("CombatSimulation")

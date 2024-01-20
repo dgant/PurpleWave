@@ -27,14 +27,14 @@ class SquadEjectScout extends Squad {
     if (targetScout().isEmpty)                                        return
     if (With.geography.ourBases.exists(_.enemies.exists(IsWarrior)))  return
 
-    lock.matcher = unit => (
-      unit.canMove
-      && unit.unitClass.attacksGround
-      && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
-      && With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)
-    lock.counter = CountOne
-    lock.preference = PreferClose(targetScout().get.pixel)
-    lock.acquire()
+    lock.setMatcher(unit => (
+        unit.canMove
+        && unit.unitClass.attacksGround
+        && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
+        && With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32))
+      .setCounter(CountOne)
+      .setPreference(PreferClose(targetScout().get.pixel))
+      .acquire()
   }
   
   override def run(): Unit = {

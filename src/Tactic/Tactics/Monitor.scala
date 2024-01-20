@@ -22,8 +22,9 @@ class Monitor extends Tactic {
     if (With.units.countEnemy(Terran.Factory) > 7) return
     if (With.enemies.exists(_.hasTech(Terran.WraithCloak))) return
     if (With.units.countOurs(Protoss.Observer) < 3 && MacroFacts.enemyHasShown(Terran.SpiderMine)) return
-    scouts.preference = PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center))
-    scouts.acquire()
+    scouts
+      .setPreference(PreferClose(scouts.units.headOption.map(_.pixel).getOrElse(With.geography.home.center)))
+      .acquire()
     val cloaked = scouts.units.exists(_.cloaked)
     val naturals = bases.flatMap(_.natural.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Seconds(25)()))
     bases = Maff.orElse(naturals, bases).toVector

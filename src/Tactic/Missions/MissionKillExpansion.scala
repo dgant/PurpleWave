@@ -33,9 +33,10 @@ class MissionKillExpansion extends Mission {
     val targetBase = best
     if (targetBase.isEmpty) { terminate("No target base available"); return }
     vicinity = targetBase.get.heart.center
-    lock.preference = PreferClose(vicinity)
-    lock.counter = CountExactly(unitsRequired(targetBase.get))
-    lock.acquire()
+    lock
+      .setCounter(CountExactly(unitsRequired(targetBase.get)))
+      .setPreference(PreferClose(vicinity))
+      .acquire()
   }
 
   private def baseFarFromMain(base: Base): Boolean = With.scouting.enemyMain.forall(b => b.metro != base.metro && ! b.natural.contains(base))
@@ -54,8 +55,7 @@ class MissionKillExpansion extends Mission {
     if ( ! enoughKillers) { terminate(f"Not enough fighters: ${units.size} vs ${unitsRequired()} "); return }
 
     if (With.unitsShown.any(Terran.Wraith, Terran.Ghost, Terran.SpiderMine, Terran.Vulture, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker, Zerg.LurkerEgg) || With.enemies.exists(_.hasTech(Zerg.Burrow))) {
-      detectorLock.preference = PreferClose(vicinity)
-      detectorLock.acquire()
+      detectorLock.setPreference(PreferClose(vicinity)).acquire()
     }
 
     SquadAutomation.targetRaid(this)

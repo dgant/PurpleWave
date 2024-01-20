@@ -2,19 +2,20 @@ package Tactic.Squads
 
 import Lifecycle.With
 import Planning.MacroFacts
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsAny, IsWarrior, IsWorker}
 import Utilities.UnitPreferences.PreferClose
 
 class SquadBackstabProxy extends Squad {
 
-  lock.matcher = IsWarrior
+  lock.matcher = IsAny(Terran.Vulture, Protoss.Zealot, Protoss.DarkTemplar, Zerg.Zergling, Zerg.Mutalisk)
   lock.counter = CountUpTo(2)
-  lock.preference = PreferClose(vicinity)
 
   override def launch(): Unit = {
     if ( ! MacroFacts.enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.proxyRax)) return
     if ( ! With.units.enemy.exists(_.proxied)) return
+    if (With.geography.enemyBases.exists(_.units.exists(IsWarrior))) return
 
     val targetBase = With.scouting.enemyMain
     if (targetBase.isEmpty) return
@@ -25,7 +26,7 @@ class SquadBackstabProxy extends Squad {
     }
 
     vicinity = targetBase.get.heart.center
-    lock.acquire()
+    lock.setPreference(PreferClose(vicinity)).acquire()
   }
 
   override def run(): Unit = {

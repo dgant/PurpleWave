@@ -20,11 +20,9 @@ class MissionSpeedlotDrop extends MissionDrop {
   val zealotLock: LockUnits = new LockUnits(this, MatchDroppableSpeedlot).setCounter(CountExactly(4))
 
   override protected def recruit(): Unit = {
-    transportLock.preference = PreferClose(With.geography.home.center)
-    transportLock.acquire()
+    transportLock.setPreference(PreferClose(With.geography.home.center)).acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }
-    zealotLock.preference = PreferClose(transportLock.units.head.pixel)
-    zealotLock.acquire()
+    zealotLock.setPreference(PreferClose(transportLock.units.head.pixel)).acquire()
     if (zealotLock.units.isEmpty) { terminate("No speedlots available"); return }
     transports ++= transportLock.units
     passengers ++= zealotLock.units

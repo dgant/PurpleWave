@@ -20,12 +20,10 @@ class MissionDTDrop extends MissionDrop {
   override protected def recruit(): Unit = {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
-    transportLock.preference = PreferClose(vicinity)
-    transportLock.acquire()
+    transportLock.setPreference(PreferClose(vicinity)).acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }
     val transportPixel = transportLock.units.head.pixel
-    dtLock.preference = PreferClose(transportPixel)
-    dtLock.acquire()
+    dtLock.setPreference(PreferClose(transportPixel)).acquire()
     if (dtLock.units.isEmpty) { terminate("No DTs available"); return }
     transports ++= transportLock.units
     passengers ++= dtLock.units

@@ -18,10 +18,11 @@ class SquadCatchDTRunby extends Squad {
     val bases = With.geography.ourBases.filter(_.workerCount > 1)
     if (bases.isEmpty) return
     vicinity        = Maff.minBy(bases.map(_.heart.center))(heart => Maff.min(enemies.map(_.pixelDistanceCenter(heart))).getOrElse(heart.pixelDistance(With.scouting.enemyHome.center))).getOrElse(With.geography.home.center)
-    lock.matcher    = IsMobileDetector
-    lock.counter    = CountOne
-    lock.preference = PreferClose(vicinity)
-    lock.acquire()
+    lock
+      .setMatcher(IsMobileDetector)
+      .setCounter(CountOne)
+      .setPreference(PreferClose(vicinity))
+      .acquire()
   }
 
   override def run(): Unit = {

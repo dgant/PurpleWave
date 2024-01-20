@@ -23,16 +23,15 @@ class MissionStormDrop extends MissionDrop {
   override protected def recruit(): Unit = {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
-    transportLock.preference = PreferClose(vicinity)
-    transportLock.acquire()
+    transportLock.setPreference(PreferClose(vicinity)).acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }
     val transportPixel = transportLock.units.head.pixel
-    stormLock.preference = PreferClose(transportPixel)
-    stormLock.acquire()
+    stormLock.setPreference(PreferClose(transportPixel)).acquire()
     if (stormLock.units.isEmpty) { terminate("No storms available"); return }
-    zealotLock.counter = CountUpTo(4 - stormLock.units.size)
-    zealotLock.preference = PreferClose(transportPixel)
-    zealotLock.acquire()
+    zealotLock
+      .setCounter(CountUpTo(4 - stormLock.units.size))
+      .setPreference(PreferClose(transportPixel))
+      .acquire()
     transports ++= transportLock.units
     passengers ++= stormLock.units
     passengers ++= zealotLock.units

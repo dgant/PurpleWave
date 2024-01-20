@@ -34,13 +34,14 @@ class DefendFightersAgainstRush extends Tactic {
     val workersToFight  = Maff.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
 
-    defenders.counter     = CountUpTo(workersToFight.toInt)
-    defenders.preference  = (unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth)
-    defenders.acquire()
-    defenders.units.foreach(_.intend(this)
-      .setCanFlee(false)
-      .setTerminus(target)
-      .setTargets(aggressors))
+    defenders
+      .setCounter(CountUpTo(workersToFight.toInt))
+      .setPreference((unit: FriendlyUnitInfo) => PreferClose(target)(unit) * (1.0 - unit.totalHealth / unit.unitClass.maxTotalHealth))
+      .acquire()
+      .foreach(_.intend(this)
+        .setCanFlee(false)
+        .setTerminus(target)
+        .setTargets(aggressors))
   }
 
   private lazy val fingerprintsRequiringFighterProtection = Seq(

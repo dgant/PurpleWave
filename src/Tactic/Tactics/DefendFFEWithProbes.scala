@@ -61,9 +61,10 @@ class DefendFFEWithProbes extends Tactic {
     if (defenders.units.size > probesRequired) {
       defenders.release()
     }
-    defenders.preference = PreferClose(defensePoints.map(_.pixel).minBy(_.groundPixels(threatSource)))
-    defenders.counter = CountUpTo(probesRequired)
-    defenders.acquire()
+    defenders
+      .setPreference(PreferClose(defensePoints.map(_.pixel).minBy(_.groundPixels(threatSource))))
+      .setCounter(CountUpTo(probesRequired))
+      .acquire()
     val closestDistance = defensePoints.map(_.pixelDistanceTravelling(threatSource)).min
     val threatenedCannons = defensePoints.filter(_.pixelDistanceTravelling(threatSource) <= closestDistance + 96)
     val workers = new ArrayBuffer[FriendlyUnitInfo]

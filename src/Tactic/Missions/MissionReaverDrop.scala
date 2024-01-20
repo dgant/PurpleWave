@@ -46,14 +46,13 @@ class MissionReaverDrop extends MissionDrop {
   override protected def recruit(): Unit = {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
-    transportLock.preference = PreferClose(vicinity)
-    transportLock.acquire()
+    transportLock.setPreference(PreferClose(vicinity)).acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }
 
     val transportPixel = transportLock.units.head.pixel
-    reaverLock.preference = PreferClose(transportPixel)
-    smallLock.preference = PreferClose(transportPixel)
-    bigLock.preference = PreferClose(transportPixel)
+    reaverLock.setPreference(PreferClose(transportPixel))
+    smallLock .setPreference(PreferClose(transportPixel))
+    bigLock   .setPreference(PreferClose(transportPixel))
 
     reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
     reaverLock.acquire()

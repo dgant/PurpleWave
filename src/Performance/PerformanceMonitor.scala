@@ -52,7 +52,7 @@ class PerformanceMonitor {
   def continueRunning     : Boolean = With.frame == 0 || ! With.configuration.enablePerformancePauses || (msBeforeTarget > 0 && PurpleBWClient.framesBehind() < 1)
 
   def disqualificationDanger: Boolean = (
-    With.configuration.enablePerformancePauses && (
+    With.configuration.enablePerformancePauses && ! With.configuration.debugging && (
       disqualified
       || framesOverShort >= 160
       || framesOver1000  >= 5

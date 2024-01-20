@@ -1,5 +1,3 @@
-#!/
-
 import argparse
 import contextlib
 import subprocess

@@ -118,8 +118,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     if (orderedTile.isDefined && orderedTile != desiredTile) {
       builderLock.release()
     }
-    builderLock.preference = PreferAll(PreferIf(builder.contains), PreferClose(desiredTile.get.center))
-    builderLock.acquire()
+    builderLock.setPreference(PreferAll(PreferIf(builder.contains), PreferClose(desiredTile.get.center))).acquire()
     
     if (intendAfter.isDefined) {
       if (With.frame < intendAfter.get) return

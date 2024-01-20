@@ -85,10 +85,11 @@ class SquadScoutExpansions extends Squad {
       .getOrElse(b.heart.groundTiles(With.geography.home)))
 
     vicinity        = toScoutBaseSorted.head.heart.center
-    lock.counter    = CountOne
-    lock.matcher    = ?(With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65, matchAll, matchFlying)
-    lock.preference = PreferClose(vicinity)
-    lock.acquire()
+    lock
+      .setCounter(CountOne)
+      .setMatcher(?(With.blackboard.wantToAttack() && With.scouting.enemyProximity < 0.65, matchAll, matchFlying))
+      .setPreference(PreferClose(vicinity))
+      .acquire()
   }
 
   def run(): Unit = {

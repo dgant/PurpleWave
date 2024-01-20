@@ -40,8 +40,18 @@ trait Tugging {
   def ourThreatOrigin   : Tile = _ourThreatOrigin()
   def ourMuscleOrigin   : Tile = _ourMuscleOrigin()
 
-  private val _tugStart           = new Cache(() => With.geography.home)
-  private val _tugEnd             = new Cache(() => With.scouting.enemyHome)
+  private val _tugStart = new Cache(() => With.geography.home)
+  private val _tugEnd   = new Cache(() =>
+    Maff.orElse(
+      Maff.orElse(
+        With.scouting.firstEnemyMain.filter(_.isEnemy),
+        With.geography.enemyBases.filter(_.isMain),
+        With.geography.mains.filter(_.metro.bases.exists(_.isEnemy)),
+        With.geography.enemyBases)
+        .map(_.townHallTile),
+      Seq(With.scouting.enemyHome))
+      .maxBy(_.groundPixels(With.geography.home)))
+
   private val _ourProximity       = new Cache(() => proximity(ourMuscleOrigin))
   private val _enemyProximity     = new Cache(() => proximity(enemyMuscleOrigin))
   private val _weControlOurFoyer  = new Cache(() => weControl(With.geography.ourFoyer))

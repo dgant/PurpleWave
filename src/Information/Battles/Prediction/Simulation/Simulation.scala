@@ -6,6 +6,7 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.SpinWait
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -89,7 +90,7 @@ final class Simulation {
             }
             simulatingAsynchronously = false
           }
-          Thread.`yield`() // Ideally Thread.onSpinWait() but that's Java 9+
+          SpinWait()
         }
       })
       thread.setName("CombatSimulation")

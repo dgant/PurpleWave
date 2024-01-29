@@ -105,7 +105,7 @@ def makejre():
 
 def compileschnail():
   log()
-  log("BUILDING SCHNAIL CLIENT")
+  log("BUILDING SCHNAIL LAUNCHER")
   subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAIL.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])
   logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), "c:/Program Files (x86)/SCHNAIL Client/bots/PurpleWave/PurpleWaveSCHNAIL.exe")
   

@@ -7,16 +7,29 @@ import os
 
 def main():
   parser = argparse.ArgumentParser(description="Compile, stage, and package PurpleWave and its JREs.")
-  parser.add_argument('--all',     action='store_true', default=False,  help='Perform all steps')
-  parser.add_argument('--jre',     action='store_true', default=False,  help='Step 1: (Skipped by default) Package lightweight JRE using jdeps+jlink, then stage them for packaging')
-  parser.add_argument('--stage',   action='store_true', default=True,   help='Step 2: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
-  parser.add_argument('--package', action='store_true', default=True,   help='Step 3: Re-zip directories')
+  parser.add_argument('--all',            action='store_true', default=False,  help='Perform all steps')
+  parser.add_argument('--jre',            action='store_true', default=False,  help='Step 1: (Skipped by default) Package lightweight JRE using jdeps+jlink, then stage them for packaging')
+  parser.add_argument('--compileschnail', action='store_true', default=False,   help='Step 2: Compile SCHNAIL launcher')
+  parser.add_argument('--stage',          action='store_true', default=False,   help='Step 3: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
+  parser.add_argument('--package',        action='store_true', default=False,   help='Step 4: Re-zip directories')
+  
   args = parser.parse_args()
+  did_anything = False
   if args.all or args.jre:
+    did_anything = True
     makejre()
+  if args.all or args.compileschnail:
+    did_anything = True
+    compileschnail()
   if args.all or args.stage:
+    did_anything = True
     stage()
   if args.all or args.package:
+    did_anything = True
+    package()
+  
+  if not did_anything:
+    stage()
     package()
 
 def pathjoin(*args):
@@ -89,7 +102,15 @@ def makejre():
       "--output",
       path_staging("jre") ])
 
-def stage():
+
+def compileschnail():
+  log()
+  log("BUILDING SCHNAIL CLIENT")
+  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAIL.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])
+  logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), "c:/Program Files (x86)/SCHNAIL Client/bots/PurpleWave/PurpleWaveSCHNAIL.exe")
+  
+def stage(): 
+  
   log()
   log("STAGING")
   log("Post-build steps")
@@ -169,6 +190,8 @@ def package():
       logf(shutil.copytree, path_staging("jre"), dir_package_jre)
     if package in ["AIIDE"]:
       open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()  
+    if package in ["SCHNAIL"]:
+      logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"),  package_dir)
   
   log()
   log("Replacing zips")

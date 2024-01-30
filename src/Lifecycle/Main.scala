@@ -18,7 +18,7 @@ object Main {
   val framesToBuffer      : Int             = if (useFrameBuffer) Maff.clamp(framesBufferable, 1, 24) else 0
 
   val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()
-    .withAutoContinue(true)
+    .withAutoContinue(false)
     .withMaxFrameDurationMs(30)
     .withAsyncFrameBufferCapacity(framesToBuffer)
     .withAsync(useFrameBuffer)

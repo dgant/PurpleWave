@@ -29,6 +29,7 @@ def main():
     package()
   
   if not did_anything:
+    compileschnail()
     stage()
     package()
 
@@ -65,7 +66,7 @@ def path_scbwbots(path):
 def log(*args, **kwargs):
   print(*args, **kwargs, flush=True)
 def logf(f, *args, **kwargs):
-  log(f.__name__, args, kwargs)
+  #log(f.__name__, args, kwargs)
   f(*args, **kwargs)
   
 def rmtree(dir):
@@ -106,8 +107,9 @@ def makejre():
 def compileschnail():
   log()
   log("BUILDING SCHNAIL LAUNCHER")
-  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAIL.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])
-  logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), "c:/Program Files (x86)/SCHNAIL Client/bots/PurpleWave/PurpleWaveSCHNAIL.exe")
+  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAIL.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])  
+  subprocess.run(file_launch4j + " "+  path_configs("launch4jSCHNAIL.xml"))
+  logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL4J.exe"), pathjoin(dir_localschnail, "PurpleWaveSCHNAIL.exe"))
   
 def stage(): 
   
@@ -191,7 +193,7 @@ def package():
     if package in ["AIIDE"]:
       open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()  
     if package in ["SCHNAIL"]:
-      logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"),  package_dir)
+      logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL4J.exe"),  package_dir)
   
   log()
   log("Replacing zips")
@@ -203,11 +205,7 @@ def package():
     with contextlib.suppress(FileNotFoundError):
       logf(os.remove,         path_staging(f"{package_name}.zip"))
     logf(shutil.make_archive, path_staging(package_name), 'zip', path_staging(package_name))
-    logf(rmtree,              path_staging(package_name))
-    
-  log()
-  log("Cleaning up")
-  logf(rmtree,    path_staging("jre"))         
+    logf(rmtree,              path_staging(package_name))       
     
 if __name__ == "__main__":
   main()

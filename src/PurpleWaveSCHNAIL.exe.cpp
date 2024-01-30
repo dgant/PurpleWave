@@ -96,8 +96,8 @@ std::string escapeCommand(const std::string& input) {
 int main() {
   const std::string javaPath    = "../bots/PurpleWave/jre/bin/java.exe";
   const std::string jarPath     = "bwapi-data/AI/PurpleWave.jar";
-  const std::string logPath     = "bwapi-data/write/PurpleWaveSCHNAIL.exe.txt";
-  const std::string javaLogPath = "bwapi-data/write/java.exe.txt";
+  const std::string logPath     = "./bwapi-data/write/PurpleWaveSCHNAIL.exe.txt";
+  const std::string javaLogPath = "./bwapi-data/write/java.exe.txt";
   
   std::ofstream logFile(logPath);
   std::ostream& logStream = logFile;
@@ -119,13 +119,16 @@ int main() {
     
     if ( ! absoluteJavaPath.empty()) {
       ranBundledJava = true;
-      std::string command = "\"\""
-        + javaPath
-        + "\""
-        + " -jar -XX:MaxGCPauseMillis=15 -Xms1536m -Xmx1536m --add-opens=java.base/java.nio=ALL-UNNAMED "
-        + "\""
+      std::string command =
+        // "\""
+        //+ javaPath
+        //+ "\""
+         std::string("java")
+        + " -jar -XX:MaxGCPauseMillis=15 -Xms1536m -Xmx1536m "
+        //+ " --add-opens=java.base/java.nio=ALL-UNNAMED "
+        //+ "\""
         + jarPath
-        + "\""
+        //+ "\""
         + " > "
         + javaLogPath
         + " 2>&1 \"";

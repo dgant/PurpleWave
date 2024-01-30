@@ -23,15 +23,14 @@
     <cp>Lifecycle.Main</cp>
   </classPath>
   <jre>
-    <path>../../../bots/PurpleWave/jre</path>
+    <path>../bots/PurpleWave/jre/;%JAVA_HOME%;%PATH%</path>
     <requiresJdk>false</requiresJdk>
     <requires64Bit>false</requires64Bit>
     <minVersion>8</minVersion>
     <maxVersion>99</maxVersion>
-    <initialHeapSize>1536</initialHeapSize>
-    <maxHeapSize>1536</maxHeapSize>
+    <initialHeapSize>1024</initialHeapSize>
+    <maxHeapSize>1024</maxHeapSize>
     <opt>-XX:MaxGCPauseMillis=15 </opt>
-    <opt>--add-opens=java.base/java.nio=ALL-UNNAMED</opt>
     <opt>-Dcom.sun.management.jmxremote=true</opt>
     <opt>-Dcom.sun.management.jmxremote.port=20000</opt>
     <opt>-Dcom.sun.management.jmxremote.ssl=false</opt>
@@ -39,7 +38,7 @@
   </jre>
   <messages>
     <startupErr>An error occurred while starting PurpleWave.</startupErr>
-    <jreNotFoundErr>Failed to find PurpleWave&apos;s Java Runtime Environment, which should be located in a directory named "jre" next to PurpleWave.exe.</jreNotFoundErr>
+    <jreNotFoundErr>Failed to find PurpleWave&apos;s Java Runtime Environment.</jreNotFoundErr>
     <jreVersionErr>The version of Java Runtime Environment being used to run PurpleWave is incorrect, or the operating system may be 32-bit.</jreVersionErr>
     <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
     <instanceAlreadyExistsMsg>An instance  of PurpleWave is already running. Only one copy can run at a time.

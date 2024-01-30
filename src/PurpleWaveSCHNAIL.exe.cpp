@@ -124,7 +124,8 @@ int main() {
         //+ javaPath
         //+ "\""
          std::string("java")
-        + " -jar -XX:MaxGCPauseMillis=15 -Xms1536m -Xmx1536m "
+        //+ " -jar -XX:MaxGCPauseMillis=15 -Xms1536m -Xmx1536m "
+        + " -jar -XX:MaxGCPauseMillis=15 -Xms1024m -Xmx1024m "
         //+ " --add-opens=java.base/java.nio=ALL-UNNAMED "
         //+ "\""
         + jarPath
@@ -148,3 +149,4 @@ int main() {
   logFile.close();
   return 0;
 }
+

@@ -23,6 +23,7 @@ object Main {
     .withAsyncFrameBufferCapacity(framesToBuffer)
     .withAsync(useFrameBuffer)
     .withAsyncUnsafe(useFrameBuffer)
+    .withDebugConnection(true)
 
   def main(args: Array[String]): Unit = {
     PurpleBWClient.startGame(jbwapiConfiguration)

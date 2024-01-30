@@ -104,12 +104,13 @@ def makejre():
       path_staging("jre") ])
 
 
+schnail_exe_source="PurpleWaveSCHNAILCPP.exe"
 def compileschnail():
   log()
   log("BUILDING SCHNAIL LAUNCHER")
-  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAIL.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])  
   subprocess.run(file_launch4j + " "+  path_configs("launch4jSCHNAIL.xml"))
-  logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL4J.exe"), pathjoin(dir_localschnail, "PurpleWaveSCHNAIL.exe"))
+  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAILCPP.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])    
+  logf(shutil.copy2, path_staging(schnail_exe_source), path_staging("PurpleWaveSCHNAIL.exe"))
   
 def stage(): 
   
@@ -157,6 +158,7 @@ def stage():
     log("Populate SCHNAIL")
     populate_bwapidata(dir_localschnail, dir_localschnail)
     logf(shutil.copy2, path_configs("PurpleWaveSCHNAIL.config.json"), dir_localschnail)
+    logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), dir_localschnail)
   else:
     log("Did not find SCHNAIL")
       
@@ -193,7 +195,7 @@ def package():
     if package in ["AIIDE"]:
       open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()  
     if package in ["SCHNAIL"]:
-      logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL4J.exe"),  package_dir)
+      logf(shutil.copy2, path_staging(schnail_exe_source), pathjoin(package_dir, "PurpleWaveSCHNAIL.exe"))
   
   log()
   log("Replacing zips")

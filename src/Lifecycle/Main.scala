@@ -20,9 +20,12 @@ object Main {
   val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()
     .withAutoContinue(false)
     .withMaxFrameDurationMs(30)
-    .withAsyncFrameBufferCapacity(framesToBuffer)
-    .withAsync(useFrameBuffer)
-    .withAsyncUnsafe(useFrameBuffer)
+    //.withAsyncFrameBufferCapacity(framesToBuffer)
+    //.withAsync(useFrameBuffer)
+    //.withAsyncUnsafe(useFrameBuffer)
+    .withAsyncFrameBufferCapacity(0)
+    .withAsync(false)
+    .withAsyncUnsafe(false)
     .withDebugConnection(true)
 
   def main(args: Array[String]): Unit = {

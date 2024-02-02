@@ -3,7 +3,7 @@
   <component name="ExcludeFromValidation">
     <file url="file://$PROJECT_DIR$/3rdparty/mjson/src/java/mjson/Json.java" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="graalvm-jdk-21" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

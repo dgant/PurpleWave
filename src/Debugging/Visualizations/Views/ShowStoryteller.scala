@@ -4,8 +4,6 @@ import Debugging.Visualizations.Rendering.DrawScreen
 import Lifecycle.With
 import Utilities.Time.Seconds
 
-
-
 import scala.collection.JavaConverters._
 
 object ShowStoryteller extends DebugView {

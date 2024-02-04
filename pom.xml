@@ -11,11 +11,23 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <scala.version>2.12.6</scala.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
     </properties>
 
     <dependencies>
         <!-- Scala dependencies -->
-        <!-- Add any other Scala dependencies you may have -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
 
         <!-- Java dependencies -->
         <dependency>
@@ -39,9 +51,41 @@
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
-                <groupId>org.scala-tools</groupId>
-                <artifactId>maven-scala-plugin</artifactId>
-                <version>2.15.2</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>                    
+                    <showDeprecation>false</showDeprecation>                    
+                </configuration>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <includes>
+                                <include>**/*.java</include>
+                            </includes>
+                            <compileSourceRoots>
+                                <compileSourceRoot>3rdparty/jbwapi/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>3rdparty/javajps/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>3rdparty/jbweb/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>3rdparty/javajps/src/main/java</compileSourceRoot>
+                                <compileSourceRoot>3rdparty/mjson/src/java</compileSourceRoot>
+                            </compileSourceRoots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>4.5.4</version>
                 <executions>
                     <execution>
                         <goals>
@@ -50,27 +94,63 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                    <recompileMode>incremental</recompileMode>
+                    <args>
+                        <scalaVersion>${scala.version}</scalaVersion>
+                        <arg>-unchecked</arg>
+                        <arg>-feature</arg>                        
+                        <arg>-deprecation</arg> <!-- To disable deprecation warnings -->
+                        <arg>-language:postfixOps</arg> <!-- To disable postfix operator warnings -->
+                    </args>
+                </configuration>
             </plugin>
-            <plugin>
+
+            <!-- Maven Jar Plugin -->
+           <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <archive>
+                    <!--
                         <manifest>
-                            <mainClass>LifeCycle.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>Lifecycle.Main</mainClass>
                         </manifest>
+                        -->
+                        <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
+
+            <!-- Maven Shade Plugin for creating a fat JAR with dependencies included -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>Lifecycle.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>3rdparty/jbwapi/src/main/java</directory>
-                <directory>3rdparty/javajps/src/main/java</directory>
-                <directory>3rdparty/jbweb/src/main/java</directory>
-                <directory>3rdparty/mjson/src/java</directory>
-            </resource>
-        </resources>
     </build>
 </project>

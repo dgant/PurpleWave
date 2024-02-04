@@ -4,7 +4,7 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Mathematics.Points.{Point, Tile}
 
-import scala.collection.JavaConverters._
+//import scala.collection.JavaConverters._
 
 case class TemplatePoint(point: Point, requirement: TemplatePointRequirement) {
   def drawMap(origin: Tile): Unit = {
@@ -20,7 +20,7 @@ case class TemplatePoint(point: Point, requirement: TemplatePointRequirement) {
       else Colors.MediumViolet
     DrawMap.box(pixelStart, pixelEnd, color)
     if (requirement.width > 1) {
-      DrawMap.labelBox(requirement.toString.lines.iterator.asScala.toVector, pixelStart.midpoint(pixelEnd))
+      DrawMap.labelBox(requirement.toString.lines, pixelStart.midpoint(pixelEnd))
     }
   }
 }

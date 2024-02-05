@@ -15,17 +15,14 @@ object Main {
   val liveDebugging       : Boolean         = jvmRuntimeArguments.exists(_.contains("purpledebug"))
   val framesBufferable    : Int             = ((memoryFree - botRequiredDataSizeBytes) / JBWAPIClientDataSizeBytes).toInt
   val useFrameBuffer      : Boolean         = ! liveDebugging
-  val framesToBuffer      : Int             = if (useFrameBuffer) Maff.clamp(framesBufferable, 1, 24) else 0
+  val framesToBuffer      : Int             = if (useFrameBuffer) Maff.clamp(framesBufferable, 1, 10) else 0
 
   val jbwapiConfiguration: BWClientConfiguration = new BWClientConfiguration()
     .withAutoContinue(false)
     .withMaxFrameDurationMs(30)
-    //.withAsyncFrameBufferCapacity(framesToBuffer)
-    //.withAsync(useFrameBuffer)
-    //.withAsyncUnsafe(useFrameBuffer)
-    .withAsyncFrameBufferCapacity(0)
-    .withAsync(false)
-    .withAsyncUnsafe(false)
+    .withAsyncFrameBufferCapacity(framesToBuffer)
+    .withAsync(useFrameBuffer)
+    .withAsyncUnsafe(useFrameBuffer)
     .withDebugConnection(true)
 
   def main(args: Array[String]): Unit = {

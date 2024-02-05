@@ -10,7 +10,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <scala.version>2.12.6</scala.version>
+        <scala.version>2.12.18</scala.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
@@ -54,7 +54,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>                    
-                    <showDeprecation>false</showDeprecation>                    
+                    <showDeprecation>false</showDeprecation>
+                    <!--<fork>true</fork>-->
+                    <meminitial>2048m</meminitial>
+                    <maxmem>2048m</maxmem>
                 </configuration>
                 <version>3.8.1</version>
                 <executions>
@@ -90,7 +93,6 @@
                     <execution>
                         <goals>
                             <goal>compile</goal>
-                            <goal>testCompile</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -103,29 +105,34 @@
                         <arg>-feature</arg>                        
                         <arg>-deprecation</arg> <!-- To disable deprecation warnings -->
                         <arg>-language:postfixOps</arg> <!-- To disable postfix operator warnings -->
+                        <arg>-opt:unreachable-code</arg>
+                        <arg>-opt:simplify-jumps</arg>
+                        <arg>-opt:compact-locals</arg>
+                        <arg>-opt:copy-propagation</arg>
+                        <arg>-opt:redundant-casts</arg>
+                        <arg>-opt:box-unbox</arg>
+                        <arg>-opt:nullness-tracking</arg>
+                        <arg>-opt:closure-invocations</arg>
+                        <arg>-opt:inline</arg>
+                        <arg>-opt:l:default,inline</arg>
+                        <arg>'-opt-inline-from:**'</arg>
+                        <arg>-opt-warnings</arg>
                     </args>
                 </configuration>
             </plugin>
 
-            <!-- Maven Jar Plugin -->
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <archive>
-                    <!--
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>Lifecycle.Main</mainClass>
-                        </manifest>
-                        -->
                         <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
 
-            <!-- Maven Shade Plugin for creating a fat JAR with dependencies included -->
+            <!-- Maven Shade cerates a fat JAR with dependencies included -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

@@ -35,6 +35,11 @@ class Visualization extends TimedTask {
     ShowUnitsFriendly,
     ShowUnitsEnemy,
     ShowJudgment,
+
+    ShowProduction,
+    ShowZones,
+    ShowPlacement,
+    ShowFoundations,
   )
 
   lazy val knownViews: Vector[DebugView] = Vector[DebugView](

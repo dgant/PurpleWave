@@ -10,7 +10,7 @@ def main():
   parser.add_argument('--all',            action='store_true', default=False, help='Perform all steps')
   parser.add_argument('--jre',            action='store_true', default=False, help='Step 1: (Skipped by default) Package lightweight JRE using jdeps+jlink, then stage them for packaging')
   parser.add_argument('--maven',          action='store_true', default=False, help='Step 2: Compile PurpleWave with Maven')
-  parser.add_argument('--launcher',       action='store_true', default=False, help='Step 3: Compile SCHNAIL launcher')
+  parser.add_argument('--schnail',        action='store_true', default=False, help='Step 3: Compile SCHNAIL launcher')
   parser.add_argument('--stage',          action='store_true', default=False, help='Step 4: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
   parser.add_argument('--package',        action='store_true', default=False, help='Step 5: Re-zip directories')
   
@@ -22,9 +22,9 @@ def main():
   if args.all or args.maven:
     did_anything = True
     maven_build()
-  if args.all or args.launcher:
+  if args.all or args.schnail:
     did_anything = True
-    compile_schnail()
+    schnail()
   if args.all or args.stage:
     did_anything = True
     stage()
@@ -34,7 +34,7 @@ def main():
   
   if not did_anything:
     maven_build()
-    compile_schnail()
+    schnail()
     stage()
     package()
 
@@ -121,11 +121,11 @@ def makejre():
 
 
 schnail_exe_source="PurpleWaveSCHNAILCPP.exe"
-def compile_schnail():
+def schnail():
   log()
   log("BUILDING SCHNAIL LAUNCHER")
   subprocess.run(file_launch4j + " "+  path_configs("launch4jSCHNAIL.xml"))
-  subprocess.run(["x86_64-w64-mingw32-g++", "-o", path_staging("PurpleWaveSCHNAILCPP.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])    
+  subprocess.run(["x86_64-w64-mingw32-g++", "-static", "-o", path_staging("PurpleWaveSCHNAILCPP.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])    
   logf(shutil.copy2, path_staging(schnail_exe_source), path_staging("PurpleWaveSCHNAIL.exe"))
   
 def stage(): 
@@ -173,9 +173,9 @@ def stage():
   log()
   if (os.path.exists(dir_localschnail)):
     log("Populate SCHNAIL")
-    populate_bwapidata(dir_localschnail, dir_localschnail)
-    logf(shutil.copy2, path_configs("PurpleWaveSCHNAIL.config.json"), dir_localschnail)
-    logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), dir_localschnail)
+    #populate_bwapidata(dir_localschnail, dir_localschnail)
+    #logf(shutil.copy2, path_configs("PurpleWaveSCHNAIL.config.json"), dir_localschnail)
+    #logf(shutil.copy2, path_staging("PurpleWaveSCHNAIL.exe"), dir_localschnail)
   else:
     log("Did not find SCHNAIL")
       
@@ -186,7 +186,6 @@ def populate_bwapidata(dir_bwapidata, dir_ai=None):
   logf(os.makedirs,                                   dir_ai, exist_ok=True)  
   logf(shutil.copy2, path_configs("bwapi.dll"),       dir_bwapidata)
   logf(shutil.copy2, path_staging("PurpleWave.jar"),  dir_ai)
-  logf(shutil.copy2, path_staging("PurpleWave.exe"),  dir_ai)
   logf(shutil.copy2, path_staging("timestamp.txt"),   dir_ai)
   logf(shutil.copy2, path_staging("revision.txt"),    dir_ai)  
   logf(shutil.copy2, path_configs("run_proxy.bat"),   dir_ai)
@@ -205,11 +204,8 @@ def package():
     logf(os.makedirs,   package_dir)
     populate_bwapidata(package_dir, package_dir)
     logf(shutil.copy2,  path_configs(f"{package_name}.config.json"),  package_dir)
-    if package in ["AIIDE", "SCHNAIL"]:
-      dir_package_jre = pathjoin(package_dir, "jre")    
-      logf(rmtree, dir_package_jre)
-      logf(shutil.copytree, path_staging("jre"), dir_package_jre)
     if package in ["AIIDE"]:
+      logf(shutil.copytree, path_staging("jre"), pathjoin(package_dir, "jre"))
       open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()  
     if package in ["SCHNAIL"]:
       logf(shutil.copy2, path_staging(schnail_exe_source), pathjoin(package_dir, "PurpleWaveSCHNAIL.exe"))

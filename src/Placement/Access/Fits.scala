@@ -26,11 +26,11 @@ trait Fits {
 
   def at(tile: Tile)                : TemplatePoint       = if (tile.valid) points(tile.i) else new PointNothing
   def get(tile: Tile)               : Option[Foundation]  = SomeIfO(tile.valid, byTile(tile.i))
-  def get(width: Int, height: Int)  : Seq[Foundation]     = byDimensions.getOrElse((width, height), Seq.empty)
-  def get(zone: Zone)               : Seq[Foundation]     = byZone.getOrElse(zone, Seq.empty)
-  def get(base: Base)               : Seq[Foundation]     = byBase.getOrElse(base, Seq.empty)
-  def get(building: UnitClass)      : Seq[Foundation]     = byBuilding.getOrElse(building, Seq.empty)
-  def get(label: PlaceLabel)        : Seq[Foundation]     = byLabelYes.getOrElse(label, Seq.empty)
+  def get(width: Int, height: Int)  : Seq[Foundation]     = byDimensions  .getOrElse((width, height), Seq.empty)
+  def get(zone: Zone)               : Seq[Foundation]     = byZone        .getOrElse(zone,            Seq.empty)
+  def get(base: Base)               : Seq[Foundation]     = byBase        .getOrElse(base,            Seq.empty)
+  def get(building: UnitClass)      : Seq[Foundation]     = byBuilding    .getOrElse(building,        Seq.empty)
+  def get(label: PlaceLabel)        : Seq[Foundation]     = byLabelYes    .getOrElse(label,           Seq.empty)
   def foundations                   : Seq[Foundation]     = _foundations
   def fits                          : Seq[Fit]            = _fits
 
@@ -49,7 +49,7 @@ trait Fits {
           .foreach(points(_) = point)
     byTile(foundation.tile.i) = Some(foundation)
     if ( ! requirement.buildableBefore) return
-    if (requirement.buildableAfter) return
+    if (   requirement.buildableAfter)  return
     _foundations += foundation
     put(byDimensions, foundation.point.requirement.dimensions,  foundation)
     put(byZone,       foundation.tile.zone,                     foundation)
@@ -59,7 +59,9 @@ trait Fits {
   }
 
   private def put[T, U](map: mutable.Map[T, ArrayBuffer[U]], key: T, value: U): Unit = {
-    map.put(key, map.getOrElse(key, new ArrayBuffer)).foreach(_ += value)
+    val values = map.getOrElse(key, new ArrayBuffer)
+    values += value
+    map(key) = values
   }
 
   protected def sort(): Unit = {

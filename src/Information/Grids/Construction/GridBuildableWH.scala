@@ -5,7 +5,7 @@ import Lifecycle.With
 
 final class GridBuildableWH(w: Int, h: Int) extends AbstractGridArrayBoolean {
 
-  final override val defaultValue: Boolean = true
+  override val defaultValue: Boolean = true
 
   override def onInitialization(): Unit = {
     reset()

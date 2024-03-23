@@ -4,7 +4,7 @@
 
 std::string absolutify(const std::string& relative) {
   char fullPath[MAX_PATH];
-  if (GetFullPathName("../bots/PurpleWave/jre/bin/java.exe", MAX_PATH, fullPath, nullptr) != 0) {
+  if (GetFullPathName(relative.c_str(), MAX_PATH, fullPath, nullptr) != 0) {
     std::ifstream fileStream(fullPath);
     if (fileStream.good()) {
       fileStream.close();
@@ -43,7 +43,7 @@ void launchBot(const std::string& command, const std::string& logPath, std::ostr
     const_cast<char*>(command.c_str()), // Command line
     nullptr,                // Process handle not inheritable
     nullptr,                // Thread handle not inheritable
-    true,                  // Set handle inheritance to FALSE
+    true,                   // Set handle inheritance to FALSE
     0,                      // No creation flags
     nullptr,                // Use parent's environment block
     nullptr,                // Use parent's starting directory 
@@ -82,19 +82,9 @@ void launchBot(const std::string& command, const std::string& logPath, std::ostr
     }
 }
 
-std::string escapeCommand(const std::string& input) {
-  std::string escapedString;
-  for (char c : input) {
-    if (c == '\\' || c == '\"') {
-      escapedString += '\\'; 
-    }
-    escapedString += c;
-  }
-  return escapedString;
-}
-
 int main() {
-  const std::string javaPath    = "../bots/PurpleWave/jre/bin/java.exe";
+  const std::string javaPath8   = "../jre/bin/java.exe";
+  const std::string javaPath21  = "../bots/PurpleWave/jre/bin/java.exe";  
   const std::string jarPath     = "bwapi-data/AI/PurpleWave.jar";
   const std::string logPath     = "./bwapi-data/write/PurpleWaveSCHNAIL.exe.txt";
   const std::string javaLogPath = "./bwapi-data/write/java.exe.txt";
@@ -113,38 +103,46 @@ int main() {
   logStream << "PurpleWave SCHNAIL Launcher: " << (absoluteJarPath.empty() ? "Did not find" : "Found") << " bot at " << absoluteJarPath << std::endl;
   
   bool ranBundledJava = false;
-  if (is64Bit) {    
-    auto absoluteJavaPath = absolutify(javaPath);
+  
+  const bool allowBundledJava = false;
+  if (is64Bit) {
+    auto absoluteJavaPath = absolutify(javaPath21);
     logStream << "PurpleWave SCHNAIL Launcher: " << (absoluteJavaPath.empty() ? "Did not find" : "Found") << " bundled JRE at " << absoluteJavaPath << std::endl;
     
-    if ( ! absoluteJavaPath.empty()) {
+    if (allowBundledJava && ! absoluteJavaPath.empty()) {
       ranBundledJava = true;
       std::string command =
-        // "\""
-        //+ javaPath
-        //+ "\""
-         std::string("java")
-        //+ " -jar -XX:MaxGCPauseMillis=15 -Xms1536m -Xmx1536m "
+         "\""
+        + absoluteJavaPath
+        + "\""
         + " -jar -XX:MaxGCPauseMillis=15 -Xms1024m -Xmx1024m "
-        //+ " --add-opens=java.base/java.nio=ALL-UNNAMED "
-        //+ "\""
+        + " --add-opens=java.base/java.nio=ALL-UNNAMED "
         + jarPath
-        //+ "\""
         + " > "
         + javaLogPath
-        + " 2>&1 \"";
-      logStream << "PurpleWave SCHNAIL Launcher: Launching bot with: " << command << std::endl;
-      //std::string escapedCommand = escapeCommand(command);
-      //logStream << "PurpleWave SCHNAIL Launcher: Ecaped command as:  " << escapedCommand << std::endl;
+        + " 2>&1";
+      logStream << "PurpleWave SCHNAIL Launcher: Launching bot with bundled JRE: " << command << std::endl;
       system(command.c_str());
-      logStream << "PurpleWave SCHNAIL Launcher: Done launching bot." << std::endl;
     }
   }
   
   if ( ! ranBundledJava) {
-    logStream << "PurpleWave SCHNAIL Launcher: Launching bot with run32.bat" << std::endl;
-    system("./bwapi-data/AI/run32.bat");
+    auto absoluteJavaPath = absolutify(javaPath8);
+    logStream << "PurpleWave SCHNAIL Launcher: " << (absoluteJavaPath.empty() ? "Did not find" : "Found") << " SCHNAIL JRE at " << absoluteJavaPath << std::endl;
+    std::string command =
+       "\""
+      + absoluteJavaPath
+      + "\""
+      + " -jar -XX:MaxGCPauseMillis=15 -Xms1024m -Xmx1024m "
+      + jarPath
+      + " > "
+      + javaLogPath
+      + " 2>&1";
+    logStream << "PurpleWave SCHNAIL Launcher: Launching bot with SCHNAIL JRE: " << command << std::endl;
+    system(command.c_str());      
   }
+    
+  logStream << "PurpleWave SCHNAIL Launcher: Done launching bot." << std::endl;
   
   logFile.close();
   return 0;

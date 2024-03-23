@@ -6,7 +6,7 @@ import Planning.Compositor
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Strategery.Strategies.Protoss.{PvZExpand, PvZGoon, PvZMuscle, PvZReaver, PvZSpeedlot, PvZTech}
+import Strategery.Strategies.Protoss._
 import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.{IsHatchlike, IsWarrior, IsWorker}
 import Utilities.{?, SwapIf}
@@ -14,6 +14,8 @@ import Utilities.{?, SwapIf}
 import scala.collection.mutable
 
 class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
+
+  override def activated: Boolean = employing(PvZ1BaseReactive)
 
   protected def economy       : Economy           = ?(PvZTech(committedTech), Tech, ?(PvZExpand(committedExpand), Expand, Muscle))
   protected var timingAttack  : Boolean           = false

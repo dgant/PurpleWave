@@ -4,12 +4,16 @@ import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points}
 import Placement.Generation.{Fit, Fitter, Templates}
-import Placement.Walls.WallDesigner
+import Placement.Walls.{Wall, FindWall, WallFinder}
 import Utilities.?
 
 class Placement extends Fitter {
 
   private var _initialized: Boolean = false
+
+  var wallFinder: Option[WallFinder] = None
+
+  def wall: Option[Wall] = wallFinder.flatMap(_.wall)
 
   def initialize(): Unit = {
     if (_initialized) return
@@ -57,8 +61,7 @@ class Placement extends Fitter {
   }
 
   private def preplaceWalls(zone: Zone): Unit = {
-    val wall = WallDesigner(zone)
-    val fit = wall.map(_.toFit)
-    fit.foreach(index)
+    wallFinder = FindWall(zone)
+    wall.map(_.toFit).foreach(index)
   }
 }

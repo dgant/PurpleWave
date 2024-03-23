@@ -57,6 +57,7 @@ trait MacroActions {
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
   def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
   def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, placementQueryArg = Some(placementQuery)))
+  def get(quantity: Int, unit: UnitClass, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireLabelYes(labels: _*))
   def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base))
   def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base).requireLabelYes(labels: _*))
   def get(upgrade: Upgrade): Unit = get(RequestUpgrade(upgrade))

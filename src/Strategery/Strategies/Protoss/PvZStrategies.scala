@@ -1,8 +1,6 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.PvZ.PvZ1BaseReactive
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -12,7 +10,6 @@ abstract class PvZStrategy extends Strategy {
 }
 
 object PvZ1BaseReactive extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1BaseReactive)
   addChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
   addChoice(PvZMuscle,  PvZExpand,  PvZTech)
 }

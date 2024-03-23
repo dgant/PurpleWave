@@ -27,7 +27,6 @@ object StrategyGroups {
     PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
 
     PvZGatewayFE,
-    PvZFFE,
   )
 }
 

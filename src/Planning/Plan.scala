@@ -7,7 +7,7 @@ class Plan extends Prioritized with SimpleString {
   
   protected def onUpdate() {}
   
-  final def update() {
+  final def update(): Unit = {
     prioritize()
     onUpdate()
   }

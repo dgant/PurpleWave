@@ -1,6 +1,8 @@
 package Mathematics.Shapes
 
 import Mathematics.Points.{Point, Tile}
+import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 
 object Pylons {
   // Pylon power is weird.
@@ -45,4 +47,8 @@ object Pylons {
 
   def powers2(from: Tile, to: Tile): Boolean = map2.contains((to.x - from.x, to.y - from.y))
   def powers3(from: Tile, to: Tile): Boolean = map3.contains((to.x - from.x, to.y - from.y))
+  def powers(from: Tile, to: Tile, unitClass: UnitClass): Boolean = ?(
+    unitClass.tileHeight <= 2,
+    powers2(from, to),
+    powers3(from, to))
 }

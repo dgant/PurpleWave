@@ -24,6 +24,7 @@ final class PathfindProfile(
   var costRepulsion       : Double                        = 0.0,
   var costThreat          : Double                        = 0.0,
   var debug               : Boolean                       = false,
+  var allowDiagonals      : Boolean                       = false,
   var alsoUnwalkable      : Set[Tile]                     = Set.empty,
   var repulsors           : IndexedSeq[PathfindRepulsor]  = IndexedSeq.empty,
   var unit                : Option[FriendlyUnitInfo]      = None) {

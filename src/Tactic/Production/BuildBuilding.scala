@@ -160,8 +160,8 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
 
   def builderTravelFramesMax            : Double = With.blackboard.maxBuilderTravelFrames() * (1 + Maff.fromBoolean(desiredTile.get.base.exists( ! _.owner.isUs)))
   def builderTravelFrames               : Double = proposedBuilder().map(_.framesToTravelTo(desiredTile.get.center)).getOrElse(Forever()).toDouble
-  def builderTravelHysteresisFrames     : Double = if (builder.isDefined) 48 else 24
-  def builderTravelHysteresisMultiplier : Double = if (builder.isDefined) 1.35 else 1.2
+  def builderTravelHysteresisFrames     : Double = ?(builder.isDefined, 48, 24)     + ?(builder.exists(b => desiredTile.exists(t => ! b.zone.bases.exists(_.townHall.exists(h => h.isOurs && h.complete)))), 480, 0)
+  def builderTravelHysteresisMultiplier : Double = ?(builder.isDefined, 1.35, 1.2)
   def builderAdvanceFrames              : Double = builderTravelHysteresisFrames + builderTravelHysteresisMultiplier * builderTravelFrames
   def incomeFrames                      : Double = Math.max(
     Maff.nanToN(if (buildingClass.mineralPrice  == 0) 0 else buildingClass.mineralPrice / With.accounting.ourIncomePerFrameMinerals, Forever()),

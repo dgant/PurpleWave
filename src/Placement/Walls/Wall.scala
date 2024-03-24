@@ -25,15 +25,21 @@ class Wall {
   }
 
   def toFit: Fit = {
-    if (buildings.isEmpty) return Fit(Tile(0, 0), new Template())
-    val origin = Tile(buildings.view.map(_._1.x).min, buildings.view.map(_._1.x).max)
-    val fit = Fit(origin, new Template)
+    if (buildings.isEmpty) {
+      return Fit(Tile(0, 0), new Template())
+    }
+
+    val origin  = Tile(buildings.view.map(_._1.x).min, buildings.view.map(_._1.x).max)
+    val fit     = Fit(origin, new Template)
+
     buildings.foreach(b => fit.template.add(
       Point(b._1.x - origin.x, b._1.y - origin.y),
       new TemplatePointRequirement(b._2).withLabels(PlaceLabels.Defensive, PlaceLabels.DefendEntrance, PlaceLabels.DefendGround, PlaceLabels.Wall)))
+
     hallway.foreach(tile => fit.template.add(
       Point(tile.x - origin.x, tile.y - origin.y),
       new RequireWalkable))
+
     fit
   }
 }

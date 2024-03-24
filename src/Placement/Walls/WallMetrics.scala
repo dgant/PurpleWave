@@ -6,6 +6,7 @@ class WallMetrics {
   var unbuildableTerrain  = 0
   var intersectsPrevious  = 0
   var intersectsHall      = 0
+  var intersectsMining    = 0
   var unbuildableGranular = 0
   var insufficientlyTight = 0
   var wrongZone           = 0
@@ -14,5 +15,4 @@ class WallMetrics {
   var gapTooWide          = 0
   var unpowered           = 0
   var acceptable          = 0
-
 }

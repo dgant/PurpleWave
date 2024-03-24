@@ -56,10 +56,13 @@ class PvZFE extends GameplanImperative {
     }
     if (With.fingerprints.hatchFirst()) {
       once(12, Protoss.Probe)
+      if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
+        cancel(Protoss.Forge, Protoss.PhotonCannon)
+      }
       naturalNexus()
       once(13, Protoss.Probe)
       buildInWall(1, Protoss.Gateway)
-      once(13, Protoss.Probe)
+      once(14, Protoss.Probe)
     } else if (With.fingerprints.twelvePool() || With.fingerprints.overpool()) {
       once(13, Protoss.Probe)
       naturalNexus()
@@ -67,6 +70,7 @@ class PvZFE extends GameplanImperative {
     } else {
       get(11, Protoss.Probe)
       buildInWall(1, Protoss.Forge)
+      buildInWall(2, Protoss.PhotonCannon)
     }
 
     once(13, Protoss.Probe)

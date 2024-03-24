@@ -57,6 +57,7 @@ object FindWall {
     With.logger.debug(f"Unbuildable (Granular):   ${wallFinder.metrics.unbuildableGranular}")
     With.logger.debug(f"Intersection (Previous):  ${wallFinder.metrics.intersectsPrevious}")
     With.logger.debug(f"Intersection (Hall):      ${wallFinder.metrics.intersectsHall}")
+    With.logger.debug(f"Intersection (Mining):    ${wallFinder.metrics.intersectsMining}")
     With.logger.debug(f"Wrong zone:               ${wallFinder.metrics.wrongZone}")
     With.logger.debug(f"Insufficiently tight:     ${wallFinder.metrics.insufficientlyTight}")
     With.logger.debug(f"Gap too narrow:           ${wallFinder.metrics.gapTooNarrow}")

@@ -38,7 +38,7 @@ class Visualization extends TimedTask {
 
     ShowProduction,
     ShowZones,
-    ShowPlacement,
+    ShowWall,
     ShowFoundations,
   )
 
@@ -89,6 +89,7 @@ class Visualization extends TimedTask {
     ShowTextOnly,
     ShowTileInfo,
     ShowUnitPaths,
+    ShowWall,
     ShowZonePaths,
     ShowZones
   )

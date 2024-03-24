@@ -191,11 +191,11 @@ trait TilePathfinder {
         return debugTilePath(output)
       }
 
-      val neigborTiles = bestTileState.tile.adjacent8
+      val (neighborTiles, neighborTilesLength) = if (profile.allowDiagonals) (bestTileState.tile.adjacent8, 8) else (bestTileState.tile.adjacent4, 4)
       var i = 0
-      while (i < 8) {
+      while (i < neighborTilesLength) {
 
-        val neighborTile = neigborTiles(i)
+        val neighborTile = neighborTiles(i)
         if (neighborTile.valid) {
 
           val neighborState = tiles(neighborTile.i)

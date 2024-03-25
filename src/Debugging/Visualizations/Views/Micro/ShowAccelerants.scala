@@ -11,7 +11,7 @@ object ShowAccelerants extends DebugView {
   override def renderMap(): Unit = {
     val radius = With.gathering.zipperRadius
     val minerals = With.units.neutral.filter(_.mineralsLeft > 0)
-    minerals.foreach(u => DrawMap.box(u.topLeft, u.bottomRight, Color.Teal))
+    minerals.foreach(u => DrawMap.box(u.topLeft, u.bottomRightInclusive, Color.Teal))
     minerals.filter(With.gathering.getAccelerantPixelSpawn(_).isDefined).foreach(mineral => {
       val accelerantPixel = With.gathering.getAccelerantPixelSpawn(mineral).get
       DrawMap.circle(accelerantPixel, radius, Color.Blue)

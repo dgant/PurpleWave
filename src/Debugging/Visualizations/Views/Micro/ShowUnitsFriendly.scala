@@ -55,7 +55,7 @@ object ShowUnitsFriendly extends DebugView {
 
     if (showLeaders) {
       if (agent.leader().contains(unit)) {
-        val start = origin.add(0, unit.unitClass.dimensionDown + 8)
+        val start = origin.add(0, unit.unitClass.dimensionDownInclusive + 8)
         DrawMap.circle(start, 5, color = unit.player.colorMidnight, solid = true)
         DrawMap.star(start, 4, Colors.NeonYellow)
       }
@@ -116,7 +116,7 @@ object ShowUnitsFriendly extends DebugView {
 
     if (showTarget) {
       unit.orderTarget.foreach(t => {
-        DrawMap.box(t.topLeft, t.bottomRight, unit.unitColor)
+        DrawMap.box(t.topLeft, t.bottomRightInclusive, unit.unitColor)
         DrawMap.line(unit.pixel, t.pixel, unit.unitColor)
       })
       unit.orderTargetPixel.filter(p => p.x > 0 && p.y > 0).foreach(t => {

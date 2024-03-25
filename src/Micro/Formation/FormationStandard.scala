@@ -311,7 +311,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     super.renderMap()
     goalPath.renderMap(Colors.brighten(style.color), customOffset = Point(-3, -3))
     targetPath.renderMap(Colors.darken(style.color), customOffset = Point(3, 3))
-    DrawMap.polygon(Maff.convexHull(vanguardUnits.view.flatMap(_.corners)), Colors.DarkGray)
+    DrawMap.polygon(Maff.convexHull(vanguardUnits.view.flatMap(_.cornersInclusive)), Colors.DarkGray)
     Seq(("Goal", goal), ("Target", threatOrigin), ("Face", face), ("Apex", apex), ("Centroid", vanguardCentroid))
       .groupBy(_._2)
       .foreach(p => DrawMap.label(p._2.map(_._1).mkString(" & "), p._1, drawBackground = true, style.color))

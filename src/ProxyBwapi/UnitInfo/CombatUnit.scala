@@ -98,31 +98,36 @@ trait CombatUnit {
   @inline final def cooldownMaxAirGround: Int = Math.max(?(unitClass.attacksAir, cooldownMaxAir, 0), ?(unitClass.attacksGround, cooldownMaxGround, 0))
   @inline final def effectiveRangePixels: Double = Math.max(pixelRangeMax, unitClass.effectiveRangePixels)
 
-  @inline final def x           : Int   = pixel.x
-  @inline final def y           : Int   = pixel.y
-  @inline final def left        : Int   = x - unitClass.dimensionLeft
-  @inline final def right       : Int   = x + unitClass.dimensionRight
-  @inline final def top         : Int   = y - unitClass.dimensionUp
-  @inline final def bottom      : Int   = y + unitClass.dimensionDown
-  @inline final def topLeft     : Pixel = Pixel(left, top)
-  @inline final def topRight    : Pixel = Pixel(right, top)
-  @inline final def bottomLeft  : Pixel = Pixel(left, bottom)
-  @inline final def bottomRight : Pixel = Pixel(right, bottom)
+  @inline final def x                     : Int   = pixel.x
+  @inline final def y                     : Int   = pixel.y
+  @inline final def left                  : Int   = x - unitClass.dimensionLeft
+  @inline final def rightInclusive        : Int   = x + unitClass.dimensionRightInclusive
+  @inline final def rightExclusive        : Int   = rightInclusive + 1
+  @inline final def top                   : Int   = y - unitClass.dimensionUp
+  @inline final def bottomInclusive       : Int   = y + unitClass.dimensionDownInclusive
+  @inline final def bottomExclusive       : Int   = bottomInclusive + 1
+  @inline final def topLeft               : Pixel = Pixel(left, top)
+  @inline final def topRightInclusive     : Pixel = Pixel(rightInclusive, top)
+  @inline final def topRightExclusive     : Pixel = Pixel(rightExclusive, top)
+  @inline final def bottomLeftInclusive   : Pixel = Pixel(left, bottomInclusive)
+  @inline final def bottomLeftExclusive   : Pixel = Pixel(left, bottomExclusive)
+  @inline final def bottomRightInclusive  : Pixel = Pixel(rightInclusive, bottomInclusive)
+  @inline final def bottomRightExclusive  : Pixel = Pixel(rightExclusive, bottomExclusive)
 
-  @inline final def corners: Vector[Pixel] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+  @inline final def cornersInclusive: Vector[Pixel] = Vector(topLeft, topRightInclusive, bottomLeftInclusive, bottomRightInclusive)
 
   @inline final def pixelStart                                                                        : Pixel   = Pixel(left, top)
-  @inline final def pixelEnd                                                                          : Pixel   = Pixel(right, bottom)
+  @inline final def pixelEndExclusive                                                                 : Pixel   = Pixel(rightExclusive, bottomExclusive)
   @inline final def pixelStartAt                  (at: Pixel)                                         : Pixel   = at.subtract(pixel).add(left, top)
-  @inline final def pixelEndAt                    (at: Pixel)                                         : Pixel   = at.subtract(pixel).add(right, bottom)
+  @inline final def pixelEndAtExclusive           (at: Pixel)                                         : Pixel   = at.subtract(pixel).add(rightExclusive, bottomExclusive)
   @inline final def pixelDistanceCenter           (to: Pixel)                                         : Double  = pixel.pixelDistance(to)
   @inline final def pixelDistanceCenter           (other: CombatUnit)                                 : Double  = pixelDistanceCenter(other.pixel)
-  @inline final def pixelDistanceShooting         (other: CombatUnit)                                 : Double  = ?(unitClass == Protoss.Reaver && pixel.zone != other.pixel.zone, pixelDistanceTravelling(other.pixel), pixelDistanceEdge(other.pixelStart, other.pixelEnd))
-  @inline final def pixelDistanceEdge             (boxStart: Pixel, boxEnd: Pixel)                    : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEnd, boxStart, boxEnd)
-  @inline final def pixelDistanceEdge             (destination: Pixel)                                : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEnd, destination, destination)
-  @inline final def pixelDistanceEdge             (other: CombatUnit)                                 : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEnd)
-  @inline final def pixelDistanceEdge             (other: CombatUnit,              otherAt: Pixel)    : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(1 + other.unitClass.dimensionRight, 1 + other.unitClass.dimensionDown))
-  @inline final def pixelDistanceEdge             (other: CombatUnit, usAt: Pixel, otherAt: Pixel)    : Double  = Maff.broodWarDistanceBox(usAt.subtract(unitClass.dimensionLeft, unitClass.dimensionUp), usAt.add(1 + unitClass.dimensionRight, 1 + unitClass.dimensionDown), otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRight, other.unitClass.dimensionDown))
+  @inline final def pixelDistanceShooting         (other: CombatUnit)                                 : Double  = ?(unitClass == Protoss.Reaver && pixel.zone != other.pixel.zone, pixelDistanceTravelling(other.pixel), pixelDistanceEdge(other.pixelStart, other.pixelEndExclusive))
+  @inline final def pixelDistanceEdge             (boxStart: Pixel, boxEnd: Pixel)                    : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEndExclusive, boxStart, boxEnd)
+  @inline final def pixelDistanceEdge             (destination: Pixel)                                : Double  = Maff.broodWarDistanceBox(pixelStart, pixelEndExclusive, destination, destination)
+  @inline final def pixelDistanceEdge             (other: CombatUnit)                                 : Double  = pixelDistanceEdge(other.pixelStart, other.pixelEndExclusive)
+  @inline final def pixelDistanceEdge             (other: CombatUnit,              otherAt: Pixel)    : Double  = pixelDistanceEdge(otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRightExclusive, other.unitClass.dimensionDownExclusive))
+  @inline final def pixelDistanceEdge             (other: CombatUnit, usAt: Pixel, otherAt: Pixel)    : Double  = Maff.broodWarDistanceBox(usAt.subtract(unitClass.dimensionLeft, unitClass.dimensionUp), usAt.add(unitClass.dimensionRightExclusive, unitClass.dimensionDownExclusive), otherAt.subtract(other.unitClass.dimensionLeft, other.unitClass.dimensionUp), otherAt.add(other.unitClass.dimensionRightExclusive, other.unitClass.dimensionDownExclusive))
   @inline final def pixelDistanceEdgeFrom         (other: CombatUnit, usAt: Pixel)                    : Double  = other.pixelDistanceEdge(this, usAt)
   @inline final def pixelDistanceSquared          (other: CombatUnit)                                 : Double  = pixelDistanceSquared(other.pixel)
   @inline final def pixelDistanceSquared          (to: Pixel)                                         : Double  = pixel.pixelDistanceSquared(to)

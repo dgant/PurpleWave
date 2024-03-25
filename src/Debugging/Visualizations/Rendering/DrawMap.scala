@@ -167,8 +167,8 @@ object DrawMap {
   }
   
   def tileRectangle(rectangle: TileRectangle, color: Color, margin: Int = 0): Unit = {
-    if (irrelevant(rectangle.startPixel, rectangle.endPixel)) return
-    With.game.drawBoxMap(rectangle.startPixel.subtract(margin, margin).bwapi, rectangle.endPixel.add(margin, margin).bwapi, color)
+    if (irrelevant(rectangle.startPixel, rectangle.endPixelInclusive)) return
+    With.game.drawBoxMap(rectangle.startPixel.subtract(margin, margin).bwapi, rectangle.endPixelInclusive.add(margin, margin).bwapi, color)
   }
   
   def polygon(pixels: Iterable[Pixel], color: Color = Colors.DefaultGray): Unit = {

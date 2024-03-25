@@ -4,7 +4,6 @@ import Information.GameSense.Budgets
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Point, Tile, TileRectangle}
-import Planning.Plans.Basic.NoPlan
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Neutral, Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}
@@ -29,16 +28,19 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val occupancy    : Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
 
-  lazy val topLeft      : Point = Point(-dimensionLeft, -dimensionUp)
-  lazy val topRight     : Point = Point(dimensionRight, -dimensionUp)
-  lazy val bottomLeft   : Point = Point(-dimensionLeft, dimensionDown)
-  lazy val bottomRight  : Point = Point(dimensionRight, dimensionDown)
-  lazy val corners: Vector[Point] = Vector(topLeft, topRight, bottomLeft, bottomRight)
+  lazy val topLeft              : Point         = Point(  - dimensionLeft,            - dimensionUp)
+  lazy val topRightInclusive    : Point         = Point(    dimensionRightInclusive,  - dimensionUp)
+  lazy val bottomLeftInclusive  : Point         = Point(  - dimensionLeft,              dimensionDownInclusive)
+  lazy val bottomRightInclusive : Point         = Point(    dimensionRightInclusive,    dimensionDownInclusive)
+  lazy val cornersInclusive     : Vector[Point] = Vector(topLeft, topRightInclusive, bottomLeftInclusive, bottomRightInclusive)
 
-  lazy val marginUp     : Int = 16 * tileHeight - dimensionUp
-  lazy val marginDown   : Int = 16 * tileHeight - dimensionDown   - 1
-  lazy val marginLeft   : Int = 16 * tileWidth  - dimensionLeft
-  lazy val marginRight  : Int = 16 * tileWidth  - dimensionRight  - 1
+  lazy val marginUp             : Int = 16 * tileHeight - dimensionUp
+  lazy val marginDownInclusive  : Int = 16 * tileHeight - dimensionDownInclusive
+  lazy val marginLeft           : Int = 16 * tileWidth  - dimensionLeft
+  lazy val marginRightInclusive : Int = 16 * tileWidth  - dimensionRightInclusive
+
+  lazy val tileWidthPlusAddon: Int = tileWidth + 2 * Maff.fromBoolean(canBuildAddon)
+  lazy val tileArea: TileRectangle = TileRectangle(Tile(0, 0), tileSize)
 
   //////////////
   // Movement //
@@ -168,16 +170,19 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (this == Zerg.Queen)            32.0 * 9.0
     else pixelRangeMax
 
-  lazy val tileWidthPlusAddon: Int = tileWidth + 2 * Maff.fromBoolean(canBuildAddon)
-  lazy val tileArea: TileRectangle = TileRectangle(Tile(0, 0), tileSize)
-  lazy val orderable: Boolean = ! isSpell && ! Vector(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
-  lazy val isMinerals: Boolean = isMineralField
-  lazy val isGas: Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
-  lazy val isResource: Boolean = isMinerals || isGas
-  lazy val isTownHall: Boolean = isResourceDepot
-  lazy val isStaticDefense: Boolean = isBuilding && (canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery)
-  lazy val isTransport: Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
-  lazy val affectedByDarkSwarm: Boolean = ! Vector(
+  /////////////////
+  // Capabilities //
+  //////////////////
+
+  lazy val orderable            : Boolean = ! isSpell && ! Vector(Protoss.Interceptor, Protoss.Scarab, Terran.SpiderMine).contains(this)
+  lazy val isMinerals           : Boolean = isMineralField
+  lazy val isGas                : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
+  lazy val isResource           : Boolean = isMinerals || isGas
+  lazy val isTownHall           : Boolean = isResourceDepot
+  lazy val isStaticDefense      : Boolean = isBuilding && (canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery)
+  lazy val isTransport          : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier
+  lazy val powers               : Boolean = this == Protoss.Pylon
+  lazy val affectedByDarkSwarm  : Boolean = ! Vector(
     Terran.SiegeTankSieged,
     Terran.Firebat,
     Protoss.Zealot,
@@ -194,9 +199,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // Macro //
   ///////////
 
-  lazy val isProtoss: Boolean = race == Race.Protoss
-  lazy val isTerran: Boolean = race == Race.Terran
-  lazy val isZerg: Boolean = race == Race.Zerg
+  lazy val isProtoss  : Boolean = race == Race.Protoss
+  lazy val isTerran   : Boolean = race == Race.Terran
+  lazy val isZerg     : Boolean = race == Race.Zerg
 
   // Source: http://satirist.org/ai/starcraft/blog/archives/916-when-will-that-enemy-building-complete.html
   lazy val framesToFinishCompletion: Int = if (isBuilding) { if (isProtoss) 75 else if (isZerg) 9 else 2 } else 0
@@ -209,10 +214,10 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val trainsGroundUnits: Boolean = unitsTrained.exists(unit => ! unit.isFlyer && !unit.isBuilding)
   lazy val trainsUpgradesOrTechs: Boolean = unitsTrained.nonEmpty || techsWhat.nonEmpty || upgradesWhat.nonEmpty
 
-  lazy val buildTechEnabling: Option[Tech] = if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown) None else Some(requiredTechRaw)
-  lazy val buildUnitsEnabling: Vector[UnitClass] = _buildUnitsEnabling
-  lazy val buildUnitsBorrowed: Vector[UnitClass] = _buildUnitsBorrowed
-  lazy val buildUnitsSpent: Vector[UnitClass] = _buildUnitsSpent
+  lazy val buildTechEnabling  : Option[Tech]      = if (requiredTechRaw == Techs.None || requiredTechRaw == Techs.Unknown) None else Some(requiredTechRaw)
+  lazy val buildUnitsEnabling : Vector[UnitClass] = _buildUnitsEnabling
+  lazy val buildUnitsBorrowed : Vector[UnitClass] = _buildUnitsBorrowed
+  lazy val buildUnitsSpent    : Vector[UnitClass] = _buildUnitsSpent
 
   lazy val macroSubstitutes: Seq[UnitClass] =
           if (this == Zerg.Spire)     Seq(Zerg.GreaterSpire)
@@ -223,7 +228,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val isHatchlike  : Boolean = withMacroSubstitutes.contains(Zerg.Hatchery)
   lazy val isLairlike   : Boolean = withMacroSubstitutes.contains(Zerg.Lair)
   lazy val isSpirelike  : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
-  lazy val isTank: Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
+  lazy val isTank       : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
 
   private def _buildUnitsEnabling: Vector[UnitClass] = {
     lazy val output = new ListBuffer[UnitClass]

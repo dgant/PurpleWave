@@ -31,14 +31,14 @@ trait AccelerantMinerals {
     // Not sure how to do the second one yet so this will just do the first
 
     val hallStart = base.townHallArea.startPixel
-    val hallEnd = base.townHallArea.endPixel
+    val hallEndExclusive = base.townHallArea.endPixelExclusive
 
-    val minerals = base.minerals.map(m => (m, Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, hallStart, hallEnd))).sortBy(_._2)
+    val minerals = base.minerals.map(m => (m, Maff.broodWarDistanceBox(m.topLeft, m.bottomRightExclusive, hallStart, hallEndExclusive))).sortBy(_._2)
     var i = 0
     while (i < minerals.length) {
-      val mineral = minerals(i)
+      val mineral               = minerals(i)
       val acceleratorCandidates = minerals.drop(i).filter(_._2 > 24 + mineral._2).filter(_._1.pixelDistanceEdge(mineral._1) < 40)
-      val accelerator = Maff.minBy(acceleratorCandidates)(_._1.pixelDistanceEdge(mineral._1))
+      val accelerator           = Maff.minBy(acceleratorCandidates)(_._1.pixelDistanceEdge(mineral._1))
       accelerator.foreach(a => accelerantMinerals(mineral._1) = a._1)
       i += 1
     }

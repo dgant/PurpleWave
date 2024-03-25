@@ -25,7 +25,7 @@ object ShowDivisions extends DebugView {
   override def renderMap(): Unit = {
     With.battles.divisions.foreach(division => {
       val enemyPoints = division.enemies.flatMap(u =>
-        u.corners
+        u.cornersInclusive
           .map(p => p.add(
             3 * Maff.toSign(p.x > u.x),
             3 * Maff.toSign(p.y > u.y))))

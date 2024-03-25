@@ -66,7 +66,7 @@ trait Zippers {
       u.unitClass.isWorker
       && u.orderTarget.exists(t =>
         t.mineralsLeft > 0
-        && u.pixelDistanceEdge(t) <= 1
+        && u.pixelDistanceEdge(t) < 1
         && u.pixel != u.previousPixel(1)))
     arrivingWorkers.foreach(worker => {
       val framesAgo = 11 + With.latency.latencyFrames

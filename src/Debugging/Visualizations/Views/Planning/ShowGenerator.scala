@@ -23,7 +23,7 @@ object ShowGenerator extends DebugView {
         val directionToBack   = new Direction(cornerFront, cornerBack)
         val directionToFront  = new Direction(cornerBack, cornerFront)
 
-        DrawMap.box(bounds.startPixel, bounds.endPixel, Colors.NeonYellow)
+        DrawMap.box(bounds.startPixel, bounds.endPixelInclusive, Colors.NeonYellow)
         val generator = new TileGeneratorRectangularSweep(exitTile, zone.boundary.startInclusive, zone.boundary.endExclusive, directionToBack)
         var previous = exitTile
         var next = previous

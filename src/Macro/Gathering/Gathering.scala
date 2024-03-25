@@ -21,7 +21,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
   private class Slot(var resource: UnitInfo, val order: Int) {
     val tile        : Tile    = resource.tileTopLeft
     val base        : Base    = resource.base.getOrElse(With.geography.bases.minBy(_.heart.groundPixels(resource.tileTopLeft)))
-    val distance    : Double  = Maff.broodWarDistanceBox(resource.topLeft, resource.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel)
+    val distance    : Double  = Maff.broodWarDistanceBox(resource.topLeft, resource.bottomRightExclusive, base.townHallArea.startPixel, base.townHallArea.endPixelExclusive)
     var lastUpdate  : Int     = - Forever()
     var worker      : Option[FriendlyUnitInfo] = None
     def free        : Boolean = worker.isEmpty && mineable
@@ -35,8 +35,8 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         val sorted = group._2.toVector
           .sortBy(m =>
             // Give slight edge to patches near the 3rd starting worker and where future workers will spawn if Terran/Protoss
-            Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
-              Maff.broodWarDistanceBox(m.topLeft, m.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+            Maff.broodWarDistanceBox(m.topLeft, m.bottomRightExclusive, base.townHallArea.startPixel.add(47, 80), base.townHallArea.startPixel.add(70, 103)) * 0.1 +
+            Maff.broodWarDistanceBox(m.topLeft, m.bottomRightExclusive, base.townHallArea.startPixel,             base.townHallArea.endPixelExclusive))
         (base, (sorted.map(new Slot(_, 0)) ++ sorted.reverse.map(new Slot(_, 1)) ++ sorted.reverse.map(new Slot(_, 2)))) })
     // A base doesn't *have* to have any minerals in it
     val omitted = With.geography.bases.filterNot(basesWithMinerals.contains)
@@ -50,7 +50,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         val base = group._1
         val sorted = group._2.toVector
           .sortBy(_.gasMinersRequired)
-          .sortBy(g => Maff.broodWarDistanceBox(g.topLeft, g.bottomRight, base.townHallArea.startPixel, base.townHallArea.endPixel))
+          .sortBy(g => Maff.broodWarDistanceBox(g.topLeft, g.bottomRightExclusive, base.townHallArea.startPixel, base.townHallArea.endPixelExclusive))
         (base, sorted.flatMap(g => (0 until g.gasMinersRequired).map(new Slot(g, _)).toVector)) })
   private lazy val slotsByResource: mutable.Map[UnitInfo, Seq[Slot]] = new mutable.HashMap[UnitInfo, Seq[Slot]] ++ (mineralSlots.values.view.flatten ++ gasSlots.values.view.flatten).groupBy(_.resource).map(p => (p._1, p._2.toSeq))
   private lazy val baseCosts: Map[(Base, Base), Double] = With.geography.bases

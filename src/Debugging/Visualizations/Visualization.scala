@@ -36,7 +36,6 @@ class Visualization extends TimedTask {
     ShowUnitsEnemy,
     ShowJudgment,
 
-    ShowProduction,
     ShowZones,
     ShowWall,
     ShowFoundations,

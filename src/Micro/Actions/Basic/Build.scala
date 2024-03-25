@@ -87,8 +87,8 @@ object Build extends Action {
     if (Protoss.Probe(unit)) {
       // If unit doesn't have to resolve collision after moving it gets back to work faster
       movePixel = movePixel.add(
-        if (unit.x < movePixel.x) - unit.unitClass.dimensionRight - buildClass.dimensionLeft - 1 else unit.unitClass.dimensionLeft + buildClass.dimensionRight + 1,
-        if (unit.y < movePixel.y) - unit.unitClass.dimensionDown  - buildClass.dimensionUp   - 1 else unit.unitClass.dimensionUp   + buildClass.dimensionDown + 1).walkablePixel
+        if (unit.x < movePixel.x) - unit.unitClass.dimensionRightInclusive - buildClass.dimensionLeft - 1 else unit.unitClass.dimensionLeft + buildClass.dimensionRightInclusive + 1,
+        if (unit.y < movePixel.y) - unit.unitClass.dimensionDownInclusive  - buildClass.dimensionUp   - 1 else unit.unitClass.dimensionUp   + buildClass.dimensionDownInclusive + 1).walkablePixel
     } else if (Zerg.Drone(unit)) {
       // McRave found that positioning Drone (0, -7) from building location minimizes wiggling
       movePixel = movePixel.add(buildClass.tileWidth * 16, buildClass.tileHeight * 16 - 7)

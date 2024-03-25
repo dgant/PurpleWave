@@ -173,8 +173,8 @@ object Commander {
 
     // Clip to map
     to = Pixel(
-      Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRight),
-      Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDown))
+      Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRightInclusive),
+      Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDownInclusive))
 
     if (unit.airborne) return to
 
@@ -186,10 +186,10 @@ object Commander {
     // Even slight intersection with a non-walkable tile can cause a unit to refuse movement
     // This could prevent getting stuck eg when trying to move behind a mineral line with a Dragoon
     var walkabilityAssured = to.walkable
-    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,  - unit.unitClass.dimensionUp    ).walkable
-    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight,   unit.unitClass.dimensionDown  ).walkable
-    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRight, - unit.unitClass.dimensionUp    ).walkable
-    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,    unit.unitClass.dimensionDown  ).walkable
+    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,            - unit.unitClass.dimensionUp            ).walkable
+    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRightInclusive,    unit.unitClass.dimensionDownInclusive ).walkable
+    walkabilityAssured &&= to.add(   unit.unitClass.dimensionRightInclusive,  - unit.unitClass.dimensionUp            ).walkable
+    walkabilityAssured &&= to.add( - unit.unitClass.dimensionLeft,              unit.unitClass.dimensionDownInclusive ).walkable
     if ( ! walkabilityAssured && unit.pixelDistanceCenter(to) > 32) {
       to = to.walkableTile.center
     }

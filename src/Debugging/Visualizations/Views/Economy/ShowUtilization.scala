@@ -39,15 +39,15 @@ object ShowUtilization extends DebugView {
     if (ratio <= 0) return
     DrawMap.box(
       unit.topLeft,
-      unit.bottomRight,
+      unit.bottomRightInclusive,
       Color.Black)
     DrawMap.box(
       unit.topLeft.add(1, 1),
-      unit.bottomRight.subtract(1, 1),
+      unit.bottomRightInclusive.subtract(1, 1),
       Color.Black)
     DrawMap.box(
       unit.pixel.subtract((ratio * unit.unitClass.dimensionLeft).toInt, (ratio * unit.unitClass.dimensionUp).toInt),
-      unit.pixel.add((ratio * unit.unitClass.dimensionRight).toInt, (ratio * unit.unitClass.dimensionDown).toInt),
+      unit.pixel.add((ratio * unit.unitClass.dimensionRightInclusive).toInt, (ratio * unit.unitClass.dimensionDownInclusive).toInt),
       Color.Black,
       solid = true)
   }

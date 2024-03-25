@@ -53,7 +53,7 @@ object Root extends Action {
     private lazy val buildingInRange        = visibleTargetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets          = unit.matchups.enemies.filter(e => unit.canAttack(e) && e.unitClass.attacksOrCastsOrDetectsOrTransports)
     private lazy val targetsInRange         = combatTargets.filter(t => unit.pixelDistanceEdge(t) < maxRange)
-    private lazy val targetsNearingRange    = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAt(p)) < maxRange - 32})
+    private lazy val targetsNearingRange    = combatTargets.filter(t => { val p = t.projectFrames(framesToRoot); unit.pixelDistanceEdge(t.pixelStartAt(p), t.pixelEndAtExclusive(p)) < maxRange - 32})
     private lazy val girdForCombat          = targetsInRange.nonEmpty || targetsNearingRange.size > 3
     private lazy val artilleryOutOfRange    = unit.matchups.targets.filter(t => t.canAttack(unit) && t.pixelRangeAgainst(unit) >unit.pixelRangeAgainst(t) && t.inRangeToAttack(unit))
     private lazy val duckForCover           = false && (weAreALurker && unit.matchups.groupVs.detectors.isEmpty && unit.matchups.framesOfSafety < framesToRoot && (artilleryOutOfRange.isEmpty || ! With.enemy.isTerran)) // Root for safety, but not in range of Tanks if they can scan us

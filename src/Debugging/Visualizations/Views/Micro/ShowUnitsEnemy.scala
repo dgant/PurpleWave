@@ -55,7 +55,7 @@ object ShowUnitsEnemy extends DebugView {
           Array(
             f"$timeLeft ($timeEnd)",
             "%02f".format(pctHp) + "%"),
-          Pixel(unit.x, unit.bottom), drawBackground = true, unit.teamColor)
+          Pixel(unit.x, unit.bottomExclusive), drawBackground = true, unit.teamColor)
       }
     }
   }

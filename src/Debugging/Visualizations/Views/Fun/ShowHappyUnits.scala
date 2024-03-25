@@ -10,7 +10,7 @@ import bwapi.Color
 
 object ShowHappyUnits extends DebugView {
   
-  override def renderMap() {
+  override def renderMap(): Unit = {
     
     With.units.all
       .filter(unit =>
@@ -27,7 +27,7 @@ object ShowHappyUnits extends DebugView {
     DrawScreen.text(541, 4, "Friends: ")
   }
   
-  def renderUnit(unit:UnitInfo) {
+  def renderUnit(unit:UnitInfo): Unit = {
     
     val color = unit.teamColor
     val isActiveBuilding = unit.friendly.nonEmpty && unit.friendly.get.trainingQueue.nonEmpty
@@ -37,13 +37,13 @@ object ShowHappyUnits extends DebugView {
       if (unit.flying) 24
       else if (isActiveBuilding) (Math.sin(animationFrame/8) * 6).toInt
       else 0
-    
+
     val horizontalBonus = 0
   
     val left              = horizontalBonus + unit.left
-    val right             = horizontalBonus + unit.right
+    val right             = horizontalBonus + unit.rightExclusive
     val top               = verticalBonus + unit.top
-    val bottom            = verticalBonus + unit.bottom
+    val bottom            = verticalBonus + unit.bottomExclusive
     val middle            = (left + right)/2
     val farLeft           = left    - unit.unitClass.width / 8
     val farRight          = right   + unit.unitClass.width / 8

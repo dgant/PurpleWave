@@ -19,7 +19,7 @@ object ShuttleAwait extends Action {
       .sortBy(! _.trainee.exists(Protoss.Reaver))
       .headOption
     roboticsFacility.foreach(robo => {
-      val roboCorner = robo.bottomLeft.add(0, 16)
+      val roboCorner = robo.bottomLeftInclusive.add(0, 16)
       shuttle.agent.redoubt.set(roboCorner)
       shuttle.agent.decision.set(roboCorner)
       val framesToRobotics  = shuttle.framesToTravelTo(roboCorner)

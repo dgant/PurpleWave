@@ -12,7 +12,7 @@ class Placement extends Fitter {
   private var _initialized: Boolean = false
 
   var wallFinder: Option[WallFinder] = None
-  val wallEverything = false
+  val wallEverything = true
 
   def wall: Option[Wall] = wallFinder.flatMap(_.wall)
 
@@ -32,7 +32,8 @@ class Placement extends Fitter {
 
     basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
     if (wallEverything) {
-      zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
+      With.geography.zones.filter(_.bases.exists(b => b.isNatural || With.geography.ourNatural == b)).foreach(preplaceWalls)
+      //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
     } else if (With.self.isProtoss && With.enemies.exists(_.isZerg)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }

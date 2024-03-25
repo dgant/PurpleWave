@@ -63,7 +63,7 @@ class Architecture {
       With.architecture.ungassable.set(tile, Some(exclusion))
     })
 
-    if (unit == Protoss.Pylon) {
+    if (unit.powers) {
       val powerFrame = With.frame + futureFrames + Protoss.Pylon.buildFramesFull
       Pylons.points2.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame2Height.set(_, powerFrame))
       Pylons.points3.map(tile.add).filter(_.valid).foreach(With.architecture.powerFrame3Height.set(_, powerFrame))

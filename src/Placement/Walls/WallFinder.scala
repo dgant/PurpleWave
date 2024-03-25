@@ -4,16 +4,19 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Point, Tile}
-import Mathematics.Shapes.{Corners, Pylons, Rectangle, RoundedBox}
+import Mathematics.Points.{Point, Tile, TileRectangle}
+import Mathematics.Shapes.{Pylons, Rectangle, RoundedBox}
 import Placement.Generation.TileGeneratorRectangularSweep
+import Placement.Walls.WallFillers.{PylonsCannons, WallFiller}
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall}
-import ProxyBwapi.Races.{Neutral, Protoss}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallConstraint], filler: Seq[UnitClass]) {
+class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallConstraint], filler: WallFiller) {
   val metrics                         = new WallMetrics
   val wallScores                      = new ArrayBuffer[(Wall, Double)]()
   val incompleteWall  : Wall          = new Wall
@@ -73,13 +76,16 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
           metrics.gapTooWide += 1
           return false
         }
+
+        /* Disabling because we're changing the way we iterate to avoid having to do this check, at a cost of rejecting walls where the gap is at the far end
         // Use Chebyshev distance to check gap size because cater-corner diagonals are not acceptable
         if (horizon.exists(t => boundaryEnd.exists(_.tileDistanceChebyshev(t) <= gapsLeft))) {
           metrics.gapTooNarrow += 1
           return false
         }
-        // If the wall has a Pylon, then all buildings need to be powered.
-        val pylons = incompleteWall.buildings.filter(_._2 == Protoss.Pylon)
+        */
+        // If the wall has a Pylon, then it must power the other buildings.
+        val pylons = incompleteWall.buildings.filter(_._2.powers)
         if (pylons.nonEmpty) {
           val unpowered = incompleteWall.buildings.find(b => b._2.requiresPsi && ! pylons.exists(p => Pylons.powers(p._1, b._1, b._2)))
           if (unpowered.isDefined) {
@@ -90,6 +96,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
         wallScores += ((new Wall(incompleteWall), scoreWall(incompleteWall)))
         return true
       }
+
       // For each tile in the boundary,
       //   for each way to place a tile adjacent to it,
       //     for each gap size still available,
@@ -114,7 +121,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
       horizon.exists(horizonTile => {
         metrics.tilesConsidered += 1
         RoundedBox(width + 2, height + 2).exists(relative =>
-          (0 to gapsLeft).exists(gapsUsed => {
+          (buildingsLeft.length - 1 to gapsLeft).exists(gapsUsed => {
             val gapOffset =
                     if (relative.x == 0)          Point(- gapsUsed,   0)
               else  if (relative.y == 0)          Point(  0,        - gapsUsed)
@@ -131,10 +138,10 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
               val tileGapRight  = lastTile.x      - buildingTile.x  - width
               val tileGapUp     = buildingTile.y  - lastTile.y      - lastBuilding.tileHeight
               val tileGapDown   = lastTile.y      - buildingTile.y  - height
-              val alleyLeft     = if (tileGapLeft   == 0) lastBuilding.marginRight  + building.marginLeft   else -1
-              val alleyRight    = if (tileGapRight  == 0) lastBuilding.marginLeft   + building.marginRight  else -1
-              val alleyUp       = if (tileGapUp     == 0) lastBuilding.marginDown   + building.marginUp     else -1
-              val alleyDown     = if (tileGapDown   == 0) lastBuilding.marginUp     + building.marginDown   else -1
+              val alleyLeft     = if (tileGapLeft   == 0) lastBuilding.marginRightInclusive   + building.marginLeft           else -1
+              val alleyRight    = if (tileGapRight  == 0) lastBuilding.marginLeft             + building.marginRightInclusive else -1
+              val alleyUp       = if (tileGapUp     == 0) lastBuilding.marginDownInclusive    + building.marginUp             else -1
+              val alleyDown     = if (tileGapDown   == 0) lastBuilding.marginUp               + building.marginDownInclusive  else -1
               (alleyLeft, alleyRight, alleyUp, alleyDown)
             }).getOrElse((-1, -1, -1, -1))
 
@@ -143,10 +150,12 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
             }
 
             // First building must touch the target zone
+              /*
             else if (incompleteWall.buildings.isEmpty && Corners(width, height).map(buildingTile.add).forall(_.zone != zone)) {
               metrics.wrongZone += 1
               false
             }
+            */
 
             // Gaps must meet tightness criterion
             else if (gapsUsed == 0 && (alleyLeft >= constraint.blocksUnit.width || alleyRight >= constraint.blocksUnit.width || alleyUp >= constraint.blocksUnit.height || alleyDown >= constraint.blocksUnit.height)) {
@@ -157,8 +166,8 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
             // Success! Place the next building.
             // Apply changes
             else {
-              val gapBefore = incompleteWall.gap
               incompleteWall.buildings += ((buildingTile, building))
+              val gapBefore = incompleteWall.gap
               if (gapBefore.isEmpty && gapsUsed > 0) {
                 incompleteWall.gap = Some(horizonTile.add(gapOffset.direction.x, gapOffset.direction.y))
               }
@@ -221,7 +230,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     }
 
     // Buildings must not block mining
-    if(buildingTiles.exists(t => t.base.exists(_.harvestingTrafficTiles.contains(t)))) {
+    if(buildingTiles.exists(t => t.base.exists(_.resourcePathTiles.contains(t)))) {
       metrics.intersectsMining += metricsValue
       return false
     }
@@ -247,49 +256,86 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   }
 
   def placeFiller(): Unit = {
-    if (filler.isEmpty) return
     if (wall.get.gap.isDefined) {
       val gap             = wall.get.gap.get
-      val hallwayWalls    = wall.get.buildings.flatMap(p => p._2.tileArea.add(p._1).tiles).toSet
+      val hallwayWalls    = (wall.get.buildings.flatMap(p => p._2.tileArea.add(p._1).tiles) ++ zone.bases.flatMap(_.townHallArea.tiles)).toSet
       val hallwayProfile  = new PathfindProfile(gap, Some(entrance), employGroundDist = true, alsoUnwalkable = hallwayWalls, allowDiagonals = false)
       val hallwayPath     = hallwayProfile.find.tiles
       wall.get.hallway    = hallwayPath.getOrElse(Seq.empty)
-      if (wall.get.hallway.isEmpty) return // We can't safely fill without preserving a path
-    }
-    var i           = 0
-    var lastFiller  = Neutral.PsiDisruptor
-    var lastFilled  = true
-    while (i < filler.length) {
-      val fill = filler(i)
-      // Don't try and fail to fill the same thing multiple times
-      if (lastFilled || fill != lastFiller) {
-        lastFilled = tryFill(fill)
+      // We can't safely fill without preserving a path
+      if (wall.get.hallway.isEmpty) {
+        metrics.noPath += 1
+        wall = None
+        return
       }
-      lastFiller = fill
-      i += 1
+    }
+
+    if (filler == PylonsCannons) fill2X2()
+  }
+
+  def fill2X2(): Unit = {
+    val offsets = Vector(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))
+    val placements = new mutable.HashMap[Point, ArrayBuffer[Tile]]
+    offsets.foreach(offset => {
+      placements(offset) = new ArrayBuffer[Tile]()
+      fill2x2Offset(offset, placements(offset))
+    })
+    val tiles = placements.values.maxBy(_.length) // TODO: Also score based on quality of fit
+    if (filler == PylonsCannons) {
+      if (tiles.length + wall.get.buildings.length < 7) {
+        metrics.insufficientFiller += 1
+        wall = None
+        return
+      }
+      val centroid          = Maff.centroid(wall.get.buildings.map(b => b._1.topLeftPixel.add(b._2.dimensionLeft, b._2.dimensionUp)))
+      wall.get.buildings  ++= tiles.map(t => (t, Protoss.PhotonCannon))
+      def pylons            = wall.get.buildings.view.filter(b => b._2.powers)
+      def convertable       = wall.get.buildings.view.filter(b => b._2 == Protoss.PhotonCannon)
+      def unpowered         = wall.get.buildings.view.filter(b => b._2.requiresPsi && ! pylons.exists(p => Pylons.powers(p._1, b._1, b._2)))
+      while (unpowered.nonEmpty && convertable.nonEmpty) {
+        val scores = convertable.map(c => (c._1, c._2, unpowered.map(u => ?(Pylons.powers(c._1, u._1, u._2), ?(u._2 == Protoss.PhotonCannon, 1, 100), 0)).sum))
+        val maxScore = scores.map(_._3).max
+        if (maxScore == 0) {
+          metrics.unpowered += 1
+          wall = None
+          return
+        }
+        val candidates  = scores.filter(_._3 == maxScore)
+        val best        = candidates.maxBy(_._1.topLeftPixel.add(32, 32).pixelDistanceSquared(centroid))
+        wall.get.buildings -= ((best._1, best._2))
+        wall.get.buildings += ((best._1, Protoss.Pylon))
+        if (unpowered.exists(_._2.tileWidth > 2)) {
+          metrics.unpowered += 1
+          wall = None
+          return
+        }
+      }
     }
   }
 
-  def tryFill(unit: UnitClass): Boolean = {
+  def fill2x2Offset(offset: Point, placements: ArrayBuffer[Tile]): Unit = {
     val w = wall.get
     val generator = new TileGeneratorRectangularSweep(exit.pixelCenter.tile, zone.boundary.startInclusive, zone.boundary.endExclusive, exit.pixelCenter.directionTo(zone.heart.center))
-    while (generator.hasNext) {
+    while (generator.hasNext && placements.length < 16) {
       val tile = generator.next()
+      val rectangle = new TileRectangle(tile, 2, 2)
       if (tile.zone == zone
-        && canPlace(unit.tileWidthPlusAddon, unit.tileHeight, tile, countMetrics = false)
-        && ! w.hallway.contains(tile)
+        // Is legal placement
+        && canPlace(2, 2, tile, countMetrics = false)
+        // Don't intersect hallway
+        && ! rectangle.tiles.exists(w.hallway.contains)
+        // Don't intersect filler
+        && ! placements.exists(_.tileDistanceChebyshev(tile) < 2)
+        // Don't intersect original placements
+        // Did we obviate this by introducing canPlace() ?
         && ! w.buildings.exists(b =>
           64 +  zone.heart.center.pixelDistanceChebyshev(b._1.topLeftPixel.add(16 * b._2.tileWidthPlusAddon, 16 * b._2.tileHeight))
-          <     zone.heart.center.pixelDistanceChebyshev(tile.topLeftPixel.add(16 * unit.tileWidthPlusAddon, 16 * unit.tileHeight)))
-        // Did we obviate this by introducing canPlace() ?
+          <     zone.heart.center.pixelDistanceChebyshev(tile.topLeftPixel.add(16 * 2,                       16 * 2)))
         && ! w.buildings.exists(b => Maff.rectanglesIntersect(
           b._1.x, b._1.y, b._1.x + b._2.tileWidthPlusAddon, b._1.y + b._2.tileHeight,
-          tile.x, tile.y, tile.x + unit.tileWidthPlusAddon, tile.y + unit.tileHeight))) {
-        // TODO: Test power
-        w.buildings += ((tile, unit))
-        return true
+          tile.x, tile.y, tile.x + 2, tile.y + 2))) {
+        placements += tile
       }
     }
-    false
   }
 }

@@ -22,9 +22,11 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val canProduce              = bwapiType.canProduce
   lazy val cloakingTech       = Techs.get(bwapiType.cloakingTech)
   val destroyScore            = bwapiType.destroyScore
-  val dimensionDown           = bwapiType.dimensionDown
+  val dimensionDownInclusive  = bwapiType.dimensionDown
+  val dimensionDownExclusive = dimensionDownInclusive + 1
   val dimensionLeft           = bwapiType.dimensionLeft
-  val dimensionRight          = bwapiType.dimensionRight
+  val dimensionRightInclusive = bwapiType.dimensionRight
+  val dimensionRightExclusive = dimensionRightInclusive + 1
   val dimensionUp             = bwapiType.dimensionUp
   val gasPrice                = bwapiType.gasPrice
   val haltPixels              = if (bwapiType == UnitType.Protoss_Dark_Templar) 0 else bwapiType.haltDistance / 256

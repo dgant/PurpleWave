@@ -13,6 +13,8 @@ class WallMetrics {
   var failedRecursively   = 0
   var gapTooNarrow        = 0
   var gapTooWide          = 0
+  var noPath              = 0
+  var insufficientFiller  = 0
   var unpowered           = 0
   var acceptable          = 0
 }

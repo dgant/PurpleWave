@@ -46,7 +46,7 @@ object ShowArchitecture extends DebugView {
       tiles.map(exclusions.get).filter(_.nonEmpty).distinct.foreach(exclusion =>
         DrawMap.box(
           exclusion.get.areaExcluded.startPixel.add(radius, radius),
-          exclusion.get.areaExcluded.endPixel.subtract(radius, radius),
+          exclusion.get.areaExcluded.endPixelInclusive.subtract(radius, radius),
           color))
     }
 

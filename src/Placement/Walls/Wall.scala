@@ -1,5 +1,6 @@
 package Placement.Walls
 
+import Lifecycle.With
 import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels
 import Placement.Generation.Fit
@@ -22,6 +23,9 @@ class Wall {
     constraint  = other.constraint
     gap         = other.gap
     hallway     = other.hallway
+    if (gap.isEmpty) {
+      With.logger.error(f"No gap in $this")
+    }
   }
 
   def toFit: Fit = {
@@ -42,4 +46,6 @@ class Wall {
 
     fit
   }
+
+  override def toString: String = f"Wall: $constraint -> Buildings: $buildings, Gap: $gap, Hallway: $hallway"
 }

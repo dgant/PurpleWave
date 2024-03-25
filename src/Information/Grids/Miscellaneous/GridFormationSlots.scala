@@ -38,8 +38,8 @@ final class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitCl
       if (Maff.rectanglesIntersect(x0, y0, x1, y1,
         p.x - u.dimensionLeft,
         p.y - u.dimensionUp,
-        p.x + u.dimensionRight,
-        p.y + u.dimensionDown)) {
+        p.x + u.dimensionRightInclusive,
+        p.y + u.dimensionDownInclusive)) {
         return true
       }
       k += 1
@@ -50,10 +50,10 @@ final class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitCl
     val i = this.i(Maff.div32(pixel.x), Maff.div32(pixel.y))
     if (i < 0 || i > length) return false
     if (unitClass.isFlyer) return true
-    val x0 = pixel.x - unitClass.dimensionLeft  - 2
-    val x1 = pixel.x + unitClass.dimensionRight + 2
-    val y0 = pixel.y - unitClass.dimensionUp    - 2
-    val y1 = pixel.y + unitClass.dimensionDown  + 2
+    val x0 = pixel.x - unitClass.dimensionLeft            - 2
+    val x1 = pixel.x + unitClass.dimensionRightInclusive  + 2
+    val y0 = pixel.y - unitClass.dimensionUp              - 2
+    val y1 = pixel.y + unitClass.dimensionDownInclusive   + 2
     val output = (
          ! intersects(x0, y0, x1, y1, i - 1)
       && ! intersects(x0, y0, x1, y1, i)

@@ -2,6 +2,7 @@ package Placement.Walls
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
+import Placement.Walls.WallFillers.PylonsCannons
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall, TerrainTerrain}
 import ProxyBwapi.Races.{Protoss, Zerg}
 
@@ -22,11 +23,14 @@ object FindWall {
 
     val entrance = zone.entranceOriginal.map(_.pixelCenter.tile).getOrElse(zone.heart)
     val constraints = Vector(
-      WallConstraint(1, Zerg.Zergling,    TerrainTerrain, Protoss.Gateway, Protoss.Forge),
-      WallConstraint(1, Zerg.Hydralisk,   TerrainTerrain, Protoss.Gateway, Protoss.Forge),
+      // These should work but are temporarily disabled to ease debugging
+      //WallConstraint(1, Zerg.Zergling,    TerrainTerrain, Protoss.Gateway, Protoss.Forge),
+      //WallConstraint(1, Zerg.Hydralisk,   TerrainTerrain, Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Protoss.Dragoon,  TerrainTerrain, Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Protoss.Dragoon,  TerrainTerrain, Protoss.Gateway, Protoss.Forge, Protoss.Pylon),
       WallConstraint(2, Protoss.Dragoon,  TerrainTerrain, Protoss.Gateway, Protoss.Forge, Protoss.Pylon),
+      // Not sure we ACTUALLY want to do this one in practice, but we should see what it produces
+      WallConstraint(3, Protoss.Dragoon,  TerrainTerrain, Protoss.Gateway, Protoss.Forge, Protoss.Pylon),
       WallConstraint(1, Zerg.Zergling,    TerrainGas,     Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainGas,     Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainGas,     Protoss.Gateway, Protoss.Forge, Protoss.Pylon),
@@ -34,16 +38,7 @@ object FindWall {
       WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge),
       WallConstraint(1, Zerg.Hydralisk,   TerrainHall,    Protoss.Gateway, Protoss.Forge, Protoss.Pylon))
 
-    val wallFinder = new WallFinder(zone, exit.get, entrance, constraints, Seq(
-      Protoss.Pylon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon,
-      Protoss.PhotonCannon))
+    val wallFinder = new WallFinder(zone, exit.get, entrance, constraints, PylonsCannons)
     wallFinder.generate()
 
     With.logger.debug(f"$zone: ${if (wallFinder.wall.isDefined) "CREATED WALL" else "FAILED to create wall"}")
@@ -63,6 +58,8 @@ object FindWall {
     With.logger.debug(f"Gap too narrow:           ${wallFinder.metrics.gapTooNarrow}")
     With.logger.debug(f"Gap too wide:             ${wallFinder.metrics.gapTooWide}")
     With.logger.debug(f"Unpowered:                ${wallFinder.metrics.unpowered}")
+    With.logger.debug(f"Insufficient filler:      ${wallFinder.metrics.insufficientFiller}")
+    With.logger.debug(f"No path:                  ${wallFinder.metrics.noPath}")
     With.logger.debug(f"Failed recursively:       ${wallFinder.metrics.failedRecursively}")
     With.logger.debug("")
 

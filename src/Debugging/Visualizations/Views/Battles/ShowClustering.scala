@@ -30,7 +30,7 @@ object ShowClustering extends DebugView {
     battles.foreach(b => Seq(
       (b.us, With.self.colorNeon),
       (b.enemy, With.enemy.colorNeon)).foreach(p =>
-        DrawMap.polygon(Maff.convexHull(p._1.units.flatMap(_.corners)).map(_.asPixel), p._2)
+        DrawMap.polygon(Maff.convexHull(p._1.units.flatMap(_.cornersInclusive)).map(_.asPixel), p._2)
     ))
   }
   

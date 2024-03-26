@@ -40,7 +40,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val marginRightInclusive : Int = 16 * tileWidth  - dimensionRightInclusive
 
   lazy val tileWidthPlusAddon: Int = tileWidth + 2 * Maff.fromBoolean(canBuildAddon)
-  lazy val tileArea: TileRectangle = TileRectangle(Tile(0, 0), tileSize)
+
+  lazy val tileArea           : TileRectangle =     TileRectangle(Tile(0, 0), tileSize)
+  lazy val tileAreaPlusAddon  : TileRectangle = new TileRectangle(Tile(0, 0), tileWidthPlusAddon, tileHeight)
 
   //////////////
   // Movement //

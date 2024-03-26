@@ -1,31 +1,33 @@
 package Placement.Walls
 
-import Lifecycle.With
 import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels
 import Placement.Generation.Fit
 import Placement.Templating.{RequireWalkable, Template, TemplatePointRequirement}
+import Placement.Walls.WallProblems.WallProblem
 import Placement.Walls.WallSpans.TerrainTerrain
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class Wall {
-  val buildings   : ArrayBuffer[(Tile, UnitClass)]  = new ArrayBuffer[(Tile, UnitClass)]
-  var constraint  : WallConstraint                  = WallConstraint(0, Protoss.Dragoon, TerrainTerrain)
-  var gap         : Option[Tile]                    = None
-  var hallway     : Seq[Tile]                       = Seq.empty
+  var constraint    : WallConstraint                  = WallConstraint(0, Protoss.Dragoon, TerrainTerrain)
+  val buildings     : ArrayBuffer[(Tile, UnitClass)]  = new ArrayBuffer[(Tile, UnitClass)]
+  var problems      : mutable.HashSet[WallProblem]    = new mutable.HashSet[WallProblem]
+  var gap           : Option[Tile]                    = None
+  var hallway       : Seq[Tile]                       = Seq.empty
+  var score         : Double                          = _
 
   def this(other: Wall) {
     this()
-    buildings ++= other.buildings
     constraint  = other.constraint
+    buildings ++= other.buildings
+    problems  ++= other.problems
     gap         = other.gap
     hallway     = other.hallway
-    if (gap.isEmpty) {
-      With.logger.error(f"No gap in $this")
-    }
+    score       = other.score
   }
 
   def toFit: Fit = {

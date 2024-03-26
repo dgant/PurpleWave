@@ -2,19 +2,21 @@ package Placement
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Mathematics.Points.{Direction, Points}
+import Mathematics.Points.{Direction, Points, Tile}
 import Placement.Generation.{Fit, Fitter, Templates}
-import Placement.Walls.{Wall, FindWall, WallFinder}
+import Placement.Walls.{FindWall, Wall, WallFinder}
 import Utilities.?
+
+import scala.collection.mutable.ArrayBuffer
 
 class Placement extends Fitter {
 
   private var _initialized: Boolean = false
 
-  var wallFinder: Option[WallFinder] = None
-  val wallEverything = true
+  val wallFinders: ArrayBuffer[WallFinder] = new ArrayBuffer[WallFinder]()
+  val wallEverything                       = true
 
-  def wall: Option[Wall] = wallFinder.flatMap(_.wall)
+  def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
 
   def initialize(): Unit = {
     if (_initialized) return
@@ -32,7 +34,10 @@ class Placement extends Fitter {
 
     basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
     if (wallEverything) {
-      With.geography.zones.filter(_.bases.exists(b => b.isNatural || With.geography.ourNatural == b)).foreach(preplaceWalls)
+      With.geography.zones
+        .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
+        .sortBy( ! _.metro.exists(_.isOurs))
+        .foreach(preplaceWalls)
       //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
     } else if (With.self.isProtoss && With.enemies.exists(_.isZerg)) {
       preplaceWalls(With.geography.ourFoyer.zone)
@@ -64,7 +69,16 @@ class Placement extends Fitter {
   }
 
   def preplaceWalls(zone: Zone): Unit = {
-    wallFinder = FindWall(zone)
-    wall.map(_.toFit).foreach(index)
+    val wallFinder = FindWall(zone)
+    wallFinder.flatMap(_.wall).map(_.toFit).foreach(index)
+    wallFinders ++= wallFinder
+  }
+
+  def auditWall(tiles: Tile*): Unit = {
+    val matching =
+      ( wallFinders.flatMap(_.wallsAcceptable) ++
+        wallFinders.flatMap(_.wallsUnacceptable))
+      .filter(w => tiles.forall(t => w.buildings.exists(b => b._1 == t)))
+    matching.foreach(w => With.logger.debug(w.toString))
   }
 }

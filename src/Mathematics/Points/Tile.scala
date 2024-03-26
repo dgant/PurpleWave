@@ -119,6 +119,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def directionTo(other: Tile): Direction = {
     other.subtract(this).direction
   }
+  @inline def groundDirectionTo(other: Tile): Direction = {
+    Directions.All.minBy(d => add(d.x, d.y).groundPixels(other))
+  }
   @inline def tileDistanceManhattan(tile: Tile): Int = {
     Math.abs(x-tile.x) + Math.abs(y-tile.y)
   }

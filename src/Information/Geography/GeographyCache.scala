@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Performance.Cache
 import Planning.MacroFacts
+import Utilities.LightYear
 import Utilities.UnitFilters.IsTank
 
 trait GeographyCache extends GeographyBuilder {
@@ -28,8 +29,13 @@ trait GeographyCache extends GeographyBuilder {
     .getOrElse(geo.bases.filterNot(geo.ourMain==).minBy(_.townHallTile.groundPixels(geo.ourMain.townHallTile))))
 
   protected val ourFoyerCache: Cache[Base] = new Cache(() =>
-    ourMainCache().metro.bases.minBy(b =>
-      b.exitNow.map(_.pixelCenter.walkableTile.groundPixels(With.scouting.enemyHome))))
+    Some(ourNaturalCache())
+      .filter(natural => foyerDistance(natural) < foyerDistance(geo.ourMain))
+      .getOrElse(ourMainCache().metro.bases.minBy(foyerDistance)))
+
+  private def foyerDistance(base: Base): Double = {
+    base.exitNow.map(_.pixelCenter.groundPixels(With.scouting.enemyHome)).getOrElse(LightYear())
+  }
 
   protected def getSettlements: Vector[Base] = (
     Vector.empty

@@ -1,6 +1,7 @@
 package Information.Scouting
 
 import Lifecycle.With
+import ProxyBwapi.Orders
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -42,7 +43,7 @@ trait EnemyTechs {
       addIf(Terran.SpiderMinePlant, enemies.exists(Terran.SpiderMine))
       addIf(Terran.Stim,            enemies.exists(_.stimmed))
       addIf(Terran.WraithCloak,     enemies.exists(u => Terran.Wraith(u) && u.cloaked))
-      addIf(Zerg.Burrow,            enemies.exists(u => u.burrowed && u.isNone(Terran.SpiderMine, Zerg.Lurker)))
+      addIf(Zerg.Burrow,            enemies.exists(u => (u.burrowed || u.order == Orders.Burrowing || u.order == Orders.Unburrowing) && u.isNone(Terran.SpiderMine, Zerg.Lurker)))
       addIf(Zerg.Ensnare,           ours.exists(_.ensnared),      checkOurs = true)
       addIf(Zerg.LurkerMorph,       enemies.exists(Zerg.Lurker) || enemies.exists(Zerg.LurkerEgg))
       addIf(Zerg.Plague,            ours.exists(_.plagued),       checkOurs = true)

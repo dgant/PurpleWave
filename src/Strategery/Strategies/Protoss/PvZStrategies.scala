@@ -24,9 +24,12 @@ object PvZSpeedlot  extends PvZStrategy
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }
-object PvZFFE extends PvZFFEOpening
+object PvZFFE extends PvZFFEOpening {
+  override def addRequirement(predicate: () => Boolean): Unit = With.placement.wall.isDefined
+}
 object PvZGatewayFE extends PvZFFEOpening {
+  override def addRequirement(predicate: () => Boolean): Unit = With.placement.wall.isDefined
   override def minimumGamesVsOpponent: Int = 2
   override def responsesWhitelisted = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
-  override def responsesBlacklisted = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool, With.fingerprints.twelvePool)
+  override def responsesBlacklisted = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool)
 }

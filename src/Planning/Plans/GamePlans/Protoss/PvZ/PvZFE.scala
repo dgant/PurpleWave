@@ -1,27 +1,28 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
+import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendAir
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
 import Planning.Plans.GamePlans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
+import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Strategery.Strategies.Protoss.PvZFFE
-import Utilities.?
+import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGatewayFE}
+import Utilities.{?, DoQueue}
+import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.IsWarrior
 
 class PvZFE extends GameplanImperative {
 
-  override def activated: Boolean = PvZFFE()
+  override def activated: Boolean = PvZFFE() || PvZGatewayFE()
 
   lazy val wallOption: Option[Wall] = With.placement.wall
   private def wall = wallOption.get
   private val oneBase = new PvZ1BaseReactive
-
-  var haveTakenNatural: Boolean = false
 
   private def wallPlacement   (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
   private def buildInWall     (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }
@@ -32,11 +33,28 @@ class PvZFE extends GameplanImperative {
   }
 
   override def executeBuild(): Unit = {
-    if (wallOption.isEmpty) { oneBase.executeBuild(); return; }
+    if (wallOption.isEmpty) {
+      // We shouldn't even pick this strategy in the first place, but if we do here's an escape valve
+      once(5, Protoss.Probe)
+      With.strategy.swapEverything(Seq(PvZ1BaseReactive), Seq(PvZFFE, PvZGatewayFE))
+      return
+    }
+
+    // FFE: Scout on pylon
+    // GFE: Scout with Zealot or just on gate
+    // GFE: Can attack with first Zealot unless Zerg made 6 Zerglings
+    scoutOn(Protoss.Pylon)
+
+    // Via https://www.youtube.com/watch?v=OgLBP6y_CQU
+    // - GFE: Vs. 6 lings: 3 Zealot 23 Nexus
+    // - GFE: Vs. cross spawn, few lings: 1 Zealot Nexus
+    // - GFE: 12+ Ling: Defend at natural
+    // On maps where you can completely block with forge-forge-gateway:
+    // FFE: Khala: "When you fail to scout Zerg at first try do 12 forge because you can block 9 pool with sim city)" Not sure if map-specific: https://youtu.be/Zm-t_mpHWG0?t=102
+    // FFE: Khala: Can send second scout if first one misses to catch 4/5 pool
 
     get(8, Protoss.Probe)
     buildInWall(1, Protoss.Pylon)
-    scoutOn(Protoss.Pylon)
 
     if (With.fingerprints.fourPool() && units(IsWarrior) < 9) {
       cancel(Protoss.Nexus, Protoss.Assimilator, Protoss.CyberneticsCore)
@@ -74,22 +92,19 @@ class PvZFE extends GameplanImperative {
     }
 
     once(13, Protoss.Probe)
-    buildInWall(Math.max(?(With.fingerprints.ninePool(), 2, 1), (3 + enemies(Zerg.Zergling)) / 4), Protoss.PhotonCannon)
+    if (With.frame < Minutes(8)()) {
+      buildInWall(
+        Maff.clamp(
+          ?(With.fingerprints.ninePool() || With.tactics.scoutWithWorkers.scouts.isEmpty, 2, 1),
+          (3 + enemies(Zerg.Zergling)) / 3,
+          6),
+        Protoss.PhotonCannon)
+    }
     naturalNexus()
   }
 
   override def executeMain(): Unit = {
-    if (wallOption.isEmpty) { oneBase.executeMain(); return; }
-    // FFE: Scout on pylon
-    // GFE: Scout with Zealot or just on gate
-    // GFE: Can attack with first Zealot unless Zerg made 6 Zerglings
-    // Via https://www.youtube.com/watch?v=OgLBP6y_CQU
-    // - GFE: Vs. 6 lings: 3 Zealot 23 Nexus
-    // - GFE: Vs. cross spawn, few lings: 1 Zealot Nexus
-    // - GFE: 12+ Ling: Defend at natural
-    // On maps where you can completely block with forge-forge-gateway:
-      // FFE: Khala: "When you fail to scout Zerg at first try do 12 forge because you can block 9 pool with sim city)" Not sure if map-specific: https://youtu.be/Zm-t_mpHWG0?t=102
-      // FFE: Khala: Can send second scout if first one misses to catch 4/5 pool
+    if (wallOption.isEmpty) return
 
     // Cannons vs. ling/hydra bust
     // Cannons vs. muta
@@ -102,35 +117,94 @@ class PvZFE extends GameplanImperative {
     // Main composition: Zealots-Weapons-Speed-Corsair-Templar/Storm-Amulet-Dragoon-Range-Observer-Speed shuttle-Reaver
 
     tryBuildInWall(1, Protoss.Gateway)
+    get(Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain))
+
+    ///////////////////
+    // High priority //
+    ///////////////////
 
     if (enemyMutalisksLikely) {
       pumpRatio(Protoss.Corsair, 6, 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
-      upgradeContinuously(Protoss.AirDamage)
-      upgradeContinuously(Protoss.AirArmor)
       val mutaliskCannons = Maff.clamp(1 + enemies(Zerg.Mutalisk) / 3, 2, 5)
+      val cannonTime      = Math.min(With.scouting.expectedArrival(Zerg.Mutalisk), GameTime(7, 0)())
+      val pylonTime       = cannonTime - Protoss.Pylon.buildFramesFull
+      tryBuildInWall(1, Protoss.Forge)
       With.geography.ourBases.foreach(base => {
-        get(1,                Protoss.Pylon,        new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))
-        get(mutaliskCannons,  Protoss.PhotonCannon, new PlacementQuery(Protoss.PhotonCannon).requireBase(base).requireLabelYes(DefendAir))
+        tryBuildInWall(1, Protoss.Forge)
+        get(RequestUnit(Protoss.Pylon,        1,                pylonTime,  Some(new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))))
+        get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))))
       })
       pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
-      upgradeContinuously(Protoss.DragoonRange)
-      tryBuildInWall(1, Protoss.Forge)
-      get(Protoss.CyberneticsCore)
+      get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+      get(Maff.clamp(enemies(Zerg.Mutalisk) / 8, 1, 2), Protoss.Stargate)
+      get(Protoss.DragoonRange)
+      get(Protoss.AirDamage)
+      buildGasPumps()
     }
 
-    if (enemyHydralisksLikely) {
-      buildInWall(Math.min(enemies(Zerg.Hydralisk), 6 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
+    if (enemyHydralisksLikely || enemyLurkersLikely) {
+      if (With.frame < Minutes(8)()) {
+        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 6 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
+      }
+    }
+    if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {
+      get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+      get(Protoss.DragoonRange)
+      once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
+      buildGasPumps()
     }
 
-    if ( ! haveComplete(Protoss.CyberneticsCore, Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)) {
-      pump(Protoss.Zealot)
+    maintainMiningBases(3)
+    buildCannonsAtExpansions(4)
+    if (unitsComplete(IsWarrior) >= 16
+      && unitsComplete(Protoss.Gateway) >= 6
+      && safePushing
+      && upgradeComplete(Protoss.DragoonRange)
+      && upgradeComplete(Protoss.ZealotSpeed)
+      && haveComplete(Protoss.Observer)) {
+      requireMiningBases(3)
     }
-    get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+    val doTech = new DoQueue(getTech)
+    if (unitsComplete(IsWarrior) >= ?(safeDefending, 20, 30)) {
+      doTech()
+    }
 
-    haveTakenNatural ||= With.geography.ourNatural.townHall.exists(h => h.isOurs && h.complete)
-    if (haveTakenNatural) {
-      oneBase.executeBuild()
-      oneBase.executeMain()
+    //////////
+    // Army //
+    //////////
+
+    new MeldArchons()()
+    if (upgradeStarted(Protoss.DragoonRange)) {
+      pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
     }
+    pumpRatio(Protoss.Observer, 1, 3, Seq(Enemy(Zerg.Lurker, 0.5)))
+    pumpShuttleAndReavers()
+    pump(Protoss.HighTemplar)
+    pump(Protoss.Zealot)
+
+    once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
+    get(5, Protoss.Gateway)
+    doTech()
+    get(15, Protoss.Gateway)
+
+    if (bases > 2) {
+      attack()
+    }
+    if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.DragoonRange) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {
+      attack()
+    }
+  }
+
+  def getTech(): Unit = {
+    buildGasPumps()
+    get(Protoss.GroundDamage)
+    get(Protoss.CitadelOfAdun)
+    get(Protoss.ZealotSpeed)
+    get(Protoss.DragoonRange)
+    get(Protoss.GroundArmor)
+    once(Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.RoboticsSupportBay)
+    get(Protoss.ObserverSpeed)
+    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
+    get(Protoss.ShuttleSpeed)
   }
 }

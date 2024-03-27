@@ -70,6 +70,21 @@ class Strategist {
     }
     deactivate(strategy)
   }
+  def swapEverything(whitelisted: Seq[Strategy], blacklisted: Seq[Strategy] = Seq.empty): Unit = {
+    val matchedBranches = Maff.orElse(
+      strategyBranchesLegal     .filter(branch => whitelisted.forall(branch.contains)).filterNot(branch => blacklisted.exists(branch.contains)),
+      strategyBranchesUnfiltered.filter(branch => whitelisted.forall(branch.contains)).filterNot(branch => blacklisted.exists(branch.contains)))
+    val bestBranch = Maff.maxBy(matchedBranches)(branch => winProbabilityByBranch.getOrElse(branch, 0.0))
+    bestBranch.foreach(branch => {
+      selected.filterNot(branch.contains).foreach(_.swapOut())
+      branch.filterNot(selected.contains).foreach(_.swapIn())
+    })
+    if (bestBranch.isEmpty) {
+      With.logger.warn(f"Attempted to swap everything, but found  no legal branches. Whitelisted: $whitelisted - Blacklisted:  $blacklisted")
+      blacklisted.foreach(_.swapOut())
+      whitelisted.foreach(_.swapIn())
+    }
+  }
 
   private lazy val _standardGamePlan = new StandardGamePlan
   private var _lastSelectedWithGameplan: Option[Strategy] = None

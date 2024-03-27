@@ -177,7 +177,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
             else if (gapsUsed == 0
               && (constraint.blocksUnit.width < 32 || constraint.blocksUnit.height < 32) // Don't even bother checking for big units
               && (alleyLeft >= constraint.blocksUnit.width || alleyRight >= constraint.blocksUnit.width || alleyUp >= constraint.blocksUnit.height || alleyDown >= constraint.blocksUnit.height)) {
-              return fail(wallInProgress, InsufficientlyTight)
+              fail(wallInProgress, InsufficientlyTight)
             }
 
             // Success! Place the next building.
@@ -257,13 +257,19 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     true
   }
 
+  private lazy val townHallTiles = zone.bases.flatMap(_.townHallArea.tiles)
   def scoreWall(wall: Wall): Double = {
     if (wall.buildings.isEmpty) return 0.0
     val rectangles = wall.buildings.map(b => new TileRectangle(b._1, b._2.tileWidthPlusAddon, b._2.tileHeight))
     val expanded  = rectangles.map(_.expand(1, 1))
     val union     = expanded.reduce(_.add(_))
     val perimeter = union.tiles.count(t => ! rectangles.exists(_.contains(t)) && expanded.exists(_.contains(t)))
-    perimeter
+    val distance  = union.center.walkableTile.groundTiles(zone.heart)
+    val margin    = Maff.min(townHallTiles.flatMap(hallTile => rectangles.flatMap(_.tiles).map(_.tileDistanceChebyshev(hallTile)))).getOrElse(0)
+    (10 * perimeter
+    - 5 * margin
+    - 1 * distance)
+
   }
 
   def scoreWallByArea(wall: Wall): Double = {
@@ -334,13 +340,13 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   def fill2x2Offset(offset: Point, placements: ArrayBuffer[Tile]): Unit = {
     val w = wall.get
     val buildingCentroid  = Maff.centroid(w.buildings.map(b => b._1.topLeftPixel.add(16 * b._2.tileWidthPlusAddon, 16 * b._2.tileHeight))).walkablePixel
-    val buildingTiles     = w.buildings.flatMap(b => b._2.tileAreaPlusAddon.add(b._1).expand(4, 4).tiles)
-    val tiles             = zone.tiles ++ buildingTiles
-    val generatorBounds   = new TileRectangle(tiles)
+    val buildingTiles     = w.buildings.flatMap(b => b._2.tileAreaPlusAddon.add(b._1).expand(3, 3).tiles)
     val startOrigin       = zone.metro.flatMap(_.main.map(_.heart)).getOrElse(With.geography.startLocations.minBy(_.groundPixels(zone.heart)))
     val startRemote       = With.geography.startLocations.maxBy(_.groundPixels(startOrigin))
-    val generatorStart    = tiles.filter(_.buildable).maxBy(_.groundPixels(startOrigin))
-    val generatorEnd      = tiles.filter(_.buildable).minBy(_.groundPixels(startOrigin))
+    val tiles             = (zone.tiles ++ buildingTiles).filter(t => t.buildable && t.groundTiles(startOrigin) < 256)
+    val generatorBounds   = new TileRectangle(tiles)
+    val generatorStart    = tiles.minBy(_.groundPixels(startRemote))
+    val generatorEnd      = tiles.minBy(_.groundPixels(startOrigin))
     val direction         = generatorStart.groundDirectionTo(generatorEnd)
     val generator         = new TileGeneratorRectangularSweep(generatorStart, generatorBounds.startInclusive, generatorBounds.endExclusive, direction)
     def tryFill(tile: Tile): Unit = {
@@ -372,7 +378,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     }
     while (generator.hasNext && placements.length < 16) { tryFill(generator.next()) }
 
-    // The generator can miss spots when the wall is near or outside the zone boundary
+    Maff.sortStablyInPlaceBy(placements)(_.groundPixels(buildingCentroid))
   }
 
   override def toString: String = f"WallFinder ${zone.name} ${zone.heart} $wall"

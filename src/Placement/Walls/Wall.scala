@@ -1,5 +1,6 @@
 package Placement.Walls
 
+import Mathematics.Maff
 import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels
 import Placement.Generation.Fit
@@ -19,6 +20,16 @@ class Wall {
   var gap           : Option[Tile]                    = None
   var hallway       : Seq[Tile]                       = Seq.empty
   var score         : Double                          = _
+
+  lazy val defensePoint: Tile = gap.getOrElse({
+    val buildingAreas = buildings.map(b => b._2.tileAreaPlusAddon.add(b._1))
+    val centroid      = Maff.exemplar(buildingAreas.flatMap(_.tiles).map(_.center))
+    val searchArea    = buildingAreas.reduce(_.add(_)).expand(1, 1)
+    searchArea.tiles
+      .filter(_.walkable)
+      .filterNot(t => buildingAreas.exists(_.contains(t)))
+      .minBy(_.tileDistanceFast(centroid.zone.heart))
+  })
 
   def this(other: Wall) {
     this()

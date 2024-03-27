@@ -5,8 +5,8 @@ import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Actions.{Action, Idle}
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Formation._
@@ -20,7 +20,7 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.{IsDetector, IsTank, IsWarrior, IsWorker}
+import Utilities.UnitFilters._
 
 class SquadDefendBase(base: Base) extends Squad {
 
@@ -31,6 +31,10 @@ class SquadDefendBase(base: Base) extends Squad {
 
   val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.base.filter(_.isOurs).forall(base==), CountEverything)
 
+  val plugWall = new Cache(() => With.placement.wall
+    .filter(wall => With.units.ours.filter(IsBuilding).map(_.tileTopLeft).exists(t => wall.buildings.exists(_._1 == t)))
+    .map(_.defensePoint))
+
   val plugEdge = new Cache(() =>
     base.metro.bases
       .find(_.isMain)
@@ -39,6 +43,9 @@ class SquadDefendBase(base: Base) extends Squad {
       .map(main => (main.zone, main.zone.exitNow)))
 
   val zoneAndChoke: Cache[(Zone, Option[Edge])] = new Cache(() => {
+    if (plugWall().isDefined) {
+      (plugWall().get.zone, Maff.minBy(plugWall().get.zone.edges)(_.pixelCenter.groundPixels(plugWall().get.center)))
+    }
     if (plugEdge().isDefined) {
       plugEdge().get
     } else {
@@ -71,16 +78,16 @@ class SquadDefendBase(base: Base) extends Squad {
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
   val bastion: Cache[Pixel] = new Cache(() =>
-      Maff.minBy(
-        base.metro.zones
-          .flatMap(_.units.view.filter(_.isOurs))
-          .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || Protoss.ShieldBattery(u) || (u.complete && u.totalHealth < 300)))
-          .map(_.pixel))
-      (_.groundPixels(
-        guardChoke
-          .map(_.pixelCenter)
-          .getOrElse(vicinity)))
-      .getOrElse(vicinity))
+    Maff.minBy(
+      base.metro.zones
+        .flatMap(_.units.view.filter(_.isOurs))
+        .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || Protoss.ShieldBattery(u) || (u.complete && u.totalHealth < 300)))
+        .map(_.pixel))
+    (_.groundPixels(
+      guardChoke
+        .map(_.pixelCenter)
+        .getOrElse(vicinity)))
+    .getOrElse(vicinity))
 
   private var formationReturn: Formation = FormationEmpty
 
@@ -125,7 +132,6 @@ class SquadDefendBase(base: Base) extends Squad {
         }
       } else formationBastion
     }
-
 
     val canWithdraw     = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     val canGuard        = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg) || With.geography.ourBases.length > 1)

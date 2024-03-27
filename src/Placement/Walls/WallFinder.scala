@@ -177,7 +177,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
             else if (gapsUsed == 0
               && (constraint.blocksUnit.width < 32 || constraint.blocksUnit.height < 32) // Don't even bother checking for big units
               && (alleyLeft >= constraint.blocksUnit.width || alleyRight >= constraint.blocksUnit.width || alleyUp >= constraint.blocksUnit.height || alleyDown >= constraint.blocksUnit.height)) {
-              fail(wallInProgress, InsufficientlyTight)
+              return fail(wallInProgress, InsufficientlyTight)
             }
 
             // Success! Place the next building.

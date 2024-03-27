@@ -14,7 +14,7 @@ class Placement extends Fitter {
   private var _initialized: Boolean = false
 
   val wallFinders: ArrayBuffer[WallFinder] = new ArrayBuffer[WallFinder]()
-  val wallEverything                       = true
+  val wallEverything                       = false
 
   def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
 

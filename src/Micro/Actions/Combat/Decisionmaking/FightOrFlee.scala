@@ -40,6 +40,7 @@ object FightOrFlee extends Action {
     decide(true,  "Cloaked",    () => u.effectivelyCloaked)
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)
     decide(true,  "Lurking",    () => Zerg.Lurker(u)                                              && u.matchups.groupVs.detectors.isEmpty)
+    decide(true,  "Towers",     () => With.frame < Minutes(8)() && u.matchups.allies.exists(a => a.unitClass.isBuilding && a.unitClass.canAttack && (a.matchups.targetNearest.exists(t => u.canAttack(t) && a.inRangeToAttack(t)) || a.matchups.threatNearest.exists(t => u.canAttack(t) && t.canAttack(a) && t.framesToGetInRange(a) <= u.framesToGetInRange(a) && (t.pixelDistanceEdge(a) < 6 * 32) || t.inRangeToAttack(a)))))
     decide(false, "Scourge",    () => u.flying && With.enemies.exists(_.isZerg) && u.matchups.groupVs.has(Zerg.Scourge) && u.matchups.threats.exists(t => Zerg.Scourge(t) && t.pixelDistanceEdge(u) < 128 && t.matchups.threatsInRange.map(_.damageOnNextHitAgainst(t)).sum < t.hitPoints))
     decide(false, "Scarabless", () => Protoss.Reaver(u) && u.scarabs == 0 && ! u.trainee.exists(_.remainingCompletionFrames < Math.max(u.matchups.framesOfSafety, u.cooldownLeft)))
     decide(false, "Birdless",   () => Protoss.Carrier(u) && ! u.interceptors.exists(_.complete))

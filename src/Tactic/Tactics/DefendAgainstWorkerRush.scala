@@ -15,7 +15,7 @@ class DefendAgainstWorkerRush extends Tactic {
       .flatMap(_.enemies.filter(u =>
         u.unitClass.isWorker
         && u.matchups.targets.exists(ally =>
-          (ally.unitClass.isBuilding || ally.friendly.exists(_.intent.toBuild.isDefined))
+          (ally.unitClass.isBuilding || ally.friendly.exists(_.intent.toBuild.nonEmpty))
           && u.framesToGetInRange(ally) < 24 * 3)))
       .distinct
 

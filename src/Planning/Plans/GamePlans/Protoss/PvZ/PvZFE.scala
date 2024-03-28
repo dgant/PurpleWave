@@ -11,10 +11,11 @@ import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
+import Strategery.Python
 import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGatewayFE}
-import Utilities.{?, DoQueue}
 import Utilities.Time.{GameTime, Minutes}
 import Utilities.UnitFilters.IsWarrior
+import Utilities.{?, DoQueue}
 
 class PvZFE extends GameplanImperative {
 
@@ -53,9 +54,6 @@ class PvZFE extends GameplanImperative {
     // FFE: Khala: "When you fail to scout Zerg at first try do 12 forge because you can block 9 pool with sim city)" Not sure if map-specific: https://youtu.be/Zm-t_mpHWG0?t=102
     // FFE: Khala: Can send second scout if first one misses to catch 4/5 pool
 
-    get(8, Protoss.Probe)
-    buildInWall(1, Protoss.Pylon)
-
     if (With.fingerprints.fourPool() && units(IsWarrior) < 9) {
       cancel(Protoss.Nexus, Protoss.Assimilator, Protoss.CyberneticsCore)
       once(Protoss.Forge)
@@ -72,22 +70,40 @@ class PvZFE extends GameplanImperative {
       oneBase.executeMain()
       return
     }
+
+    get(8, Protoss.Probe)
+    buildInWall(1, Protoss.Pylon)
     if (With.fingerprints.hatchFirst()) {
       once(12, Protoss.Probe)
-      if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
-        cancel(Protoss.Forge, Protoss.PhotonCannon)
-      }
       naturalNexus()
       once(13, Protoss.Probe)
-      buildInWall(1, Protoss.Gateway)
-      once(14, Protoss.Probe)
+      if (With.fingerprints.tenHatch() || With.fingerprints.twoHatchMain() || Python()) {
+        once(15, Protoss.Probe)
+        buildInWall(1, Protoss.Gateway)
+        buildInWall(1, Protoss.Forge)
+        once(Protoss.Zealot)
+        buildInWall(2, Protoss.PhotonCannon)
+      } else {
+        if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
+          cancel(Protoss.Forge, Protoss.PhotonCannon)
+        }
+        once(15, Protoss.Probe)
+        buildInWall(1, Protoss.Gateway)
+        buildInWall(1, Protoss.Forge)
+        once(Protoss.Zealot)
+        once(16, Protoss.Probe)
+      }
     } else if (With.fingerprints.twelvePool() || With.fingerprints.overpool()) {
       once(13, Protoss.Probe)
       naturalNexus()
       buildInWall(1, Protoss.Forge)
     } else {
-      get(11, Protoss.Probe)
+      val no4PoolDelay = ?(With.fingerprints.fourPool.recently, 0, 2)
+      //get(10 + no4PoolDelay, Protoss.Probe)
+      once(12, Protoss.Probe)
       buildInWall(1, Protoss.Forge)
+      //once(12 + no4PoolDelay, Protoss.Probe)
+      once(14, Protoss.Probe)
       buildInWall(2, Protoss.PhotonCannon)
     }
 
@@ -95,7 +111,10 @@ class PvZFE extends GameplanImperative {
     if (With.frame < Minutes(8)()) {
       buildInWall(
         Maff.clamp(
-          ?(With.fingerprints.ninePool() || With.tactics.scoutWithWorkers.scouts.isEmpty, 2, 1),
+          1 + Seq(
+            With.fingerprints.ninePool(),
+            With.tactics.scoutWithWorkers.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
+            With.fingerprints.twoHatchMain).count(_ == true),
           (3 + enemies(Zerg.Zergling)) / 3,
           6),
         Protoss.PhotonCannon)
@@ -124,7 +143,7 @@ class PvZFE extends GameplanImperative {
     ///////////////////
 
     if (enemyMutalisksLikely) {
-      pumpRatio(Protoss.Corsair, 6, 12, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+      pumpRatio(Protoss.Corsair, 6, 24, Seq(Enemy(Zerg.Mutalisk, 1.0)))
       val mutaliskCannons = Maff.clamp(1 + enemies(Zerg.Mutalisk) / 3, 2, 5)
       val cannonTime      = Math.min(With.scouting.expectedArrival(Zerg.Mutalisk), GameTime(7, 0)())
       val pylonTime       = cannonTime - Protoss.Pylon.buildFramesFull
@@ -188,6 +207,9 @@ class PvZFE extends GameplanImperative {
     get(15, Protoss.Gateway)
 
     if (bases > 2) {
+      attack()
+    }
+    if (safePushing && ! enemyHasUpgrade(Zerg.ZerglingSpeed) && ! enemyHasUpgrade(Zerg.HydraliskSpeed) && enemiesComplete(Zerg.SunkenColony) < 2) {
       attack()
     }
     if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.DragoonRange) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {

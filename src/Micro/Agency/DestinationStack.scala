@@ -38,19 +38,19 @@ abstract class DestinationStack(unit: FriendlyUnitInfo) {
     path = None
     home.set(defaultHome)
     terminus.set(unit.pixel)
-    unit.intent.redoubt                   .foreach(redoubt.set)
-    unit.stationDisengage                 .foreach(redoubt.set) // Formation supersedes intent; intent is used to provide a default value
-    unit.intent.toNuke                    .foreach(terminus.set)
-    unit.intent.toAttack    .map(_.pixel) .foreach(terminus.set)
-    unit.intent.toGather    .map(_.pixel) .foreach(terminus.set)
-    unit.intent.toRepair    .map(_.pixel) .foreach(terminus.set)
-    unit.intent.toFinish    .map(_.pixel) .foreach(terminus.set)
-    unit.intent.toBoard     .map(_.pixel) .foreach(terminus.set)
-    unit.intent.toBuildTile               .foreach(terminus.set)
-    unit.intent.toScoutTiles.headOption   .foreach(terminus.set)
-    unit.intent.terminus                  .foreach(terminus.set) // Explicit intent supersedes implicit intent
-    unit.intent.station                   .foreach(station.set)
-    unit.stationEngage                    .foreach(station.set) // Formation supersedes intent; intent is used to provide a default value
+    unit.intent.redoubt                                 .foreach(redoubt.set)
+    unit.stationDisengage                               .foreach(redoubt.set) // Formation supersedes intent; intent is used to provide a default value
+    unit.intent.toNuke                                  .foreach(terminus.set)
+    unit.intent.toAttack      .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toGather      .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toRepair      .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toFinish      .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toBoard       .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toBuildActive .map(_.tile.topLeftPixel) .foreach(terminus.set)
+    unit.intent.toScoutTiles.headOption                 .foreach(terminus.set)
+    unit.intent.terminus                                .foreach(terminus.set) // Explicit intent supersedes implicit intent
+    unit.intent.station                                 .foreach(station.set)
+    unit.stationEngage                                  .foreach(station.set) // Formation supersedes intent; intent is used to provide a default value
   }
 
   def safety: Pixel = unit.agent

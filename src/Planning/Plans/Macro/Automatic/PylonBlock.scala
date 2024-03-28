@@ -3,8 +3,9 @@ package Planning.Plans.Macro.Automatic
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Micro.Agency.BuildIntent
 import Planning.Plan
-import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
+import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.GameTime
@@ -56,12 +57,11 @@ class PylonBlock extends Plan {
       blockerLock.units.headOption.foreach(blocker => {
         lastWorker = Some(blocker)
         val tileToBlock = baseToBlock.townHallTile.add(1, 1)
-        if (blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed400 + 24 >= With.self.supplyTotal400) {
+        val readyToBuild = blocker.pixelDistanceCenter(tileToBlock.center) < 256 && With.self.supplyUsed400 + 24 >= With.self.supplyTotal400
+        if (readyToBuild) {
           currencyLock.acquire()
-          blocker.intend(this).setBuild(Protoss.Pylon).setBuildTile(tileToBlock)
-        } else {
-          blocker.intend(this).setCanFight(false).setTerminus(tileToBlock.center)
         }
+        blocker.intend(this).addBuild(BuildIntent(Protoss.Pylon, tileToBlock, readyToBuild))
       })
     })
   }

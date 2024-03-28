@@ -17,15 +17,15 @@ import Utilities.?
 
 object Build extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.toBuildTile.isDefined
+  override def allowed(unit: FriendlyUnitInfo): Boolean = unit.intent.toBuild.nonEmpty
   
   override def perform(unit: FriendlyUnitInfo): Unit = {
-    val toBuild     = unit.intent.toBuild
-    val toBuildTile = unit.intent.toBuildTile.get
-    val buildShape  = toBuild.getOrElse(Protoss.Gateway)
+    val intent      = unit.intent.toBuildActive.get
+    val building    = intent.unitClass
+    val tile        = intent.tile
 
     // If building already started, get a head start on mining
-    if (toBuildTile.units.exists(u => u.isOurs && u.unitClass.isBuilding && (u.complete || u.unitClass.isProtoss))) {
+    if (tile.units.exists(u => u.isOurs && u.unitClass.isBuilding && (u.complete || u.unitClass.isProtoss))) {
       if (unit.intent.toScoutTiles.isEmpty) {
         unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
         Gather(unit)
@@ -39,7 +39,7 @@ object Build extends Action {
       && ! blocker.flying
       && blocker.visible)
 
-    val buildArea             = buildShape.tileArea.add(toBuildTile)
+    val buildArea             = building.tileArea.add(tile)
     val ignoreBlockers        = unit.pixelDistanceTravelling(buildArea.center) > 32.0 * 8.0 || With.yolo.active
     lazy val blockersIn       = if (ignoreBlockers) Seq.empty else buildArea.tiles.flatMap(blockersForTile).toSeq
     lazy val blockersNear     = if (ignoreBlockers) Seq.empty else buildArea.expand(2, 2).tiles.flatMap(blockersForTile).toSeq
@@ -72,28 +72,27 @@ object Build extends Action {
     Commander.defaultEscalation(unit)
     val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
 
-    With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + toBuild.getOrElse(Protoss.Gateway).radialHypotenuse, unit))
+    With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + building.radialHypotenuse, unit))
 
-    var movePixel = toBuildTile.topLeftPixel.add(buildShape.tileWidth * 16, buildShape.tileHeight * 16)
+    var movePixel = tile.topLeftPixel.add(building.tileWidth * 16, building.tileHeight * 16)
 
-    toBuild.foreach(building => {
-      if (toBuildTile.visible
-        && unit.pixelDistanceCenter(movePixel) < 112 // Addtl reference: McRave uses 96
-        && With.self.minerals >= building.mineralPrice - 8
-        && With.self.gas      >= building.gasPrice - 8) {
-        Commander.build(unit, building, toBuildTile)
-        return
-      }
-    })
+    if (intent.startNow
+      && tile.visible
+      && unit.pixelDistanceCenter(movePixel) < 112 // Addtl reference: McRave uses 96
+      && With.self.minerals >= building.mineralPrice - 8
+      && With.self.gas      >= building.gasPrice - 8) {
+      Commander.build(unit, building, tile)
+      return
+    }
 
     if (Protoss.Probe(unit)) {
       // If unit doesn't have to resolve collision after moving it gets back to work faster
       movePixel = movePixel.add(
-        if (unit.x < movePixel.x) - unit.unitClass.dimensionRightInclusive - buildShape.dimensionLeft - 1 else unit.unitClass.dimensionLeft + buildShape.dimensionRightInclusive + 1,
-        if (unit.y < movePixel.y) - unit.unitClass.dimensionDownInclusive  - buildShape.dimensionUp   - 1 else unit.unitClass.dimensionUp   + buildShape.dimensionDownInclusive + 1).walkablePixel
+        if (unit.x < movePixel.x) - unit.unitClass.dimensionRightInclusive - building.dimensionLeft - 1 else unit.unitClass.dimensionLeft + building.dimensionRightInclusive + 1,
+        if (unit.y < movePixel.y) - unit.unitClass.dimensionDownInclusive  - building.dimensionUp   - 1 else unit.unitClass.dimensionUp   + building.dimensionDownInclusive + 1).walkablePixel
     } else if (Zerg.Drone(unit)) {
       // McRave found that positioning Drone (0, -7) from building location minimizes wiggling
-      movePixel = movePixel.add(buildShape.tileWidth * 16, buildShape.tileHeight * 16 - 7)
+      movePixel = movePixel.add(building.tileWidth * 16, building.tileHeight * 16 - 7)
     }
 
     unit.agent.decision.set(movePixel)

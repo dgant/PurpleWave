@@ -3,6 +3,7 @@ package Micro.Actions.Protoss.Shuttle
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
+import Planning.MacroFacts
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactic.Squads.{SquadAttack, SquadDefendBase}
@@ -36,8 +37,8 @@ object ShuttleAdoptPassenger extends Action {
       && passenger.transport.isEmpty
       && passenger.agent.ride.forall(shuttle==)
       && passenger.unitClass.spaceRequired + shuttle.agent.passengerSize <= shuttle.unitClass.spaceProvided
-    // Do we want to adopt this passenger?
-      && (passenger.isAny(Protoss.Reaver, Protoss.HighTemplar) || passenger.matchups.targetedByScarab)
+      // Do we want to adopt this passenger?
+      && (passenger.matchups.targetedByScarab || Protoss.Reaver(passenger) || (Protoss.HighTemplar(passenger) && MacroFacts.techStarted(Protoss.PsionicStorm)))
       && (shuttle.agent.passengers.isEmpty || shuttle.agent.passengers.headOption.map(_.squad).getOrElse(shuttle.squad).forall(passenger.squad.contains))
     )
 

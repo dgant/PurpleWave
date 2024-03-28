@@ -10,6 +10,9 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/3rdparty/apache/commons-lang3-3.8.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/3rdparty/apache/jna-platform-5.1.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/org.scala-lang.modules/scala-xml_2.12/bundles/scala-xml_2.12-2.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/scala-lang/scala-reflect/2.12.18/scala-reflect-2.12.18.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

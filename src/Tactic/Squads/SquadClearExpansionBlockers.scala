@@ -1,6 +1,8 @@
 package Tactic.Squads
 
 import Lifecycle.With
+import Mathematics.Points.Pixel
+import Performance.Cache
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.Time.{Minutes, Seconds}
@@ -21,8 +23,9 @@ class SquadClearExpansionBlockers extends Squad {
     if ( ! With.enemies.exists(_.isZerg) &&   With.enemies.forall(With.unitsShown(_, Terran.SpiderMine) == 0)) return
 
     val target = With.units.ours
-      .find(u => u.intent.toBuild.exists(_.isTownHall) && ! u.unitClass.isBuilding)
-      .flatMap(_.intent.toBuildTile.map(_.topLeftPixel))
+      .flatMap(_.intent.toBuild)
+      .find(b => b.unitClass.isTownHall && ! b.unitClass.isLairlike)
+      .map(_.tile.topLeftPixel.add(64, 48))
 
     if (target.isEmpty) {
       detectorLock.release()
@@ -40,10 +43,12 @@ class SquadClearExpansionBlockers extends Squad {
     }
   }
 
+  private val randomPosition = new Cache(() => Pixel(Random.nextInt(192) - 96, Random.nextInt(160) - 80), 48)
+
   def run(): Unit = {
     if (units.isEmpty) return
     setTargets(SquadAutomation.rankedAround(this))
-    detectorLock.units.foreach(_.intend(this).setTerminus(vicinity.add(64, 48)))
-    sweeperLock.units.foreach(_.intend(this).setTerminus(vicinity.add(Random.nextInt(192) - 96, Random.nextInt(160) - 80)))
+    detectorLock.units.foreach(_.intend(this).setTerminus(vicinity))
+    sweeperLock.units.foreach(_.intend(this).setTerminus(vicinity.add(randomPosition())))
   }
 }

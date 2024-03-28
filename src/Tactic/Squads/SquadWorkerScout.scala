@@ -54,9 +54,6 @@ class SquadWorkerScout extends Squad {
         Zerg.Mutalisk,
         Zerg.Spire))))
 
-    // Abandon scouting when we have all the information we could possibly want
-    scoutingAbandoned ||= With.fingerprints.fourPool()
-
     if (scoutingAbandoned) return
 
     val scoutCount = Maff.vmin(

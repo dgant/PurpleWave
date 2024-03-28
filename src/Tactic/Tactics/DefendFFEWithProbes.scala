@@ -36,20 +36,23 @@ class DefendFFEWithProbes extends Tactic {
   def launch(): Unit = {
     if (With.frame > Minutes(6)()) return
     if (With.enemies.size > 1) return
-    haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
+    if ( ! With.geography.ourMain.units.exists(Zerg.Zergling)) return
     if (With.units.countOurs(Protoss.PhotonCannon) == 0) return
     if (With.units.countOurs(IsAll(Protoss.PhotonCannon, IsComplete)) > 3) return
+    haveMinedEnoughForTwoCannons ||= With.units.countOurs(Protoss.PhotonCannon) + (With.self.minerals + 24) / 150 >= 2
     if ( ! haveMinedEnoughForTwoCannons) return
     if ( ! With.enemies.exists(_.isUnknownOrZerg)) return
-    if (With.fingerprints.twelveHatch()) return
-    if (With.fingerprints.tenHatch()) return
-    if (With.fingerprints.twelvePool()) return
-    if (With.fingerprints.overpool()) return
-    if (With.fingerprints.ninePool()) return
+    if (With.fingerprints.twelveHatch())  return
+    if (With.fingerprints.tenHatch())     return
+    if (With.fingerprints.twelvePool())   return
+    if (With.fingerprints.overpool())     return
+    if (With.fingerprints.ninePool())     return
     if ( ! EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
     if ( ! With.fingerprints.fourPool() && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
-    val defensePoints = Maff.orElse(With.units.ours.filter(Protoss.PhotonCannon), With.units.ours.filter(Protoss.Forge))
+    val defensePoints = Maff.orElse(
+      With.units.ours.filter(Protoss.PhotonCannon)  .filter(_.base.contains(With.geography.ourMain)),
+      With.units.ours.filter(Protoss.Forge)         .filter(_.base.contains(With.geography.ourMain)))
     
     lazy val zerglings    = With.units.enemy.find(Zerg.Zergling)
     lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.enemyHome.center)
@@ -100,10 +103,12 @@ class DefendFFEWithProbes extends Tactic {
         }
       })
 
+      val targets = With.units.enemy.filter(e => e.canAttack && defensePoints.exists(_.pixelDistanceCenter(toDefend) < 96)).toVector
       workers.foreach(_.intend(this)
         .setCanFlee(false)
         .setTerminus(toDefend)
-        .setRedoubt(toDefend))
+        .setRedoubt(toDefend)
+        .setTargets(targets))
 
       if (ShowUnitsFriendly.mapInUse) {
         workers.foreach(w => DrawMap.circle(toDefend, 16, Colors.NeonYellow))

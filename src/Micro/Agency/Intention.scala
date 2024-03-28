@@ -1,6 +1,7 @@
 package Micro.Agency
 
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
 import Micro.Actions.{Action, Idle}
 import ProxyBwapi.Techs.Tech
@@ -22,10 +23,9 @@ class Intention {
   var toFinish          : Option[UnitInfo]              = None
   var toBoard           : Option[FriendlyUnitInfo]      = None
   var toTrain           : Option[UnitClass]             = None
-  var toBuild           : Option[UnitClass]             = None
-  var toBuildTile       : Option[Tile]                  = None
   var toTech            : Option[Tech]                  = None
   var toUpgrade         : Option[Upgrade]               = None
+  var toBuild           : Seq[BuildIntent]              = Seq.empty
   var toScoutTiles      : Seq[Tile]                     = Seq.empty
   var action            : Action                        = Idle
   var canFight          : Boolean                       = true
@@ -47,8 +47,6 @@ class Intention {
   def setFinish           (value: UnitInfo)                 : Intention = { toFinish          = Some(value); this }
   def setBoard            (value: FriendlyUnitInfo)         : Intention = { toBoard           = Some(value); this }
   def setTrain            (value: UnitClass)                : Intention = { toTrain           = Some(value); this }
-  def setBuild            (value: UnitClass)                : Intention = { toBuild           = Some(value); this }
-  def setBuildTile        (value: Tile)                     : Intention = { toBuildTile       = Some(value); this }
   def setUpgrade          (value: Upgrade)                  : Intention = { toUpgrade         = Some(value); this }
   def setTech             (value: Tech)                     : Intention = { toTech            = Some(value); this }
   def setTerminus         (value: Option[Pixel])            : Intention = { terminus          = value; this }
@@ -62,12 +60,11 @@ class Intention {
   def setFinish           (value: Option[UnitInfo])         : Intention = { toFinish          = value; this }
   def setBoard            (value: Option[FriendlyUnitInfo]) : Intention = { toBoard           = value; this }
   def setTrain            (value: Option[UnitClass])        : Intention = { toTrain           = value; this }
-  def setBuild            (value: Option[UnitClass])        : Intention = { toBuild           = value; this }
-  def setBuildTile        (value: Option[Tile])             : Intention = { toBuildTile       = value; this }
   def setUpgrade          (value: Option[Upgrade])          : Intention = { toUpgrade         = value; this }
   def setTech             (value: Option[Tech])             : Intention = { toTech            = value; this }
-  def setAction           (value: Action)                   : Intention = { action            = value; this }
+  def addBuild            (value: BuildIntent)              : Intention = { toBuild           :+= value; this }
   def setScout            (value: Seq[Tile])                : Intention = { toScoutTiles      = value; this }
+  def setAction           (value: Action)                   : Intention = { action            = value; this }
   def setCanFight         (value: Boolean = true)           : Intention = { canFight          = value; this }
   def setCanFlee          (value: Boolean = true)           : Intention = { canFlee           = value; this }
   def setCanSneak         (value: Boolean = true)           : Intention = { canSneak          = value; this }
@@ -76,4 +73,6 @@ class Intention {
   def setShouldLiftoff    (value: Boolean = true)           : Intention = { shouldLiftoff     = value; this }
   def setTargets          (value: Iterable[UnitInfo])       : Intention = { targets           = Some(new IndexedSet[UnitInfo](value)); this }
   def setTargets          (value: UnitInfo*)                : Intention = setTargets(value)
+
+  def toBuildActive: Option[BuildIntent] = Maff.maxBy(toBuild)(_.startNow)
 }

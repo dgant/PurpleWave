@@ -45,10 +45,9 @@ class Scan extends Tactic {
       return
     }
     
-    val blockedBuilders = With.units.ours.filter(b =>
-      b.intent.toBuild.exists(_.isTownHall)
-      && b.intent.toBuildTile.map(_.center).exists(b.pixelDistanceCenter(_) < 96)
-      && b.seeminglyStuck)
+    val blockedBuilders = With.units.ours.filter(u =>
+      u.intent.toBuild.exists(b => b.unitClass.isTownHall && u.pixelDistanceCenter(b.unitClass.tileArea.add(b.tile).center)  < 96)
+      && u.seeminglyStuck)
     
     if (blockedBuilders.nonEmpty) {
       scan(blockedBuilders.head.pixel)

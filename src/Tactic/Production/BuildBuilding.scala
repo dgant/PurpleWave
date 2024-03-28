@@ -5,11 +5,12 @@ import Lifecycle.With
 import Macro.Requests.RequestBuildable
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
+import Micro.Agency.BuildIntent
 import Performance.Cache
 import Placement.Access.{Foundation, PlacementQuery}
 import Placement.Architecture.ArchitecturalAssessment
 import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
-import ProxyBwapi.Races.Neutral
+import ProxyBwapi.Races.{Neutral, Protoss}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
@@ -29,8 +30,15 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
   var foundation      : Option[Foundation]  = None
   var intendAfter     : Option[Int]         = None
   private var _trainee: Option[FriendlyUnitInfo] = None
-  private val proposedBuilder = new Cache(() => builderLock.inquire().flatMap(_.headOption))
-  def builder: Option[FriendlyUnitInfo] = builderLock.units.headOption
+  private val recycledBuilder = new Cache(() => ?(builderMatcher == Protoss.Probe,
+    Maff.minBy(With.units.ours.filter(u =>
+      Protoss.Probe(u)
+        && u.intent.frameCreated == With.frame
+        && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 20))
+          ||  u.intent.toBuild      .exists(b =>  foundation.exists(_.tile.groundTiles(b.tile)  < 40)))))(u => foundation.map(f => u.pixelDistanceTravelling(f.tile)).getOrElse(0.0)),
+    None))
+  private val proposedBuilder = new Cache(() => recycledBuilder().orElse(builderLock.inquire().flatMap(_.headOption)))
+  def builder: Option[FriendlyUnitInfo] = recycledBuilder().orElse(builderLock.units.headOption)
   def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
   override def trainee: Option[FriendlyUnitInfo] = _trainee
   override def hasSpent: Boolean = trainee.isDefined
@@ -103,30 +111,37 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
       return
     }
 
-    // Find an appropriate builder (or make sure we use the current builder)
-    val desiredZone = desiredTile.map(_.zone)
-    if (trainee.exists(_.buildUnit.isDefined)) {
-      builderLock.matcher = trainee.get.buildUnit.contains
-    } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
-      // Performance optimization: Only consider workers in the same zone when we have a lot available
-      builderLock.matcher = unit => desiredZone.contains(unit.zone) && builderMatcher(unit)
-    } else {
-      builderLock.matcher = builderMatcher
+    // Find an appropriate builder (or make sure we use the current builder) (or use a recycled builder)
+    if (recycledBuilder().isEmpty) {
+      val desiredZone = desiredTile.map(_.zone)
+      if (trainee.exists(_.buildUnit.isDefined)) {
+        builderLock.matcher = trainee.get.buildUnit.contains
+      } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
+        // Performance optimization: Only consider workers in the same zone when we have a lot available
+        builderLock.matcher = unit => desiredZone.contains(unit.zone) && builderMatcher(unit)
+      } else {
+        builderLock.matcher = builderMatcher
+      }
+
+      // When building placement changes we want a builder closer to the new placement
+      if (orderedTile.isDefined && orderedTile != desiredTile) {
+        builderLock.release()
+      }
+      builderLock.setPreference(PreferAll(PreferIf(builder.contains), PreferClose(desiredTile.get.center))).acquire()
     }
-  
-    // When building placement changes we want a builder closer to the new placement
-    if (orderedTile.isDefined && orderedTile != desiredTile) {
-      builderLock.release()
-    }
-    builderLock.setPreference(PreferAll(PreferIf(builder.contains), PreferClose(desiredTile.get.center))).acquire()
-    
+
     if (intendAfter.isDefined) {
       if (With.frame < intendAfter.get) return
       orderedTile = None
       intendAfter = None
     }
     
-    if (builderLock.satisfied) {
+    if (recycledBuilder().isDefined || builderLock.satisfied) {
+      val intent = if (recycledBuilder().isDefined) {
+        builder.get.intent
+      } else {
+        builder.get.intend(this)
+      }
       if (trainee.isEmpty) {
         if (orderedTile.exists( ! desiredTile.contains(_))) {
           // The building placement has changed. This puts us at risk of building the same building twice.
@@ -138,20 +153,19 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
           // 1. Recall the builder
           // 2. Wait for the order to take effect
           intendAfter = Some(With.frame + 24)
-          builder.get.intend(this)
+          intent
             .setCanFight(false)
-            .setBuildTile(desiredTile)
+            .addBuild(BuildIntent(buildingClass, desiredTile.get, startNow = false))
             .setTerminus(desiredTile.map(_.center))
         } else {
           orderedTile = desiredTile
-          builder.get.intend(this)
+          intent
             .setCanFight(false)
-            .setBuild(?(hasSpent || currencyLock.satisfied, Some(buildingClass), None))
-            .setBuildTile(orderedTile)
+            .addBuild(BuildIntent(buildingClass, desiredTile.get, startNow = hasSpent || currencyLock.satisfied))
             .setTerminus(orderedTile.map(_.center))
         }
       } else if (buildingClass.isTerran) {
-        builder.get.intend(this)
+        intent
           .setCanFight(false)
           .setFinish(trainee)
       }

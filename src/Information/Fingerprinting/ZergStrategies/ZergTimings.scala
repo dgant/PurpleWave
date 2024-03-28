@@ -60,7 +60,7 @@ object ZergTimings {
 
   private val PresumedZerglingRushTime = Seconds(30)
 
-  val Latest_FourPool_PoolCompleteBy        : FrameCount = SevenPool_PoolCompleteBy             - Seconds(3)
+  val Latest_FourPool_PoolCompleteBy        : FrameCount = NinePool_PoolCompleteBy              - Seconds(3)
   val Latest_NinePool_PoolCompleteBy        : FrameCount = Overpool_PoolCompleteBy              - Seconds(5)
   val Latest_Overpool_PoolCompleteBy        : FrameCount = TwelvePool_PoolCompleteBy            - Seconds(3)
   val Latest_TwelvePool_PoolCompleteBy      : FrameCount = TenHatch9Pool_PoolCompleteBy         - Seconds(7) // Narrower tolerance because 9H9P, which we categorize as 10H9P, would get pool a little earlier but we don't track it

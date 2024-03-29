@@ -198,6 +198,7 @@ class PvZFE extends GameplanImperative {
     }
     pumpRatio(Protoss.Observer, 1, 3, Seq(Enemy(Zerg.Lurker, 0.5)))
     pumpShuttleAndReavers()
+    pump(Protoss.DarkTemplar, 2)
     pump(Protoss.HighTemplar)
     pump(Protoss.Zealot)
 

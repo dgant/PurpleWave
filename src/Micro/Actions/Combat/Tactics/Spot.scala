@@ -10,7 +10,7 @@ import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Tactic.Squads.{Squad, UnitGroup}
+import Tactic.Squads.UnitGroup
 import Utilities.?
 import Utilities.UnitFilters.{IsTank, IsWarrior}
 
@@ -84,7 +84,7 @@ object Spot extends Action {
     val spookies = Maff.orElseFiltered(enemiesToConsider(unit): _*)(e =>
         (e.cloakedOrBurrowed || canEventuallyCloak(e))
         && (unit.squad.exists(_.canAttackIfVisible(e)) || unit.matchups.groupOf.canAttackIfVisible(e)))
-    val spookiesResponsible = spookies.filter(_.matchups.enemyDetectorDeepest.forall(unit==))
+    val spookiesResponsible = spookies.filter(_.matchups.enemyDetectorDeepest.filter(d => d.canMove && d.friendly.exists(_.squad == unit.squad)).forall(unit==))
     Maff.minBy(spookiesResponsible)(_.pixelDistanceSquared(unit))
   }
 

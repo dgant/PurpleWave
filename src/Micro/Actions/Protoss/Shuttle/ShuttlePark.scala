@@ -19,7 +19,7 @@ object ShuttlePark extends Action {
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(_.matchups.pixelsEntangled)
+    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
     val centroid  = Maff.centroid(Maff.orElse(exposed.map(_.pixel), Seq(shuttle.pixel)))
     val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
     val goals     = new ArrayBuffer[Pixel]
@@ -27,12 +27,16 @@ object ShuttlePark extends Action {
     threat.foreach(threat => goals += threat.pixel.project(centroid, threat.pixelDistanceCenter(centroid) + Shuttling.pickupRadiusCenter(exposed.head)))
 
     if (goals.nonEmpty) {
-      val to = MicroPathing.pullTowards(12, goals: _*) // TODO: The leash length should ideally be the edge-to-edge pickup radius (32) minus the diameter of a spinning Shuttle (unclear) to ensure that the Shuttle doesn't get out of range
-      shuttle.agent.decision.set(to)
-      if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
-        Retreat.delegate(shuttle)
-      }
-      Commander.move(shuttle)
+      park(shuttle, goals)
     }
+  }
+
+  def park(shuttle: FriendlyUnitInfo, goals: Seq[Pixel]): Unit = {
+    val to = MicroPathing.pullTowards(12, goals: _*) // TODO: The leash length should ideally be the edge-to-edge pickup radius (32) minus the diameter of a spinning Shuttle (unclear) to ensure that the Shuttle doesn't get out of range
+    shuttle.agent.decision.set(to)
+    if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
+      Retreat.delegate(shuttle)
+    }
+    Commander.move(shuttle)
   }
 }

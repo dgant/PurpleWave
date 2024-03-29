@@ -72,7 +72,7 @@ object BeShuttle extends Action {
       // Hover over passenger
       } else if (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
 
-        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark(shuttle)))
+        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark.park(shuttle, Seq(p.pixel))))
 
       }
     })

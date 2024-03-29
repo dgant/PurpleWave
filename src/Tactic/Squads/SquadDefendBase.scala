@@ -92,7 +92,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private var formationReturn: Formation = FormationEmpty
 
   override def run(): Unit = {
-    vicinity = ?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center
+    vicinity = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
     if (units.isEmpty) return
     if (emergencyDTHugs()) return
 
@@ -119,7 +119,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
     lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
-    lazy val formationGuard     = guardChoke.map(c => new FormationStandard(this, FormationStyleGuard, c.pixelCenter, Some(guardZone))).getOrElse(formationBastion)
+    lazy val formationGuard     = plugWall().map(_.center).orElse(guardChoke.map(_.pixelCenter)).map(pixel => new FormationStandard(this, FormationStyleGuard, pixel, Some(guardZone))).getOrElse(formationBastion)
     lazy val formationBastion   = {
       val enemyTopSpeed         = Maff.max(enemies.view.filter(u => u.canAttack && ! IsWorker(u)).map(_.topSpeed)).getOrElse(2 * Terran.Vulture.topSpeed)
       val formationBastion      = Formations.march(this, bastion())

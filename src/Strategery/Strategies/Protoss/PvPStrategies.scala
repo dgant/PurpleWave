@@ -13,12 +13,17 @@ abstract class PvPStrategy extends Strategy {
 
 ///////////////////
 // Opening steps //
-///////////////////
+///////////////////}
+
+object PvPGateCore extends PvPStrategy {
+  val criticalRushDistance = 150
+  setRushTilesMinimum(criticalRushDistance)
+}
 
 object PvP1012 extends PvPStrategy {
   addChoice(PvP3Zealot, PvP5Zealot)
   addRequirement(() =>
-    rushTilesMinimum <= PvPGateCore.criticalRushDistance // Important, because we prohibit GateCore below this
+    ! PvPGateCore.legal
     || With.fingerprints.nexusFirst.recently
     || With.fingerprints.proxyGateway.recently
     || With.fingerprints.twoGate99.recently)
@@ -31,10 +36,6 @@ object PvP3Zealot extends PvPStrategy {
   blacklistVs(With.fingerprints.twoGate)
 }
 object PvP5Zealot extends PvPStrategy
-object PvPGateCore extends PvPStrategy {
-  val criticalRushDistance = 150
-  setRushTilesMinimum(criticalRushDistance)
-}
 
 ////////////////////////
 // Main continuations //

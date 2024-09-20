@@ -215,7 +215,7 @@ trait MacroCounting {
   }
 
   def enemyLurkersLikely: Boolean = {
-    enemyHasShown(Zerg.Lurker, Zerg.LurkerEgg) || (enemyHasShown(Zerg.Hydralisk, Zerg.HydraliskDen) && enemyHasShown(Zerg.Lair, Zerg.Hive, Zerg.Spire, Zerg.Mutalisk))
+    enemyHasShown(Zerg.Lurker, Zerg.LurkerEgg) || (With.self.isTerran && enemyHasShown(Zerg.Hydralisk, Zerg.HydraliskDen) && enemyHasShown(Zerg.Lair, Zerg.Hive, Zerg.Spire, Zerg.Mutalisk))
   }
 
   def enemyHydralisksLikely: Boolean = {

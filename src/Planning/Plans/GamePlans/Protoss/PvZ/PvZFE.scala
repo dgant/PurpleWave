@@ -13,7 +13,7 @@ import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Python
 import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGatewayFE}
-import Utilities.Time.{GameTime, Minutes}
+import Utilities.Time.GameTime
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, DoQueue}
 
@@ -44,7 +44,11 @@ class PvZFE extends GameplanImperative {
     // FFE: Scout on pylon
     // GFE: Scout with Zealot or just on gate
     // GFE: Can attack with first Zealot unless Zerg made 6 Zerglings
-    scoutOn(Protoss.Pylon)
+    if (With.geography.startLocations.length >= ?(With.geography.mains.count(_.scoutedByUs) >= 2, 4, 5)) {
+      scoutOn(Protoss.Pylon, 2)
+    } else {
+      scoutOn(Protoss.Pylon)
+    }
 
     // Via https://www.youtube.com/watch?v=OgLBP6y_CQU
     // - GFE: Vs. 6 lings: 3 Zealot 23 Nexus
@@ -108,15 +112,17 @@ class PvZFE extends GameplanImperative {
     }
 
     once(13, Protoss.Probe)
-    if (With.frame < Minutes(8)()) {
+    if (With.frame < GameTime(6, 30)()) {
       buildInWall(
-        Maff.clamp(
-          1 + Seq(
-            With.fingerprints.ninePool(),
-            With.tactics.scoutWithWorkers.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
-            With.fingerprints.twoHatchMain).count(_ == true),
-          (3 + enemies(Zerg.Zergling)) / 3,
-          6),
+        Math.min(
+          6,
+          Math.max(
+            1 + Seq(
+              With.fingerprints.ninePool(),
+              With.tactics.scoutWithWorkers.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
+              With.fingerprints.twoHatchMain).count(_ == true),
+            (3 + enemies(Zerg.Zergling)) / 3)
+          - unitsComplete(IsWarrior)),
         Protoss.PhotonCannon)
     }
     naturalNexus()
@@ -138,6 +144,12 @@ class PvZFE extends GameplanImperative {
     tryBuildInWall(1, Protoss.Gateway)
     get(Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain))
 
+    if ( ! haveEver(Protoss.CyberneticsCore)) {
+      gasLimitCeiling(0)
+    } else if ( ! haveEver(Protoss.CitadelOfAdun, Protoss.Stargate)) {
+      gasLimitCeiling(250)
+    }
+
     ///////////////////
     // High priority //
     ///////////////////
@@ -154,7 +166,7 @@ class PvZFE extends GameplanImperative {
         get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))))
       })
       pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
-      get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+      once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
       get(Maff.clamp(enemies(Zerg.Mutalisk) / 8, 1, 2), Protoss.Stargate)
       get(Protoss.DragoonRange)
       get(Protoss.AirDamage)
@@ -162,12 +174,12 @@ class PvZFE extends GameplanImperative {
     }
 
     if (enemyHydralisksLikely || enemyLurkersLikely) {
-      if (With.frame < Minutes(8)()) {
-        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 6 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
+      if (With.frame < GameTime(6, 30)()) {
+        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 8 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
       }
     }
     if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {
-      get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+      once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
       get(Protoss.DragoonRange)
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       buildGasPumps()
@@ -200,6 +212,9 @@ class PvZFE extends GameplanImperative {
     pumpShuttleAndReavers()
     pump(Protoss.DarkTemplar, 2)
     pump(Protoss.HighTemplar)
+    if (upgradeStarted(Protoss.DragoonRange) && ! upgradeStarted(Protoss.ZealotSpeed)) {
+      pump(Protoss.Dragoon)
+    }
     pump(Protoss.Zealot)
 
     once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
@@ -220,9 +235,18 @@ class PvZFE extends GameplanImperative {
 
   def getTech(): Unit = {
     buildGasPumps()
+    if (enemiesHave(Zerg.Lair)) {
+      get(Protoss.Stargate)
+    }
     get(Protoss.GroundDamage)
     get(Protoss.CitadelOfAdun)
     get(Protoss.ZealotSpeed)
+    if (have(Protoss.Stargate)) {
+      get(Protoss.AirDamage)
+      if (enemies(Zerg.Mutalisk) > 5 && upgradeComplete(Protoss.AirDamage)) {
+        get(Protoss.AirArmor)
+      }
+    }
     get(Protoss.DragoonRange)
     get(Protoss.GroundArmor)
     once(Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.RoboticsSupportBay)

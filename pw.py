@@ -128,8 +128,7 @@ def schnail():
   subprocess.run(["x86_64-w64-mingw32-g++", "-static", "-o", path_staging("PurpleWaveSCHNAILCPP.exe"), path_pw("/src/PurpleWaveSCHNAIL.exe.cpp")])    
   logf(shutil.copy2, path_staging(schnail_exe_source), path_staging("PurpleWaveSCHNAIL.exe"))
   
-def stage(): 
-  
+def stage():
   log()
   log("STAGING")
   log("Post-build steps")
@@ -167,8 +166,8 @@ def stage():
         content = file.read().replace("Protoss", race).replace("PurpleWave", name)
       with open(bot_json, 'w') as file:
         file.write(content)
-    else:
-      log("Did not find SC-Docker")
+  else:
+    log("Did not find SC-Docker")
       
   log()
   if (os.path.exists(dir_localschnail)):

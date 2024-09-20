@@ -55,6 +55,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastFrameStartingAttack     : Int = - Forever()
   var lastFrameHarvested          : Int = - Forever()
   var lastFrameMiningGas          : Int = - Forever()
+  var lastFrameCarrying           : Int = - Forever()
   var firstFrameMiningGas         : Int =   Forever()
   var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastHitPoints               : Int = _
@@ -74,6 +75,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     if (isEnemy && visible && unitClass.isWorker && orderTarget.exists(t => t.unitClass.isGas && t.player == player && t.complete)) {
       lastFrameMiningGas  = With.frame
       firstFrameMiningGas = Math.min(firstFrameMiningGas, With.frame)
+    }
+    if (carrying) {
+      lastFrameCarrying = With.frame
     }
     if (complete) {
       // If the unit class changes (eg. Geyser -> Extractor) update the completion frame
@@ -214,7 +218,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && ?(isFriendly,
       With.scouting.proximity(tile) < 1 - _proxyThreshold
         || ! metro.exists(_.bases.exists(_.isOurs)),
-      With.scouting.proximity(tile) >     _proxyThreshold + ?(base.exists(_.owner == player), 0.25, 0)
+      With.scouting.proximity(tile) >     _proxyThreshold + ?(metro.exists(_.owner == player) || With.scouting.firstEnemyMain.isEmpty, 0.25, 0)
         || base.orElse(Maff.minBy(With.geography.bases)(_.groundPixels(tile))).exists(b => b.isOurs || b.groundPixels(tile) > 32 * 20)),
     240)
 

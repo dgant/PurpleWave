@@ -15,6 +15,7 @@ class SquadAcePilots extends Squad {
   val acePilotMatcher   : UnitFilter      = IsAny(acePilots: _*)
   val splashPilots      : Seq[UnitClass]  = Seq(Terran.Valkyrie, Protoss.Corsair)
   val splashPilotMatcher: UnitFilter      = IsAny(splashPilots: _*)
+
   lock.matcher = acePilotMatcher
   lock.counter = CountEverything
   override def launch(): Unit = {
@@ -35,7 +36,6 @@ class SquadAcePilots extends Squad {
   }
 
   private def chooseActivity(): Unit = {
-
     val otherSquads   = With.squads.all.view.filterNot(==)
     val weSplash      = units.exists(splashPilotMatcher)
     val enemySplashes = With.units.enemy.exists(splashPilotMatcher)

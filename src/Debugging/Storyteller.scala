@@ -148,7 +148,7 @@ class Storyteller {
             tell(f"$unit is already complete")
           } else {
             val remainingFrames = unit.completionFrame - With.frame
-            tell(f"$unit projects to complete in $remainingFrames frames at ${Frames(unit.completionFrame)}")
+            tell(f"$unit projects to complete in $remainingFrames frames at ${Frames(unit.completionFrame)}. Proximity: ${unit.proximity} between ${With.scouting.tugStart} and ${With.scouting.tugEnd}")
           }
         } else {
           val arrivalFrame = unit.arrivalFrame

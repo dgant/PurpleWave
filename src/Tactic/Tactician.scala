@@ -12,10 +12,10 @@ import Tactic.Missions._
 import Tactic.Production.Produce
 import Tactic.Squads._
 import Tactic.Tactics._
-import _root_.Tactic.Squads.Qualities.Qualities
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters._
+import _root_.Tactic.Squads.Qualities.Qualities
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -199,11 +199,11 @@ final class Tactician extends TimedTask {
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(IsRecruitableForCombat))
-      .sortBy(-_.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
+      .sortBy( - _.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
       .sortBy(_.unitClass.isTransport) // So transports can go to squads which need them
-    val freelancerCountInitial = freelancers.size
-    def freelancerValue = freelancers.view.map(_.subjectiveValue).sum
-    val freelancerValueInitial = freelancerValue
+    val freelancerCountInitial  = freelancers.size
+    def freelancerValue         = freelancers.view.map(_.subjectiveValue).sum
+    val freelancerValueInitial  = freelancerValue
 
     // First satisfy each defense squad
     // First pass gets essential defenders
@@ -220,14 +220,17 @@ final class Tactician extends TimedTask {
 
     // Proactive drop/harassment defense
     if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
+
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount > 5
         && ! defenseDivisionsActive.exists(_.division.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.ourUnits).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
+
       val qualifiedClasses = if (With.enemies.exists(_.isTerran))
         Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
       else
         Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
+
       freelancersPick(
         freelancers,
         dropVulnerableBases.map(defenseSquads(_)),
@@ -235,7 +238,7 @@ final class Tactician extends TimedTask {
     }
 
     catchDTRunby.launch()
-    freelancers --= catchDTRunby.lock.units
+    freelancers --= catchDTRunby.units
 
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step

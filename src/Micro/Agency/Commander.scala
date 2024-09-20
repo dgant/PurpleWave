@@ -353,63 +353,66 @@ object Commander {
     if (unit.carrying) {
       // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
+        lazy val nextClosestFrames = Maff.min(With.geography.ourBases.view.flatMap(_.townHall).filter(_.complete).map(h => unit.framesToTravelTo(h.exitTile)))
         val incompleteHall = unit.base.flatMap(_.townHall.filterNot(_.complete))
-        lazy val nextClosestFrames = Maff.min(With.geography.ourBases.view.flatMap(_.townHall).filter(_.complete).map(h => unit.pixelDistanceTravelling(h.exitTile) / unit.topSpeed))
         if (incompleteHall.exists(hall => nextClosestFrames.forall(_ * 2 > hall.remainingCompletionFrames))) {
           move(unit, incompleteHall.get.pixel)
         } else {
           unit.bwapiUnit.returnCargo()
         }
       }
+    } else if ( ! resource.visible) {
+      move(unit, resource.pixel)
     } else {
-      if (resource.visible) {
-        def doGather(): Unit = {
-          unit.bwapiUnit.rightClick(resource.bwapiUnit)
-        }
-        if (resource.unitClass.isGas) {
-          if ( ! unit.orderTarget.contains(resource)) {
-            doGather()
-          }
-        } else {
-          lazy val coworkers            = With.gathering.getWorkersByResource(resource)
-          lazy val accelerantFrame      = 11 + With.latency.remainingFrames
-          lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
-          lazy val accelerantPixel      = With.gathering.getAccelerantPixelSteady(resource)
-          lazy val distance             = unit.pixelDistanceEdge(resource)
-          lazy val projectedFrames      = Maff.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
-          lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)
-          lazy val onTargetMineral      = unit.orderTarget.contains(resource)
-          lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)
-          def doGatherFromAccelerant(): Unit = { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
-          if (unit.order == Orders.MiningMinerals) {
-            // Leave well alone!
-          } else if (onAccelerantPixel) {
-            doGather()
-          // See https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/Workers.cpp#L587
-          } else if (coworkers.exists(w => w != unit && w.order == Orders.MiningMinerals && w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.remainingFrames)) {
-            doGather()
-          } else if (projectedFrames == accelerantFrame) {
-            doGather()
-          } else if (accelerantMineral.isDefined && false) { // TODO: Need to filter accelerant minerals before relying on them; they need to pull the worker across their face relative to the town hall or at least be a straight horizontal shot
-            if (onTargetMineral) {
-              if (projectedFrames > accelerantFrame) {
-                doGatherFromAccelerant()
-              }
-            } else if (onAccelerantMineral) {
-              if (distance < 32 || unit.pixelDistanceEdge(accelerantMineral.get) < 32) {
-                doGather()
-              }
-            } else if (projectedFrames > accelerantFrame) {
-              doGatherFromAccelerant()
-            }
-          } else if ( ! onTargetMineral) {
-            doGather()
-          }
+      def doGather(): Unit = { unit.bwapiUnit.rightClick(resource.bwapiUnit) }
+      if (resource.unitClass.isGas) {
+        if ( ! unit.orderTarget.contains(resource)) {
+          doGather()
         }
       } else {
-        move(unit, resource.pixel)
+        lazy val coworkers            = With.gathering.getWorkersByResource(resource)
+        lazy val accelerantFrame      = 11 + With.latency.remainingFrames
+        lazy val accelerantMineral    = With.gathering.getAccelerantMineral(resource)
+        lazy val accelerantPixel      = With.gathering.getAccelerantPixelSteady(resource)
+        lazy val distance             = unit.pixelDistanceEdge(resource)
+        lazy val projectedFrames      = Maff.nanToZero(Math.max(0, distance - unit.unitClass.haltPixels) / unit.topSpeed + 2 * Math.min(distance, unit.unitClass.haltPixels) / unit.topSpeed)
+        lazy val onAccelerantPixel    = With.gathering.onAccelerant(unit, resource)
+        lazy val onTargetMineral      = unit.orderTarget.contains(resource)
+        lazy val onAccelerantMineral  = accelerantMineral.exists(unit.orderTarget.contains)
+        def doGatherFromAccelerant(): Unit = { unit.bwapiUnit.gather(accelerantMineral.get.bwapiUnit) }
+        if (unit.order == Orders.MiningMinerals) {
+          // Leave well alone!
+
+        // Reduce delay after returning cargo. Cargo-culted from Stardust: https://github.com/bmnielsen/Stardust/commit/1f303c8735aac2de348a8528b7e42fb75de3d96b
+        // If we microed units every frame we would only care about the frame after returning. Because we micro intermittently, allow a delay.
+        // Require a minimum distance to avoid hurting ourselves on Fastest Possible Maps.
+        } else if (With.framesSince(unit.lastFrameCarrying) < 8 && distance > 64) {
+          doGather()
+        } else if (onAccelerantPixel) {
+          doGather()
+        // See https://github.com/bmnielsen/Stardust/blob/b8a91e52f453e6fdc60798edac569826df98148a/src/Workers/Workers.cpp#L587
+        } else if (coworkers.exists(w => w != unit && w.order == Orders.MiningMinerals && w.orderTarget.contains(resource) && w.bwapiUnit.getOrderTimer + 7 == 11 + With.latency.remainingFrames)) {
+          doGather()
+        } else if (projectedFrames == accelerantFrame) {
+          doGather()
+        } else if (accelerantMineral.isDefined && false) { // TODO: Need to filter accelerant minerals before relying on them; they need to pull the worker across their face relative to the town hall or at least be a straight horizontal shot
+          if (onTargetMineral) {
+            if (projectedFrames > accelerantFrame) {
+              doGatherFromAccelerant()
+            }
+          } else if (onAccelerantMineral) {
+            if (distance < 32 || unit.pixelDistanceEdge(accelerantMineral.get) < 32) {
+              doGather()
+            }
+          } else if (projectedFrames > accelerantFrame) {
+            doGatherFromAccelerant()
+          }
+        } else if ( ! onTargetMineral) {
+          doGather()
+        }
       }
     }
+
     sleep(unit, 1)
   }
 

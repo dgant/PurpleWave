@@ -71,7 +71,8 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
     composition = Seq.empty
 
-    go (Stargate,     have(Protoss.Stargate))
+    // Disabling this because we get Stargate as part of going Speedlot!
+    //go (Stargate,     have(Protoss.Stargate))
     go (Reaver,       have(Protoss.RoboticsFacility, Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Reaver))
     go (Speedlot,     have(Protoss.CitadelOfAdun) || (have(Protoss.Forge) && ! enemyLurkersLikely))
     go (Goon,         upgradeComplete(Protoss.DragoonRange) || units(Protoss.Dragoon) > 3)

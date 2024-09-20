@@ -89,7 +89,7 @@ class PvPOpening extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     if (sequence == null) {
-      sequence = if (PvP1012()) GCGate else {
+      sequence = if (PvP1012()) GGC else {
         var wTech   =   1.0
         var wGate   =   1.0
         wTech       *=  (With.geography.startLocations.length - 1)
@@ -344,6 +344,7 @@ class PvPOpening extends GameplanImperative {
     atMainTiming  ||= haveComplete(Protoss.Reaver)    && With.fingerprints.cannonRush()
     atMainTiming  ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst, With.fingerprints.rampBlock)
     atMainTiming  ||= enemyBases > 1
+    atMainTiming  ||= With.fingerprints.cannonRush.recently && ! With.fingerprints.gatewayFirst()
     // There may not be a timing depending on what our opponent does,
     // or the timing window might close permanently.
     earlyTimingClosed   ||= PvP1012()         && With.fingerprints.twoGate()
@@ -503,7 +504,7 @@ class PvPOpening extends GameplanImperative {
       && With.frame < Minutes(7)()
       && unitsComplete(IsWarrior) < 7
       // If they just make a few Zealots and stop, we don't want to overreact and die to, say, a DT swap
-      && ! enemiesHave(Protoss.CyberneticsCore)) {
+      && ! enemiesHave(Protoss.CyberneticsCore, Protoss.Dragoon)) {
       status("99Defense")
       gasLimitCeiling(200)
       if (units(Protoss.Gateway) < 2 || unitsComplete(Protoss.Probe) < 15) {

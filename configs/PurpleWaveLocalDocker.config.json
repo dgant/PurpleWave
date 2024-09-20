@@ -11,6 +11,6 @@
 "logstd"          : true,
 "multiCPU"        : true,
 "framemstarget"   : 25,
-"framemslimit"    : 30
+"framemslimit"    : 30,
 "comments"        : "SC-Docker does not enforce per-frame limits."
 }

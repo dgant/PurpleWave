@@ -363,7 +363,7 @@ class PvPLateGame extends GameplanImperative {
       get(Protoss.Forge)
     }
     if (addForge || have(Protoss.Forge)) {
-      if ( ! have(Protoss.Observer)) {
+      if ( ! have(Protoss.Observer) || shouldAttack) {
         buildCannonsAtFoyer(1, PlaceLabels.DefendEntrance)
       }
       With.geography.ourBasesAndSettlements.view

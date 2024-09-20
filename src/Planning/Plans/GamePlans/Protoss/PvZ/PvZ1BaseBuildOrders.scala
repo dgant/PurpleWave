@@ -3,8 +3,8 @@ package Planning.Plans.GamePlans.Protoss.PvZ
 import Lifecycle.With
 import Planning.Plans.GamePlans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.Time.Minutes
-import Utilities.UnitFilters.IsWarrior
+import Utilities.Time.{Minutes, Seconds}
+import Utilities.UnitFilters.{IsHatchlike, IsWarrior}
 
 abstract class PvZ1BaseBuildOrders extends GameplanImperative {
 
@@ -250,11 +250,13 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
   private var _previouslyAnticipatedSpeedlings: Boolean = false
   protected def anticipateSpeedlings: Boolean = {
     var output  =   With.fingerprints.zerglingsOnly.recently || enemyRecentStrategy(speedlingStrategies: _*)
-    output      &&= ! With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)()
+    output      &&= ! (With.scouting.enemyMainFullyScouted && With.frame > Minutes(3)())
     output      ||= enemyStrategy(speedlingStrategies: _*)
     output      ||= enemiesShown(Zerg.Zergling) >= 20
     output      &&= enemies(Zerg.CreepColony, Zerg.SunkenColony) > 1
     output      ||= enemiesShown(Zerg.Zergling) >= 30
+    output      ||= enemyHasShown(Zerg.Zergling) && enemies(Zerg.Drone) < enemies(IsHatchlike) * 6;
+    output      ||= With.units.enemy.filter(Zerg.Extractor).exists(e => With.framesSince(e.completionFrame) > Seconds(21)() && ! With.units.enemy.exists(Zerg.LairOrHive)) // It takes 21 seconds to mine 100 gas from an Extractor
     output      &&= ! enemyHydralisksLikely
     output      &&= ! enemyMutalisksLikely
     output      &&= ! enemyLurkersLikely

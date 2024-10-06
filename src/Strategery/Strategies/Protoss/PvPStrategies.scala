@@ -13,17 +13,21 @@ abstract class PvPStrategy extends Strategy {
 
 ///////////////////
 // Opening steps //
-///////////////////}
+///////////////////
+
+object CanGateCoreOnThisMap {
+  val criticalRushDistance = 150
+  def apply(): Boolean = With.strategy.rushDistanceMin > criticalRushDistance
+}
 
 object PvPGateCore extends PvPStrategy {
-  val criticalRushDistance = 150
-  setRushTilesMinimum(criticalRushDistance)
+  addRequirement(() => CanGateCoreOnThisMap())
 }
 
 object PvP1012 extends PvPStrategy {
   addChoice(PvP3Zealot, PvP5Zealot)
   addRequirement(() =>
-    ! PvPGateCore.legal
+    ! CanGateCoreOnThisMap()
     || With.fingerprints.nexusFirst.recently
     || With.fingerprints.proxyGateway.recently
     || With.fingerprints.twoGate99.recently)

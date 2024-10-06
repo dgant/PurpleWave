@@ -1,8 +1,8 @@
 {
 "human"           : false,
-"ladder"          : true,
+"ladder"          : false,
 "livestream"      : false,
-"tournament"      : false,
+"tournament"      : true,
 "roundrobin"      : true,
 "elimination"     : false,
 "pretraining"     : false,

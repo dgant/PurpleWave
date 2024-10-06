@@ -25,7 +25,7 @@ object FindWall {
       WallProblems.all.view
         .map(p => (p, wallFinder.wallsUnacceptable.count(_.problems.contains(p))))
         .filter(_._2 > 0)
-        .foreach(p => With.logger.debug(f"$p._1: p._2"))
+        .foreach(p => With.logger.debug(f"${p._1}: ${p._2}"))
       With.logger.debug("All scores:")
       With.logger.debug(wallFinder.wallsAcceptable.sortBy(_.score).map(_.toString).mkString("\n"))
       With.logger.debug("")

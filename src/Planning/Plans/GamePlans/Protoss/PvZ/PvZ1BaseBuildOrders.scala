@@ -255,7 +255,7 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     output      ||= enemiesShown(Zerg.Zergling) >= 20
     output      &&= enemies(Zerg.CreepColony, Zerg.SunkenColony) > 1
     output      ||= enemiesShown(Zerg.Zergling) >= 30
-    output      ||= enemyHasShown(Zerg.Zergling) && enemies(Zerg.Drone) < enemies(IsHatchlike) * 6;
+    output      ||= enemyHasShown(Zerg.Zergling) && enemies(Zerg.Drone) < enemies(IsHatchlike) * 5;
     output      ||= With.units.enemy.filter(Zerg.Extractor).exists(e => With.framesSince(e.completionFrame) > Seconds(21)() && ! With.units.enemy.exists(Zerg.LairOrHive)) // It takes 21 seconds to mine 100 gas from an Extractor
     output      &&= ! enemyHydralisksLikely
     output      &&= ! enemyMutalisksLikely

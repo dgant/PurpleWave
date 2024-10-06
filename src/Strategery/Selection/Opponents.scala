@@ -6,10 +6,11 @@ object Opponents {
   private var allKnown: Vector[Opponent] = Vector.empty
   private def add(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()): Opponent = { val output = Opponent(name, policy); allKnown = allKnown :+ output; output }
 
+  val aggroPvZ  : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseReactive, PvZSpeedlot, PvZMuscle) { duration = 10 }
+  val ecoPvZ    : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZFFE) { duration = 10 }
   val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
-  val aggroPvZ  : StrategySelectionPolicy = StrategySelectionFixed(PvZ1BaseReactive, PvZSpeedlot, PvZMuscle)
+  val defaultPvZ: StrategySelectionPolicy = aggroPvZ
 
   // AIIDE 2024
   val bananabrain : Opponent = add("BananaBrain",     new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPRobo, PvPReaver))
@@ -17,9 +18,8 @@ object Opponents {
   val steamhammer : Opponent = add("Steamhammer",     aggroPvZ)
   val microwave   : Opponent = add("Microwave",       aggroPvZ)
   val infestedart : Opponent = add("InfestedArtosis", aggroPvZ)
-  val dragon      : Opponent = add("Dragon",          StrategySelectionFixed(PvTCustom))
   val ualbertabot : Opponent = add("UAlbertaBot",     StrategySelectionFixed(PvR2Gate4Gate))
-  val mcrave      : Opponent = add("McRave",          StrategySelectionFixed(PvZ1BaseReactive, PvZGoon, PvZExpand))
+  val mcrave      : Opponent = add("McRave",          ecoPvZ)
 
   // COG 2023
   val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))

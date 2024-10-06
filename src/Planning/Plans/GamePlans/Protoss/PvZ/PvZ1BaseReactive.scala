@@ -1,6 +1,7 @@
 package Planning.Plans.GamePlans.Protoss.PvZ
 
 import Lifecycle.With
+import Performance.Cache
 import Placement.Access.PlaceLabels
 import Planning.Compositor
 import Planning.Plans.Macro.Protoss.MeldArchons
@@ -73,10 +74,11 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
 
     // Disabling this because we get Stargate as part of going Speedlot!
     //go (Stargate,     have(Protoss.Stargate))
-    go (Reaver,       have(Protoss.RoboticsFacility, Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Reaver))
+    go (Reaver,       safeVsAir && have(Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Reaver))
+    go (Reaver,       enemyLurkersLikely && have(Protoss.RoboticsFacility))
     go (Speedlot,     have(Protoss.CitadelOfAdun) || (have(Protoss.Forge) && ! enemyLurkersLikely))
     go (Goon,         upgradeComplete(Protoss.DragoonRange) || units(Protoss.Dragoon) > 3)
-    goo(Reaver,   0,  have(Protoss.RoboticsFacility) || enemyHydralisksLikely || enemyLurkersLikely)
+    goo(Reaver,   0,  safeVsAir && (have(Protoss.RoboticsFacility) || enemyHydralisksLikely || enemyLurkersLikely))
     goo(Speedlot, 0,  anticipateSpeedlings)
     goo(Goon,     0,  enemyMutalisksLikely && units(Protoss.Gateway) >= 3)
     goo(Stargate, 0,  enemyMutalisksLikely)
@@ -118,10 +120,21 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   }
 
   private def committedSpeedlot = haveEver(Protoss.Forge)
-  private def committedReaver   = haveEver(Protoss.RoboticsFacility)
+  private def committedReaver   = haveEver(Protoss.Shuttle, Protoss.RoboticsSupportBay)
   private def committedGoon     = upgradeStarted(Protoss.DragoonRange)
   private def committedTech     = haveEver(Protoss.Assimilator)
   private def committedExpand   = With.geography.maxMiningBasesOurs >= 2
+
+  private def safeVsAir: Boolean = _safeVsAir()
+  private val _safeVsAir = new Cache(() => airScore >= 0)
+  private def airScore: Double = {
+    var output: Double = - Math.max(enemies(Zerg.Mutalisk), ?(enemyMutalisksLikely, 6, 0))
+    output += 4 * units(Protoss.Archon)
+    output += units(Protoss.Dragoon)
+    output += 1.5 * Math.max(0d, units(Protoss.Corsair) - 2 * enemies(Zerg.Scourge))
+    output
+
+  }
 
   override def executeBuild(): Unit = {
     new MeldArchons()()
@@ -252,7 +265,9 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
           },
           {
             get(Protoss.CitadelOfAdun)
-            get(Protoss.Shuttle)
+            if (safeDefending || units(Protoss.Reaver) >= 2) {
+              get(Protoss.Shuttle)
+            }
             get(Protoss.ZealotSpeed)
           })
       case Stargate =>

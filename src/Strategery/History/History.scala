@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 class History {
   
-  lazy val games: Iterable[HistoricalGame] = HistoryLoader.load()
+  lazy val games: Seq[HistoricalGame] = HistoryLoader.load()
   
   lazy val currentMapName   : String  = With.game.mapFileName
   lazy val currentStarts    : Int     = With.game.getStartLocations.size

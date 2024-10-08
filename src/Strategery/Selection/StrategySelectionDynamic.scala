@@ -7,11 +7,17 @@ import Strategery.Strategies.Strategy
 object StrategySelectionDynamic extends StrategySelectionPolicy {
 
   def chooseBranch: Seq[Strategy] = {
-    val weights = StrategyShare.byBranch
-      .map(branch => (
-        branch._1,
-        Math.exp(With.configuration.dynamicStickiness * With.strategy.winProbabilityByBranch(branch._1)) / branch._2
-      ))
-    Maff.sampleWeighted(weights.keys.toSeq, weights).get
+    sample(16)
+  }
+
+  def sample(probabilityExponent: Double): Seq[Strategy] = {
+    val branches = With.strategy.strategyBranchesLegal
+    Maff
+      .sampleWeighted(
+        branches,
+        (branch: Seq[Strategy]) =>
+          Math.pow(WinProbability(branch), probabilityExponent)
+          / Maff.geometricMean(branch.map(strategy => branches.count(_.contains(strategy)).toDouble)))
+      .getOrElse(Seq.empty)
   }
 }

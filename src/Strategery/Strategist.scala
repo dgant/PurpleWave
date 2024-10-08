@@ -139,13 +139,12 @@ class Strategist {
   lazy val strategyBranchesUnfiltered : Seq[Seq[Strategy]] = strategiesTopLevel.flatMap(ExpandStrategy.apply).distinct
   lazy val strategyBranchesLegal      : Seq[Seq[Strategy]] = strategyBranchesUnfiltered.filter(_.forall(_.legality.isLegal))
 
-  lazy val legalities   : Map[Strategy, StrategyLegality]   = strategiesAll.distinct.map(s => (s, new StrategyLegality(s))).toMap
-  lazy val evaluations  : Map[Strategy, StrategyEvaluation] = strategiesAll.distinct.map(s => (s, new StrategyEvaluation(s))).toMap
+  lazy val legalities   : Map[Strategy, StrategyLegality]   = strategiesAll.map(s => (s, new StrategyLegality(s))).toMap
+  lazy val evaluations  : Map[Strategy, StrategyEvaluation] = strategiesAll.map(s => (s, new StrategyEvaluation(s))).toMap
 
-  lazy val gamesVsOpponent: Iterable[HistoricalGame] = if (With.enemies.size > 1) Iterable.empty else With.history.games.filter(_.enemyName == With.configuration.playbook.enemyName)
-  lazy val winProbability: Double = if (gamesVsOpponent.isEmpty) With.configuration.targetWinrate else gamesVsOpponent.filter(_.won).map(_.weight).sum / gamesVsOpponent.map(_.weight).sum
-  lazy val winProbabilityByBranch       : Map[Iterable[Strategy], Double] = strategyBranchesUnfiltered.map(b => (b, WinProbability(b))).toMap
-  lazy val winProbabilityByBranchLegal  : Map[Iterable[Strategy], Double] = winProbabilityByBranch.filter(_._1.forall(_.legality.isLegal))
+  lazy val gamesVsOpponent              : Seq[HistoricalGame]         = With.history.games.filter(With.enemies.size == 1 && _.enemyName == With.configuration.playbook.enemyName)
+  lazy val winProbabilityByBranch       : Map[Seq[Strategy], Double]  = strategyBranchesUnfiltered.map(b => (b, WinProbability(b))).toMap
+  lazy val winProbabilityByBranchLegal  : Map[Seq[Strategy], Double]  = winProbabilityByBranch.filter(_._1.forall(_.legality.isLegal))
 
   val rolls: mutable.HashMap[String, Boolean] = new mutable.HashMap
   def roll(key: String, probability: Double): Boolean = {

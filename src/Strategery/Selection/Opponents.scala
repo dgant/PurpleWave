@@ -8,7 +8,7 @@ object Opponents {
 
   val aggroPvZ  : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseReactive, PvZSpeedlot, PvZMuscle) { duration = 10 }
   val ecoPvZ    : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZFFE) { duration = 10 }
-  val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ)
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvZ: StrategySelectionPolicy = aggroPvZ
 
@@ -19,7 +19,7 @@ object Opponents {
   val microwave   : Opponent = add("Microwave",       aggroPvZ)
   val infestedart : Opponent = add("InfestedArtosis", aggroPvZ)
   val ualbertabot : Opponent = add("UAlbertaBot",     StrategySelectionFixed(PvR2Gate4Gate))
-  val mcrave      : Opponent = add("McRave",          ecoPvZ)
+  val mcrave      : Opponent = add("McRave",          StrategySelectionGreedy())
 
   // COG 2023
   val xiaoyi      : Opponent = add("XIAOYI",        StrategySelectionFixed(PvT28Nexus))

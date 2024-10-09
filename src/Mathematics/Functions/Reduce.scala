@@ -18,6 +18,8 @@ trait Reduce {
     val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(value, min))
   }
+  @inline final def clamp01(value: Int)   : Int     = clamp(value, 0, 1)
+  @inline final def clamp01(value: Double): Double  = clamp(value, 0, 1)
 
   @inline final def betweenI(value: Int, bound1: Int, bound2: Int): Boolean = {
     val min = Math.min(bound1, bound2)
@@ -166,7 +168,7 @@ trait Reduce {
   }
 
   @inline final def takePercentile[T](percentile: Double, iterable: Iterable[T])(implicit ordering: Ordering[T]): IndexedSeq[T] = {
-    val nth = (iterable.size * Maff.clamp(percentile, 0, 1)).toInt
+    val nth = (iterable.size * Maff.clamp01(percentile)).toInt
     val queue = collection.mutable.PriorityQueue[T](iterable.toSeq: _*)
     (0 until nth).foreach(i => queue.dequeue())
     val finalSize = queue.size

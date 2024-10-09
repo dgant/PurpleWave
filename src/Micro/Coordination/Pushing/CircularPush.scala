@@ -15,7 +15,7 @@ class CircularPush(val priority: TrafficPriority, center: Pixel, radius: Double,
     val distance = target.pixelDistance(center)
     if (center == target) return Some(Potential.towards(recipient, recipient.agent.safety))
     val magnitude = Maff.nanToZero((radius - distance) / radius)
-    val magnitudeClamped = Maff.clamp(magnitude, 0, 1)
+    val magnitudeClamped = Maff.clamp01(magnitude)
     if (magnitudeClamped <= 0) None else Some(ForceMath.fromPixels(center, target, magnitudeClamped))
   }
 

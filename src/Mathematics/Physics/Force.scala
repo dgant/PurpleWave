@@ -9,12 +9,14 @@ final case class Force(x: Double, y: Double) {
   def this() = this(0.0, 0.0)
   def this(point: AbstractPoint) = this(point.x, point.y)
   
-  @inline def unary_-           : Force = Force(-x, -y)
-  @inline def +(other: Force)   : Force = Force(x + other.x, y + other.y)
-  @inline def -(other: Force)   : Force = Force(x - other.x, y - other.y)
-  @inline def *(other: Force)   : Double = x * other.x + y * other.y
-  @inline def *(value: Double)  : Force = Force(x * value, y * value)
-  @inline def /(value: Double)  : Force = Force(x / value, y / value)
+  @inline def unary_-           : Force   = Force(-x, -y)
+  @inline def +(other: Force)   : Force   = Force(x + other.x,  y + other.y)
+  @inline def -(other: Force)   : Force   = Force(x - other.x,  y - other.y)
+  @inline def *(other: Force)   : Force   = Force(x * other.x,  y * other.y)
+  @inline def *(value: Double)  : Force   = Force(x * value,    y * value)
+  @inline def /(other: Force)   : Force   = Force(x / other.x,  y / other.y)
+  @inline def /(value: Double)  : Force   = Force(x / value,    y / value)
+  @inline def dot(b: Force)     : Double  = x * b.x + y * b.y
 
   @inline def degrees: Double = radians * Maff.x360inv2Pi
   @inline def radians: Double = Maff.fastAtan2(y, x)
@@ -32,6 +34,7 @@ final case class Force(x: Double, y: Double) {
         scale * x / length,
         scale * y / length)
   }
+
 
   @inline def clipAtLeast(scale: Double): Force = {
     if (scale * scale >= lengthSquared) this else normalize(scale)

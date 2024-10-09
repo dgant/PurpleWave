@@ -147,6 +147,9 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def altitudeUnchecked: Double = {
     tile.altitudeUnchecked
   }
+  @inline def proximity: Double = {
+    With.scouting.proximity(this)
+  }
 
   @inline private def nwtTest(tile: Tile): Option[Tile] = SomeIf(tile.walkable, tile)
   @inline private def nwtFlip(xFirst: Boolean, t0: Tile, t1: Tile): Option[Tile] =

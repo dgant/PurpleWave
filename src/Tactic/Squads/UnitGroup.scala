@@ -18,7 +18,6 @@ trait UnitGroup {
   def groupOrderable    : Seq[UnitInfo] = groupUnits.view.filter(_.unitClass.orderable)
   def mobileUnits       : Seq[UnitInfo] = _mobileUnits()
   def attackers         : Seq[UnitInfo] = _attackers()
-  def attackersNonWorker: Seq[UnitInfo] = _attackersNonWorker()
   def detectors         : Seq[UnitInfo] = _detectors().view
   def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
   def arbiters          : Seq[UnitInfo] = _arbiters().view
@@ -111,10 +110,10 @@ trait UnitGroup {
   private val _minersThreatened           = new Cache(() => consensusPrimaryFoes.attackers.exists(_.matchups.threateningMiners))
   private val _widthPixels                = new Cache(() => warriorsCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
-  private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
-  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(                                 groupOrderable, groupUnits)), _.pixel))
-  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(                     attackers,  groupOrderable, groupUnits)), _.pixel))
-  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackersNonWorker,  attackers,  groupOrderable, groupUnits)), _.pixel))
+  private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
+  private val _centroidGround             = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidAir          = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
+  private val _attackCentroidGround       = new Cache(() => GroupCentroid.ground(centroidUnits(Maff.orElse(attackers, groupOrderable, groupUnits)), _.pixel))
   private val _attackCentroidKey          = new Cache(() => ?(_hasGround(), attackCentroidGround, attackCentroidAir))
   private val _destinationNext            = new Cache(() => GroupCentroid.ground(centroidUnits(attackers), _.presumptiveDestinationNext))
   private val _destinationFinal           = new Cache(() => GroupCentroid.ground(centroidUnits(attackers), _.presumptiveDestinationFinal))

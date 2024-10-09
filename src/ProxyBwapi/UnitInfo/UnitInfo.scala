@@ -313,10 +313,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val speedTowardsThreat    = speedApproaching(threat)
     val framesToStopMe        = ?(speedTowardsThreat <= 0, 0.0, framesToStopRightNow)
     val framesToFlee          = framesToStopMe + unitClass.framesToTurn180 + With.latency.remainingFrames + With.reaction.agencyAverage
-    val distanceClosedByMe    = speedTowardsThreat * framesToFlee
+    val distanceClosedByMe    = 0.5 * speedTowardsThreat * framesToFlee
     val distanceClosedByEnemy = ?(Protoss.Interceptor(threat), 0.0, threat.topSpeed * framesToFlee)
-    val distanceEntangled     = threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)
-    val output                = distanceEntangled + distanceClosedByEnemy
+    val output                = distanceClosedByMe + distanceClosedByEnemy + threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)
     output
   }
   final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
@@ -493,17 +492,13 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     }
   }
   @inline final def pixelsToSightRange(other: UnitInfo): Double = pixelDistanceEdge(other) - sightPixels
-  @inline final def canStim: Boolean = unitClass.canStim && player.hasTech(Terran.Stim) && hitPoints > 10
+  @inline final def canStim : Boolean = unitClass.canStim && canDoAnything && player.hasTech(Terran.Stim) && hitPoints > 10
+  @inline final def canSiege: Boolean = unitClass.isTank  && canDoAnything && player.hasTech(Terran.SiegeMode)
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0
   @inline final def speed: Double = Maff.broodWarDistanceDouble(0.0, 0.0, velocityX, velocityY)
   @inline final def speedApproaching(other: UnitInfo): Double = speedApproaching(other.pixel)
-  @inline final def speedApproaching(pixel: Pixel): Double = {
-    val deltaXY = Force(x - pixel.x, y - pixel.y)
-    val deltaV  = velocity
-    val output  = - velocity.lengthFast * (deltaXY.normalize * velocity.normalize)
-    output
-  }
+  @inline final def speedApproaching(pixel: Pixel): Double = velocity.dot(Force(pixel.x - x, pixel.y - y).normalize)
   private val _gatheringOrders = Seq(Orders.WaitForMinerals, Orders.MiningMinerals, Orders.WaitForGas, Orders.HarvestGas, Orders.MoveToMinerals, Orders.MoveToGas, Orders.ReturnGas, Orders.ReturnMinerals, Orders.ResetCollision)
   @inline final def speedApproachingEachOther(other: UnitInfo): Double = speedApproaching(other) + other.speedApproaching(this)
   @inline final def airborne  : Boolean = flying || airlifted

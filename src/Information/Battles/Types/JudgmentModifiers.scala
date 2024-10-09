@@ -4,10 +4,11 @@ import Debugging.Visualizations.Colors
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
-import ProxyBwapi.Races.Terran
-import Utilities.{?, SomeIf}
+import ProxyBwapi.Races.{Terran, Zerg}
+import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsSpeedling, IsTank, IsWorker}
+import Utilities.UnitFilters.{IsAny, IsTank, IsWorker}
 import bwapi.Color
 
 import scala.collection.mutable.ArrayBuffer
@@ -17,10 +18,16 @@ object JudgmentModifiers {
   def apply(battle: Battle): Seq[JudgmentModifier] = {
     val output = new ArrayBuffer[JudgmentModifier]
     def add(name: String, color: Color, modifier: Option[JudgmentModifier]): Unit = {
-      modifier.foreach(m => {
-        m.name = name
-        m.color = color
-        output += m })
+      modifier
+        .filter(m =>
+              ! m.targetDelta.isNaN
+          &&  ! m.speedMultiplier.isNaN
+          &&  Math.abs(m.targetDelta)         > 0.0001
+          &&  Math.abs(m.speedMultiplier - 1) > 0.0001)
+        .foreach(m => {
+            m.name = name
+            m.color = color
+            output += m })
     }
     add("Proximity",    Colors.NeonRed,       proximity(battle))
     add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
@@ -31,30 +38,35 @@ object JudgmentModifiers {
     add("Caught",       Colors.BrightGreen,   caught(battle))
     output
   }
+
+  private def modifyTarget  (value: Double): Option[JudgmentModifier] = Some(JudgmentModifier(targetDelta     = value))
+  private def multiplySpeed (value: Double): Option[JudgmentModifier] = Some(JudgmentModifier(speedMultiplier = value))
+
+
   // Prefer fighting
   //  when close to home,
   //  especially against ranged units
   //  especially if pushed into our main/natural
   //    because we will run out of room to retreat
   //    and because workers or buildings will be endangered if we don't
-  def proximity(battleLocal: Battle): Option[JudgmentModifier] = {
-    val enemyRange      = battleLocal.enemy.meanAttackerRange
+  def proximity(battle: Battle): Option[JudgmentModifier] = {
+    val enemyRange      = battle.enemy.meanAttackerRange
     val deltaMin        = -0.4 * Maff.clamp(With.frame.toDouble / Minutes(10)(), 0.5, 1.0)
     val deltaMax        = 0.05
-    val proximity       = With.scouting.proximity(battleLocal.enemy.centroidGround)
+    val proximity       = With.scouting.proximity(battle.enemy.centroidGround)
     val proximityMult   = (proximity * 2 - 1)
     val rangeMult       = Maff.clamp(enemyRange / (32 * 6.0), 0.0, 2.0)
     val targetDeltaRaw  = -0.3 * proximityMult * rangeMult
     val targetDelta     = Maff.clamp(targetDeltaRaw, deltaMin, deltaMax)
-    Some(JudgmentModifier(targetDelta = targetDelta))
+    modifyTarget(targetDelta)
   }
 
   // Prefer fighting
   //   when our gatherers are endangered
   //    because they are very fragile
   //    and if they die we will probably lose the game
-  def gatherers(battleLocal: Battle): Option[JudgmentModifier] = {
-    val workersImperiled = battleLocal.us.units.count(ally =>
+  def gatherers(battle: Battle): Option[JudgmentModifier] = {
+    val workersImperiled = battle.us.units.count(ally =>
       ally.unitClass.isWorker
       && ally.visibleToOpponents
       && ally.friendly.exists(_.agent.toGather.exists(g =>
@@ -63,7 +75,7 @@ object JudgmentModifiers {
         && ally.matchups.threats.exists(t => t.pixelDistanceEdge(g) - t.pixelRangeAgainst(ally) <= Gather.defenseRadiusPixels))))
     val workersTotal = With.units.countOurs(IsWorker)
     val workersRatio = Maff.nanToZero(workersImperiled.toDouble / workersTotal)
-    SomeIf(workersRatio > 0, JudgmentModifier(targetDelta = -workersRatio / 2.0))
+    modifyTarget( - workersRatio / 2.0)
   }
 
   // Avoid fighting
@@ -72,16 +84,15 @@ object JudgmentModifiers {
   //     because their existence is highly probable
   //     and if we attacked in error once, we will likely keep doing it
   //     and thus systematically bleed units
-  def hiddenTanks(battleLocal: Battle): Option[JudgmentModifier] = {
+  def hiddenTanks(battle: Battle): Option[JudgmentModifier] = {
     if (With.enemies.forall(e => ! e.isTerran || ! e.hasTech(Terran.SiegeMode))) return None
-    val tanks           = battleLocal.enemy.units.count(u => IsTank(u) && u.base.exists(_.owner.isEnemy) && ! u.visible)
+    val tanks           = battle.enemy.units.count(u => IsTank(u) && u.base.exists(_.owner.isEnemy) && ! u.visible)
     if (tanks == 0) return None
-    def ourCombatUnits  = battleLocal.us.units.view.filter(_.canAttack)
-    val valueUs         = ourCombatUnits.map(_.subjectiveValue).sum
-    val valueUsGround   = ourCombatUnits.filterNot(_.flying).map(_.subjectiveValue).sum
+    val valueUs         = value(battle.us.attackers)
+    val valueUsGround   = value(battle.us.attackers, ! _.flying)
     val ratioUsGround   = Maff.nanToZero(valueUsGround / valueUs)
-    val enemyBonus      = Math.min(ratioUsGround * tanks * 0.1, 0.4)
-    SomeIf(enemyBonus > 0, JudgmentModifier(speedMultiplier = 1 - enemyBonus))
+    val score           = Maff.clamp(ratioUsGround * tanks * 0.1, 0.0, 0.4)
+    multiplySpeed(1 - score)
   }
 
   // Avoid disengaging
@@ -98,50 +109,71 @@ object JudgmentModifiers {
   //
   // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
   private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
-  def hysteresis(battleLocal: Battle): Option[JudgmentModifier] = {
-    val commitmentRaw             = Maff.mean(battleLocal.us.attackers.map(u => Maff.clamp(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d), 0, 1)))
+  def hysteresis(battle: Battle): Option[JudgmentModifier] = {
+    val commitmentRaw             = Maff.weightedMean(battle.us.attackers.map(u => (Maff.clamp01(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d)), u.subjectiveValue)))
     val commitment                = commitmentFloor(commitmentRaw)
-    lazy val enemyAttackers       = battleLocal.enemy.attackers.size.toDouble
-    lazy val hesitanceVisibility  = 0.08 / Math.max(1.0, enemyAttackers) * battleLocal.enemy.attackers.count( ! _.visible)
-    lazy val hesitanceTanks       = 0.12 / Math.max(1.0, enemyAttackers) * battleLocal.enemy.attackers.count(t => Terran.SiegeTankSieged(t) || (Terran.SiegeTankUnsieged(t) && With.framesSince(t.lastSeen) > 24))
-    Some(JudgmentModifier(targetDelta = ?(commitment > 0, -commitment * 0.2, hesitanceVisibility + hesitanceTanks)))
+    lazy val groundRatio          = valueRatio(battle.us.attackers, ! _.flying)
+    lazy val invisibleRatio       = valueRatio(battle.enemy.attackers, !_.visible)
+    lazy val siegeRatio           = ?(With.enemies.exists(_.isTerran), valueRatio(battle.enemy.attackers, t => Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)), 0)
+    lazy val hesitanceVisibility  = 0.08 * invisibleRatio
+    lazy val hesitanceTanks       = 0.12 * siegeRatio * groundRatio
+    modifyTarget(?(commitment > 0, -commitment * 0.2, hesitanceVisibility + hesitanceTanks))
   }
+  /*
+  Hysteresis ideas:
+  - STALL when last decision was flee
+  - STALL vs static D or siegeable tanks
+  - STALL vs invisible units
+  - STALL when bloodthirst is low
+  - STALL when pace is high
+  - STALL when reinforcements are approaching
+  - COMMIT when last decision was fight
+  - COMMIT when deep in enemy range, especially if we're slow
+  - COMMIT when enemy is in range, especially if units are juicy (reavers, tanks, workers, static D)
+  - COMMIT when across a bridge
+   */
 
   // Avoid fighting across chokes/bridges
-  def choke(battleLocal: Battle): Option[JudgmentModifier] = {
-    val pUs       = battleLocal.us.attackCentroidGround
-    val pFoe      = battleLocal.enemy.vanguardGround()
-    val edge      = battleLocal.choke
-    if (edge.isEmpty) return None
-    if (pFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains)) return None
-    if (pFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < battleLocal.us.maxRangeGround) return None
-    val badness   = edge.get.badness(battleLocal.us, pUs.zone)
-    if (badness <= 1) return None
-    val speedMod  = battleLocal.us.combatGroundFraction * Maff.nanToOne(1.0 / badness)
-    val deltaMod  = battleLocal.us.combatGroundFraction * Maff.clamp((badness - 1)* 0.0175, 0.0, 0.3)
-    Some(JudgmentModifier(speedMultiplier = speedMod, targetDelta = deltaMod))
+  def choke(battle: Battle): Option[JudgmentModifier] = {
+    val pixelUs   = battle.us.attackCentroidGround
+    val pixelFoe  = battle.enemy.vanguardGround()
+    val edge      = battle.choke
+    if (edge.isEmpty)                                                                                     return None
+    if (pixelFoe.zone.bases.exists(With.geography.ourBasesAndSettlements.contains))                       return None
+    if (pixelFoe.pixelDistance(edge.get.pixelCenter) + edge.get.radiusPixels < battle.us.maxRangeGround)  return None
+
+    val badness   = edge.get.badness(battle.us, pixelUs.zone)
+    if (badness <= 1)                                                                                     return None
+
+    val speedMultiplier = battle.us.combatGroundFraction * Maff.nanToOne(1.0 / badness)
+    val targetDelta     = battle.us.combatGroundFraction * Maff.clamp((badness - 1) * 0.0175, 0.0, 0.3)
+    Some(JudgmentModifier(speedMultiplier = speedMultiplier, targetDelta = targetDelta))
   }
 
   // Prefer fighting tanks when we are already in range to attack them, or vice versa
-  def tankLock(battleLocal: Battle): Option[JudgmentModifier] = {
-    if ( ! With.enemies.exists(_.isTerran)) return None
-    if ( ! battleLocal.enemy.units.exists(Terran.SiegeTankSieged)) return None
-    val attackers         = battleLocal.us.attackers.size
-    val inTankRange       = battleLocal.us.attackers.count(_.matchups.inTankRange)
-    val tankInRange       = battleLocal.us.attackers.count(_.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
-    val inRankRangeScore  = 1.0 / 3.0 * inTankRange / Math.max(1, attackers)
-    val tankInRangeScore  = 2.0 / 3.0 * tankInRange / Math.max(1, attackers)
-    val score             = 0.5 * (inRankRangeScore + tankInRangeScore)
-    ?(score <= 0, None, Some(JudgmentModifier(targetDelta = score)))
+  def tankLock(battle: Battle): Option[JudgmentModifier] = {
+    if ( ! With.enemies.exists(_.isTerran))                   return None
+    if ( ! battle.enemy.units.exists(Terran.SiegeTankSieged)) return None
+
+    val inTankRangeRatio  = valueRatio(battle.us.attackers, _.matchups.inTankRange)
+    val tankInRangeRatio   = valueRatio(battle.us.attackers, _.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
+    val inRankRangeScore  = inTankRangeRatio * 1/3d
+    val tankInRangeScore  = tankInRangeRatio * 2/3d
+    val score             = - 0.5 * (inRankRangeScore + tankInRangeScore)
+    modifyTarget(score)
   }
 
   // Prefer fighting when caught by fast units
-  def caught(battleLocal: Battle): Option[JudgmentModifier] = {
-    val catchers  = battleLocal.enemy.units.count(u => u.isAny(IsSpeedling, Terran.Vulture))
-    val enemies   = battleLocal.enemy.units.length
-    val caught    = battleLocal.us.units.count(u => u.matchups.threatDeepest.exists(t => t.isAny(IsSpeedling, Terran.Vulture) && t.inRangeToAttack(u) && t.topSpeed > u.topSpeed))
-    val allies    = battleLocal.us.units.length
-    val score     = Maff.nanToZero(catchers.toDouble / enemies * caught / allies)
-    ?(score <= 0, None, Some(JudgmentModifier(targetDelta =  -score)))
+  private val catcher = IsAny(Zerg.Zergling, Terran.Vulture, Zerg.Mutalisk)
+  def caught(battle: Battle): Option[JudgmentModifier] = {
+    if ( ! battle.us.attackers.exists(_.matchups.engagedUpon)) return None
+    val catcherRatio  = valueRatio(battle.enemy.attackers, catcher)
+    val caughtRatio   = valueRatio(battle.us.attackers, u => ! u.flying && u.matchups.threatDeepest.exists(t => catcher(t) && t.pixelsToGetInRange(u) < 160 && t.topSpeed > 1.05 * u.topSpeed))
+    val score         = -0.5 * Math.max(0, (1 - battle.us.vanguardGround().proximity) * Math.sqrt(Maff.nanToZero(catcherRatio * caughtRatio)))
+    modifyTarget(score)
   }
+
+  private def value       (units: Iterable[UnitInfo])                           : Double = units.view.map(_.subjectiveValue).sum
+  private def value       (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units.view.filter(test))
+  private def valueRatio  (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units, test) / Math.max(1, value(units))
 }

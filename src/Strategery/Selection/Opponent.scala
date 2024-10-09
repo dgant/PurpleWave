@@ -1,6 +1,11 @@
 package Strategery.Selection
 
-case class Opponent(name: String, policy: StrategySelectionPolicy = StrategySelectionGreedy()) {
+case class Opponent(name: String, targetWinrate: Double, policy: StrategySelectionPolicy = StrategySelectionGreedy()) {
+
+  def this(name: String, other: Opponent) {
+    this(name, other.targetWinrate, other.policy)
+  }
+
   def matches(otherName: String): Boolean = {
     name == otherName
   }

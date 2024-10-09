@@ -15,7 +15,7 @@ trait Tugging {
   def tugLength                                 : Double      = tugStart.groundPixels(tugEnd)
   def tugDistanceGroundUs     (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugStart)
   def tugDistanceGroundEnemy  (pixel  : Pixel)  : Double      = pixel.walkablePixel.groundPixels(tugEnd)
-  def proximity               (pixel  : Pixel)  : Double      = Maff.clamp(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)), 0, 1)
+  def proximity               (pixel  : Pixel)  : Double      = Maff.clamp01(0.5 + 0.5 * (tugDistanceGroundEnemy(pixel) - tugDistanceGroundUs(pixel)) / (tugDistanceGroundUs(pixel) + tugDistanceGroundEnemy(pixel)))
   def proximity               (tile   : Tile)   : Double      = proximity(tile.center)
   def proximity               (base   : Base)   : Double      = proximity(base.townHallArea.center)
   def ourProximity                              : Double      = _ourProximity()

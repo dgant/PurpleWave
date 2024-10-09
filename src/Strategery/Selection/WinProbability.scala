@@ -72,7 +72,7 @@ object WinProbability {
     // Calculate UCB
     val ucb = winRate + ucbConfidence * Math.sqrt(2 * Math.log(games.length) / denominator)
 
-    Maff.clamp(ucb, 0, 1)
+    Maff.clamp01(ucb)
   }
 
 }

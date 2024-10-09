@@ -200,6 +200,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def altitudeUnchecked: Int = {
     With.game.getGroundHeight(x, y) // TODO: Replace with actually unchecked variant
   }
+  @inline def proximity: Double = {
+    With.scouting.proximity(this)
+  }
   @inline def toRectangle: TileRectangle = {
     TileRectangle(this, this.add(1, 1))
   }

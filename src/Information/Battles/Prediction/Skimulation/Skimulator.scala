@@ -76,11 +76,7 @@ object Skimulator {
     // Estimate distance of hidden enemy units, conservatively expecting them to travel with the rest of the army
     // Note that this can significantly swing our perception of hidden army strength
     if (battle.enemy.units.exists(_.visible)) {
-      val enemyMeanVisibleDistance = Maff.mean(
-        Maff.orElse(
-          battle.enemy.attackersNonWorker,
-          battle.enemy.attackers,
-          battle.enemy.units).view.filter(_.visible).map(_.skimDistanceToEngage))
+      val enemyMeanVisibleDistance = Maff.mean(Maff.orElse(battle.enemy.attackers, battle.enemy.units).view.filter(_.visible).map(_.skimDistanceToEngage))
       battle.enemy.units.view.filterNot(_.visible).foreach(u => u.skimDistanceToEngage = Maff.clamp(u.skimDistanceToEngage - u.topSpeed * With.framesSince(u.lastSeen), u.skimDistanceToEngage, enemyMeanVisibleDistance))
     }
 

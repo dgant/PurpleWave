@@ -2,6 +2,7 @@ package Information.Battles.Types
 
 import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 
 class BattleJudgment(battle: Battle) {
   lazy val scoreSim11     : Double  = calculateSimulationScore11
@@ -26,18 +27,18 @@ class BattleJudgment(battle: Battle) {
 
   private def calculateSimulationScore11: Double = {
     if ( ! battle.simulated) return 0.0
-    // This can happen when all simulated enemies run away and nobody does any damage
-    if (battle.simulationCheckpoints.lastOption.forall(metric => metric.healthLostUs <= 0)) return 1.0
+    if (battle.simulationCheckpoints.lastOption.forall(metric => metric.healthLostUs <= 0)) return 1.0 // This can happen when all simulated enemies run away and nobody does any damage
+
     Maff.weightedMean(battle.simulationCheckpoints.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness)))
   }
 
   private def calculateTarget: Double = {
-    Maff.clamp(battle.judgmentModifiers.view.map(_.targetDelta).sum, -0.9, 0.9)
+    Maff.clamp11(battle.judgmentModifiers.view.map(_.targetDelta).sum)
   }
 
   private def calculateConfidence11(score: Double, target: Double): Double = {
-    Maff.nanToN((score - target) / Math.abs(Math.signum(score - target) - target), if (score >= target) 1 else -1)
+    Maff.nanToN((score - target) / Math.abs(Math.signum(score - target) - target), ?(score >= target, 1, -1))
   }
 
-  def unitShouldFight(unit: UnitInfo): Boolean = if (unit.flying) shouldFightAir else shouldFightGround
+  def unitShouldFight(unit: UnitInfo): Boolean = ?(unit.flying, shouldFightAir, shouldFightGround)
 }

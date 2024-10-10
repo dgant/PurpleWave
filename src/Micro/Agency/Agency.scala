@@ -66,6 +66,8 @@ class Agency extends TimedTask {
           val timeDelta = timeAfter - timeBefore
           With.logger.performance(f"${unit} crossed ${With.configuration.frameLimitMs}ms: ${timeDelta}ms on ${if (agent.actions.isEmpty) agent.lastAction.get else agent.actions.mkString(", ")}")
         }
+
+        unit.hysteresis.update() // Update hysteresis immediately so combat sim has access to the latest value
       }
     }
   }

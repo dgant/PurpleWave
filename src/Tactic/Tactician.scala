@@ -197,6 +197,9 @@ final class Tactician extends TimedTask {
       p._2.vicinity = p._1.attackCentroidKey
     })
 
+    // Proactive DT defense
+    catchDTRunby.launch()
+
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(IsRecruitableForCombat))
       .sortBy( - _.frameDiscovered) // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
@@ -236,9 +239,6 @@ final class Tactician extends TimedTask {
         dropVulnerableBases.map(defenseSquads(_)),
         filter = (f, s) => f.isAny(qualifiedClasses: _*) && s.unitsNext.size < Math.min(3, freelancerCountInitial / 12))
     }
-
-    catchDTRunby.launch()
-    freelancers --= catchDTRunby.units
 
     // If we want to attack and enough freelancers remain, populate the attack squad
     // TODO: If the attack goal is the enemy army, and we have a defense squad handling it, skip this step

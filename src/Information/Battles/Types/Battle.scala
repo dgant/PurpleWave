@@ -9,6 +9,7 @@ import Mathematics.Points.Pixel
 import Performance.Cache
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
+import Utilities.?
 import Utilities.Time.Minutes
 
 import scala.collection.mutable
@@ -42,8 +43,8 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val simulated        : Boolean               = simWeight > 0
   lazy val skimulated       : Boolean               = skimWeight > 0
   lazy val logSimulation    : Boolean               = With.configuration.debugging
-  lazy val speedMultiplier  : Double                = if (isGlobal) 1.0       else judgmentModifiers.map(_.speedMultiplier).product
-  lazy val judgmentModifiers: Seq[JudgmentModifier] = if (isGlobal) Seq.empty else JudgmentModifiers(this)
+  lazy val speedMultiplier  : Double                = ?(isGlobal, 1.0      , judgmentModifiers.map(_.speedMultiplier).product)
+  lazy val judgmentModifiers: Seq[JudgmentModifier] = ?(isGlobal, Seq.empty, JudgmentModifiers(this))
   lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal
   def      differential     : Double                = judgement.map(j => skimWeight * differentialSkim + simWeight * j.scoreSim11 * (us.skimStrengthTotal + enemy.skimStrengthTotal) / 2.0).getOrElse(differentialSkim)
 

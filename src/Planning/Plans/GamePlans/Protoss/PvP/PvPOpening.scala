@@ -796,7 +796,9 @@ class PvPOpening extends GameplanImperative {
             .find(Protoss.Shuttle)
             .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
             .getOrElse(?(shuttleFirst, Forever(), 0))))
-        once(Protoss.Observer)
+        if (getObservers) {
+          once(Protoss.Observer)
+        }
       } else {
         cancel(Protoss.Observer)
         cancel(Protoss.Observatory)
@@ -826,9 +828,14 @@ class PvPOpening extends GameplanImperative {
         expand()
       }
       trainRoboUnits()
-      pumpWorkers(oversaturate = true) // Need to keep worker production up in case they just expand
+      if (enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
+        get(3, Protoss.Gateway)
+      } else {
+        pumpWorkers(oversaturate = true) // Need to keep worker production up in case they just expand
+      }
       trainGatewayUnits()
-      get(?(getReavers && ! With.fingerprints.fourGateGoon(), 2, 3), Protoss.Gateway)
+      pumpWorkers(oversaturate = true)
+      get(3, Protoss.Gateway)
     } else if (PvPDT()) {
       if (cannonExpand) {
         expand()

@@ -33,6 +33,12 @@ object PvP1012 extends PvPStrategy {
     || With.fingerprints.twoGate99.recently)
 }
 
+object PvPNexusFirst extends PvPStrategy {
+  whitelistVs(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)
+  blacklistVs(With.fingerprints.gatewayFirst)
+  setMinimumGamesVsOpponent(3)
+}
+
 object PvP3Zealot extends PvPStrategy {
   // You're advantaged when arriving with 3 zealots vs fewer than 3 combat units, which ideally is NZCore but is probably okay vs coreZ too
   whitelistVs(With.fingerprints.coreBeforeZ)

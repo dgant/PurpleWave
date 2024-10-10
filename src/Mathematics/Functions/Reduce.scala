@@ -18,8 +18,10 @@ trait Reduce {
     val max = Math.max(bound1, bound2)
     Math.min(max, Math.max(value, min))
   }
-  @inline final def clamp01(value: Int)   : Int     = clamp(value, 0, 1)
-  @inline final def clamp01(value: Double): Double  = clamp(value, 0, 1)
+  @inline final def clamp01(value: Int)   : Int     = clamp(value,  0, 1)
+  @inline final def clamp01(value: Double): Double  = clamp(value,  0, 1)
+  @inline final def clamp11(value: Int)   : Int     = clamp(value, -1, 1)
+  @inline final def clamp11(value: Double): Double  = clamp(value, -1, 1)
 
   @inline final def betweenI(value: Int, bound1: Int, bound2: Int): Boolean = {
     val min = Math.min(bound1, bound2)

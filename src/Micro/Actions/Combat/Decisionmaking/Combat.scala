@@ -20,7 +20,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.{GenericFriendlyUnitGroup, TFriendlyUnitGroup, UnitGroup}
 import Utilities.Time.{Forever, Seconds}
 import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot, IsWarrior}
-import Utilities.{?, SomeIf, SwapIf}
+import Utilities.{?, SomeIf}
 
 final class Combat(unit: FriendlyUnitInfo) extends Action {
 
@@ -236,6 +236,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.agent.shouldFight = true // This encourages the unit to use its forward formation rather than its retreat formation
     unit.agent.fightReason = "Walking"
 
+    unit.agent.perch.clear() // We're not picking a fight just yet
     if (unit.intent.canSneak) {
       MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     } else if (unit.agent.receivedPushPriority() > unit.agent.priority) {
@@ -376,7 +377,9 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       breakFormationToAttack ||= target.exists(unit.pixelsToGetInRange(_) < Math.max(0, 128 * unit.confidence11))
       breakFormationToAttack ||= With.yolo.active
 
-      unit.agent.decision.set(Maff.orElse(SwapIf(breakFormationToAttack, unit.agent.station.pixel, unit.agent.perch.pixel)).headOption)
+      if ( ! breakFormationToAttack) {
+        unit.agent.perch.clear()
+      }
       if (pushThrough) {
         unit.agent.act("Push")
         applySeparationForces()

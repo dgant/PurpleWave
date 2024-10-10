@@ -85,8 +85,9 @@ abstract class AbstractSearch extends Action {
     val path                  = profile.find
 
     if (unit.zone == unit.agent.destinationNext().zone && ! unit.zone.edges.exists(_.contains(unit.pixel))) {
-      unit.agent.forces(Forces.travel) = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destinationNext()))
-      unit.agent.forces(Forces.threat) = Potential.hardAvoidThreatRange(unit)
+      unit.agent.forces(Forces.travel)  = Potential.towards(unit, MicroPathing.getWaypointAlongTilePath(unit, path).getOrElse(unit.agent.destinationNext()))
+      unit.agent.forces(Forces.threat)  = Potential.hardAvoidThreatRange(unit)
+      unit.agent.forces(Forces.pushing) = unit.velocity.normalize(0.5)
       unit.agent.destinationNext.setWaypoint(MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians))
     } else {
       MicroPathing.tryMovingAlongTilePath(unit, path)

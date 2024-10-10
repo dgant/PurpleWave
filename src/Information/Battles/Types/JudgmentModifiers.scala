@@ -5,9 +5,9 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Basic.Gather
 import ProxyBwapi.Races.{Terran, Zerg}
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
-import Utilities.Time.Minutes
+import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsAny, IsTank, IsWorker}
 import bwapi.Color
 
@@ -22,8 +22,9 @@ object JudgmentModifiers {
         .filter(m =>
               ! m.targetDelta.isNaN
           &&  ! m.speedMultiplier.isNaN
-          &&  Math.abs(m.targetDelta)         > 0.0001
-          &&  Math.abs(m.speedMultiplier - 1) > 0.0001)
+          &&  (
+                  Math.abs(m.targetDelta)         > 0.0001
+              ||  Math.abs(m.speedMultiplier - 1) > 0.0001))
         .foreach(m => {
             m.name = name
             m.color = color
@@ -32,16 +33,19 @@ object JudgmentModifiers {
     add("Proximity",    Colors.NeonRed,       proximity(battle))
     add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
     add("HiddenTanks",  Colors.MediumIndigo,  hiddenTanks(battle))
-    add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))
     add("Choke",        Colors.MediumOrange,  choke(battle))
-    add("TankLock",     Colors.MediumRed,     tankLock(battle))
+    //add("TankLock",     Colors.MediumRed,     tankLock(battle))
     add("Caught",       Colors.BrightGreen,   caught(battle))
+    add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))
     output
   }
 
   private def modifyTarget  (value: Double): Option[JudgmentModifier] = Some(JudgmentModifier(targetDelta     = value))
   private def multiplySpeed (value: Double): Option[JudgmentModifier] = Some(JudgmentModifier(speedMultiplier = value))
 
+  private def value       (units: Iterable[UnitInfo])                           : Double = units.view.map(_.subjectiveValue).sum
+  private def value       (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units.view.filter(test))
+  private def valueRatio  (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units, test) / Math.max(1, value(units))
 
   // Prefer fighting
   //  when close to home,
@@ -95,44 +99,6 @@ object JudgmentModifiers {
     multiplySpeed(1 - score)
   }
 
-  // Avoid disengaging
-  //   from a fight we have already committed to
-  //   especially if it is a large battle
-  //     because leaving a battle is costly
-  //     and if it's a large battle, our reinforcements won't make up
-  //       for the units we lose in the retreat
-  // Avoid engaging
-  //   in a fight we have not yet committed to
-  //   until conditions look advantageous
-  //     because surprise is on the enemy's side
-  //     and because patience will tend to let us gather more force to fight
-  //
-  // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
-  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
-  def hysteresis(battle: Battle): Option[JudgmentModifier] = {
-    val commitmentRaw             = Maff.weightedMean(battle.us.attackers.map(u => (Maff.clamp01(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d)), u.subjectiveValue)))
-    val commitment                = commitmentFloor(commitmentRaw)
-    lazy val groundRatio          = valueRatio(battle.us.attackers, ! _.flying)
-    lazy val invisibleRatio       = valueRatio(battle.enemy.attackers, !_.visible)
-    lazy val siegeRatio           = ?(With.enemies.exists(_.isTerran), valueRatio(battle.enemy.attackers, t => Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)), 0)
-    lazy val hesitanceVisibility  = 0.08 * invisibleRatio
-    lazy val hesitanceTanks       = 0.12 * siegeRatio * groundRatio
-    modifyTarget(?(commitment > 0, -commitment * 0.2, hesitanceVisibility + hesitanceTanks))
-  }
-  /*
-  Hysteresis ideas:
-  - STALL when last decision was flee
-  - STALL vs static D or siegeable tanks
-  - STALL vs invisible units
-  - STALL when bloodthirst is low
-  - STALL when pace is high
-  - STALL when reinforcements are approaching
-  - COMMIT when last decision was fight
-  - COMMIT when deep in enemy range, especially if we're slow
-  - COMMIT when enemy is in range, especially if units are juicy (reavers, tanks, workers, static D)
-  - COMMIT when across a bridge
-   */
-
   // Avoid fighting across chokes/bridges
   def choke(battle: Battle): Option[JudgmentModifier] = {
     val pixelUs   = battle.us.attackCentroidGround
@@ -156,7 +122,7 @@ object JudgmentModifiers {
     if ( ! battle.enemy.units.exists(Terran.SiegeTankSieged)) return None
 
     val inTankRangeRatio  = valueRatio(battle.us.attackers, _.matchups.inTankRange)
-    val tankInRangeRatio   = valueRatio(battle.us.attackers, _.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
+    val tankInRangeRatio  = valueRatio(battle.us.attackers, _.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
     val inRankRangeScore  = inTankRangeRatio * 1/3d
     val tankInRangeScore  = tankInRangeRatio * 2/3d
     val score             = - 0.5 * (inRankRangeScore + tankInRangeScore)
@@ -173,7 +139,80 @@ object JudgmentModifiers {
     modifyTarget(score)
   }
 
-  private def value       (units: Iterable[UnitInfo])                           : Double = units.view.map(_.subjectiveValue).sum
-  private def value       (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units.view.filter(test))
-  private def valueRatio  (units: Iterable[UnitInfo], test: UnitInfo => Boolean): Double = value(units, test) / Math.max(1, value(units))
+  // Avoid disengaging
+  //   from a fight we have already committed to
+  //   especially if it is a large battle
+  //     because leaving a battle is costly
+  //     and if it's a large battle, our reinforcements won't make up
+  //       for the units we lose in the retreat
+  // Avoid engaging
+  //   in a fight we have not yet committed to
+  //   until conditions look advantageous
+  //     because surprise is on the enemy's side
+  //     and because patience will tend to let us gather more force to fight
+  //
+  // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
+  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
+  def hysteresisOld(battle: Battle): Option[JudgmentModifier] = {
+    val commitmentRaw             = Maff.weightedMean(battle.us.attackers.map(u => (Maff.clamp01(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d)), u.subjectiveValue)))
+    val commitment                = commitmentFloor(commitmentRaw)
+    lazy val groundRatio          = valueRatio(battle.us.attackers, ! _.flying)
+    lazy val invisibleRatio       = valueRatio(battle.enemy.attackers, !_.visible)
+    lazy val siegeRatio           = ?(With.enemies.exists(_.isTerran), valueRatio(battle.enemy.attackers, t => Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)), 0)
+    lazy val hesitanceVisibility  = 0.08 * invisibleRatio
+    lazy val hesitanceTanks       = 0.12 * siegeRatio * groundRatio
+    modifyTarget(?(commitment > 0, -commitment * 0.2, hesitanceVisibility + hesitanceTanks))
+  }
+
+  def hysteresis(battle: Battle): Option[JudgmentModifier] = {
+    modifyTarget(Maff.weightedMean(battle.us.attackers.flatMap(_.friendly.map(hysteresis))))
+  }
+  private case class Motivation(var amount: Double = 0, var weight: Double = 0)
+  def hysteresis(unit: FriendlyUnitInfo): (Double, Double) = {
+    var amount: Double    =   0
+    val fighting     =   unit.matchups.engagedUpon || unit.matchups.engagingOn
+    val speed        =   Math.max(unit.topSpeed, 0.1)
+    val entanglement =   Maff.clamp01(unit.matchups.pixelsEntangled / speed / Math.min(unit.matchups.framesToLive, Seconds(5)()))
+    val recentEngage =   Math.max(0, 1 - unit.hysteresis.decisionFrames / Seconds(10)())
+    val incomingShot =   Maff.fromBoolean(unit.damageQueue.view.exists(_.committed))
+    val paidPrice    =   Math.max(0, 1 - incomingShot * Math.max(0, With.framesSince(unit.lastFrameTakingDamage) / Seconds(5)()))
+    val stickiness   =   recentEngage * paidPrice
+    val staticThreat =   Maff.fromBoolean(unit.matchups.threatDeepest.exists(t => t.unitClass.isBuilding || Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)))
+    val obscurity    =   unit.presumptiveTarget.map(target => Math.min(1, With.framesSince(target.lastSeen).toDouble / Seconds(60)())).getOrElse(0d)
+    val pace         =   unit.squad.map(_.pace01).getOrElse(0)
+    val patience     =   1 - Maff.clamp01(unit.hysteresis.bloodlustFrames.toDouble / Seconds(15)())
+    val displacement =   Math.max(0, Maff.clamp01(Math.abs(unit.matchups.pixelsToTargetRange.flatMap(distance => unit.squad.map(_.meanAttackerTargetDistance - distance)).getOrElse(0d)) / speed / Seconds(15)()) - 0.333)
+    val tankLock     =   Maff.or0(Maff.or0(.333, unit.matchups.inTankRange) + Maff.or0(0.666, unit.matchups.inRangeOfTank), With.enemies.exists(_.isTerran))
+
+    if (fighting) {
+      amount  -= .25  * entanglement
+      amount  -= .15  * stickiness
+      amount  -= .25  * tankLock
+    } else {
+      amount  += .10  * staticThreat
+      amount  += .03  * obscurity
+      //amount  +=  0   * pace
+      amount  += .10  * patience
+      amount  += .10  * displacement
+    }
+    if (With.frame < 0) {
+      With.logger.debug(f"$fighting $speed $entanglement $stickiness $staticThreat $obscurity $pace $patience $displacement $tankLock")
+    }
+    (amount, unit.subjectiveValue * ?(fighting, 2, 1))
+  }
+
+  /*
+  Hysteresis ideas:
+  [x] STALL when last decision was flee
+  [x] STALL vs static D or siegeable tanks
+  [x] STALL vs invisible units
+  [x] STALL when bloodthirst is low
+  [~] STALL when pace is high
+  [x] STALL when reinforcements are approaching
+  [x] COMMIT when last decision was fight
+  [x] COMMIT when deep in enemy range, especially if we're slow
+  - COMMIT when enemy is in range, especially if units are juicy (reavers, tanks, workers, static D)
+  - COMMIT when across a bridge
+  - COMMIT when enemies are disabled
+   */
 }

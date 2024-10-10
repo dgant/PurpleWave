@@ -37,7 +37,7 @@ class SquadCatchDTRunby extends Squad {
 
     if (tower.isEmpty) {
       lockWarriors
-        .setMatcher(IsAll(IsWarrior, u =>  u.canAttackGround))
+        .setMatcher(IsAll(IsWarrior, u => u.canAttackGround))
         .setCounter(CountUpTo(2))
         .setPreference(PreferClose(vicinity))
         .acquire()

@@ -23,7 +23,7 @@ object Gather extends Action {
 
   val defenseRadiusPixels = 160
 
-  private def resourceThreatened(resource: UnitInfo): Boolean = resource.tile.enemyRangeGround > 0 || resource.tile.add(1, 0).enemyRangeGround > 0
+  private def resourceThreatened(resource: UnitInfo): Boolean = resource.tile.enemyRangeGround > 0 || resource.tile.add(1, 0).enemyRangeGround > 0 || resource.returnTile.enemyRangeGround > 0
 
   private def minerThreatenedAt(miner: FriendlyUnitInfo, resource: UnitInfo): Boolean = (
     resourceThreatened(resource)

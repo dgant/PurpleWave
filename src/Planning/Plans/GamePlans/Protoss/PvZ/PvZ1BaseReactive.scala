@@ -173,7 +173,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
     canAttackEarly      ||= haveComplete(Protoss.Scout,  Protoss.DarkTemplar)
     canAttackEarly      &&= unitsComplete(IsWarrior) >= 3 || unitsEver(IsWarrior) >= 5 || With.fingerprints.twelveHatch()
     canAttackEarly      &&= confidenceAttacking11 > 0.2 + 0.1 * enemiesComplete(Zerg.SunkenColony)
-    canAttackEarly      &&= ! With.fingerprints.twoHatchMain()
+    canAttackEarly      &&= ! enemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePoolGas, With.fingerprints.overpoolGas, With.fingerprints.tenHatchPoolGas, With.fingerprints.twoHatchMain)
 
     val needToPushLurkers = enemyLurkersLikely && ! haveComplete(Protoss.PhotonCannon, Protoss.Observer)
 

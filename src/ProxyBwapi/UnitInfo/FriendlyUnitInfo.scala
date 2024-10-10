@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitInfo
 
-import Information.Battles.Types.FriendlyTeam
+import Information.Battles.Types.{FriendlyTeam, Hysteresis}
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -38,6 +38,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     if (cooldownLeft > 0 || ! tryingToAttackHere) _framesFailingToAttack = 0 else _framesFailingToAttack += 1
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
     if (order == Orders.HarvestGas || order == Orders.MiningMinerals) orderTarget.foreach(_.lastFrameHarvested = With.frame)
+    hysteresis.update()
   }
 
   def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > Math.max(24, cooldownMaxAirGround + 2)
@@ -49,7 +50,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def lastFrameOccupied         : Int = _lastFrameOccupied
 
-  lazy val agent: Agent = new Agent(this)
+  lazy val agent     : Agent      = new Agent(this)
+  lazy val hysteresis: Hysteresis = new Hysteresis(this)
   private var _client : Any        = None
   private var _intent : Intention  = new Intention
   def client: Any       = _client

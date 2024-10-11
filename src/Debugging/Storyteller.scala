@@ -119,7 +119,7 @@ class Storyteller {
       firstLog = false
       logEnvironment()
       logStrategyEvaluation()
-      logStrategyInterest()
+      logWinProbability()
     }
     if (With.performance.stopwatchDurationMillis > 60 * 1000) {
       With.logger.debug(f"Wall clock: ${With.performance.wallClockDurationMillis / 60 / 1000} minutes elapsed. Checkpoint game speed: ${Decimal(1000d / 24 * With.performance.stopwatchDurationFrames / With.performance.stopwatchDurationMillis)}x. Total game speed: ${Decimal(1000d / 24 * With.frame / With.performance.wallClockDurationMillis)}x")
@@ -264,28 +264,24 @@ class Storyteller {
     tell(s"Rush distance: ${With.strategy.rushDistanceMean}")
   }
 
+  private def formatGames(games: Double): String = "%1.1f".format(games)
+  private def formatPercentage(value: Double): String = (value * 100.0).toInt + "%%"
   private def logStrategyEvaluation(): Unit = {
-    val evaluations = With.strategy.evaluations.values.filter(e => e.strategy.legality.isLegal || e.gamesUs.nonEmpty).toVector.sortBy( - _.probabilityWin)
-    val columns = Vector(
-      Vector("Strategy") ++ evaluations.map(_.strategy.toString),
-      Vector("#Games")   ++ evaluations.map(e => formatGames(e.gamesUs.size)),
-      Vector("#Wtd")     ++ evaluations.map(e => formatGames(e.gamesUs.map(_.weight).sum)),
-      Vector("#WtdWins") ++ evaluations.map(e => formatGames(e.gamesUs.filter(_.won).map(_.weight).sum)),
-      Vector("WinPct")   ++ evaluations.map(e => formatPercentage(e.winrateVsEnemy)),
-      Vector("WinEst")   ++ evaluations.map(e => formatPercentage(e.probabilityWin)))
-    columns.map(_.mkString("\t")).foreach(tell)
-  }
-  private def logStrategyInterest(): Unit = {
-    tell("Strategy interest")
-    With.strategy.winProbabilityByBranchLegal
+    With.strategy.strategiesAll
+      .filter(s => s.legality.isLegal || s.evaluation.games.nonEmpty)
+      .map(_.evaluation)
       .toVector
-      .sortBy( - _._2)
-      .map(pair => (formatPercentage(pair._2), pair._1.toSeq.map(_.toString).sorted.mkString(" + ")))
-      .map(p => p._1 + " " + p._2)
+      .sortBy(-_.winrateWeighted)
+      .foreach(e => tell(f"${e.strategy}: Won ${e.gamesWon.length} of ${e.games.length} games (${formatGames(e.gamesWeighted)} weighted). ${formatPercentage(e.winrate)}%% raw, ${formatPercentage(e.winrateWeighted)}%% weighted"))
+  }
+  private def logWinProbability(): Unit = {
+    tell("Win probability by branch")
+    With.strategy.strategyBranchesLegal
+      .toVector
+      .sortBy( - _.winProbability)
+      .map(branch => f"${formatPercentage(branch.winProbability)} $branch")
       .foreach(tell)
   }
-  private def formatGames(games: Double): String = "%1.1f".format(games)
-  private def formatPercentage(value: Double): String = (value * 100.0).toInt + """%%"""
 
   class Tale(val tale: String) { val frame: Int = With.frame }
 

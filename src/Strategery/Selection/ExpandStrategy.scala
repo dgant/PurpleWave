@@ -1,9 +1,9 @@
 package Strategery.Selection
 
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{Strategy, StrategyBranch}
 
 object ExpandStrategy {
-  def apply(root: Strategy): Seq[Seq[Strategy]] = {
+  def apply(root: Strategy): Seq[StrategyBranch] = {
     if (root == null) {
       throw new NullPointerException()
     }
@@ -16,16 +16,16 @@ object ExpandStrategy {
     val choices = root.choices.filter(_.nonEmpty)
 
     if (choices.isEmpty) {
-      return Seq(Seq(root))
+      return Seq(StrategyBranch(Seq(root)))
     }
 
     val choicesChain = choices.map(_.flatMap(apply))
 
-    var output = Seq(Seq(root))
+    var output = Seq(StrategyBranch(Seq(root)))
     choicesChain.foreach(nextChoiceChain =>
       output = output.flatMap(outputChain =>
         nextChoiceChain.map(nextChoice =>
-          outputChain ++ nextChoice))
+          StrategyBranch(outputChain.strategies ++ nextChoice.strategies)))
     )
 
     output.distinct

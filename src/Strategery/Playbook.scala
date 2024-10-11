@@ -22,9 +22,11 @@ object StrategyGroups {
 
     TvR1Rax, // Why is this disabled? Is it broken?
 
-    PvRProxy2Gate, // Proxy builds are temporarily broken due to new building placer
-    PvTProxy2Gate, // Proxy builds are temporarily broken due to new building placer
-    PvPProxy2Gate, // Proxy builds are temporarily broken due to new building placer
+    PvRProxy2Gate,
+    PvTProxy2Gate,
+    PvPProxy2Gate,
+
+    PvTCustom, // Disabled for AIIDE 2024. Not needed and risky.
 
     PvZGatewayFE,
   )

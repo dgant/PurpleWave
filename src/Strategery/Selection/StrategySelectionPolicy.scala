@@ -1,10 +1,10 @@
 package Strategery.Selection
 
 import Debugging.SimpleString
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.StrategyBranch
 
 trait StrategySelectionPolicy extends SimpleString {
-  def chooseBranch: Seq[Strategy]
-  def respectMap: Boolean = true
-  def respectHistory: Boolean = true
+  def chooseBranch: StrategyBranch
+  def respectMap      : Boolean = true
+  def respectHistory  : Boolean = true
 }

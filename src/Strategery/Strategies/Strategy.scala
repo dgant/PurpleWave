@@ -119,6 +119,6 @@ abstract class Strategy extends SimpleString {
   def selected  : Boolean = { With.strategy.isSelected(this) }
   def legal     : Boolean = legality.isLegal
 
-  def legality    : StrategyLegality    = With.strategy.legalities(this)
-  def evaluation  : StrategyEvaluation  = With.strategy.evaluations(this)
+  lazy val legality   : StrategyLegality    = new StrategyLegality(this)
+  lazy val evaluation : StrategyEvaluation  = new StrategyEvaluation(this)
 }

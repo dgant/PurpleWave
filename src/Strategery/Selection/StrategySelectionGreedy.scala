@@ -1,17 +1,19 @@
 package Strategery.Selection
 import Lifecycle.With
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{Strategy, StrategyBranch}
 
 case class StrategySelectionGreedy(requiredBranches: Option[Seq[Seq[Strategy]]] = None) extends StrategySelectionPolicy {
 
-  lazy val branches: Seq[Seq[Strategy]] = requiredBranches.getOrElse(With.strategy.strategyBranchesLegal)
+  lazy val branches: Seq[StrategyBranch] = requiredBranches
+    .map(rbs => rbs.flatMap(With.strategy.matchBranches))
+    .getOrElse(With.strategy.strategyBranchesLegal)
 
-  def chooseBranch: Seq[Strategy] = {
-    var eligibleBranches = branches.filter(_.forall(_.legality.isLegal))
+  def chooseBranch: StrategyBranch = {
+    var eligibleBranches = branches.filter(_.legal)
 
     if (eligibleBranches.isEmpty && requiredBranches.nonEmpty) {
       With.logger.warn("Required branches which weren't legal; reverting to required branches without legality filtering.")
-      eligibleBranches = requiredBranches.get
+      eligibleBranches = branches
       if (eligibleBranches.isEmpty) {
         With.logger.warn("Required no branches! Reverting to default filtered branches")
         eligibleBranches = With.strategy.strategyBranchesLegal
@@ -19,15 +21,9 @@ case class StrategySelectionGreedy(requiredBranches: Option[Seq[Seq[Strategy]]] 
     }
     if (eligibleBranches.isEmpty) {
       With.logger.warn(toString + " has no legal branches! Reverting to unfiltered branches")
-      eligibleBranches = With.strategy.strategyBranchesUnfiltered
+      eligibleBranches = With.strategy.strategyBranchesAll
     }
 
-    pickFrom(eligibleBranches)
-  }
-
-  private def pickFrom(branches: Seq[Seq[Strategy]]): Seq[Strategy] = {
-    val branchScores = branches.map(m => (m, With.strategy.winProbabilityByBranch.get(m)))
-    branchScores.filter(_._2.isEmpty).foreach(missingScore => With.logger.warn("Missing win probability for: " + missingScore._1.mkString(" + ")))
-    branchScores.maxBy(_._2.getOrElse(-1.0))._1
+    eligibleBranches.maxBy(_.winProbability)
   }
 }

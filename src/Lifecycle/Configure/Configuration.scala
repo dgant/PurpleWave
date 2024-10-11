@@ -30,8 +30,7 @@ class Configuration {
   // Strategy //
   //////////////
 
-  var dynamicStickiness   = 15.0
-  var targetWinrate       = 0.8
+  var targetWinrate       = 0.75
   var historyHalfLife     = 3.0
   var recentFingerprints  = 2
   var fixedBuilds         = ""

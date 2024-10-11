@@ -6,20 +6,11 @@ import Strategery.History.HistoricalGame
 import Strategery.Strategies.Strategy
 
 class StrategyEvaluation(val strategy: Strategy) {
-
-  // Hyperparameter controlling how many games worth of the optimistic target winrate to assume
-  // Increase to revisit lost strategies sooner
-  // Decrease to abandon them more aggressively
-  val priorGames            : Double = 1.5
-  val gamesUs               : Vector[HistoricalGame]  = With.strategy.gamesVsOpponent.filter(_.weEmployed(strategy)).toVector
-  val gamesUsWon            : Vector[HistoricalGame]  = gamesUs.filter(_.won)
-  val gamesUsLost           : Vector[HistoricalGame]  = gamesUs.filterNot(_.won)
-  val gamesUsWeightSum      : Double  = gamesUs     .map(_.weight).sum
-  val gamesUsWonWeightSum   : Double  = gamesUsWon  .map(_.weight).sum
-  val targetWins            : Double  = With.configuration.targetWinrate
-  val winrateVsEnemy        : Double  = Maff.nanToZero(gamesUsWonWeightSum / gamesUsWeightSum)
-
-  // Probability we win given this strategy
-  val probabilityWin: Double = (priorGames * targetWins + gamesUsWonWeightSum) / (priorGames + gamesUsWeightSum)
+  val games             : Vector[HistoricalGame]  = With.strategy.gamesVsOpponent.filter(_.weEmployed(strategy)).toVector
+  val gamesWon          : Vector[HistoricalGame]  = games.filter(_.won)
+  val gamesWeighted     : Double                  = games     .map(_.weight).sum
+  val gamesWeightedWon  : Double                  = gamesWon  .map(_.weight).sum
+  val winrate           : Double                  = Maff.nanToZero(gamesWon.length / games.length)
+  val winrateWeighted   : Double                  = Maff.nanToZero(gamesWeightedWon / gamesWeighted)
 }
 

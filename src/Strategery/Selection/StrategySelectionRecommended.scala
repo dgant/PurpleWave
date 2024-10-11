@@ -1,7 +1,7 @@
 package Strategery.Selection
 
 import Lifecycle.With
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{Strategy, StrategyBranch}
 
 class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommendedBranch: Strategy*) extends StrategySelectionPolicy {
 
@@ -15,8 +15,10 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
     this.duration = duration
   }
 
-  override def chooseBranch: Seq[Strategy] = {
-    val legalMatchedBranches = With.strategy.strategyBranchesLegal.filter(branch => recommendedBranch.forall(branch.contains)).sortBy(_.length)
+  override def chooseBranch: StrategyBranch = {
+    val legalMatchedBranches = With.strategy.strategyBranchesLegal
+      .filter(branch => recommendedBranch.forall(branch.strategies.contains))
+      .sortBy(_.strategies.length)
 
     if (legalMatchedBranches.isEmpty) {
       With.logger.warn(f"$this failed to find any branches, filtered by legality, matching ${recommendedBranch.mkString(" + ")}")
@@ -27,7 +29,7 @@ class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommende
     val gamesAgainstString = "game " + gamesAgainst + " of " + duration
     if (gamesAgainst < duration) {
       With.logger.debug(toString + " still in recommended strategy phase in " + gamesAgainstString)
-      StrategySelectionGreedy(Some(legalMatchedBranches)).chooseBranch
+      StrategySelectionGreedy(Some(legalMatchedBranches.map(_.strategies))).chooseBranch
     } else {
       With.logger.debug(toString + " has finished recommended strategy phase in " + gamesAgainstString + "; will fall back to " + fallback)
       fallback.chooseBranch

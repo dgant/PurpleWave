@@ -1,11 +1,11 @@
 package Strategery.Selection
 
 import Mathematics.Maff
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.{Strategy, StrategyBranch}
 
 object StrategySelectionRandom extends StrategySelectionPolicy {
 
-  def chooseBranch: Seq[Strategy] = {
+  def chooseBranch: StrategyBranch = {
     // Select randomly, weighed by frequency of components
     val weights = StrategyShare.byBranch
       .map(branch => (

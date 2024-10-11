@@ -2,22 +2,22 @@ package Strategery.Selection
 
 import Lifecycle.With
 import Mathematics.Maff
-import Strategery.Strategies.Strategy
+import Strategery.Strategies.StrategyBranch
 
 object StrategySelectionDynamic extends StrategySelectionPolicy {
 
-  def chooseBranch: Seq[Strategy] = {
+  def chooseBranch: StrategyBranch = {
     sample(16)
   }
 
-  def sample(probabilityExponent: Double): Seq[Strategy] = {
-    val branches = With.strategy.strategyBranchesLegal
+  def sample(probabilityExponent: Double): StrategyBranch = {
+    val branches = Maff.orElse(With.strategy.strategyBranchesLegal, With.strategy.strategyBranchesAll).toSeq
     Maff
       .sampleWeighted(
         branches,
-        (branch: Seq[Strategy]) =>
+        (branch: StrategyBranch) =>
           Math.pow(WinProbability(branch), probabilityExponent)
-          / Maff.geometricMean(branch.map(strategy => branches.count(_.contains(strategy)).toDouble)))
-      .getOrElse(Seq.empty)
+          / Maff.geometricMean(branch.strategies.map(strategy => branches.count(_.strategies.contains(strategy)).toDouble)))
+      .get
   }
 }

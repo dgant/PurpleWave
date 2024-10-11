@@ -1,6 +1,5 @@
 package Strategery
 
-import Lifecycle.Configure.ConfigurationLoader.matchNames
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
@@ -8,7 +7,7 @@ import Planning.Plans.GamePlans.All.StandardGamePlan
 import ProxyBwapi.Players.Players
 import Strategery.History.HistoricalGame
 import Strategery.Selection._
-import Strategery.Strategies.{AllChoices, Strategy}
+import Strategery.Strategies.{AllChoices, Strategy, StrategyBranch}
 import bwapi.{GameType, Race}
 
 import scala.collection.mutable
@@ -17,7 +16,7 @@ import scala.util.Random
 class Strategist {
 
   lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_())
-  lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.toSet
+  lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.strategies.toSet
 
   private var _lastEnemyRace  = With.enemy.raceInitial
   val selected    = new mutable.HashSet[Strategy]
@@ -52,8 +51,8 @@ class Strategist {
   def deactivate(strategy: Strategy): Unit = {
     if (active.contains(strategy)) {
       With.logger.debug(f"Deactivating strategy $strategy")
+      active -= strategy
     }
-    active -= strategy
   }
   def swapIn(strategy: Strategy): Unit = {
     if ( ! selected.contains(strategy)) {
@@ -72,12 +71,12 @@ class Strategist {
   }
   def swapEverything(whitelisted: Seq[Strategy], blacklisted: Seq[Strategy] = Seq.empty): Unit = {
     val matchedBranches = Maff.orElse(
-      strategyBranchesLegal     .filter(branch => whitelisted.forall(branch.contains)).filterNot(branch => blacklisted.exists(branch.contains)),
-      strategyBranchesUnfiltered.filter(branch => whitelisted.forall(branch.contains)).filterNot(branch => blacklisted.exists(branch.contains)))
-    val bestBranch = Maff.maxBy(matchedBranches)(branch => winProbabilityByBranch.getOrElse(branch, 0.0))
+      strategyBranchesLegal .filter(branch => whitelisted.forall(branch.strategies.contains)).filterNot(branch => blacklisted.exists(branch.strategies.contains)),
+      strategyBranchesAll   .filter(branch => whitelisted.forall(branch.strategies.contains)).filterNot(branch => blacklisted.exists(branch.strategies.contains)))
+    val bestBranch = Maff.maxBy(matchedBranches)(_.winProbability)
     bestBranch.foreach(branch => {
-      selected.filterNot(branch.contains).foreach(_.swapOut())
-      branch.filterNot(selected.contains).foreach(_.swapIn())
+      selected.filterNot(branch.strategies.contains).foreach(_.swapOut())
+      branch.strategies.filterNot(selected.contains).foreach(_.swapIn())
     })
     if (bestBranch.isEmpty) {
       With.logger.warn(f"Attempted to swap everything, but found  no legal branches. Whitelisted: $whitelisted - Blacklisted:  $blacklisted")
@@ -119,7 +118,12 @@ class Strategist {
   lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
     .filter(_.enemyMatches)
     .zipWithIndex
-    .map(p => (p._1, 1.0 / (1.0 + (p._2 / With.configuration.historyHalfLife))))
+    .map { case (game, age) =>
+      val relevanceTimeDecay  : Double = Math.pow(0.98, age)
+      val relevanceRecentLoss : Double = Maff.fromBoolean(age < With.configuration.recentFingerprints && !game.won)
+      val relevanceAge        : Double = 0.25 + 0.5 * relevanceTimeDecay + 0.25 * relevanceRecentLoss
+      (game, relevanceAge)
+    }
     .toMap
 
   lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
@@ -133,18 +137,13 @@ class Strategist {
     With.history.gamesVsEnemies.take(finalGames).flatMap(_.tags.toVector).filter(_.startsWith("Finger")).distinct
   }
 
-  lazy val strategiesTopLevel : Seq[Strategy] = if (With.enemy.raceCurrent == Race.Unknown) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
-  lazy val strategiesAll      : Seq[Strategy] = strategyBranchesUnfiltered.flatten.distinct
+  lazy val strategiesTopLevel     : Seq[Strategy]       = if (With.enemy.raceCurrent == Race.Unknown) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
+  lazy val strategiesAll          : Seq[Strategy]       = strategyBranchesAll.flatMap(_.strategies).distinct
 
-  lazy val strategyBranchesUnfiltered : Seq[Seq[Strategy]] = strategiesTopLevel.flatMap(ExpandStrategy.apply).distinct
-  lazy val strategyBranchesLegal      : Seq[Seq[Strategy]] = strategyBranchesUnfiltered.filter(_.forall(_.legality.isLegal))
+  lazy val strategyBranchesAll    : Seq[StrategyBranch] = strategiesTopLevel.flatMap(ExpandStrategy.apply).distinct
+  lazy val strategyBranchesLegal  : Seq[StrategyBranch] = strategyBranchesAll.filter(_.strategies.forall(_.legal))
 
-  lazy val legalities   : Map[Strategy, StrategyLegality]   = strategiesAll.map(s => (s, new StrategyLegality(s))).toMap
-  lazy val evaluations  : Map[Strategy, StrategyEvaluation] = strategiesAll.map(s => (s, new StrategyEvaluation(s))).toMap
-
-  lazy val gamesVsOpponent              : Seq[HistoricalGame]         = With.history.games.filter(With.enemies.size == 1 && _.enemyName == With.configuration.playbook.enemyName)
-  lazy val winProbabilityByBranch       : Map[Seq[Strategy], Double]  = strategyBranchesUnfiltered.map(b => (b, WinProbability(b))).toMap
-  lazy val winProbabilityByBranchLegal  : Map[Seq[Strategy], Double]  = winProbabilityByBranch.filter(_._1.forall(_.legality.isLegal))
+  lazy val gamesVsOpponent: Seq[HistoricalGame] = With.history.games.filter(With.enemies.size == 1 && _.enemyName == With.configuration.playbook.enemyName)
 
   val rolls: mutable.HashMap[String, Boolean] = new mutable.HashMap
   def roll(key: String, probability: Double): Boolean = {
@@ -157,22 +156,35 @@ class Strategist {
     rolls(key)
   }
 
+  def matchNames(names: Seq[String], branches: Seq[StrategyBranch]): Seq[StrategyBranch] = {
+    strategyBranchesAll.filter(branch => names.forall(name => branch.strategies.exists(_.toString.toLowerCase == name.toLowerCase)))
+  }
+  def matchBranches(strategies: Seq[Strategy]): Seq[StrategyBranch] = {
+    strategyBranchesAll.filter(branch => strategies.forall(branch.strategies.contains))
+  }
+
   private def setFixedBuild(strategyNamesText: String): Unit = {
     // The implementation of this is a little tricky because we have to call this before the Strategist has been instantiated
 
     // Get all the strategy names
-    val strategyNamesLines = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
-    val strategyNames = Maff.sample(strategyNamesLines).split(" ")
+    val strategyNamesLines  = strategyNamesText.replaceAll(",", " ").replaceAll("  ", " ").split("[\r\n]+").filter(_.nonEmpty).toVector
+    val strategyNames       = Maff.sample(strategyNamesLines).split(" ")
 
     // Get all the mapped strategy objects
-    var matchingBranches = matchNames(strategyNames, AllChoices.tree.flatMap(ExpandStrategy.apply).distinct)
+    var matchingBranches = AllChoices.tree
+      .flatMap(ExpandStrategy.apply)
+      .distinct
+      .filter(branch =>
+        strategyNames.forall(name =>
+          branch.strategies.exists(_.toString.toLowerCase == name.toLowerCase)))
+
     if (matchingBranches.isEmpty) {
       With.logger.warn("Tried to use fixed build but failed to match " + strategyNamesText)
     }
     if (matchingBranches.nonEmpty) {
       With.logger.debug("Using fixed build: " + strategyNamesText)
       With.configuration.forcedPlaybook = Some(new TestingPlaybook {
-        override def policy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches))
+        override def policy: StrategySelectionPolicy = StrategySelectionGreedy(Some(matchingBranches.map(_.strategies)))
       })
     }
   }

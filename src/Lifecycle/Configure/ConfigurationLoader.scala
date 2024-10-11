@@ -1,7 +1,6 @@
 package Lifecycle.Configure
 
 import Lifecycle.With
-import Strategery.Strategies.Strategy
 import Strategery.{HumanPlaybook, PretrainingPlaybook, TournamentPlaybook}
 import mjson.Json
 
@@ -147,10 +146,6 @@ object ConfigurationLoader {
     config.visualizeDebug     = true
     config.detectBreakpoints  = true
     //config.forcedPlaybook     = Some(new TestingPlaybook)
-  }
-
-  def matchNames(names: Seq[String], branches: Seq[Seq[Strategy]]): Seq[Seq[Strategy]] = {
-    branches.filter(branch => names.forall(name => branch.exists(_.toString == name)))
   }
 
   private def config: Configuration = With.configuration

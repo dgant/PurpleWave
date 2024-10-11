@@ -17,12 +17,12 @@ object Opponents {
   // AIIDE 2024
   val bananabrain : Opponent = add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPRobo, PvPReaver))
   val stardust    : Opponent = add("Stardust",        .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT))
-  val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionGreedy())
+  val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionDynamic)
   val microwave   : Opponent = add("Microwave",       .9,   aggroPvZ)
-  val insanitybot : Opponent = add("InsanityBot",     .9,   defaultPvT)
+  val insanitybot : Opponent = add("InsanityBot",     .95,  defaultPvT)
   val infestedart : Opponent = add("InfestedArtosis", .9,   aggroPvZ)
-  val steamhammer : Opponent = add("Steamhammer",     .9,   aggroPvZ)
-  val ualbertabot : Opponent = add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate))
+  val steamhammer : Opponent = add("Steamhammer",     .95,  aggroPvZ)
+  val ualbertabot : Opponent = add("UAlbertaBot",     .95,  StrategySelectionFixed(PvR2Gate4Gate))
 
   // Aliased
   //val adias       : Opponent = add("adias")

@@ -15,7 +15,7 @@ case class HistoricalGame(
   tags            : Seq[String]) {
   
   // Convenience methods
-  def weight        : Double = With.strategy.gameWeights.getOrElse(this, 0.0000001)
+  def weight: Double = With.strategy.gameWeights.getOrElse(this, 0.0000001)
 
   def weEmployed(strategy: Strategy): Boolean = tags.contains(strategy.toString)
 

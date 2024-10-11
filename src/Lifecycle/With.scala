@@ -121,6 +121,8 @@ object With {
     frame = With.game.getFrameCount
   }
 
+  def id: Long = startNanoTime
+
   def onStart(): Unit = {
     startNanoTime = System.nanoTime()
     game = PurpleBWClient.getGame

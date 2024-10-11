@@ -1,18 +1,13 @@
 package Strategery.Selection
 
+import Lifecycle.With
 import Mathematics.Maff
-import Strategery.Strategies.{Strategy, StrategyBranch}
+import Strategery.Strategies.StrategyBranch
 
 object StrategySelectionRandom extends StrategySelectionPolicy {
 
   def chooseBranch: StrategyBranch = {
-    // Select randomly, weighed by frequency of components
-    val weights = StrategyShare.byBranch
-      .map(branch => (
-        branch._1,
-        1.0 / branch._2
-      ))
-    Maff.sampleWeighted(weights.keys.toSeq, weights).get
+    Maff.sampleWeighted(With.strategy.strategyBranchesLegal, (b: StrategyBranch) => b.explorationWeight).get
   }
 
   override def toString = "StrategySelectionRandom"

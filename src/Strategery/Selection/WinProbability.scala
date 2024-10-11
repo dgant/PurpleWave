@@ -2,7 +2,6 @@ package Strategery.Selection
 
 import Lifecycle.With
 import Mathematics.Maff
-import Strategery.History.HistoricalGame
 import Strategery.Strategies.StrategyBranch
 
 import scala.util.Random
@@ -24,53 +23,16 @@ object WinProbability {
   // Apply a small random factor to shuffle strategies with nearly-equal values
 
   def apply(strategyBranch: StrategyBranch): Double = {
-    noise(ucb(strategyBranch))
+    val explorationGames = strategyBranch.explorationGames
+    val meanWinProbability =
+      Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(e =>
+        (e.gamesWeightedWon + explorationGames * With.configuration.targetWinrate)
+          / (e.gamesWeighted    + explorationGames)))
+    noise(meanWinProbability)
   }
 
   private def noise(input: Double): Double = {
     val noiseWeight = 1e-6
     Random.nextDouble() * noiseWeight + input * (1.0 - noiseWeight)
   }
-
-  // The approach we used before UCB
-  private def geometricMean(strategyBranch: StrategyBranch): Double = {
-    Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(e =>
-        (e.gamesWeightedWon + 1.5 * With.configuration.targetWinrate)
-      / (e.gamesWeighted    + 1.5)))
-  }
-
-  private def ucb(strategyBranch: StrategyBranch): Double = {
-    val strategies = strategyBranch.strategies
-    class WeightedGame(val game: HistoricalGame) {
-      val similarity  : Double = strategies.count(game.weEmployed).toDouble / strategies.size
-      val finalWeight : Double = similarity * game.weight
-    }
-
-    val expectedWins = With.configuration.targetWinrate
-
-    val games = With.strategy.gamesVsOpponent
-      .filter(game => strategies.exists(game.weEmployed))
-      .map(new WeightedGame(_))
-      .toVector
-
-    if (games.isEmpty) return expectedWins
-
-    // UCB Confidence:
-    // Lower values (like 0.5 - 1) -> More exploitation
-    // Higher values (like 1.5 - 2) -> More exploration
-    val totalBranches = With.strategy.strategyBranchesLegal.length
-    val totalGames    = 200 // TODO: Configure per event
-    val ucbConfidence = 1.0
-    //explorationConstant * Math.sqrt(2 * Math.log(totalGames) * totalBranches / totalGames)
-
-    // Calculate UCB
-    val weightTotal     = games.map(_.finalWeight).sum
-    val weightWins      = games.filter(_.game.won).map(_.finalWeight).sum
-    val winRate         = Maff.nanToN(weightWins / weightTotal, expectedWins)
-    val weightedSamples = weightTotal / games.map(_.finalWeight).max
-    val ucb             = winRate + ucbConfidence * Math.sqrt(2 * Math.log(games.length) / weightedSamples)
-
-    Maff.clamp01(ucb)
-  }
-
 }

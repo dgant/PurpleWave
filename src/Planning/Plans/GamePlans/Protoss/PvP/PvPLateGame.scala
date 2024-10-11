@@ -250,6 +250,10 @@ class PvPLateGame extends GameplanImperative {
     if (shouldReaver) {
       pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     }
+    if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
+      // TODO: This is a last minute tournament panic addition. Maybe we can come up with somthing more principled
+      get(Protoss.ShuttleSpeed)
+    }
 
     if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
       pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))

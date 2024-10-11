@@ -45,7 +45,9 @@ class SquadCatchDTRunby extends Squad {
   }
 
   override def run(): Unit = {
-    setTargets(vicinity.zone.metro.map(_.zones).getOrElse(Seq(vicinity.zone)).flatMap(_.enemies.view.filter(Protoss.DarkTemplar)))
+    val darkTemplar = With.units.enemy.filter(Protoss.DarkTemplar).filter(dt => dt.proximity > 0.5 || dt.metro.exists(_.isOurs))
+    setTargets(darkTemplar)
+    vicinity = Maff.minBy(darkTemplar.map(_.pixel))(_.groundPixels(vicinity)).getOrElse(vicinity)
     units.foreach(_.intend(this).setTerminus(vicinity))
   }
 }

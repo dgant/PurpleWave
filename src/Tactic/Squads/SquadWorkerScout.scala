@@ -11,7 +11,7 @@ import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
 import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsAny, IsComplete, IsWorker}
+import Utilities.UnitFilters.{IsAny, IsComplete, IsSpeedling, IsWorker}
 import Utilities.UnitPreferences.PreferScout
 
 class SquadWorkerScout extends Squad {
@@ -21,6 +21,8 @@ class SquadWorkerScout extends Squad {
   val scoutLock         : LockUnits                 = new LockUnits(this, IsWorker).setInterruptible(false)
 
   def launch(): Unit = {
+    if (scoutingAbandoned) return
+
     val basesToScout = Maff.orElseFiltered(
       ?(With.scouting.enemyMainFullyScouted,
         With.geography.enemyBases.flatMap(b => Vector(b) ++ b.natural ++ b.naturalOf).distinct,
@@ -42,17 +44,20 @@ class SquadWorkerScout extends Squad {
         && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)()))))
 
     // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
-    scoutingAbandoned ||= ( ! ZvE4Pool() && ! ZvT1HatchHydra() && With.units.enemy.exists(_.isAll(
+    scoutingAbandoned ||= With.units.enemy.exists(_.isAll(
       IsComplete,
       IsAny(
         Terran.Marine,
         Terran.Vulture,
         Terran.Factory,
         Protoss.Dragoon,
-        Protoss.PhotonCannon,
+        IsSpeedling,
         Zerg.Hydralisk,
         Zerg.Mutalisk,
-        Zerg.Spire))))
+        Zerg.Spire)))
+    scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
+    scoutingAbandoned &&= ! ZvE4Pool()
+    scoutingAbandoned &&= ! ZvT1HatchHydra()
 
     if (scoutingAbandoned) return
 

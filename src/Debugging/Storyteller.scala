@@ -265,14 +265,14 @@ class Storyteller {
   }
 
   private def formatGames(games: Double): String = "%1.1f".format(games)
-  private def formatPercentage(value: Double): String = (value * 100.0).toInt + "%%"
+  private def formatPercentage(value: Double): String = f"${(value * 100.0).toInt}%%"
   private def logStrategyEvaluation(): Unit = {
     With.strategy.strategiesAll
       .filter(s => s.legality.isLegal || s.evaluation.games.nonEmpty)
       .map(_.evaluation)
       .toVector
       .sortBy(-_.winrateWeighted)
-      .foreach(e => tell(f"${e.strategy}: Won ${e.gamesWon.length} of ${e.games.length} games (${formatGames(e.gamesWeighted)} weighted). ${formatPercentage(e.winrate)}%% raw, ${formatPercentage(e.winrateWeighted)}%% weighted"))
+      .foreach(e => tell(f"${e.strategy}: Won ${e.gamesWon.length} of ${e.games.length} games (${formatGames(e.gamesWeighted)} weighted). ${formatPercentage(e.winrate)} raw, ${formatPercentage(e.winrateWeighted)} weighted"))
   }
   private def logWinProbability(): Unit = {
     tell("Win probability by branch")

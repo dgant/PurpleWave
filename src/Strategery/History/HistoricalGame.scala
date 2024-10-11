@@ -26,6 +26,6 @@ case class HistoricalGame(
     + ourRace.toString.take(1) + "v" + enemyRace.toString.take(1) + " "
     + enemyName + " "
     + "@ " + mapName
-    + " (" + tags.map(_.toString).mkString(", ") + ")"
+    + " (" + tags.mkString(", ") + ")"
   )
 }

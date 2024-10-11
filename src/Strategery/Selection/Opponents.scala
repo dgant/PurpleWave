@@ -15,8 +15,8 @@ object Opponents {
   val defaultPvZ: StrategySelectionPolicy = aggroPvZ
 
   // AIIDE 2024
-  val bananabrain : Opponent = add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPRobo, PvPReaver))
-  val stardust    : Opponent = add("Stardust",        .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT))
+  val bananabrain : Opponent = add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 4 })
+  val stardust    : Opponent = add("Stardust",        .75,  new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
   val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionDynamic)
   val microwave   : Opponent = add("Microwave",       .9,   aggroPvZ)
   val insanitybot : Opponent = add("InsanityBot",     .95,  defaultPvT)

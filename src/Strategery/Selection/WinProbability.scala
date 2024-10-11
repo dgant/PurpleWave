@@ -25,9 +25,9 @@ object WinProbability {
   def apply(strategyBranch: StrategyBranch): Double = {
     val explorationGames = strategyBranch.explorationGames
     val meanWinProbability =
-      Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(e =>
-        (e.gamesWeightedWon + explorationGames * With.configuration.targetWinrate)
-          / (e.gamesWeighted    + explorationGames)))
+      Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(eval =>
+          (eval.gamesWeightedWon + explorationGames * With.configuration.targetWinrate)
+        / (eval.gamesWeighted    + explorationGames)))
     noise(meanWinProbability)
   }
 

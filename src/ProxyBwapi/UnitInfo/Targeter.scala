@@ -4,10 +4,18 @@ import Lifecycle.With
 import Micro.Targeting.TargetScoring
 import Performance.Cache
 
+import scala.collection.mutable
+
 trait Targeter {
-  def targetScore(target: UnitInfo): Double = targetScores(target.id)()
-  val targetScores: Array[Cache[Double]] = (0 until 10000).map(i => new Cache[Double](() =>
-    With.units.getId(i)
-      .map(target => TargetScoring.slow(this.asInstanceOf[FriendlyUnitInfo], target))
-      .getOrElse(0.0))).toArray
+
+  def targetScore(target: UnitInfo): Double = {
+    targetScores.getOrElseUpdate(
+      target.id,
+      new Cache[Double](() =>
+        With.units.getId(target.id)
+          .map(target => TargetScoring.slow(this.asInstanceOf[FriendlyUnitInfo], target))
+          .getOrElse(0.0)))()
+  }
+
+  val targetScores = new mutable.HashMap[Int, Cache[Double]]()
 }

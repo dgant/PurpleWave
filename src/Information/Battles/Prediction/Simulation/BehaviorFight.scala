@@ -46,7 +46,7 @@ object BehaviorFight extends SimulacrumBehavior {
         simulacrum.tween(
           threat.get.pixel.project(
             simulacrum.pixel,
-            threat.get.pixelDistanceEdge(simulacrum) + freeDistance * 0.5),
+            threat.get.pixelDistanceCenter(simulacrum) + freeDistance * 0.5),
           Some("Kiting"))
         return
       }

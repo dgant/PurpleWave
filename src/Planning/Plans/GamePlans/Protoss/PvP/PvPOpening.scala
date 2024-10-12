@@ -878,6 +878,9 @@ class PvPOpening extends GameplanImperative {
       }
       once(2, Protoss.Dragoon)
       get(?(PvP3GateGoon(), 3, 4), Protoss.Gateway)
+      if (safePushing && unitsComplete(Protoss.Gateway) >= 3 && unitsEver(Protoss.Dragoon) >= 10) {
+        buildCannonsAtFoyer(1)
+      }
       trainGatewayUnits()
       if (PvP3GateGoon()) { expand() }
     }

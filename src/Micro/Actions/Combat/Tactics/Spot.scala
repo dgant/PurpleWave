@@ -33,7 +33,7 @@ object Spot extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     // TODO: This logic is sloppy and doesn't handle our various use cases well
-    if (unit.matchups.pixelsEntangled > -96 && unit.totalHealth < 400) {
+    if (unit.matchups.pixelsEntangled > -96 && unit.totalHealth < 400 && ( ! Protoss.Observer(unit) || unit.matchups.enemyDetectorDeepest.exists(_.canMove) || With.units.existsEverEnemy(Terran.Academy, Terran.Comsat, Terran.SpellScannerSweep))) {
       if ( ! IsWarrior(unit)) {
         unit.agent.redoubt.set(groupSupported(unit).map(_.attackCentroidKey))
         Retreat.delegate(unit)

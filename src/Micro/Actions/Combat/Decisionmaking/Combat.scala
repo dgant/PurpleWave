@@ -298,7 +298,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         unit.agent.escalatePriority(TrafficPriorities.Nudge)
         move()
 
-
       } else if (unit.isAny(Terran.Wraith, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Scourge) && target.exists(t =>
         t.flying
         && unit.pixelDistanceEdge(t)          > 0.25 * unit.pixelRangeAgainst(t)
@@ -352,7 +351,10 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (unit.readyForAttackOrder) {
       minimumSpace = Math.min(minimumSpace, target.map(unit.pixelRangeAgainst).getOrElse(unit.pixelRangeMax) - 24)
     }
-    if (unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace) || ! attackIfReady()) {
+    if (unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace)) {
+      Retreat(unit)
+    }
+    if ( ! attackIfReady() && unit.matchups.threatDeepest.exists(a => a.presumptiveTarget.contains(unit) || a.speedApproaching(unit) > 0)) {
       Retreat(unit)
     }
     if (idealDistanceForward > 0) {

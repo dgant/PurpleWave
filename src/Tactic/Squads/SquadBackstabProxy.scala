@@ -15,6 +15,7 @@ class SquadBackstabProxy extends Squad {
   override def launch(): Unit = {
     if ( ! MacroFacts.enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.proxyRax)) return
     if ( ! With.units.enemy.exists(_.proxied)) return
+    if (With.units.enemy.exists(e => e.isAny(Protoss.Gateway, Terran.Factory, Terran.Barracks) && ! e.proxied)) return
     if (With.geography.enemyBases.exists(_.units.exists(IsWarrior))) return
 
     val targetBase = With.scouting.enemyMain

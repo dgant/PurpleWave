@@ -1,5 +1,6 @@
 package Micro.Actions.Combat.Maneuvering
 
+import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.{Maff, Shapes}
@@ -11,7 +12,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.IsTank
+import Utilities.UnitFilters.{IsTank, IsWorker}
 
 object Retreat extends Action {
   
@@ -55,6 +56,9 @@ object Retreat extends Action {
     lazy val forceVector = {
       if (unit.agent.forces.isEmpty) {
         MicroPathing.setDefaultForces(unit, goalOrigin = goalOrigin, goalSafety = goalSafety)
+      }
+      if (unit.base.exists(_.isOurMain) && unit.isAny(Terran.Marine, Terran.Vulture, Protoss.Dragoon) && unit.matchups.threats.forall(_.isAny(IsWorker, Protoss.Zealot, Protoss.DarkTemplar, Zerg.Zergling))) {
+        unit.agent.forces(Forces.travel) *= 0.1
       }
       unit.agent.forces.sum
     }

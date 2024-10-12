@@ -13,16 +13,17 @@ object Opponents {
   val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ)
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvZ: StrategySelectionPolicy = aggroPvZ
+  val defaultPvR: StrategySelectionPolicy = StrategySelectionFixed(PvR2Gate4Gate)
 
   // AIIDE 2024
-  val bananabrain : Opponent = add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 4 })
+  val bananabrain : Opponent = add("BananaBrain",     .6,   StrategySelectionGreedy())
   val stardust    : Opponent = add("Stardust",        .75,  new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
-  val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionDynamic)
+  val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionGreedy())
   val microwave   : Opponent = add("Microwave",       .9,   aggroPvZ)
   val insanitybot : Opponent = add("InsanityBot",     .95,  defaultPvT)
   val infestedart : Opponent = add("InfestedArtosis", .9,   aggroPvZ)
   val steamhammer : Opponent = add("Steamhammer",     .95,  aggroPvZ)
-  val ualbertabot : Opponent = add("UAlbertaBot",     .95,  StrategySelectionFixed(PvR2Gate4Gate))
+  val ualbertabot : Opponent = add("UAlbertaBot",     .95,  defaultPvR)
 
   // Aliased
   //val adias       : Opponent = add("adias")

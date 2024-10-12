@@ -22,9 +22,10 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
 
     var default: StrategySelectionPolicy = StrategySelectionGreedy()
     if (With.self.raceCurrent == Race.Protoss) {
-      if (With.enemy.raceInitial == Race.Terran) default= Opponents.defaultPvT
-      else if (With.enemy.raceInitial == Race.Protoss) default = Opponents.defaultPvP
-      else if (With.enemy.raceInitial == Race.Zerg) default = Opponents.defaultPvZ
+      if (With.enemy.raceInitial == Race.Terran)        default = Opponents.defaultPvT
+      else if (With.enemy.raceInitial == Race.Protoss)  default = Opponents.defaultPvP
+      else if (With.enemy.raceInitial == Race.Zerg)     default = Opponents.defaultPvZ
+      else if (With.enemy.raceInitial == Race.Unknown)  default = Opponents.defaultPvR
     }
 
     val policy = opponent.map(_.policy).getOrElse(default)

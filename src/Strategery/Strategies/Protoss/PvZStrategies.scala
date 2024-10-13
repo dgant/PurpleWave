@@ -18,18 +18,20 @@ object PvZMuscle    extends PvZStrategy
 object PvZExpand    extends PvZStrategy
 object PvZTech      extends PvZStrategy
 object PvZGoon      extends PvZStrategy
-object PvZReaver    extends PvZStrategy
+object PvZReaver    extends PvZStrategy {
+  blacklistVs(With.fingerprints.twoHatchMuta, With.fingerprints.threeHatchMuta)
+}
 object PvZSpeedlot  extends PvZStrategy
 
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }
 object PvZFFE extends PvZFFEOpening {
-  override def addRequirement(predicate: () => Boolean): Unit = With.placement.wall.isDefined
+  addRequirement(() => With.placement.wall.isDefined)
 }
 object PvZGatewayFE extends PvZFFEOpening {
-  override def addRequirement(predicate: () => Boolean): Unit = With.placement.wall.isDefined
-  override def minimumGamesVsOpponent: Int = 2
-  override def responsesWhitelisted = Seq(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
-  override def responsesBlacklisted = Seq(With.fingerprints.fourPool, With.fingerprints.ninePool)
+  addRequirement(() => With.placement.wall.isDefined)
+  setMinimumGamesVsOpponent(2)
+  whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
+  blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)
 }

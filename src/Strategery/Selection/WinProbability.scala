@@ -26,8 +26,10 @@ object WinProbability {
     val explorationGames = strategyBranch.explorationGames
     val meanWinProbability =
       Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(eval =>
+        Math.max(
+          Maff.nanToZero(eval.gamesWeightedWon / eval.gamesWeighted),
           (eval.gamesWeightedWon + explorationGames * With.configuration.targetWinrate)
-        / (eval.gamesWeighted    + explorationGames)))
+        / (eval.gamesWeighted    + explorationGames))))
     noise(meanWinProbability)
   }
 

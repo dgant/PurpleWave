@@ -5,11 +5,12 @@ import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 import Utilities.?
+import Utilities.UnitFilters.IsAny
 
 object TargetScoring {
 
   @inline private def pixelCost(attacker: CombatUnit, target: CombatUnit): Double = {
-    Math.max(0, attacker.pixelsToGetInRange(target) - 0.5 * attacker.cooldownLeft * attacker.topSpeed)
+    Math.max(0, attacker.pixelDistanceCenter(target) - attacker.pixelRangeAgainst(target) - attacker.unitClass.dimensionMin - target.unitClass.dimensionMin - 0.5 * attacker.cooldownLeft * attacker.topSpeed)
   }
 
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
@@ -77,6 +78,7 @@ object TargetScoring {
     * The unit of value is tiles, as in, how far would we extend ourselves to attack this unit?
     */
   private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValueOverHealth
+  private lazy val cloakyMatcher = IsAny(Zerg.Lurker, Protoss.Arbiter, Protoss.DarkTemplar)
   private val combatBonus = 8.0
   def apply(target: UnitInfo): Double = {
     var output = 4.0 * baseValue * target.unitClass.subjectiveValueOverHealth
@@ -115,7 +117,7 @@ object TargetScoring {
 
     // Detector bonus
     // TODO: Needs player-agnosticism for simulation
-    output += add(6.0, (Terran.WraithCloak() || With.units.existsOurs(Zerg.Lurker, Protoss.Arbiter, Protoss.DarkTemplar)) && aidsDetection(target))
+    output += add(6.0, (Terran.WraithCloak() || With.units.existsOurs(cloakyMatcher)) && aidsDetection(target))
 
     // Alternative repair value
     output = Math.max(output, target.orderTarget.filter(target.repairing && ! _.repairing).map(2.5 + _.targetValue).getOrElse(0.0))

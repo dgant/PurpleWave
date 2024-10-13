@@ -13,17 +13,20 @@ object Cancel extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
     if (With.framesSince(unit.frameDiscovered) < Seconds(5)()) return false
 
-    if ( ! unit.complete && With.blackboard.toCancel().contains(unit.unitClass)) {
-      return true
-    }
-    if (unit.trainee.exists(With.blackboard.toCancel().contains)) {
-      return true
-    }
-    if (unit.upgradeProducing.exists(With.blackboard.toCancel().contains)) {
-      return true
-    }
-    if (unit.techProducing.exists(With.blackboard.toCancel().contains)) {
-      return true
+    // Redundant check to spare performance on .trainee()
+    if (With.blackboard.toCancel().nonEmpty) {
+      if ( ! unit.complete && With.blackboard.toCancel().contains(unit.unitClass)) {
+        return true
+      }
+      if (unit.trainee.exists(With.blackboard.toCancel().contains)) {
+        return true
+      }
+      if (unit.upgradeProducing.exists(With.blackboard.toCancel().contains)) {
+        return true
+      }
+      if (unit.techProducing.exists(With.blackboard.toCancel().contains)) {
+        return true
+      }
     }
 
     lazy val unpowered        = unit.unitClass.requiresPsi && ! unit.powered

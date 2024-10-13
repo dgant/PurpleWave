@@ -19,9 +19,11 @@ object PvPIdeas extends MacroActions with MacroCounting {
 
   def enemyContained: Boolean = With.geography.enemyBases.nonEmpty && With.geography.enemyBases.forall(b => (Seq(b) ++ b.natural).exists(With.scouting.weControl))
 
-  def recentlyExpandedFirst: Boolean = (
+  def riskingFirstExpansion: Boolean = (
     With.scouting.weExpandedFirst
     && ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
+    && ! (employing(PvP3GateGoon, PvP4GateGoon) && With.fingerprints.robo())
+    && ! (PvPRobo() && With.fingerprints.dtRush())
     && With.framesSince(With.scouting.firstExpansionFrameUs) < Minutes(3)())
 
   def monitorSafely(): Unit = {

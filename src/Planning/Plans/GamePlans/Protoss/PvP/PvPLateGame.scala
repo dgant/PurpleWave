@@ -69,7 +69,7 @@ class PvPLateGame extends GameplanImperative {
     val reaverShuttleCombo = unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 1
     fearDeath   = ! safeDefending
     fearDeath   ||= unitsComplete(IsWarrior) < 8 && ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.gatewayFe, With.fingerprints.nexusFirst)
-    fearDeath   ||= recentlyExpandedFirst && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && ! reaverShuttleCombo
+    fearDeath   ||= riskingFirstExpansion && estimatedArmyDifferential < 0 && ! With.fingerprints.robo() && ! PvP4GateGoon() && ( ! PvP3GateGoon() || With.fingerprints.fourGateGoon()) && ! reaverShuttleCombo
     fearDeath   &&= ! dtBraveryHome
     fearDeath   &&= ! (With.fingerprints.cannonRush() && enemies(IsWarrior) < 8)
     fearMacro   = miningBases < Math.max(2, enemyBases)
@@ -88,7 +88,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack = enemyMiningBases > miningBases
     shouldAttack ||= bases > 2
     shouldAttack ||= bases > miningBases
-    shouldAttack ||= ! recentlyExpandedFirst
+    shouldAttack ||= ! riskingFirstExpansion
     shouldAttack ||= reaverShuttleCombo
     shouldAttack ||= With.fingerprints.cannonRush() || With.fingerprints.forgeFe()
     shouldAttack ||= dtBraveryAbroad && ! enemiesHaveComplete(Protoss.PhotonCannon)
@@ -123,7 +123,7 @@ class PvPLateGame extends GameplanImperative {
     ///////////////////////////
 
     PvPIdeas.requireTimelyDetection()
-    if (recentlyExpandedFirst) {
+    if (riskingFirstExpansion) {
       if (PvPCoreExpand()) {
         if (units(Protoss.Gateway) < 3) {
           pumpSupply()
@@ -149,7 +149,7 @@ class PvPLateGame extends GameplanImperative {
       }
     }
 
-    status(PvPIdeas.recentlyExpandedFirst,  "Pioneer")
+    status(PvPIdeas.riskingFirstExpansion,  "Pioneer")
     status(dtBraveryHome,                   "DTBraveHome")
     status(dtBraveryAbroad,                 "DTBraveAbroad")
     status(fearDeath,                       "FearDeath")
@@ -241,7 +241,7 @@ class PvPLateGame extends GameplanImperative {
     pump(Protoss.Observer, Math.min(3, enemies(Protoss.DarkTemplar)))
     if (shouldReaver) {
       // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
-      if (recentlyExpandedFirst || ! shouldAttack) {
+      if (riskingFirstExpansion || ! shouldAttack) {
         pump(Protoss.Reaver, 2)
       }
       pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))

@@ -66,7 +66,7 @@ abstract class DestinationStack(unit: FriendlyUnitInfo) {
           || base.metro == With.geography.ourMetro))(base =>
       unit.pixelDistanceTravelling(base.heart)
         // Retreat into main
-        + ?(base.naturalOf.filter(_.isOurs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.centroidGround.base.contains(base)), 32 * 40, 0))
+        + ?(base.naturalOf.filter(_.isOurs).exists(_.heart.altitude >= base.heart.altitude) && unit.battle.exists(_.enemy.attackCentroidGround.base.contains(base)), 32 * 40, 0))
       .map(_.heart.center)
       .getOrElse(With.geography.home.center))
 

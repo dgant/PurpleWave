@@ -57,7 +57,8 @@ object ProtossChoices {
   /////////
 
   val vsProtoss_NeverVsRandom = Vector(
-    PvPProxy2Gate
+    PvPProxy2Gate,
+    PvPNexusFirst
   )
 
   val vsProtoss_OpenersTransitioningFrom_2Gate = Vector(

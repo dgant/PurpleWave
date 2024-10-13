@@ -13,7 +13,7 @@ object ShowTeams extends DebugView {
       val medium = Colors.MediumTeal
       val dark = Colors.DarkTeal
       DrawMap.circle(team.centroidAir, 16, bright)
-      DrawMap.box(team.centroidGround.subtract(16, 16), team.centroidGround.add(16, 16), bright)
+      DrawMap.box(team.attackCentroidKey.subtract(16, 16), team.attackCentroidKey.add(16, 16), bright)
     })
   }
 }

@@ -21,12 +21,15 @@ class SquadBackstabProxy extends Squad {
     val targetBase = With.scouting.enemyMain
     if (targetBase.isEmpty) return
 
+    val base = targetBase.get
+    if (base.units.exists(u => u.isEnemy && u.complete && u.isAny(Terran.Barracks, Terran.Factory, Protoss.Gateway))) return
+
     if (lock.units.isEmpty) {
       if ( ! With.blackboard.wantToAttack()) return
       if (MacroFacts.unitsComplete(IsWarrior) < 7) return
     }
 
-    vicinity = targetBase.get.heart.center
+    vicinity = base.heart.center
     lock.setPreference(PreferClose(vicinity)).acquire()
   }
 

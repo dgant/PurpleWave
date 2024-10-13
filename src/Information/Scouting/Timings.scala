@@ -92,7 +92,9 @@ trait Timings {
   }
 
   def earliestArrival(unitClass: UnitClass): Int = {
-    enemyContacts.get(unitClass).foreach(return _)
-    earliestCompletion(unitClass) + rushFrames(unitClass)
+    enemyContacts
+      .get(unitClass)
+      .filter(_ < Forever())
+      .getOrElse(earliestCompletion(unitClass) + rushFrames(unitClass))
   }
 }

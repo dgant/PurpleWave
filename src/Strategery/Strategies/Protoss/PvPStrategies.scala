@@ -26,11 +26,6 @@ object PvPGateCore extends PvPStrategy {
 
 object PvP1012 extends PvPStrategy {
   addChoice(PvP3Zealot, PvP5Zealot)
-  addRequirement(() =>
-    ! CanGateCoreOnThisMap()
-    || With.fingerprints.nexusFirst.recently
-    || With.fingerprints.proxyGateway.recently
-    || With.fingerprints.twoGate99.recently)
 }
 
 object PvPNexusFirst extends PvPStrategy {

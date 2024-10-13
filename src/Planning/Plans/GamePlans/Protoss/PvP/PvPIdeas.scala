@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
-import Planning.MacroCounting
+import Planning.{MacroCounting, MacroFacts}
 import Planning.Plans.GamePlans.All.MacroActions
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -126,21 +126,21 @@ object PvPIdeas extends MacroActions with MacroCounting {
       }
     } else if (dtArePossibility && (PvPDT() || PvPCoreExpand() || PvP3GateGoon() || PvP4GateGoon())) {
       // If DTs are already here, spam cannons and pray one sticks
-      if (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar))) {
+      if (enemyDarkTemplarLikely && (framesUntilArrival < 120 || (With.geography.ourBases :+ With.geography.ourNatural).exists(_.enemies.exists(Protoss.DarkTemplar)))) {
         get(Protoss.Forge)
         val bestBase    = Some(With.geography.ourFoyer).filter(_.ourUnits.exists(u => Protoss.PhotonCannon(u) && u.complete)).getOrElse(With.geography.ourMain)
         val holdNatural = bestBase.naturalOf.isDefined && ! With.strategy.isMoneyMap
         val bestTile    = ?(holdNatural, bestBase.zone.exitNowOrHeart, ?(cannonsAreReady, bestBase.zone.exitNowOrHeart, bestBase.heart))
         val label       = ?(holdNatural || cannonsAreReady, DefendEntrance, DefendHall)
         status(f"DTHere-Hold${?(holdNatural, "Nat", "Main")}-${?(cannonsAreReady, "Prepared", "Scrambling")}")
-        get(RequestUnit(Protoss.PhotonCannon, ?(cannonsAreReady, 3, 4),
+        get(RequestUnit(Protoss.PhotonCannon, ?(MacroFacts.enemiesHaveComplete(Protoss.DarkTemplar, Protoss.TemplarArchives), ?(cannonsAreReady, 3, 4), 1),
           placementQueryArg = Some(new PlacementQuery(Protoss.PhotonCannon)
             .preferBase(bestBase)
             .preferTile(bestTile)
             .preferLabelYes(Defensive, DefendGround, label))))
 
       // If DTs will arrive before cannons, try a tiered approach to maximize our potential outcomes
-      } else if (dtPrecedesCannon) {
+      } else if (enemyDarkTemplarLikely && dtPrecedesCannon) {
         status("DTPrecedesCannon")
         get(Protoss.Forge)
         if ( ! With.strategy.isMoneyMap) {

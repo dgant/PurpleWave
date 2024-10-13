@@ -6,7 +6,8 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Targeting.TargetScoring
-import ProxyBwapi.Races.Protoss
+import Planning.MacroFacts
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.Time.Minutes
@@ -89,7 +90,7 @@ class SquadDarkTemplar extends Squad {
     val nearestMiner    = Maff.min(workers
       .filter(w => w.base.exists(b => w.pixelDistanceCenter(b.townHallArea.center) < 256))
       .map(w => dt.pixelDistanceTravelling(w.pixel))).getOrElse(LightYear().toDouble)
-    val goBerserk       = nearestMiner < 256 || nearestMiner < nearestDetector + 64 || nearestMiner < nearestThreat + 64
+    val goBerserk       = (nearestMiner < 256 || nearestMiner < nearestDetector + 64 || nearestMiner < nearestThreat + 64) && ( ! dt.intent.canFlee || MacroFacts.enemiesComplete(Terran.MissileTurret, Protoss.PhotonCannon) == 0)
     dt.intend(this)
       .setCanFlee( ! goBerserk)
       .setTerminus(base.heart.center)

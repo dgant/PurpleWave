@@ -57,7 +57,7 @@ object JudgmentModifiers {
     val enemyRange      = battle.enemy.meanAttackerRange
     val deltaMin        = -0.4 * Maff.clamp(With.frame.toDouble / Minutes(10)(), 0.5, 1.0)
     val deltaMax        = 0.05
-    val proximity       = With.scouting.proximity(battle.enemy.centroidGround)
+    val proximity       = With.scouting.proximity(battle.enemy.attackCentroidGround)
     val proximityMult   = (proximity * 2 - 1)
     val rangeMult       = Maff.clamp(enemyRange / (32 * 6.0), 0.0, 2.0)
     val targetDeltaRaw  = -0.3 * proximityMult * rangeMult

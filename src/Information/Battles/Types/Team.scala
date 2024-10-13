@@ -26,7 +26,7 @@ abstract class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGr
     Maff.minBy(
       Maff.orElse(
         asGroup.attackers,
-        units))(_.pixelDistanceSquared(opponent.asGroup.centroidKey))
+        units))(_.pixelDistanceSquared(opponent.asGroup.attackCentroidKey))
     .map(_.pixel)
     .getOrElse(With.scouting.enemyThreatOrigin.center))
 
@@ -34,7 +34,7 @@ abstract class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGr
     Maff.minBy(
       Maff.orElse(
         asGroup.attackers.view.filter(_.flying),
-        units.view.filter(_.flying)))(_.pixelDistanceTravelling(opponent.asGroup.centroidKey))
+        units.view.filter(_.flying)))(_.pixelDistanceTravelling(opponent.asGroup.attackCentroidKey))
     .map(_.pixel)
     .getOrElse(vanguardAll()))
 
@@ -42,7 +42,7 @@ abstract class Team(val battle: Battle, val units: Seq[UnitInfo]) extends UnitGr
     Maff.minBy(
       Maff.orElse(
         asGroup.attackers.view.filterNot(_.flying),
-        units.view.filterNot(_.flying)))(_.pixelDistanceTravelling(opponent.asGroup.centroidGround))
+        units.view.filterNot(_.flying)))(_.pixelDistanceTravelling(opponent.asGroup.attackCentroidGround))
     .map(_.pixel)
     .getOrElse(vanguardAll()))
 

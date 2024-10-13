@@ -5,6 +5,7 @@ import Mathematics.Maff
 import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
+import Utilities.Time.Seconds
 import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters.{IsAll, IsBuilding, IsMobileDetector, IsWarrior}
 import Utilities.UnitPreferences.PreferClose
@@ -16,6 +17,8 @@ class SquadCatchDTRunby extends Squad {
   def launch(): Unit = {
     if ( ! With.enemies.exists(_.isProtoss))  return
     if ( ! MacroFacts.enemyDarkTemplarLikely) return
+    if ( ! With.blackboard.wantToAttack()) return
+    if (With.scouting.earliestArrival(Protoss.DarkTemplar) > With.frame + Seconds(15)()) return
     setEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
     setTargets(enemies)
 

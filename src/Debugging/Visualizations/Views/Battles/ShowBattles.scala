@@ -57,13 +57,10 @@ object ShowBattles extends DebugView {
       DrawScreen.table(x, 4 * With.visualization.lineHeightSmall, Vector(
         Vector("Score",       format(battle.judgement.get.scoreTotal),  "Our survivors:", describeTeam(battle.simulationReport.filter(_._1.isFriendly)  .filter(_._2.alive).keys)),
         Vector("Target",      format(battle.judgement.get.scoreTarget), "Foe survivors:", describeTeam(battle.simulationReport.filter(_._1.isEnemy)     .filter(_._2.alive).keys)),
-        Vector("LVLR",        format(metrics.valueLostRatio)),
-        Vector("LHLR",        format(metrics.healthLostRatio),          "Our deaths:",    describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
-        Vector("LHVLR",       format(metrics.healthValueLostRatio),     "Foe deaths:",    describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filterNot(_._2.alive).keys)),
-        Vector("RLVLN",       format(metrics.ratioValueLostNet)),
-        Vector("RLHLN",       format(metrics.ratioHealthLostNet),       f"${metrics.framesIn / 24} second duration"),
-        Vector("RLHVLN",      format(metrics.ratioHealthValueLostNet),  f"${battle.simulationCheckpoints.size} metrics checkpoints"),
-        Vector("Confidence",  format(battle.judgement.get.confidence11Total))))
+        Vector("Value",       format(metrics.valueLostRatio),           "Our deaths:",    describeTeam(battle.simulationReport.filter(_._1.isFriendly) .filterNot(_._2.alive).keys)),
+        Vector("Value HP",    format(metrics.healthValueLostRatio),     "Foe deaths:",    describeTeam(battle.simulationReport.filter(_._1.isEnemy)    .filterNot(_._2.alive).keys)),
+        Vector("Confidence",  format(battle.judgement.get.confidence11Total)),
+        Vector(f"${battle.simulationCheckpoints.size} checkpoints over ${metrics.framesIn / 24}s")))
     })
 
     val graphWidth = 82

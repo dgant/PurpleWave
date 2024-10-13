@@ -80,7 +80,7 @@ object Potential {
   def regroup(unit: FriendlyUnitInfo): Force = {
     unit.squad.orElse(unit.team)
       .filter(_.attackers.size > 1)
-      .map(g => ?(unit.flying, g.centroidKey, g.centroidGround))
+      .map(g => ?(unit.flying, g.attackCentroidKey, g.attackCentroidGround))
       .map(towards(unit, _))
       .getOrElse(Forces.None)
   }

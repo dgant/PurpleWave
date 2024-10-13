@@ -16,7 +16,7 @@ object Opponents {
   val defaultPvR: StrategySelectionPolicy = StrategySelectionFixed(PvR2Gate4Gate)
 
   // AIIDE 2024
-  val bananabrain : Opponent = add("BananaBrain",     .6,   StrategySelectionGreedy())
+  val bananabrain : Opponent = add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvP1012, PvP5Zealot, PvPDT) { duration = 3 })
   val stardust    : Opponent = add("Stardust",        .75,  new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
   val mcrave      : Opponent = add("McRave",          .6,   StrategySelectionGreedy())
   val microwave   : Opponent = add("Microwave",       .9,   aggroPvZ)

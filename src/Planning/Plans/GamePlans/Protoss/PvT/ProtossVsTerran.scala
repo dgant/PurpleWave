@@ -1,5 +1,5 @@
 
-package Planning.Plans.GamePlans.Protoss.PvT
+package Planning.Plans.Gameplans.Protoss.PvT
 
 import Debugging.SimpleString
 import Lifecycle.With

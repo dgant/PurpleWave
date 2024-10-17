@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Zerg}

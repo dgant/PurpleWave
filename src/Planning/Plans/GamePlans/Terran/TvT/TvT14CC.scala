@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.Gameplans.Terran.TvT
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plan
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvR
+package Planning.Plans.Gameplans.Terran.TvR
 
 import Macro.Requests.Get
 import Planning.Plans.Compound._
@@ -10,7 +10,7 @@ import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.Employing
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
+import Planning.Plans.Gameplans.All.GameplanTemplateVsRandom
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvR1Rax

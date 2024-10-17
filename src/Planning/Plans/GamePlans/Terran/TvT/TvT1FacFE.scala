@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.Gameplans.Terran.TvT
 
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, Get}
@@ -10,7 +10,7 @@ import Planning.Predicates.Compound.{And, Latch}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvT1FacFE

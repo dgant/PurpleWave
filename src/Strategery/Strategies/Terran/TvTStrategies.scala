@@ -1,7 +1,7 @@
 package Strategery.Strategies.Terran
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Terran.TvT.TvTProxy5Rax
+import Planning.Plans.Gameplans.Terran.TvT.TvTProxy5Rax
 import Strategery.Strategies.Strategy
 import Strategery.{MapGroups, StarCraftMap}
 import bwapi.Race

@@ -27,10 +27,10 @@ abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }
 object PvZFFE extends PvZFFEOpening {
-  addRequirement(() => With.placement.wall.isDefined)
+  addSelectionRequirement(() => With.placement.wall.isDefined)
 }
 object PvZGatewayFE extends PvZFFEOpening {
-  addRequirement(() => With.placement.wall.isDefined)
+  addSelectionRequirement(() => With.placement.wall.isDefined)
   setMinimumGamesVsOpponent(2)
   whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
   blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)

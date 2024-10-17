@@ -20,7 +20,7 @@ object ShowHeader extends DebugView {
     DrawScreen.text(245, 1 * h, f"${With.configuration.frameLimitMs}ms: ${With.performance.framesOverShort}/320 ${With.performance.framesOver1000}/10 ${With.performance.framesOver10000}/1")
     DrawScreen.text(365, 1 * h, f"A:${With.reaction.agencyAverage} C:${With.reaction.clusteringAverage} P:${With.reaction.planningAverage}")
     DrawScreen.text(5,   2 * h, MapIdentifier(With.game.mapFileName))
-    DrawScreen.text(125, 2 * h, f"${With.strategy.selected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
+    DrawScreen.text(125, 2 * h, f"${With.strategy.strategiesSelected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.mkString(" ").replaceAll("Finger", "")}")
     DrawScreen.text(5,   3 * h, With.blackboard.status.get.mkString(", "))
   }
 }

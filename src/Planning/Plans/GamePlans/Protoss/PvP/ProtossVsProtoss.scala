@@ -1,6 +1,6 @@
-package Planning.Plans.GamePlans.Protoss.PvP
+package Planning.Plans.Gameplans.Protoss.PvP
 
-import Planning.Plans.GamePlans.All.ModalGameplan
+import Planning.Plans.Gameplans.All.ModalGameplan
 
 class ProtossVsProtoss extends ModalGameplan(
   new PvPNexusFirst,

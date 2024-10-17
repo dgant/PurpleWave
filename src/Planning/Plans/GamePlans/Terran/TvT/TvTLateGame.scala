@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.Gameplans.Terran.TvT
 
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, FloatBuildings}
 import Planning.Plans.Compound.{If, Parallel, Trigger}
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.FFA
+package Planning.Plans.Gameplans.Protoss.FFA
 
 import Planning.Predicates.{Never, Predicate}
 

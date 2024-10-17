@@ -1,7 +1,7 @@
 package Strategery.Strategies.AllRaces
 
 import Planning.Plan
-import Planning.Plans.GamePlans.All.Sandbox
+import Planning.Plans.Gameplans.All.Sandbox
 import Strategery.Strategies.Strategy
 
 object Sandbox extends Strategy {

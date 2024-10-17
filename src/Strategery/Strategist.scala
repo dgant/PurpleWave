@@ -3,69 +3,66 @@ package Strategery
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
-import Planning.Plans.GamePlans.All.StandardGamePlan
-import ProxyBwapi.Players.Players
-import Strategery.History.HistoricalGame
+import Planning.Plans.Gameplans.All.StandardGameplan
 import Strategery.Selection._
-import Strategery.Strategies.{AllChoices, Strategy, StrategyBranch}
-import bwapi.{GameType, Race}
+import Strategery.Strategies.{AllChoices, Strategy}
+import bwapi.Race
 
 import scala.collection.mutable
-import scala.util.Random
 
-class Strategist {
+class Strategist extends StrategyDatabase with FingerprintDatabase with GameFeatures with Rolling {
 
-  lazy val map: Option[StarCraftMap] = StarCraftMaps.all.find(_())
   lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.strategies.toSet
 
-  private var _lastEnemyRace  = With.enemy.raceInitial
-  val selected    = new mutable.HashSet[Strategy]
-  val deselected  = new mutable.HashSet[Strategy]
-  val active      = new mutable.HashSet[Strategy]
+  val strategiesSelected      = new mutable.HashSet[Strategy]
+  val strategiesDeselected    = new mutable.HashSet[Strategy]
+  val strategiesActive        = new mutable.HashSet[Strategy]
 
+  private var _lastEnemyRace  = With.enemy.raceInitial
   def update(): Unit = {
     val enemyRaceNow = With.enemy.raceCurrent
-    if (selected.isEmpty) {
+    if (strategiesSelected.isEmpty) {
       if (With.configuration.fixedBuilds.nonEmpty) {
         setFixedBuild(With.configuration.fixedBuilds)
       }
-      selected ++= selectedInitially
+      strategiesSelected ++= selectedInitially
     } else if (_lastEnemyRace != enemyRaceNow) {
-      val toRemove = selected.filter(_.enemyRaces.forall(r => r != Race.Unknown && r != enemyRaceNow))
-      toRemove.foreach(swapOut)
+      strategiesSelected
+        .filter(_.enemyRaces.forall(r => r != Race.Unknown && r != enemyRaceNow))
+        .foreach(swapOut)
     }
     _lastEnemyRace = enemyRaceNow
   }
 
-  def isActive(strategy: Strategy): Boolean = selected.contains(strategy) && active.contains(strategy)
-  def isSelected(strategy: Strategy): Boolean = selected.contains(strategy)
+  def isActive(strategy: Strategy): Boolean = strategiesSelected.contains(strategy) && strategiesActive.contains(strategy)
+  def isSelected(strategy: Strategy): Boolean = strategiesSelected.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
     // Use public "selected" to force initialization
-    val output = selected.contains(strategy)
-    if (output && ! active.contains(strategy)) {
+    val output = strategiesSelected.contains(strategy)
+    if (output && ! strategiesActive.contains(strategy)) {
       With.logger.debug(f"Activating strategy $strategy")
-      active += strategy
+      strategiesActive += strategy
     }
     output
   }
   def deactivate(strategy: Strategy): Unit = {
-    if (active.contains(strategy)) {
+    if (strategiesActive.contains(strategy)) {
       With.logger.debug(f"Deactivating strategy $strategy")
-      active -= strategy
+      strategiesActive -= strategy
     }
   }
   def swapIn(strategy: Strategy): Unit = {
-    if ( ! selected.contains(strategy)) {
+    if ( ! strategiesSelected.contains(strategy)) {
       With.logger.debug(f"Swapping in strategy $strategy")
-      selected += strategy
-      deselected -= strategy
+      strategiesSelected += strategy
+      strategiesDeselected -= strategy
     }
   }
   def swapOut(strategy: Strategy): Unit = {
-    if (selected.contains(strategy)) {
+    if (strategiesSelected.contains(strategy)) {
       With.logger.debug(f"Swapping out strategy $strategy")
-      selected -= strategy
-      deselected += strategy
+      strategiesSelected -= strategy
+      strategiesDeselected += strategy
     }
     deactivate(strategy)
   }
@@ -75,8 +72,8 @@ class Strategist {
       strategyBranchesAll   .filter(branch => whitelisted.forall(branch.strategies.contains)).filterNot(branch => blacklisted.exists(branch.strategies.contains)))
     val bestBranch = Maff.maxBy(matchedBranches)(_.winProbability)
     bestBranch.foreach(branch => {
-      selected.filterNot(branch.strategies.contains).foreach(_.swapOut())
-      branch.strategies.filterNot(selected.contains).foreach(_.swapIn())
+      strategiesSelected.filterNot(branch.strategies.contains).foreach(_.swapOut())
+      branch.strategies.filterNot(strategiesSelected.contains).foreach(_.swapIn())
     })
     if (bestBranch.isEmpty) {
       With.logger.warn(f"Attempted to swap everything, but found  no legal branches. Whitelisted: $whitelisted - Blacklisted:  $blacklisted")
@@ -85,82 +82,22 @@ class Strategist {
     }
   }
 
-  private lazy val _standardGamePlan = new StandardGamePlan
-  private var _lastSelectedWithGameplan: Option[Strategy] = None
+  private lazy val _standardGameplan = new StandardGameplan
+  private var _lastStrategyWithCustomGameplan: Option[Strategy] = None
   private var _lastCustomGameplan: Option[Plan] = None
   def gameplan: Plan = {
-    val selectedWithGameplan = selected.find(_.gameplan.isDefined)
-    if (selectedWithGameplan.isDefined) {
-      selectedWithGameplan.get.activate()
-      if ( ! _lastSelectedWithGameplan.contains(selectedWithGameplan.get)) {
-        _lastSelectedWithGameplan = selectedWithGameplan
-        _lastCustomGameplan = _lastSelectedWithGameplan.get.gameplan
+    val selectedStrategyWithCustomGameplan = strategiesSelected.find(_.gameplan.isDefined)
+    if (selectedStrategyWithCustomGameplan.isDefined) {
+      selectedStrategyWithCustomGameplan.get.activate()
+      if ( ! _lastStrategyWithCustomGameplan.contains(selectedStrategyWithCustomGameplan.get)) {
+        _lastStrategyWithCustomGameplan = selectedStrategyWithCustomGameplan
+        _lastCustomGameplan = _lastStrategyWithCustomGameplan.get.gameplan
       }
     } else {
-      _lastSelectedWithGameplan = None
+      _lastStrategyWithCustomGameplan = None
       _lastCustomGameplan = None
     }
-    _lastCustomGameplan.getOrElse(_standardGamePlan)
-  }
-
-  lazy val heightMain       : Double  = With.self.startTile.altitude
-  lazy val heightNatural    : Double  = With.geography.ourNatural.townHallTile.altitude
-  lazy val isRamped         : Boolean = heightMain > heightNatural
-  lazy val isFlat           : Boolean = heightMain == heightNatural
-  lazy val isInverted       : Boolean = heightMain < heightNatural
-  lazy val isFixedOpponent  : Boolean = With.configuration.playbook.policy.isInstanceOf[StrategySelectionFixed]
-  lazy val rushDistanceMin  : Int     = Maff.min(With.geography.rushDistances).getOrElse(rushDistanceMean)
-  lazy val rushDistanceMax  : Int     = Maff.max(With.geography.rushDistances).getOrElse(rushDistanceMean)
-  lazy val rushDistanceMean : Int     = Maff.mean(With.geography.rushDistances.map(_.toDouble)).toInt
-  lazy val isIslandMap      : Boolean = With.geography.mains.forall(base1 => With.geography.mains.forall(base2 => base1 == base2 || With.paths.zonePath(base1.zone, base2.zone).isEmpty))
-  lazy val isFfa            : Boolean = With.enemies.size > 1 && ! Players.all.exists(p => p.isAlly) && With.game.getGameType != GameType.Top_vs_Bottom
-  lazy val isMoneyMap       : Boolean = With.geography.mains.forall(b => b.minerals.length >= 16 && b.mineralsLeft > 1500 * 40)
-  lazy val gameWeights: Map[HistoricalGame, Double] = With.history.games
-    .filter(_.enemyMatches)
-    .zipWithIndex
-    .map { case (game, age) =>
-      val relevanceTimeDecay  : Double = Math.pow(0.98, age)
-      val relevanceRecentLoss : Double = Maff.fromBoolean(age < With.configuration.recentFingerprints && !game.won)
-      val relevanceAge        : Double = 0.25 + 0.5 * relevanceTimeDecay + 0.25 * relevanceRecentLoss
-      (game, relevanceAge)
-    }
-    .toMap
-
-  lazy val enemyRecentFingerprints: Vector[String] = enemyFingerprints(With.configuration.recentFingerprints)
-  private lazy val recentGamesCheckingForMultipleRaces = With.history.gamesVsEnemies.take(10)
-  private lazy val enemyHasBeenTerran   : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Terran))
-  private lazy val enemyHasBeenProtoss  : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Protoss))
-  private lazy val enemyHasBeenZerg     : Int = Math.min(1, recentGamesCheckingForMultipleRaces.count(_.enemyRace == Race.Zerg))
-  private lazy val enemyMultipleRaces   : Boolean = (enemyHasBeenTerran + enemyHasBeenProtoss + enemyHasBeenZerg > 1)
-  def enemyFingerprints(games: Int): Vector[String] = {
-    val finalGames = (if (enemyMultipleRaces) 3 else 1) * games
-    With.history.gamesVsEnemies.take(finalGames).flatMap(_.tags.toVector).filter(_.startsWith("Finger")).distinct
-  }
-
-  lazy val strategiesTopLevel     : Seq[Strategy]       = if (With.enemy.raceCurrent == Race.Unknown) AllChoices.treeVsRandom else AllChoices.treeVsKnownRace
-  lazy val strategiesAll          : Seq[Strategy]       = strategyBranchesAll.flatMap(_.strategies).distinct
-
-  lazy val strategyBranchesAll    : Seq[StrategyBranch] = strategiesTopLevel.flatMap(ExpandStrategy.apply).distinct
-  lazy val strategyBranchesLegal  : Seq[StrategyBranch] = strategyBranchesAll.filter(_.strategies.forall(_.legal))
-
-  lazy val gamesVsOpponent: Seq[HistoricalGame] = With.history.games.filter(With.enemies.size == 1 && _.enemyName == With.configuration.playbook.enemyName)
-
-  val rolls: mutable.HashMap[String, Boolean] = new mutable.HashMap
-  def roll(key: String, probability: Double): Boolean = {
-    if ( ! rolls.contains(key)) {
-      val rolled = Random.nextDouble()
-      val success = rolled <= probability
-      With.logger.debug(f"Roll for $key ${if (success) "PASSED" else "FAILED"} (Rolled $rolled into probability $probability)")
-      rolls(key) = success
-    }
-    rolls(key)
-  }
-
-  def matchNames(names: Seq[String], branches: Seq[StrategyBranch]): Seq[StrategyBranch] = {
-    strategyBranchesAll.filter(branch => names.forall(name => branch.strategies.exists(_.toString.toLowerCase == name.toLowerCase)))
-  }
-  def matchBranches(strategies: Seq[Strategy]): Seq[StrategyBranch] = {
-    strategyBranchesAll.filter(branch => strategies.forall(branch.strategies.contains))
+    _lastCustomGameplan.getOrElse(_standardGameplan)
   }
 
   private def setFixedBuild(strategyNamesText: String): Unit = {
@@ -171,7 +108,7 @@ class Strategist {
     val strategyNames       = Maff.sample(strategyNamesLines).split(" ")
 
     // Get all the mapped strategy objects
-    var matchingBranches = AllChoices.tree
+    val matchingBranches = AllChoices.tree
       .flatMap(ExpandStrategy.apply)
       .distinct
       .filter(branch =>

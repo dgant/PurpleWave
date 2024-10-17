@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Terran.TvP
+package Planning.Plans.Gameplans.Terran.TvP
 
 import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.Terran.RepairBunker
-import Planning.Plans.GamePlans.Terran.TvP.TvPIdeas.ReactiveDetection
+import Planning.Plans.Gameplans.Terran.RepairBunker
+import Planning.Plans.Gameplans.Terran.TvP.TvPIdeas.ReactiveDetection
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
@@ -14,7 +14,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Reactive.EnemyBasesAtMost
 import Planning.Predicates.Strategy.Employing
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2Armory

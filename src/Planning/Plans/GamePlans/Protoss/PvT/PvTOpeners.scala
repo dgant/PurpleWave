@@ -1,7 +1,7 @@
-package Planning.Plans.GamePlans.Protoss.PvT
+package Planning.Plans.Gameplans.Protoss.PvT
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Planning.Plans.Gameplans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss._
 import Utilities.?

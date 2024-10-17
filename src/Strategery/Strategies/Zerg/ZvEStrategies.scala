@@ -3,7 +3,7 @@ package Strategery.Strategies.Zerg
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvE.{ZvE4Pool, ZvE9Pool2HatchSpeed}
+import Planning.Plans.Gameplans.Zerg.ZvE.{ZvE4Pool, ZvE9Pool2HatchSpeed}
 import Strategery.{Benzene, StarCraftMap}
 import Strategery.Strategies.Strategy
 import bwapi.Race

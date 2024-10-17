@@ -21,7 +21,7 @@ object CanGateCoreOnThisMap {
 }
 
 object PvPGateCore extends PvPStrategy {
-  addRequirement(() => CanGateCoreOnThisMap())
+  addSelectionRequirement(() => CanGateCoreOnThisMap())
 }
 
 object PvP1012 extends PvPStrategy {
@@ -62,7 +62,7 @@ object PvPDT extends PvPStrategy {
 object PvPCoreExpand extends PvPStrategy {
   setMinimumGamesVsOpponent(3)
   addChoice(PvPGateCore)
-  addRequirement(() =>
+  addSelectionRequirement(() =>
     rushTilesMinimum >= 200
     || MapGroups.strongNatural.exists(_())
     ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
@@ -72,15 +72,15 @@ object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
-  addRequirement(() => entranceInverted
+  addSelectionRequirement(() => entranceInverted
     || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
-  addRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
-  addRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
+  addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
+  addSelectionRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
 }
 
 //////////////

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.Gameplans.Terran.TvT
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -11,7 +11,7 @@ import Planning.Predicates.Compound.Not
 import Planning.Predicates.Milestones.FoundEnemyBase
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvTProxy5Rax

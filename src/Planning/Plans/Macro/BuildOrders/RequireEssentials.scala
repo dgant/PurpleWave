@@ -2,7 +2,7 @@ package Planning.Plans.Macro.BuildOrders
 
 import Lifecycle.With
 import Planning.{MacroCounting, Plan}
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import Planning.Plans.Macro.Expanding.MaintainMiningBases
 import ProxyBwapi.Races.Zerg
 import Utilities.UnitFilters.{IsTownHall, IsWorker}

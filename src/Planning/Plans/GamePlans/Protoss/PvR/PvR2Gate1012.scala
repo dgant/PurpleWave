@@ -1,12 +1,12 @@
-package Planning.Plans.GamePlans.Protoss.PvR
+package Planning.Plans.Gameplans.Protoss.PvR
 
 import Macro.Requests.Get
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
+import Planning.Plans.Gameplans.All.GameplanTemplateVsRandom
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Milestones.UnitsAtLeast
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Gameplans.Protoss.ProtossBuilds
 import Planning.Plans.Scouting.ScoutOn
 import Planning.Predicates.Predicate
 import Planning.Predicates.Strategy.Employing

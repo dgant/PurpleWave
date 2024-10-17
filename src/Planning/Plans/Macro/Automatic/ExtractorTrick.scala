@@ -3,7 +3,7 @@ package Planning.Plans.Macro.Automatic
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plan
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.Races.Zerg
 
 class ExtractorTrick extends Plan with MacroActions {

@@ -1,7 +1,7 @@
 package Strategery.Strategies.Terran.FFA
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Terran.FFA.TerranFFABio
+import Planning.Plans.Gameplans.Terran.FFA.TerranFFABio
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

@@ -1,14 +1,14 @@
 package Strategery.Strategies
 
-import Debugging.{SimpleString, ToString}
+import Debugging.ToString
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
-import Planning.Plan
+import Planning.{MacroCounting, Plan}
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import Utilities.{?, LightYear}
 import bwapi.Race
 
-abstract class Strategy extends SimpleString {
+abstract class Strategy extends MacroCounting {
   override val toString: String = ToString(this)
 
   private var _islandMaps             : Boolean             = false
@@ -32,7 +32,8 @@ abstract class Strategy extends SimpleString {
   private var _responsesBlacklisted   : Seq[Fingerprint]    = Seq.empty
   private var _responsesWhitelisted   : Seq[Fingerprint]    = Seq.empty
   private var _choices                : Seq[Seq[Strategy]]  = Seq.empty
-  private var _requirements           : Seq[() => Boolean]  = Seq.empty
+  private var _selectionRequirements  : Seq[() => Boolean]  = Seq.empty
+  private var _activationRequirements : Seq[() => Boolean]  = Seq.empty
 
   def gameplan                : Option[Plan]        = None
   def islandMaps              : Boolean             = _islandMaps
@@ -55,7 +56,8 @@ abstract class Strategy extends SimpleString {
   def mapsWhitelisted         : Seq[StarCraftMap]   = _mapsWhitelisted
   def responsesBlacklisted    : Seq[Fingerprint]    = _responsesBlacklisted
   def responsesWhitelisted    : Seq[Fingerprint]    = _responsesWhitelisted
-  def requirements            : Seq[() => Boolean]  = _requirements
+  def selectionRequirements   : Seq[() => Boolean]  = _selectionRequirements
+  def activationRequirements  : Seq[() => Boolean]  = _activationRequirements
   def choices                 : Seq[Seq[Strategy]]  = _choices
 
   /////////////////////////////////////////////////////
@@ -84,7 +86,8 @@ abstract class Strategy extends SimpleString {
   def blacklistVs               (fingerprints: Fingerprint*)  : Unit = { _responsesBlacklisted ++= fingerprints }
   def addChoice                 (strategies: Strategy*)       : Unit = { _choices = _choices :+ strategies }
   def setChoice                 (strategies: Strategy*)       : Unit = { _choices = Seq(strategies) }
-  def addRequirement            (predicate: () => Boolean)    : Unit = { _requirements = _requirements :+ predicate }
+  def addSelectionRequirement   (predicate: () => Boolean)    : Unit = { _selectionRequirements   = _selectionRequirements  :+ predicate }
+  def addActivationRequirement  (predicate: () => Boolean)    : Unit = { _activationRequirements  = _activationRequirements :+ predicate }
 
   /**
     * Flag a strategy as being salient to the gameplay.

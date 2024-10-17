@@ -1,7 +1,7 @@
 package Planning
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.CountMap
 

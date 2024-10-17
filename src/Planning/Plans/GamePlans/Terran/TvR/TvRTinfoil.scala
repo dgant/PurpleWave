@@ -1,9 +1,9 @@
-package Planning.Plans.GamePlans.Terran.TvR
+package Planning.Plans.Gameplans.Terran.TvR
 
 import Macro.Requests.Get
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.Terran.RepairBunker
+import Planning.Plans.Gameplans.Terran.RepairBunker
 import Planning.Plans.Macro.Automatic.{Friendly, Pump, PumpRatio}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.BuildGasPumps
@@ -12,7 +12,7 @@ import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeComplete}
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.IsWarrior
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
+import Planning.Plans.Gameplans.All.GameplanTemplateVsRandom
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Terran
 import Strategery.Strategies.Terran.TvR.TvRTinfoil

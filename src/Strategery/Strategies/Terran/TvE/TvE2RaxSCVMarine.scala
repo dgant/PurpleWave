@@ -3,7 +3,7 @@ package Strategery.Strategies.Terran.TvE
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Terran.TvE.TvE2RaxSCVMarine
+import Planning.Plans.Gameplans.Terran.TvE.TvE2RaxSCVMarine
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

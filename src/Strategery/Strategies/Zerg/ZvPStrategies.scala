@@ -3,7 +3,7 @@ package Strategery.Strategies.Zerg
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Planning.Plan
-import Planning.Plans.GamePlans.Zerg.ZvP.ZvP2HatchMuta
+import Planning.Plans.Gameplans.Zerg.ZvP.ZvP2HatchMuta
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

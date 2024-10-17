@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvP
+package Planning.Plans.Gameplans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -7,8 +7,8 @@ import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.{NoPlan, WriteStatus}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraSpeedThenRange
+import Planning.Plans.Gameplans.All.GameplanTemplate
+import Planning.Plans.Gameplans.Zerg.ZergIdeas.UpgradeHydraSpeedThenRange
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}

@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -12,7 +12,7 @@ import Planning.Predicates.Compound.{And, Latch, Not}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.{ZvT12Hatch11Pool, ZvT12Hatch13Pool, ZvT9Pool}

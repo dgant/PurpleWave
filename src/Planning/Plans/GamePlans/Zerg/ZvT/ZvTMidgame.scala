@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -13,7 +13,7 @@ import Planning.Predicates.Compound._
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 

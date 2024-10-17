@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.PvP
+package Planning.Plans.Gameplans.Protoss.PvP
 
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -6,7 +6,7 @@ import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import Planning.{MacroCounting, MacroFacts}
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._

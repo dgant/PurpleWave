@@ -1,12 +1,12 @@
-package Planning.Plans.GamePlans.Zerg.ZvZ
+package Planning.Plans.Gameplans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.Zerg.ZergIdeas.PumpMutalisks
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Placement.BuildSunkensInMain
@@ -16,7 +16,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.IsHatchlike
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvZ9PoolSpeed

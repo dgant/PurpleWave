@@ -1,13 +1,13 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.Gameplans.Terran.TvZ
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Plans.GamePlans.Terran.RepairBunker
-import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
+import Planning.Plans.Gameplans.All.GameplanTemplate
+import Planning.Plans.Gameplans.Terran.RepairBunker
+import Planning.Plans.Gameplans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases

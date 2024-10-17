@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvP
+package Planning.Plans.Gameplans.Terran.TvP
 
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, Get}
@@ -13,7 +13,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAny, IsTank}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Terran.TvP2Fac

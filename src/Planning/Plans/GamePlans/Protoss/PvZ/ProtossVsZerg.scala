@@ -1,6 +1,6 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
-import Planning.Plans.GamePlans.All.ModalGameplan
+import Planning.Plans.Gameplans.All.ModalGameplan
 
 class ProtossVsZerg extends ModalGameplan(
   new PvZFE,

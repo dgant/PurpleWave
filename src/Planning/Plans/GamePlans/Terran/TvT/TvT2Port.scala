@@ -1,9 +1,9 @@
-package Planning.Plans.GamePlans.Terran.TvT
+package Planning.Plans.Gameplans.Terran.TvT
 
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plan
 import Planning.Plans.Compound.FlipIf
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Predicates.Compound.Latch

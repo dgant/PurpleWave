@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.FFA
+package Planning.Plans.Gameplans.Terran.FFA
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.Aggression
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, UpgradeContinuously}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBasesFFA}

@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.Gameplans.Terran.TvZ
 
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass, FloatBuildings}
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Terran.RepairBunker
+import Planning.Plans.Gameplans.Terran.RepairBunker
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -15,7 +15,7 @@ import Planning.Predicates.Reactive.{EnemyLurkersLikely, EnemyMutalisksLikely, S
 import Planning.Predicates.Strategy.Employing
 import Utilities.UnitFilters.{IsAny, IsTank, IsWarrior}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran._

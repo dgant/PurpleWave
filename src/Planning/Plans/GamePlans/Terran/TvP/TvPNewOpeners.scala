@@ -1,7 +1,7 @@
-package Planning.Plans.GamePlans.Terran.TvP
+package Planning.Plans.Gameplans.Terran.TvP
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Planning.Plans.Gameplans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.Enemy
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Strategy

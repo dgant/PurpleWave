@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
 import Lifecycle.With
 import Macro.Requests.RequestUnit
@@ -6,7 +6,7 @@ import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendAir
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Planning.Plans.Gameplans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Friendly}
 import Planning.Plans.Macro.Protoss.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}

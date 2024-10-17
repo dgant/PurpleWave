@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.Protoss.PvT.PvTCustom
+import Planning.Plans.Gameplans.Protoss.PvT.PvTCustom
 import Planning.{MacroFacts, Plan}
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
@@ -33,7 +33,7 @@ object PvTRangeless     extends PvTStrategyNoZealotNoRange
 object PvT28Nexus       extends PvTStrategyNoZealot
 object PvTZealotExpand  extends PvTStrategy
 object PvTZZCoreZ       extends PvTStrategy {
-  addRequirement(() =>
+  addSelectionRequirement(() =>
     ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
 }

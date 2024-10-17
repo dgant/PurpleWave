@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.All
+package Planning.Plans.Gameplans.All
 
 import Planning.Plans.Compound.SwitchOurRace
-import Planning.Plans.GamePlans.Protoss.ProtossStandardGamePlan
-import Planning.Plans.GamePlans.Terran.TvE.TerranStandardGamePlan
-import Planning.Plans.GamePlans.Zerg.ZergStandardGamePlan
+import Planning.Plans.Gameplans.Protoss.ProtossStandardGameplan
+import Planning.Plans.Gameplans.Terran.TvE.TerranStandardGameplan
+import Planning.Plans.Gameplans.Zerg.ZergStandardGameplan
 
-class StandardGamePlan extends SwitchOurRace(
-  whenTerran  = new TerranStandardGamePlan,
-  whenProtoss = new ProtossStandardGamePlan,
-  whenZerg    = new ZergStandardGamePlan)
+class StandardGameplan extends SwitchOurRace(
+  whenTerran  = new TerranStandardGameplan,
+  whenProtoss = new ProtossStandardGameplan,
+  whenZerg    = new ZergStandardGameplan)

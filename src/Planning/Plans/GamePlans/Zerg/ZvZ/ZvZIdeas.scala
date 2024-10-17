@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvZ
+package Planning.Plans.Gameplans.Zerg.ZvZ
 
 import Lifecycle.With
 import Macro.Requests.Get

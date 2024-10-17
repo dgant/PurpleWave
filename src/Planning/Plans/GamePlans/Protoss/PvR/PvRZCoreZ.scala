@@ -1,17 +1,17 @@
-package Planning.Plans.GamePlans.Protoss.PvR
+package Planning.Plans.Gameplans.Protoss.PvR
 
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound.If
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Gameplans.Protoss.ProtossBuilds
 import Planning.Plans.Macro.Automatic.Pump
 import Planning.Predicates.Compound.{And, Or}
 import Planning.Predicates.Milestones.UnitsAtLeast
 import Planning.Predicates.Strategy.{Employing, EnemyIsTerran, EnemyRaceKnown, EnemyStrategy}
 import Utilities.UnitFilters.IsWarrior
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplateVsRandom
+import Planning.Plans.Gameplans.All.GameplanTemplateVsRandom
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvROpenZCoreZ

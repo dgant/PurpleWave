@@ -1,13 +1,13 @@
-package Planning.Plans.GamePlans.Terran.TvE
+package Planning.Plans.Gameplans.Terran.TvE
 
 import Planning.Plans.Compound.SwitchEnemyRace
-import Planning.Plans.GamePlans.All.ModalGameplan
-import Planning.Plans.GamePlans.Terran.TvP.TerranVsProtoss
-import Planning.Plans.GamePlans.Terran.TvR.TerranVsRandom
-import Planning.Plans.GamePlans.Terran.TvT.TerranVsTerran
-import Planning.Plans.GamePlans.Terran.TvZ.TerranVsZerg
+import Planning.Plans.Gameplans.All.ModalGameplan
+import Planning.Plans.Gameplans.Terran.TvP.TerranVsProtoss
+import Planning.Plans.Gameplans.Terran.TvR.TerranVsRandom
+import Planning.Plans.Gameplans.Terran.TvT.TerranVsTerran
+import Planning.Plans.Gameplans.Terran.TvZ.TerranVsZerg
 
-class TerranStandardGamePlan extends ModalGameplan(
+class TerranStandardGameplan extends ModalGameplan(
   new TerranVsRandom,
   new SwitchEnemyRace(
     new TerranVsTerran,

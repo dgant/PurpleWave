@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvE
+package Planning.Plans.Gameplans.Terran.TvE
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
@@ -6,7 +6,7 @@ import Planning.Plan
 import Planning.Plans.Army.{Aggression, AttackAndHarass, AttackWithWorkers}
 import Planning.Plans.Basic.{NoPlan, Write}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic.{Pump, PumpWorkers}
 import Planning.Plans.Placement.BuildBunkersAtEnemy
 import Planning.Plans.Scouting.ScoutOn

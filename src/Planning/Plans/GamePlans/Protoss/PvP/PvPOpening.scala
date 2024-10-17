@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Protoss.PvP
+package Planning.Plans.Gameplans.Protoss.PvP
 
 import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Planning.Plans.Gameplans.All.GameplanImperative
 import Planning.Plans.Macro.Automatic.{Enemy, Flat}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss._

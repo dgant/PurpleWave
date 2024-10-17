@@ -5,6 +5,7 @@ import Lifecycle.With
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsSlowling, IsTank, IsWarrior, IsWorker}
 
@@ -50,7 +51,7 @@ object FightOrFlee extends Action {
     decide(false, "CarrierVuln",() => Protoss.Carrier(u) && u.matchups.threats.exists(t => ! t.flying && t.pixelsToGetInRange(u) < 32))
     decide(true,  "CarrierTrap",() => Protoss.Carrier(u) && u.matchups.groupOf.airToAirStrength >= u.matchups.groupVs.airToAirStrength || u.matchups.groupVs.has(Terran.Battlecruiser, Protoss.Carrier))
     decide(true,  "Raze",       () => ((IsTank(u) && Terran.SiegeMode()) || u.isAny(Protoss.Reaver, Zerg.Guardian) && u.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding)))
-    decide(true,  "Miners",     () => ! IsWorker(u) && u.canAttack && u.battle.exists(_.us.minersThreatened) && u.presumptiveTarget.exists(_.matchups.threateningMiners))
+    decide(true,  "Miners",     () => ! u.isAny(IsWorker, Protoss.Carrier) && u.canAttack && u.battle.exists(_.us.minersThreatened) && u.presumptiveTarget.exists(_.matchups.threateningMiners))
 
     decide(true,  "Energized",  () =>
       u.unitClass.maxShields > 20
@@ -75,7 +76,7 @@ object FightOrFlee extends Action {
       unit.agent.fightReason = ""
     } else {
       unit.agent.shouldFight = unit.battle.get.judgement.get.unitShouldFight(unit)
-      unit.agent.fightReason = if (unit.agent.shouldFight) "Yes" else "No"
+      unit.agent.fightReason = ?(unit.agent.shouldFight, "Yes", "No")
     }
   }
 }

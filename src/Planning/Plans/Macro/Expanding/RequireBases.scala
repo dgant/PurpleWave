@@ -2,7 +2,7 @@ package Planning.Plans.Macro.Expanding
 
 import Debugging.English
 import Planning.Plan
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 
 class RequireBases(bases: Int = 1) extends Plan with MacroActions {
 

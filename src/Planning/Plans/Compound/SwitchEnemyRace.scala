@@ -3,7 +3,7 @@ package Planning.Plans.Compound
 import Lifecycle.With
 import Planning.Plans.Basic.NoPlan
 import Planning.Plan
-import Planning.Plans.GamePlans.All.Modal
+import Planning.Plans.Gameplans.All.Modal
 import Utilities.Property
 import bwapi.Race
 

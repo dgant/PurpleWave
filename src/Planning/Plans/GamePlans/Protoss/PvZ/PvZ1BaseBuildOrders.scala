@@ -1,7 +1,7 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
 import Lifecycle.With
-import Planning.Plans.GamePlans.All.GameplanImperative
+import Planning.Plans.Gameplans.All.GameplanImperative
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsHatchlike, IsWarrior}

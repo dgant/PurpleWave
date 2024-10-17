@@ -2,7 +2,7 @@ package Planning
 
 import Lifecycle.With
 import Performance.Tasks.TimedTask
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Minutes

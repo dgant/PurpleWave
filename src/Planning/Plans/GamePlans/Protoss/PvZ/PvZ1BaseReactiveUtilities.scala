@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Protoss.PvZ
+package Planning.Plans.Gameplans.Protoss.PvZ
 
 import Debugging.SimpleString
 import Information.Fingerprinting.ZergStrategies.ZergTimings._

@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Protoss.PvP
+package Planning.Plans.Gameplans.Protoss.PvP
 
 import Debugging.SimpleString
 import Lifecycle.With
 import Placement.Access.PlaceLabels
-import Planning.Plans.GamePlans.All.GameplanImperative
-import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas._
+import Planning.Plans.Gameplans.All.GameplanImperative
+import Planning.Plans.Gameplans.Protoss.PvP.PvPIdeas._
 import Planning.Plans.Macro.Automatic.{Enemy, Flat, Friendly}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss

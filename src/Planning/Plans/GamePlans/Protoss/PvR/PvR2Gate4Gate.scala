@@ -1,8 +1,8 @@
-package Planning.Plans.GamePlans.Protoss.PvR
+package Planning.Plans.Gameplans.Protoss.PvR
 
-import Planning.Plans.GamePlans.All.GameplanImperative
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
-import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas
+import Planning.Plans.Gameplans.All.GameplanImperative
+import Planning.Plans.Gameplans.Protoss.ProtossBuilds
+import Planning.Plans.Gameplans.Protoss.PvP.PvPIdeas
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.UnitFilters.IsWarrior
 

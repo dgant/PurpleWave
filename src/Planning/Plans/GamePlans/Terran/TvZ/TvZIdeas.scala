@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.Gameplans.Terran.TvZ
 
 import Lifecycle.With
 import Macro.Requests.Get

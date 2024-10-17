@@ -2,7 +2,7 @@
 "human"           : false,
 "ladder"          : false,
 "livestream"      : false,
-"tournament"      : true,
+"tournament"      : false,
 "roundrobin"      : true,
 "elimination"     : false,
 "pretraining"     : false,

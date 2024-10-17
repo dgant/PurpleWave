@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.UnitClass
 

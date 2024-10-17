@@ -34,7 +34,7 @@ class StrategyLegality(strategy: Strategy) {
   val appropriateForEnemyRace : Boolean = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
   val allowedGivenHumanity    : Boolean = strategy.allowedVsHuman || ! With.configuration.humanMode
   val allowedGivenHistory     : Boolean = allowedGivenOpponentHistory(strategy)
-  val allowedGivenRequirements: Boolean = strategy.requirements.forall(_())
+  val allowedGivenRequirements: Boolean = strategy.selectionRequirements.forall(_())
 
   val isLegal: Boolean = (
     (strategy.ffa == With.strategy.isFfa)

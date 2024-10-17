@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireBases
@@ -15,7 +15,7 @@ import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import Utilities.UnitFilters.IsAny
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT7Pool

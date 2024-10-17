@@ -1,12 +1,12 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
 import Planning.Plans.Basic.Write
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.UpgradeHydraRangeThenSpeed
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.Zerg.ZergIdeas.UpgradeHydraRangeThenSpeed
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
@@ -16,7 +16,7 @@ import Planning.Predicates.Economy.MineralsAtLeast
 import Planning.Predicates.Milestones._
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT3HatchLing

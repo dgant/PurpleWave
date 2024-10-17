@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.All
+package Planning.Plans.Gameplans.All
 
 import Macro.Requests.RequestBuildable
 import Planning.Plan

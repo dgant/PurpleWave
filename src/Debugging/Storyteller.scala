@@ -67,7 +67,7 @@ class Storyteller {
     new Story                           ("Playbook",            () => With.configuration.playbook),
     new Story                           ("Policy",              () => With.configuration.playbook.policy),
     new Story                           ("Enemy race",          () => With.enemy.raceCurrent),
-    new Story[mutable.Set[Strategy]]    ("Strategy",            () => With.strategy.selected,                                                                                      _.map(_.toString).mkString(" "), expand = true),
+    new Story[mutable.Set[Strategy]]    ("Strategy",            () => With.strategy.strategiesSelected,                                                                                      _.map(_.toString).mkString(" "), expand = true),
     new Story                           ("Our bases",           () => With.geography.ourBases.size),
     new Story                           ("Enemy bases",         () => With.geography.enemyBases.size),
     new Story                           ("Our mining bases",    () => With.geography.ourMiningBases.size),
@@ -120,6 +120,7 @@ class Storyteller {
       logEnvironment()
       logStrategyEvaluation()
       logWinProbability()
+      tell(f"Latency: LF${With.latency.latencyFrames} (Turn size ${With.latency.turnSize})")
     }
     if (With.performance.stopwatchDurationMillis > 60 * 1000) {
       With.logger.debug(f"Wall clock: ${With.performance.wallClockDurationMillis / 60 / 1000} minutes elapsed. Checkpoint game speed: ${Decimal(1000d / 24 * With.performance.stopwatchDurationFrames / With.performance.stopwatchDurationMillis)}x. Total game speed: ${Decimal(1000d / 24 * With.frame / With.performance.wallClockDurationMillis)}x")

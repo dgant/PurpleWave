@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.All
+package Planning.Plans.Gameplans.All
 
 trait Modal {
   def isComplete: Boolean

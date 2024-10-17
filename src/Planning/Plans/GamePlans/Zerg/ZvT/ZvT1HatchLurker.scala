@@ -1,17 +1,17 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireMiningBases}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UnitsAtMost}
 import Planning.Predicates.Strategy.Employing
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 import Strategery.Strategies.Zerg.ZvT1HatchLurker

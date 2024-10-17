@@ -1,13 +1,13 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.All.GameplanTemplate
+import Planning.Plans.Gameplans.Zerg.ZergIdeas.{MorphLurkers, UpgradeHydraRangeThenSpeed}
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Cancel

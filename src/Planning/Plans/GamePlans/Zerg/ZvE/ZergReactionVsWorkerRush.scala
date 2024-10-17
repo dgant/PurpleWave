@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.Gameplans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -12,7 +12,7 @@ import Planning.Predicates.Compound.{And, Not, Or}
 import Planning.Predicates.Milestones.{UnitsAtLeast, UpgradeStarted}
 import Planning.Predicates.Strategy.EnemyStrategy
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.Zerg
 

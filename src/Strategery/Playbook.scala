@@ -26,8 +26,6 @@ object StrategyGroups {
     PvTProxy2Gate,
     PvPProxy2Gate,
 
-    PvTCustom, // Disabled for AIIDE 2024. Not needed and risky.
-
     PvZGatewayFE,
   )
 }

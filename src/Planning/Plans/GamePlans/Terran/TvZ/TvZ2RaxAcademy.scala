@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.Terran.TvZ
+package Planning.Plans.Gameplans.Terran.TvZ
 
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, Get}
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
+import Planning.Plans.Gameplans.Terran.TvZ.TvZIdeas.TvZFourPoolEmergency
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.Expanding.RequireMiningBases
 import Planning.Plans.Placement.{BuildBunkersAtMain, BuildBunkersAtNatural, BuildMissileTurretsAtNatural}
@@ -16,7 +16,7 @@ import Planning.Predicates.Reactive.SafeAtHome
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy, StartPositionsAtLeast}
 import Utilities.UnitFilters.{IsAny, IsWarrior}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Terran.TvZ2RaxAcademy

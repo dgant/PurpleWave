@@ -205,7 +205,8 @@ def package():
     logf(shutil.copy2,  path_configs(f"{package_name}.config.json"),  package_dir)
     if package in ["AIIDE"]:
       logf(shutil.copytree, path_staging("jre"), pathjoin(package_dir, "jre"))
-      open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()  
+      open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()
+    # TODO: AIIDE does not want the bwapi.dll
     if package in ["SCHNAIL"]:
       logf(shutil.copy2, path_staging(schnail_exe_source), pathjoin(package_dir, "PurpleWaveSCHNAIL.exe"))
   

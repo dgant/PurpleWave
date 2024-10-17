@@ -1,11 +1,11 @@
-package Planning.Plans.GamePlans.Protoss.FPM
+package Planning.Plans.Gameplans.Protoss.FPM
 
 import Debugging.SimpleString
 import Lifecycle.With
 import Mathematics.Maff
 import Placement.Access.PlacementQuery
-import Planning.Plans.GamePlans.All.GameplanImperative
-import Planning.Plans.GamePlans.Protoss.PvP.PvPIdeas
+import Planning.Plans.Gameplans.All.GameplanImperative
+import Planning.Plans.Gameplans.Protoss.PvP.PvPIdeas
 import Planning.Plans.Macro.Automatic.Friendly
 import ProxyBwapi.Races.Protoss
 import Utilities.SwapIf

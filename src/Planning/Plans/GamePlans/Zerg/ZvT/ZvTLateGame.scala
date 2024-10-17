@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.{AttackAndHarass, ConsiderAttacking}
 import Planning.Plans.Compound.{If, Parallel}
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.Build
 import Planning.Plans.Macro.Expanding.RequireMiningBases

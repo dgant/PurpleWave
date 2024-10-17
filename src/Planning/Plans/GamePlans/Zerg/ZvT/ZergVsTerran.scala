@@ -1,7 +1,7 @@
-package Planning.Plans.GamePlans.Zerg.ZvT
+package Planning.Plans.Gameplans.Zerg.ZvT
 
-import Planning.Plans.GamePlans.All.ModalGameplan
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.All.ModalGameplan
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 
 class ZergVsTerran extends ModalGameplan(
   new ZergReactionVsWorkerRush,

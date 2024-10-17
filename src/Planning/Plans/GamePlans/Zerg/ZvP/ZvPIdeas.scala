@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvP
+package Planning.Plans.Gameplans.Zerg.ZvP
 
 import Planning.Plans.Compound.{If, _}
 import Planning.Plans.Macro.Automatic._

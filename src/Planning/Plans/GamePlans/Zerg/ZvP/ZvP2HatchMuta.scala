@@ -1,10 +1,10 @@
-package Planning.Plans.GamePlans.Zerg.ZvP
+package Planning.Plans.Gameplans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plans.Army.{Aggression, AttackAndHarass}
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.Zerg.ZvE.ZergReactionVsWorkerRush
+import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases, RequireMiningBases}
@@ -17,7 +17,7 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAll, IsComplete, IsAny}
 import Planning.{MacroFacts, Plan}
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvP2HatchMuta
 

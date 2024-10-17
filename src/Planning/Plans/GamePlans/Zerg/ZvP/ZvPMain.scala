@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvP
+package Planning.Plans.Gameplans.Zerg.ZvP
 
 import Lifecycle.With
 import Macro.Requests.Get
@@ -15,7 +15,7 @@ import Planning.Predicates.Reactive.{EnemyBasesAtLeast, SafeAtHome}
 import Planning.Predicates.Strategy.{Employing, EnemyStrategy}
 import Utilities.UnitFilters.{IsAll, IsComplete, IsAny, IsWarrior}
 import Planning.Plan
-import Planning.Plans.GamePlans.All.GameplanTemplate
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Zerg.{ZvPHydraBust, ZvPMutaliskBust, ZvPReactiveBust, ZvPZerglingBust}

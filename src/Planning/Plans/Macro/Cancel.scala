@@ -1,7 +1,7 @@
 package Planning.Plans.Macro
 
 import Planning.Plan
-import Planning.Plans.GamePlans.All.MacroActions
+import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.Buildable
 
 class Cancel(buildables: Buildable*) extends Plan with MacroActions {

@@ -1,12 +1,12 @@
-package Planning.Plans.GamePlans.Terran.TvP
+package Planning.Plans.Gameplans.Terran.TvP
 
 import Lifecycle.With
 import Macro.Requests.Get
 import Planning.Plan
 import Planning.Plans.Army.ConsiderAttacking
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Plans.GamePlans.Terran.RepairBunker
+import Planning.Plans.Gameplans.All.GameplanTemplate
+import Planning.Plans.Gameplans.Terran.RepairBunker
 import Planning.Plans.Macro.Automatic.{CapGasAt, Pump}
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Terran.PopulateBunkers

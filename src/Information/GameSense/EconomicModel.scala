@@ -172,7 +172,7 @@ trait EconomicModel {
     val enemyWorkerCount      = With.units.countEnemy       (IsWorker)
     val ourWorkerDeaths       = With.units.deadOurs.count   (IsWorker)
     val enemyWorkerDeaths     = With.units.deadEnemy.count  (IsWorker)
-    val ourWorkerDelta        = Maff.max(With.strategy.selected.view.map(_.workerDelta)).getOrElse(0) + With.blackboard.workerDelta()
+    val ourWorkerDelta        = Maff.max(With.strategy.strategiesSelected.view.map(_.workerDelta)).getOrElse(0) + With.blackboard.workerDelta()
     val enemyWorkerDelta      = Maff.max(With.fingerprints.all.view.filter(_()).map(_.workerDelta)).getOrElse(0)
     val enemyBasePatchesMins  = (if (unscouted) 9 else 0)                                   + With.geography.enemyBases.view.flatMap(_.minerals).size
     val enemyBasePatchesGas   = (if (unscouted && With.frame > GameTime(2, 5)()) 1 else 0) + With.geography.enemyBases.view.flatMap(_.gas).count(u => u.isEnemy && u.complete && u.gasLeft > 0)

@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Planning.Plan
-import Planning.Plans.GamePlans.Protoss.FPM.PvPFPM
+import Planning.Plans.Gameplans.Protoss.FPM.PvPFPM
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

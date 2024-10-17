@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Terran
+package Planning.Plans.Gameplans.Terran
 
 import Lifecycle.With
 import Mathematics.Maff

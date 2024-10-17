@@ -1,6 +1,6 @@
-package Planning.Plans.GamePlans.Protoss.PvR
+package Planning.Plans.Gameplans.Protoss.PvR
 
-import Planning.Plans.GamePlans.Protoss.ProtossBuilds
+import Planning.Plans.Gameplans.Protoss.ProtossBuilds
 import Planning.Predicates.Strategy.Employing
 import Strategery.Strategies.Protoss.PvROpen2Gate910
 

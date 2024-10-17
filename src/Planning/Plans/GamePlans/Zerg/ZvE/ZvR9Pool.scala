@@ -1,4 +1,4 @@
-package Planning.Plans.GamePlans.Zerg.ZvE
+package Planning.Plans.Gameplans.Zerg.ZvE
 
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, Get}
@@ -6,9 +6,9 @@ import Planning.Plan
 import Planning.Plans.Army.AttackAndHarass
 import Planning.Plans.Basic.NoPlan
 import Planning.Plans.Compound._
-import Planning.Plans.GamePlans.All.GameplanTemplate
-import Planning.Plans.GamePlans.Zerg.ZergIdeas.PumpMutalisks
-import Planning.Plans.GamePlans.Zerg.ZvZ.ZvZIdeas
+import Planning.Plans.Gameplans.All.GameplanTemplate
+import Planning.Plans.Gameplans.Zerg.ZergIdeas.PumpMutalisks
+import Planning.Plans.Gameplans.Zerg.ZvZ.ZvZIdeas
 import Planning.Plans.Macro.Automatic._
 import Planning.Plans.Macro.BuildOrders.{Build, BuildOrder}
 import Planning.Plans.Macro.Expanding.{BuildGasPumps, RequireBases}

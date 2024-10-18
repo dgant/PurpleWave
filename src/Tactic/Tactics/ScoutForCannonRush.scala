@@ -14,7 +14,7 @@ class ScoutForCannonRush extends Tactic {
 
   val scouts: LockUnits = new LockUnits(this, (u:  UnitInfo) => u.unitClass.isWorker && ! u.carrying, CountOne, interruptable = false)
 
-  lazy val previouslyCannonRushed: Boolean = With.strategy.enemyFingerprints(5).contains(With.fingerprints.cannonRush.toString)
+  lazy val previouslyCannonRushed: Boolean = With.strategy.enemyFingerprints(5).contains(With.fingerprints.cannonRush)
 
   private val maxScoutDistance: Int = 32 * 25
   lazy val tilesToScout: Vector[Tile] = With.geography.allTiles.filter(tile => tile.buildableUnchecked && (tile.metro.exists(_.isOurs) || With.geography.ourFoyer.zone.distanceGrid.getUnchecked(tile.i)  < maxScoutDistance))

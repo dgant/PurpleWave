@@ -1,6 +1,7 @@
 package Strategery.History
 
 import Lifecycle.With
+import Strategery.Tags
 import Utilities.Time.Frames
 import bwapi.Race
 
@@ -17,9 +18,6 @@ class History {
   
   var message = new mutable.ArrayBuffer[String]
   def onStart(): Unit = {
-    message += "Good luck on " + currentMapName + ", " + currentEnemyName + "!"
-    message += " "
-    
     val mapWins         = games.count(g => g.mapName        == currentMapName         &&    g.won)
     val mapLosses       = games.count(g => g.mapName        == currentMapName         &&  ! g.won)
     val startWins       = games.count(g => g.startLocations == currentStarts          &&    g.won)
@@ -30,7 +28,10 @@ class History {
     val ourRaceLosses   = games.count(g => g.ourRace        == With.self.raceInitial  &&  ! g.won)
     val vsWins          = games.count(g => g.enemyName      == currentEnemyName       &&    g.won)
     val vsLosses        = games.count(g => g.enemyName      == currentEnemyName       &&  ! g.won)
-    
+
+
+    message += f"Good luck on $currentMapName, $currentEnemyName!"
+    message += " "
     message += "On this map: "                                          + mapWins       + " - " + mapLosses
     message += "With "  + currentStarts         + " start locations: "  + startWins     + " - " + startLosses
     message += "As this race: "                                         + ourRaceWins   + " - " + ourRaceLosses
@@ -52,10 +53,9 @@ class History {
       enemyRace       = currentEnemyRace,
       won             = weWon,
       tags = (
-        Vector(Frames(With.frame).toString)
-        ++ With.strategy.strategiesSelected.filter(_.active).map(_.toString)
-        ++ With.strategy.strategiesSelected.filterNot(_.active).map(s => f"[$s]").toVector
-        ++ With.fingerprints.all.filter(_()).map(_.toString).sorted).distinct)
+        Vector(Frames(With.frame).toString) // TODO: Promote this to a game property (though this will necessitate a version increase)
+        ++ With.strategy.strategiesSelected.map(Tags.tagStrategy)
+        ++ With.fingerprints.all.filter(_()).map(Tags.tagFingerprint)).distinct)
     HistoryLoader.save(games.toVector :+ thisGame)
   }
 

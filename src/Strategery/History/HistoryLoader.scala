@@ -74,10 +74,9 @@ object HistoryLoader {
     try {
       if (file.exists) {
             filename  = file.getName
-        var proceed   = true
+            reader    = new BufferedReader(new InputStreamReader(new FileInputStream(file)))
         val lines     = new ArrayBuffer[String]
-        val stream    = new FileInputStream(file)
-            reader    = new BufferedReader(new InputStreamReader(stream))
+        var proceed   = true
         while (proceed) {
           val nextLine = reader.readLine()
           proceed = nextLine != null
@@ -88,7 +87,7 @@ object HistoryLoader {
         output = lines
       }
     } catch { case exception: Exception =>
-      With.logger.warn("Failed to load game history from " + filename)
+      With.logger.warn(f"Failed to load game history from $filename")
       With.logger.onException(exception)
     }
     if (reader != null) {

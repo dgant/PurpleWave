@@ -256,7 +256,7 @@ trait MacroCounting {
   def enemyStrategy(fingerprints: Fingerprint*): Boolean = fingerprints.exists(_())
 
   def enemyRecentStrategy(fingerprints: Fingerprint*): Boolean = {
-    enemyStrategy(fingerprints: _*) || fingerprints.map(_.toString).exists(With.strategy.enemyRecentFingerprints.contains)
+    enemyStrategy(fingerprints: _*) || fingerprints.exists(With.strategy.enemyRecentFingerprints.contains)
   }
 
   def trackRecordLacks(fingerprints: Fingerprint*): Boolean = {

@@ -10,7 +10,7 @@ import bwapi.Race
 
 import scala.collection.mutable
 
-class Strategist extends StrategyDatabase with FingerprintDatabase with GameFeatures with Rolling {
+class Strategist extends StrategyDatabase with RecentFingerprints with GameFeatures with Rolling {
 
   lazy val selectedInitially: Set[Strategy] = With.configuration.playbook.policy.chooseBranch.strategies.toSet
 
@@ -34,7 +34,7 @@ class Strategist extends StrategyDatabase with FingerprintDatabase with GameFeat
     _lastEnemyRace = enemyRaceNow
   }
 
-  def isActive(strategy: Strategy): Boolean = strategiesSelected.contains(strategy) && strategiesActive.contains(strategy)
+  def isActive(strategy: Strategy): Boolean = isSelected(strategy) && strategiesActive.contains(strategy)
   def isSelected(strategy: Strategy): Boolean = strategiesSelected.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
     // Use public "selected" to force initialization

@@ -1,7 +1,7 @@
 package Information.Fingerprinting
 
-import Debugging.ToString
 import Lifecycle.With
+import Strategery.Tags
 import Utilities.Time.{Forever, Minutes}
 
 abstract class Fingerprint {
@@ -14,9 +14,8 @@ abstract class Fingerprint {
   protected val children: Seq[Fingerprint] = Seq.empty
 
   @inline final def lastUpdateFrame: Int = _lastUpdateFrame
-  //@inline final def matches: Boolean = matched
   @inline final def apply(): Boolean = matched
-  @inline final def recently: Boolean = matched || With.strategy.enemyRecentFingerprints.contains(toString)
+  @inline final def recently: Boolean = matched || With.strategy.enemyRecentFingerprints.contains(this)
   @inline final def update(): Unit = {
     if (_lastUpdateFrame == With.frame) return
     _lastUpdateFrame = With.frame
@@ -34,6 +33,8 @@ abstract class Fingerprint {
   def workerDelta: Int = 0
 
   protected def reason: String = "(No reason)"
+
   def explanation: String = f"$this ${if (matched) "matched" else "unmatched"}: $reason"
-  override val toString: String = ToString(this).replace("Fingerprint", "Finger")
+
+  override val toString: String = Tags.tagFingerprint(this)
 }

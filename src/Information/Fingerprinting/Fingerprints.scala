@@ -5,6 +5,7 @@ import Information.Fingerprinting.ProtossStrategies._
 import Information.Fingerprinting.TerranStrategies._
 import Information.Fingerprinting.ZergStrategies._
 import Lifecycle.With
+import Strategery.Tags
 
 import scala.collection.mutable
 
@@ -12,7 +13,7 @@ class Fingerprints {
 
   val all: mutable.ArrayBuffer[Fingerprint] = new mutable.ArrayBuffer[Fingerprint]
 
-  def status: Seq[String] = all.filter(_()).map(_.toString.replaceAll("Finger", ""))
+  def status: Seq[String] = all.filter(_()).map(Tags.tagFingerprint)
 
   def relevant: Seq[Fingerprint] =
     Seq(

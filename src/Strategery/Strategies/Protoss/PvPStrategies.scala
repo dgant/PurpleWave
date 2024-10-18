@@ -2,6 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Planning.MacroFacts
+import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import Strategery._
 import bwapi.Race
@@ -50,14 +51,19 @@ object PvPRobo extends PvPStrategy {
   addChoice(PvPGateCore)
   addChoice(PvPObs, PvPReaver)
   // No restrictions; Preserve this as our "Always valid" choice
+  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
 }
-object PvPReaver extends PvPStrategy
+object PvPReaver extends PvPStrategy {
+  addActivationRequirement(() => haveEver(Protoss.Reaver))
+}
 object PvPObs extends PvPStrategy {
   whitelistVs(With.fingerprints.dtRush) // Until we make better use of the Obs
+  addActivationRequirement(() => haveEver(Protoss.Observatory))
 }
 object PvPDT extends PvPStrategy {
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.robo)
+  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
 }
 object PvPCoreExpand extends PvPStrategy {
   setMinimumGamesVsOpponent(3)
@@ -67,13 +73,14 @@ object PvPCoreExpand extends PvPStrategy {
     || MapGroups.strongNatural.exists(_())
     ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
+  addActivationRequirement(() => unitsEver(Protoss.Nexus) >= 2)
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
-  addSelectionRequirement(() => entranceInverted
-    || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
+  addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
+  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 3)
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
@@ -81,6 +88,7 @@ object PvP4GateGoon extends PvPStrategy {
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addSelectionRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
+  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 4)
 }
 
 //////////////

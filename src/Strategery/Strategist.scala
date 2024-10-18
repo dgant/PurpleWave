@@ -34,7 +34,7 @@ class Strategist extends StrategyDatabase with RecentFingerprints with GameFeatu
     _lastEnemyRace = enemyRaceNow
   }
 
-  def isActive(strategy: Strategy): Boolean = isSelected(strategy) && strategiesActive.contains(strategy)
+  def isActive(strategy: Strategy): Boolean = isSelected(strategy) && strategiesActive.contains(strategy) && strategy.activationRequirements.forall(_())
   def isSelected(strategy: Strategy): Boolean = strategiesSelected.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
     // Use public "selected" to force initialization

@@ -1,6 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
+import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -14,15 +15,26 @@ object PvZ1BaseReactive extends PvZStrategy {
   addChoice(PvZMuscle,  PvZExpand,  PvZTech)
 }
 
-object PvZMuscle    extends PvZStrategy
-object PvZExpand    extends PvZStrategy
-object PvZTech      extends PvZStrategy
-object PvZGoon      extends PvZStrategy
-object PvZReaver    extends PvZStrategy {
-  blacklistVs(With.fingerprints.twoHatchMuta, With.fingerprints.threeHatchMuta)
+object PvZMuscle extends PvZStrategy {
+  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 2)
 }
-object PvZSpeedlot  extends PvZStrategy
 
+object PvZExpand extends PvZStrategy {
+  addActivationRequirement(() => With.geography.maxMiningBasesOurs >= 2)
+}
+object PvZTech extends PvZStrategy {
+  addActivationRequirement(() => haveEver(Protoss.Assimilator))
+}
+object PvZGoon extends PvZStrategy {
+  addActivationRequirement(() => haveEver(Protoss.Dragoon) && upgradeStarted(Protoss.DragoonRange))
+}
+object PvZReaver extends PvZStrategy {
+  blacklistVs(With.fingerprints.twoHatchMuta, With.fingerprints.threeHatchMuta)
+  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
+}
+object PvZSpeedlot extends PvZStrategy {
+  addActivationRequirement(() => haveEver(Protoss.Forge))
+}
 abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }

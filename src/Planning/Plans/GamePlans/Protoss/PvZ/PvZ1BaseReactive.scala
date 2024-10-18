@@ -156,12 +156,6 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
       }
     }
     scoutOn(Protoss.Pylon)
-
-    if ( ! committedSpeedlot) PvZSpeedlot .deactivate()
-    if ( ! committedReaver)   PvZReaver   .deactivate()
-    if ( ! committedGoon)     PvZGoon     .deactivate()
-    if ( ! committedExpand)   PvZExpand   .deactivate()
-    if ( ! committedTech)     PvZTech     .deactivate()
   }
 
   private val compositor = new Compositor

@@ -39,7 +39,7 @@ class Placement extends Fitter {
         .sortBy( ! _.metro.exists(_.isOurs))
         .foreach(preplaceWalls)
       //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
-    } else if (With.self.isProtoss && With.enemies.exists(_.isZerg)) {
+    } else if (With.self.isProtoss && With.enemies.exists( ! _.isProtoss)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }
     basesSorted.foreach(base => fitAndIndexConstrained(5, 1, ?(base.isMain, Templates.mainBases, Templates.bases), base))

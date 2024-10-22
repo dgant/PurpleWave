@@ -73,7 +73,6 @@ class TvE2RaxSCVMarine extends GameplanTemplate {
           new EnemiesAtLeast(1, Zerg.SunkenColony)),
         new AllInIf,
         new Aggression(2.0))),
-    new Write(With.blackboard.pushKiters, () => true),
     new Pump(Terran.Marine),
     new BuildOrder(Get(20, Terran.SCV)),
     new Pump(Terran.SCV, 3),

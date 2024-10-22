@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Planning.Plans.Gameplans.Protoss.PvT.PvTCustom
+import Planning.Plans.Gameplans.Protoss.PvT.{PvTSpeedlotDT, PvTGasSteal}
 import Planning.{MacroFacts, Plan}
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
@@ -93,5 +93,9 @@ object PvTProxy2Gate extends PvTStrategy {
 }
 
 object PvTCustom extends PvTStrategy {
-  override def gameplan: Option[Plan] = Some(new PvTCustom)
+  override def gameplan: Option[Plan] = Some(new PvTSpeedlotDT)
+}
+
+object PvTGasSteal extends PvTStrategy {
+  override def gameplan: Option[Plan] = Some(new PvTGasSteal)
 }

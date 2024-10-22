@@ -33,8 +33,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
   private val recycledBuilder = new Cache(() => ?(builderMatcher == Protoss.Probe,
     Maff.minBy(With.units.ours.filter(u =>
       Protoss.Probe(u)
-        && u.intent.frameCreated == With.frame
-        && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 20))
+        && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 40))
           ||  u.intent.toBuild      .exists(b =>  foundation.exists(_.tile.groundTiles(b.tile)  < 40)))))(u => foundation.map(f => u.pixelDistanceTravelling(f.tile)).getOrElse(0.0)),
     None))
   private val proposedBuilder = new Cache(() => recycledBuilder().orElse(builderLock.inquire().flatMap(_.headOption)))
@@ -137,11 +136,7 @@ class BuildBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) extend
     }
     
     if (recycledBuilder().isDefined || builderLock.satisfied) {
-      val intent = if (recycledBuilder().isDefined) {
-        builder.get.intent
-      } else {
-        builder.get.intend(this)
-      }
+      val intent = recycledBuilder().map(_.intent).filter(_.frameCreated >= With.frame).getOrElse(builder.get.intend(this))
       if (trainee.isEmpty) {
         if (orderedTile.exists( ! desiredTile.contains(_))) {
           // The building placement has changed. This puts us at risk of building the same building twice.

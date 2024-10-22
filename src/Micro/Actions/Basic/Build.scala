@@ -1,5 +1,6 @@
 package Micro.Actions.Basic
 
+import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
@@ -9,11 +10,12 @@ import Micro.Actions.Combat.Fight
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
+import Micro.Heuristics.Potential
 import Micro.Targeting.Target
-import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
+import Utilities.UnitFilters.IsWorker
 
 object Build extends Action {
   
@@ -99,6 +101,12 @@ object Build extends Action {
     if (unit.pixelDistanceTravelling(movePixel) > 256 + ?(unit.agent.path.isEmpty, 0, 256)) {
       MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getSneakyPath(unit))
     }
+
+    if ( ! intent.startNow && unit.matchups.pixelsEntangled > -64) {
+      Potential.hardAvoidThreatRange(unit, 64)
+      unit.agent.forces(Forces.travel) = Potential.towards(unit, movePixel) * 0.5
+    }
+
     Commander.move(unit)
   }
 }

@@ -1,10 +1,9 @@
 package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
 import Planning.Plan
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
-import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
 import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
@@ -59,7 +58,6 @@ class ZvT1HatchHydra extends GameplanTemplate {
   override def buildOrder: Seq[RequestBuildable] = if (With.geography.startLocations.size < 3) poolOn8 else poolOn9
 
   override def buildPlans = Seq(
-    new Write(With.blackboard.pushKiters, () => true),
     new FloorGasWorkersAt(1),
     new AllInIf(new EnemiesAtLeast(1, Terran.Bunker)),
     new If(

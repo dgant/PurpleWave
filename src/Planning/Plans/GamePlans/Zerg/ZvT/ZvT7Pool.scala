@@ -1,10 +1,11 @@
 package Planning.Plans.Gameplans.Zerg.ZvT
 
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, Get}
+import Macro.Requests.{Get, RequestBuildable}
+import Planning.Plan
 import Planning.Plans.Army.{AllInIf, AttackAndHarass}
-import Planning.Plans.Basic.Write
 import Planning.Plans.Compound.{If, Trigger}
+import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Plans.Gameplans.Zerg.ZvE.ZergReactionVsWorkerRush
 import Planning.Plans.Macro.Automatic.{CapGasAt, CapGasWorkersAt, Pump}
 import Planning.Plans.Macro.BuildOrders.Build
@@ -12,13 +13,11 @@ import Planning.Plans.Macro.Expanding.RequireBases
 import Planning.Plans.Scouting.ScoutNow
 import Planning.Predicates.Compound.{And, Check, Not}
 import Planning.Predicates.Milestones._
-import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
-import Utilities.UnitFilters.IsAny
-import Planning.Plan
-import Planning.Plans.Gameplans.All.GameplanTemplate
 import Planning.Predicates.Predicate
+import Planning.Predicates.Strategy.{Employing, StartPositionsAtLeast}
 import ProxyBwapi.Races.{Terran, Zerg}
 import Strategery.Strategies.Zerg.ZvT7Pool
+import Utilities.UnitFilters.IsAny
 
 class ZvT7Pool extends GameplanTemplate {
 
@@ -53,7 +52,6 @@ class ZvT7Pool extends GameplanTemplate {
     Get(Zerg.Extractor))
 
   override def buildPlans: Seq[Plan] = Seq(
-    new Write(With.blackboard.pushKiters, () => true),
     new AllInIf(new EnemiesAtLeast(1, IsAny(Terran.Vulture, Terran.Factory), complete = true)),
     new If(
       new GasForUpgrade(Zerg.ZerglingSpeed),

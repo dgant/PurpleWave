@@ -50,7 +50,6 @@ object BlockConstruction extends Action {
   val constructionOrders: Seq[String] = Vector(
     Orders.PlaceBuilding,
     Orders.ZergBuildingMorph,
-    Orders.ConstructingBuilding,
     Orders.CreateProtossBuilding,
     Orders.PlaceProtossBuilding
   )

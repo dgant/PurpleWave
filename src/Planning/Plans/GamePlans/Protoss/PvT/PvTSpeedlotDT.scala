@@ -3,9 +3,9 @@ package Planning.Plans.Gameplans.Protoss.PvT
 import Lifecycle.With
 import Planning.Plans.Gameplans.All.GameplanImperative
 import ProxyBwapi.Races.Protoss
-import Utilities.Time.GameTime
+import Utilities.Time.{GameTime, Seconds}
 
-class PvTCustom extends GameplanImperative {
+class PvTSpeedlotDT extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     if (With.fingerprints.workerRush()) {
@@ -41,11 +41,11 @@ class PvTCustom extends GameplanImperative {
     get(Protoss.DragoonRange)
     get(Protoss.ZealotSpeed)
     if (frame > GameTime(7, 0)()) {
-      attack()
       pump(Protoss.DarkTemplar)
       pump(Protoss.Zealot)
-      if (frame > GameTime(7, 18)()) {
-        allIn(true)
+      attack()
+      if ((GameTime(7, 18) - Seconds(18)).minutes % 2 == 1) {
+        allIn()
       }
     }
     pump(Protoss.Zealot, units(Protoss.Dragoon))

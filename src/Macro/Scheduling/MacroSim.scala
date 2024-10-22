@@ -22,7 +22,7 @@ final class MacroSim {
   val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
 
   private def requests: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
-  def queue: Seq[(RequestBuildable, Int)] = requests.filter(_._1.specificUnit.isDefined) ++ requests.filter(_._1.specificUnit.isEmpty)
+  def queue: Seq[(RequestBuildable, Int)] = requests.filter(_._1.specificTrainee.isDefined) ++ requests.filter(_._1.specificTrainee.isEmpty)
 
   private var _simIncomeMineralsPerFrame: Double = _
   private var _simIncomeGasPerFrame: Double = _
@@ -64,7 +64,7 @@ final class MacroSim {
       val event = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
-        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificUnitArg = Some(u)))
+        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
         event.dUnitComplete       = u.unitClass
         event.dUnitCompleteN      = 1
         event.dUnitCompleteASAP   = u.unitClass

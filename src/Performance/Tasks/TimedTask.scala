@@ -12,13 +12,13 @@ abstract class TimedTask {
 
   With.performance.addTask(this)
 
-  var skipsMax    : Int     = 24
-  var weight      : Int     = 1
-  var cosmetic    : Boolean = false
-  var alwaysSafe  : Boolean = false
-  var name        : String  = ToString(this)
+  var skipsMax      : Int     = 24
+  var weight        : Int     = 1
+  var cosmetic      : Boolean = false
+  var alwaysSafe    : Boolean = false
+  var name          : String  = ToString(this)
+  var lastRunFrame  : Int   = -1
 
-  private var lastRunFrame        : Int   = -1
   private var _runsTotal          : Int   = 0
   private var _skipsTotal         : Int   = 0
   private var _runMsTotal         : Long  = 0

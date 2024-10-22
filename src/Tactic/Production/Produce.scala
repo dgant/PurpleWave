@@ -33,7 +33,7 @@ class Produce extends Tactic {
       lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(production => production.satisfies(request) && ! matched.contains(production))
       existingNext.foreach(matched+=)
       existingNext.foreach(_.setRequest(request, expectedFrames)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request
-      if (existingNext.isEmpty && request.specificUnit.isEmpty) {
+      if (existingNext.isEmpty && request.specificTrainee.isEmpty) {
         existingLast.foreach(_queueNext+=)
         existingLast.foreach(matched+=)
         existingLast.foreach(_.setRequest(request, expectedFrames)) // Cosmetic: Ensures that the quantity of the Production matches the quantity on the Request

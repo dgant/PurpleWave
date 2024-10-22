@@ -16,12 +16,12 @@ import Utilities.?
 import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
-  var batchId         : Int                           = Int.MinValue
-  var vicinity        : Pixel                         = Points.middle
-  var targets         : Option[IndexedSet[UnitInfo]]  = None
-  var formations      : ArrayBuffer[Formation]        = ArrayBuffer.empty
-  val lock            : LockUnits                     = new LockUnits(this)
-  val qualityCounter  : QualityCounter                = new QualityCounter
+  var batchId           : Int                           = Int.MinValue
+  var vicinity          : Pixel                         = Points.middle
+  var targets           : Option[IndexedSet[UnitInfo]]  = None
+  var formations        : ArrayBuffer[Formation]        = ArrayBuffer.empty
+  val lock              : LockUnits                     = new LockUnits(this)
+  val qualityCounter    : QualityCounter                = new QualityCounter
 
   private var _unitsNow       = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext      = new ArrayBuffer[FriendlyUnitInfo]

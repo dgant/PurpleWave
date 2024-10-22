@@ -49,7 +49,6 @@ class ZvE4Pool extends GameplanTemplate {
       new Aggression(1.5)),
 
     new CapGasAt(0, 0),
-    new Write(With.blackboard.pushKiters, () => true),
     new AllInIf(new EnemiesAtLeast(1, Protoss.PhotonCannon)),
   
     new Pump(Zerg.Drone, 3),

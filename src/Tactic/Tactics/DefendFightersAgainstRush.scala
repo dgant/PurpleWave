@@ -30,7 +30,7 @@ class DefendFightersAgainstRush extends Tactic {
     if (With.self.isProtoss && ! aggressors.exists(_.isAny(Terran.Marine, Zerg.Zergling))) return // Avoid pulling Probes vs. Zealots; let our units come to us if they want
     
     val workersNeeded   = 1 + 3 * (aggressors.map(_.unitClass.mineralValue).sum - fighters.map(_.unitClass.mineralValue).sum) / 100.0
-    val workerCap       = workers.size - 4 - With.blackboard.workersPulled()
+    val workerCap       = workers.size - 4
     val workersToFight  = Maff.clamp(workersNeeded, 0, workerCap)
     val target          = fighters.minBy(fighter => aggressors.map(_.pixelDistanceEdge(fighter)).min).pixel
 

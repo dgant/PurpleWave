@@ -56,9 +56,10 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _intent : Intention  = new Intention
   def client: Any       = _client
   def intent: Intention = _intent
-  def intend(intendingClient: Any, intent: Intention = new Intention): Intention = {
+  def intend(intendingClient: Any): Intention = {
+    val newIntent = ?(intent.frameCreated >= With.frame, intent, new Intention)
     _client = intendingClient
-    _intent = intent
+    _intent = newIntent
     _intent
   }
 

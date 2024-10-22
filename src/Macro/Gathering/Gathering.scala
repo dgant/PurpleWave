@@ -4,7 +4,6 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import Micro.Agency.Intention
 import Performance.Tasks.TimedTask
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -83,7 +82,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     bases = With.geography.bases.filter(isValidBase) // Geography.ourBases may not be valid on frame 0
     if (bases.isEmpty) { // Yikes. Wait for a base to finish or just go attack
       val goal = Maff.minBy(With.units.ours.filter(_.unitClass.isTownHall))(u => 10000 * u.remainingCompletionFrames + u.id).map(_.pixel).getOrElse(With.scouting.enemyHome.center)
-      workers.foreach(_.intend(this, new Intention().setTerminus(goal)))
+      workers.foreach(_.intend(this).setTerminus(goal))
       return
     }
 

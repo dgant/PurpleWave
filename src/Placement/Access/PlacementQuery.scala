@@ -2,12 +2,13 @@ package Placement.Access
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Mathematics.Maff
 import Mathematics.Points.Tile
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.{?, SomeIf}
+import Utilities.?
 
 class PlacementQuery {
   var requirements  = new PlacementQueryParameters
@@ -125,14 +126,19 @@ class PlacementQuery {
   def townHallFoundations: Seq[Foundation] = With.geography.preferredExpansionsOurs.map(_.townHallTile).map(With.placement.get).flatten
 
   def gasFoundations: Seq[Foundation] = {
-    val bases = (if (requirements.base.isEmpty && requirements.zone.isEmpty) {
-      With.geography.ourBases.view
-    } else if (requirements.zone.isEmpty) {
-      requirements.zone.view.flatMap(_.bases)
-    } else {
-      requirements.zone.view.flatMap(_.bases).filter(requirements.base.contains)
-    })
-    bases.flatMap(_.gas).filter(_.isNeutral).map(_.tileTopLeft).map(Foundation(_, new PointGas))
+    val bases: Iterable[Base] =
+      Maff.orElse(
+        requirements.tile.flatMap(_.base),
+        requirements.base,
+        requirements.zone.flatMap(_.bases),
+        With.geography.ourBases,
+        With.geography.ourBasesAndSettlements)
+    bases
+      .flatMap(_.gas)
+      .filter(_.isNeutral)
+      .map(_.tileTopLeft)
+      .map(Foundation(_, new PointGas))
+      .toSeq
   }
 
   def auditTiles: Vector[Tile] = foundations.view.map(_.tile).toVector

@@ -2,6 +2,7 @@ package Planning.Plans.Gameplans.All
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Macro.Allocation.Prioritized
 import Macro.Requests._
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.PlaceLabel
@@ -46,12 +47,13 @@ trait MacroActions {
   def aggression(value: Double): Unit = {
     With.blackboard.aggressionRatio.set(value)
   }
-  def gasWorkerFloor(value: Int): Unit = With.blackboard.gasWorkerFloor.set(value)
+  def gasWorkerFloor  (value: Int): Unit = With.blackboard.gasWorkerFloor.set(value)
   def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling.set(value)
-  def gasLimitFloor(value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
-  def gasLimitCeiling(value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
+  def gasLimitFloor   (value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
+  def gasLimitCeiling (value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  def get(item: RequestBuildable): Unit = With.scheduler.request(NoPlan(), item)
+  def asPrioritized: Prioritized = Option(asInstanceOf[Prioritized]).getOrElse(NoPlan())
+  def get(item: RequestBuildable): Unit = With.scheduler.request(asPrioritized, item)
   def get(units: UnitClass*): Unit = units.foreach(get(1, _))
   def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
@@ -67,7 +69,7 @@ trait MacroActions {
   def once(upgrade: Upgrade): Unit = get(upgrade)
   def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
   def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(NoPlan(), Get(quantity, unit))
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(asPrioritized, Get(quantity, unit))
 
   def buildOrder(items: RequestBuildable*): Unit = {
     new BuildOrder(items: _*).update()

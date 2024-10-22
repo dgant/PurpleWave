@@ -15,7 +15,7 @@ abstract class RequestBuildable(
     val quantity      : Int = 0,
     val minStartFrame : Int = 0,
     val placement     : Option[PlacementQuery] = None,
-    val specificUnit  : Option[FriendlyUnitInfo] = None) {
+    val specificTrainee  : Option[FriendlyUnitInfo] = None) {
   def tech      : Option[Tech]      = buildable match { case c: Tech      => Some(c) case _ => None }
   def upgrade   : Option[Upgrade]   = buildable match { case c: Upgrade   => Some(c) case _ => None }
   def unit      : Option[UnitClass] = buildable match { case c: UnitClass => Some(c) case _ => None }
@@ -46,7 +46,7 @@ abstract class RequestBuildable(
     }
   }
 
-  private def stringWhat  : String = f" ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificUnit.map(u => f" ($u)").mkString("")}"
+  private def stringWhat  : String = f" ${if (unit.isDefined) f"$quantity " else ""}$buildable${specificTrainee.map(u => f" ($u)").mkString("")}"
   private def stringLevel : String = if (upgrade.isDefined) f" lvl $quantity" else ""
   private def stringWhen  : String = if (minStartFrame <= 0) "" else f" after ${Frames(minStartFrame)}"
   private def stringWhere : String = if (placement.isEmpty) "" else f" @ ${placement.get}".replace("PlacementQuery ", "")

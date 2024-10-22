@@ -23,6 +23,7 @@ import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
 import Planning.Plans.Macro.Automatic.Supplier
+import Planning.Proxy.Proxies
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets
 import ProxyBwapi.Players.{PlayerInfo, Players}
@@ -94,6 +95,7 @@ object With {
   var placement         : Placement           = _
   var projections       : Projections         = _
   var proxy             : ProxyBWAPI          = _
+  var proxies           : Proxies             = _
   var priorities        : Priorities          = _
   var reaction          : ReactionTimes       = _
   var recruiter         : Recruiter           = _
@@ -203,6 +205,7 @@ object With {
     placement         = new Placement
     priorities        = new Priorities
     projections       = new Projections
+    proxies           = new Proxies
     reaction          = new ReactionTimes
     recruiter         = new Recruiter
     sense             = new GameSensor

@@ -25,7 +25,7 @@ object HistorySerializer {
   
   private def readGame(serializedGame: String): Option[HistoricalGame] = {
     try {
-      Some(readGameFromColumns(serializedGame.replaceAll(",,,", separator).split(separator)))
+      Some(readGameFromColumns(serializedGame.replaceAll(",,,", separator).split(separator).map(_.trim)))
     } catch { case exception: Exception =>
       With.logger.warn(f"Failed to deserialize game: $serializedGame")
       With.logger.onException(exception)

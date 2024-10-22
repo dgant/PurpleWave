@@ -1,6 +1,5 @@
 package Micro.Actions.Basic
 
-import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
@@ -10,7 +9,6 @@ import Micro.Actions.Combat.Fight
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.{CircularPush, TrafficPriorities}
-import Micro.Heuristics.Potential
 import Micro.Targeting.Target
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -103,8 +101,7 @@ object Build extends Action {
     }
 
     if ( ! intent.startNow && unit.matchups.pixelsEntangled > -64) {
-      Potential.hardAvoidThreatRange(unit, 64)
-      unit.agent.forces(Forces.travel) = Potential.towards(unit, movePixel) * 0.5
+      MicroPathing.tryMovingAlongTilePath(unit, MicroPathing.getThreatAwarePath(unit, preferHome = false))
     }
 
     Commander.move(unit)

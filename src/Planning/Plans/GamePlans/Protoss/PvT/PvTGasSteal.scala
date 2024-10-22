@@ -12,7 +12,7 @@ class PvTGasSteal extends GameplanImperative {
     if (With.placement.wall.isDefined) {
       // TODO: Build Pylon+Gate in wall
     }
-    scoutAt(8)
+    scoutOn(Protoss.Pylon)
 
     once(8,  Protoss.Probe)
     once(Protoss.Pylon)
@@ -45,17 +45,22 @@ class PvTGasSteal extends GameplanImperative {
     once(4, Protoss.Gateway)
     once(22, Protoss.Probe)
     if (units(Protoss.Gateway) < 4) {
-      gasWorkerCeiling(1)
+      gasWorkerCeiling(2)
     }
   }
 
   override def executeMain(): Unit = {
+
+    attack()
+
     pump(Protoss.Dragoon)
     pump(Protoss.Zealot)
     get(Protoss.Assimilator)
     get(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     get(4, Protoss.Gateway)
-    attack()
+    requireMiningBases(2)
+    once(10, Protoss.Gateway)
+    buildGasPumps()
   }
 }

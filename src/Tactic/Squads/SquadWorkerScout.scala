@@ -7,7 +7,6 @@ import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
-import Strategery.Strategies.Zerg.{ZvE4Pool, ZvT1HatchHydra}
 import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountUpTo
@@ -56,8 +55,6 @@ class SquadWorkerScout extends Squad {
         Zerg.Mutalisk,
         Zerg.Spire)))
     scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
-    scoutingAbandoned &&= ! ZvE4Pool()
-    scoutingAbandoned &&= ! ZvT1HatchHydra()
 
     if (scoutingAbandoned) return
 

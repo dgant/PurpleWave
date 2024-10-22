@@ -5,15 +5,13 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Strategery.Strategies.Zerg.ZvE4Pool
 
 object SabotageProxy extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
     && unit.canAttackGround
-    && unit.matchups.targets.exists(_.proxied)
-    && ! ZvE4Pool())
+    && unit.matchups.targets.exists(_.proxied))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     unit.agent.toAttack = Maff.minBy(unit.matchups.targets.view.filter(u => u.unitClass.isBuilding || (u.unitClass.isWorker && u.visible)))(_.unitClass.maxTotalHealth)

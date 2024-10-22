@@ -1,7 +1,6 @@
 package Planning.Plans.Gameplans.Protoss.PvR
 
 import Planning.Plans.Gameplans.All.GameplanImperative
-import Planning.Plans.Gameplans.Protoss.ProtossBuilds
 import Planning.Plans.Gameplans.Protoss.PvP.PvPIdeas
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.UnitFilters.IsWarrior
@@ -9,7 +8,23 @@ import Utilities.UnitFilters.IsWarrior
 class PvR2Gate4Gate extends GameplanImperative {
 
   override def executeBuild(): Unit = {
-    buildOrder(ProtossBuilds.TwoGate1012: _*)
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+    once(Protoss.Gateway)
+    once(12, Protoss.Probe)
+    once(2, Protoss.Gateway)
+    once(13, Protoss.Probe)
+    once(Protoss.Zealot)
+    once(2, Protoss.Pylon)
+    once(14, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(14, Protoss.Probe)
+    once(3, Protoss.Zealot)
+    once(3, Protoss.Pylon)
+    once(15, Protoss.Probe)
+    once(5, Protoss.Zealot)
+    once(17, Protoss.Probe)
   }
 
   override def executeMain(): Unit = {

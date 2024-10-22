@@ -1,4 +1,4 @@
-package Planning.Plans.Gameplans.Terran.TvE
+package Planning.Plans.Gameplans.Terran
 
 import Planning.Plans.Compound.SwitchEnemyRace
 import Planning.Plans.Gameplans.All.ModalGameplan

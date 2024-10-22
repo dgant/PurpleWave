@@ -4,13 +4,8 @@ import Strategery.Strategies._
 
 object ProtossChoices {
   
-  val vsRandom = Vector(
-    PvROpen2Gate910,
-    PvROpen2Gate1012,
-    PvROpenZCoreZ,
-    PvRProxy2Gate,
+  val pvr = Vector(
     PvR2Gate4Gate,
-    PvR1BaseDT,
   )
 
   val oddball = Vector(
@@ -101,5 +96,5 @@ object ProtossChoices {
   // All //
   /////////
 
-  val all: Vector[Strategy] = (vsRandom ++ vsTerran_All ++ vsProtoss_Openers ++ vsZerg_Openers ++ oddball).distinct
+  val all: Vector[Strategy] = (pvr ++ vsTerran_All ++ vsProtoss_Openers ++ vsZerg_Openers ++ oddball).distinct
 }

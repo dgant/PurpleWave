@@ -77,7 +77,7 @@ trait MacroActions {
   def requireEssentials(): Unit = {
     new RequireEssentials().update()
   }
-  def pump(unitClass: UnitClass, maximumTotal: Int = Int.MaxValue, maximumConcurrently : Int = Int.MaxValue): Unit = {
+  def pump(unitClass: UnitClass, maximumTotal: Int = 400, maximumConcurrently : Int = 400): Unit = {
     new Pump(unitClass, maximumTotal, maximumConcurrently).update()
   }
   def pumpWorkers(oversaturate: Boolean = false, maximumTotal: Int = 75, maximumConcurrently: Int = 2): Unit = {
@@ -116,7 +116,7 @@ trait MacroActions {
   def cancel(buildables: Buildable*): Unit = {
     With.blackboard.toCancel.set(With.blackboard.toCancel() ++ buildables)
   }
-  def buildGasPumps(quantity: Int = Int.MaxValue): Unit = {
+  def buildGasPumps(quantity: Int = 400): Unit = {
     new BuildGasPumps(quantity).update()
   }
 

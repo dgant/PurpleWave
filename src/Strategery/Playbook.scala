@@ -6,7 +6,6 @@ import Strategery.Selection._
 import Strategery.Strategies.AllRaces.Sandbox
 import Strategery.Strategies.Protoss._
 import Strategery.Strategies.Strategy
-import Strategery.Strategies.Terran.TvR.TvR1Rax
 
 class Playbook extends SimpleString {
   lazy val disabled   : Seq[Strategy]           = Seq.empty
@@ -20,9 +19,6 @@ object StrategyGroups {
   val disabled: Vector[Strategy] = Vector[Strategy](
     Sandbox,
 
-    TvR1Rax, // Why is this disabled? Is it broken?
-
-    PvRProxy2Gate,
     PvTProxy2Gate,
     PvPProxy2Gate,
 

@@ -1,4 +1,4 @@
-package Planning
+package Planning.Plans
 
 import Debugging.SimpleString
 import Macro.Allocation.Prioritized

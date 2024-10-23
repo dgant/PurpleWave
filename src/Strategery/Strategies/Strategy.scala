@@ -5,7 +5,7 @@ import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
 import Macro.Facts.MacroCounting
 import Performance.GameCache
-import Planning.Plan
+import Planning.Plans.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import Utilities.{?, LightYear}
 import bwapi.Race

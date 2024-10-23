@@ -7,8 +7,8 @@ import Utilities.Time.Frames
 
 object ShowSupply extends DebugView {
   override def renderScreen(): Unit = {
-    val supplier = With.supplier
-    val requested = With.scheduler.requests.find(_._1 == supplier).map(_._2.toVector).getOrElse(Vector.empty)
+    val supplier  = With.supplier
+    val requested = With.scheduler.requests.filter(_.requester == supplier)
     DrawScreen.table(340, 45,
       Seq(
         Seq("Supply used",        f"        ${supplier.simSupplyUsed / 2}", "/ 200"),
@@ -17,13 +17,13 @@ object ShowSupply extends DebugView {
         Seq(),
         Seq("Farms now",          f"        ${With.units.countOurs(supplier.farm)}"),
         Seq("Farms needed",       f"        ${supplier.simFarms}"),
-        Seq("Farms demanded now", f"        ${With.scheduler.requests.find(_._1 == With.supplier).map(_._2.count(_.minStartFrame <= With.frame)).getOrElse(0)}"),
+        Seq("Farms demanded now", f"        ${requested.count(_.request.minStartFrame <= With.frame)}"),
         Seq())
       ++ Seq("Farms queued")
         .padTo(requested.length, "")
         .take(requested.length)
         .zipWithIndex
-        .map(p => Seq(p._1,       f"        ${Frames(Math.max(0, requested(p._2).minStartFrame - With.frame))}"))
+        .map(p => Seq(p._1,       f"        ${Frames(Math.max(0, requested(p._2).request.minStartFrame - With.frame))}"))
       ++ Seq("Eaters")
         .padTo(supplier.consumed.length, "")
         .take(supplier.consumed.length)

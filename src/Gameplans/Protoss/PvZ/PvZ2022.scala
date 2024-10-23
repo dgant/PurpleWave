@@ -5,7 +5,6 @@ import Macro.Actions.{Enemy, Flat, Friendly}
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendHall
 import Placement.Access.PlacementQuery
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.?
 import Utilities.Time.GameTime
@@ -20,7 +19,7 @@ class PvZ2022 extends PvZ1BaseOpenings {
   private def getStorm = With.configuration.humanMode
 
   override def executeMain(): Unit = {
-    new MeldArchons(?(getStorm, 49, 250)).update()
+    makeArchons(?(getStorm, 50, 250))
     var targetMiningBases = Math.min(With.geography.maxMiningBasesOurs, ?(unitsComplete(IsWarrior) >= 8, 2, 1))
     targetMiningBases = Math.max(targetMiningBases, unitsComplete(IsWarrior) / 12)
     targetMiningBases = Maff.clamp(targetMiningBases, 1, 4)
@@ -149,7 +148,7 @@ class PvZ2022 extends PvZ1BaseOpenings {
     else if (enemyMutalisksLikely)    get(Protoss.Stargate)
     get(Protoss.CitadelOfAdun)
     get(Protoss.ZealotSpeed)
-    if (gas < 300) buildGasPumps()
+    if (gas < 300) pumpGasPumps()
   }
 
   private def techStage3(): Unit = {

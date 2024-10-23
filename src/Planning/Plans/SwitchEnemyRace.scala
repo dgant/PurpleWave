@@ -2,7 +2,6 @@ package Planning.Plans
 
 import Gameplans.All.Modal
 import Lifecycle.With
-import Planning.Plan
 import Utilities.Property
 import bwapi.Race
 

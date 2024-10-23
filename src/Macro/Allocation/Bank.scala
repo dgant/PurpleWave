@@ -16,7 +16,7 @@ class Bank {
   val requests = new mutable.PriorityQueue[LockCurrency]()(Ordering.by( - _.owner.priorityUntouched))
   var requestsLast: Seq[LockCurrency] = Seq.empty
   
-  def update() {
+  def update(): Unit = {
     if (ShowProduction.inUse) {
       requestsLast = requests.toVector
     }
@@ -24,21 +24,21 @@ class Bank {
     recountResources()
   }
   
-  def request(request: LockCurrency) {
+  def request(request: LockCurrency): Unit = {
     request.owner.prioritize()
     requests += request
     recountResources()
   }
 
   private val resourceLookaheadFrames = Seconds(2)()
-  private def recountResources() {
+  private def recountResources(): Unit = {
     mineralsLeft  = With.self.minerals  + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameMinerals).toInt
     gasLeft       = With.self.gas       + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal400 - With.self.supplyUsed400
     requests.foreach(queueBuyer)
   }
   
-  private def queueBuyer(request: LockCurrency) {
+  private def queueBuyer(request: LockCurrency): Unit = {
     val framesToEarnCost = Math.max(framesToEarnMinerals(request.minerals), framesToEarnGas(request.gas))
     request.satisfied = isAvailableNow(request)
     mineralsLeft -= request.minerals

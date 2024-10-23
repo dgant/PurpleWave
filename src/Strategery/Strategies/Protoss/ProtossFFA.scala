@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Gameplans.Protoss.FFA.{ProtossFFA, ProtossFFAMoney}
-import Planning.Plan
+import Planning.Plans.Plan
 import Strategery.Hunters
 import Strategery.Strategies.Strategy
 import bwapi.Race

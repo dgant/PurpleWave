@@ -3,12 +3,10 @@ package Tactic.Squads
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.Protoss
-import Utilities.UnitCounters.CountEverything
 
-class SquadMergeDarchons extends Squad {
+class SquadMeldDarchons extends Squad {
 
   lock.matcher = Protoss.DarkTemplar
-  lock.counter = CountEverything
 
   def launch(): Unit = {
     lock.release() // Ditch units that are already Dark Archons
@@ -18,7 +16,7 @@ class SquadMergeDarchons extends Squad {
   }
 
   override def run(): Unit = {
-    val partyCentral = Maff.maxBy(With.geography.ourBases)(_.heart.tileDistanceSquared(With.scouting.enemyThreatOrigin)).map(_.heart).getOrElse(With.geography.home).center
+    val partyCentral = Maff.minBy(With.geography.ourBases)(_.groundPixels(With.scouting.ourMuscleOrigin)).map(_.heart).getOrElse(With.geography.home).center
     lock.units.foreach(_.intend(this)
       .setShouldMeld(true)
       .setTerminus(partyCentral))

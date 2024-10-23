@@ -186,7 +186,7 @@ class PvPLateGame extends GameplanImperative {
     }
     recordRequestedBases()
     if (saturated && gas < 500) {
-      buildGasPumps()
+      pumpGasPumps()
     }
     if (units(Protoss.Zealot) >= 4) {
       upgradeContinuously(Protoss.ZealotSpeed)
@@ -294,7 +294,7 @@ class PvPLateGame extends GameplanImperative {
 
   private def doRobo(): Unit = {
     if (productionCapacity >= 6 && gas < 250) {
-      buildGasPumps()
+      pumpGasPumps()
     }
     get(Protoss.RoboticsFacility)
     if (shouldReaver || techStarted(Protoss.PsionicStorm)) {
@@ -332,7 +332,7 @@ class PvPLateGame extends GameplanImperative {
     get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
     val gasThreshold = 250
     if (gas < gasThreshold) {
-      buildGasPumps()
+      pumpGasPumps()
     }
     if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
       doUpgrades()

@@ -3,7 +3,6 @@ package Gameplans.Protoss.PvP
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Actions.MacroActions
-import Macro.Facts.{MacroCounting, MacroFacts}
 import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
@@ -13,7 +12,7 @@ import Strategery.Strategies.Protoss._
 import Utilities.?
 import Utilities.Time.{Frames, GameTime, Minutes, Seconds}
 
-object PvPIdeas extends MacroActions with MacroCounting {
+object PvPIdeas extends MacroActions {
 
   def attackFirstZealot: Boolean = trackRecordLacks(With.fingerprints.twoGate, With.fingerprints.proxyGateway)
 
@@ -135,7 +134,7 @@ object PvPIdeas extends MacroActions with MacroCounting {
         val bestTile    = ?(holdNatural, bestBase.zone.exitNowOrHeart, ?(cannonsAreReady, bestBase.zone.exitNowOrHeart, bestBase.heart))
         val label       = ?(holdNatural || cannonsAreReady, DefendEntrance, DefendHall)
         status(f"DTHere-Hold${?(holdNatural, "Nat", "Main")}-${?(cannonsAreReady, "Prepared", "Scrambling")}")
-        get(RequestUnit(Protoss.PhotonCannon, ?(MacroFacts.enemiesHaveComplete(Protoss.DarkTemplar, Protoss.TemplarArchives), ?(cannonsAreReady, 3, 4), 1),
+        get(RequestUnit(Protoss.PhotonCannon, ?(enemiesHaveComplete(Protoss.DarkTemplar, Protoss.TemplarArchives), ?(cannonsAreReady, 3, 4), 1),
           placementQueryArg = Some(new PlacementQuery(Protoss.PhotonCannon)
             .preferBase(bestBase)
             .preferTile(bestTile)

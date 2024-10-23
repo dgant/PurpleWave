@@ -4,7 +4,6 @@ import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Macro.Requests.Get
 import Mathematics.Maff
-import Planning.Plans.NoPlan
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.UnitFilters._
@@ -37,6 +36,6 @@ object Pump {
     val builders            = getBuildersExisting + larvaSpawning
     val unitsToAdd          = Maff.vmin(maximumConcurrently, 2 * builders * unitClass.copiesProduced)
     val unitsToRequest      = Maff.vmin(maximumTotal, unitsComplete + unitsToAdd)
-    With.scheduler.request(NoPlan(), Get(unitsToRequest, unitClass))
+    With.scheduler.request(this, Get(unitsToRequest, unitClass))
   }
 }

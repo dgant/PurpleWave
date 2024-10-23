@@ -2,7 +2,6 @@ package Gameplans.Protoss.FFA
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Races.Protoss
 import Utilities.?
 import Utilities.UnitFilters.{IsGroundWarrior, IsWarrior}
@@ -52,7 +51,7 @@ class ProtossFFA extends GameplanImperative {
                                                 pump(Protoss.Dragoon, 24, maximumConcurrently = ?(upgradeStarted(Protoss.CarrierCapacity), Int.MaxValue, 2))
                                                 pump(Protoss.HighTemplar, 4)
                                                 pump(Protoss.Zealot, 12)
-    new MeldArchons(49)()
+    makeArchons(50)
 
     get(Protoss.Gateway)
     get(Protoss.Assimilator)
@@ -60,7 +59,7 @@ class ProtossFFA extends GameplanImperative {
     get(Protoss.DragoonRange)
     get(3, Protoss.Gateway)
     if (gas < 800 && With.units.ours.filter(Protoss.Assimilator).forall(_.complete) && units(Protoss.Assimilator) < units(Protoss.Probe) / 5) {
-      buildGasPumps()
+      pumpGasPumps()
     }
     get(2, Protoss.Stargate)
     get(Protoss.FleetBeacon)

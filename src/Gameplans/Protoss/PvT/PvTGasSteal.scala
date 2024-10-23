@@ -61,6 +61,6 @@ class PvTGasSteal extends GameplanImperative {
     get(4, Protoss.Gateway)
     requireMiningBases(2)
     once(10, Protoss.Gateway)
-    buildGasPumps()
+    pumpGasPumps()
   }
 }

@@ -96,7 +96,7 @@ final class MacroSim {
 
     // Insert requests
     With.scheduler.requests.view
-      .flatMap(_._2)
+      .map(_.request)
       .filterNot(r => With.blackboard.toCancel().contains(r.buildable))
       .foreach(buildRequest => {
         if (buildRequest.upgrade.exists(u => steps.last.state.upgrades(u) < buildRequest.quantity)) {

@@ -13,6 +13,7 @@ import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
 import Lifecycle.Configure.{BwapiData, Configuration, ConfigurationLoader}
+import Macro.Actions.Supplier
 import Macro.Allocation._
 import Macro.Gathering.Gathering
 import Macro.Scheduling.{MacroSim, Scheduler}
@@ -22,7 +23,6 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
-import Planning.Plans.Supplier
 import Planning.Proxy.Proxies
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets

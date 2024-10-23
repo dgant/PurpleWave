@@ -3,7 +3,7 @@ package Debugging
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformance
 import Lifecycle.{Main, PurpleBWClient, With}
-import Macro.Facts.MacroFacts
+import Macro.Facts.MacroCounting
 import Mathematics.Maff
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -22,7 +22,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.io.Source
 
-class Storyteller {
+class Storyteller extends MacroCounting {
 
   trait IStory { def update(): Unit }
 
@@ -86,11 +86,11 @@ class Storyteller {
     new Story                           ("Enemy Barracks",      () => With.units.countEnemy(Terran.Barracks)),
     new Story                           ("Enemy Gateways",      () => With.units.countEnemy(Protoss.Gateway)),
     new Story                           ("Enemy Hatcheries",    () => With.units.countEnemy(_.unitClass.isHatchlike)),
-    new Story                           ("Safe defending",      () => MacroFacts.safeDefending),
-    new Story                           ("Safe pushing",        () => MacroFacts.safePushing),
-    new Story                           ("Safe skirmishing",    () => MacroFacts.safeSkirmishing),
-    new Story                           ("Skirmish > Defense",  () => MacroFacts.skirmishBetterThanDefense),
-    new Story                           ("Kill potential",      () => MacroFacts.killPotential),
+    new Story                           ("Safe defending",      () => safeDefending),
+    new Story                           ("Safe pushing",        () => safePushing),
+    new Story                           ("Safe skirmishing",    () => safeSkirmishing),
+    new Story                           ("Skirmish > Defense",  () => skirmishBetterThanDefense),
+    new Story                           ("Kill potential",      () => killPotential),
     new Story                           ("Aggression",          () => With.blackboard.aggressionRatio.get),
     new Story                           ("Want to attack",      () => With.blackboard.wantToAttack.get),
     new Story                           ("Want to harass",      () => With.blackboard.wantToHarass.get),

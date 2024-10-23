@@ -186,7 +186,7 @@ class PvPFPM extends GameplanImperative {
     }
 
     get(5, Protoss.Gateway)
-    buildGasPumps(Math.floor(0.15 * units(Protoss.Probe) - gas / 200).toInt)
+    pumpGasPumps(Math.floor(0.15 * units(Protoss.Probe) - gas / 200).toInt)
     doNextTech()
     get(8, Protoss.Gateway)
     doNextTech()

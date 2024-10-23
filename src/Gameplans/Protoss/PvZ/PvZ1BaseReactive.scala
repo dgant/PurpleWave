@@ -1,10 +1,9 @@
 package Gameplans.Protoss.PvZ
 
 import Lifecycle.With
+import Macro.Actions.Compositor
 import Performance.Cache
 import Placement.Access.PlaceLabels
-import Planning.Compositor
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Strategies.Protoss._
@@ -137,7 +136,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   }
 
   override def executeBuild(): Unit = {
-    new MeldArchons()()
+    makeArchons()
     chooseOpening()
     chooseComposition()
     capGas()
@@ -214,7 +213,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   def buildTech(): Unit = {
     get(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
     if (units(Protoss.Gateway) >= 5 || units(IsWorker) > 35) {
-      buildGasPumps()
+      pumpGasPumps()
     }
 
     composition.foreach {

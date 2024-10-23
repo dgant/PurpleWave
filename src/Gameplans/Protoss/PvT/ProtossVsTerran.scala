@@ -96,7 +96,7 @@ class ProtossVsTerran extends PvTOpeners {
     override def started: Boolean = TechDarkTemplar.started && have(Protoss.RoboticsFacility)
     override def profited: Boolean = unitsEver(Protoss.DarkTemplar) > 0 && unitsEver(Protoss.Shuttle) > 0
     override def perform(): Unit = {
-      buildGasPumps(2)
+      pumpGasPumps(2)
       once(Protoss.CitadelOfAdun, Protoss.RoboticsFacility, Protoss.TemplarArchives, Protoss.Shuttle)
       once(2, Protoss.DarkTemplar)
     }
@@ -120,7 +120,7 @@ class ProtossVsTerran extends PvTOpeners {
     def started: Boolean = unitsEver(Protoss.Reaver) > 0 || (have(Protoss.RoboticsSupportBay) && ! have(Protoss.TemplarArchives))
     def profited: Boolean = unitsEver(Protoss.Reaver) > 0 && unitsEver(Protoss.Shuttle) > 0
     def perform(): Unit = {
-      buildGasPumps(2)
+      pumpGasPumps(2)
       get(Protoss.RoboticsFacility)
       once(Protoss.Shuttle)
       get(Protoss.RoboticsSupportBay)
@@ -138,7 +138,7 @@ class ProtossVsTerran extends PvTOpeners {
       get(3, Protoss.Gateway) //  Upgrading with anything less is silly
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
-      buildGasPumps(2)
+      pumpGasPumps(2)
       get(?(counterBio, 2, 1), Protoss.Forge) // This tends to get slotted in prematurely when we're gas-starved
       get(Protoss.TemplarArchives)
       get(Protoss.GroundDamage)
@@ -155,7 +155,7 @@ class ProtossVsTerran extends PvTOpeners {
       get(Protoss.DragoonRange)
       get(Protoss.CitadelOfAdun)
       get(Protoss.ZealotSpeed)
-      buildGasPumps(2)
+      pumpGasPumps(2)
       get(Protoss.TemplarArchives)
       get(5, Protoss.Gateway) // Storm with anything less is silly
       once(2, Protoss.HighTemplar)
@@ -172,7 +172,7 @@ class ProtossVsTerran extends PvTOpeners {
     def perform(): Unit = {
       // We're leaning heavily on MacroSim to sequence this for us
       val stargates = Math.min(4, miningBases)
-      buildGasPumps(2)
+      pumpGasPumps(2)
       get(2, Protoss.Stargate)
       get(Protoss.FleetBeacon)
       get(stargates, Protoss.Stargate)
@@ -192,7 +192,7 @@ class ProtossVsTerran extends PvTOpeners {
     def profited: Boolean = unitsEver(Protoss.Arbiter) > 0
     def perform(): Unit = {
       get(Protoss.DragoonRange)
-      buildGasPumps(3)
+      pumpGasPumps(3)
       get(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.ArbiterTribunal, Protoss.Stargate)
       if ( ! have(Protoss.Arbiter)) {
         get(Protoss.ArbiterEnergy)
@@ -394,7 +394,7 @@ class ProtossVsTerran extends PvTOpeners {
   }
 
   def requireGas(quantity: Double = Double.MaxValue): Unit = {
-    if (With.self.gas < 600) buildGasPumps(quantity.toInt)
+    if (With.self.gas < 600) pumpGasPumps(quantity.toInt)
   }
 
   def doArmyHighPriority(): Unit = {

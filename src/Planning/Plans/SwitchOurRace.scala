@@ -1,7 +1,6 @@
 package Planning.Plans
 
 import Lifecycle.With
-import Planning.Plan
 import Utilities.Property
 import bwapi.Race
 

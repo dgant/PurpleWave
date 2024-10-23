@@ -1,7 +1,6 @@
-package Planning.Plans
+package Macro.Actions
 
 import Lifecycle.With
-import Macro.Allocation.Prioritized
 import Macro.Facts.MacroFacts
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
@@ -15,7 +14,7 @@ import Utilities.UnitFilters.IsTownHall
 
 import scala.collection.mutable.ArrayBuffer
 
-class Supplier extends Prioritized {
+class Supplier {
   val farm: UnitClass = With.self.supplyClass
 
   var incomeMins      : Double  = 0.0
@@ -72,7 +71,7 @@ class Supplier extends Prioritized {
   private def measureAppetite: Int = {
     val units = new CountMap[UnitClass]
     With.units.ours.foreach(u => units(u.unitClass) += 1)
-    With.scheduler.requests.foreach(_._2.foreach(r => r.unit.foreach(u => units(u) = Math.max(units(u), r.quantity))))
+    With.scheduler.requests.view.map(_.request).foreach(r => r.unit.foreach(u => units(u) = Math.max(units(u), r.quantity)))
     units.view.map(p => p._1.supplyRequired * p._2).sum
   }
 

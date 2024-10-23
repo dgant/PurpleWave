@@ -1,6 +1,5 @@
 package Gameplans.Protoss.PvZ
 
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.SwapIf
 import Utilities.UnitFilters.IsWarrior
@@ -8,7 +7,7 @@ import Utilities.UnitFilters.IsWarrior
 class PvZ1BaseGoonReaver extends PvZ1BaseAllIn {
 
   override def executeMain(): Unit = {
-    new MeldArchons()()
+    makeArchons()
     pump(Protoss.Observer, 1)
     if ( ! needToAllIn) {
       pumpShuttleAndReavers(shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))

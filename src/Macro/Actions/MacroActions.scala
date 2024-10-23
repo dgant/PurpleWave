@@ -2,28 +2,26 @@ package Macro.Actions
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Macro.Allocation.Prioritized
-import Macro.Facts.MacroFacts
+import Macro.Actions.Rounding.Rounding
+import Macro.Facts.MacroCounting
 import Macro.Requests._
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
-import Rounding.Rounding
-import Planning.Plans.{NoPlan, PylonBlock}
+import Planning.Plans.PylonBlock
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
-import Utilities.Time.Seconds
-import Utilities.UnitFilters.{IsTownHall, IsWorker, UnitFilter}
+import Utilities.UnitFilters.UnitFilter
 
-trait MacroActions {
+trait MacroActions extends MacroCounting {
   def status(text: Any): Unit = With.blackboard.status.set(With.blackboard.status() :+ ?(text == null, "", text.toString))
   def status(predicate: Boolean, text: => Any): Unit = if (predicate) status(text)
   def recordRequestedBases(): Unit = {
-    val max = Maff.max(With.scheduler.requests.view.flatMap(_._2).filter(_.unit.exists(_.isTier1TownHall)).map(_.quantity)).getOrElse(0)
+    val max = Maff.max(With.scheduler.requests.view.map(_.request).filter(_.unit.exists(_.isTier1TownHall)).map(_.quantity)).getOrElse(0)
     status(max > 0, f"${max}base")
   }
 
@@ -38,7 +36,7 @@ trait MacroActions {
     if (With.units.ours.count(unitMatcher) >= quantity) scout(scoutCount)
   }
   def scoutAt(minimumSupply: Int, scoutCount: Int = 1): Unit = {
-    if (MacroFacts.supplyUsed200 >= minimumSupply) scout(scoutCount)
+    if (supplyUsed200 >= minimumSupply) scout(scoutCount)
   }
 
   def aggression(value: Double): Unit = {
@@ -49,9 +47,7 @@ trait MacroActions {
   def gasLimitFloor   (value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
   def gasLimitCeiling (value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
 
-  //def asPrioritized: Prioritized = Option(asInstanceOf[Prioritized]).getOrElse(NoPlan())
-  def asPrioritized: Prioritized = NoPlan()
-  def get(item: RequestBuildable): Unit = With.scheduler.request(asPrioritized, item)
+  def get(item: RequestBuildable): Unit = With.scheduler.request(this, item)
   def get(units: UnitClass*): Unit = units.foreach(get(1, _))
   def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
   def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
@@ -67,69 +63,34 @@ trait MacroActions {
   def once(upgrade: Upgrade): Unit = get(upgrade)
   def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
   def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(asPrioritized, Get(quantity, unit))
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(this, Get(quantity, unit))
 
   def buildOrder(items: RequestBuildable*): Unit = {
-    items.foreach(BuildOnce(asPrioritized, _))
+    items.foreach(BuildOnce(this, _))
   }
   def requireEssentials(): Unit = {
-    val haveWorkers     = MacroFacts.units(IsWorker) > 0
-    val haveHall        = MacroFacts.units(IsTownHall) > 0
-    val canMakeWorkers  = (haveHall || MacroFacts.units(Zerg.Larva) > 0) && (MacroFacts.minerals >= 50 || haveWorkers)
-    val canMakeHall     = (haveWorkers || canMakeWorkers) && (MacroFacts.minerals >= With.self.townHallClass.mineralPrice || (haveWorkers && haveHall))
-    if (canMakeWorkers) {
-      get(1, With.self.workerClass)
-    }
-    if (canMakeHall) {
-      requireMiningBases(1)
-    }
-    if (canMakeWorkers) {
-      get(3, With.self.workerClass)
-      if (With.self.isZerg) {
-        get(1, Zerg.Overlord)
-      }
-    }
-    if (canMakeHall) {
-      if (With.units.ours.filter(_.unitClass.isResourceDepot).forall(_.complete)) {
-        requireMiningBases(Maff.vmin(
-          With.geography.maxMiningBasesOurs,
-          MacroFacts.miningBases + 1,
-          MacroFacts.units(IsWorker) * 15))
-      }
-    }
+    RequireEssentials()
   }
   def pump(unitClass: UnitClass, maximumTotal: Int = 400, maximumConcurrently : Int = 400): Unit = {
     Pump(unitClass, maximumTotal, maximumConcurrently)
   }
   def pumpWorkers(oversaturate: Boolean = false, maximumTotal: Int = 75, maximumConcurrently: Int = 2): Unit = {
-    val builderCount = ?(With.self.isTerran, 3, ?(With.self.isZerg, 2, 0))
-    var max = ?(oversaturate, 15, 0) // 6 less than 21; one town hall can produce 6 workers in the time it takes to finish a new town hall
-    With.geography.ourBases.foreach(base =>
-      max += builderCount + 2 * base.minerals.count(_.resourcesLeft > 200) + base.gas.view.filter(_.resourcesLeft > 200).map(_.gasMinersRequired).sum)
-    max = Math.max(max, 21)
-    pump(With.self.workerClass, max, maximumConcurrently)
+    PumpWorkers(oversaturate, maximumTotal, maximumConcurrently)
   }
   def pumpSupply(): Unit = {
     With.supplier.update()
   }
-  def pumpRatio(
-    unitClass     : UnitClass,
-    minimum       : Int,
-    maximum       : Int,
-    ratios        : Seq[MatchingRatio],
-    round         : Rounding = Rounding.Up): Unit = {
+  def pumpRatio(unitClass: UnitClass, minimum: Int, maximum: Int, ratios: Seq[MatchingRatio], round: Rounding = Rounding.Up): Unit = {
     PumpRatio(unitClass, minimum, maximum, ratios, round)
   }
   def pumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true): Unit = {
-    if (shuttleFirst && ! MacroFacts.haveComplete(Protoss.RoboticsSupportBay)) {
-      once(Protoss.Shuttle)
-    }
-    pumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5)))
-    pump(Protoss.Reaver, reavers)
-    pumpRatio(Protoss.Shuttle, 0, (reavers + 1) / 2, Seq(Flat(0.5), Friendly(Protoss.Reaver, 0.5)), round = Rounding.Down)
+    PumpShuttleAndReavers(reavers, shuttleFirst)
   }
   def makeDarkArchons(): Unit = {
     With.blackboard.makeDarkArchons.set(true)
+  }
+  def makeArchons(energy: Int = 300): Unit = {
+    With.blackboard.maximumArchonEnergy.set(energy)
   }
   def roll(key: String, probability: Double): Boolean = {
     With.strategy.roll(key, probability)
@@ -138,66 +99,36 @@ trait MacroActions {
     new PylonBlock().update()
   }
   def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Boolean = {
-    if (With.self.getUpgradeLevel(upgrade) < Math.min(maxLevel, upgrade.levels.size) && With.units.existsOurs(upgrade.whatUpgrades)) {
-      With.scheduler.request(asPrioritized, Get(upgrade, With.self.getUpgradeLevel(upgrade) + 1))
-    }
-    MacroFacts.upgradeStarted(upgrade, maxLevel)
+    UpgradeContinuously(upgrade, maxLevel)
   }
   def extractorTrick(): Unit = {
-    lazy val extractors = With.units.ours.filter(e => Zerg.Extractor(e) && ! e.complete)
-    val shouldBuildExtractor = (
-      With.self.supplyTotal400 == 18
-        && Vector(17, 18).contains(With.self.supplyUsed400)
-        && With.self.minerals >= 84
-        && MacroFacts.have(Zerg.Larva)
-        && extractors.isEmpty)
-
-    lazy val shouldCancelExtractor = (
-      // Give time for our supply to update
-      extractors.exists(e => With.framesSince(e.frameDiscovered) > 24)
-        && (
-        extractors.exists(_.remainingCompletionFrames < 3 * 24)
-          || (With.self.supplyTotal400 == 18 && With.self.supplyUsed400 >= 18))
-      )
-
-    if (shouldBuildExtractor) {
-      With.scheduler.request(asPrioritized, Get(1, Zerg.Extractor))
-    } else if (shouldCancelExtractor) {
-      cancel(Zerg.Extractor)
-    }
+    ExtractorTrick()
   }
   def cancel(buildables: Buildable*): Unit = {
     With.blackboard.toCancel.set(With.blackboard.toCancel() ++ buildables)
   }
-  def buildGasPumps(quantity: Int = 400): Unit = {
-    val pumpType            = With.self.gasClass
-    val eligibleBases       = With.geography.ourBases.filter(base => base.townHall.exists(_.remainingCompletionFrames <= pumpType.buildFrames)).sortBy(-_.gasLeft).sortBy(_.townHall.exists(_.complete))
-    val eligibleGas         = eligibleBases.flatMap(_.gas)
-    val eligibleGasToTake   = eligibleGas.filter(_.player.isNeutral)
-    val eligibleBlueprints  = eligibleGasToTake.map(_.tileTopLeft)
-    val gasToRequest        = Math.min(quantity, eligibleGas.size)
-    With.scheduler.request(asPrioritized, Get(gasToRequest, pumpType))
+  def pumpGasPumps(quantity: Int = 400): Unit = {
+    PumpGasPumps(quantity)
   }
 
-  // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
   def expandOnce(): Unit = {
-    expandNTimes(1)
+    expandNTimes(1) // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
   }
   def expandNTimes(times: Int): Unit = {
     if (times <= 0) return
-    get(MacroFacts.ourBaseTownHalls.count(_.complete) + times, With.self.townHallClass)
+    get(ourBaseTownHalls.count(_.complete) + times, With.self.townHallClass)
   }
   def requireBases(count: Int): Unit = {
-    expandNTimes(count - MacroFacts.ourBaseTownHalls.count(_.complete))
+    expandNTimes(count - ourBaseTownHalls.count(_.complete))
   }
   def requireMiningBases(count: Int): Unit = {
-    expandNTimes(count - MacroFacts.ourBaseTownHalls.filter(_.complete).count(_.base.exists(MacroFacts.isMiningBase)))
+    expandNTimes(count - ourBaseTownHalls.filter(_.complete).count(_.base.exists(isMiningBase)))
   }
   def approachBases(count: Int) : Unit = {
-    if (MacroFacts.ourBaseTownHalls.size < count) expandOnce()
+    if (ourBaseTownHalls.size < count) expandOnce()
   }
   def approachMiningBases(count: Int): Unit = {
-    if (MacroFacts.ourBaseTownHalls.count(_.base.exists(MacroFacts.isMiningBase)) < count) expandOnce()
+    if (ourBaseTownHalls.count(_.base.exists(isMiningBase)) < count) expandOnce()
   }
   def maintainMiningBases(max: Int = 10): Unit = {
     approachMiningBases(Math.min(max, With.geography.maxMiningBasesOurs))
@@ -274,15 +205,6 @@ trait MacroActions {
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
 
   def sneakyCitadel(): Unit = {
-    if (MacroFacts.scoutCleared) {
-      get(Protoss.CitadelOfAdun)
-      cancel(Protoss.AirDamage)
-    } else if (MacroFacts.units(Protoss.CitadelOfAdun) == 0) {
-      if (With.units.ours.find(_.upgradeProducing.contains(Protoss.AirDamage)).exists(_.remainingUpgradeFrames < Seconds(5)())) {
-        cancel(Protoss.AirDamage)
-      } else if ( ! MacroFacts.upgradeStarted(Protoss.DragoonRange)) {
-        get(Protoss.AirDamage)
-      }
-    }
+    SneakyCitadel()
   }
 }

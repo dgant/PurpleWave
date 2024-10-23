@@ -1,15 +1,14 @@
 package Gameplans.Protoss.PvZ
 
 import Mathematics.Maff
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.{?, SwapIf}
 import Utilities.UnitFilters.IsWarrior
+import Utilities.{?, SwapIf}
 
 class PvZ1BaseStargate extends PvZ1BaseAllIn {
 
   override def executeMain(): Unit = {
-    new MeldArchons()()
+    makeArchons()
     pump(Protoss.Observer, 1)
 
     SwapIf(

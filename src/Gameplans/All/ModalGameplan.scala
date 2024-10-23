@@ -1,6 +1,6 @@
 package Gameplans.All
 
-import Planning.Plan
+import Planning.Plans.Plan
 
 class ModalGameplan(modes: Modal*) extends Plan with Modal {
   override def isComplete: Boolean = modes.forall(_.isComplete)

@@ -1,10 +1,9 @@
 package Gameplans.All
 
 import Macro.Actions.MacroActions
-import Macro.Facts.MacroCounting
-import Planning.Plan
+import Planning.Plans.Plan
 
-abstract class GameplanImperative extends Plan with Modal with MacroCounting with MacroActions  {
+abstract class GameplanImperative extends Plan with Modal with MacroActions  {
   def activated: Boolean = true
   def completed: Boolean = false
   final def isComplete: Boolean = completed || ! activated

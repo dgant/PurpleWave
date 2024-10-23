@@ -52,6 +52,6 @@ class PvR2Gate4Gate extends GameplanImperative {
     get(Protoss.Assimilator, Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     get(4, Protoss.Gateway)
-    buildGasPumps()
+    pumpGasPumps()
   }
 }

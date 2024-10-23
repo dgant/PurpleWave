@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Gameplans.Protoss.PvR.PvR2Gate4Gate
-import Planning.Plan
+import Planning.Plans.Plan
 import Strategery.Strategies.Strategy
 import bwapi.Race
 

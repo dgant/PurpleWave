@@ -1,9 +1,8 @@
-package Planning
+package Macro.Actions
 
 import Lifecycle.With
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.CountMap
-import Macro.Actions.MacroActions
 
 import scala.collection.mutable
 

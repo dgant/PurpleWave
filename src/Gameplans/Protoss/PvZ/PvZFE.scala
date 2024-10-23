@@ -8,7 +8,6 @@ import Mathematics.Maff
 import Placement.Access.PlaceLabels.DefendAir
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
-import Planning.Plans.MeldArchons
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Python
@@ -170,7 +169,7 @@ class PvZFE extends GameplanImperative {
       get(Maff.clamp(enemies(Zerg.Mutalisk) / 8, 1, 2), Protoss.Stargate)
       get(Protoss.DragoonRange)
       get(Protoss.AirDamage)
-      buildGasPumps()
+      pumpGasPumps()
     }
 
     if (enemyHydralisksLikely || enemyLurkersLikely) {
@@ -182,7 +181,7 @@ class PvZFE extends GameplanImperative {
       once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
       get(Protoss.DragoonRange)
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
-      buildGasPumps()
+      pumpGasPumps()
     }
 
     maintainMiningBases(3)
@@ -204,7 +203,7 @@ class PvZFE extends GameplanImperative {
     // Army //
     //////////
 
-    new MeldArchons()()
+    makeArchons()
     if (upgradeStarted(Protoss.DragoonRange)) {
       pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
     }
@@ -234,7 +233,7 @@ class PvZFE extends GameplanImperative {
   }
 
   def getTech(): Unit = {
-    buildGasPumps()
+    pumpGasPumps()
     if (enemiesHave(Zerg.Lair)) {
       get(Protoss.Stargate)
     }

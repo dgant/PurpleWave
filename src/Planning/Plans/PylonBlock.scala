@@ -4,7 +4,6 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Agency.BuildIntent
-import Planning.Plan
 import Planning.ResourceLocks.{LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo

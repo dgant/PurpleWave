@@ -3,7 +3,7 @@ package Strategery.Strategies.Protoss
 import Gameplans.Protoss.PvT.{PvTGasSteal, PvTSpeedlotDT}
 import Lifecycle.With
 import Macro.Facts.MacroFacts
-import Planning.Plan
+import Planning.Plans.Plan
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race

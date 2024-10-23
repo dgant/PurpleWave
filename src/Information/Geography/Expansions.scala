@@ -4,9 +4,9 @@ import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Tile
-import Planning.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import Utilities.?

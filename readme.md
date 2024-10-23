@@ -9,6 +9,7 @@ PurpleWave has won:
  * :trophy: 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2019/?cat=17)
  * :trophy: 1st Place in the [2018-19 SSCAIT](https://sscaitournament.com/index.php?action=2018)
  * :trophy: 1st Place in the [2018 AIST S1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
+ * :2nd_place_medal: 2nd Place in the [2024 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2024/)
  * :2nd_place_medal: 2nd Place in the [2023 IEEE COG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition/?cat=17)
  * :2nd_place_medal: 2nd Place in the [2022 IEEE COG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2022/?cat=17)
  * :2nd_place_medal: 2nd Place in the [2021 AIST S4](https://sites.google.com/view/aistarcrafttournament/aist-s4)

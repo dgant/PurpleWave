@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Planning.MacroFacts
+import Macro.Facts.MacroFacts
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import Strategery._

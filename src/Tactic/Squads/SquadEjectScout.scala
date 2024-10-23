@@ -1,9 +1,9 @@
 package Tactic.Squads
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Performance.Cache
-import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import Utilities.?
 import Utilities.Time.Minutes

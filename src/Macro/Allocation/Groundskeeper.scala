@@ -2,7 +2,7 @@ package Macro.Allocation
 
 import Lifecycle.With
 import Mathematics.Points.{Tile, TileRectangle}
-import Planning.Plans.Basic.NoPlan
+import Planning.Plans.NoPlan
 import Planning.ResourceLocks.LockTiles
 import Utilities.Time.Forever
 

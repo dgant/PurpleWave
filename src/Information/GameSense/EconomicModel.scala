@@ -1,8 +1,8 @@
 package Information.GameSense
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
-import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClass

@@ -2,10 +2,10 @@ package Information.Battles.Types
 
 import Information.Battles.Prediction.Skimulation.SkimulationTeam
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
-import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 import Tactic.Squads.UnitGroup

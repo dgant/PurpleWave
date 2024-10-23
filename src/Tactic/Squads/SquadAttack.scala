@@ -1,11 +1,11 @@
 package Tactic.Squads
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
-import Planning.MacroFacts
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsBuilding
 

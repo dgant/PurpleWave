@@ -86,7 +86,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val turnRadius256           = bwapiType.turnRadius
   lazy val upgrades           = bwapiType.upgrades.asScala.map(Upgrades.get)
   lazy val upgradesWhat       = bwapiType.upgradesWhat.asScala.map(Upgrades.get)
-  lazy val whatBuilds         = new Pair(UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue.toInt)
+  lazy val whatBuilds         = (UnitClasses.get(bwapiType.whatBuilds.getKey), bwapiType.whatBuilds.getValue.toInt)
   val width                   = bwapiType.width
   val race                    = bwapiType.getRace
   val airWeaponRaw            = bwapiType.airWeapon

@@ -3,9 +3,9 @@ package Tactic
 import Information.Battles.Types.{Division, DivisionRadius}
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Performance.Tasks.TimedTask
-import Planning.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Missions._

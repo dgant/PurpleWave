@@ -3,6 +3,7 @@ package Tactic.Squads
 import Debugging.Visualizations.Forces
 import Information.Geography.Types.{Base, Edge, Zone}
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Combat.Tactics.Potshot
@@ -12,7 +13,6 @@ import Micro.Coordination.Pathing.MicroPathing
 import Micro.Formation._
 import Micro.Heuristics.Potential
 import Performance.Cache
-import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}

@@ -3,8 +3,8 @@ package Debugging
 import Debugging.Visualizations.Rendering.DrawScreen
 import Debugging.Visualizations.Views.Performance.ShowPerformance
 import Lifecycle.{Main, PurpleBWClient, With}
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
-import Planning.MacroFacts
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.{Tech, Techs}

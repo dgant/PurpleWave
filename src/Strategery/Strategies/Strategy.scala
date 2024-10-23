@@ -3,8 +3,9 @@ package Strategery.Strategies
 import Debugging.ToString
 import Information.Fingerprinting.Fingerprint
 import Lifecycle.With
+import Macro.Facts.MacroCounting
 import Performance.GameCache
-import Planning.{MacroCounting, Plan}
+import Planning.Plan
 import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import Utilities.{?, LightYear}
 import bwapi.Race

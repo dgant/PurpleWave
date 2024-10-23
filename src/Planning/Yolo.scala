@@ -2,10 +2,10 @@ package Planning
 
 import Lifecycle.With
 import Performance.Tasks.TimedTask
-import Planning.Plans.Gameplans.All.MacroActions
 import Utilities.UnitFilters.IsWorker
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.Minutes
+import Macro.Actions.MacroActions
 
 class Yolo extends TimedTask with MacroActions {
   var lastUpdate: Int = 0

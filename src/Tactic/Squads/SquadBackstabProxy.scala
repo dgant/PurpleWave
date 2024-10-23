@@ -1,7 +1,7 @@
 package Tactic.Squads
 
 import Lifecycle.With
-import Planning.MacroFacts
+import Macro.Facts.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsAny, IsWarrior, IsWorker}

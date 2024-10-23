@@ -1,8 +1,9 @@
 package Strategery.Strategies.Protoss
 
+import Gameplans.Protoss.PvT.{PvTGasSteal, PvTSpeedlotDT}
 import Lifecycle.With
-import Planning.Plans.Gameplans.Protoss.PvT.{PvTSpeedlotDT, PvTGasSteal}
-import Planning.{MacroFacts, Plan}
+import Macro.Facts.MacroFacts
+import Planning.Plan
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race

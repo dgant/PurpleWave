@@ -4,9 +4,9 @@ import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.Micro.ShowUnitsFriendly
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Planning.Predicates.Strategy.EnemyRecentStrategy
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -47,7 +47,7 @@ class DefendFFEWithProbes extends Tactic {
     if (With.fingerprints.twelvePool())   return
     if (With.fingerprints.overpool())     return
     if (With.fingerprints.ninePool())     return
-    if ( ! EnemyRecentStrategy(With.fingerprints.fourPool).apply) return
+    if ( ! MacroFacts.enemyRecentStrategy(With.fingerprints.fourPool)) return
     if ( ! With.fingerprints.fourPool() && ! With.scouting.enemyHasScoutedUsWithWorker) return
 
     val defensePoints = Maff.orElse(

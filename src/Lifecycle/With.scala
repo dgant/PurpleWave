@@ -22,7 +22,7 @@ import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
 import Placement.Placement
-import Planning.Plans.Macro.Automatic.Supplier
+import Planning.Plans.Supplier
 import Planning.Proxy.Proxies
 import Planning.{Blackboard, Yolo}
 import ProxyBwapi.Bullets.Bullets

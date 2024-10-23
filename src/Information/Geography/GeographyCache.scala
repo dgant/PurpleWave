@@ -2,9 +2,9 @@ package Information.Geography
 
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Performance.Cache
-import Planning.MacroFacts
 import Utilities.LightYear
 import Utilities.UnitFilters.IsTank
 

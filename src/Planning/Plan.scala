@@ -5,7 +5,7 @@ import Macro.Allocation.Prioritized
 
 class Plan extends Prioritized with SimpleString {
   
-  protected def onUpdate() {}
+  protected def onUpdate(): Unit = {}
   
   final def update(): Unit = {
     prioritize()

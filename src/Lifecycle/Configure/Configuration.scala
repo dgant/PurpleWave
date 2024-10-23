@@ -52,7 +52,7 @@ class Configuration {
   /////////////////
 
   var enablePerformancePauses             = true
-  var maximumGamesHistoryPerOpponent      = 100
+  var maximumGamesHistoryPerOpponent      = 1000
   var logTaskDuration                     = false
   
   ///////////////////

@@ -1,9 +1,9 @@
 package Strategery
 
+import Gameplans.All.StandardGameplan
 import Lifecycle.With
 import Mathematics.Maff
 import Planning.Plan
-import Planning.Plans.Gameplans.All.StandardGameplan
 import Strategery.Selection._
 import Strategery.Strategies.{AllChoices, Strategy}
 import bwapi.Race

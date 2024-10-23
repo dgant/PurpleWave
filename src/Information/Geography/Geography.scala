@@ -3,10 +3,10 @@ package Information.Geography
 import Information.Geography.Calculations.UpdateZones
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.{Points, Tile}
 import Performance.Tasks.TimedTask
-import Planning.MacroFacts
 
 import scala.collection.JavaConverters._
 

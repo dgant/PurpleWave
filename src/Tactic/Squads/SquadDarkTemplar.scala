@@ -2,11 +2,11 @@ package Tactic.Squads
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points}
 import Mathematics.Shapes.Spiral
 import Micro.Targeting.TargetScoring
-import Planning.MacroFacts
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer

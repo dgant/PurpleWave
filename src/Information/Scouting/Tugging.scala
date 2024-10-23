@@ -2,10 +2,10 @@ package Information.Scouting
 
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
-import Planning.MacroFacts
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.UnitInfo
 

@@ -1,9 +1,9 @@
 package Planning
 
 import Lifecycle.With
-import Planning.Plans.Gameplans.All.MacroActions
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.CountMap
+import Macro.Actions.MacroActions
 
 import scala.collection.mutable
 

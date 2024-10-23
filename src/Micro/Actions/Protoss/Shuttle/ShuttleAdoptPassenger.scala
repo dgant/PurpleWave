@@ -1,9 +1,9 @@
 package Micro.Actions.Protoss.Shuttle
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Micro.Actions.Action
-import Planning.MacroFacts
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactic.Squads.{SquadAttack, SquadDefendBase}

@@ -1,8 +1,8 @@
 package Tactic.Missions
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
-import Planning.MacroFacts
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters._

@@ -69,6 +69,7 @@ class LockUnits(
     ?(finalistsSatisfy, Some(finalists), None)
   }
 
+  //noinspection ComparingUnrelatedTypes
   private def findFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
     // Here's a bunch of special-case performance shortcuts
     counter match {
@@ -79,6 +80,7 @@ class LockUnits(
     }
   }
 
+  //noinspection ComparingUnrelatedTypes
   private def findMultipleFinalists(candidates: Iterable[FriendlyUnitInfo]): Seq[FriendlyUnitInfo] = {
     // Build a queue based on whether we need to sort it
     val (candidateQueue, dequeue, preference) =

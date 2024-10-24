@@ -8,6 +8,10 @@ import ProxyBwapi.Races.Protoss
 
 class PvTGasSteal extends GameplanImperative {
 
+  // Rain vs. Sharp: https://youtu.be/IckWDksioQE?t=1293
+  // 10 Gas Steal 11 Gate
+
+
   override def executeBuild(): Unit = {
     if (With.placement.wall.isDefined) {
       // TODO: Build Pylon+Gate in wall

@@ -12,18 +12,20 @@ import Utilities.UnitPreferences.PreferClose
 
 class SquadCatchDTs extends Squad {
 
-  private lazy val lockWarriors: LockUnits = new LockUnits(this);
+  private lazy val lockWarriors: LockUnits = new LockUnits(this)
+    .setMatcher(IsAll(IsWarrior, _.canAttackGround))
+    .setCounter(CountUpTo(2));
 
   def launch(): Unit = {
+    lazy val bases = With.geography.ourBases.filter(_.workerCount > 1)
     if ( ! With.enemies.exists(_.isProtoss))  return
     if ( ! MacroFacts.enemyDarkTemplarLikely) return
-    if ( ! With.blackboard.wantToAttack()) return
+    if ( ! With.blackboard.wantToAttack())    return
+    if (bases.isEmpty)                        return
     if (With.scouting.earliestArrival(Protoss.DarkTemplar) > With.frame + Seconds(15)()) return
+
     setEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
     setTargets(enemies)
-
-    val bases = With.geography.ourBases.filter(_.workerCount > 1)
-    if (bases.isEmpty) return
 
     vicinity = bases.map(_.heart.center).minBy(heart =>
       Maff.min(enemies.map(_.pixelDistanceCenter(heart)))
@@ -39,17 +41,12 @@ class SquadCatchDTs extends Squad {
       .acquire()
 
     if (tower.isEmpty) {
-      lockWarriors
-        .setMatcher(IsAll(IsWarrior, u => u.canAttackGround))
-        .setCounter(CountUpTo(2))
-        .setPreference(PreferClose(vicinity))
-        .acquire()
+      lockWarriors.setPreference(PreferClose(vicinity)).acquire()
     }
   }
 
   override def run(): Unit = {
-    val darkTemplar = With.units.enemy.filter(Protoss.DarkTemplar).filter(dt => dt.proximity > 0.5 || dt.metro.exists(_.isOurs))
-    setTargets(darkTemplar)
+    val darkTemplar = enemies.filter(dt => dt.proximity > 0.5 || dt.metro.exists(_.isOurs))
     vicinity = Maff.minBy(darkTemplar.map(_.pixel))(_.groundPixels(vicinity)).getOrElse(vicinity)
     units.foreach(_.intend(this).setTerminus(vicinity))
   }

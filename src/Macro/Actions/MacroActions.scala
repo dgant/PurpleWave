@@ -8,12 +8,12 @@ import Macro.Requests._
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Access.{PlaceLabels, PlacementQuery}
-import Planning.Plans.PylonBlock
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
+import Tactic.Tactics.TacticPylonBlock
 import Utilities.?
 import Utilities.UnitFilters.UnitFilter
 
@@ -88,9 +88,6 @@ trait MacroActions extends MacroCounting {
   }
   def roll(key: String, probability: Double): Boolean = {
     With.strategy.roll(key, probability)
-  }
-  def pylonBlock(): Unit = {
-    new PylonBlock().update()
   }
   def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Boolean = {
     UpgradeContinuously(upgrade, maxLevel)

@@ -1,6 +1,6 @@
 package Gameplans.All
 
-import Macro.Actions.MacroActions
+import Macro.Actions.{MacroActions, RequireEssentials}
 import Planning.Plans.Plan
 
 abstract class GameplanImperative extends Plan with Modal with MacroActions  {
@@ -19,7 +19,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroActions  {
     if (isComplete) return
     status(toString)
     if (doBasics) {
-      requireEssentials()
+      RequireEssentials()
     }
     if (doBuildOrder) {
       executeBuild()

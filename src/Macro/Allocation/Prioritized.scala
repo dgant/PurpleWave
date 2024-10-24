@@ -1,6 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 trait Prioritized {
 
@@ -22,4 +23,6 @@ trait Prioritized {
       _priority
     }
   }
+
+  def units: Seq[FriendlyUnitInfo] = With.recruiter.lockedBy(this).toSeq
 }

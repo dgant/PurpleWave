@@ -3,7 +3,7 @@ package Tactic.Tactics
 import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
 
-class DoFloatBuildings extends Tactic {
+class TacticFloatBuildings extends Tactic {
 
   val floaties: LockUnits = new LockUnits(this, u => ! u.flying && With.blackboard.floatableBuildings().exists(_(u)))
 

@@ -7,7 +7,7 @@ import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Terran
 import Utilities.UnitFilters.IsTank
 
-class Scan extends Tactic {
+class TacticScan extends Tactic {
   
   val scanners = new LockUnits(this, Terran.Comsat)
   var lastScan = 0

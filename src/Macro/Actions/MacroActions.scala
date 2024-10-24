@@ -18,8 +18,10 @@ import Utilities.?
 import Utilities.UnitFilters.UnitFilter
 
 trait MacroActions extends MacroCounting {
+
   def status(text: Any): Unit = With.blackboard.status.set(With.blackboard.status() :+ ?(text == null, "", text.toString))
   def status(predicate: Boolean, text: => Any): Unit = if (predicate) status(text)
+
   def recordRequestedBases(): Unit = {
     val max = Maff.max(With.scheduler.requests.view.map(_.request).filter(_.unit.exists(_.isTier1TownHall)).map(_.quantity)).getOrElse(0)
     status(max > 0, f"${max}base")
@@ -29,48 +31,40 @@ trait MacroActions extends MacroCounting {
   def harass(value: Boolean = true) : Unit = if (value) With.blackboard.wantToHarass.set(true)
   def allIn (value: Boolean = true) : Unit = if (value) { With.blackboard.yoloing.set(true); attack() }
 
-  def scout(scoutCount: Int = 1): Unit = {
-    With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
-  }
-  def scoutOn(unitMatcher: UnitFilter, scoutCount: Int = 1, quantity: Int = 1): Unit = {
-    if (With.units.ours.count(unitMatcher) >= quantity) scout(scoutCount)
-  }
-  def scoutAt(minimumSupply: Int, scoutCount: Int = 1): Unit = {
-    if (supplyUsed200 >= minimumSupply) scout(scoutCount)
-  }
-
   def aggression(value: Double): Unit = {
     With.blackboard.aggressionRatio.set(value)
   }
-  def gasWorkerFloor  (value: Int): Unit = With.blackboard.gasWorkerFloor.set(value)
-  def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling.set(value)
-  def gasLimitFloor   (value: Int): Unit = With.blackboard.gasLimitFloor.set(value)
-  def gasLimitCeiling (value: Int): Unit = With.blackboard.gasLimitCeiling.set(value)
+
+    def scout(scoutCount: Int = 1): Unit = {
+    With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
+  }
+  def scoutOn(unitMatcher: UnitFilter, quantity: Int = 1, scouts: Int = 1): Unit = if (With.units.ours.count(unitMatcher) >= quantity)  scout(scouts)
+  def scoutAt(minimumSupply: Int,                         scouts: Int = 1): Unit = if (supplyUsed200 >= minimumSupply)                  scout(scouts)
+
+  def gasWorkerFloor  (value: Int): Unit = With.blackboard.gasWorkerFloor   .set(value)
+  def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling .set(value)
+  def gasLimitFloor   (value: Int): Unit = With.blackboard.gasLimitFloor    .set(value)
+  def gasLimitCeiling (value: Int): Unit = With.blackboard.gasLimitCeiling  .set(value)
 
   def get(item: RequestBuildable): Unit = With.scheduler.request(this, item)
-  def get(units: UnitClass*): Unit = units.foreach(get(1, _))
-  def get(unit: UnitClass, placementQuery: PlacementQuery): Unit = get(1, unit, placementQuery)
-  def get(unit: UnitClass, base: Base): Unit = get(1, unit, base)
-  def get(quantity: Int, unit: UnitClass): Unit = get(RequestUnit(unit, quantity))
-  def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery): Unit = get(RequestUnit(unit, quantity, placementQueryArg = Some(placementQuery)))
-  def get(quantity: Int, unit: UnitClass, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireLabelYes(labels: _*))
-  def get(quantity: Int, unit: UnitClass, base: Base): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base))
+  def get(units: UnitClass*)                                              : Unit = units.foreach(get(1, _))
+  def get(unit: UnitClass, placementQuery: PlacementQuery)                : Unit = get(1, unit, placementQuery)
+  def get(unit: UnitClass, base: Base)                                    : Unit = get(1, unit, base)
+  def get(quantity: Int, unit: UnitClass)                                 : Unit = get(RequestUnit(unit, quantity))
+  def get(quantity: Int, unit: UnitClass, placementQuery: PlacementQuery) : Unit = get(RequestUnit(unit, quantity, placementQueryArg = Some(placementQuery)))
+  def get(quantity: Int, unit: UnitClass, labels: PlaceLabel*)            : Unit = get(1, unit, new PlacementQuery(unit).requireLabelYes(labels: _*))
+  def get(quantity: Int, unit: UnitClass, base: Base)                     : Unit = get(1, unit, new PlacementQuery(unit).requireBase(base))
   def get(quantity: Int, unit: UnitClass, base: Base, labels: PlaceLabel*): Unit = get(1, unit, new PlacementQuery(unit).requireBase(base).requireLabelYes(labels: _*))
-  def get(upgrade: Upgrade): Unit = get(RequestUpgrade(upgrade))
-  def get(upgrade: Upgrade, level: Int): Unit = get(Get(level, upgrade))
-  def get(tech: Tech): Unit = get(RequestTech(tech))
-  def once(units: UnitClass*): Unit = units.foreach(once(1, _))
-  def once(upgrade: Upgrade): Unit = get(upgrade)
-  def once(upgrade: Upgrade, level: Int): Unit = get(upgrade, level)
-  def once(tech: Tech): Unit = get(tech)
-  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(this, Get(quantity, unit))
+  def get(upgrade: Upgrade)                                               : Unit = get(RequestUpgrade(upgrade))
+  def get(upgrade: Upgrade, level: Int)                                   : Unit = get(Get(level, upgrade))
+  def get(tech: Tech)                                                     : Unit = get(RequestTech(tech))
 
-  def buildOrder(items: RequestBuildable*): Unit = {
-    items.foreach(BuildOnce(this, _))
-  }
-  def requireEssentials(): Unit = {
-    RequireEssentials()
-  }
+  def once(upgrade: Upgrade)              : Unit = get(upgrade)
+  def once(upgrade: Upgrade, level: Int)  : Unit = get(upgrade, level)
+  def once(tech: Tech)                    : Unit = get(tech)
+  def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(this, Get(quantity, unit))
+  def once(units: UnitClass*)             : Unit = units.foreach(once(1, _))
+
   def pump(unitClass: UnitClass, maximumTotal: Int = 400, maximumConcurrently : Int = 400): Unit = {
     Pump(unitClass, maximumTotal, maximumConcurrently)
   }
@@ -101,9 +95,6 @@ trait MacroActions extends MacroCounting {
   def upgradeContinuously(upgrade: Upgrade, maxLevel: Int = 3): Boolean = {
     UpgradeContinuously(upgrade, maxLevel)
   }
-  def extractorTrick(): Unit = {
-    ExtractorTrick()
-  }
   def cancel(buildables: Buildable*): Unit = {
     With.blackboard.toCancel.set(With.blackboard.toCancel() ++ buildables)
   }
@@ -111,28 +102,16 @@ trait MacroActions extends MacroCounting {
     PumpGasPumps(quantity)
   }
 
-  def expandOnce(): Unit = {
-    expandNTimes(1) // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
-  }
-  def expandNTimes(times: Int): Unit = {
-    if (times <= 0) return
-    get(ourBaseTownHalls.count(_.complete) + times, With.self.townHallClass)
-  }
-  def requireBases(count: Int): Unit = {
-    expandNTimes(count - ourBaseTownHalls.count(_.complete))
-  }
-  def requireMiningBases(count: Int): Unit = {
-    expandNTimes(count - ourBaseTownHalls.filter(_.complete).count(_.base.exists(isMiningBase)))
-  }
-  def approachBases(count: Int) : Unit = {
-    if (ourBaseTownHalls.size < count) expandOnce()
-  }
-  def approachMiningBases(count: Int): Unit = {
-    if (ourBaseTownHalls.count(_.base.exists(isMiningBase)) < count) expandOnce()
-  }
-  def maintainMiningBases(max: Int = 10): Unit = {
-    approachMiningBases(Math.min(max, With.geography.maxMiningBasesOurs))
-  }
+  // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
+  private def completeBases       : Int = ourBaseTownHalls.count(b => b.complete)
+  private def completeMiningBases : Int = ourBaseTownHalls.count(b => b.complete && b.base.exists(isMiningBase))
+  def expandNTimes        (times: Int)    : Unit = if (times > 0) get(completeBases + times, With.self.townHallClass)
+  def expandOnce()                        : Unit = expandNTimes(1)
+  def requireBases        (count: Int)    : Unit = expandNTimes(count - completeBases)
+  def requireMiningBases  (count: Int)    : Unit = expandNTimes(count - completeMiningBases)
+  def approachBases       (count: Int)    : Unit = if (completeBases        < count) expandOnce()
+  def approachMiningBases (count: Int)    : Unit = if (completeMiningBases  < count) expandOnce()
+  def maintainMiningBases (max: Int = 10) : Unit = approachMiningBases(Math.min(max, With.geography.maxMiningBasesOurs))
 
   def buildDefensesAtBase(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], base: Base): Unit = {
     def query(buildingClass: UnitClass): PlacementQuery = new PlacementQuery(buildingClass)
@@ -149,24 +128,13 @@ trait MacroActions extends MacroCounting {
     bases.foreach(buildDefensesAtBase(count, defenseClass, labels, _))
 
   }
-  def buildDefenseAtBases(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases)
-  }
-  def buildDefenseAtMain(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourMain))
-  }
-  def buildDefenseAtNatural(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourNatural))
-  }
-  def buildDefenseAtFoyer(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourFoyer))
-  }
-  def buildDefenseAtExpansions(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.isOurMain).filterNot(_.isOurNatural))
-  }
-  def buildDefenseAtOpenings(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = {
-    buildDefensesAt(count, defenseClass, labels, With.geography.ourMetros.flatMap(m => m.exits.flatMap(_.zones.flatMap(_.bases)).filter(m.bases.contains)))
-  }
+  def buildDefenseAtBases         (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, With.geography.ourBases)
+  def buildDefenseAtMain          (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourMain))
+  def buildDefenseAtNatural       (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourNatural))
+  def buildDefenseAtFoyer         (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourFoyer))
+  def buildDefenseAtExpansions    (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, With.geography.ourBases.filterNot(_.isOurMain).filterNot(_.isOurNatural))
+  def buildDefenseAtOpenings      (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, With.geography.ourMetros.flatMap(m => m.exits.flatMap(_.zones.flatMap(_.bases)).filter(m.bases.contains)))
+
   def buildCannonsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Protoss.PhotonCannon,   labels)
   def buildCannonsAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Protoss.PhotonCannon,   labels)

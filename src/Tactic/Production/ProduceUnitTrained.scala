@@ -10,7 +10,7 @@ import Utilities.UnitPreferences.{PreferTiers, PreferTrainerFor}
 
 import scala.util.Try
 
-class TrainUnit(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+class ProduceUnitTrained(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
   val traineeClass    : UnitClass           = request.unit.get
   val trainerClass    : UnitClass           = traineeClass.whatBuilds._1

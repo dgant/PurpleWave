@@ -1,4 +1,4 @@
-package Tactic.Squads
+package Tactic.Tactics
 
 import Lifecycle.With
 import Performance.Cache
@@ -7,7 +7,8 @@ import Utilities.?
 import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
 
-class SquadInitialOverlordScout extends Squad {
+class TacticInitialOverlordScout extends Tactic {
+
   var endScouting: Boolean = false
 
   private val bases = new Cache(() =>
@@ -37,7 +38,7 @@ class SquadInitialOverlordScout extends Squad {
           .map(_.pixelCenter)
           .getOrElse(base.townHallArea.center)
           .pixelDistance(
-            units
+            lock.units
               .headOption
               .map(_.pixel)
               .getOrElse(With.geography.home.center))
@@ -62,13 +63,11 @@ class SquadInitialOverlordScout extends Squad {
     }
     if (bases().isEmpty) return
 
-    vicinity = bases().head.townHallArea.center
+    val vicinity = bases().head.townHallArea.center
     lock.setMatcher(Zerg.Overlord).setPreference(PreferClose(vicinity)).acquire()
-  }
 
-  def run(): Unit = {
     if (bases().isEmpty) return
-    units.zipWithIndex.foreach(s => {
+    lock.units.zipWithIndex.foreach(s => {
       val overlord = s._1
       val i = s._2
       val base = bases()(i % bases().size)

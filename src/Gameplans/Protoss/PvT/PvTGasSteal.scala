@@ -19,7 +19,7 @@ class PvTGasSteal extends GameplanImperative {
     once(10, Protoss.Probe)
     once(Protoss.Gateway)
 
-    val scout = With.tactics.scoutWithWorkers.units.headOption
+    val scout = With.tactics.scoutWithWorkers.lock.units.headOption
     val enemyMain = With.scouting.enemyMain
     if (scout.isDefined && enemyMain.exists(_.gas.forall(_.isNeutral))) {
       get(RequestUnit(Protoss.Assimilator, 1, placementQueryArg = Some(new PlacementQuery(Protoss.Assimilator).requireBase(enemyMain.get))))

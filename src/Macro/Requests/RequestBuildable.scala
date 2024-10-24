@@ -35,14 +35,14 @@ abstract class RequestBuildable(
   def producersRequired : Int                     = unit.map(_.whatBuilds._2).getOrElse(1)
 
   final def makeProduction(expectedFrames: Int): Production = {
-    if (tech.isDefined) new ResearchTech(this, expectedFrames)
-    else if (upgrade.isDefined) new ResearchUpgrade(this, expectedFrames)
+    if (tech.isDefined) new ProduceTech(this, expectedFrames)
+    else if (upgrade.isDefined) new ProduceUpgrade(this, expectedFrames)
     else {
       val unitClass = unit.get
-      if (unitClass.isAddon)                                                  new BuildAddon(this, expectedFrames)
-      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new BuildBuilding(this, expectedFrames)
-      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new MorphUnit(this, expectedFrames)
-      else                                                                    new TrainUnit(this, expectedFrames)
+      if (unitClass.isAddon)                                                  new ProduceAddon(this, expectedFrames)
+      else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new ProduceBuilding(this, expectedFrames)
+      else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new ProduceUnitMorphed(this, expectedFrames)
+      else                                                                    new ProduceUnitTrained(this, expectedFrames)
     }
   }
 

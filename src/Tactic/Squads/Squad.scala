@@ -5,7 +5,6 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Points}
 import Micro.Formation.Formation
 import Performance.Cache
-import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.IndexedSet
@@ -17,10 +16,8 @@ import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
   var batchId           : Int                           = Int.MinValue
-  var vicinity          : Pixel                         = Points.middle
   var targets           : Option[IndexedSet[UnitInfo]]  = None
   var formations        : ArrayBuffer[Formation]        = ArrayBuffer.empty
-  val lock              : LockUnits                     = new LockUnits(this)
   val qualityCounter    : QualityCounter                = new QualityCounter
 
   private var _unitsNow       = new ArrayBuffer[FriendlyUnitInfo]
@@ -42,8 +39,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   }
 
 
-  @inline final def groupFriendlyUnits  : Seq[FriendlyUnitInfo] = units
-  @inline final def units               : Seq[FriendlyUnitInfo] = _unitsNow
+  @inline final override def units      : Seq[FriendlyUnitInfo] = _unitsNow
   @inline final def unitsNext           : Seq[FriendlyUnitInfo] = _unitsNext
   @inline final def addUnits(units: Iterable[FriendlyUnitInfo]): Unit = units.foreach(addUnit)
   @inline final def addUnit(unit: FriendlyUnitInfo): Unit = {

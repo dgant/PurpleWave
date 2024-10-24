@@ -5,7 +5,7 @@ import Lifecycle.With
 import Planning.ResourceLocks.LockUnits
 import Utilities.UnitFilters.IsWorker
 
-class Gather extends Tactic with SimpleString {
+class TacticGather extends Tactic with SimpleString {
 
   val workerLock: LockUnits = new LockUnits(this, IsWorker)
 

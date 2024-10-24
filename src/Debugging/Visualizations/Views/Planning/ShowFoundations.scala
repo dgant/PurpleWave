@@ -5,7 +5,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Debugging.Visualizations.Views.DebugView
 import Lifecycle.With
 import Mathematics.Points.{Pixel, TileRectangle}
-import Tactic.Production.BuildBuilding
+import Tactic.Production.ProduceBuilding
 
 object ShowFoundations extends DebugView {
 
@@ -14,8 +14,8 @@ object ShowFoundations extends DebugView {
     var lastCorners: Iterable[Pixel] = Iterable.empty
     With.tactics.produce.queue
       .view
-      .filter(_.isInstanceOf[BuildBuilding])
-      .map(_.asInstanceOf[BuildBuilding])
+      .filter(_.isInstanceOf[ProduceBuilding])
+      .map(_.asInstanceOf[ProduceBuilding])
       .foreach(production => production.foundation.foreach(foundation => {
         val box = TileRectangle(
           foundation.tile,

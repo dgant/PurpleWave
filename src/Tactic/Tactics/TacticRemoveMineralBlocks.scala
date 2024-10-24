@@ -7,7 +7,7 @@ import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters.IsWorker
 import Utilities.UnitPreferences.PreferClose
 
-class RemoveMineralBlocks extends Tactic {
+class TacticRemoveMineralBlocks extends Tactic {
   
   val miners: LockUnits = new LockUnits(this, IsWorker, CountOne, interruptable = false)
 

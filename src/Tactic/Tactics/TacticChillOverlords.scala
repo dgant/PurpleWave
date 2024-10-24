@@ -9,7 +9,7 @@ import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitCounters.CountEverything
 
-class ChillOverlords extends Tactic {
+class TacticChillOverlords extends Tactic {
   
   val overlords = new LockUnits(this, Zerg.Overlord, CountEverything)
 

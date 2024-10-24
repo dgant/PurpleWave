@@ -38,46 +38,46 @@ final class Tactician extends TimedTask {
   private val missionSpeedlotDrop       = addMission(new MissionSpeedlotDrop)
   private val missionReaverDrop         = addMission(new MissionReaverDrop)
 
+  //////////////////////
+  // Priority tactics //
   /////////////////////
-  // Priority squads //
-  ////////////////////
 
           val produce: Produce          = addPriorityTactic(new Produce)
           val acePilots                 = addPriorityTactic(new SquadAcePilots)
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
-  private val ejectScout                = addPriorityTactic(new SquadEjectScout)
-          val scoutWithOverlord         = addPriorityTactic(new SquadInitialOverlordScout)
+  private val ejectScout                = addPriorityTactic(new TacticEjectScout)
+          val scoutWithOverlord         = addPriorityTactic(new TacticInitialOverlordScout)
   private val backstabProxy             = addPriorityTactic(new SquadBackstabProxy)
   private val defendAgainstProxy        = addPriorityTactic(new DefendAgainstProxy)
   private val defendFightersAgainstRush = addPriorityTactic(new DefendFightersAgainstRush)
   private val defendAgainstWorkerRush   = addPriorityTactic(new DefendAgainstWorkerRush)
   private val defendFFEAgainst4Pool     = addPriorityTactic(new DefendFFEWithProbes)
-  private val makeDarkArchons           = addPriorityTactic(new SquadMeldDarchons)
-  private val makeHighArchons           = addPriorityTactic(new SquadMeldArchons)
+  private val makeDarkArchons           = addPriorityTactic(new TacticMeldDarchons)
+  private val makeHighArchons           = addPriorityTactic(new TacticMeldArchons)
   private val mindControl               = addPriorityTactic(new SquadMindControl)
-          val scoutWithWorkers          = addPriorityTactic(new SquadWorkerScout)
-  private val scoutForCannonRush        = addPriorityTactic(new ScoutForCannonRush)
+          val scoutWithWorkers          = addPriorityTactic(new TacticWorkerScout)
+  private val scoutForCannonRush        = addPriorityTactic(new TacticScoutForCannonRush)
           val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
           val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
-          val monitorWithObserver       = addPriorityTactic(new Monitor)
+          val monitorWithObserver       = addPriorityTactic(new TacticMonitor)
 
-  //////////////////
-  // Basic squads //
-  //////////////////
+  ///////////////////
+  // Basic tactics //
+  ///////////////////
 
   lazy val defenseSquads: Map[Base, SquadDefendBase] = With.geography.bases.map(base => (base, new SquadDefendBase(base))).toMap
-  private val catchDTRunby = new SquadCatchDTRunby
+  private val catchDTs = new SquadCatchDTs
   val attackSquad = new SquadAttack
 
-  ///////////////////////
-  // Background squads //
-  ///////////////////////
+  ////////////////////////
+  // Background tactics //
+  ////////////////////////
 
-  private val removeMineralBlocks       = addBackgroundTactic(new RemoveMineralBlocks)
-  private val gather                    = addBackgroundTactic(new Gather)
-  private val chillOverlords            = addBackgroundTactic(new ChillOverlords)
-  private val doFloatBuildings          = addBackgroundTactic(new DoFloatBuildings)
-  private val scan                      = addBackgroundTactic(new Scan)
+  private val removeMineralBlocks       = addBackgroundTactic(new TacticRemoveMineralBlocks)
+  private val gather                    = addBackgroundTactic(new TacticGather)
+  private val chillOverlords            = addBackgroundTactic(new TacticChillOverlords)
+  private val doFloatBuildings          = addBackgroundTactic(new TacticFloatBuildings)
+  private val scan                      = addBackgroundTactic(new TacticScan)
 
   override protected def onRun(budgetMs: Long): Unit = {
     missions.foreach(_.launch())
@@ -199,7 +199,7 @@ final class Tactician extends TimedTask {
     })
 
     // Proactive DT defense
-    catchDTRunby.launch()
+    catchDTs.launch()
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(IsRecruitableForCombat))

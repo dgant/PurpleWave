@@ -9,7 +9,7 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsAll
 import Utilities.UnitPreferences.PreferIdle
 
-class BuildAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) extends Production {
+class ProduceAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(buildableAddon, expectedFramesArg)
   def addonClass    : UnitClass     = request.unit.get
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass)

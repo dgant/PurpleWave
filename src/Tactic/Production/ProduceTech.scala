@@ -9,7 +9,7 @@ import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferIdle
 
-class ResearchTech(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+class ProduceTech(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
   val tech          : Tech          = request.tech.get
   val techerClass   : UnitClass     = tech.whatResearches

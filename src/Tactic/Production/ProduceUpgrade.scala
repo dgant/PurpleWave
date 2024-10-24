@@ -9,7 +9,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Utilities.UnitCounters.CountOne
 import Utilities.UnitPreferences.PreferIdle
 
-class ResearchUpgrade(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
+class ProduceUpgrade(requestArg: RequestBuildable, expectedFramesArg: Int) extends Production {
   setRequest(requestArg, expectedFramesArg)
   val upgrade       : Upgrade       = request.upgrade.get
   val level         : Int           = request.quantity

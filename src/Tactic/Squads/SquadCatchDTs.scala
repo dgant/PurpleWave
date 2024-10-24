@@ -10,7 +10,7 @@ import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters.{IsAll, IsBuilding, IsMobileDetector, IsWarrior}
 import Utilities.UnitPreferences.PreferClose
 
-class SquadCatchDTRunby extends Squad {
+class SquadCatchDTs extends Squad {
 
   private lazy val lockWarriors: LockUnits = new LockUnits(this);
 

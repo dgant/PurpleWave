@@ -10,7 +10,7 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.{IsAny, IsMobileDetector}
 import Utilities.UnitPreferences.PreferClose
 
-class Monitor extends Tactic {
+class TacticMonitor extends Tactic {
 
   val scouts: LockUnits = new LockUnits(this, IsAny(Protoss.Observer, Zerg.Overlord), CountOne, interruptable = false)
 

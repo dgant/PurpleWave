@@ -10,7 +10,7 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.{IsAll, IsComplete}
 import Utilities.UnitPreferences.PreferClose
 
-class ScoutForCannonRush extends Tactic {
+class TacticScoutForCannonRush extends Tactic {
 
   val scouts: LockUnits = new LockUnits(this, (u:  UnitInfo) => u.unitClass.isWorker && ! u.carrying, CountOne, interruptable = false)
 

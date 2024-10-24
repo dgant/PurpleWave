@@ -1,4 +1,4 @@
-package Tactic.Squads
+package Tactic.Tactics
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
@@ -11,7 +11,8 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.IsWarrior
 import Utilities.UnitPreferences.PreferClose
 
-class SquadEjectScout extends Squad {
+class TacticEjectScout extends Tactic {
+
   override def toString: String = "Eject"
 
   val legalScouts = new Cache(() => With.scouting.enemyScouts().filter(u => u.visible || ! u.flying || ! u.tile.zone.island))
@@ -35,10 +36,8 @@ class SquadEjectScout extends Squad {
       .setCounter(CountOne)
       .setPreference(PreferClose(targetScout().get.pixel))
       .acquire()
-  }
-  
-  override def run(): Unit = {
-    units.foreach(ejector =>
+
+    lock.units.foreach(ejector =>
       ejector.intend(this)
         .setTerminus(destination())
         .setAttack(?(ejector.matchups.targets.forall(targetScout().contains), targetScout(), None))

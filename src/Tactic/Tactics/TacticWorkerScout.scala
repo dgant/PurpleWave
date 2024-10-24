@@ -1,9 +1,8 @@
-package Tactic.Squads
+package Tactic.Tactics
 
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
@@ -13,11 +12,12 @@ import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.{IsAny, IsComplete, IsSpeedling, IsWorker}
 import Utilities.UnitPreferences.PreferScout
 
-class SquadWorkerScout extends Squad {
+class TacticWorkerScout extends Tactic {
 
   var scoutingAbandoned : Boolean                   = false
   var scouts            : Vector[FriendlyUnitInfo]  = Vector.empty
-  val scoutLock         : LockUnits                 = new LockUnits(this, IsWorker).setInterruptible(false)
+
+  lock.setMatcher(IsWorker).setInterruptible(false)
 
   def launch(): Unit = {
     if (scoutingAbandoned) return
@@ -62,8 +62,8 @@ class SquadWorkerScout extends Squad {
       With.blackboard.maximumScouts(),
       With.units.countOurs(IsWorker) - 3,
       basesToScout.size)
-    if (scoutLock.units.size > scoutCount) { scoutLock.release() }
-    scouts = scoutLock
+    if (lock.units.size > scoutCount) { lock.release() }
+    scouts = lock
       .setCounter(CountUpTo(scoutCount))
       .setPreference(new PreferScout(basesToScout.map(_.townHallArea.center): _*))
       .acquire().toVector // The copy is important since the source is mutable
@@ -93,6 +93,4 @@ class SquadWorkerScout extends Squad {
           else          Seq(base.townHallArea.tiles.minBy(scout.pixelDistanceTravelling)))
     })
   }
-
-  override def run(): Unit = {}
 }

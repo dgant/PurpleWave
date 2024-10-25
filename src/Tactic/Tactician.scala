@@ -56,11 +56,11 @@ final class Tactician extends TimedTask {
   private val makeDarkArchons           = addPriorityTactic(new TacticMeldDarchons)
   private val makeHighArchons           = addPriorityTactic(new TacticMeldArchons)
   private val mindControl               = addPriorityTactic(new SquadMindControl)
-          val scoutWithWorkers          = addPriorityTactic(new TacticWorkerScout)
+          val workerScout               = addPriorityTactic(new TacticWorkerScout)
   private val scoutForCannonRush        = addPriorityTactic(new TacticScoutForCannonRush)
           val darkTemplar               = addPriorityTactic(new SquadDarkTemplar)
           val scoutExpansions           = addPriorityTactic(new SquadScoutExpansions)
-          val monitorWithObserver       = addPriorityTactic(new TacticMonitor)
+          val monitor                   = addPriorityTactic(new TacticMonitor)
 
   ///////////////////
   // Basic tactics //

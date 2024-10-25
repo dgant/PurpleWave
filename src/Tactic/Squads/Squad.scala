@@ -2,7 +2,6 @@ package Tactic.Squads
 
 import Debugging.ToString
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Points}
 import Micro.Formation.Formation
 import Performance.Cache
 import ProxyBwapi.UnitClasses.UnitClass

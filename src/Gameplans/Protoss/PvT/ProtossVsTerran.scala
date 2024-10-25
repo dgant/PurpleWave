@@ -206,42 +206,16 @@ class ProtossVsTerran extends PvTOpeners {
 
   def counterBio: Boolean = With.fingerprints.bio() && enemies(Terran.Marine, Terran.Firebat, Terran.Medic) >= enemies(Terran.Vulture) * 1.5
   def executeMain(): Unit = {
-    var scoredEnemy   = false
-    def scoreEnemy(value: Boolean): Int = {
-      scoredEnemy ||= value
-      Maff.fromBoolean(value)
-    }
-    var ecoScoreUs    = 0
-    var ecoScoreFoe   = 0
-    ecoScoreUs  +=  4 * Maff.fromBoolean(PvT13Nexus())
-    ecoScoreUs  +=  2 * Maff.fromBoolean(PvTZealotExpand())
-    ecoScoreUs  +=  1 * Maff.fromBoolean(PvTRangeless())
-    ecoScoreUs  +=  0 * Maff.fromBoolean(PvT28Nexus())
-    ecoScoreUs  += -1 * Maff.fromBoolean(PvTZZCoreZ())
-    ecoScoreUs  += -1 * Maff.fromBoolean(PvTDT())
-    ecoScoreUs  += -2 * Maff.fromBoolean(PvT1BaseReaver())
-    ecoScoreUs  += -2 * Maff.fromBoolean(PvT29Arbiter())
-    ecoScoreUs  += -3 * Maff.fromBoolean(PvT1015())
-    ecoScoreUs  += -4 * Maff.fromBoolean(PvT4Gate())
-    ecoScoreUs  += -5 * Maff.fromBoolean(PvT910())
-    ecoScoreFoe +=  4 * scoreEnemy(With.fingerprints.fourteenCC())
-    ecoScoreFoe +=  2 * scoreEnemy(With.fingerprints.oneRaxFE())
-    ecoScoreFoe +=  0 * scoreEnemy(With.fingerprints.oneFac() && ! With.fingerprints.fd()) // Includes siege expand
-    ecoScoreFoe += -1 * scoreEnemy(With.fingerprints.fd())
-    ecoScoreFoe += -2 * scoreEnemy(With.fingerprints.twoFac())
-    ecoScoreFoe += -2 * scoreEnemy(With.fingerprints.twoRax1113())
-    ecoScoreFoe += -3 * scoreEnemy(With.fingerprints.threeFac())
-    ecoScoreFoe += -4 * scoreEnemy(With.fingerprints.twoRaxAcad())
-    ecoScoreFoe += -6 * scoreEnemy(With.fingerprints.bbs())
-    val ecoEdge       = ?(scoredEnemy, ecoScoreUs - ecoScoreFoe, 0)
+    val ecoScore      = new PvTEcoScore
+    val ecoEdge       = Maff.or0(ecoScore.delta, ecoScore.scoredFoe)
     val terran23Fac   = enemyStrategy(With.fingerprints.twoFac, With.fingerprints.threeFac)
     val terranOneBase = terran23Fac || enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.oneBaseBioMech)
     val turretsShown  = enemyHasShown(Terran.EngineeringBay, Terran.MissileTurret)
     val detectorShown = turretsShown || enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep, Terran.SpiderMine)
     val goDT          = PvTDT() || PvT29Arbiter() || (ecoEdge <= -3 && ! detectorShown && roll("DT", 0.6))
     val goDTDrop      = ! PvT4Gate() && ! goDT && ecoEdge <= -1 && ! turretsShown && roll("DTDrop", 0.4)
-    val goFastReaver  = PvT1BaseReaver() || ( ! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScoreFoe >= 2))
-    val goFastCarrier = ecoEdge >= 2 && ecoScoreFoe >= -1 && With.scouting.enemyProximity < 0.5 && ! counterBio && (enemyBases > 1 || enemies(Terran.CommandCenter) > 1)
+    val goFastReaver  = PvT1BaseReaver() || ( ! goDT && (terranOneBase || (counterBio && have(Protoss.RoboticsFacility)) || ecoScore.foe >= 2))
+    val goFastCarrier = ecoEdge >= 2 && ecoScore.foe >= -1 && With.scouting.enemyProximity < 0.5 && ! counterBio && (enemyBases > 1 || enemies(Terran.CommandCenter) > 1)
     val goReaver      = goFastCarrier && ! have(Protoss.TemplarArchives)
     val goCarrier     = ! TechArbiter.started && miningBases >= 3 && safeSkirmishing && safeDefending && roll("Carrier", 1.0)
 
@@ -304,7 +278,7 @@ class ProtossVsTerran extends PvTOpeners {
     shouldAttack  ||= pushMarines
     shouldAttack  ||= haveComplete(Protoss.Reaver) && haveComplete(Protoss.Shuttle) && safePushing
 
-    status(f"Eco$ecoScoreUs,$ecoScoreFoe=$ecoEdge")
+    status(f"Eco${ecoScore.us}-${ecoScore.foe}=${ecoScore.delta}")
     status(f"${gatewaysMin}-${gatewaysMax}gate")
     status(techs.mkString("-").replaceAll("Tech", "") + f":${techsComplete}/${techs.length}")
     if (armySizeLow) status("ArmyLow")

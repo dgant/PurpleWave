@@ -79,7 +79,7 @@ abstract class MissionDrop extends Mission {
     With.framesSince(base.lastFrameScoutedByUs) < Seconds(90)() && ! base.owner.isEnemy
   }
 
-  private def scoutTactics = Vector(With.tactics.scoutExpansions, With.tactics.acePilots, With.tactics.scoutWithOverlord, With.tactics.monitorWithObserver, With.tactics.darkTemplar)
+  private def scoutTactics = Vector(With.tactics.scoutExpansions, With.tactics.acePilots, With.tactics.scoutWithOverlord, With.tactics.monitor, With.tactics.darkTemplar)
 
   final private def skipBase(base: Base): Boolean = {
     if (ignore(base)) return true

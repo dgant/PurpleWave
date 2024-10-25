@@ -11,7 +11,7 @@ import ProxyBwapi.Techs.{Tech, Techs}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
 import Strategery.Strategies.Strategy
-import Tactic.Squads.Squad
+import Tactic.Tactics.Tactic
 import Utilities.Time.{Frames, Minutes}
 import com.sun.management.OperatingSystemMXBean
 
@@ -61,23 +61,23 @@ class Storyteller extends MacroCounting {
   lazy val rushDistance = f"Rush distances on ${With.mapCleanName}"
   val stories: Seq[IStory] = Seq(
     new Story                           ("Frame 0 (secs)",      () => With.frame0ms / 1000),
-    new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                              _.map(_.name).mkString(", ")),
-    new Story[Iterable[Int]]            ("Rush distances",      () => With.geography.rushDistances,                                                                                _.map(_.toString).mkString(", ")),
+    new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                               _.map(_.name).mkString(", ")),
+    new Story[Iterable[Int]]            ("Rush distances",      () => With.geography.rushDistances,                                                                                 _.map(_.toString).mkString(", ")),
     new Story                           ("Mean rush distance",  () => With.strategy.rushDistanceMean),
     new Story                           ("Playbook",            () => With.configuration.playbook),
     new Story                           ("Policy",              () => With.configuration.playbook.policy),
     new Story                           ("Enemy race",          () => With.enemy.raceCurrent),
-    new Story[mutable.Set[Strategy]]    ("Strategy",            () => With.strategy.strategiesSelected,                                                                                      _.map(_.toString).mkString(" "), expand = true),
+    new Story[mutable.Set[Strategy]]    ("Strategy",            () => With.strategy.strategiesSelected,                                                                             _.map(_.toString).mkString(" "), expand = true),
     new Story                           ("Our bases",           () => With.geography.ourBases.size),
     new Story                           ("Enemy bases",         () => With.geography.enemyBases.size),
     new Story                           ("Our mining bases",    () => With.geography.ourMiningBases.size),
     new Story                           ("Enemy mining bases",  () => With.geography.enemyMiningBases.size),
     new Story                           ("Our max mining",      () => With.geography.maxMiningBasesOurs),
     new Story                           ("Enemy max mining",    () => With.geography.maxMiningBasesEnemy),
-    new Story[Iterable[Tech]]           ("Our techs",           () => interestingTechs.filter(With.self.hasTech),                                                                  _.map(_.toString).mkString(", "), expand = true),
-    new Story[Iterable[Tech]]           ("Enemy techs",         () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                             _.map(_.toString).mkString(", "), expand = true),
-    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",        () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                   _.map(u => f"${u._1} = ${u._2}").mkString(", "), expand = true),
-    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",      () => Upgrades.all.map(u => (u, Maff.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),  _.map(u => f"${u._1} = ${u._2}").mkString(", "), expand = true),
+    new Story[Iterable[Tech]]           ("Our techs",           () => interestingTechs.filter(With.self.hasTech),                                                                   _.map(_.toString).mkString(", "), expand = true),
+    new Story[Iterable[Tech]]           ("Enemy techs",         () => interestingTechs.filter(t => With.enemies.exists(_.hasTech(t))),                                              _.map(_.toString).mkString(", "), expand = true),
+    new Story[Iterable[(Upgrade, Int)]] ("Our upgrades",        () => Upgrades.all.map(u => (u, With.self.getUpgradeLevel(u))).filter(_._2 > 0),                                    _.map(u => f"${u._1} = ${u._2}").mkString(", "), expand = true),
+    new Story[Iterable[(Upgrade, Int)]] ("Enemy upgrades",      () => Upgrades.all.map(u => (u, Maff.max(With.enemies.map(_.getUpgradeLevel(u))).getOrElse(0))).filter(_._2 > 0),   _.map(u => f"${u._1} = ${u._2}").mkString(", "), expand = true),
     new Story                           ("Our Factories",       () => With.units.countOurs(Terran.Factory)),
     new Story                           ("Our Barracks",        () => With.units.countOurs(Terran.Barracks)),
     new Story                           ("Our Gateways",        () => With.units.countOurs(Protoss.Gateway)),
@@ -104,8 +104,7 @@ class Storyteller extends MacroCounting {
     new Story                           ("Gas worker ratio",    () => With.blackboard.gasWorkerRatio()),
     new Story                           ("Gas limit floor",     () => With.blackboard.gasLimitFloor()),
     new Story                           ("Gas limit ceiling",   () => With.blackboard.gasLimitCeiling()),
-    new Story[Iterable[Squad]]          ("Active squads",       () => With.squads.all.toVector,                                                                                    _.mkString(", "), expand = true),
-    new Story                           ("Attack squad",        () => With.tactics.attackSquad.toString),
+    new Story[Vector[String]]           ("Active tactics",      () => With.recruiter.audit.view.map(_._1).filter(_.isInstanceOf[Tactic]).map(_.toString).toVector.sorted,          _.mkString(", "), expand = true),
     new Story                           ("Pulling workers",     () => With.tactics.defenseSquads.values.exists(_.workerLock.units.nonEmpty).toString),
     new Story                           ("Main fully scouted",  () => With.scouting.enemyMainFullyScouted)
   )

@@ -1,10 +1,10 @@
 package Macro.Actions
 
 import Lifecycle.With
-import Macro.Facts.MacroFacts
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import Performance.CacheForever
+import ProxyBwapi.Races.Zerg.LairOrHive
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -14,7 +14,7 @@ import Utilities.UnitFilters.IsTownHall
 
 import scala.collection.mutable.ArrayBuffer
 
-class Supplier {
+class Supplier extends MacroActions {
   val farm: UnitClass = With.self.supplyClass
 
   var incomeMins      : Double  = 0.0
@@ -27,16 +27,12 @@ class Supplier {
   var simMins         : Double  = 0
   var simGas          : Double  = 0
 
-  var halls       : Vector[FriendlyUnitInfo] = Vector.empty
-  var producers   : Vector[FriendlyUnitInfo] = Vector.empty
-  val consumers   : ArrayBuffer[SupplyConsumer] = new ArrayBuffer[SupplyConsumer]
+  var halls       : Vector[FriendlyUnitInfo]      = Vector.empty
+  var producers   : Vector[FriendlyUnitInfo]      = Vector.empty
+  val consumers   : ArrayBuffer[SupplyConsumer]   = new ArrayBuffer[SupplyConsumer]
   val consumed    : ArrayBuffer[(Int, UnitClass)] = new ArrayBuffer[(Int, UnitClass)]
 
   def update(): Unit = {
-
-    /////////////////////////////
-    // Construct initial state //
-    /////////////////////////////
 
     incomeMins      = With.accounting.ourIncomePerFrameMinerals
     incomeGas       = With.accounting.ourIncomePerFrameGas
@@ -47,7 +43,6 @@ class Supplier {
     simFrames       = 0
     simMins         = With.self.minerals
     simGas          = With.self.gas
-
     halls           = With.units.ours.filter(IsTownHall).toVector
     producers       = With.units.ours.filter(_.isAny(productionTypes: _*)).toVector
     consumers.clear()
@@ -87,10 +82,10 @@ class Supplier {
       With.scheduler.request(this, RequestUnit(farm, simFarms, minStartFrameArg = With.frame + simFrames - farm.buildFrames))
     }
 
+    // Include supply from halls that will finish faster than any farm we could construct
+    // Include some slack time, too, to leverage nearly-done halls
     simSupplyHalls = halls
-      // Include supply from halls that will finish faster than any farm we could construct
-      // Include some slack time, too, to leverage nearly-done halls
-      .filter(h => h.remainingCompletionFrames < Seconds(5)() + Math.max(farm.buildFrames, simFrames) || h.isAny(Zerg.Lair, Zerg.Hive))
+      .filter(h => h.remainingCompletionFrames < Seconds(5)() + Math.max(farm.buildFrames, simFrames) || LairOrHive(h))
       .map(_.unitClass.supplyProvided)
       .sum
   }
@@ -118,7 +113,7 @@ class Supplier {
   private def produceConsumer(producer: FriendlyUnitInfo): SupplyConsumer = {
     val hungriestConsumer = producer.unitClass.unitsTrained
       // Don't consider units we can't make yet; eg a Stargate needs 6/200 supply to make Carriers but only 3/200 for Scouts
-      .filter(t => t.buildUnitsEnabling.forall(With.units.existsOurs(_)) && t.buildTechEnabling.forall(MacroFacts.techStarted))
+      .filter(t => t.buildUnitsEnabling.forall(With.units.existsOurs(_)) && t.buildTechEnabling.forall(techStarted))
       // Prefer considering the cheapest unit we can make for the max supply cost, eg. Zealot is cheaper than Dragoon
       .sortBy(_.buildFrames)
       // Consider the fastest-training unit we can make for the max supply cost, eg. Vulture builds much faster than Tank

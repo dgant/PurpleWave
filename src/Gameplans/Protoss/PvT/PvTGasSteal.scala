@@ -10,7 +10,8 @@ class PvTGasSteal extends GameplanImperative {
 
   // Rain vs. Sharp: https://youtu.be/IckWDksioQE?t=1293
   // 10 Gas Steal 11 Gate
-
+  // Mini vs. Organ https://youtu.be/Cl2MHjmGBLk?t=1342
+  // 10 Gate 2 Gas Steal
 
   override def executeBuild(): Unit = {
     if (With.placement.wall.isDefined) {
@@ -22,8 +23,9 @@ class PvTGasSteal extends GameplanImperative {
     once(Protoss.Pylon)
     once(10, Protoss.Probe)
     once(Protoss.Gateway)
+    once(12, Protoss.Probe)
 
-    val scout = With.tactics.scoutWithWorkers.lock.units.headOption
+    val scout = With.tactics.workerScout.lock.units.headOption
     val enemyMain = With.scouting.enemyMain
     if (scout.isDefined && enemyMain.exists(_.gas.forall(_.isNeutral))) {
       get(RequestUnit(Protoss.Assimilator, 1, placementQueryArg = Some(new PlacementQuery(Protoss.Assimilator).requireBase(enemyMain.get))))

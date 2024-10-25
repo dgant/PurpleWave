@@ -118,7 +118,7 @@ class PvZFE extends GameplanImperative {
           Math.max(
             1 + Seq(
               With.fingerprints.ninePool(),
-              With.tactics.scoutWithWorkers.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
+              With.tactics.workerScout.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
               With.fingerprints.twoHatchMain).count(_ == true),
             (3 + enemies(Zerg.Zergling)) / 3)
           - unitsComplete(IsWarrior)),

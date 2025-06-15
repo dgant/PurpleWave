@@ -7,8 +7,12 @@ object PumpShuttleAndReavers extends MacroActions {
     if (shuttleFirst && ! haveComplete(Protoss.RoboticsSupportBay)) {
       once(Protoss.Shuttle)
     }
-    pumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5)))
-    pump(Protoss.Reaver, reavers)
-    pumpRatio(Protoss.Shuttle, 0, (reavers + 1) / 2, Seq(Flat(0.5), Friendly(Protoss.Reaver, 0.5)), round = Rounding.Down)
+    (0 to reavers).foreach(i => {
+      pump(Protoss.Reaver, i)
+      pump(Protoss.Shuttle, (i + 1) / 2)
+    })
+    //pumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5)))
+    //pump(Protoss.Reaver, reavers)
+    //pumpRatio(Protoss.Shuttle, 0, (reavers + 1) / 2, Seq(Flat(0.5), Friendly(Protoss.Reaver, 0.5)), round = Rounding.Down)
   }
 }

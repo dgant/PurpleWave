@@ -363,7 +363,7 @@ abstract class PvTOpeners extends GameplanImperative {
     if (frame < Minutes(7)() && With.fingerprints.bunkerRush() && (enemies(IsAll(Terran.Bunker, IsProxied), Terran.Marine) > 0)) {
       status("ReactToBunkerRush")
       pump(Protoss.Dragoon, 3)
-      if (unitsComplete(Protoss.CyberneticsCore) == 0) {
+      if ( ! haveComplete(Protoss.CyberneticsCore)) {
         pump(Protoss.Zealot, 3)
       }
     }
@@ -384,7 +384,14 @@ abstract class PvTOpeners extends GameplanImperative {
       pump(Protoss.Reaver, 4)
       pump(Protoss.Zealot, 3)
       pumpWorkers()
-      if (units(Protoss.Reaver) > 1) requireMiningBases(2) else cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)
+      if (have(Protoss.Reaver)) {
+        requireMiningBases(2)
+      } else {
+        cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)
+      }
+      if (upgradeComplete(Protoss.DragoonRange, 1, Protoss.Dragoon.buildFrames)) {
+        pump(Protoss.Dragoon)
+      }
       pump(Protoss.Zealot)
       once(2, Protoss.Gateway)
       if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs)) once(5, Protoss.Zealot) // I think this is best but am not sure

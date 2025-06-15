@@ -1,0 +1,194 @@
+package Gameplans.Protoss.PvT
+
+import Lifecycle.With
+import Macro.Actions.{Enemy, Flat, Friendly}
+import Performance.Cache
+import ProxyBwapi.Races.{Protoss, Terran}
+import Strategery.Strategies.Protoss.PvT13Nexus
+import Utilities.Time.Minutes
+import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior, IsWorker}
+import Utilities.{?, DoQueue}
+
+class PvT2025 extends PvTOpeners {
+
+  override def executeBuild(): Unit = {
+    open()
+  }
+
+  override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = 70)
+
+  private val armySupply200 = new Cache(() => With.units.ours.filter(u => IsWarrior(u) && u.complete).map(_.unitClass.supplyRequired).sum / 2)
+
+  override def executeMain(): Unit = {
+    val armyNormalPriority = new DoQueue(doArmyNormalPriority)
+
+    get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
+
+    doArmyHighPriority()
+    maintainMiningBases(3)
+    requireMiningBases(enemyMiningBases)
+    requireMiningBases(supplyTotal200 / 40)
+
+    if (armySupply200() < 24) {
+      armyNormalPriority()
+    }
+    if ( PvT13Nexus() || ! enemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE) || With.fingerprints.bunkerRush() || With.fingerprints.workerRush()) {
+      get(Protoss.DragoonRange)
+    }
+    if (With.fingerprints.twoFac()) {
+      get(2, Protoss.Gateway)
+    }
+    requireMiningBases(2)
+
+    if (armySupply200() < 32) {
+      armyNormalPriority()
+    }
+    get(Protoss.RoboticsFacility)
+    if (counterBio) {
+      pumpGasPumps()
+      get(Protoss.RoboticsSupportBay)
+      once(Protoss.Reaver)
+      get(3, Protoss.Gateway)
+      get(2, Protoss.RoboticsFacility)
+    }
+    get(Protoss.Observatory)
+    get(2, Protoss.Gateway)
+    once(Protoss.Observer)
+    if (With.fingerprints.twoFac()) {
+      get(4, Protoss.Gateway)
+    }
+    if (With.fingerprints.threeFac()) {
+      get(5, Protoss.Gateway)
+    }
+    if ( ! safeDefending) {
+      get(Protoss.RoboticsSupportBay)
+      get(4, Protoss.Gateway)
+      get(2, Protoss.RoboticsFacility)
+      get(Protoss.ShuttleSpeed)
+      pumpGasPumps()
+    }
+    if (armySupply200() < 48) {
+      armyNormalPriority()
+    }
+    requireMiningBases(3)
+    get(Protoss.Shuttle)
+    get(Protoss.RoboticsSupportBay)
+
+    armyNormalPriority()
+
+    get(Protoss.ObserverSpeed)
+    get(Protoss.ObserverVisionRange)
+    get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
+    get(Protoss.Forge)
+    get(Protoss.GroundDamage)
+    if ( ! upgradeComplete(Protoss.ZealotSpeed) || ! have(Protoss.TemplarArchives)) {
+      get(Protoss.CitadelOfAdun)
+    }
+    get(Protoss.ZealotSpeed)
+    pumpGasPumps(bases - gas / 400)
+    get(Protoss.TemplarArchives)
+    get(Protoss.PsionicStorm)
+    get(Protoss.ShuttleSpeed)
+    get(2, Protoss.RoboticsFacility)
+    get(Protoss.GroundArmor)
+    get(Protoss.HighTemplarEnergy)
+    get(6, Protoss.Gateway)
+    requireMiningBases(4)
+
+    buildCannonsAtExpansions(1)
+    get(Protoss.Stargate)
+    get(Protoss.FleetBeacon)
+    upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
+    get(4, Protoss.Stargate)
+    get(Protoss.CarrierCapacity)
+    requireMiningBases(5)
+    get(2, Protoss.Forge)
+    upgradeContinuously(Protoss.GroundDamage)
+    upgradeContinuously(Protoss.Shields) && upgradeContinuously(Protoss.GroundArmor)
+    get(Protoss.ArbiterTribunal)
+    get(Protoss.Stasis)
+    pumpGasPumps()
+    get(16, Protoss.Gateway)
+
+
+    val zealotAggro     = frame < Minutes(5)() && unitsComplete(Protoss.Zealot) > 0 && ! (With.fingerprints.eightRax() && With.fingerprints.oneFac())
+    val pushMarines     = barracksCheese && ! With.strategy.isRamped
+    val mineContain     = enemyHasShown(Terran.SpiderMine) && unitsComplete(Protoss.Observer) == 0
+    val armySizeUs      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
+    val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
+    val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
+    val nascentCarriers = have(Protoss.FleetBeacon) && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
+    val encroaching     = With.scouting.enemyProximity > 0.65
+    var shouldAttack    = unitsComplete(IsWarrior) >= 7
+    shouldAttack  ||= ! barracksCheese
+    shouldAttack  &&= safeSkirmishing
+    shouldAttack  &&= ! mineContain
+    shouldAttack  &&= ! vultureRush
+    shouldAttack  &&= ! consolidatingFE
+    shouldAttack  ||= zealotAggro
+    shouldAttack  ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
+    shouldAttack  ||= bases > 2
+    shouldAttack  ||= enemyMiningBases > miningBases
+    shouldAttack  ||= frame > Minutes(10)()
+    shouldAttack  ||= pushMarines
+    shouldAttack  ||= haveComplete(Protoss.Reaver) && haveComplete(Protoss.Shuttle) && safePushing
+
+    if (zealotAggro)      status("ZealotAggro")
+    if (pushMarines)      status("PushMarines")
+    if (mineContain)      status("MineContain")
+    if (vultureRush)      status("VultureRush")
+    if (consolidatingFE)  status("ConsolidatingFE")
+    if (nascentCarriers)  status("NascentCarriers")
+    if (encroaching)      status("Encroaching")
+
+    if (shouldAttack) {
+      attack()
+    }
+    harass()
+    gasLimitCeiling(Math.max(1, miningBases) * 300)
+    With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
+  }
+
+  def counterBio: Boolean = With.fingerprints.bio() && enemies(Terran.Marine, Terran.Firebat, Terran.Medic) >= enemies(Terran.Vulture) * 1.5
+
+  def doArmyHighPriority(): Unit = {
+    if (have(Protoss.TemplarArchives)
+      && ( ! enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep) || enemyBases < 2)
+      && ! have(Protoss.FleetBeacon, Protoss.Arbiter)
+      && ! haveComplete(Protoss.ArbiterTribunal)
+      && ! enemiesHave(Terran.ScienceVessel)
+      && ( ! enemyHasShown(Terran.SpiderMine) || With.scouting.enemyProximity > 0.7))  {
+      once(2, Protoss.DarkTemplar)
+      pump(Protoss.DarkTemplar, ?(enemyHasShown(Terran.SpiderMine), 1, 2))
+    }
+    pump(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 1))
+    pumpRatio(Protoss.Dragoon, 6, 16, Seq(Flat(6), Enemy(Terran.Vulture, .75), Enemy(Terran.Wraith, 1.0))) // Don't get caught with pants totally down against harassment
+    if (have(Protoss.RoboticsSupportBay)) {
+      pumpShuttleAndReavers(?(counterBio, 6, 4), shuttleFirst = ! counterBio)
+    }
+    pump(Protoss.Carrier, 8)
+  }
+
+  def doArmyNormalPriority(): Unit = {
+    pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .75), Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
+    pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 3), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
+    if (have(Protoss.Stargate) && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 2)) {
+      pump(Protoss.Observer, 8)
+    }
+    pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 0.1), Friendly(Protoss.Carrier, 1.0)))
+    if (unitsComplete(Protoss.FleetBeacon) == 0 && With.scouting.enemyProximity > 0.4 && enemies(Terran.Goliath) + enemies(Terran.Marine) / 5 == 0) {
+      pump(Protoss.Scout, 2)
+    }
+    pump(Protoss.Arbiter, 1)
+    pump(Protoss.Carrier, 16)
+    pump(Protoss.Arbiter, 2)
+    if (have(Protoss.HighTemplar)) {
+      pumpRatio(Protoss.Shuttle, 1, 5, Seq(Friendly(Protoss.Reaver, 0.5), Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+    }
+    if (upgradeStarted(Protoss.ZealotSpeed)) {
+      pump(Protoss.Zealot, units(Protoss.Dragoon))
+    }
+    pump(Protoss.Dragoon)
+    pump(Protoss.Zealot)
+  }
+}

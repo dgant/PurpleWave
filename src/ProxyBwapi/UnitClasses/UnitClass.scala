@@ -180,6 +180,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val isMinerals           : Boolean = isMineralField
   lazy val isGas                : Boolean = Vector(Neutral.Geyser, Terran.Refinery, Protoss.Assimilator, Zerg.Extractor).contains(this)
   lazy val isResource           : Boolean = isMinerals || isGas
+  lazy val isFarm               : Boolean = this == Terran.SupplyDepot || this == Protoss.Pylon || this == Zerg.Overlord
   lazy val isTownHall           : Boolean = isResourceDepot
   lazy val isStaticDefense      : Boolean = isBuilding && (canAttack || this == Terran.Bunker || this == Protoss.ShieldBattery)
   lazy val isTransport          : Boolean = spaceProvided > 0 && isFlyer && this != Protoss.Carrier

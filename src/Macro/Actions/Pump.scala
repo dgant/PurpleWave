@@ -2,10 +2,11 @@ package Macro.Actions
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
-import Macro.Requests.Get
+import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 import Utilities.UnitFilters._
 
 object Pump {
@@ -31,11 +32,27 @@ object Pump {
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
         && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
 
-    val unitsComplete       = With.macroCounts.oursComplete(unitClass)
-    val larvaSpawning       = if (builderClass == Zerg.Larva) With.units.countOurs(IsAll(IsHatchlike, IsComplete)) else 0
-    val builders            = getBuildersExisting + larvaSpawning
-    val unitsToAdd          = Maff.vmin(maximumConcurrently, 2 * builders * unitClass.copiesProduced)
-    val unitsToRequest      = Maff.vmin(maximumTotal, unitsComplete + unitsToAdd)
-    With.scheduler.request(this, Get(unitsToRequest, unitClass))
+    val unitsComplete = With.macroCounts.oursComplete(unitClass)
+    val larvaSpawning = ?(builderClass == Zerg.Larva, With.units.countOurs(IsAll(IsHatchlike, IsComplete)), 0)
+    val capacity      = (getBuildersExisting + larvaSpawning) * unitClass.copiesProduced
+    val wavesAhead    = 4
+
+    if (maximumConcurrently < Int.MaxValue / wavesAhead) {
+      (0 until wavesAhead).foreach(wave =>
+        With.scheduler.request(
+          this,
+          RequestUnit(
+            unitClass,
+            Math.min(maximumTotal, unitsComplete + capacity * (1 + wave)),
+            unitClass.buildFrames * wave)))
+    } else {
+      val unitsToRequest = Maff.vmin(maximumTotal, unitsComplete + wavesAhead * capacity)
+      With.scheduler.request(
+        this,
+        RequestUnit(
+          unitClass,
+          Math.min(maximumTotal, unitsComplete + capacity * wavesAhead),
+          unitsToRequest))
+    }
   }
 }

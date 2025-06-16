@@ -33,6 +33,8 @@ class Supplier extends MacroActions {
   val consumed    : ArrayBuffer[(Int, UnitClass)] = new ArrayBuffer[(Int, UnitClass)]
 
   def update(): Unit = {
+    return // Deprecated with Autosupply in MacroSim
+
     incomeMins      = With.accounting.ourIncomePerFrameMinerals
     incomeGas       = With.accounting.ourIncomePerFrameGas
     appetite        = measureAppetite

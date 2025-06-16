@@ -76,10 +76,11 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     lazy val safePassage  = unit.matchups.ignorant || unit.topSpeedTransported >= 0.9 * group.meanTopSpeed && unit.matchups.pixelsToThreatRange.forall(_ > 32 * ?(unit.agent.receivedPushPriority() < TrafficPriorities.Bump, 2, 16))
 
     technique =
-            if ( ! unit.canMove)                            Fight
-      else  if (unit.agent.shouldFight && target.isDefined) Fight
-      else  if (safePassage)                                Walk
-      else                                                  Flee
+            if ( ! unit.canMove)                                    Fight
+      else  if (unit.agent.shouldFight && target.isDefined)         Fight
+      else  if (safePassage && target.exists(unit.inRangeToAttack)) Fight
+      else  if (safePassage)                                        Walk
+      else                                                          Flee
 
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)

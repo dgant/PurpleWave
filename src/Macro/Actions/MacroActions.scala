@@ -71,8 +71,7 @@ trait MacroActions extends MacroCounting {
     PumpWorkers(oversaturate, maximumTotal, maximumConcurrently)
   }
   def pumpSupply(): Unit = {
-    With.blackboard.autoSupply.set(true)
-    //With.supplier.update()
+    With.scheduler.request(this, RequestAutosupply)
   }
   def pumpRatio(unitClass: UnitClass, minimum: Int, maximum: Int, ratios: Seq[MatchingRatio], round: Rounding = Rounding.Up): Unit = {
     PumpRatio(unitClass, minimum, maximum, ratios, round)

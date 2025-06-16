@@ -2,7 +2,7 @@ package Macro.Scheduling
 
 import Debugging.SimpleString
 import Lifecycle.With
-import Macro.Requests.{RequestBuildable, RequestTech, RequestUnit, RequestUpgrade}
+import Macro.Requests.{RequestAutosupply, RequestBuildable, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -10,7 +10,7 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
-import Utilities.Time.{Forever, Seconds}
+import Utilities.Time.{Forever, GameTime, Seconds}
 import Utilities.{?, CloneyCountMap}
 
 import scala.collection.mutable
@@ -33,7 +33,7 @@ final class MacroSim {
   object StealsSupply           extends InsertionResult
 
   val redundant = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
-  val denied    = new ArrayBuffer[(RequestBuildable, InsertionResult)]() // We don't need this for bot operation; it's just here for debugging
+  val denied    = new ArrayBuffer[(RequestBuildable, InsertionResult)]()
   val steps     = new mutable.ArrayBuffer[MacroStep]()
   val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
 
@@ -42,11 +42,13 @@ final class MacroSim {
 
   private var _simIncomeMineralsPerFrame: Double = _
   private var _simIncomeGasPerFrame: Double = _
+  private var _autosupply: Boolean = _
 
   private def trulyUnoccupied(unit: UnitInfo): Boolean = unit.complete && (unit.remainingOccupationFrames == 0 || unit.isAny(Protoss.Reaver, Protoss.Carrier))
   def simulate(): Unit = {
     _simIncomeMineralsPerFrame = With.accounting.ourIncomePerFrameMinerals
     _simIncomeGasPerFrame = ?(With.gathering.gasIsCappedOnQuantity, With.accounting.ourIncomePerFrameGasMax, With.accounting.ourIncomePerFrameGas)
+    _autosupply = false
 
     redundant.clear()
     denied.clear()
@@ -109,31 +111,36 @@ final class MacroSim {
     // Populate states as of each event
     updateStatesFrom(1)
 
-    queueRequests()
-  }
-
-
-
-  private def queueRequests(): Unit = {
     // Insert requests
     val requests = new ArrayBuffer[RequestBuildable]
     With.scheduler.requests.view
       .map(_.request)
       .filterNot(r => With.blackboard.toCancel().contains(r.buildable))
-      .foreach(buildRequest => {
-        if (buildRequest.upgrade.exists(u => steps.last.state.upgrades(u) < buildRequest.quantity)) {
-          requests += buildRequest
-        } else if (buildRequest.tech.exists(t => ! steps.last.state.techs.contains(t))) {
-          requests += buildRequest
-        } else if (buildRequest.unit.isDefined) {
-          requests += buildRequest
+      .foreach(request => {
+        var include: Boolean = false
+        include ||= request.upgrade.exists(u => steps.last.state.upgrades(u) < request.quantity)
+        include ||= request.tech.exists(t => ! steps.last.state.techs.contains(t))
+        include ||= request.unit.isDefined
+        include ||= request == RequestAutosupply
+        if (include) {
+          requests += request
         }
       })
 
     // For each request, check if we've satisfied it by the end, and if not, insert it
     requests.foreach(satisfyRequest)
   }
+
+  private val maximumFramesAhead = GameTime(3, 30)() // The slowest thing in the game is
   private def satisfyRequest(request: RequestBuildable): Boolean = {
+    if (request == RequestAutosupply) {
+      _autosupply = true
+      return true
+    }
+    if (denied.exists(_._1 == request)) {
+      return false
+    }
+
     val farm = With.self.supplyClass
     // TODO: Don't occupy Probes
     // TODO: Don't return producers which morph
@@ -169,15 +176,17 @@ final class MacroSim {
       var supplyTried     : Boolean         = false
       var succeeded       : Boolean         = false
       var stepBefore      : MacroStep       = null
-      while (stepIndex < steps.length && ! succeeded) {
+      while ( ! succeeded && stepIndex < steps.length && steps(stepIndex).event.dFrames < maximumFramesAhead) {
         stepBefore = steps(stepIndex)
-        val insertionResult = tryInsertAfter(request, stepBefore, stepIndex)
+        insertionResult = tryInsertAfter(request, stepBefore, stepIndex)
         if ((insertionResult == MissingSupply || insertionResult == StealsSupply)
+          && _autosupply
+          && ! supplyTried
           && stepBefore.state.supplyAvailable < 400
           && stepBefore.event.dFrames > farm.buildFrames
-          && ! supplyTried) {
+          ) {
           supplyTried = true
-          succeeded = satisfyRequest(RequestUnit(farm, stepBefore.state.unitsComplete(farm) + 1, stepBefore.event.dFrames + With.frame - farm.buildFrames - Seconds(5)()))
+          succeeded = satisfyRequest(RequestUnit(farm, stepBefore.state.unitsComplete(farm) + 1, stepBefore.event.dFrames + With.frame - farm.buildFrames - Seconds(10)()))
         } else if (insertionResult == Success) {
           succeeded = true
         }
@@ -197,7 +206,7 @@ final class MacroSim {
         if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
         if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
         .max).toInt
-      if (framesAfter < Forever()) {
+      if (framesAfter < maximumFramesAhead) {
         val stepStart           = new MacroStep
         val stepFinish          = new MacroStep
         val eventStart          = stepStart.event
@@ -253,6 +262,7 @@ final class MacroSim {
     extantAt(buildable, if (absoluteFrame == 0) steps.last else steps.reverseIterator.find(_.event.dFrames + With.frame < absoluteFrame).getOrElse(steps.head))
   }
 
+  //lazy val supplyStealingLimit: Int = Protoss.Pylon.buildFrames + Seconds(10)()
   private def tryInsertAfter(request: RequestBuildable, step: MacroStep, i: Int): InsertionResult = {
     lazy val atFrame = {
       val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / _simIncomeMineralsPerFrame))
@@ -278,25 +288,36 @@ final class MacroSim {
     } else if (request.unitsRequired.exists(_.withMacroSubstitutes.map(step.state.unitsComplete).sum == 0)) {
       return MissingUnitRequirement
     }
-    var futureEffect: InsertionResult = Success
-    var j = i
-    while (j < steps.length && (futureEffect == Success || futureEffect == StealsSupply)) {
+
+    var j = i + 1
+    lazy val justInTimeSupply = request.unit.exists(_.isFarm) && request.minStartFrame > 0
+    while (j < steps.length) {
       val futureStep = steps(j)
       val state = futureStep.state
       if (request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired && futureStep.event.dFrames < atFrame + request.buildFrames) {
-        futureEffect = StealsProducer
-      } else if (request.mineralCost > Math.max(0, state.minerals)) {
-        futureEffect = StealsMinerals
+        return StealsProducer
+      } else if (request.mineralCost > Math.max(0, state.minerals) && ! (justInTimeSupply && futureStep.request.exists(_.unit.exists(_.supplyRequired > 0)))) {
+        return StealsMinerals
       } else if (request.gasCost > Math.max(0, state.gas)) {
-        futureEffect = StealsGas
-      } else if (request.supplyRequired > Math.max(0, state.supplyAvailable - state.supplyUsed)) {
-        futureEffect = StealsSupply
+        return StealsGas
       }
       j += 1
     }
-    if (futureEffect != Success) {
-      return futureEffect
+
+    // Do second loop checking for supply-stealing
+    // We must do this AFTER the other checks in order to not say "this totally unaffordable request is fine because we're rejecting it for StealsSupply and can just add more supply"
+    if ( ! _autosupply) { // Disabling this under the assumption that we will autosupply as needed
+      j = i + 1
+      while (j < steps.length) {
+        val futureStep = steps(j)
+        val state = futureStep.state
+        if (request.supplyRequired > Math.max(0, state.supplyAvailable - state.supplyUsed)) {
+          return StealsSupply
+        }
+        j += 1
+      }
     }
+
     // Verify that the request doesn't block us on supply.
     // This check must happen last! We only want to attempt to clear a supply block if no other problems exist.
     //
@@ -306,7 +327,7 @@ final class MacroSim {
     // In the meantime, we could be making Zealots!
     //
     // So if an insertion would block us on supply, but put us near the supply cap, allow it.
-    else if (request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed) && step.state.supplyUsed < 380) {
+    if (request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed) && step.state.supplyUsed < 380) {
       return MissingSupply
     }
     Success

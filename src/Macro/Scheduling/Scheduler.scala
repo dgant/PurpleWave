@@ -1,6 +1,6 @@
 package Macro.Scheduling
 
-import Macro.Requests.RequestBuildable
+import Macro.Requests.{RequestAutosupply, RequestBuildable}
 
 import scala.collection.mutable
 
@@ -12,7 +12,7 @@ class Scheduler {
   }
 
   def request(requester: Any, theRequest: RequestBuildable): Unit = {
-    if (theRequest.tech.isDefined || theRequest.quantity > 0) {
+    if (theRequest.tech.isDefined || theRequest.quantity > 0 || theRequest == RequestAutosupply) {
       _requests += ScheduleItem(requester, theRequest)
     }
   }

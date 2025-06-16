@@ -21,6 +21,7 @@ class Blackboard {
 
   val status                  : Property[Seq[String]]       = add(new Property(Seq.empty))
   val aggressionRatio         : Property[Double]            = add(new Property(1.0))
+  val autoSupply              : Property[Boolean]           = add(new Property(false))
   val wantToAttack            : Property[Boolean]           = add(new Property(false))
   val wantToHarass            : Property[Boolean]           = add(new Property(false))
   val scoutExpansions         : Property[Boolean]           = add(new Property(true))

@@ -13,7 +13,6 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
-import Tactic.Tactics.TacticPylonBlock
 import Utilities.?
 import Utilities.UnitFilters.UnitFilter
 
@@ -72,7 +71,8 @@ trait MacroActions extends MacroCounting {
     PumpWorkers(oversaturate, maximumTotal, maximumConcurrently)
   }
   def pumpSupply(): Unit = {
-    With.supplier.update()
+    With.blackboard.autoSupply.set(true)
+    //With.supplier.update()
   }
   def pumpRatio(unitClass: UnitClass, minimum: Int, maximum: Int, ratios: Seq[MatchingRatio], round: Rounding = Rounding.Up): Unit = {
     PumpRatio(unitClass, minimum, maximum, ratios, round)

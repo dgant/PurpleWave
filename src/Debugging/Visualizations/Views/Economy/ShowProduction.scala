@@ -23,7 +23,8 @@ object ShowProduction extends DebugView {
       val unitClass = if (unit.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon)) unit.buildType else unit.unitClass
       if ( ! unit.complete)
         Some(Producible(
-          unitClass.toString,
+          unitClass.toString
+            .replaceAll("Robotics Support Bay", "Support Bay"),
           unitClass.buildFrames,
           if (unit.complete) unit.remainingTrainFrames else unit.remainingCompletionFrames,
           if (unit.producer.isEmpty) Colors.DarkRed else Colors.DarkBlue,

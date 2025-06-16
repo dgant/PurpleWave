@@ -33,7 +33,6 @@ class Supplier extends MacroActions {
   val consumed    : ArrayBuffer[(Int, UnitClass)] = new ArrayBuffer[(Int, UnitClass)]
 
   def update(): Unit = {
-
     incomeMins      = With.accounting.ourIncomePerFrameMinerals
     incomeGas       = With.accounting.ourIncomePerFrameGas
     appetite        = measureAppetite
@@ -66,7 +65,8 @@ class Supplier extends MacroActions {
   private def measureAppetite: Int = {
     val units = new CountMap[UnitClass]
     With.units.ours.foreach(u => units(u.unitClass) += 1)
-    With.scheduler.requests.view.map(_.request).foreach(r => r.unit.foreach(u => units(u) = Math.max(units(u), r.quantity)))
+    With.scheduler.requests.view.map(_.request)
+      .foreach(r => r.unit.foreach(u => units(u) = Math.max(units(u), r.quantity)))
     units.view.map(p => p._1.supplyRequired * p._2).sum
   }
 

@@ -347,10 +347,15 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
           minimumSpace += 32
         }
       }
+      lazy val rangeDifferential = unit.pixelRangeAgainst(t) - t.pixelRangeAgainst(unit)
+      if (unit.canAttack(t) && rangeDifferential > 0) {
+        minimumSpace = Math.min(minimumSpace, rangeDifferential / 2)
+      }
     })
     if (unit.readyForAttackOrder) {
       minimumSpace = Math.min(minimumSpace, target.map(unit.pixelRangeAgainst).getOrElse(unit.pixelRangeMax) - 24)
     }
+
     if (unit.matchups.threatDeepest.exists(_.pixelsToGetInRange(unit) < minimumSpace)) {
       Retreat(unit)
     }

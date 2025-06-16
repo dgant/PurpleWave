@@ -1,5 +1,6 @@
 package Macro.Scheduling
 
+import Debugging.SimpleString
 import Lifecycle.With
 import Macro.Requests.{RequestBuildable, RequestTech, RequestUnit, RequestUpgrade}
 import Mathematics.Maff
@@ -9,20 +10,35 @@ import ProxyBwapi.Techs.Techs
 import ProxyBwapi.UnitClasses.UnitClasses
 import ProxyBwapi.UnitInfo.UnitInfo
 import ProxyBwapi.Upgrades.{Upgrade, Upgrades}
+import Utilities.Time.{Forever, Seconds}
 import Utilities.{?, CloneyCountMap}
-import Utilities.Time.Forever
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 final class MacroSim {
+  trait InsertionResult extends SimpleString
+  object Success                extends InsertionResult
+  object PrecedesMinInsert      extends InsertionResult
+  object MissingMinerals        extends InsertionResult
+  object MissingGas             extends InsertionResult
+  object MissingSupply          extends InsertionResult
+  object MissingUpgrade         extends InsertionResult
+  object MissingTech            extends InsertionResult
+  object MissingProducer        extends InsertionResult
+  object MissingUnitRequirement extends InsertionResult
+  object StealsProducer         extends InsertionResult
+  object StealsMinerals         extends InsertionResult
+  object StealsGas              extends InsertionResult
+  object StealsSupply           extends InsertionResult
+
   val redundant = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
-  val denied    = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
+  val denied    = new ArrayBuffer[(RequestBuildable, InsertionResult)]() // We don't need this for bot operation; it's just here for debugging
   val steps     = new mutable.ArrayBuffer[MacroStep]()
   val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
 
-  private def requests: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
-  def queue: Seq[(RequestBuildable, Int)] = requests.filter(_._1.specificTrainee.isDefined) ++ requests.filter(_._1.specificTrainee.isEmpty)
+  private def _queue: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
+  def queue: Seq[(RequestBuildable, Int)] = _queue.filter(_._1.specificTrainee.isDefined) ++ _queue.filter(_._1.specificTrainee.isEmpty)
 
   private var _simIncomeMineralsPerFrame: Double = _
   private var _simIncomeGasPerFrame: Double = _
@@ -32,7 +48,6 @@ final class MacroSim {
     _simIncomeMineralsPerFrame = With.accounting.ourIncomePerFrameMinerals
     _simIncomeGasPerFrame = ?(With.gathering.gasIsCappedOnQuantity, With.accounting.ourIncomePerFrameGasMax, With.accounting.ourIncomePerFrameGas)
 
-    val requests = new ArrayBuffer[RequestBuildable]
     redundant.clear()
     denied.clear()
     steps.clear()
@@ -94,7 +109,14 @@ final class MacroSim {
     // Populate states as of each event
     updateStatesFrom(1)
 
+    queueRequests()
+  }
+
+
+
+  private def queueRequests(): Unit = {
     // Insert requests
+    val requests = new ArrayBuffer[RequestBuildable]
     With.scheduler.requests.view
       .map(_.request)
       .filterNot(r => With.blackboard.toCancel().contains(r.buildable))
@@ -109,84 +131,115 @@ final class MacroSim {
       })
 
     // For each request, check if we've satisfied it by the end, and if not, insert it
-    requests.foreach(request => {
-      // TODO: Don't occupy Probes
-      // TODO: Don't return producers which morph
-      // TODO: Reduce diff for zergling/scourge
+    requests.foreach(satisfyRequest)
+  }
+  private def satisfyRequest(request: RequestBuildable): Boolean = {
+    val farm = With.self.supplyClass
+    // TODO: Don't occupy Probes
+    // TODO: Don't return producers which morph
+    // TODO: Reduce diff for zergling/scourge
 
-      // By the end of our simulation, have we not yet met the request?
-      //
-      // Units:
-      // - (Default) If there is no placement query, use our state count
-      // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
+    // By the end of our simulation, have we not yet met the request?
+    //
+    // Units:
+    // - (Default) If there is no placement query, use our state count
+    // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
 
-      val unitDiff = request.unit.map(u => request.quantity -
-        (if (request.placement.isEmpty)
-          (if (request.minStartFrame <= 0) steps.last.state.unitsCompleteASAP(u) else extantBy(request.buildable, request.minStartFrame))
-        else
-          With.units.ours.filter(u).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
-      val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
-      val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
-      val diff        = Maff.vmax(unitDiff, upgradeDiff, techDiff)
-      if (diff <= 0) {
-        redundant += request
-      } else {
-        (0 until diff).foreach(iDiff => {
-          val insertAfter = steps.indices.drop(minInsert.getOrElse(request, 0)).find(canInsertAfter(request, _))
-          if (insertAfter.isEmpty) { denied += request }
-          insertAfter.foreach(i => {
-            val stepBefore = steps(i)
-            val framesAfter = Math.ceil(Seq(
-              request.minStartFrame - With.frame,
-              stepBefore.event.dFrames,
-              if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
-              if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
-              .max).toInt
-            if (framesAfter < Forever()) {
-              val stepStart           = new MacroStep
-              val stepFinish          = new MacroStep
-              val eventStart          = stepStart.event
-              val eventFinish         = stepFinish.event
-              stepStart.request       = Some(request)
-              eventStart.dFrames      = framesAfter
-              eventStart.dMinerals    = - request.mineralCost
-              eventStart.dGas         = - request.gasCost
-              eventStart.dSupplyUsed  = request.supplyRequired
-              eventStart.dProducer1   = request.producerRequired
-              eventStart.dProducer1N  = - request.producersRequired
-              eventFinish.dFrames     = eventStart.dFrames + request.buildFrames
-              eventFinish.dProducer1  = eventStart.dProducer1
-              eventFinish.dProducer1N = - eventStart.dProducer1N
-              request.unit.foreach(u => {
-                val ASAP                        = request.minStartFrame <= With.frame + Maff.div4(u.buildFrames)
-                eventStart.dUnitExtant1         = u
-                eventStart.dUnitExtant1N        = u.copiesProduced
-                eventFinish.dUnitComplete       = u
-                eventFinish.dUnitCompleteN      = u.copiesProduced
-                eventFinish.dUnitCompleteASAP   = ?(ASAP, u, UnitClasses.None)
-                eventFinish.dUnitCompleteASAPN  = ?(ASAP, u.copiesProduced, 0)
-                eventFinish.dProducer2          = u
-                eventFinish.dProducer2N         = u.copiesProduced
-                eventFinish.dSupplyAvailable    = u.supplyProvided
-                eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
-              })
-              if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
-                eventStart.dUnitExtant2 = request.producerRequired
-                eventStart.dUnitExtant2N = - request.producersRequired
-              }
-              request.tech.foreach(eventFinish.dTech = _)
-              request.upgrade.foreach(upgrade => {
-                eventFinish.dUpgrade = upgrade
-                eventFinish.dUpgradeLevel = request.quantity
-              })
-              val iStart = insert(stepStart)
-              insert(stepFinish)
-              updateStatesFrom(iStart)
-            }
-          })
-        })
+    val unitDiff = request.unit.map(u => request.quantity -
+      (if (request.placement.isEmpty)
+        (if (request.minStartFrame <= 0) steps.last.state.unitsCompleteASAP(u) else extantBy(request.buildable, request.minStartFrame))
+      else
+        With.units.ours.filter(u).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
+    val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
+    val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
+    val diff        = Maff.vmax(unitDiff, upgradeDiff, techDiff)
+    if (diff <= 0) {
+      redundant += request
+      return false
+    }
+    var iDiff = 0
+    var output = false
+    while (iDiff < diff) {
+      iDiff += 1
+
+      // Find an insertion step
+      var insertionResult : InsertionResult = null
+      val stepInitial     : Int             = minInsert.getOrElse(request, 0)
+      var stepIndex       : Int             = stepInitial
+      var supplyTried     : Boolean         = false
+      var succeeded       : Boolean         = false
+      var stepBefore      : MacroStep       = null
+      while (stepIndex < steps.length && ! succeeded) {
+        stepBefore = steps(stepIndex)
+        val insertionResult = tryInsertAfter(request, stepBefore, stepIndex)
+        if ((insertionResult == MissingSupply || insertionResult == StealsSupply)
+          && stepBefore.state.supplyAvailable < 400
+          && stepBefore.event.dFrames > farm.buildFrames
+          && ! supplyTried) {
+          supplyTried = true
+          succeeded = satisfyRequest(RequestUnit(farm, stepBefore.state.unitsComplete(farm) + 1, stepBefore.event.dFrames + With.frame - farm.buildFrames - Seconds(5)()))
+        } else if (insertionResult == Success) {
+          succeeded = true
+        }
+        if ( ! succeeded) {
+          minInsert(request) = Math.max(stepIndex, minInsert.getOrElse(request, stepIndex))
+          stepIndex += 1
+        }
       }
-    })
+      if ( ! succeeded) {
+        denied += ((request, insertionResult))
+        return false
+      }
+      output = true
+      val framesAfter = Math.ceil(Seq(
+        request.minStartFrame - With.frame,
+        stepBefore.event.dFrames,
+        if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
+        if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
+        .max).toInt
+      if (framesAfter < Forever()) {
+        val stepStart           = new MacroStep
+        val stepFinish          = new MacroStep
+        val eventStart          = stepStart.event
+        val eventFinish         = stepFinish.event
+        stepStart.request       = Some(request)
+        eventStart.dFrames      = framesAfter
+        eventStart.dMinerals    = - request.mineralCost
+        eventStart.dGas         = - request.gasCost
+        eventStart.dSupplyUsed  = request.supplyRequired
+        eventStart.dProducer1   = request.producerRequired
+        eventStart.dProducer1N  = - request.producersRequired
+        eventFinish.dFrames     = eventStart.dFrames + request.buildFrames
+        eventFinish.dProducer1  = eventStart.dProducer1
+        eventFinish.dProducer1N = - eventStart.dProducer1N
+        request.unit.foreach(u => {
+          val ASAP                        = request.minStartFrame <= With.frame + Maff.div4(u.buildFrames)
+          eventStart.dUnitExtant1         = u
+          eventStart.dUnitExtant1N        = u.copiesProduced
+          eventFinish.dUnitComplete       = u
+          eventFinish.dUnitCompleteN      = u.copiesProduced
+          eventFinish.dUnitCompleteASAP   = ?(ASAP, u, UnitClasses.None)
+          eventFinish.dUnitCompleteASAPN  = ?(ASAP, u.copiesProduced, 0)
+          eventFinish.dProducer2          = u
+          eventFinish.dProducer2N         = u.copiesProduced
+          eventFinish.dSupplyAvailable    = u.supplyProvided
+          eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
+        })
+        if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
+          eventStart.dUnitExtant2 = request.producerRequired
+          eventStart.dUnitExtant2N = - request.producersRequired
+        }
+        request.tech.foreach(eventFinish.dTech = _)
+        request.upgrade.foreach(upgrade => {
+          eventFinish.dUpgrade = upgrade
+          eventFinish.dUpgradeLevel = request.quantity
+        })
+        val iStart = insert(stepStart)
+        insert(stepFinish)
+        updateStatesFrom(iStart)
+      }
+    }
+    output
   }
 
   private def extantAt(buildable: Buildable, step: MacroStep): Int = {
@@ -200,21 +253,52 @@ final class MacroSim {
     extantAt(buildable, if (absoluteFrame == 0) steps.last else steps.reverseIterator.find(_.event.dFrames + With.frame < absoluteFrame).getOrElse(steps.head))
   }
 
-  private def canInsertAfter(request: RequestBuildable, i: Int): Boolean = {
-    // Find a state where we can fulfill the request
-    val step = steps(i)
-    var cant = false
+  private def tryInsertAfter(request: RequestBuildable, step: MacroStep, i: Int): InsertionResult = {
     lazy val atFrame = {
       val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / _simIncomeMineralsPerFrame))
       val gasFrames     = Math.max(0, Maff.nanToInfinity((request.gasCost     - step.state.gas)       / _simIncomeGasPerFrame))
       step.event.dFrames + Math.max(mineralFrames, gasFrames)
     }
-    cant ||= exceedsMinInsert(request, i + 1)
-    cant ||= request.mineralCost > Math.max(0, step.state.minerals) && _simIncomeMineralsPerFrame == 0
+    if (exceedsMinInsert(request, i + 1)) {
+      return PrecedesMinInsert
+    } else if (request.mineralCost > Math.max(0, step.state.minerals) && _simIncomeMineralsPerFrame == 0) {
+      return MissingMinerals
+    }
     // TODO: Restore once we update income per-state
-    //cant ||= request.gasCost > Math.max(0, step.state.gas) && _simIncomeGasPerFrame == 0
-    cant ||= request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0
+    // else if (request.gasCost > Math.max(0, step.state.gas) && _simIncomeGasPerFrame == 0
+    else if (request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0) {
+      return MissingGas
+    }
+    else if (request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)) {
+      return MissingUpgrade
+    } else if (request.techRequired.exists(t => ! step.state.techs.contains(t))) {
+      return MissingTech
+    } else if (step.state.producers(request.producerRequired) < request.producersRequired) {
+      return MissingProducer
+    } else if (request.unitsRequired.exists(_.withMacroSubstitutes.map(step.state.unitsComplete).sum == 0)) {
+      return MissingUnitRequirement
+    }
+    var futureEffect: InsertionResult = Success
+    var j = i
+    while (j < steps.length && (futureEffect == Success || futureEffect == StealsSupply)) {
+      val futureStep = steps(j)
+      val state = futureStep.state
+      if (request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired && futureStep.event.dFrames < atFrame + request.buildFrames) {
+        futureEffect = StealsProducer
+      } else if (request.mineralCost > Math.max(0, state.minerals)) {
+        futureEffect = StealsMinerals
+      } else if (request.gasCost > Math.max(0, state.gas)) {
+        futureEffect = StealsGas
+      } else if (request.supplyRequired > Math.max(0, state.supplyAvailable - state.supplyUsed)) {
+        futureEffect = StealsSupply
+      }
+      j += 1
+    }
+    if (futureEffect != Success) {
+      return futureEffect
+    }
     // Verify that the request doesn't block us on supply.
+    // This check must happen last! We only want to attempt to clear a supply block if no other problems exist.
     //
     // Dilemma:
     // If we're trying to pump High Templar, followed by Zealots, are nearly maxed, and are low on gas,
@@ -222,33 +306,10 @@ final class MacroSim {
     // In the meantime, we could be making Zealots!
     //
     // So if an insertion would block us on supply, but put us near the supply cap, allow it.
-    cant ||= request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed) && step.state.supplyUsed < 380
-    cant ||= request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)
-    cant ||= request.techRequired.exists(t => ! step.state.techs.contains(t))
-    cant ||= step.state.producers(request.producerRequired) < request.producersRequired
-    cant ||= request.unitsRequired.exists(_.withMacroSubstitutes.map(step.state.unitsComplete).sum == 0)
-    cant ||= ! canInsertBefore(request, i + 1, atFrame.toInt)
-    // TODO: Treat addons as producers
-    if (cant) {
-      minInsert(request) = Math.max(i, minInsert.getOrElse(request, i))
+    else if (request.supplyRequired > Math.max(0, step.state.supplyAvailable - step.state.supplyUsed) && step.state.supplyUsed < 380) {
+      return MissingSupply
     }
-    ! cant
-  }
-
-  private def canInsertBefore(request: RequestBuildable, i: Int, atFrame: Int): Boolean = {
-    // Ensure no future states would be rendered impossible by inserting the request
-    var j = i
-    var cant = false
-    while(j < steps.length && ! cant) {
-      val step = steps(j)
-      val state = step.state
-      cant ||= request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired && step.event.dFrames < atFrame + request.buildFrames
-      cant ||= request.mineralCost      > Math.max(0, state.minerals)
-      cant ||= request.gasCost          > Math.max(0, state.gas)
-      cant ||= request.supplyRequired   > Math.max(0, state.supplyAvailable - state.supplyUsed)
-      j += 1
-    }
-    ! cant
+    Success
   }
 
   private def exceedsMinInsert(request: RequestBuildable, i: Int): Boolean = {

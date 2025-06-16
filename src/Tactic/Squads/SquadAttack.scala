@@ -36,10 +36,13 @@ class SquadAttack extends Squad {
   }
 
   def chooseMode(): AttackMode = {
-    val proxies             = With.units.enemy.filter(_.proxied).toVector
+    val legalTargets = With.units.enemy
+      .filter(u => attacksAir     || ! u.unitClass.canFly || ( u.visible && ! u.flying) || u.tile.walkable)
+      .filter(u => attacksGround  || ! u.flying)
+    val proxies             = legalTargets.filter(_.proxied).toVector
     val enemyBasesOccupied  = units.view.flatMap(_.base).filter(_.isEnemy).toSet
 
-    lazy val enemyBuildings       = With.units.enemy.filter(IsBuilding).filter(b => attacksAir || ! b.flying)
+    lazy val enemyBuildings       = legalTargets.filter(IsBuilding).filter(b => attacksAir || ! b.flying)
     lazy val nearestEnemyBuilding = Maff.minBy(enemyBuildings.map(_.pixel))(attackKeyDistanceTo)
     lazy val neutralBase          = Maff.minBy(With.geography.bases.filter(b => With.framesSince(b.lastFrameScoutedByUs) > Minutes(2)()))(b => attackKeyDistanceTo(b.heart.center))
     lazy val tilesSparse          = (0 until With.mapTileWidth by 4).flatMap(x => (0 until With.mapTileHeight by 4).map(y => Tile(x, y)).filter(t => With.framesSince(t.lastSeen) > Minutes(2)()))
@@ -48,14 +51,13 @@ class SquadAttack extends Squad {
 
     if (With.yolo.active) {
 
-
       setMode(
         YOLO,
         nearestEnemyBuilding
           .orElse(neutralBase.map(_.heart.center))
           .orElse(unseenTile.map(_.center))
           .getOrElse(With.scouting.enemyHome.center),
-        SquadAutomation.rankForArmy(this, With.units.enemy.filter(e => IsBuilding(e) || e.matchups.pixelsToThreatRange.exists(_ <= 0)).toVector))
+        SquadAutomation.rankForArmy(this, legalTargets.filter(e => IsBuilding(e) || e.matchups.pixelsToThreatRange.exists(_ <= 0)).toVector))
 
     } else if (enemyBasesOccupied.nonEmpty) {
 

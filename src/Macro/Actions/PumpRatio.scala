@@ -27,6 +27,8 @@ object PumpRatio {
       })(ratios.map(_.quantity).sum).toInt,
       minimum,
       maximum)
+
+    Pump(unitClass, maxDesirable)
   }
 }
 

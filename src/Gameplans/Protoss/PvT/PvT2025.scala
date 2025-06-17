@@ -117,7 +117,7 @@ class PvT2025 extends PvTOpeners {
     val armySizeUs      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
     val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
-    val nascentCarriers = have(Protoss.FleetBeacon) && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4
+    val nascentCarriers = have(Protoss.FleetBeacon) && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4 && With.self.supplyTotal400 < 376
     val encroaching     = With.scouting.enemyProximity > 0.65
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
     shouldAttack  ||= ! barracksCheese

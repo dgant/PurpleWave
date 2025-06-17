@@ -4,7 +4,7 @@ import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
 import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
-import Information.Counting.{Accounting, MacroCounts, ProductionHistory, Projections}
+import Information.Counting.{Accounting, Efficiency, MacroCounts, ProductionHistory, Projections}
 import Information.Fingerprinting.Fingerprints
 import Information.GameSense.GameSensor
 import Information.Geography.Geography
@@ -76,6 +76,7 @@ object With {
   var camera            : Camera              = _
   var coordinator       : Coordinator         = _
   var configuration     : Configuration       = _
+  var efficiency        : Efficiency          = _
   var fingerprints      : Fingerprints        = _
   var gathering         : Gathering           = _
   var geo               : NeoGeo              = _
@@ -189,6 +190,7 @@ object With {
     camera            = new Camera
     coordinator       = new Coordinator
     accounting        = new Accounting
+    efficiency        = new Efficiency
     fingerprints      = new Fingerprints
     groundskeeper     = new Groundskeeper
     gathering         = new Gathering

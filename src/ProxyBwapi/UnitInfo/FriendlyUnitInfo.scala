@@ -27,6 +27,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _lastFrameOccupied      : Int = - Forever()
   private var _framesFailingToMove    : Int = 0
   private var _framesFailingToAttack  : Int = 0
+  private var _framesIdle             : Int = 0
+  private var _framesIdleConsecutive  : Int = 0
   override def update(): Unit = {
     if (frameDiscovered <  With.frame) readProxy()
     if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
@@ -39,6 +41,12 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     if (remainingOccupationFrames > 0) _lastFrameOccupied = With.frame
     if (order == Orders.HarvestGas || order == Orders.MiningMinerals) orderTarget.foreach(_.lastFrameHarvested = With.frame)
     hysteresis.update()
+    if (complete && unitClass.unitsTrained.nonEmpty && ! training && ! constructing && ! flying && ! morphing && With.self.supplyTotal400 <= 388) {
+      _framesIdle += 1
+      _framesIdleConsecutive += 1
+    } else {
+      _framesIdleConsecutive = 0
+    }
   }
 
   def seeminglyStuck: Boolean = _framesFailingToMove > 24 || _framesFailingToAttack > Math.max(24, cooldownMaxAirGround + 2)
@@ -49,6 +57,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
 
   def remainingCompletionFrames : Int = bwapiUnit.getRemainingBuildTime
   def lastFrameOccupied         : Int = _lastFrameOccupied
+  def framesIdle                : Int = _framesIdle
+  def framesIdleConsecutive     : Int = _framesIdleConsecutive
 
   lazy val agent     : Agent      = new Agent(this)
   lazy val hysteresis: Hysteresis = new Hysteresis(this)

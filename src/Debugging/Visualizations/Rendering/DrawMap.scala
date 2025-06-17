@@ -134,7 +134,7 @@ object DrawMap {
     if (irrelevant(position)) return
     
     val horizontalMargin = 2
-    val estimatedTextWidth = (9 * textLines.map(_.length).max) / 2
+    val estimatedTextWidth = textLines.map(TextWidth(_)).max / 2
     val boxWidth = estimatedTextWidth + (if (estimatedTextWidth > 0) 2 * horizontalMargin else 0)
     val boxHeight = 11 * textLines.size
     val textX = position.x - boxWidth/2

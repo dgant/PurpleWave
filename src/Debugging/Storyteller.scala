@@ -293,6 +293,7 @@ class Storyteller extends MacroCounting {
   }
 
   def onEnd(): Unit = {
+    tell(f"Supply block: ${formatPercentage(With.efficiency.framesSupplyBlocked.toFloat / With.frame)}")
     logPerformance()
     logMemoryUsage()
   }

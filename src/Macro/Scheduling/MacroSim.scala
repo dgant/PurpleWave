@@ -175,9 +175,7 @@ final class MacroSim {
     while (iDiff < diff) {
       iDiff += 1
       var insertionResult : InsertionResult = TooFarInTheFuture
-      val stepInitial     : Int             = minInsert.getOrElse(request, 0)
-      var stepIndex       : Int             = stepInitial
-      var supplyTried     : Boolean         = false
+      var stepIndex       : Int             = minInsert.getOrElse(request, 0)
       var succeeded       : Boolean         = false
       var stepBefore      : MacroStep       = null
       while ( ! succeeded && stepIndex < steps.length && steps(stepIndex).event.dFrames < maximumFramesAhead) {
@@ -201,12 +199,16 @@ final class MacroSim {
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
         val (stepStart, stepFinish) = constructStepsForRequest(request, framesAfter)
+        val at = fit(stepStart)
+        val stepBefore = ?(at < steps.length, steps(at), steps.last)
+
         if (_autosupply
+          && allowSupplyInjection
           && request.unit.exists(_.supplyRequired > 0)
-          && stepStart.state.supplyEnqueued < stepStart.state.supplyUsed + stepStart.event.dSupplyUsed + stepStart.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames) {
+          && stepBefore.state.supplyEnqueued < Math.min(400, stepBefore.state.supplyUsed + stepStart.event.dSupplyUsed + stepBefore.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames)) {
 
           val farm = With.self.supplyClass
-          tryInsertRequest(RequestUnit(farm, stepStart.state.unitsExtant(farm) + 1))
+          tryInsertRequest(RequestUnit(farm, stepBefore.state.unitsExtant(farm) + 1, With.frame + stepBefore.event.dFrames - Terran.SupplyDepot.buildFrames))
           iDiff -= 1
           allowSupplyInjection = false
         } else {
@@ -230,7 +232,6 @@ final class MacroSim {
     extantAt(buildable, if (absoluteFrame == 0) steps.last else steps.reverseIterator.find(_.event.dFrames + With.frame < absoluteFrame).getOrElse(steps.head))
   }
 
-  //lazy val supplyStealingLimit: Int = Protoss.Pylon.buildFrames + Seconds(10)()
   private def tryInsertAfter(request: RequestBuildable, step: MacroStep, i: Int): InsertionResult = {
     lazy val atFrame = {
       val mineralFrames = Math.max(0, Maff.nanToInfinity((request.mineralCost - step.state.minerals)  / _simIncomeMineralsPerFrame))
@@ -301,29 +302,30 @@ final class MacroSim {
     Success
   }
 
-  private def insertStartFinish(start: MacroStep, finish: MacroStep): Unit = {
-
-  }
-
-  private def insert(step: MacroStep): Int = {
+  private def fit(step: MacroStep): Int = {
     // Binary search to figure out where to fit the step
     val dFrames = step.event.dFrames
     var min = 1
     var max = steps.length
     while(true) {
       val at = (min + max) / 2
-      val dFramesBefore = if (at <= 0) Int.MinValue else steps(at - 1).event.dFrames
-      val dFramesAfter = if (at >= steps.length) Int.MaxValue else steps(at).event.dFrames
+      val dFramesBefore = if (at <= 0)            Int.MinValue else steps(at - 1).event.dFrames
+      val dFramesAfter  = if (at >= steps.length) Int.MaxValue else steps(at    ).event.dFrames
       if (dFramesBefore > dFrames) {
         max = at - 1
       } else if (dFramesAfter <= dFrames) {
         min = at + 1
       } else {
-        steps.insert(at, step)
         return at
       }
     }
     throw new RuntimeException("Failed to insert a MacroStep")
+  }
+
+  private def insert(step: MacroStep): Int = {
+    val at = fit(step)
+    steps.insert(at, step)
+    at
   }
 
   private def constructStepsForRequest(request: RequestBuildable, framesAfter: Int): (MacroStep, MacroStep) = {
@@ -367,7 +369,7 @@ final class MacroSim {
   }
 
   lazy val suppliers: Vector[UnitClass] = UnitClasses.all.filter(_.supplyProvided > 0)
-  def ourSuppliers: Seq[UnitClass]  = suppliers.view.filter(_.race == With.self.raceCurrent)
+  def ourSuppliers: Seq[UnitClass]  = suppliers.view.filter(_.race == With.self.raceCurrent).filter( ! _.isTownHall) // Exclude the town halls for now due to how long they take to finish
   private def updateStatesFrom(index: Int): Unit = {
     var i = index
     while (i < steps.length) {

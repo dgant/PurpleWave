@@ -30,6 +30,9 @@ class PvTGasSteal extends GameplanImperative {
     if (scout.isDefined && enemyMain.exists(_.gas.forall(_.isNeutral))) {
       get(RequestUnit(Protoss.Assimilator, 1, placementQueryArg = Some(new PlacementQuery(Protoss.Assimilator).requireBase(enemyMain.get))))
     }
+    if (With.fingerprints.wallIn() && safeDefending) {
+      cancel(Protoss.Zealot)
+    }
 
     once(13, Protoss.Probe)
     once(Protoss.Zealot)

@@ -525,7 +525,7 @@ class PvPOpening extends GameplanImperative {
       once(Protoss.Gateway)
       once(11, Protoss.Probe)
       once(2, Protoss.Gateway)
-      pumpSupply()
+      autosupply()
       pumpWorkers(oversaturate = true)
       pump(Protoss.Dragoon)
       pump(Protoss.Zealot)

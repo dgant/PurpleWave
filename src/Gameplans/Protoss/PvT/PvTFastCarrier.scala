@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvT
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import Performance.Cache
-import Placement.Access.PlacementQuery
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT13Nexus, PvTFastCarrier}
 import Utilities.Time.Minutes
@@ -67,8 +67,8 @@ class PvTFastCarrier extends PvTOpeners {
     ////////////////
 
     once(8, Protoss.Carrier)
-    buildCannonsAtExpansions(3)
-    buildCannonsAtNatural(1)
+    buildCannonsAtExpansions(3, PlaceLabels.DefendHall)
+    buildCannonsAtNatural(1, PlaceLabels.DefendHall)
     upgradeContinuously(Protoss.GroundDamage)
     if ( ! upgradeComplete(Protoss.ZealotSpeed) || ! have(Protoss.TemplarArchives)) {
       get(Protoss.CitadelOfAdun)

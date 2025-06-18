@@ -25,7 +25,7 @@ abstract class GameplanImperative extends Plan with Modal with MacroActions  {
       executeBuild()
     }
     if (doBasics) {
-      pumpSupply() // This currently just prioritizes Supplier
+      autosupply() // This currently just prioritizes Supplier
       doWorkers()
     }
     executeMain()

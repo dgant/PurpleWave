@@ -64,14 +64,14 @@ trait MacroActions extends MacroCounting {
   def once(quantity: Int, unit: UnitClass): Unit = BuildOnce(this, Get(quantity, unit))
   def once(units: UnitClass*)             : Unit = units.foreach(once(1, _))
 
+  def autosupply(): Unit = {
+    With.scheduler.request(this, RequestAutosupply)
+  }
   def pump(unitClass: UnitClass, maximumTotal: Int = 400, maximumConcurrently : Int = 400): Unit = {
     Pump(unitClass, maximumTotal, maximumConcurrently)
   }
   def pumpWorkers(oversaturate: Boolean = false, maximumTotal: Int = 75, maximumConcurrently: Int = 2): Unit = {
     PumpWorkers(oversaturate, maximumTotal, maximumConcurrently)
-  }
-  def pumpSupply(): Unit = {
-    With.scheduler.request(this, RequestAutosupply)
   }
   def pumpRatio(unitClass: UnitClass, minimum: Int, maximum: Int, ratios: Seq[MatchingRatio], round: Rounding = Rounding.Up): Unit = {
     PumpRatio(unitClass, minimum, maximum, ratios, round)

@@ -149,16 +149,21 @@ final class MacroSim {
     // TODO: Don't return producers which morph
     // TODO: Reduce diff for zergling/scourge
 
-    // By the end of our simulation, have we not yet met the request?
-    //
     // Units:
     // - (Default) If there is no placement query, use our state count
     // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
-    val unitDiff = request.unit.map(u => request.quantity -
-      (if (request.placement.isEmpty)
-        (if (request.minStartFrame <= 0) steps.last.state.unitsCompleteASAP(u) else extantBy(request.buildable, request.minStartFrame))
-      else
-        With.units.ours.filter(u).map(_.tileTopLeft).count(request.placement.get.acceptExisting))).getOrElse(0)
+    val unitDiff = request.unit
+      .map(u =>
+        request.quantity -
+          ?(request.placement.isEmpty,
+            ?(request.minStartFrame <= 0,
+              steps.last.state.unitsCompleteASAP(u),
+              extantBy(request.buildable, request.minStartFrame)),
+            With.units.ours
+              .filter(u)
+              .map(_.tileTopLeft)
+              .count(request.placement.get.acceptExisting)))
+      .getOrElse(0)
     val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
     val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
     val diff        = Maff.vmax(unitDiff, upgradeDiff, techDiff)
@@ -230,7 +235,14 @@ final class MacroSim {
   }
 
   private def extantBy(buildable: Buildable, absoluteFrame: Int = 0): Int = {
-    extantAt(buildable, if (absoluteFrame == 0) steps.last else steps.reverseIterator.find(_.event.dFrames + With.frame < absoluteFrame).getOrElse(steps.head))
+    extantAt(
+      buildable,
+      ?(absoluteFrame == 0,
+        steps.last,
+        steps
+          .reverseIterator
+          .find(_.event.dFrames + With.frame < absoluteFrame)
+          .getOrElse(steps.head)))
   }
 
   private def tryInsertAfter(request: RequestBuildable, step: MacroStep, i: Int): InsertionResult = {
@@ -329,19 +341,19 @@ final class MacroSim {
   }
 
   private def constructStepsForRequest(request: RequestBuildable, framesAfter: Int): (MacroStep, MacroStep) = {
-    val stepStart           = new MacroStep
-    val stepFinish          = new MacroStep
-    val eventStart          = stepStart.event
-    val eventFinish         = stepFinish.event
-    stepStart.request       = Some(request)
-    eventStart.dFrames      = framesAfter
+    val stepStart           =   new MacroStep
+    val stepFinish          =   new MacroStep
+    val eventStart          =   stepStart.event
+    val eventFinish         =   stepFinish.event
+    stepStart.request       =   Some(request)
+    eventStart.dFrames      =   framesAfter
     eventStart.dMinerals    = - request.mineralCost
     eventStart.dGas         = - request.gasCost
-    eventStart.dSupplyUsed  = request.supplyRequired
-    eventStart.dProducer1   = request.producerRequired
+    eventStart.dSupplyUsed  =   request.supplyRequired
+    eventStart.dProducer1   =   request.producerRequired
     eventStart.dProducer1N  = - request.producersRequired
-    eventFinish.dFrames     = eventStart.dFrames + request.buildFrames
-    eventFinish.dProducer1  = eventStart.dProducer1
+    eventFinish.dFrames     =   eventStart.dFrames + request.buildFrames
+    eventFinish.dProducer1  =   eventStart.dProducer1
     eventFinish.dProducer1N = - eventStart.dProducer1N
     request.unit.foreach(u => {
       val ASAP                        = request.minStartFrame <= With.frame + Maff.div4(u.buildFrames)
@@ -357,12 +369,12 @@ final class MacroSim {
       eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
     })
     if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
-      eventStart.dUnitExtant2 = request.producerRequired
-      eventStart.dUnitExtant2N = - request.producersRequired
+      eventStart.dUnitExtant2   =   request.producerRequired
+      eventStart.dUnitExtant2N  = - request.producersRequired
     }
     request.tech.foreach(eventFinish.dTech = _)
     request.upgrade.foreach(upgrade => {
-      eventFinish.dUpgrade = upgrade
+      eventFinish.dUpgrade      = upgrade
       eventFinish.dUpgradeLevel = request.quantity
     })
     (stepStart, stepFinish)

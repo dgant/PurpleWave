@@ -17,7 +17,7 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
         get(3, Protoss.PhotonCannon)
       }
       once(Protoss.Gateway)
-      pumpSupply()
+      autosupply()
       pumpWorkers()
       pump(Protoss.Zealot)
       cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)

@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvT
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import Performance.Cache
-import Placement.Access.PlacementQuery
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.{PvT13Nexus, PvTDT, PvTDoubleRobo}
 import Utilities.Time.Minutes
@@ -105,7 +105,7 @@ class PvTDoubleRobo extends PvTOpeners {
     // Four Base //
     ////////////////
 
-    buildCannonsAtExpansions(1)
+    buildCannonsAtExpansions(1, PlaceLabels.DefendHall)
     get(2, Protoss.Forge)
     upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
     upgradeContinuously(Protoss.GroundArmor)

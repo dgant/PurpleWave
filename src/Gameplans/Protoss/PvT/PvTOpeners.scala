@@ -442,7 +442,7 @@ abstract class PvTOpeners extends GameplanImperative {
       once(9, Protoss.Probe)
       once(Protoss.Gateway)
       once(10, Protoss.Probe)
-      pumpSupply()
+      autosupply()
       // Worker cut rax cheese requires more extreme measures
       if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs) && units(Protoss.Gateway) < 2) {
         gasWorkerCeiling(0)

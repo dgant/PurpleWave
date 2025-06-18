@@ -126,13 +126,13 @@ class PvPLateGame extends GameplanImperative {
     if (riskingFirstExpansion) {
       if (PvPCoreExpand()) {
         if (units(Protoss.Gateway) < 3) {
-          pumpSupply()
+          autosupply()
           doTrainArmy()
           get(3, Protoss.Gateway)
         }
       } else if (PvPDT() && ! With.fingerprints.dtRush()) {
         safePumpDT()
-        pumpSupply()
+        autosupply()
         get(Protoss.DragoonRange)
         get(5, Protoss.Gateway)
         shouldAttack = false
@@ -141,7 +141,7 @@ class PvPLateGame extends GameplanImperative {
         get(4 - 2 * units(Protoss.RoboticsSupportBay), Protoss.Gateway)
       }
       if ( ! With.scouting.enemyNaturalPossiblyMining && ! With.fingerprints.robo()) {
-        pumpSupply()
+        autosupply()
         doTrainArmy()
         get(3, Protoss.Gateway)
         doCannons()

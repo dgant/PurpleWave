@@ -11,8 +11,8 @@ import Utilities.UnitFilters._
 object Pump {
   def apply(
       unitClass           : UnitClass,
-      maximumTotal        : Int = Int.MaxValue,
-      maximumConcurrently : Int = Int.MaxValue): Unit = {
+      maximumTotal        : Int = 400,
+      maximumConcurrently : Int = 400): Unit = {
 
     val builderClass: UnitClass = unitClass.whatBuilds._1
 
@@ -36,16 +36,22 @@ object Pump {
     val capacity      = (getBuildersExisting + larvaSpawning) * unitClass.copiesProduced
     val wavesAhead    = 4
 
-    if (maximumConcurrently < Int.MaxValue / wavesAhead) {
-      (0 until wavesAhead).foreach(wave =>
-        With.scheduler.request(
-          this,
-          RequestUnit(
-            unitClass,
-            Math.min(
-              maximumTotal,
-              unitsComplete + capacity * (1 + wave)),
-            unitClass.buildFrames * wave)))
+    if (maximumConcurrently < 400) {
+      var maxQuantity = 0
+      (0 until wavesAhead).foreach(wave => {
+        val quantity = Math.min(
+          maximumTotal,
+          unitsComplete + maximumConcurrently * (1 + wave))
+        if (quantity > maxQuantity) {
+          With.scheduler.request(
+            this,
+            RequestUnit(
+              unitClass,
+              quantity,
+              ?(wave > 0, With.frame + unitClass.buildFrames * wave, 0)))
+        }
+        maxQuantity = Math.max(maxQuantity, quantity)
+      })
     } else {
       With.scheduler.request(
         this,

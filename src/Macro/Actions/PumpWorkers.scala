@@ -11,6 +11,7 @@ object PumpWorkers extends MacroActions {
     With.geography.ourBases.foreach(base =>
       max += builderCount + 2 * base.minerals.count(_.resourcesLeft > 200) + base.gas.view.filter(_.resourcesLeft > 200).map(_.gasMinersRequired).sum)
     max = Math.max(max, 21)
+    max = Math.min(max, maximumTotal)
     pump(With.self.workerClass, max, maximumConcurrently)
   }
 }

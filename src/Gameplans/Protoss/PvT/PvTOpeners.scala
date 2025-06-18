@@ -60,7 +60,6 @@ abstract class PvTOpeners extends GameplanImperative {
     once(2, Protoss.Nexus)
     once(14, Protoss.Probe)
     once(Protoss.Gateway)
-    // Mainly scouting to calculate eco diff
     scoutOn(Protoss.Gateway)
     once(15, Protoss.Probe)
     once(2, Protoss.Gateway)
@@ -74,6 +73,8 @@ abstract class PvTOpeners extends GameplanImperative {
     once(19, Protoss.Probe)
     once(2, Protoss.Dragoon)
     once(20, Protoss.Probe)
+    get(Protoss.DragoonRange)
+    once(21, Protoss.Probe)
     // Flash follows with robo, range, and fast arbiter, and thus takes 2nd gas here
     // TODO: I think one gate core if cross-spawn, two if close. Also might depend on gas/no gas
     // Then: Robo if rax expand; range if not
@@ -434,24 +435,39 @@ abstract class PvTOpeners extends GameplanImperative {
         pump(Protoss.Zealot, 3)
       }
     }
+    if (frame < Minutes(10)() && PvT13Nexus() && With.geography.ourNatural.enemies.exists(e => Terran.Bunker(e) && e.complete)) {
+      cancel(Protoss.Nexus)
+      get(Protoss.DragoonRange)
+      pump(Protoss.Dragoon)
+      get(3, Protoss.Gateway)
+      gasLimitCeiling(250)
+      get(Protoss.RoboticsFacility)
+      if (Protoss.DragoonRange()) {
+        attack()
+      }
+      return
+    }
     if (frame < Minutes(10)() && barracksCheese) {
       status("ReactToRaxCheese")
       gasLimitCeiling(200)
       once(8, Protoss.Probe)
       once(Protoss.Pylon)
-      once(9, Protoss.Probe)
-      once(Protoss.Gateway)
       once(10, Protoss.Probe)
-      autosupply()
-      // Worker cut rax cheese requires more extreme measures
+      once(Protoss.Gateway)
+      once(13, Protoss.Probe)
+      once(Protoss.Zealot)
+
+
       if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs) && units(Protoss.Gateway) < 2) {
         gasWorkerCeiling(0)
         cancel(Protoss.Assimilator, Protoss.CyberneticsCore)
       }
-      pump(Protoss.Reaver, 4)
+
+      autosupply()
+      pumpShuttleAndReavers(2, shuttleFirst = false)
       pump(Protoss.Zealot, 3)
       pumpWorkers()
-      if (have(Protoss.Reaver)) {
+      if (haveComplete(Protoss.Reaver)) {
         requireMiningBases(2)
       } else {
         cancel(Protoss.Nexus, Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.Stargate)
@@ -459,14 +475,15 @@ abstract class PvTOpeners extends GameplanImperative {
       if (upgradeComplete(Protoss.DragoonRange, 1, Protoss.Dragoon.buildFrames)) {
         pump(Protoss.Dragoon)
       }
-      pump(Protoss.Zealot)
-      once(2, Protoss.Gateway)
-      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs)) once(5, Protoss.Zealot) // I think this is best but am not sure
-      once(Protoss.Assimilator, Protoss.CyberneticsCore)
-      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs))  once(7, Protoss.Zealot) // I think this is best but am not sure
-      once(Protoss.RoboticsSupportBay, Protoss.RoboticsSupportBay)
+      pump(Protoss.Zealot, 7)
+      get(2, Protoss.Gateway)
+      get(Protoss.Assimilator)
+      get(Protoss.CyberneticsCore)
+      get(Protoss.DragoonRange)
+      pump(Protoss.Dragoon)
+      get(Protoss.RoboticsFacility)
+      get(Protoss.RoboticsSupportBay)
       once(3, Protoss.Gateway)
-      once(2, Protoss.Nexus)
     }
   }
 }

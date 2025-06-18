@@ -77,9 +77,7 @@ class PvTFastCarrier extends PvTOpeners {
     get(Protoss.ZealotSpeed)
     get(Protoss.RoboticsFacility)
     get(Protoss.Observatory)
-    once(2, Protoss.Observer)
-    get(Protoss.TemplarArchives)
-    get(Protoss.ObserverSpeed)
+    once(Protoss.Observer)
     get(4, Protoss.Gateway)
     requireMiningBases(4)
 
@@ -87,63 +85,24 @@ class PvTFastCarrier extends PvTOpeners {
     // Four Base //
     ////////////////
 
-    get(2, Protoss.Forge)
-    upgradeContinuously(?(counterBio, Protoss.AirArmor, Protoss.AirDamage)) && upgradeContinuously(?(counterBio, Protoss.AirDamage, Protoss.AirArmor))
-    upgradeContinuously(Protoss.Shields)
-    get(2, Protoss.Gateway)
-
-    if (With.fingerprints.twoFac()) {
-      get(3, Protoss.Gateway)
-      once(Protoss.Shuttle)
-      get(Protoss.RoboticsSupportBay)
-    }
-    if ( ! safeDefending) {
-      get(Protoss.RoboticsSupportBay)
-      get(3, Protoss.Gateway)
-    }
-    if (armySupply200() < 48) {
-      armyNormalPriority()
-    }
-
-    requireMiningBases(3)
-    get(Protoss.RoboticsSupportBay)
-    once(Protoss.Shuttle)
-    get(Protoss.ShuttleSpeed)
-    get(2, Protoss.RoboticsFacility)
-    once(4, Protoss.Reaver)
-    once(2, Protoss.Shuttle)
-    gasIfNeeded()
-
-    armyNormalPriority()
-
-    get(Protoss.Forge)
-    get(Protoss.GroundDamage)
-    if ( ! upgradeComplete(Protoss.ZealotSpeed) || ! have(Protoss.TemplarArchives)) {
-      get(Protoss.CitadelOfAdun)
-    }
-    get(Protoss.ZealotSpeed)
-    get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
-
-    get(Protoss.ObserverSpeed)
+    pump(Protoss.Carrier)
     get(Protoss.TemplarArchives)
-    get(Protoss.PsionicStorm)
-    get(Protoss.GroundArmor)
-    get(Protoss.HighTemplarEnergy)
-    get(6, Protoss.Gateway)
-    requireMiningBases(4)
-
-    get(3, Protoss.Stargate)
+    get(Protoss.ObserverSpeed)
+    upgradeContinuously(?(counterBio, Protoss.AirArmor, Protoss.AirDamage)) && upgradeContinuously(?(counterBio, Protoss.AirDamage, Protoss.AirArmor))
     get(8, Protoss.Gateway)
-    get(2, Protoss.Forge)
-    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
-    upgradeContinuously(Protoss.GroundArmor)
-    get(Protoss.ObserverVisionRange)
     requireMiningBases(5)
 
     ///////////////
     // Five Base //
     ///////////////
 
+    get(3, Protoss.Stargate)
+    get(2, Protoss.Forge)
+    upgradeContinuously(Protoss.Shields)
+    get(2, Protoss.CyberneticsCore)
+    upgradeContinuously(Protoss.AirDamage)
+    upgradeContinuously(Protoss.AirArmor)
+    get(Protoss.ObserverVisionRange)
     upgradeContinuously(Protoss.GroundArmor)
     pumpGasPumps()
     (1 to 3).foreach(count =>
@@ -164,18 +123,19 @@ class PvTFastCarrier extends PvTOpeners {
     val armySizeUs      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
     val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
+    val nascentCarriers = existsEver(Protoss.FleetBeacon) && unitsEver(Protoss.Carrier) < 4 && unitsEver(Protoss.Interceptor) < 24
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
     shouldAttack  ||= ! barracksCheese
-    shouldAttack  &&= safeSkirmishing
+    shouldAttack  &&=   safeSkirmishing
     shouldAttack  &&= ! mineContain
     shouldAttack  &&= ! vultureRush
     shouldAttack  &&= ! consolidatingFE
+    shouldAttack  &&= ! nascentCarriers
     shouldAttack  ||= zealotAggro
-    shouldAttack  ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
-    shouldAttack  ||= bases > 2
-    shouldAttack  ||= enemyMiningBases > miningBases
-    shouldAttack  ||= frame > Minutes(10)()
     shouldAttack  ||= pushMarines
+    shouldAttack  ||= enemyMiningBases > miningBases
+    shouldAttack  ||= unitsComplete(Protoss.Interceptor) > 24
+    shouldAttack  ||= frame > Minutes(12)()
 
     if (zealotAggro)      status("ZealotAggro")
     if (pushMarines)      status("PushMarines")
@@ -198,7 +158,6 @@ class PvTFastCarrier extends PvTOpeners {
     if (have(Protoss.RoboticsSupportBay)) {
       pumpShuttleAndReavers(?(counterBio, 6, 4), shuttleFirst = ! counterBio)
     }
-    pump(Protoss.Carrier)
   }
 
   def doArmyNormalPriority(): Unit = {

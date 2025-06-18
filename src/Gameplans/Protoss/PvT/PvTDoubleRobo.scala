@@ -91,6 +91,7 @@ class PvTDoubleRobo extends PvTOpeners {
       get(Protoss.CitadelOfAdun)
     }
     get(Protoss.ZealotSpeed)
+    get(Protoss.ScarabDamage)
     get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
 
     get(Protoss.ObserverSpeed)
@@ -137,17 +138,17 @@ class PvTDoubleRobo extends PvTOpeners {
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
     shouldAttack  ||= ! barracksCheese
-    shouldAttack  &&= safeSkirmishing
+    shouldAttack  &&=   safeSkirmishing
     shouldAttack  &&= ! mineContain
     shouldAttack  &&= ! vultureRush
     shouldAttack  &&= ! consolidatingFE
     shouldAttack  ||= zealotAggro
+    shouldAttack  ||= pushMarines
     shouldAttack  ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
+    shouldAttack  ||= haveComplete(Protoss.Reaver) && haveComplete(Protoss.Shuttle) && safePushing
     shouldAttack  ||= bases > 2
     shouldAttack  ||= enemyMiningBases > miningBases
-    shouldAttack  ||= frame > Minutes(10)()
-    shouldAttack  ||= pushMarines
-    shouldAttack  ||= haveComplete(Protoss.Reaver) && haveComplete(Protoss.Shuttle) && safePushing
+    shouldAttack  ||= frame > Minutes(12)()
 
     if (zealotAggro)      status("ZealotAggro")
     if (pushMarines)      status("PushMarines")
@@ -192,9 +193,6 @@ class PvTDoubleRobo extends PvTOpeners {
   def doArmyNormalPriority(): Unit = {
     pumpRatio(Protoss.Dragoon, ?(counterBio, 6, 12), 24, Seq(Enemy(Terran.Vulture, .75), Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 4.0), Friendly(Protoss.Zealot, 0.5)))
     pumpRatio(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 3), 4, Seq(Friendly(IsWarrior, 1.0 / 12.0)))
-    if (have(Protoss.Stargate) && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 2)) {
-      pump(Protoss.Observer, 8)
-    }
     pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 0.2)))
     if (have(Protoss.HighTemplar)) {
       pumpRatio(Protoss.Shuttle, 0, 6, Seq(Friendly(Protoss.Reaver, 0.5), Flat(1), Friendly(Protoss.HighTemplar, 1.0 / 3.0)))

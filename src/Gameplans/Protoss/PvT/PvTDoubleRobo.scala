@@ -3,17 +3,16 @@ package Gameplans.Protoss.PvT
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import Performance.Cache
+import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvT13Nexus
+import Strategery.Strategies.Protoss.{PvT13Nexus, PvTDT, PvTDoubleRobo}
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsAll, IsComplete, IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsWarrior, IsWorker}
 import Utilities.{?, DoQueue}
 
-class PvT2025 extends PvTOpeners {
+class PvTDoubleRobo extends PvTOpeners {
 
-  override def executeBuild(): Unit = {
-    open()
-  }
+  override def activated: Boolean = PvTDoubleRobo()
 
   override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = 70)
 
@@ -21,14 +20,11 @@ class PvT2025 extends PvTOpeners {
 
   override def executeMain(): Unit = {
     val armyNormalPriority = new DoQueue(doArmyNormalPriority)
+    val gasIfNeeded = new DoQueue(() => pumpGasPumps(miningBases - gas / 400))
 
     get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
 
     doArmyHighPriority()
-    maintainMiningBases(3)
-    requireMiningBases(enemyMiningBases)
-    requireMiningBases(supplyTotal200 / 40)
-
     if (armySupply200() < 24) {
       armyNormalPriority()
     }
@@ -38,78 +34,100 @@ class PvT2025 extends PvTOpeners {
     if (With.fingerprints.twoFac()) {
       get(2, Protoss.Gateway)
     }
+
+    //////////////
+    // Two Base //
+    //////////////
+
+    maintainMiningBases(3)
     requireMiningBases(2)
+    requireMiningBases(enemyMiningBases)
+    requireMiningBases(supplyTotal200 / 40)
 
     if (armySupply200() < 32) {
       armyNormalPriority()
     }
     get(Protoss.RoboticsFacility)
+    get(Protoss.DragoonRange)
     if (counterBio) {
-      pumpGasPumps()
       get(Protoss.RoboticsSupportBay)
-      once(Protoss.Reaver)
+      once(2, Protoss.Reaver)
       get(3, Protoss.Gateway)
-      get(2, Protoss.RoboticsFacility)
     }
     get(Protoss.Observatory)
     get(2, Protoss.Gateway)
     once(Protoss.Observer)
     if (With.fingerprints.twoFac()) {
-      get(4, Protoss.Gateway)
-    }
-    if (With.fingerprints.threeFac()) {
-      get(5, Protoss.Gateway)
+      get(3, Protoss.Gateway)
+      once(Protoss.Shuttle)
+      get(Protoss.RoboticsSupportBay)
     }
     if ( ! safeDefending) {
       get(Protoss.RoboticsSupportBay)
-      get(4, Protoss.Gateway)
-      get(2, Protoss.RoboticsFacility)
-      get(Protoss.ShuttleSpeed)
-      pumpGasPumps()
+      get(3, Protoss.Gateway)
     }
     if (armySupply200() < 48) {
       armyNormalPriority()
     }
+
+    ////////////////
+    // Three Base //
+    ////////////////
+
     requireMiningBases(3)
-    get(Protoss.Shuttle)
     get(Protoss.RoboticsSupportBay)
+    once(Protoss.Shuttle)
+    get(Protoss.ShuttleSpeed)
+    get(2, Protoss.RoboticsFacility)
+    once(4, Protoss.Reaver)
+    once(2, Protoss.Shuttle)
+    gasIfNeeded()
 
     armyNormalPriority()
 
-    get(Protoss.ObserverSpeed)
-    get(Protoss.ObserverVisionRange)
-    get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
     get(Protoss.Forge)
     get(Protoss.GroundDamage)
     if ( ! upgradeComplete(Protoss.ZealotSpeed) || ! have(Protoss.TemplarArchives)) {
       get(Protoss.CitadelOfAdun)
     }
     get(Protoss.ZealotSpeed)
-    pumpGasPumps(bases - gas / 400)
+    get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
+
+    get(Protoss.ObserverSpeed)
     get(Protoss.TemplarArchives)
     get(Protoss.PsionicStorm)
-    get(Protoss.ShuttleSpeed)
-    get(2, Protoss.RoboticsFacility)
     get(Protoss.GroundArmor)
     get(Protoss.HighTemplarEnergy)
     get(6, Protoss.Gateway)
     requireMiningBases(4)
 
-    buildCannonsAtExpansions(1)
-    get(Protoss.Stargate)
-    get(Protoss.FleetBeacon)
-    upgradeContinuously(Protoss.AirDamage) && upgradeContinuously(Protoss.AirArmor)
-    get(4, Protoss.Stargate)
-    get(Protoss.CarrierCapacity)
-    requireMiningBases(5)
-    get(2, Protoss.Forge)
-    upgradeContinuously(Protoss.GroundDamage)
-    upgradeContinuously(Protoss.Shields) && upgradeContinuously(Protoss.GroundArmor)
-    get(Protoss.ArbiterTribunal)
-    get(Protoss.Stasis)
-    pumpGasPumps()
-    get(16, Protoss.Gateway)
+    ////////////////
+    // Four Base //
+    ////////////////
 
+    buildCannonsAtExpansions(1)
+    get(2, Protoss.Forge)
+    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
+    upgradeContinuously(Protoss.GroundArmor)
+    get(Protoss.ObserverVisionRange)
+    requireMiningBases(5)
+
+    ///////////////
+    // Five Base //
+    ///////////////
+
+    pumpGasPumps()
+    (1 to 3).foreach(count =>
+      With.geography.ourMiningBases
+        .sortBy(-_.tiles.size)
+        .foreach(base => {
+          get(    count, Protoss.Pylon,   new PlacementQuery(Protoss.Pylon).requireBase(base))
+          get(3 * count, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).requireBase(base))
+        }))
+
+    ///////////////
+    // Attacking //
+    ///////////////
 
     val zealotAggro     = frame < Minutes(5)() && unitsComplete(Protoss.Zealot) > 0 && ! (With.fingerprints.eightRax() && With.fingerprints.oneFac())
     val pushMarines     = barracksCheese && ! With.strategy.isRamped
@@ -117,8 +135,6 @@ class PvT2025 extends PvTOpeners {
     val armySizeUs      = With.units.ours.filterNot(IsWorker).map(_.unitClass.supplyRequired / 4.0).sum
     val vultureRush     = frame < Minutes(8)() && enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures) && (armySizeUs < 12 || unitsComplete(Protoss.Observer) == 0)
     val consolidatingFE = frame < Minutes(7)() && PvT13Nexus() && ! With.fingerprints.fourteenCC()
-    val nascentCarriers = have(Protoss.FleetBeacon) && unitsEver(IsAll(Protoss.Carrier, IsComplete)) < 4 && With.self.supplyTotal400 < 376
-    val encroaching     = With.scouting.enemyProximity > 0.65
     var shouldAttack    = unitsComplete(IsWarrior) >= 7
     shouldAttack  ||= ! barracksCheese
     shouldAttack  &&= safeSkirmishing
@@ -138,13 +154,13 @@ class PvT2025 extends PvTOpeners {
     if (mineContain)      status("MineContain")
     if (vultureRush)      status("VultureRush")
     if (consolidatingFE)  status("ConsolidatingFE")
-    if (nascentCarriers)  status("NascentCarriers")
-    if (encroaching)      status("Encroaching")
 
     if (shouldAttack) {
       attack()
     }
-    harass()
+    if (Protoss.PsionicStorm() && unitsComplete(Protoss.HighTemplar) > 2) {
+      harass()
+    }
     gasLimitCeiling(Math.max(1, miningBases) * 300)
     With.blackboard.monitorBases.set(unitsComplete(Protoss.Observer) > 1 || ! enemyHasShown(Terran.SpiderMine) || ! shouldAttack)
   }
@@ -152,9 +168,14 @@ class PvT2025 extends PvTOpeners {
   def counterBio: Boolean = With.fingerprints.bio() && enemies(Terran.Marine, Terran.Firebat, Terran.Medic) >= enemies(Terran.Vulture) * 1.5
 
   def doArmyHighPriority(): Unit = {
+    if (PvTDT()) {
+      once(2, Protoss.DarkTemplar)
+      if ( ! enemyHasShown(Terran.MissileTurret, Terran.ScienceVessel)) {
+        pump(Protoss.DarkTemplar)
+      }
+    }
     if (have(Protoss.TemplarArchives)
       && ( ! enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep) || enemyBases < 2)
-      && ! have(Protoss.FleetBeacon, Protoss.Arbiter)
       && ! haveComplete(Protoss.ArbiterTribunal)
       && ! enemiesHave(Terran.ScienceVessel)
       && ( ! enemyHasShown(Terran.SpiderMine) || With.scouting.enemyProximity > 0.7))  {
@@ -166,7 +187,6 @@ class PvT2025 extends PvTOpeners {
     if (have(Protoss.RoboticsSupportBay)) {
       pumpShuttleAndReavers(?(counterBio, 6, 4), shuttleFirst = ! counterBio)
     }
-    pump(Protoss.Carrier, 8)
   }
 
   def doArmyNormalPriority(): Unit = {
@@ -175,15 +195,9 @@ class PvT2025 extends PvTOpeners {
     if (have(Protoss.Stargate) && (enemyHasTech(Terran.WraithCloak) || enemies(Terran.Wraith) > 2)) {
       pump(Protoss.Observer, 8)
     }
-    pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 0.1), Friendly(Protoss.Carrier, 1.0)))
-    if (unitsComplete(Protoss.FleetBeacon) == 0 && With.scouting.enemyProximity > 0.4 && enemies(Terran.Goliath) + enemies(Terran.Marine) / 5 == 0) {
-      pump(Protoss.Scout, 2)
-    }
-    pump(Protoss.Arbiter, 1)
-    pump(Protoss.Carrier, 16)
-    pump(Protoss.Arbiter, 2)
+    pumpRatio(Protoss.HighTemplar, 2, 8, Seq(Friendly(IsWarrior, 0.2)))
     if (have(Protoss.HighTemplar)) {
-      pumpRatio(Protoss.Shuttle, 1, 5, Seq(Friendly(Protoss.Reaver, 0.5), Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
+      pumpRatio(Protoss.Shuttle, 0, 6, Seq(Friendly(Protoss.Reaver, 0.5), Flat(1), Friendly(Protoss.HighTemplar, 1.0 / 3.0)))
     }
     if (upgradeStarted(Protoss.ZealotSpeed)) {
       pump(Protoss.Zealot, units(Protoss.Dragoon))

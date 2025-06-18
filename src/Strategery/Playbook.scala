@@ -27,7 +27,6 @@ object StrategyGroups {
     PvT29Arbiter,
     PvT4Gate,
     PvTCustom,
-    PvTGasSteal,
     PvZGatewayFE,
   )
 }

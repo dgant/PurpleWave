@@ -3,7 +3,6 @@ package Macro.Actions
 import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Macro.Requests.RequestUnit
-import Mathematics.Maff
 import ProxyBwapi.Races.{Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
@@ -43,16 +42,18 @@ object Pump {
           this,
           RequestUnit(
             unitClass,
-            Math.min(maximumTotal, unitsComplete + capacity * (1 + wave)),
+            Math.min(
+              maximumTotal,
+              unitsComplete + capacity * (1 + wave)),
             unitClass.buildFrames * wave)))
     } else {
-      val unitsToRequest = Maff.vmin(maximumTotal, unitsComplete + wavesAhead * capacity)
       With.scheduler.request(
         this,
         RequestUnit(
           unitClass,
-          Math.min(maximumTotal, unitsComplete + capacity * wavesAhead),
-          unitsToRequest))
+          Math.min(
+            maximumTotal,
+            unitsComplete + capacity * wavesAhead)))
     }
   }
 }

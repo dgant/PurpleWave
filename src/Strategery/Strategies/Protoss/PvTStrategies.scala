@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvT.{PvTGasSteal, PvTSpeedlotDT}
+import Gameplans.Protoss.PvT.PvTSpeedlotDT
 import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Planning.Plans.Plan
@@ -26,19 +26,33 @@ abstract class PvTStrategyNoZealotNoRange extends PvTStrategyNoZealot {
     With.fingerprints.bunkerRush,
     With.fingerprints.twoRax1113)
 }
+
+//////////////
+// Openings //
+//////////////
+
 object PvT13Nexus extends PvTStrategyNoZealotNoRange {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
   setStartLocationsMin(4)
   setRushTilesMinimum(180)
 }
-object PvTRangeless     extends PvTStrategyNoZealotNoRange
-object PvT28Nexus       extends PvTStrategyNoZealot
-object PvTZealotExpand  extends PvTStrategy
+object PvTRangeless     extends PvTStrategyNoZealotNoRange {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
+}
+object PvT28Nexus       extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
+}
+object PvTZealotExpand  extends PvTStrategy {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
+}
 object PvTZZCoreZ       extends PvTStrategy {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
   addSelectionRequirement(() =>
     ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
 }
 object PvT910 extends PvTStrategy {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
   setMinimumGamesVsOpponent(3)
   whitelistVs(
     With.fingerprints.workerRush,
@@ -50,6 +64,7 @@ object PvT910 extends PvTStrategy {
     With.fingerprints.oneRaxFE)
 }
 object PvT1015 extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -60,6 +75,7 @@ object PvT1015 extends PvTStrategyNoZealot {
     With.fingerprints.wallIn)
 }
 object PvT1BaseReaver extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo)
   whitelistVs(
     With.fingerprints.fourteenCC,
     With.fingerprints.oneRaxFE,
@@ -69,14 +85,18 @@ object PvT1BaseReaver extends PvTStrategyNoZealot {
     With.fingerprints.twoRaxAcad)
 }
 object PvTDT extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo)
   blacklistVs(
     With.fingerprints.twoRax1113,
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFacVultures)
 }
-object PvT29Arbiter extends PvTStrategyNoZealot
+object PvT29Arbiter extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
+}
 object PvT4Gate extends PvTStrategyNoZealot {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -88,6 +108,25 @@ object PvT4Gate extends PvTStrategyNoZealot {
     With.fingerprints.wallIn
   )
 }
+object PvTGasSteal extends PvTStrategy {
+  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  blacklistVs(
+    With.fingerprints.workerRush,
+    With.fingerprints.bbs)
+  setStartLocationsMax(3)
+}
+
+//////////////////
+// Compositions //
+//////////////////
+
+object PvTDoubleRobo extends PvTStrategy
+object PvTFastCarrier extends PvTStrategy
+
+//////////////
+// Oddballs //
+//////////////
+
 object PvTProxy2Gate extends PvTStrategy {
   blacklistOn(MapGroups.badForProxying: _*)
   blacklistVs(With.fingerprints.wallIn)
@@ -95,8 +134,4 @@ object PvTProxy2Gate extends PvTStrategy {
 
 object PvTCustom extends PvTStrategy {
   override def gameplan: Option[Plan] = Some(new PvTSpeedlotDT)
-}
-
-object PvTGasSteal extends PvTStrategy {
-  override def gameplan: Option[Plan] = Some(new PvTGasSteal)
 }

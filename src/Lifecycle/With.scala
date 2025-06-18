@@ -107,7 +107,6 @@ object With {
   var squads            : Squads              = _
   var strategy          : Strategist          = _
   var storyteller       : Storyteller         = _
-  var supplier          : Supplier            = _
   var tactics           : Tactician           = _
   var tasks             : TaskQueueParallel   = _
   var units             : UnitTracker         = _
@@ -217,7 +216,6 @@ object With {
     squads            = new Squads
     strategy          = new Strategist
     storyteller       = new Storyteller
-    supplier          = new Supplier
     tactics           = new Tactician
     units             = new UnitTracker
     unitsShown        = new UnitsShown

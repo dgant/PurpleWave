@@ -85,7 +85,6 @@ class Visualization extends TimedTask {
     ShowRushDistances,
     ShowSquads,
     ShowStoryteller,
-    ShowSupply,
     ShowTeams,
     ShowTextOnly,
     ShowTileInfo,

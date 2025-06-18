@@ -141,9 +141,6 @@ final class MacroSim {
       _autosupply = true
       return
     }
-    if (denied.exists(_._1 == request)) {
-      return
-    }
     tryInsertRequest(request)
   }
 
@@ -199,13 +196,17 @@ final class MacroSim {
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
         val (stepStart, stepFinish) = constructStepsForRequest(request, framesAfter)
-        val at = fit(stepStart)
-        val stepBefore = ?(at < steps.length, steps(at), steps.last)
+        lazy val atSupply   = fit(stepStart.event.dFrames + Terran.SupplyDepot.buildFrames)
+        lazy val stepSupply = ?(atSupply < steps.length, steps(atSupply), steps.last)
 
         if (_autosupply
           && allowSupplyInjection
-          && request.unit.exists(_.supplyRequired > 0)
-          && stepBefore.state.supplyEnqueued < Math.min(400, stepBefore.state.supplyUsed + stepStart.event.dSupplyUsed + stepBefore.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames)) {
+          && stepStart.event.dSupplyUsed > 0
+          && stepSupply.state.supplyAvailable < Math.min(
+            400,
+            stepBefore.state.supplyUsed
+            + stepStart.event.dSupplyUsed
+            + stepBefore.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames / 2)) {
 
           val farm = With.self.supplyClass
           tryInsertRequest(RequestUnit(farm, stepBefore.state.unitsExtant(farm) + 1, With.frame + stepBefore.event.dFrames - Terran.SupplyDepot.buildFrames))
@@ -302,9 +303,8 @@ final class MacroSim {
     Success
   }
 
-  private def fit(step: MacroStep): Int = {
-    // Binary search to figure out where to fit the step
-    val dFrames = step.event.dFrames
+  private def fit(dFrames: Int): Int = {
+    // Binary search to figure out where the step falls
     var min = 1
     var max = steps.length
     while(true) {
@@ -323,7 +323,7 @@ final class MacroSim {
   }
 
   private def insert(step: MacroStep): Int = {
-    val at = fit(step)
+    val at = fit(step.event.dFrames)
     steps.insert(at, step)
     at
   }
@@ -369,7 +369,7 @@ final class MacroSim {
   }
 
   lazy val suppliers: Vector[UnitClass] = UnitClasses.all.filter(_.supplyProvided > 0)
-  def ourSuppliers: Seq[UnitClass]  = suppliers.view.filter(_.race == With.self.raceCurrent).filter( ! _.isTownHall) // Exclude the town halls for now due to how long they take to finish
+  def ourSuppliers: Seq[UnitClass]  = suppliers.view.filter(_.race == With.self.raceCurrent) // Exclude the town halls for now due to how long they take to finish
   private def updateStatesFrom(index: Int): Unit = {
     var i = index
     while (i < steps.length) {
@@ -381,7 +381,6 @@ final class MacroSim {
       stateNext.gas               = stateLast.gas             + event.dGas      + (dFrames * _simIncomeGasPerFrame).toInt
       stateNext.supplyAvailable   = Math.min(400, stateLast.supplyAvailable + event.dSupplyAvailable)
       stateNext.supplyUsed        = stateLast.supplyUsed      + event.dSupplyUsed
-
       stateNext.mineralPatches    = stateLast.mineralPatches  + event.dMineralPatches
       stateNext.geysers           = stateLast.geysers         + event.dGeysers
       stateNext.techs             = stateLast.techs
@@ -390,7 +389,6 @@ final class MacroSim {
       stateNext.unitsComplete     = stateLast.unitsComplete
       stateNext.unitsCompleteASAP = stateLast.unitsCompleteASAP
       stateNext.producers         = stateLast.producers
-      stateNext.supplyEnqueued    = ourSuppliers.map(u => stateNext.unitsExtant(u) * u.supplyProvided).sum
       if (event.dUpgrade          != Upgrades.None)                                               stateNext.upgrades          = stateNext.upgrades.clone
       if (event.dUnitExtant1      != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)  stateNext.unitsExtant       = stateNext.unitsExtant.clone
       if (event.dUnitComplete     != UnitClasses.None)                                            stateNext.unitsComplete     = stateNext.unitsComplete.clone

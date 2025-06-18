@@ -3,11 +3,14 @@ package Information.Counting
 import Lifecycle.With
 
 class Efficiency {
-  var _framesSupplyBlocked: Int = 0
-  var _framesSupplyBlockedConsecutively: Int = 0
-
-  def framesSupplyBlocked: Int = _framesSupplyBlocked
-  def framesSupplyBlockedConsecutively: Int = _framesSupplyBlockedConsecutively
+  var _framesSupplyBlocked              : Int = 0
+  var _framesSupplyBlockedConsecutively : Int = 0
+  var _framesOversupplied               : Int = 0
+  var _framesOversuppliedConsecutively  : Int = 0
+  def framesSupplyBlocked               : Int = _framesSupplyBlocked
+  def framesSupplyBlockedConsecutively  : Int = _framesSupplyBlockedConsecutively
+  def framesOversupplied                : Int = _framesOversupplied
+  def framesOversuppliedConsecutively   : Int = _framesOversuppliedConsecutively
 
   def update(): Unit = {
     if ( ! With.configuration.debugging) return
@@ -24,6 +27,13 @@ class Efficiency {
       _framesSupplyBlockedConsecutively += 1
     } else {
       _framesSupplyBlockedConsecutively = 0
+    }
+
+    if (With.self.supplyTotal400 >= With.self.supplyUsed400 + 8 * 2 * 2) {
+      _framesOversupplied += 1
+      _framesOversuppliedConsecutively += 1
+    } else {
+      _framesOversuppliedConsecutively = 0
     }
   }
 }

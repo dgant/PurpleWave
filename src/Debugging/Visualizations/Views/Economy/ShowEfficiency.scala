@@ -39,7 +39,7 @@ object ShowEfficiency extends DebugView {
       val p = producers(i)
       Efficiency(
         p.unitClass.toString,
-        i + 1,
+        i + 2,
         With.framesSince(p.completionFrame),
         p.framesIdle,
         p.framesIdleConsecutive)
@@ -49,7 +49,13 @@ object ShowEfficiency extends DebugView {
         0,
         With.frame,
         With.efficiency.framesSupplyBlocked,
-        With.efficiency.framesSupplyBlockedConsecutively)
+        With.efficiency.framesSupplyBlockedConsecutively) :+
+      Efficiency(
+        "Oversupply",
+        1,
+        With.frame,
+        With.efficiency.framesOversupplied,
+        With.efficiency.framesOversuppliedConsecutively)
 
     labels.foreach(_.renderScreen())
   }

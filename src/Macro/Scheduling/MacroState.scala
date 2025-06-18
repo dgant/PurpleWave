@@ -10,7 +10,6 @@ final class MacroState {
   var gas               : Int = _
   var supplyAvailable   : Int = _
   var supplyUsed        : Int = _
-  var supplyEnqueued    : Int = _
   var mineralPatches    : Int = _
   var geysers           : Int = _
   var supplyUsePerFrame : Float = _

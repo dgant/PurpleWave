@@ -14,6 +14,8 @@ abstract class PvTOpeners extends GameplanImperative {
 
   var openingComplete: Boolean = false
 
+  override def doWorkers(): Unit = pumpWorkers(oversaturate = true, maximumTotal = 70)
+
   override def executeBuild(): Unit = {
     open()
   }

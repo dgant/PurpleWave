@@ -32,27 +32,27 @@ abstract class PvTStrategyNoZealotNoRange extends PvTStrategyNoZealot {
 //////////////
 
 object PvT13Nexus extends PvTStrategyNoZealotNoRange {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   setStartLocationsMin(4)
   setRushTilesMinimum(180)
 }
 object PvTRangeless     extends PvTStrategyNoZealotNoRange {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
 }
 object PvT28Nexus       extends PvTStrategyNoZealot {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
 }
 object PvTZealotExpand  extends PvTStrategy {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
 }
 object PvTZZCoreZ       extends PvTStrategy {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   addSelectionRequirement(() =>
     ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
 }
 object PvT910 extends PvTStrategy {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   setMinimumGamesVsOpponent(3)
   whitelistVs(
     With.fingerprints.workerRush,
@@ -64,7 +64,7 @@ object PvT910 extends PvTStrategy {
     With.fingerprints.oneRaxFE)
 }
 object PvT1015 extends PvTStrategyNoZealot {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -85,7 +85,7 @@ object PvT1BaseReaver extends PvTStrategyNoZealot {
     With.fingerprints.twoRaxAcad)
 }
 object PvTDT extends PvTStrategyNoZealot {
-  addChoice(PvTDoubleRobo)
+  addChoice(PvTDoubleRobo, PvTArbiter)
   blacklistVs(
     With.fingerprints.twoRax1113,
     With.fingerprints.twoRaxAcad,
@@ -93,10 +93,10 @@ object PvTDT extends PvTStrategyNoZealot {
     With.fingerprints.threeFacVultures)
 }
 object PvT29Arbiter extends PvTStrategyNoZealot {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTArbiter)
 }
 object PvT4Gate extends PvTStrategyNoZealot {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTArbiter)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
   blacklistOn(MapGroups.badForMassGoon: _*)
@@ -109,7 +109,7 @@ object PvT4Gate extends PvTStrategyNoZealot {
   )
 }
 object PvTGasSteal extends PvTStrategy {
-  addChoice(PvTDoubleRobo, PvTFastCarrier)
+  addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   blacklistVs(
     With.fingerprints.workerRush,
     With.fingerprints.bbs)
@@ -120,8 +120,9 @@ object PvTGasSteal extends PvTStrategy {
 // Compositions //
 //////////////////
 
-object PvTDoubleRobo extends PvTStrategy
+object PvTDoubleRobo  extends PvTStrategy
 object PvTFastCarrier extends PvTStrategy
+object PvTArbiter     extends PvTStrategy
 
 //////////////
 // Oddballs //

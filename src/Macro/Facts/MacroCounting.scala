@@ -3,6 +3,7 @@ package Macro.Facts
 import Information.Fingerprinting.Fingerprint
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
@@ -31,6 +32,9 @@ trait MacroCounting {
   def supplyTotal200  : Int = supplyTotal400 / 2
   def supplyBlocked: Boolean = supplyUsed200 >= supplyTotal200
   def saturated: Boolean = units(IsWorker) >= Math.min(60, With.geography.ourBases.view.map(b => b.minerals.size* 2 + b.gas.size * 3).sum)
+
+  private val _armySupply200 = new Cache(() => With.units.ours.filter(u => IsWarrior(u) && u.complete).map(_.unitClass.supplyRequired).sum / 2)
+  def armySupply200: Int = _armySupply200()
 
   // Mineout threshold is  "how much we can mine from a patch in the time it takes to build a new town hall"
   // 7 patch/base * (200mins/patch = (75secs building + 20secs travel)/base * 24frames/sec * 0.044minerals/worker * 2workers/patch)

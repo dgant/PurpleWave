@@ -1,20 +1,19 @@
 package Gameplans.Protoss.PvT
 
 import Lifecycle.With
-import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT13Nexus, PvTDoubleRobo}
+import Strategery.Strategies.Protoss.{PvT13Nexus, PvTArbiter}
 import Utilities.DoQueue
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
-class PvTDoubleRobo extends PvTOpeners {
+class PvTArbiter extends PvTOpeners {
 
-  override def activated: Boolean = PvTDoubleRobo()
+  override def activated: Boolean = PvTArbiter()
 
   override def executeMain(): Unit = {
     val armyNormalPriority = new DoQueue(PvTArmy.normalPriority)
-    val gasIfNeeded = new DoQueue(() => pumpGasPumps(miningBases - gas / 400))
 
     get(Protoss.Pylon, Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore)
 
@@ -22,9 +21,7 @@ class PvTDoubleRobo extends PvTOpeners {
     if (armySupply200 < 24) {
       armyNormalPriority()
     }
-    if ( PvT13Nexus() || ! enemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE) || With.fingerprints.bunkerRush() || With.fingerprints.workerRush()) {
-      get(Protoss.DragoonRange)
-    }
+    get(Protoss.DragoonRange)
     if (With.fingerprints.twoFac()) {
       get(2, Protoss.Gateway)
     }
@@ -36,82 +33,50 @@ class PvTDoubleRobo extends PvTOpeners {
     maintainMiningBases(3)
     requireMiningBases(2)
     requireMiningBases(enemyMiningBases)
-    requireMiningBases(supplyTotal200 / 40)
-
-    if (armySupply200 < 32) {
-      armyNormalPriority()
-    }
-    get(Protoss.RoboticsFacility)
-    get(Protoss.DragoonRange)
-    if (PvTArmy.counterBio) {
-      get(Protoss.RoboticsSupportBay)
-      once(2, Protoss.Reaver)
-      get(3, Protoss.Gateway)
-    }
-    get(Protoss.Observatory)
+    requireMiningBases(armySupply200 / 30)
     get(2, Protoss.Gateway)
-    once(Protoss.Observer)
-    if (With.fingerprints.twoFac()) {
-      get(3, Protoss.Gateway)
-      once(Protoss.Shuttle)
-      get(Protoss.RoboticsSupportBay)
-    }
-    if ( ! safeDefending) {
-      get(Protoss.RoboticsSupportBay)
-      get(3, Protoss.Gateway)
-    }
-    if (armySupply200 < 48) {
+    get(Protoss.CitadelOfAdun)
+    pumpGasPumps()
+    get(Protoss.TemplarArchives)
+    get(Protoss.Stargate)
+    once(2, Protoss.DarkTemplar)
+    get(Protoss.ArbiterTribunal)
+    once(2, Protoss.Arbiter)
+    get(Protoss.ZealotSpeed)
+    get(Protoss.Stasis)
+    if (armySupply200 < 40) {
       armyNormalPriority()
     }
+    get(4, Protoss.Gateway)
+    requireMiningBases(3)
 
     ////////////////
     // Three Base //
     ////////////////
 
-    requireMiningBases(3)
-    get(Protoss.RoboticsSupportBay)
+    get(Protoss.RoboticsFacility)
     once(Protoss.Shuttle)
-    get(Protoss.ShuttleSpeed)
-    get(2, Protoss.RoboticsFacility)
-    once(4, Protoss.Reaver)
-    once(2, Protoss.Shuttle)
-    gasIfNeeded()
-
-    armyNormalPriority()
-
-    get(Protoss.Forge)
-    get(Protoss.GroundDamage)
-    if ( ! upgradeComplete(Protoss.ZealotSpeed) || ! have(Protoss.TemplarArchives)) {
-      get(Protoss.CitadelOfAdun)
-    }
-    get(Protoss.ZealotSpeed)
-    get(Protoss.ScarabDamage)
-    get(Math.max(3, (1.5 * enemies(Terran.Factory)).toInt), Protoss.Gateway)
-
-    get(Protoss.ObserverSpeed)
-    get(Protoss.TemplarArchives)
-    get(Protoss.PsionicStorm)
-    get(Protoss.GroundArmor)
-    get(Protoss.HighTemplarEnergy)
-    get(6, Protoss.Gateway)
-    requireMiningBases(4)
-
-    ////////////////
-    // Four Base //
-    ////////////////
-
-    buildCannonsAtExpansions(1, PlaceLabels.DefendHall)
+    get(Protoss.Observatory)
+    once(Protoss.Observer)
     get(2, Protoss.Forge)
     upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
     upgradeContinuously(Protoss.GroundArmor)
+    get(Protoss.RoboticsSupportBay)
+    once(2, Protoss.Reaver)
+    get(Protoss.ShuttleSpeed)
+    get(Protoss.PsionicStorm)
+    get(Protoss.HighTemplarEnergy)
+    get(Protoss.ObserverSpeed)
     get(Protoss.ObserverVisionRange)
-    requireMiningBases(5)
+    get(Protoss.ArbiterEnergy)
+    get(2, Protoss.RoboticsFacility)
+    get(6, Protoss.Gateway)
+    requireMiningBases(4)
 
     ///////////////
-    // Five Base //
+    // Four Base //
     ///////////////
 
-    pumpGasPumps()
     (1 to 3).foreach(count =>
       With.geography.ourMiningBases
         .sortBy(-_.tiles.size)

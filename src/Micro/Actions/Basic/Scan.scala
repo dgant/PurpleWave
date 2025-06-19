@@ -11,7 +11,7 @@ object Scan extends Action {
     unit.intent.toScan.isDefined
   }
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     Commander.useTechOnPixel(unit, Terran.ScannerSweep, unit.intent.toScan.get)
     // Ensure we don't spam scan in the absence of a new intention
     unit.intent.toScan = None

@@ -196,8 +196,8 @@ final class MacroSim {
       val framesAfter = Math.ceil(Seq(
         request.minStartFrame - With.frame,
         stepBefore.event.dFrames,
-        if (request.mineralCost == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
-        if (request.gasCost     == 0) 0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
+        if (request.mineralCost <= stepBefore.state.minerals) 0 else stepBefore.event.dFrames + Maff.nanToN((request.mineralCost  - stepBefore.state.minerals)  / _simIncomeMineralsPerFrame,  Forever()),
+        if (request.gasCost     <= stepBefore.state.gas)      0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
         val (stepStart, stepFinish) = constructStepsForRequest(request, framesAfter)

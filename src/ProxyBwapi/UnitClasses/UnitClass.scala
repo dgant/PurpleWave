@@ -221,6 +221,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val buildUnitsEnabling : Vector[UnitClass] = _buildUnitsEnabling
   lazy val buildUnitsBorrowed : Vector[UnitClass] = _buildUnitsBorrowed
   lazy val buildUnitsSpent    : Vector[UnitClass] = _buildUnitsSpent
+  lazy val addonRequired      : Option[UnitClass] = _addonsRequired.headOption
 
   lazy val macroSubstitutes: Seq[UnitClass] =
           if (this == Zerg.Spire)     Seq(Zerg.GreaterSpire)
@@ -228,10 +229,11 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else  if (this == Zerg.Lair)      Seq(Zerg.Hive)
     else                              Seq.empty
   lazy val withMacroSubstitutes: Seq[UnitClass] = Seq(this) ++ macroSubstitutes
-  lazy val isHatchlike  : Boolean = withMacroSubstitutes.contains(Zerg.Hatchery)
-  lazy val isLairlike   : Boolean = withMacroSubstitutes.contains(Zerg.Lair)
-  lazy val isSpirelike  : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
-  lazy val isTank       : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
+  lazy val isHatchlike    : Boolean = withMacroSubstitutes.contains(Zerg.Hatchery)
+  lazy val isLairlike     : Boolean = withMacroSubstitutes.contains(Zerg.Lair)
+  lazy val isSpirelike    : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
+  lazy val isTank         : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
+
 
   private def _buildUnitsEnabling: Vector[UnitClass] = {
     lazy val output = new ListBuffer[UnitClass]
@@ -389,20 +391,33 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(output, Zerg.HydraliskDen, Zerg.Drone)
     addBuildUnitIf(output, Zerg.Spire, Zerg.Drone)
     addBuildUnitIf(output, Zerg.QueensNest, Zerg.Drone)
-    addBuildUnitIf(output, Zerg.UltraliskCavern, Zerg.Drone)
+    addBuildUnitIf(output, Zerg.UltraliskCavern,Zerg.Drone)
     addBuildUnitIf(output, Zerg.DefilerMound, Zerg.Drone)
     addBuildUnitIf(output, Zerg.NydusCanal, Zerg.Drone)
 
     // Zerg morphs
-    addBuildUnitIf(output, Zerg.LurkerEgg, Zerg.Hydralisk)
-    addBuildUnitIf(output, Zerg.Lurker, Zerg.Hydralisk)
-    addBuildUnitIf(output, Zerg.Cocoon, Zerg.Mutalisk)
-    addBuildUnitIf(output, Zerg.Guardian, Zerg.Mutalisk)
-    addBuildUnitIf(output, Zerg.Devourer, Zerg.Mutalisk)
-    addBuildUnitIf(output, Zerg.Lair, Zerg.Hatchery)
-    addBuildUnitIf(output, Zerg.Hive, Zerg.Lair)
+    addBuildUnitIf(output, Zerg.LurkerEgg,    Zerg.Hydralisk)
+    addBuildUnitIf(output, Zerg.Lurker,       Zerg.Hydralisk)
+    addBuildUnitIf(output, Zerg.Cocoon,       Zerg.Mutalisk)
+    addBuildUnitIf(output, Zerg.Guardian,     Zerg.Mutalisk)
+    addBuildUnitIf(output, Zerg.Devourer,     Zerg.Mutalisk)
+    addBuildUnitIf(output, Zerg.Lair,         Zerg.Hatchery)
+    addBuildUnitIf(output, Zerg.Hive,         Zerg.Lair)
     addBuildUnitIf(output, Zerg.SunkenColony, Zerg.CreepColony)
-    addBuildUnitIf(output, Zerg.SporeColony, Zerg.CreepColony)
+    addBuildUnitIf(output, Zerg.SporeColony,  Zerg.CreepColony)
+
+    output.toVector
+  }
+
+  private def _addonsRequired: Vector[UnitClass] = {
+
+    lazy val output = new ListBuffer[UnitClass]
+
+    addBuildUnitIf(output, Terran.SiegeTankUnsieged,  Terran.MachineShop)
+    addBuildUnitIf(output, Terran.Dropship,           Terran.ControlTower)
+    addBuildUnitIf(output, Terran.ScienceVessel,      Terran.ControlTower)
+    addBuildUnitIf(output, Terran.Valkyrie,           Terran.ControlTower)
+    addBuildUnitIf(output, Terran.Battlecruiser,      Terran.ControlTower)
 
     output.toVector
   }

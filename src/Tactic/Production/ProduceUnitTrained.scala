@@ -18,7 +18,7 @@ class ProduceUnitTrained(requestArg: RequestBuildable, expectedFramesArg: Int) e
   val requestUnit     : Option[RequestUnit] = Try(requestArg.asInstanceOf[RequestUnit]).toOption
   val currencyLock    : LockCurrency        = new LockCurrencyFor(this, traineeClass)
   val trainerLock     : LockUnits           = new LockUnits(this,
-    (u: UnitInfo)  => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(u.addon.contains) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r))),
+    (u: UnitInfo)  => trainerClass(u) && ! u.hasNuke && ! u.flying && addonClass.forall(ac => u.addon.exists(ac)) && requestUnit.forall(_.parentRequirement.forall(r => u.friendly.forall(r))),
     requestUnit.flatMap(_.parentPreference).map(p => PreferTiers(p, PreferTrainerFor(traineeClass))).getOrElse(PreferTrainerFor(traineeClass)),
     CountOne)
 

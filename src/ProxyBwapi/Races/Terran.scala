@@ -41,6 +41,8 @@ object Terran {
   lazy val Comsat               = UnitClasses.get(UnitType.Terran_Comsat_Station)
   lazy val NuclearSilo          = UnitClasses.get(UnitType.Terran_Nuclear_Silo)
   lazy val SpellScannerSweep    = UnitClasses.get(UnitType.Spell_Scanner_Sweep)
+  lazy val FakeMachineShop      = UnitClasses.get(UnitType.Unused_Terran1)
+  lazy val FakeControlTower     = UnitClasses.get(UnitType.Unused_Terran2)
   lazy val WraithEnergy         = Upgrades.get(UpgradeType.Apollo_Reactor)
   lazy val MedicEnergy          = Upgrades.get(UpgradeType.Caduceus_Reactor)
   lazy val GoliathAirRange      = Upgrades.get(UpgradeType.Charon_Boosters)

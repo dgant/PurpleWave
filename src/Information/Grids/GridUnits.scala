@@ -53,5 +53,5 @@ final class GridUnits extends AbstractTypedGrid[Traversable[UnitInfo]] with Grid
     units.remove(unit)
   }
 
-  private def unitTile(unit: UnitInfo): Tile = ? (unit.unitClass.isBuilding, unit.tileTopLeft, unit.tile)
+  private def unitTile(unit: UnitInfo): Tile = ?(unit.unitClass.isBuilding, unit.tileTopLeft, unit.tile)
 }

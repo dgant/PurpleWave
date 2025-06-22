@@ -3,7 +3,7 @@ package Placement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points, Tile}
-import Placement.Generation.{Fit, Fitter, Templates}
+import Placement.Generation.{Fit, Fitter, TemplatesGeneric, TemplatesProtoss, TemplatesTerran}
 import Placement.Walls.{FindWall, Wall, WallFinder}
 import Utilities.?
 
@@ -18,6 +18,10 @@ class Placement extends Fitter {
 
   def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
 
+  private def protoss (todo: => Unit): Unit = { if (With.self.isProtoss)  { todo }}
+  private def terran  (todo: => Unit): Unit = { if (With.self.isTerran)   { todo }}
+  private def zerg    (todo: => Unit): Unit = { if (With.self.isZerg)     { todo }}
+
   def initialize(): Unit = {
     if (_initialized) return
     _initialized = true
@@ -26,13 +30,13 @@ class Placement extends Fitter {
     With.units.neutral
       .filter(_.unitClass.isBuilding)
       .filterNot(u => u.base.exists(_.townHallArea.intersects(u.tileArea)))
-      .foreach(_.tileArea.tiles.map(Fit(_, Templates.walkway)).foreach(index))
+      .foreach(_.tileArea.tiles.map(Fit(_, TemplatesGeneric.walkway)).foreach(index))
 
     // Fit closer zones first, so in case of tiebreaks we prefer closer zones
     val basesSorted = With.geography.bases.sortBy(b => b.heart.groundTiles(With.geography.home))
     val zonesSorted = With.geography.zones.sortBy(z => z.heart.groundTiles(With.geography.home))
 
-    basesSorted.foreach(b => index(Fit(b.townHallTile, Templates.townhall)))
+    basesSorted.foreach(b => index(Fit(b.townHallTile, TemplatesGeneric.townhall)))
     if (wallEverything) {
       With.geography.zones
         .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
@@ -42,8 +46,11 @@ class Placement extends Fitter {
     } else if (With.self.isProtoss && With.enemies.exists( ! _.isProtoss)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }
-    basesSorted.foreach(base => fitAndIndexConstrained(5, 1, ?(base.isMain, Templates.mainBases, Templates.bases), base))
-    basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, Templates.walkway))))
+    basesSorted.foreach(base => {
+      protoss (fitAndIndexConstrained(5, 1, ?(base.isMain, TemplatesProtoss.mainBases, TemplatesProtoss.bases), base))
+      terran  (fitAndIndexConstrained(5, 1, TemplatesTerran.commandCenter, base))
+    })
+    basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
   }
@@ -59,13 +66,22 @@ class Placement extends Fitter {
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
     if ( ! zone.isBackyard && ! zone.island) {
-      fitAndIndexProximity(1, 1, Templates.batterycannon,  exitTile,      zone, 10)
+      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.batterycannon, exitTile, zone, 10))
+      terran  (fitAndIndexProximity(1, 1, TemplatesTerran.bunkerTurret,   exitTile, zone, 10))
     }
-    fitAndIndexProximity(0, 1, Templates.initialLayouts, zone.downtown, zone)
-    fitAndIndexRectangle(2, 1, Templates.tech,           cornerBack,    bounds, directionToFront)
-    fitAndIndexRectangle(3, 1, Templates.gateways,       cornerFront,   bounds, directionToBack)
-    fitAndIndexRectangle(4, 1, Templates.tech,           cornerBack,    bounds, directionToFront)
-    fitAndIndexRectangle(4, 7, Templates.gateways,       cornerFront,   bounds, directionToBack)
+    protoss (fitAndIndexProximity(0, 1, TemplatesProtoss.initialLayouts,  zone.downtown,  zone))
+    protoss (fitAndIndexRectangle(2, 1, TemplatesProtoss.tech,            cornerBack,     bounds, directionToFront))
+    protoss (fitAndIndexRectangle(3, 1, TemplatesProtoss.production,      cornerFront,    bounds, directionToBack))
+    protoss (fitAndIndexRectangle(4, 1, TemplatesProtoss.tech,            cornerBack,     bounds, directionToFront))
+    protoss (fitAndIndexRectangle(4, 7, TemplatesProtoss.production,      cornerFront,    bounds, directionToBack))
+    terran  (fitAndIndexProximity(0, 1, TemplatesTerran.initialLayouts,   zone.downtown,  zone))
+    terran  (fitAndIndexRectangle(2, 1, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
+    terran  (fitAndIndexRectangle(3, 1, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
+    terran  (fitAndIndexRectangle(4, 1, TemplatesTerran.tech6,            cornerBack,     bounds, directionToFront))
+    terran  (fitAndIndexRectangle(5, 2, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
+    terran  (fitAndIndexRectangle(6, 3, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
+    terran  (fitAndIndexRectangle(7, 3, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
+    terran  (fitAndIndexRectangle(8, 7, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
   }
 
   def preplaceWalls(zone: Zone): Unit = {

@@ -56,7 +56,6 @@ final class MacroSim {
     steps.clear()
     minInsert.clear()
 
-    // Construct initial state
     val initialStep = new MacroStep
     val initialState = initialStep.state
     initialState.minerals           = With.self.minerals
@@ -78,8 +77,8 @@ final class MacroSim {
     // TODO: Don't replace morphers
     With.units.ours.filter(trulyUnoccupied).foreach(u => initialState.producers(u.unitClass) += 1)
     With.units.ours.filterNot(trulyUnoccupied).foreach(u => {
-      val step = new MacroStep
-      val event = step.event
+      val step      = new MacroStep
+      val event     = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
         step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
@@ -108,6 +107,35 @@ final class MacroSim {
       event.dProducer1N = 1
       insert(step)
     })
+    if (With.self.isTerran) {
+      val addons = With.units.ours.filter(_.isAny(Terran.MachineShop, Terran.ControlTower))
+      addons.foreach(addon => addon.addonOf.foreach(parent =>
+        if (addon.complete && trulyUnoccupied(parent)) {
+          initialState.producers(AddonSubstitution.fromReal(addon.unitClass)) += 1
+        }))
+      addons.foreach(addon =>addon.addonOf.foreach(parent => {
+        if ( ! addon.complete) {
+          val substitute  = AddonSubstitution.fromReal(addon.unitClass)
+          val step        = new MacroStep
+          val event       = step.event
+          step.request = Some(RequestUnit(substitute, initialState.unitsExtant(substitute), specificTraineeArg = Some(addon)))
+          event.dFrames             = addon.remainingCompletionFrames
+          event.dUnitComplete       = substitute
+          event.dUnitCompleteN      = 1
+          event.dUnitCompleteASAP   = substitute
+          event.dUnitCompleteASAPN  = 1
+          insert(step)
+        } else if ( ! trulyUnoccupied(parent)) {
+          val substitute    = AddonSubstitution.fromReal(addon.unitClass)
+          val step          = new MacroStep
+          val event         = step.event
+          event.dFrames     = parent.remainingOccupationFrames
+          event.dProducer1  = substitute
+          event.dProducer1N = 1
+          insert(step)
+        }
+      }))
+    }
 
     // Populate states as of each event
     updateStatesFrom(1)
@@ -256,7 +284,7 @@ final class MacroSim {
     } else if (request.mineralCost > Math.max(0, step.state.minerals) && _simIncomeMineralsPerFrame == 0) {
       return MissingMinerals
     }
-    // TODO: Restore once we update income per-state
+    // TODO: Restore this check once we update income per-state
     // else if (request.gasCost > Math.max(0, step.state.gas) && _simIncomeGasPerFrame == 0
     else if (request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0) {
       return MissingGas
@@ -352,6 +380,8 @@ final class MacroSim {
     eventStart.dSupplyUsed  =   request.supplyRequired
     eventStart.dProducer1   =   request.producerRequired
     eventStart.dProducer1N  = - request.producersRequired
+    eventStart.dProducer2   =   request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(UnitClasses.None)
+    eventStart.dProducer2N  = - request.addonRequired.size
     eventFinish.dFrames     =   eventStart.dFrames + request.buildFrames
     eventFinish.dProducer1  =   eventStart.dProducer1
     eventFinish.dProducer1N = - eventStart.dProducer1N
@@ -363,12 +393,12 @@ final class MacroSim {
       eventFinish.dUnitCompleteN      = u.copiesProduced
       eventFinish.dUnitCompleteASAP   = ?(ASAP, u, UnitClasses.None)
       eventFinish.dUnitCompleteASAPN  = ?(ASAP, u.copiesProduced, 0)
-      eventFinish.dProducer2          = u
-      eventFinish.dProducer2N         = u.copiesProduced
+      eventFinish.dProducer2          = request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(u) // Taking advantage of the fact that
+      eventFinish.dProducer2N         = 1 // It's just 1 in all cases because Zerglings/Scourge don't make anything
       eventFinish.dSupplyAvailable    = u.supplyProvided
       eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
     })
-    if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.CreepColony, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
+    if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.Hatchery, Zerg.Lair, Zerg.CreepColony, Zerg.Spire, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
       eventStart.dUnitExtant2   =   request.producerRequired
       eventStart.dUnitExtant2N  = - request.producersRequired
     }

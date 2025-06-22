@@ -25,7 +25,7 @@ object Build extends Action {
     val tile        = intent.tile
 
     // If building already started, get a head start on mining
-    if (tile.units.exists(u => u.isOurs && u.unitClass.isBuilding && (u.complete || u.unitClass.isProtoss))) {
+    if (unit.unitClass.isWorker && tile.units.exists(u => u.isOurs && u.unitClass.isBuilding && (u.complete || u.unitClass.isProtoss))) {
       if (unit.intent.toScoutTiles.isEmpty) {
         unit.agent.toGather = Maff.minBy(With.geography.ourBases.flatMap(_.minerals))(_.pixelDistanceCenter(unit.pixel))
         Gather(unit)
@@ -81,7 +81,7 @@ object Build extends Action {
       && unit.pixelDistanceCenter(movePixel) < 112 // Addtl reference: McRave uses 96
       && With.self.minerals >= building.mineralPrice - 8
       && With.self.gas      >= building.gasPrice - 8) {
-      Commander.build(unit, building, tile)
+      Commander.build(unit, building, ?(building.isAddon, tile.add(4, 1), tile))
       return
     }
 

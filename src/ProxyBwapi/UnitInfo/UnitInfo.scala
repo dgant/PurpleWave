@@ -539,6 +539,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]
 
+  def addonOf: Option[UnitInfo] = tileTopLeft.subtract(4, 1).units.find(u => u.isAny(Terran.CommandCenter, Terran.Factory, Terran.Starport, Terran.ScienceFacility) && ! u.flying)
+
   def painfullyIrradiated: Boolean = unitClass.canBeIrradiateBurned && irradiated
 
   ////////////////

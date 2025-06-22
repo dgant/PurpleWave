@@ -5,7 +5,7 @@ import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, Def
 import Placement.Templating.Template
 import bwapi.Race
 
-object Templates {
+object TemplatesProtoss {
 
   val walkway: Template = new Template().from("-")
 
@@ -208,7 +208,7 @@ object Templates {
         "--xxxxxxxx-",
         "xxxxxxx----")) ++ bases // Default to generic base layouts if needed
 
-  val initialLayouts = Seq(
+  val initialLayouts: Seq[Template] = Seq(
     // It's critical that the Gateways not have tech buildings below them.
     // Gateway above Citadel-Pylon-Core can trap Dark Templar.
     new Template()
@@ -251,7 +251,7 @@ object Templates {
         "-xxxxxxxx-",
         "----------"))
 
-  val gateways = Seq(
+  val production: Seq[Template] = Seq(
     new Template().from(
       "xxx--------",
       "2x4xxx4xxx-",
@@ -313,7 +313,7 @@ object Templates {
       "----- ")
   )
 
-  val tech = Seq(
+  val tech: Seq[Template] = Seq(
     new Template().from(
       "---------",
       "3xxPx3xx-",
@@ -327,7 +327,7 @@ object Templates {
       "Pxx-",
       "xxx-"))
 
-  val batterycannon = Seq(
+  val batterycannon: Seq[Template] = Seq(
     // Super spacious
     new Template()
       .forExitDirection(Directions.Left)
@@ -452,7 +452,7 @@ object Templates {
         "---"))
     .map(_.addLabels(Defensive, DefendEntrance, DefendGround))
 
-  val protossProxy4 = Seq(
+  val proxy4: Seq[Template] = Seq(
     new Template()
       .from(
         "x----------x",
@@ -486,7 +486,7 @@ object Templates {
         "xxxxxxx----xxxxxxxx"))
     .map(_.addLabels(AnyProxy, ProxyGround))
 
-  val protossProxy2 = Seq(
+  val proxy2: Seq[Template] = Seq(
     new Template()
       .from(
         "------xx",

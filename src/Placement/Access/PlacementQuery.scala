@@ -31,7 +31,7 @@ class PlacementQuery {
   private def defaultPreferenceBases(building: UnitClass) = With.geography.ourBases.filter(b => ! building.isGas || b.townHall.exists(b => b.hasEverBeenCompleteHatch || b.remainingCompletionFrames < Terran.Refinery.buildFrames))
   private def defaultPreferenceTiles(building: UnitClass) = ?(building.isGas, Seq(With.geography.home), Seq.empty)
   def resetDefaults(building: UnitClass): Unit = {
-    requirements.width    = Some(building.tileWidthPlusAddon)
+    requirements.width    = Some(building.tileWidth) //Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
     requirements.building = Some(building).filter(_.isGas)
     requirements.labelYes = ?(building.isTownHall, Seq(PlaceLabels.TownHall), Seq.empty)

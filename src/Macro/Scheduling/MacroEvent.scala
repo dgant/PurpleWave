@@ -30,6 +30,8 @@ final class MacroEvent(val state: MacroState) {
   var dProducer1N         : Int           = 0
   var dProducer2          : UnitClass     = UnitClasses.None
   var dProducer2N         : Int           = 0
+  var dAddon              : UnitClass     = UnitClasses.None
+  var dAddonN             : Int           = 0
   var tile                : Option[Tile]  = None
 
   private def sign(value: Int): String = {
@@ -52,6 +54,7 @@ final class MacroEvent(val state: MacroState) {
     if (dUnitExtant2      != UnitClasses.None)  output += f"${sign(dUnitExtant2N)} ${count(state.unitsExtant(dUnitExtant2))} $dUnitExtant2 "
     if (dProducer1        != UnitClasses.None)  output += f"${sign(dProducer1N)} ${count(state.producers(dProducer1))} ${freeOrDone(dProducer1)} "
     if (dProducer2        != UnitClasses.None)  output += f"${sign(dProducer2N)} ${count(state.producers(dProducer2))} ${freeOrDone(dProducer2)} "
+    if (dAddon            != UnitClasses.None)  output += f"${sign(dAddonN)} ${count(state.producers(dAddon))} ${freeOrDone(dAddon)}"
     if (dMinerals         != 0)                 output += f"${sign(dMinerals)}m "
     if (dGas              != 0)                 output += f"${sign(dGas)}g "
     if (dSupplyUsed       != 0)                 output += f"${sign(-dSupplyUsed)}s "

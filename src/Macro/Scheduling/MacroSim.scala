@@ -27,6 +27,7 @@ final class MacroSim {
   object MissingTech            extends InsertionResult
   object MissingProducer        extends InsertionResult
   object MissingUnitRequirement extends InsertionResult
+  object StealsAddon           extends InsertionResult
   object StealsProducer         extends InsertionResult
   object StealsMinerals         extends InsertionResult
   object StealsGas              extends InsertionResult
@@ -109,10 +110,14 @@ final class MacroSim {
     })
     if (With.self.isTerran) {
       val addons = With.units.ours.filter(_.isAny(Terran.MachineShop, Terran.ControlTower))
-      addons.foreach(addon => addon.addonOf.foreach(parent =>
+      addons.foreach(addon => addon.addonOf.foreach(parent => {
+        val substitute  = AddonSubstitution.fromReal(addon.unitClass)
+        initialState.unitsExtant(substitute) += 1
         if (addon.complete && trulyUnoccupied(parent)) {
+          initialState.unitsComplete(substitute) += 1
           initialState.producers(AddonSubstitution.fromReal(addon.unitClass)) += 1
-        }))
+        }
+      }))
       addons.foreach(addon =>addon.addonOf.foreach(parent => {
         if ( ! addon.complete) {
           val substitute  = AddonSubstitution.fromReal(addon.unitClass)
@@ -124,14 +129,16 @@ final class MacroSim {
           event.dUnitCompleteN      = 1
           event.dUnitCompleteASAP   = substitute
           event.dUnitCompleteASAPN  = 1
+          event.dAddon              = substitute
+          event.dAddonN             = 1
           insert(step)
         } else if ( ! trulyUnoccupied(parent)) {
-          val substitute    = AddonSubstitution.fromReal(addon.unitClass)
-          val step          = new MacroStep
-          val event         = step.event
-          event.dFrames     = parent.remainingOccupationFrames
-          event.dProducer1  = substitute
-          event.dProducer1N = 1
+          val substitute  = AddonSubstitution.fromReal(addon.unitClass)
+          val step        = new MacroStep
+          val event       = step.event
+          event.dFrames   = parent.remainingOccupationFrames
+          event.dAddon    = substitute
+          event.dAddonN   = 1
           insert(step)
         }
       }))
@@ -283,13 +290,11 @@ final class MacroSim {
       return PrecedesMinInsert
     } else if (request.mineralCost > Math.max(0, step.state.minerals) && _simIncomeMineralsPerFrame == 0) {
       return MissingMinerals
-    }
     // TODO: Restore this check once we update income per-state
     // else if (request.gasCost > Math.max(0, step.state.gas) && _simIncomeGasPerFrame == 0
-    else if (request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0) {
+    } else if (request.gasCost > Math.max(0, step.state.gas) && step.state.unitsComplete(Terran.Refinery) + step.state.unitsComplete(Protoss.Assimilator) + step.state.unitsComplete(Zerg.Extractor) == 0) {
       return MissingGas
-    }
-    else if (request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)) {
+    } else if (request.upgradeRequired.exists(u => step.state.upgrades(u._1) < u._2)) {
       return MissingUpgrade
     } else if (request.techRequired.exists(t => ! step.state.techs.contains(t))) {
       return MissingTech
@@ -310,6 +315,8 @@ final class MacroSim {
         return StealsMinerals
       } else if (request.gasCost > Math.max(0, state.gas)) {
         return StealsGas
+      } else if (request.addonRequired.exists(addon => step.state.producers(AddonSubstitution.fromReal(addon)) <= 0)) {
+        return StealsAddon
       }
       j += 1
     }
@@ -380,8 +387,8 @@ final class MacroSim {
     eventStart.dSupplyUsed  =   request.supplyRequired
     eventStart.dProducer1   =   request.producerRequired
     eventStart.dProducer1N  = - request.producersRequired
-    eventStart.dProducer2   =   request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(UnitClasses.None)
-    eventStart.dProducer2N  = - request.addonRequired.size
+    eventStart.dAddon       =   request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(UnitClasses.None)
+    eventStart.dAddonN      = - request.addonRequired.size
     eventFinish.dFrames     =   eventStart.dFrames + request.buildFrames
     eventFinish.dProducer1  =   eventStart.dProducer1
     eventFinish.dProducer1N = - eventStart.dProducer1N
@@ -393,8 +400,10 @@ final class MacroSim {
       eventFinish.dUnitCompleteN      = u.copiesProduced
       eventFinish.dUnitCompleteASAP   = ?(ASAP, u, UnitClasses.None)
       eventFinish.dUnitCompleteASAPN  = ?(ASAP, u.copiesProduced, 0)
-      eventFinish.dProducer2          = request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(u) // Taking advantage of the fact that
-      eventFinish.dProducer2N         = 1 // It's just 1 in all cases because Zerglings/Scourge don't make anything
+      eventFinish.dProducer2          = u
+      eventFinish.dProducer2N         = 1
+      eventFinish.dAddon              = request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(?(AddonSubstitution(u), AddonSubstitution.fromReal(u), UnitClasses.None))
+      eventFinish.dAddonN             = ?(AddonSubstitution(u), 1, request.addonRequired.size)
       eventFinish.dSupplyAvailable    = u.supplyProvided
       eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
     })
@@ -431,11 +440,11 @@ final class MacroSim {
       stateNext.unitsComplete     = stateLast.unitsComplete
       stateNext.unitsCompleteASAP = stateLast.unitsCompleteASAP
       stateNext.producers         = stateLast.producers
-      if (event.dUpgrade          != Upgrades.None)                                               stateNext.upgrades          = stateNext.upgrades.clone
-      if (event.dUnitExtant1      != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)  stateNext.unitsExtant       = stateNext.unitsExtant.clone
-      if (event.dUnitComplete     != UnitClasses.None)                                            stateNext.unitsComplete     = stateNext.unitsComplete.clone
-      if (event.dUnitCompleteASAP != UnitClasses.None)                                            stateNext.unitsCompleteASAP = stateNext.unitsCompleteASAP.clone
-      if (event.dProducer1        != UnitClasses.None || event.dProducer2 != UnitClasses.None)    stateNext.producers         = stateNext.producers.clone
+      if (event.dUpgrade          != Upgrades.None)                                                                                 stateNext.upgrades          = stateNext.upgrades.clone
+      if (event.dUnitExtant1      != UnitClasses.None || event.dUnitExtant2 != UnitClasses.None)                                    stateNext.unitsExtant       = stateNext.unitsExtant.clone
+      if (event.dUnitComplete     != UnitClasses.None)                                                                              stateNext.unitsComplete     = stateNext.unitsComplete.clone
+      if (event.dUnitCompleteASAP != UnitClasses.None)                                                                              stateNext.unitsCompleteASAP = stateNext.unitsCompleteASAP.clone
+      if (event.dProducer1        != UnitClasses.None || event.dProducer2 != UnitClasses.None || event.dAddon != UnitClasses.None)  stateNext.producers         = stateNext.producers.clone
       if (event.dTech             != Techs.None)        stateNext.techs                                       += event.dTech
       if (event.dUpgrade          != Upgrades.None)     stateNext.upgrades(event.dUpgrade)                    =  event.dUpgradeLevel
       if (event.dUnitExtant1      != UnitClasses.None)  stateNext.unitsExtant(event.dUnitExtant1)             += event.dUnitExtant1N
@@ -444,6 +453,7 @@ final class MacroSim {
       if (event.dUnitCompleteASAP != UnitClasses.None)  stateNext.unitsCompleteASAP(event.dUnitCompleteASAP)  += event.dUnitCompleteASAPN
       if (event.dProducer1        != UnitClasses.None)  stateNext.producers(event.dProducer1)                 += event.dProducer1N
       if (event.dProducer2        != UnitClasses.None)  stateNext.producers(event.dProducer2)                 += event.dProducer2N
+      if (event.dAddon            != UnitClasses.None)  stateNext.producers(event.dAddon)                     += event.dAddonN
       stateNext.supplyUsePerFrame = MacroProducers.ours.view.map(p => stateNext.unitsExtant(p.producer) * p.supplyUsePerFrame).sum
       i += 1
     }

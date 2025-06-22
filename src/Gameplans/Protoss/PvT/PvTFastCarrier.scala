@@ -139,7 +139,6 @@ class PvTFastCarrier extends PvTOpeners {
     shouldAttack  ||= pushMarines
     shouldAttack  ||= enemyMiningBases > miningBases
     shouldAttack  ||= unitsComplete(Protoss.Interceptor) > 24
-    shouldAttack  ||= frame > Minutes(12)()
 
     if (zealotAggro)      status("ZealotAggro")
     if (pushMarines)      status("PushMarines")

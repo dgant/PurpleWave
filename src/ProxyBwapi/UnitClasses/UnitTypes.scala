@@ -3,16 +3,14 @@ package ProxyBwapi.UnitClasses
 import bwapi.UnitType
 
 object UnitTypes {
-  val all = Vector(
+  val all: Vector[UnitType] = Vector(
     UnitType.Terran_Marine,
     UnitType.Terran_Ghost,
     UnitType.Terran_Vulture,
     UnitType.Terran_Goliath,
-    //Not available in BWMirror
-    //UnitType.Terran_Goliath_Turret,
+    UnitType.Terran_Goliath_Turret,
     UnitType.Terran_Siege_Tank_Tank_Mode,
-    //Not available in BWMirror
-    //UnitType.Terran_Siege_Tank_Tank_Mode_Turret,
+    UnitType.Terran_Siege_Tank_Tank_Mode_Turret,
     UnitType.Terran_SCV,
     UnitType.Terran_Wraith,
     UnitType.Terran_Science_Vessel,
@@ -24,24 +22,20 @@ object UnitTypes {
     UnitType.Terran_Civilian,
     UnitType.Hero_Sarah_Kerrigan,
     UnitType.Hero_Alan_Schezar,
-    //Not available in BWMirror
-    //itType.Hero_Alan_Schezar_Turret,
+    UnitType.Hero_Alan_Schezar_Turret,
     UnitType.Hero_Jim_Raynor_Vulture,
     UnitType.Hero_Jim_Raynor_Marine,
     UnitType.Hero_Tom_Kazansky,
     UnitType.Hero_Magellan,
     UnitType.Hero_Edmund_Duke_Tank_Mode,
-    //Not available in BWMirror
-    //UnitType.Hero_Edmund_Duke_Tank_Mode_Turret,
+    UnitType.Hero_Edmund_Duke_Tank_Mode_Turret,
     UnitType.Hero_Edmund_Duke_Siege_Mode,
-    //Not available in BWMirror
-    //UnitType.Hero_Edmund_Duke_Siege_Mode_Turret,
+    UnitType.Hero_Edmund_Duke_Siege_Mode_Turret,
     UnitType.Hero_Arcturus_Mengsk,
     UnitType.Hero_Hyperion,
     UnitType.Hero_Norad_II,
     UnitType.Terran_Siege_Tank_Siege_Mode,
-    //Not available in BWMirror
-    //UnitType.Terran_Siege_Tank_Siege_Mode_Turret,
+    UnitType.Terran_Siege_Tank_Siege_Mode_Turret,
     UnitType.Terran_Firebat,
     UnitType.Spell_Scanner_Sweep,
     UnitType.Terran_Medic,
@@ -129,11 +123,9 @@ object UnitTypes {
     UnitType.Terran_Science_Facility,
     UnitType.Terran_Covert_Ops,
     UnitType.Terran_Physics_Lab,
-    //Not available in BWMirror
-    //UnitType.Unused_Terran1,
+    UnitType.Unused_Terran1,
     UnitType.Terran_Machine_Shop,
-    //Not available in BWMirror
-    //UnitType.Unused_Terran2,
+    UnitType.Unused_Terran2,
     UnitType.Terran_Engineering_Bay,
     UnitType.Terran_Armory,
     UnitType.Terran_Missile_Turret,
@@ -157,8 +149,7 @@ object UnitTypes {
     UnitType.Zerg_Spawning_Pool,
     UnitType.Zerg_Creep_Colony,
     UnitType.Zerg_Spore_Colony,
-    //Not available in BWMirror
-    //UnitType.Unused_Zerg1,
+    UnitType.Unused_Zerg1,
     UnitType.Zerg_Sunken_Colony,
     UnitType.Special_Overmind_With_Shell,
     UnitType.Special_Overmind,
@@ -166,18 +157,15 @@ object UnitTypes {
     UnitType.Special_Mature_Chrysalis,
     UnitType.Special_Cerebrate,
     UnitType.Special_Cerebrate_Daggoth,
-    //Not available in BWMirror
-    //UnitType.Unused_Zerg2,
+    UnitType.Unused_Zerg2,
     UnitType.Protoss_Nexus,
     UnitType.Protoss_Robotics_Facility,
     UnitType.Protoss_Pylon,
     UnitType.Protoss_Assimilator,
-    //Not available in BWMirror
-    //UnitType.Unused_Protoss1,
+    UnitType.Unused_Protoss1,
     UnitType.Protoss_Observatory,
     UnitType.Protoss_Gateway,
-    //Not available in BWMirror
-    //UnitType.Unused_Protoss2,
+    UnitType.Unused_Protoss2,
     UnitType.Protoss_Photon_Cannon,
     UnitType.Protoss_Citadel_of_Adun,
     UnitType.Protoss_Cybernetics_Core,
@@ -195,24 +183,21 @@ object UnitTypes {
     UnitType.Resource_Mineral_Field,
     UnitType.Resource_Mineral_Field_Type_2,
     UnitType.Resource_Mineral_Field_Type_3,
-    //Not available in BWMirror
-    //UnitType.Unused_Cave,
-    //UnitType.Unused_Cave_In,
-    //UnitType.Unused_Cantina,
-    //UnitType.Unused_Mining_Platform,
-    //UnitType.Unused_Independant_Command_Center,
+    UnitType.Unused_Cave,
+    UnitType.Unused_Cave_In,
+    UnitType.Unused_Cantina,
+    UnitType.Unused_Mining_Platform,
+    UnitType.Unused_Independant_Command_Center,
     UnitType.Special_Independant_Starport,
-    //Not available in BWMirror
-    //UnitType.Unused_Independant_Jump_Gate,
-    //UnitType.Unused_Ruins,
-    //UnitType.Unused_Khaydarin_Crystal_Formation,
+    UnitType.Unused_Independant_Jump_Gate,
+    UnitType.Unused_Ruins,
+    UnitType.Unused_Khaydarin_Crystal_Formation,
     UnitType.Resource_Vespene_Geyser,
     UnitType.Special_Warp_Gate,
     UnitType.Special_Psi_Disrupter,
-    //Not available in BWMirror
-    //UnitType.Unused_Zerg_Marker,
-    //UnitType.Unused_Terran_Marker,
-    //UnitType.Unused_Protoss_Marker,
+    UnitType.Unused_Zerg_Marker,
+    UnitType.Unused_Terran_Marker,
+    UnitType.Unused_Protoss_Marker,
     UnitType.Special_Zerg_Beacon,
     UnitType.Special_Terran_Beacon,
     UnitType.Special_Protoss_Beacon,

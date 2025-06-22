@@ -433,7 +433,12 @@ object Commander {
       move(unit, tile.center)
       return
     }
-    unit.bwapiUnit.build(unitClass.bwapiType, tile.bwapi)
+
+    if (unitClass.isAddon) {
+      unit.bwapiUnit.buildAddon(unitClass.bwapiType)
+    } else {
+      unit.bwapiUnit.build(unitClass.bwapiType, tile.bwapi)
+    }
     sleepBuild(unit)
   }
 

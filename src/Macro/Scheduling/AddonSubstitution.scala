@@ -4,6 +4,7 @@ import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 
 object AddonSubstitution {
+  def apply(unitClass: UnitClass): Boolean = unitClass == Terran.MachineShop ||  unitClass == Terran.ControlTower
   def fromReal(unitClass: UnitClass): UnitClass = {
     if      (unitClass == Terran.MachineShop)   Terran.FakeMachineShop
     else if (unitClass == Terran.ControlTower)  Terran.FakeControlTower

@@ -27,7 +27,7 @@ final class MacroSim {
   object MissingTech            extends InsertionResult
   object MissingProducer        extends InsertionResult
   object MissingUnitRequirement extends InsertionResult
-  object StealsAddon           extends InsertionResult
+  object StealsAddon            extends InsertionResult
   object StealsProducer         extends InsertionResult
   object StealsMinerals         extends InsertionResult
   object StealsGas              extends InsertionResult

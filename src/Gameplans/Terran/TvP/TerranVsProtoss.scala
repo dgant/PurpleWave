@@ -1,7 +1,10 @@
 package Gameplans.Terran.TvP
 
 import Gameplans.All.GameplanImperative
-import ProxyBwapi.Races.Terran
+import Lifecycle.With
+import Macro.Actions.Enemy
+import ProxyBwapi.Races.{Protoss, Terran}
+import Utilities.UnitFilters.IsWarrior
 
 class TerranVsProtoss extends GameplanImperative {
 
@@ -13,23 +16,21 @@ class TerranVsProtoss extends GameplanImperative {
     once(Terran.Barracks)
     once(12, Terran.SCV)
     once(Terran.Refinery)
+    if (unitsEver(Terran.Vulture) < 3 && enemyStrategy(With.fingerprints.workerRush, With.fingerprints.proxyGateway)) {
+      pump(Terran.Vulture, 3)
+      pump(Terran.Marine, 4)
+      buildBunkersAtMain(1)
+      get(Terran.Factory)
+    }
     once(15, Terran.SCV)
     once(2, Terran.SupplyDepot)
-    once(Terran.Marine)
+    if (unitsComplete(Terran.Factory) < 2 && enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)) {
+      pumpRatio(Terran.Marine, 2, 9, Seq(Enemy(Protoss.Zealot, 3.0)))
+    }
     once(16, Terran.SCV)
     once(Terran.Factory)
-    once(17, Terran.SCV)
-    once(2, Terran.Marine)
     once(18, Terran.SCV)
     once(2, Terran.Factory)
-    once(19, Terran.SCV)
-    once(Terran.MachineShop)
-    once(3, Terran.SupplyDepot)
-    once(Terran.SiegeTankUnsieged)
-    once(2, Terran.MachineShop)
-    once(3, Terran.SiegeTankUnsieged)
-    once(23, Terran.SCV)
-    once(2, Terran.Vulture)
   }
 
   override def doWorkers(): Unit = {
@@ -37,24 +38,45 @@ class TerranVsProtoss extends GameplanImperative {
   }
 
   def executeMain(): Unit = {
-    once(Terran.VultureSpeed)
-    if (units(Terran.Factory) > 2) {
-      pump(Terran.SiegeTankUnsieged)
-      pump(Terran.Vulture)
+    if ( ! haveEver(Terran.MachineShop)) {
+      pumpRatio(Terran.Vulture, 0, 5, Seq(Enemy(Protoss.Zealot, 1.0)))
     }
-    if (unitsEver(Terran.SiegeTankUnsieged) >= 3 && unitsEver(Terran.Vulture) >= 2 && safePushing) {
+    once(Terran.MachineShop)
+    once(Terran.SiegeTankUnsieged)
+    once(2, Terran.MachineShop)
+    once(3, Terran.SiegeTankUnsieged)
+    get(Terran.VultureSpeed)
+    get(Terran.SpiderMinePlant)
+    once(8, Terran.Vulture)
+
+    if (unitsEver(Terran.SiegeTankUnsieged) >= 3 && safePushing && (armySupply200 > 150 || enemies(IsWarrior) < 7 || enemyMiningBases > miningBases + 2)) {
       attack()
       pump(Terran.Vulture)
     } else {
       pump(Terran.SiegeTankUnsieged)
     }
-    get(Terran.SpiderMine)
+
+    get(Terran.EngineeringBay)
+    buildTurretsAtOpenings(1)
+    pumpRatio(Terran.Goliath, 1, 48, Seq(Enemy(Protoss.Scout, 1.0), Enemy(Protoss.Shuttle, 1.0), Enemy(Protoss.Carrier, 6.0)))
+    pumpRatio(Terran.ScienceVessel, 1, 3, Seq(Enemy(Protoss.Arbiter, 1.0)))
+    pump(Terran.Goliath, 1)
+    pump(Terran.Wraith, 1)
+    pump(Terran.SiegeTankUnsieged)
+    pump(Terran.Vulture)
     get(Terran.SiegeMode)
-    once(8, Terran.Marine)
     requireMiningBases(2)
+    pumpGasPumps()
     get(Terran.Armory)
     get(Terran.MechDamage)
     get(Terran.MechArmor)
-    get(6, Terran.Factory)
+    get(5, Terran.Factory)
+    requireMiningBases(3)
+    get(Terran.Starport)
+    get(Terran.ScienceFacility)
+    get(Terran.ControlTower)
+    upgradeContinuously(Terran.MechDamage) && upgradeContinuously(Terran.MechArmor)
+    get(12, Terran.Factory)
+    get(4, Terran.MachineShop)
   }
 }

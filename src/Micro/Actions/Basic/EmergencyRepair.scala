@@ -11,11 +11,14 @@ import Utilities.Time.Seconds
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.is(Terran.SCV)
+    Terran.SCV(unit)
     && With.self.minerals + With.accounting.ourIncomePerFrameMinerals * Seconds(10)() > 25
+    && unit.intent.toBuild.isEmpty
+    && unit.intent.toScoutTiles.isEmpty
+    && (unit.intent.toGather.isEmpty || unit.matchups.pixelsToThreatRange.exists(_ < 128))
   )
   
-  override def perform(unit: FriendlyUnitInfo) {
+  override def perform(unit: FriendlyUnitInfo): Unit = {
     val patients = eligiblePatients(unit)
     
     if (patients.isEmpty) return
@@ -28,16 +31,16 @@ object EmergencyRepair extends Action {
   
   def eligiblePatients(repairer: FriendlyUnitInfo): Seq[UnitInfo] =
     Maff.orElseFiltered(
-      repairer.matchups.allies,
-      repairer.alliesSquad)(patient =>
+      repairer.alliesSquad,
+      repairer.tile.toRectangle.expand(2).tiles.flatMap(_.units))(patient =>
         patient != repairer
         && patient.complete
         && patient.unitClass.isMechanical
-        && isCloseEnough(repairer, patient)
-        && needsRepair(repairer, patient)
-        && ! patient.is(Terran.SCV)
+        //&& isCloseEnough(repairer, patient)
+        && ! Terran.SCV(patient)
         && ! patient.moving
-        && ! patient.plagued).toSeq
+        && ! patient.plagued
+        && needsRepair(repairer, patient)).toSeq
   
   def isCloseEnough(repairer: FriendlyUnitInfo, patient: UnitInfo): Boolean = {
     if (repairer.pixelDistanceEdge(patient) > 32.0 * 30.0) return false

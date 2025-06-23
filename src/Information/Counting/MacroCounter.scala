@@ -20,7 +20,11 @@ object MacroCounter {
     val output = new CountMap[UnitClass]
     if ( ! unit.alive) return output
 
-    if (unit.complete) {
+    // Count all tanks
+    if (IsTank(unit) && (unit.complete || unit.morphing)) {
+      output(Terran.SiegeTankUnsieged) = 1
+      output(Terran.SiegeTankSieged) = 1
+    } else if (unit.complete) {
       if (unit.morphing && unit.buildType != UnitClasses.None) {
         output(unit.buildType) = unit.buildType.copiesProduced
       } else {
@@ -39,12 +43,6 @@ object MacroCounter {
       output(Zerg.Hatchery) = 1
     } else if (Zerg.GreaterSpire(unit)) {
       output(Zerg.Spire) = 1
-    }
-
-    // Count all tanks
-    if (IsTank(unit)) {
-      output(Terran.SiegeTankUnsieged) = 1
-      output(Terran.SiegeTankSieged) = 1
     }
 
     output

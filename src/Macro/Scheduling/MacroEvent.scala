@@ -24,7 +24,7 @@ final class MacroEvent(val state: MacroState) {
   var dUnitExtant2N       : Int           = 0
   var dUnitComplete       : UnitClass     = UnitClasses.None
   var dUnitCompleteN      : Int           = 0
-  var dUnitCompleteASAP   : UnitClass     = UnitClasses.None
+  var dUnitCompleteASAP   : UnitClass     = UnitClasses.None // Counts only units completed without a minStartFrame; eg if we want 3 pylons ASAP and 3 have been queued but the last has a minStartFrame, queue it anyway
   var dUnitCompleteASAPN  : Int           = 0
   var dProducer1          : UnitClass     = UnitClasses.None
   var dProducer1N         : Int           = 0

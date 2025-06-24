@@ -1,8 +1,11 @@
 package Gameplans.Terran.TvT
 
 import Gameplans.All.GameplanImperative
+import Lifecycle.With
 import Macro.Actions.Enemy
 import ProxyBwapi.Races.Terran
+import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsWarrior
 
 class TerranVsTerran extends GameplanImperative {
 
@@ -25,7 +28,7 @@ class TerranVsTerran extends GameplanImperative {
 
   override def doWorkers(): Unit = {
     pump(Terran.Comsat)
-    pumpWorkers(oversaturate = true)
+    pumpWorkers(oversaturate = true, maximumConcurrently = 2)
   }
 
   override def executeMain(): Unit = {
@@ -47,8 +50,10 @@ class TerranVsTerran extends GameplanImperative {
     if (have(Terran.PhysicsLab)) {
       pump(Terran.ControlTower)
     }
-    if (units(Terran.Factory) > 1) {
+    if (units(Terran.Factory) > 1 || units(Terran.Vulture) > 3) {
       get(Terran.MachineShop)
+      get(Terran.SpiderMinePlant)
+      get(Terran.VultureSpeed)
     }
     if (unitsComplete(Terran.PhysicsLab) == 0) {
       pump(Terran.Wraith)
@@ -59,8 +64,19 @@ class TerranVsTerran extends GameplanImperative {
     }
 
     once(3, Terran.Vulture)
-    pumpRatio(Terran.Goliath, 4, 18, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 4.0), Enemy(Terran.Vulture, 0.5)))
+    pumpRatio(Terran.Goliath, 3, 18, Seq(Enemy(Terran.Wraith, 1.0), Enemy(Terran.Battlecruiser, 4.0), Enemy(Terran.Vulture, 0.5)))
+    if (With.fingerprints.bunkerRush()) {
+      get(Terran.MachineShop)
+      pump(Terran.SiegeTankUnsieged, 3)
+      get(Terran.SiegeMode)
+      gasWorkerCeiling(3)
+    }
     pump(Terran.Vulture)
+    if (With.frame < Minutes(6)() && enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.proxyRax, With.fingerprints.bbs, With.fingerprints.workerRush) && units(IsWarrior) < 8) {
+      pump(Terran.Marine)
+    }
+
+
     get(Terran.Armory)
     get(Terran.Starport)
     requireMiningBases(2)
@@ -69,13 +85,11 @@ class TerranVsTerran extends GameplanImperative {
     get(Terran.ControlTower)
     get(Terran.WraithCloak)
     get(2, Terran.Factory)
-    get(Terran.SpiderMinePlant)
     get(Terran.AirDamage)
     get(Terran.Academy)
     get(Terran.AirArmor)
     get(Terran.ScienceFacility)
     get(Terran.PhysicsLab)
-    get(Terran.VultureSpeed)
     requireMiningBases(3)
     get(2, Terran.Armory)
     upgradeContinuously(Terran.AirDamage)
@@ -85,6 +99,8 @@ class TerranVsTerran extends GameplanImperative {
     get(3, Terran.Factory)
     get(3, Terran.Starport)
     requireMiningBases(4)
-    get(7, Terran.Starport)
+    get(12, Terran.Factory)
+    pumpWorkers(oversaturate = true)
+    requireMiningBases(8)
   }
 }

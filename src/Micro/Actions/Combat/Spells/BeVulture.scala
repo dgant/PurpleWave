@@ -39,7 +39,7 @@ object BeVulture extends Action {
   protected def layTrap(vulture: FriendlyUnitInfo): Unit = {
     if (vulture.spiderMines < 2) return
     if (vulture.matchups.pixelsToThreatRange.exists(_ < 256)) return
-    if (vulture.id % 8 != Maff.div256(With.frame) % 8) return
+    if (vulture.id % 4 != Maff.div128(With.frame) % 4) return
     val target = Spiral.apply(5).map(vulture.tile.add).find(tile =>
       tile.walkable
       && ( ! tile.buildable || ! tile.base.exists(_.isOurs) || tile.zone.edges.exists(_.contains(tile)))

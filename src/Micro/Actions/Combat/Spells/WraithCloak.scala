@@ -8,17 +8,16 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object WraithCloak extends Action {
   
-  override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    With.self.hasTech(Terran.WraithCloak)               &&
-    unit.is(Terran.Wraith)                              &&
-    ! unit.cloaked                                      &&
-    unit.energy >= Terran.WraithCloak.energyCost + 10   &&
-    With.framesSince(unit.lastFrameTakingDamage) < 24   &&
-    ! With.grids.enemyDetection.inRange(unit.tile)
-  }
-  
-  override protected def perform(unit: FriendlyUnitInfo) {
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
+    Terran.WraithCloak()
+    && Terran.Wraith(unit)
+    && ! unit.cloaked
+    && unit.confidence11 < 0.9
+    && unit.matchups.pixelsToThreatRange.exists(_ < 32)
+    && unit.energy >= Terran.WraithCloak.energyCost + 20
+    && ! With.grids.enemyDetection.inRange(unit.tile))
+
+  protected def perform(unit: FriendlyUnitInfo): Unit = {
     Commander.cloak(unit, Terran.WraithCloak)
   }
-  
 }

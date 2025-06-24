@@ -38,7 +38,7 @@ object FightOrFlee extends Action {
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(false, "CantFight",  () => ! u.intent.canFight)
     decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.metro.exists(_.isOurs) && ! u.team.exists(_.catchesGround) && u.matchups.threats.exists(Terran.Vulture))
-    decide(true,  "Cloaked",    () => u.effectivelyCloaked)
+    decide(true,  "Cloaked",    () => u.effectivelyCloaked && ( ! Terran.Wraith(u) || u.energy > 10))
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)
     decide(true,  "Lurking",    () => Zerg.Lurker(u)                                              && u.matchups.groupVs.detectors.isEmpty)
     decide(true,  "Towers",     () => With.frame < Minutes(8)() && u.matchups.allies.exists(a => a.unitClass.isBuilding && a.unitClass.canAttack && (a.matchups.targetNearest.exists(t => u.canAttack(t) && a.inRangeToAttack(t)) || a.matchups.threatNearest.exists(t => u.canAttack(t) && t.canAttack(a) && t.framesToGetInRange(a) <= u.framesToGetInRange(a) && (t.pixelDistanceEdge(a) < 6 * 32) || t.inRangeToAttack(a)))))

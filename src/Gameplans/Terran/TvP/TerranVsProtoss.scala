@@ -38,6 +38,7 @@ class TerranVsProtoss extends GameplanImperative {
   }
 
   def executeMain(): Unit = {
+
     if ( ! haveEver(Terran.MachineShop)) {
       pumpRatio(Terran.Vulture, 0, 5, Seq(Enemy(Protoss.Zealot, 1.0)))
     }
@@ -64,11 +65,14 @@ class TerranVsProtoss extends GameplanImperative {
     pump(Terran.Wraith, 1)
     pump(Terran.SiegeTankUnsieged)
     pump(Terran.Vulture)
-    get(Terran.SiegeMode)
     requireMiningBases(2)
     pumpGasPumps()
     get(Terran.Armory)
     get(Terran.MechDamage)
+    get(Terran.Academy)
+    pump(Terran.Comsat)
+    get(Terran.SiegeMode)
+    get(2, Terran.MachineShop)
     get(Terran.MechArmor)
     get(5, Terran.Factory)
     requireMiningBases(3)

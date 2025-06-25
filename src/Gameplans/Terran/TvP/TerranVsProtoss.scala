@@ -3,7 +3,9 @@ package Gameplans.Terran.TvP
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Macro.Actions.Enemy
+import Macro.Requests.RequestUnit
 import ProxyBwapi.Races.{Protoss, Terran}
+import Utilities.Time.Seconds
 import Utilities.UnitFilters.IsWarrior
 
 class TerranVsProtoss extends GameplanImperative {
@@ -34,6 +36,10 @@ class TerranVsProtoss extends GameplanImperative {
   }
 
   override def doWorkers(): Unit = {
+    if (enemyDarkTemplarLikely) {
+      get(RequestUnit(Terran.Academy, minStartFrameArg = With.scouting.earliestArrival(Protoss.DarkTemplar) - Terran.Academy.buildFrames - Terran.Comsat.buildFrames - Seconds(5)()))
+      pump(Terran.Comsat)
+    }
     pumpWorkers(oversaturate = true)
   }
 
@@ -42,6 +48,7 @@ class TerranVsProtoss extends GameplanImperative {
     if ( ! haveEver(Terran.MachineShop)) {
       pumpRatio(Terran.Vulture, 0, 5, Seq(Enemy(Protoss.Zealot, 1.0)))
     }
+    pumpRatio(Terran.Vulture, 0, 8, Seq(Enemy(Protoss.DarkTemplar, 2.0)))
     once(Terran.MachineShop)
     once(Terran.SiegeTankUnsieged)
     once(2, Terran.MachineShop)

@@ -1,10 +1,14 @@
 package Gameplans.Terran.TvR
 
 import Gameplans.All.GameplanImperative
+import Lifecycle.With
 import Macro.Actions.Friendly
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import bwapi.Race
 
 class TerranVsRandom extends GameplanImperative {
+
+  override def activated: Boolean = With.enemies.exists(_.raceInitial == Race.Unknown)
 
   override def executeBuild(): Unit = {
     once(8, Terran.SCV)

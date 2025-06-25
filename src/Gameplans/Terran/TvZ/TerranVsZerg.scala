@@ -21,6 +21,10 @@ class TerranVsZerg extends GameplanImperative {
   }
 
   override def doWorkers(): Unit = {
+    if (enemyLurkersLikely) {
+      get(Terran.Academy)
+      pump(Terran.Comsat)
+    }
     pumpWorkers(oversaturate = true, 38)
     pumpWorkers(oversaturate = false)
   }

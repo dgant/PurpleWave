@@ -220,7 +220,8 @@ def package():
     with contextlib.suppress(FileNotFoundError):
       logf(os.remove,         path_staging(f"{package_name}.zip"))
     logf(shutil.make_archive, path_staging(package_name), 'zip', path_staging(package_name))
-    logf(rmtree,              path_staging(package_name))       
+    logf(rmtree,              path_staging(package_name))
+  logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_staging("PurpleSpiritBASIL.zip"))
     
 if __name__ == "__main__":
   main()

@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Actions.{Enemy, Friendly}
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Terran, Zerg}
-import Utilities.?
+import Utilities.{?, SwapIf}
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
 
@@ -31,13 +31,23 @@ class TerranVsZerg extends GameplanImperative {
 
     once(2, Terran.Medic)
     once(2, Terran.Firebat)
-    pump(Terran.Wraith, 1)
-    pump(Terran.ScienceVessel, 3)
-    pump(Terran.Battlecruiser)
-    pump(Terran.ScienceVessel)
-    pumpRatio(Terran.Firebat, 0, 4, Seq(Enemy(Zerg.Zergling, 0.125), Friendly(Terran.Dropship, 1.0)))
-    pumpRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25), Friendly(Terran.Firebat, 0.25)))
-    pump(Terran.Marine)
+    once(1, Terran.Wraith)
+    once(2, Terran.ScienceVessel)
+    SwapIf(
+      safeDefending, {
+        pump(Terran.Wraith, 1)
+        pump(Terran.ScienceVessel, 3)
+        pump(Terran.Battlecruiser)
+        pump(Terran.ScienceVessel)
+        pumpRatio(Terran.Firebat, 0, 4, Seq(Enemy(Zerg.Zergling, 0.125), Friendly(Terran.Dropship, 1.0)))
+        pumpRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25), Friendly(Terran.Firebat, 0.25)))
+        pump(Terran.Marine)
+      }, {
+        upgradeContinuously(Terran.BioDamage)
+        upgradeContinuously(Terran.BioArmor)
+        get(Terran.Irradiate)
+        get(Terran.ScienceVesselEnergy)
+      })
 
     if (With.fingerprints.fourPool()) {
       buildBunkersAtMain(1)
@@ -56,36 +66,32 @@ class TerranVsZerg extends GameplanImperative {
     get(Terran.Academy)
     get(Terran.Stim)
     get(Terran.EngineeringBay)
-    get(Terran.BioDamage)
     requireMiningBases(2)
     pump(Terran.Comsat, unitsComplete(Terran.CommandCenter))
     get(Terran.MarineRange)
     buildTurretsAtFoyer(?(enemyLurkersLikely, 2, 1), PlaceLabels.DefendEntrance)
     buildTurretsAtBases(?(enemyMutalisksLikely, 4, ?(enemyLurkersLikely, 2, 3)))
-    get(Terran.BioArmor)
     get(4, Terran.Barracks)
     get(Terran.Factory)
     get(Terran.Starport)
     pumpGasPumps()
     get(Terran.ScienceFacility)
     get(2, Terran.EngineeringBay)
-    upgradeContinuously(Terran.BioDamage)
-    upgradeContinuously(Terran.BioArmor)
     get(2, Terran.Starport)
     get(2, Terran.ControlTower)
-    get(Terran.Irradiate)
-    get(Terran.ScienceVesselEnergy)
     get(7, Terran.Barracks)
     requireMiningBases(3)
+
     get(Terran.PhysicsLab)
     get(gasPumps, Terran.Starport)
     get(gasPumps, Terran.ControlTower)
     get(4 * miningBases, Terran.Barracks)
 
     if (safePushing
-      && enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.overpool)
+      && unitsComplete(Terran.Marine) >= 5
       && (enemiesComplete(Zerg.SunkenColony) < 2 || enemyBases > 2)
       && ! enemyHasUpgrade(Zerg.ZerglingSpeed)
+      && ! enemyHasShown(Zerg.Lurker)
       && miningBases < 2
       && With.frame < Minutes(6)()) {
       attack()

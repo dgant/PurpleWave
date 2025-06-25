@@ -24,7 +24,7 @@ class TacticScan extends Tactic {
     val cloakedTargets = With.units.enemy.filter(ninja =>
       ninja.effectivelyCloaked
       && (ninja.matchups.pixelsToTargetRange.exists(_ < 64) || scans > 1)
-      && ninja.matchups.pixelsToThreatRange.exists(_ < 64))
+      && ninja.matchups.threatDeepest.exists(_.pixelsToGetInRange(ninja) < 64))
     
     if (cloakedTargets.nonEmpty) {
       val biggestThreat = cloakedTargets.maxBy(t => t.subjectiveValue * (1 + t.matchups.dpfReceiving) * (1 + t.presumptiveTarget.map(_.subjectiveValue).getOrElse(0.0)))

@@ -48,7 +48,7 @@ object Root extends Action {
     private lazy val retreating             = ! unit.agent.shouldFight
     private lazy val protectingBase         = unit.alliesBattle.exists(a => a.unitClass.isBuilding && a.matchups.framesOfSafety < unit.matchups.framesOfSafety)
     private lazy val insideTurretRange      = unit.matchups.threatsInRange.exists(_.unitClass.isBuilding)
-    private lazy val nearFormationPoint     = unit.agent.station.pixel.exists(_.pixelDistance(unit.pixel) < 32 * 6)
+    private lazy val nearFormationPoint     = unit.agent.station.pixel.exists(_.pixelDistance(unit.pixel) < 24)
     private lazy val turretsInRange         = visibleTargetsInRange.exists(_.unitClass.isStaticDefense)
     private lazy val buildingInRange        = visibleTargetsInRange.exists(_.unitClass.isBuilding)
     private lazy val combatTargets          = unit.matchups.enemies.filter(e => unit.canAttack(e) && e.unitClass.attacksOrCastsOrDetectsOrTransports)

@@ -1,6 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
+import Placement.Access.PlaceLabels.{AnyProxy, ProxyGround}
 import Placement.Templating.Template
 
 object TemplatesTerran {
@@ -208,4 +209,24 @@ object TemplatesTerran {
         "xx",
         "Bxx",
         "xxx"))
+
+  val proxy2: Seq[Template] = Seq(
+    new Template()
+      .from(
+        "----------",
+        "-4xxx4xxx-",
+        "-xxxxxxxx-",
+        "-xxxxxxxx-",
+        "----------"),
+    new Template()
+      .from(
+        "------",
+        "-4xxx-",
+        "-xxxx-",
+        "-xxxx-",
+        "-4xxx-",
+        "-xxxx-",
+        "-xxxx-",
+        "------"))
+    .map(_.addLabels(AnyProxy, ProxyGround))
 }

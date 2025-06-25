@@ -28,6 +28,7 @@ class TerranVsZerg extends GameplanImperative {
   override def executeMain(): Unit = {
     maintainMiningBases(armySupply200 / 30)
     requireMiningBases(armySupply200 / 40)
+    With.blackboard.floatableBuildings.set(Vector(Terran.Factory))
 
     once(2, Terran.Medic)
     once(2, Terran.Firebat)

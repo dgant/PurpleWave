@@ -65,6 +65,11 @@ class Placement extends Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
+    if ( zone.tiles.contains(Points.tileMiddle)) {
+      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy4,  Points.tileMiddle.walkableTile, zone))
+      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy2,  Points.tileMiddle.walkableTile, zone))
+      terran  (fitAndIndexProximity(1, 1, TemplatesTerran.proxy2,   Points.tileMiddle.walkableTile, zone))
+    }
     if ( ! zone.isBackyard && ! zone.island) {
       protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.batterycannon, exitTile, zone, 10))
       terran  (fitAndIndexProximity(1, 1, TemplatesTerran.bunkerTurret,   exitTile, zone, 10))

@@ -11,7 +11,8 @@ import Utilities.Time.Seconds
 object EmergencyRepair extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    Terran.SCV(unit)
+    false
+    && Terran.SCV(unit)
     && With.self.minerals + With.accounting.ourIncomePerFrameMinerals * Seconds(10)() > 25
     && unit.intent.toBuild.isEmpty
     && unit.intent.toScoutTiles.isEmpty

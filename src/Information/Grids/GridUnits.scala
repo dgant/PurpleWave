@@ -16,8 +16,6 @@ final class GridUnits extends AbstractTypedGrid[Traversable[UnitInfo]] with Grid
 
   override def update(): Unit = {
     units.view.filterNot(p => shouldInclude(p._1)).toVector.foreach(u => removeUnit(u._1, u._2))
-    // Now that units are invoking this on changePixel we can probably ditch these updates
-    // With.units.all.filter(shouldInclude).foreach(updateUnit)
   }
 
   private def shouldInclude(unit: UnitInfo): Boolean = unit.alive && unit.likelyStillThere

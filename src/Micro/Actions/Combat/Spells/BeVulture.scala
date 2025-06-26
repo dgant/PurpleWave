@@ -26,13 +26,14 @@ object BeVulture extends Action {
   }
   
   protected def placeMine(vulture: FriendlyUnitInfo, target: Pixel): Unit = {
-    if (vulture.pixelDistanceEdge(target) > 24) {
-      vulture.agent.decision.set(target)
+    val targetWalkable = target.walkablePixel
+    if (vulture.pixelDistanceEdge(targetWalkable) > 24) {
+      vulture.agent.decision.set(targetWalkable)
       Commander.move(vulture)
     } else if (vulture.speed > 0) {
       Commander.hold(vulture)
     } else {
-      Commander.useTechOnPixel(vulture, Terran.SpiderMinePlant, target)
+      Commander.useTechOnPixel(vulture, Terran.SpiderMinePlant, targetWalkable)
     }
   }
   

@@ -6,20 +6,18 @@ import Mathematics.Maff
 import Mathematics.Points.Tile
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import bwta.Region
 
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
-        val zones             : Vector[Zone]        = Vector(this)
-  lazy  val bases             : Vector[Base]        = With.geography.bases.filter(_.townHallTile.zone == this)
-  lazy  val metro             : Option[Metro]       = With.geography.metros.find(_.zones.contains(this))
-  lazy  val distanceGrid      : GridGroundDistance  = new GridGroundDistance(?(bases.length == 1, bases.head.heart, centroid))
-  var contested               : Boolean             = false
-  var walledIn                : Boolean             = false
-
-  var _units: Vector[UnitInfo] = _
-  def setUnits(argUnits: Vector[UnitInfo]): Unit = _units = argUnits
-  def units: Vector[UnitInfo] = _units
+        val zones             : Vector[Zone]              = Vector(this)
+        val units             : UnorderedBuffer[UnitInfo] = new UnorderedBuffer
+  lazy  val bases             : Vector[Base]              = With.geography.bases.filter(_.townHallTile.zone == this)
+  lazy  val metro             : Option[Metro]             = With.geography.metros.find(_.zones.contains(this))
+  lazy  val distanceGrid      : GridGroundDistance        = new GridGroundDistance(?(bases.length == 1, bases.head.heart, centroid))
+  var contested               : Boolean                   = false
+  var walledIn                : Boolean                   = false
 
   private var _owner: PlayerInfo = ?(tiles.contains(new Tile(With.game.self.getStartLocation)), With.self, With.neutral)
   def setOwner(argOwner: PlayerInfo): Unit = _owner = argOwner

@@ -19,7 +19,7 @@ import ProxyBwapi.Orders
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitTracking.Visibility
+import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
@@ -533,6 +533,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
       .orElse(matchups.targetNearest),
     () =>friendly.flatMap(_.agent.toAttack))
+
+  val healers: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[UnitInfo]()
+  var presumedHealing: Option[UnitInfo] = None
 
   @inline final def projectFrames(framesToLookAhead: Double): Pixel = pixel.projectUpTo(presumptiveDestinationNext, framesToLookAhead * topSpeed)
 

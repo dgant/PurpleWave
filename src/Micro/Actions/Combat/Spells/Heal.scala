@@ -26,25 +26,20 @@ object Heal extends Action {
     })
   }
   
-  private def validTargets(unit: FriendlyUnitInfo): Vector[UnitInfo] = {
-    unit
-      .alliesSquad
-      .filter(u =>
-        u.unitClass.isOrganic
-        && ! u.beingHealed
-        && ! u.is(Terran.Medic)
-        && (u.hitPoints < u.unitClass.maxHitPoints|| u.matchups.threats.nonEmpty))
-      .toVector
+  private def validTargets(medic: FriendlyUnitInfo): Seq[UnitInfo] = {
+    medic
+      .tileArea.expand(2)
+      .tiles
+      .flatMap(_.units)
+      .filter(patient =>
+          patient.unitClass.isOrganic
+        && patient.healers.forall(medic==))
   }
   
   private def targetValue(medic: FriendlyUnitInfo, patient: UnitInfo): Double = {
-    val distancePixels  = medic.pixelDistanceEdge(patient)
-    val distanceFrames  = Maff.nanToInfinity(distancePixels / medic.topSpeed)
-    val lifetimeFrames  = patient.matchups.framesToLive
-    val damage          = patient.unitClass.maxHitPoints - patient.hitPoints
-    val safety          = Maff.signum101(Math.max(0.0, patient.matchups.framesOfSafety))
-    val valueWorthwhile = Maff.clamp(Math.min(lifetimeFrames, safety) - distanceFrames, 1.0, 24.0)
-    val output          = (1.0 + damage) * valueWorthwhile
-    output
+    val damageScore     = (1.1 - patient.hitPoints.toFloat / patient.unitClass.maxHitPoints)
+    val proximityScore  = 1.0 / (1 + medic.pixelDistanceCenter(patient))
+    val threatScore     = 1.0 / Math.max(1.0, patient.matchups.pixelsToThreatRange.getOrElse(0.0))
+    damageScore * proximityScore * threatScore
   }
 }

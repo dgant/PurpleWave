@@ -14,7 +14,8 @@ object UpdateZones {
     // Precalculate these
     With.geography.zones.foreach(_.distanceGrid)
     With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
-    With.geography.zones.foreach(z => z.setUnits(With.units.all.filter(_.likelyStillThere).filter(_.zone == z).toVector))
+    With.geography.zones.foreach(_.units.clear())
+    With.units.all.foreach(u => if (u.likelyStillThere) u.zone.units.add(u))
     With.geography.zones.foreach(updateZone)
   
     if (With.frame == 0) {

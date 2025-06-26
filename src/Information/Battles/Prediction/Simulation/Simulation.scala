@@ -19,21 +19,21 @@ final class Simulation {
   val grid            : SimulationGrid        = new SimulationGrid
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
-
-  def reset(newBattle: Battle): Unit = {
-    battle            = newBattle
-    realUnits       .clear()
-    realUnitsOurs   .clear()
-    realUnitsEnemy  .clear()
-    realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
-    realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
-    realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
-    enemyVanguard     = battle.enemy.vanguardKey()
-    engaged           = battle.units.exists(_.matchups.engagedUpon)
-    simulacra.foreach(_.reset(this))
-  }
+  var shouldReset     : Boolean               = true
 
   @inline def step(): Unit = {
+    if (shouldReset) {
+      shouldReset = false
+      realUnits       .clear()
+      realUnitsOurs   .clear()
+      realUnitsEnemy  .clear()
+      realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
+      realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
+      realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
+      enemyVanguard     = battle.enemy.vanguardKey()
+      engaged           = battle.units.exists(_.matchups.engagedUpon)
+      simulacra.foreach(_.reset(this))
+    }
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
     battle.simulationFrames += 1

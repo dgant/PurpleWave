@@ -15,16 +15,13 @@ class BattleProcessPredict extends BattleProcessState {
 
       if ( ! battle.simulationComplete) {
         if (With.simulation.battle != battle) {
-          With.simulation.reset(battle)
+          With.simulation.battle      = battle
+          With.simulation.shouldReset = true
         }
 
-        // Simulate asynchronously
-        //
         if (With.configuration.simulationAsynchronous) {
           With.simulation.runAsynchronously()
         } else {
-          // Simulate synchronously
-          //
           With.simulation.step()
         }
       }

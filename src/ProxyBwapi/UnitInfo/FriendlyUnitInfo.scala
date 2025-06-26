@@ -33,8 +33,8 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
     if (frameDiscovered <  With.frame) readProxy()
     if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     super.update()
-    lazy val tryingToAttackHere = canAttack && target.exists(t => t.isEnemyOf(this) &&   inRangeToAttack(t))
-    lazy val tryingToAttackAway = canAttack && target.exists(t => t.isEnemyOf(this) && ! inRangeToAttack(t))
+    lazy val tryingToAttackHere = canAttack && target.exists(t => t.player.isEnemy &&   inRangeToAttack(t))
+    lazy val tryingToAttackAway = canAttack && target.exists(t => t.player.isEnemy && ! inRangeToAttack(t))
     if (flying || unitClass.floats || pixel != previousPixel(1) || ! canMove || ( ! agent.tryingToMove && ! tryingToAttackAway))
       _framesFailingToMove = 0 else _framesFailingToMove += 1
     if (cooldownLeft > 0 || ! tryingToAttackHere) _framesFailingToAttack = 0 else _framesFailingToAttack += 1

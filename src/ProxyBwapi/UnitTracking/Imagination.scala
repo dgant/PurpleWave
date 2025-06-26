@@ -28,7 +28,13 @@ object Imagination {
     // Speculative sanity check based on a case where an observer died while our detection was leaving the area but was flagged alive
     if ( ! unit.visible && unit.visibility == Visibility.Dead) return
 
-    lazy val shouldBeVisible = ?(unit.unitClass.isBuilding, unit.tiles.exists(_.visible), unit.tile.visible)
+    lazy val shouldBeVisible = ?(
+      unit.unitClass.isBuilding,
+          unit.tileTopLeft                                                          .visible
+      ||  unit.tileTopLeft.add(unit.unitClass.tileWidth,  unit.unitClass.tileHeight).visible
+      ||  unit.tileTopLeft.add(unit.unitClass.tileWidth,  0)                        .visible
+      ||  unit.tileTopLeft.add(0,                         unit.unitClass.tileHeight).visible,
+      unit.tile.visible)
     lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (
       unit.visibility == Visibility.InvisibleBurrowed

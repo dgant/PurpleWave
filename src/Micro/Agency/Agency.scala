@@ -41,8 +41,9 @@ class Agency extends TimedTask {
           u.unitClass.orderable
           && ?(
             u.unitClass.isBuilding,
-            ! u.complete  ||  ! u.isAny(Terran.SupplyDepot, Protoss.Pylon),
-              u.complete) ||    u.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon))
+            ! u.complete || ! u.isAny(Terran.SupplyDepot, Protoss.Pylon),
+            u.complete)
+          || u.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon))
         .map(_.agent)
 
       Maff.sortStablyInPlaceBy(agents, 0, agents.length)(a =>

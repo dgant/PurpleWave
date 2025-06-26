@@ -15,7 +15,7 @@ class TvE3Fac extends GameplanImperative {
     once(11, Terran.SCV)
     get(Terran.Barracks)
     once(12, Terran.SCV)
-    get(Terran.Refinery)
+    pumpGasPumps()
 
     scoutAt(13)
 

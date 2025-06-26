@@ -33,7 +33,7 @@ class TvEBBS extends GameplanImperative {
       get(Terran.SiegeMode)
     }
     if (enemiesHaveComplete(Terran.Bunker, Zerg.SunkenColony, Protoss.PhotonCannon, Terran.Factory)) {
-      get(Terran.Refinery)
+      pumpGasPumps()
       get(Terran.Factory)
     }
     if (enemyLurkersLikely || enemyDarkTemplarLikely) {
@@ -44,7 +44,7 @@ class TvEBBS extends GameplanImperative {
     pumpRatio(Terran.Medic, 0, 3, Seq(Friendly(Terran.Marine, 0.2)))
     pump(Terran.Marine)
     pumpWorkers(oversaturate = false, maximumTotal = 23)
-    get(Terran.Refinery)
+    pumpGasPumps()
     get(Terran.Factory)
     get(Terran.MachineShop)
     get(Terran.Academy)

@@ -11,8 +11,6 @@ import Utilities.{?, SwapIf}
 
 class TvZ8RaxSK extends GameplanImperative {
 
-  override def activated: Boolean = super.activated
-
   override def executeBuild(): Unit = {
     once(8, Terran.SCV)
     get(Terran.Barracks)

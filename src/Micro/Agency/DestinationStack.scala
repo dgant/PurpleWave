@@ -9,7 +9,8 @@ import Performance.Cache
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
 
-abstract class DestinationStack(unit: FriendlyUnitInfo) {
+trait DestinationStack {
+  val unit: FriendlyUnitInfo
 
   val destinations: Vector[Destination] = Destinations.All.map(new Destination(unit, _))
   var path: Option[TilePath] = None

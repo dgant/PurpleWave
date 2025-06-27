@@ -675,6 +675,18 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     Protoss.Dragoon,
     Zerg.Hydralisk).contains(this)
 
+  lazy val agencySortOrder: Double = 1e6 * (
+          if (this == Protoss.Reaver)       0
+    else  if (this.isTank)                  2
+    else  if (this == Zerg.Defiler)         2
+    else  if (this == Protoss.DarkArchon)   4
+    else  if (this == Zerg.Ultralisk)       4
+    else  if (this == Protoss.HighTemplar)  6
+    else  if (this == Zerg.Lurker)          6
+    else  if (this == Protoss.Archon)       8
+    else  if (isTransport)                  20
+    else                                    10)
+
   /////////////////
   // Convenience //
   /////////////////

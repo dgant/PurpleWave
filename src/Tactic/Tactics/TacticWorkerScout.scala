@@ -9,7 +9,7 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountUpTo
-import Utilities.UnitFilters.{IsAny, IsComplete, IsSpeedling, IsWorker}
+import Utilities.UnitFilters.{IsAny, IsComplete, IsSpeedling, IsTank, IsWorker}
 import Utilities.UnitPreferences.PreferScout
 
 class TacticWorkerScout extends Tactic {
@@ -49,6 +49,7 @@ class TacticWorkerScout extends Tactic {
         Terran.Marine,
         Terran.Vulture,
         Terran.Factory,
+        IsTank,
         Protoss.Dragoon,
         IsSpeedling,
         Zerg.Hydralisk,

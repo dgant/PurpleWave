@@ -19,8 +19,7 @@ object TargetFilterFocus extends TargetFilter {
     output ||= actor.squad.exists(canTargetAsRoadblock(_, target))
     output ||= (actor.inRangeToAttack(target)
       && actor.readyForAttackOrder
-      && actor.framesToFace(target) <= 2
-      && target.canAttack(actor))
+      && ( ! target.unitClass.isBuilding || target.unitClass.isStaticDefense))
     output
   }
 

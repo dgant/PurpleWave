@@ -84,7 +84,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
-    transition(Abuse,     unit.unitClass.abuseAllowed && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable) && (shouldRetreat || framesUntilShot < unit.cooldownMaxAirGround))
+    transition(Abuse,     unit.unitClass.abuseAllowed && unit.agent.receivedPushPriority() == TrafficPriorities.Freedom && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable) && (shouldRetreat || framesUntilShot < unit.cooldownMaxAirGround))
     transition(Scavenge,
       target.exists(_.matchups.framesToLive > unit.matchups.framesToLive)
       && unit.matchups.threatDeepest.exists(t => unit.canAttack(t) && unit.pixelRangeAgainst(t) >= t.pixelRangeAgainst(unit))

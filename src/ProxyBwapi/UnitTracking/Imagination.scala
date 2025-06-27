@@ -30,10 +30,7 @@ object Imagination {
 
     lazy val shouldBeVisible = ?(
       unit.unitClass.isBuilding,
-          unit.tileTopLeft                                                          .visible
-      ||  unit.tileTopLeft.add(unit.unitClass.tileWidth,  unit.unitClass.tileHeight).visible
-      ||  unit.tileTopLeft.add(unit.unitClass.tileWidth,  0)                        .visible
-      ||  unit.tileTopLeft.add(0,                         unit.unitClass.tileHeight).visible,
+      unit.tiles.exists(_.visible),
       unit.tile.visible)
     lazy val shouldBeDetected = unit.tile.friendlyDetected
     lazy val likelyBurrowed = (

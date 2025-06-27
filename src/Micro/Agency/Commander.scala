@@ -267,7 +267,7 @@ object Commander {
         unit.bwapiUnit.move(to.bwapi)
       }
       if ( ! unit.flying) {
-        pushThrough(unit, to, TrafficPriorities.None)
+        pushThrough(unit, to, TrafficPriorities.Freedom)
       }
     }
 
@@ -554,7 +554,7 @@ object Commander {
     if (unit.flying) return
     unit.agent.escalatePriority(minimumPriority)
     defaultEscalation(unit)
-    if (unit.agent.priority > TrafficPriorities.None) {
+    if (unit.agent.priority > TrafficPriorities.Freedom) {
       With.coordinator.pushes.put(makePush)
     }
   }

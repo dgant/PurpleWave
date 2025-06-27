@@ -12,7 +12,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 import scala.collection.mutable.ArrayBuffer
 
-class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
+class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySortOrder {
 
   /////////////
   // History //
@@ -38,7 +38,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
   var commit        : Boolean                   = false
   var wantsUnload   : Boolean                   = false
   var wantsPickup   : Boolean                   = false
-  var priority      : TrafficPriority           = TrafficPriorities.None
+  var priority      : TrafficPriority           = TrafficPriorities.Freedom
   val forces        : ForceMap                  = new ForceMap
   val combat        : Combat                    = new Combat(unit)
 
@@ -68,7 +68,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
     run           += 1
     lastFrame     = With.frame
     toAttackLast  = toAttack
-    priority      = TrafficPriorities.None
+    priority      = TrafficPriorities.Freedom
     fightReason   = ""
     tryingToMove  = false
     wantsUnload   = false
@@ -101,7 +101,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack(unit) {
     .map(p => (p._1, p._2.get))
     .toVector)
   val receivedPushForce = new KeyedCache(() => ForceMath.sum(receivedPushForces().view.filter(_._1.priority >= priority).map(_._2)), () => priority)
-  val receivedPushPriority = new KeyedCache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.None), () => priority)
+  val receivedPushPriority = new KeyedCache(() => Maff.max(receivedPushForces().view.map(_._1.priority)).getOrElse(TrafficPriorities.Freedom), () => priority)
 
   /////////////
   // Leading //

@@ -46,9 +46,8 @@ class Agency extends TimedTask {
           || u.isAny(Zerg.Egg, Zerg.LurkerEgg, Zerg.Cocoon))
         .map(_.agent)
 
-      Maff.sortStablyInPlaceBy(agents, 0, agents.length)(a =>
-        Maff.or1(1e5, a.unit.unitClass.isTransport)
-        - ?(a.unit.unitClass.isWarrior, a.unit.matchups.pixelsToThreatRange.getOrElse(0.0), 0.0))
+      agents.foreach(_.updateSortOrder())
+      Maff.sortStablyInPlaceBy(agents, 0, agents.length)(_.sortOrder)
     }
 
     while (agentIndex < agents.length && timer.greenLight) {

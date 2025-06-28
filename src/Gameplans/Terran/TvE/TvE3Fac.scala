@@ -5,6 +5,7 @@ import Lifecycle.With
 import Macro.Actions.Enemy
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, SwapIf}
 
 class TvE3Fac extends GameplanImperative {
@@ -77,6 +78,9 @@ class TvE3Fac extends GameplanImperative {
     pump(Terran.Vulture)
     get(3, Terran.Factory)
     get(Terran.SiegeMode)
-    attack()
+
+    if (unitsComplete(Terran.Vulture) > 0 && (safePushing || unitsComplete(IsWarrior) >= 5)) {
+      attack()
+    }
   }
 }

@@ -401,7 +401,7 @@ abstract class PvTOpeners extends GameplanImperative {
     }
   }
 
-  def barracksCheese: Boolean = enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad) && ! enemyHasShown(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
+  def barracksCheese: Boolean = enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.proxyRax, With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad) && ! enemyHasShown(Terran.Vulture, Terran.SiegeTankUnsieged, Terran.SiegeTankSieged)
 
   def doOpeningReactions(): Unit = {
     // Vs. BBS: Zealots into 3-Gate Goon into Reaver (And expand after Reaver if they do)
@@ -460,7 +460,7 @@ abstract class PvTOpeners extends GameplanImperative {
       once(Protoss.Zealot)
 
 
-      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.bbs) && units(Protoss.Gateway) < 2) {
+      if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.proxyRax, With.fingerprints.bbs) && units(Protoss.Gateway) < 2) {
         gasWorkerCeiling(0)
         cancel(Protoss.Assimilator, Protoss.CyberneticsCore)
       }

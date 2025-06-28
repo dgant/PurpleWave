@@ -7,9 +7,8 @@ import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
-import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.Terran
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitFilters.IsTank
 
 object BeVulture extends Action {
@@ -27,7 +26,7 @@ object BeVulture extends Action {
   
   protected def placeMine(vulture: FriendlyUnitInfo, target: Pixel): Unit = {
     val targetWalkable = target.walkablePixel
-    if (vulture.pixelDistanceEdge(targetWalkable) > 24) {
+    if (vulture.pixelDistanceCenter(targetWalkable) > 16) {
       vulture.agent.decision.set(targetWalkable)
       Commander.move(vulture)
     } else if (vulture.speed > 0) {
@@ -49,28 +48,26 @@ object BeVulture extends Action {
     target.foreach(t => placeMine(vulture, t.center))
   }
   
-  private object TargetFilterTriggersMines extends TargetFilter {
-    override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = target.unitClass.triggersSpiderMines
-  }
-  
   protected def sabotage(vulture: FriendlyUnitInfo): Unit = {
 
-    if (vulture.matchups.targetNearest.isEmpty) return
+    lazy val t = vulture.matchups.targetNearest
+      .orElse(vulture.matchups.threatNearest.filter(_.effectivelyCloaked))
+      .filter(_.unitClass.triggersSpiderMines)
 
-    val t = vulture.matchups.targetNearest.get
+    if (t.isEmpty) return
 
     var abort = false
-    abort ||= ! t.unitClass.triggersSpiderMines
+    abort ||= ! t.get.unitClass.triggersSpiderMines
     abort ||= vulture.confidence11 > 0.2
     abort ||= ! vulture.agent.shouldFight
-    abort ||= vulture.pixelsToGetInRange(t) > 0
-    abort ||= t.tile.toRectangle.expand(3, 3).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
+    abort ||= vulture.pixelsToGetInRange(t.get) > 0
+    abort ||= t.get.tile.toRectangle.expand(3, 3).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
 
     if (abort) return
 
     Potshot.delegate(vulture)
     if (vulture.unready) return
 
-    placeMine(vulture, t.pixel.project(vulture.pixel, 48))
+    placeMine(vulture, t.get.pixel.project(vulture.pixel, 48))
   }
 }

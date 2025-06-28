@@ -272,6 +272,8 @@ class PvPLateGame extends GameplanImperative {
     if (have(Protoss.CitadelOfAdun) && ! enemyRobo) {
       get(Protoss.TemplarArchives)
     }
+    get(?(have(Protoss.RoboticsSupportBay), 2, 4), Protoss.Gateway)
+    get(?(have(Protoss.RoboticsSupportBay), 2, 0), Protoss.RoboticsFacility)
     get(?(have(Protoss.RoboticsSupportBay), 4, 6), Protoss.Gateway)
     get(targetGateways + miningBases, Protoss.Gateway)
   }

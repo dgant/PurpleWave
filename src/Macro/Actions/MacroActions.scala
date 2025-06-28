@@ -115,7 +115,7 @@ trait MacroActions extends MacroCounting {
       .requireLabelYes(PlaceLabels.Defensive)
       .preferLabelYes(labels: _*)
     if (defenseClass.requiresPsi) get(Protoss.Pylon, query(Protoss.Pylon))
-    get(count, Protoss.PhotonCannon, query(Protoss.PhotonCannon))
+    get(count, defenseClass, query(defenseClass))
   }
   def buildDefensesAt(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], bases: Seq[Base]): Unit = {
     if (defenseClass == Terran.MissileTurret)  get(Terran.EngineeringBay)

@@ -26,7 +26,7 @@ class TvP2Fac extends GameplanImperative {
     }
     once(15, Terran.SCV)
     once(2, Terran.SupplyDepot)
-    if (unitsComplete(Terran.Factory) < 2 && enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)) {
+    if (unitsComplete(Terran.Factory) < 2 && ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)) {
       pumpRatio(Terran.Marine, 2, 9, Seq(Enemy(Protoss.Zealot, 3.0)))
     }
     once(16, Terran.SCV)
@@ -50,6 +50,14 @@ class TvP2Fac extends GameplanImperative {
     if ( ! haveEver(Terran.MachineShop)) {
       pumpRatio(Terran.Vulture, 0, 5, Seq(Enemy(Protoss.Zealot, 1.0)))
     }
+    if (enemyHasShown(Protoss.Scout, Protoss.Stargate, Protoss.Corsair, Protoss.Carrier, Protoss.FleetBeacon)) {
+      get(Terran.Armory)
+      if (enemyHasShown(Protoss.Carrier, Protoss.FleetBeacon)) {
+        once(8, Terran.Goliath)
+      }
+      get(Terran.GoliathAirRange)
+    }
+    pumpRatio(Terran.Goliath, 1, 36, Seq(Enemy(Protoss.Corsair, 0.5), Enemy(Protoss.Scout, 1.5), Enemy(Protoss.Carrier, 6.0)))
     pumpRatio(Terran.Vulture, 0, 8, Seq(Enemy(Protoss.DarkTemplar, 2.0)))
     once(Terran.MachineShop)
     once(Terran.SiegeTankUnsieged)

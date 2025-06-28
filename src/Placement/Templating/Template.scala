@@ -57,7 +57,7 @@ class Template extends TemplateFilter {
           case 'H' => new TemplatePointRequirement(4, 3).withLabels(TownHall)
           case 'I' => last.labels += Important; null
           case 'J' => null
-          case 'K' => null
+          case 'K' => new TemplatePointRequirement(Terran.Barracks).withLabels(GroundProduction, Important)
           case 'L' => null
           case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); null
           case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); null

@@ -1,16 +1,94 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
-import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, ProxyGround}
+import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, ProxyGround, Tech}
 import Placement.Templating.Template
 
 object TemplatesTerran {
 
-  val commandCenter: Seq[Template] = Seq(
+  val bases: Seq[Template] = Seq(
     new Template().from(
-    "Hxxx",
-    "xxxxxx",
-    "xxxxxx"))
+      "CM",
+      "xxGxxxKxxx-",
+      "CMxxxxxxxx-",
+      "xxBNx-xxxx-",
+      "--xxx------",
+      "------CM",
+      "CMHxxxxx",
+      "xxxxxxxx",
+      "--xxxxxx",
+      "-CM-CM-",
+      "-xx-xx-"),
+    new Template().from(
+      "xxxxGxxxCM",
+      "Kxxxxxxxxx-",
+      "xxxxBNx----",
+      "xxxxxxx-CM-",
+      "--------xx-",
+      "xxCMHxxx---",
+      "xxxxxxxxxx-",
+      "xxx-xxxxxx-",
+      "xxx-CMCM---",
+      "xxx-xxxx-"),
+    new Template().from(
+      "CM-CM-Kxxx",
+      "xx-xx-xxxx",
+      "--Hxxxxxxx",
+      "CMxxxxxx-",
+      "xxxxxxxx-",
+      "---------",
+      "CMBNx-CM",
+      "xxxxx-xx",
+      "CMGxxxCM",
+      "xxxxxxxx"),
+    new Template().from(
+      "xxCM-CM-CM",
+      "xxxx-xx-xx-",
+      "KxxxHxxx---",
+      "xxxxxxxxxx-",
+      "xxxxxxxxxx-",
+      "-----------",
+      "xxx-BNx-CM",
+      "xxCMxxx-xx",
+      "xxxxGxxxCM",
+      "xxxxxxxxxx"),
+    new Template().from(
+      "CM-CM-CM",
+      "xx-xx-xx-",
+      "--Hxxx---",
+      "CMxxxxxx-",
+      "xxxxxxxx-",
+      "---------",
+      "CMBNx-CM",
+      "xxxxx-xx"),
+    new Template().from(
+      "CMBNx-",
+      "xxxxx-CM-",
+      "------xx-",
+      "CMHxxx---",
+      "xxxxxxxx-",
+      "--xxxxxx-",
+      "CM-CM-CM",
+      "xx-xx-xx-"),
+    new Template().from(
+      "BNx-",
+      "xxx-CM-",
+      "----xx-",
+      "Hxxx---",
+      "xxxxxx-",
+      "xxxxxx-"),
+    new Template().from(
+      "----CM",
+      "Hxxxxx-",
+      "xxxxxx-",
+      "xxxxxx-",
+      "BNx----",
+      "xxx-"),
+    new Template().from(
+      "Hxxx",
+      "xxxxxx",
+      "xxxxxx"))
+
 
   val initialLayouts: Seq[Template] = Seq(
     new Template().from(
@@ -30,8 +108,7 @@ object TemplatesTerran {
       "-Fxxxxxxxxx-",
       "-xxxxxx-----",
       "-xxxxxx-",
-      "--------"),
-  )
+      "--------"))
 
   val production: Seq[Template] = Seq(
     new Template().from(
@@ -183,6 +260,7 @@ object TemplatesTerran {
       "Yxx",
       "xxx",
       "---"))
+    .map(_.addLabels(Tech))
 
   val bunkerTurret: Seq[Template] = Seq(
     new Template()
@@ -205,8 +283,8 @@ object TemplatesTerran {
     new Template()
       .forExitDirection(Directions.Down, Directions.Right)
       .from(
-        "Cx",
-        "xx",
+        "xCx",
+        "xxx",
         "Bxx",
         "xxx"))
     .map(_.addLabels(DefendEntrance, DefendGround))

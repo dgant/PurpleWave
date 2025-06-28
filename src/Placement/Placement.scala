@@ -43,12 +43,12 @@ class Placement extends Fitter {
         .sortBy( ! _.metro.exists(_.isOurs))
         .foreach(preplaceWalls)
       //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
-    } else if (With.self.isProtoss && With.enemies.exists( ! _.isProtoss)) {
+    } else if ( ! With.self.isProtoss || With.enemies.exists( ! _.isProtoss)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }
     basesSorted.foreach(base => {
       protoss (fitAndIndexConstrained(5, 1, ?(base.isMain, TemplatesProtoss.mainBases, TemplatesProtoss.bases), base))
-      terran  (fitAndIndexConstrained(5, 1, TemplatesTerran.commandCenter, base))
+      terran  (fitAndIndexConstrained(5, 1, TemplatesTerran.bases, base))
     })
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)

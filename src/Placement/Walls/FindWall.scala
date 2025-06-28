@@ -2,9 +2,9 @@ package Placement.Walls
 
 import Information.Geography.Types.Zone
 import Lifecycle.With
-import Placement.Walls.WallFillers.PylonsCannons
+import Placement.Walls.WallFillers.{NoFiller, PylonsCannons}
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall, TerrainTerrain}
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
 object FindWall {
 
@@ -33,10 +33,26 @@ object FindWall {
     wallFinderOption
   }
 
-  def terran(zone: Zone): Option[WallFinder] = None
   def zerg(zone: Zone): Option[WallFinder] = None
 
-  def protoss (zone: Zone): Option[WallFinder] = {
+  def terran(zone: Zone): Option[WallFinder] = {
+    val exit = zone.exitOriginal
+    if (exit.isEmpty) return None
+
+    val entrance = zone.entranceOriginal.map(_.pixelCenter.tile).getOrElse(zone.heart)
+    val constraints = Vector(
+      WallConstraint(0, Zerg.Zergling,  TerrainTerrain, Terran.Barracks, Terran.SupplyDepot),
+      WallConstraint(0, Protoss.Zealot, TerrainTerrain, Terran.Barracks, Terran.SupplyDepot),
+      WallConstraint(0, Zerg.Zergling,  TerrainTerrain, Terran.Barracks, Terran.SupplyDepot, Terran.SupplyDepot),
+      WallConstraint(0, Protoss.Zealot, TerrainTerrain, Terran.Barracks, Terran.SupplyDepot, Terran.SupplyDepot),
+    )
+    val wallFinder = new WallFinder(zone, exit.get, entrance, constraints, NoFiller)
+    wallFinder.generate()
+    Some(wallFinder)
+
+  }
+
+  def protoss(zone: Zone): Option[WallFinder] = {
     val exit = zone.exitOriginal
     if (exit.isEmpty) return None
 

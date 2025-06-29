@@ -33,7 +33,7 @@ object GetRepaired extends Action {
     var repairUnit: Option[FriendlyUnitInfo] = None
 
     lazy val squire     = Maff.minBy(unit.healers)(h => unit.pixelDistanceTravelling(h.pixel))
-    lazy val fieldMedic = Maff.minBy(unit.squad.view.flatMap(_.units.view.filter(u => Terran.SCV(u) && u.presumedHealing.forall(unit==))))(scv => unit.pixelDistanceTravelling(scv.pixel))
+    lazy val fieldMedic = Maff.minBy(unit.squad.view.flatMap(_.units.view.filter(u => Terran.SCV(u) && u.intent.toHeal.forall(h => h == unit || (h.hitPoints >= h.unitClass.maxHitPoints && h.healers.length > 1)))))(scv => unit.pixelDistanceTravelling(scv.pixel))
     lazy val hospital   = Maff.minBy(With.geography.ourBases.filter(_.ourUnits.exists(Terran.SCV)))(b => unit.pixelDistanceTravelling(b.heart))
 
     if (squire.isDefined) {
@@ -58,7 +58,6 @@ object GetRepaired extends Action {
         }
       })
     }
-
 
     repairGoal.foreach(unit.agent.station.set)
     repairUnit.foreach(With.coordinator.healing.heal(_, unit))

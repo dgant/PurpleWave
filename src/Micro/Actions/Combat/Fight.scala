@@ -3,9 +3,10 @@ package Micro.Actions.Combat
 import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.{Cast, Follow, Root}
 import Micro.Actions.Combat.Maneuvering.Stealth
-import Micro.Actions.Combat.Spells.{BeVulture, Stim}
+import Micro.Actions.Combat.Spells.Stim
 import Micro.Actions.Combat.Tactics._
 import Micro.Actions.Protoss._
+import Micro.Actions.Terran.{BeCombatSCV, BeVulture}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Fight extends Action {
@@ -21,10 +22,11 @@ object Fight extends Action {
     EmergencyBunk(unit)
     Root(unit)
     BeFlier(unit)
+    BeCombatSCV(unit)
+    BeVulture(unit)
     BeCarrier(unit)
     BeArbiter(unit)
     BeReaver(unit)
-    BeVulture(unit)
     Recharge(unit)
     Bust(unit)
     Stealth(unit)

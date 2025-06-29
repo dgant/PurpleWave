@@ -9,7 +9,7 @@ import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
-import Utilities.UnitFilters.UnitFilter
+import Utilities.UnitFilters.{IsTank, UnitFilter}
 
 import scala.collection.mutable
 
@@ -21,6 +21,8 @@ trait UnitGroup {
   def detectors         : Seq[UnitInfo] = _detectors().view
   def mobileDetectors   : Seq[UnitInfo] = _mobileDetectors()
   def arbiters          : Seq[UnitInfo] = _arbiters().view
+  def repairables       : Seq[UnitInfo] = _repairables().view
+  def repairableVIPs    : Seq[UnitInfo] = _repairableVIPs().view
   def warriorsCasters   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.unitClass.isWarrior || u.unitClass.castsSpells)
   def attackersBio      : Seq[UnitInfo] = groupOrderable.view.filter(_.isAny(Terran.Marine, Terran.Firebat))
   def attackersCloaky   : Seq[UnitInfo] = groupOrderable.view.filter(u => u.isAny(Terran.Wraith, Terran.Ghost, Protoss.Arbiter, Protoss.DarkTemplar, Zerg.Lurker))
@@ -90,6 +92,8 @@ trait UnitGroup {
   private val _detectors                  = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && u.unitClass.isDetector).toVector)
   private val _mobileDetectors            = new Cache(() => detectors.filter(_.canMove))
   private val _arbiters                   = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && Protoss.Arbiter(u)).toVector)
+  private val _repairables                = new Cache(() => groupOrderable.filter(_.unitClass.repairThreshold > 0))
+  private val _repairableVIPs             = new Cache(() => repairables.filter(_.isAny(Terran.Battlecruiser, IsTank, Terran.Valkyrie)))
   private val _battles                    = new Cache(() => groupUnits.flatMap(_.battle).toSet)
   private val _battleEnemies              = new Cache(() => battles.flatMap(_.enemy.units))
   private val _roadblocks                 = new Cache(() => battleEnemies.filter(e => Math.max(keyDistanceTo(e.pixel), e.pixelDistanceTravelling(destinationFinal)) < destinationFinalDistance))

@@ -44,7 +44,7 @@ trait DestinationStack {
     unit.intent.toNuke                                  .foreach(terminus.set)
     unit.intent.toAttack      .map(_.pixel)             .foreach(terminus.set)
     unit.intent.toGather      .map(_.pixel)             .foreach(terminus.set)
-    unit.intent.toHeal      .map(_.pixel)             .foreach(terminus.set)
+    unit.intent.toHeal        .map(_.pixel)             .foreach(terminus.set)
     unit.intent.toFinish      .map(_.pixel)             .foreach(terminus.set)
     unit.intent.toBoard       .map(_.pixel)             .foreach(terminus.set)
     unit.intent.toBuildActive .map(_.tile.topLeftPixel) .foreach(terminus.set)

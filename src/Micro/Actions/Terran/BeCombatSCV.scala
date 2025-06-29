@@ -1,5 +1,6 @@
-package Micro.Actions.Combat.Spells
+package Micro.Actions.Terran
 
+import Debugging.Visualizations.Forces
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
@@ -7,21 +8,49 @@ import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
+import Micro.Heuristics.Potential
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.LightYear
 import Utilities.UnitFilters.IsTank
 
-object BeVulture extends Action {
+object BeCombatSCV extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    Terran.Vulture(unit)
-    && Terran.SpiderMinePlant()
-    && unit.spiderMines > 0
+    Terran.SCV(unit)
+    && unit.intent.toBuild      .isEmpty
+    && unit.intent.toGather     .isEmpty
+    && unit.intent.toHeal       .isEmpty
+    && unit.intent.toScoutTiles .isEmpty
+    && unit.squad               .isDefined
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    sabotage(unit)
-    layTrap(unit)
+    if ( ! unit.squad.exists(_.repairables.nonEmpty)) return
+
+    unit.intent.canFight = false
+
+    val vips = unit.squad.get.repairableVIPs.flatMap(_.friendly).toVector
+      .sortBy(t => t.pixelDistanceSquared(unit) + t.matchups.pixelsToThreatRange.getOrElse(LightYear().toDouble))
+      .sortBy(IsTank)
+      .sortBy(Terran.Valkyrie)
+      .sortBy(Terran.Battlecruiser)
+      .sortBy(_.healers.count(_ != unit))
+
+    if (vips.isEmpty) return
+
+    val vip = vips.head
+    With.coordinator.healing.heal(unit, vip)
+
+    if ( ! vip.flying || ! vip.sieged) {
+      unit.agent.station.set(unit.matchups.threatDeepest.map(t => t.pixel.project(vip.pixel, t.pixelRangeAgainst(unit) + 64)).getOrElse(vip.agent.destinationNext().project(unit.pixel, 64)))
+      unit.agent.forces.put(Forces.travel,  Potential.towardsDestination(unit))
+      unit.agent.forces.put(Forces.threat,  Potential.softAvoidThreatRange(unit))
+      unit.agent.forces.put(Forces.spacing, Potential.preferSpacing(unit))
+      unit.agent.forces.put(Forces.pushing, Potential.followPushes(unit))
+      MicroPathing.setWaypointForcefully(unit)
+    }
   }
   
   protected def placeMine(vulture: FriendlyUnitInfo, target: Pixel): Unit = {

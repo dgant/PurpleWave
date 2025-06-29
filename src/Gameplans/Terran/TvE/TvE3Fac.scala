@@ -42,6 +42,11 @@ class TvE3Fac extends TerranGameplan {
   }
 
   override def executeMain(): Unit = {
+    if (units(Terran.Factory) < 3 && minerals < 300) {
+      gasWorkerCeiling(2)
+    }
+    gasLimitCeiling(300)
+
     once(Terran.Vulture)
 
     SwapIf(
@@ -74,6 +79,7 @@ class TvE3Fac extends TerranGameplan {
 
     pumpRatio(Terran.Goliath, ?(enemyMutalisksLikely, 3, 1), 18, Seq(Enemy(Zerg.Mutalisk, 2.0), Enemy(Protoss.Scout, 2.0), Enemy(Terran.Wraith, 1.0), Enemy(Protoss.Carrier, 4.0)))
     once(7, Terran.Vulture)
+    get(3, Terran.Factory)
     get(Terran.SiegeMode)
     pump(Terran.SiegeTankUnsieged, maximumConcurrently = Math.max(1, gas / 200 + units(Terran.Factory) / 4))
     pump(Terran.Vulture)

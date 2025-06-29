@@ -116,9 +116,9 @@ object Skimulator {
 
       // Consider high ground advantage
       if ( ! battle.isGlobal && unit.isFriendly && unit.canAttack && unit.effectiveRangePixels > 64 && ! unit.flying) {
-        if (unit.presumptiveTarget.exists(_.altitude > unit.altitude)) {
+        if (unit.presumptiveTarget.exists(t => t.isEnemyOf(unit) && t.altitude > unit.altitude)) {
           unit.skimStrength *= 0.75 // 0.5 in terms of DPS, but see above remarks about treating units partly as sponges
-        } else if (unit.presumptiveTarget.exists(t => t.altitude < unit.pixelToFireAtSimple(t).altitude)) {
+        } else if (unit.presumptiveTarget.exists(t => t.isEnemyOf(unit) && t.altitude < unit.pixelToFireAtSimple(t).altitude)) {
           unit.skimStrength *= 1.25 // 1.5 in terms of DPS, but see above remarks about treating units partly as sponges
         }
       }

@@ -32,7 +32,6 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
   var toAttack      : Option[UnitInfo]          = None
   var toAttackLast  : Option[UnitInfo]          = None
   var toGather      : Option[UnitInfo]          = None
-  var toRepair      : Option[UnitInfo]          = None
   var toBoard       : Option[FriendlyUnitInfo]  = None
   var shouldFight   : Boolean                   = false
   var commit        : Boolean                   = false
@@ -83,7 +82,6 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
 
     toAttack  = unit.intent.toAttack
     toGather  = unit.intent.toGather
-    toRepair  = unit.intent.toRepair
     toBoard   = unit.intent.toBoard.orElse(toBoard)
     toNuke    = unit.intent.toNuke
     unit.intent.action(unit)

@@ -57,6 +57,14 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
     }
   }
 
+
+  @inline def include(value: T): T = {
+    if ( ! contains(value)) {
+      add(value)
+    }
+    value
+  }
+
   @inline def addAll(values: TraversableOnce[T]): Unit = { values.foreach(add) }
   @inline def removeAll(values: TraversableOnce[T]): Unit = { values.foreach(remove) }
 

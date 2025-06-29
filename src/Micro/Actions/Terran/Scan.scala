@@ -1,4 +1,4 @@
-package Micro.Actions.Basic
+package Micro.Actions.Terran
 
 import Micro.Actions.Action
 import Micro.Agency.Commander

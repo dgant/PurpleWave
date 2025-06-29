@@ -1,12 +1,13 @@
 package Gameplans.Terran.TvE
 
-import Gameplans.All.GameplanImperative
 import Macro.Actions.Friendly
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 
-class TvEBBS extends GameplanImperative {
+class TvEBBS extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Terran.SCV)
     get(2, Terran.Barracks)
     get(Terran.SupplyDepot)

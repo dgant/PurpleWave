@@ -44,7 +44,7 @@ object Bust extends Action {
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     lazy val bunkers    = unit.matchups.targets.filter(Terran.Bunker)
-    lazy val repairers  = bunkers.flatMap(_.matchups.repairers)
+    lazy val repairers  = bunkers.flatMap(_.matchups.healers)
     lazy val goons      = unit.alliesSquad
       .flatMap(_.friendly)
       .filter(Bust.allowed)

@@ -1,16 +1,16 @@
-package Micro.Actions.Basic
+package Micro.Actions.Terran
 
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object Liftoff extends Action {
+object FinishConstruction extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    unit.intent.shouldLiftoff && ! unit.flying
+    unit.intent.toFinish.isDefined
   }
-  
+
   override def perform(unit: FriendlyUnitInfo) {
-    Commander.lift(unit)
+    Commander.rightClick(unit, unit.intent.toFinish.get)
   }
 }

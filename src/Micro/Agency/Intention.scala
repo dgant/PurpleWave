@@ -19,7 +19,7 @@ class Intention {
   var toNuke            : Option[Pixel]                 = None
   var toAttack          : Option[UnitInfo]              = None
   var toGather          : Option[UnitInfo]              = None
-  var toRepair          : Option[UnitInfo]              = None
+  var toHeal            : Option[UnitInfo]              = None
   var toFinish          : Option[UnitInfo]              = None
   var toBoard           : Option[FriendlyUnitInfo]      = None
   var toTrain           : Option[UnitClass]             = None
@@ -43,7 +43,7 @@ class Intention {
   def setNuke             (value: Pixel)                    : Intention = { toNuke            = Some(value); this }
   def setAttack           (value: UnitInfo)                 : Intention = { toAttack          = Some(value); this }
   def setGather           (value: UnitInfo)                 : Intention = { toGather          = Some(value); this }
-  def setRepair           (value: UnitInfo)                 : Intention = { toRepair          = Some(value); this }
+  def setHeal             (value: UnitInfo)                 : Intention = { toHeal            = Some(value); this }
   def setFinish           (value: UnitInfo)                 : Intention = { toFinish          = Some(value); this }
   def setBoard            (value: FriendlyUnitInfo)         : Intention = { toBoard           = Some(value); this }
   def setTrain            (value: UnitClass)                : Intention = { toTrain           = Some(value); this }
@@ -56,7 +56,7 @@ class Intention {
   def setNuke             (value: Option[Pixel])            : Intention = { toNuke            = value; this }
   def setAttack           (value: Option[UnitInfo])         : Intention = { toAttack          = value; this }
   def setGather           (value: Option[UnitInfo])         : Intention = { toGather          = value; this }
-  def setRepair           (value: Option[UnitInfo])         : Intention = { toRepair          = value; this }
+  def setHeal             (value: Option[UnitInfo])         : Intention = { toHeal            = value; this }
   def setFinish           (value: Option[UnitInfo])         : Intention = { toFinish          = value; this }
   def setBoard            (value: Option[FriendlyUnitInfo]) : Intention = { toBoard           = value; this }
   def setTrain            (value: Option[UnitClass])        : Intention = { toTrain           = value; this }

@@ -327,10 +327,12 @@ object Commander {
   }
 
   def repair(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
+    target.friendly.foreach(With.coordinator.healing.heal(unit, _))
     unit.agent.setRideGoal(target.pixel)
     if (unit.unready)       return
     if (autoUnburrow(unit)) return
     if (autoUnload(unit))   return
+    unit.bwapiUnit.repair(target.bwapiUnit)
     sleep(unit, 24)
   }
 
@@ -540,7 +542,7 @@ object Commander {
     if (unit.flying) return
     if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
     if (unit.intent.toFinish.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
-    if (unit.intent.toRepair.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toHeal.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toBuild.nonEmpty)                           unit.agent.escalatePriority(?(buildDistance < 128, TrafficPriorities.Shove, TrafficPriorities.Bump))
     if (unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
     if (unit.battle.isDefined && ! unit.agent.shouldFight) {    unit.agent.escalatePriority(TrafficPriorities.Pardon)

@@ -5,8 +5,9 @@ import Micro.Actions.Combat.Decisionmaking.FightOrFlee
 import Micro.Actions.Combat.Fight
 import Micro.Actions.Combat.Tactics.Unbunk
 import Micro.Actions.Commands.{Attack, Travel}
-import Micro.Actions.Protoss.Meld
+import Micro.Actions.Protoss.{Meld, ReloadInterceptors, ReloadScarabs}
 import Micro.Actions.Scouting.Scout
+import Micro.Actions.Terran.{DemandRepair, FinishConstruction, GetRepaired, Liftoff, Repair, Scan}
 import Micro.Actions.Transportation.Transport
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -27,7 +28,8 @@ object Idle extends Action {
     FinishConstruction,
     FightOrFlee,
     Repair,
-    EmergencyRepair,
+    GetRepaired,
+    DemandRepair,
     Gather,
     Addon,
     Scan,

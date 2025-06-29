@@ -5,6 +5,10 @@ import ProxyBwapi.Races.{Protoss, Terran}
 object BehaviorInitial extends SimulacrumBehavior {
   val fighting: Boolean = true
   @inline override def act(simulacrum: Simulacrum): Unit = {
+    if (simulacrum.canMove && simulacrum.realUnit.friendly.exists( ! _.intent.canFight)) {
+      simulacrum.doBehavior(BehaviorFlee)
+      return
+    }
     if (simulacrum.unitClass == Terran.Medic) {
       simulacrum.targets.addAll(simulacrum.simulation.simulacraAlliesOf(simulacrum).filter(_.unitClass.isOrganic))
       if (simulacrum.targets.nonEmpty) {

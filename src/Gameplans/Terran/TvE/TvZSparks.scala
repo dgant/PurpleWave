@@ -1,6 +1,5 @@
 package Gameplans.Terran.TvE
 
-import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Macro.Actions.Friendly
 import Placement.Access.PlaceLabels
@@ -8,9 +7,11 @@ import ProxyBwapi.Races.Terran
 import Utilities.SwapIf
 import Utilities.Time.Minutes
 
-class TvESparks extends GameplanImperative {
+class TvZSparks extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Terran.SCV)
     get(Terran.SupplyDepot)
     once(11, Terran.SCV)

@@ -109,7 +109,11 @@ case class MatchupAnalysis(me: UnitInfo) {
       && (shooter.remainingCompletionFrames < 72
         || (victim.cloaked && shooter.matchups.groupOf.detectors.nonEmpty))))
 
-  def repairers: Seq[UnitInfo] = {
-    allies.view.filter(a => Terran.SCV(a) && a.friendly.map(_.agent.toRepair.contains(me)).getOrElse(a.orderTarget.contains(me)))
+  def healers: Seq[UnitInfo] = {
+    allies.view.filter(a =>
+      Terran.SCV(a)
+      && a.friendly
+        .map(_.intent.toHeal.contains(me))
+        .getOrElse(a.orderTarget.contains(me)))
   }
 }

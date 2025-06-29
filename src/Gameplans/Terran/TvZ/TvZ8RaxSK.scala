@@ -1,6 +1,6 @@
 package Gameplans.Terran.TvZ
 
-import Gameplans.All.GameplanImperative
+import Gameplans.Terran.TvE.TerranGameplan
 import Lifecycle.With
 import Macro.Actions.{Enemy, Friendly}
 import Placement.Access.PlaceLabels
@@ -9,9 +9,11 @@ import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, SwapIf}
 
-class TvZ8RaxSK extends GameplanImperative {
+class TvZ8RaxSK extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(8, Terran.SCV)
     get(Terran.Barracks)
     once(9, Terran.SCV)

@@ -64,7 +64,7 @@ trait TilePathfinder {
       // Intuition: We want to keep this value scaled around 0-1 so we can reason about costOccupancy
       // Signum: Scale-invariant
       // Sigmoid: Tiebreaks equally signed vectors with different scales
-      val diff = With.coordinator.gridPathOccupancy.getUnchecked(i) - With.coordinator.gridPathOccupancy.getUnchecked(fromTile.i)
+      val diff = With.coordinator.occupancy.getUnchecked(i) - With.coordinator.occupancy.getUnchecked(fromTile.i)
       profile.costOccupancy * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff))
     }
     val costRepulsion: Double = if (profile.costRepulsion == 0 || profile.maxRepulsion == 0) 0 else {

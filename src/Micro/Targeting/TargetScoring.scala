@@ -94,7 +94,7 @@ object TargetScoring {
       output += combatBonus
 
       // Protect our fliers
-      output += add(2.0, target.presumptiveTarget.exists(t => t.isFriendly && t.flying && t.attacksAgainstGround > 0))
+      output += add(2.0, target.presumptiveTarget.exists(t => t.isEnemyOf(target) && t.flying && t.attacksAgainstGround > 0))
 
       // Goose chase penalties
       output += add(2.0, ! target.canMove)
@@ -116,8 +116,12 @@ object TargetScoring {
     //output += add(8.0, (target.burrowed && With.units.existsOurs(Terran.SpellScannerSweep)))
 
     // Detector bonus
-    // TODO: Needs player-agnosticism for simulation
-    output += add(6.0, (Terran.WraithCloak() || With.units.existsOurs(cloakyMatcher)) && aidsDetection(target))
+    output += add(6.0,
+      ?(
+        target.isEnemy,
+        With.units.existsOurs(cloakyMatcher),
+        With.units.existsEnemy(cloakyMatcher))
+      && aidsDetection(target))
 
     // Alternative repair value
     output = Math.max(output, target.orderTarget.filter(target.repairing && ! _.repairing).map(2.5 + _.targetValue).getOrElse(0.0))

@@ -1,6 +1,5 @@
 package Gameplans.Terran.TvE
 
-import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Macro.Actions.Enemy
 import Placement.Access.PlaceLabels
@@ -8,9 +7,11 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, SwapIf}
 
-class TvE3Fac extends GameplanImperative {
+class TvE3Fac extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Terran.SCV)
     get(Terran.SupplyDepot)
     once(11, Terran.SCV)
@@ -72,12 +73,12 @@ class TvE3Fac extends GameplanImperative {
       get(Terran.SpiderMinePlant))
 
     pumpRatio(Terran.Goliath, ?(enemyMutalisksLikely, 3, 1), 18, Seq(Enemy(Zerg.Mutalisk, 2.0), Enemy(Protoss.Scout, 2.0), Enemy(Terran.Wraith, 1.0), Enemy(Protoss.Carrier, 4.0)))
-    if (techStarted(Terran.SiegeMode)) {
-      pump(Terran.SiegeTankUnsieged)
-    }
-    pump(Terran.Vulture)
-    get(3, Terran.Factory)
+    once(7, Terran.Vulture)
     get(Terran.SiegeMode)
+    pump(Terran.SiegeTankUnsieged, maximumConcurrently = Math.max(1, gas / 200 + units(Terran.Factory) / 4))
+    pump(Terran.Vulture)
+    get(4, Terran.Factory)
+    get(2, Terran.MachineShop)
 
     if (unitsComplete(Terran.Vulture) > 0 && (safePushing || unitsComplete(IsWarrior) >= 5)) {
       attack()

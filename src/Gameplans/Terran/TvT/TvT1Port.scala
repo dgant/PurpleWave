@@ -1,15 +1,17 @@
 package Gameplans.Terran.TvT
 
-import Gameplans.All.GameplanImperative
+import Gameplans.Terran.TvE.TerranGameplan
 import Lifecycle.With
 import Macro.Actions.Enemy
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
 
-class TvT1Port extends GameplanImperative {
+class TvT1Port extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     scoutAt(13)
 
     once(9, Terran.SCV)

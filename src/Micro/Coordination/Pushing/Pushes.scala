@@ -31,7 +31,7 @@ class Pushes {
 
   def get(unit: UnitInfo): Seq[Push] = get(unit.tile)
 
-  def onAgentCycle(): Unit = {
+  def update(): Unit = {
     val gridSwap = gridPrevious
     val pushesSwap = pushesPrevious
 

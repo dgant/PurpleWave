@@ -55,7 +55,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def ground10              : Double  = ?(unit.flying, 0, 1)
   protected def shouldRetreat         : Boolean = techniqueIs(Fallback, Flee, Excuse)
   protected def shouldEngage          : Boolean = techniqueIs(Fight, Abuse, Scavenge)
-  protected def canAbuse(t: UnitInfo) : Boolean = unit.canAttack(t) && ( ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
+  protected def canAbuse(t: UnitInfo) : Boolean = unit.canAttack(t) && unit.intent.canFight && ( ! t.canAttack(unit) || (unit.topSpeed > t.topSpeed && unit.pixelRangeAgainst(t) > t.pixelRangeAgainst(unit)))
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (unit.canMove || unit.canAttack) && unit.intent.canFight
   override def perform(unused: FriendlyUnitInfo = null): Unit = {

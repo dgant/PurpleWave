@@ -58,10 +58,11 @@ object BeVulture extends Action {
 
     var abort = false
     abort ||= ! t.get.unitClass.triggersSpiderMines
-    abort ||= vulture.confidence11 > 0.2
+    abort ||= t.get.subjectiveValue > vulture.subjectiveValue
+    abort ||= vulture.confidence11 > 0.5
     abort ||= ! vulture.agent.shouldFight
-    abort ||= vulture.pixelsToGetInRange(t.get) > 0
-    abort ||= t.get.tile.toRectangle.expand(3, 3).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
+    abort ||= vulture.pixelsToGetInRange(t.get) > 32
+    abort ||= t.get.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
 
     if (abort) return
 

@@ -497,6 +497,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def pixelsToSightRange(other: UnitInfo): Double = pixelDistanceEdge(other) - sightPixels
   @inline final def canStim : Boolean = unitClass.canStim && canDoAnything && player.hasTech(Terran.Stim) && hitPoints > 10
   @inline final def canSiege: Boolean = unitClass.isTank  && canDoAnything && player.hasTech(Terran.SiegeMode)
+  @inline final def sieged: Boolean = Terran.SiegeTankSieged(this)
 
   @inline final def moving: Boolean = velocityX != 0 || velocityY != 0
   @inline final def speed: Double = Maff.broodWarDistanceDouble(0.0, 0.0, velocityX, velocityY)
@@ -511,7 +512,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def presumptiveDestinationFinal : Pixel = friendly.map(_.agent.destinationFinal()).getOrElse(_presumptiveDestinationCache())
   @inline final def presumptiveDestinationNext  : Pixel = friendly.map(_.agent.destinationNext()).map(pixel.projectUpTo(_, MicroPathing.waypointDistancePixels)).getOrElse(_presumptiveStepCache())
-  @inline final def presumptiveTarget     : Option[UnitInfo]  = friendly.flatMap(_.agent.toAttack).orElse(_presumptiveTargetCache())
+  @inline final def presumptiveTarget: Option[UnitInfo] = _presumptiveTargetCache()
   private val _presumptiveDestinationCache = new Cache(() =>
     ?(canMove,
       targetPixel
@@ -525,14 +526,16 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
       pixel),
     () => presumptiveDestinationFinal)
   private val _presumptiveTargetCache = new KeyedCache(
-    () =>friendly.flatMap(_.agent.toAttack          .filter(isEnemyOf))
-      .orElse(friendly.flatMap(_.agent.toAttackLast).filter(isEnemyOf))
-      .orElse(friendly.flatMap(_.intent.toAttack)   .filter(isEnemyOf))
-      .orElse(target                                .filter(isEnemyOf))
-      .orElse(orderTarget                           .filter(isEnemyOf))
+    () =>
+              friendly.flatMap(_.agent.toAttack)
+      .orElse(friendly.flatMap(_.agent.toAttackLast))
+      .orElse(friendly.flatMap(_.intent.toAttack))
+      .orElse(friendly.flatMap(_.intent.toHeal))
+      .orElse(target)
+      .orElse(orderTarget)
       .orElse(friendly.flatMap(_.targetsAssigned).flatMap(_.headOption))
       .orElse(matchups.targetNearest),
-    () =>friendly.flatMap(_.agent.toAttack))
+    () => friendly.map(_.agent.lastFrame).getOrElse(With.frame))
 
   val healers: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[UnitInfo]()
   var presumedHealing: Option[UnitInfo] = None

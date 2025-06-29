@@ -1,6 +1,6 @@
 package Strategery.Strategies.Terran
 
-import Gameplans.Terran.TvE.{TvE3Fac, TvEBBS, TvESparks}
+import Gameplans.Terran.TvE.{TvE3Fac, TvEBBS, TvZSparks}
 import Gameplans.Terran.TvP.TvP2Fac
 import Gameplans.Terran.TvT.{TvT1Port, TvT3FacVult}
 import Gameplans.Terran.TvZ.TvZ8RaxSK
@@ -16,16 +16,16 @@ abstract class TvRStrategy extends TvEStrategy  { setEnemyRace(Race.Unknown)  }
 
 object TvEBBS       extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvEBBS)      }
 object TvE3Fac      extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvE3Fac)     }
-object TvESparks    extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvESparks)   }
 object TvT1Port     extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT1Port)    }
 object TvT3FacVult  extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT3FacVult) }
 object TvP2Fac      extends TvPStrategy { override def gameplan: Option[Plan] = Some(new TvP2Fac)     }
 object TvZ8RaxSK    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZ8RaxSK)   }
+object TvZSparks    extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvZSparks)   }
 
 object TerranChoices {
-  
+
   val tvr: Vector[Strategy] = Vector(
-    TvEBBS, TvE3Fac, TvESparks
+    TvEBBS, TvE3Fac
   )
   
   val tvtOpeners: Vector[Strategy] = Vector(
@@ -37,7 +37,7 @@ object TerranChoices {
   )
   
   val tvzOpeners: Vector[Strategy] = Vector(
-    TvZ8RaxSK
+    TvZ8RaxSK, TvZSparks
   )
 
   val all: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

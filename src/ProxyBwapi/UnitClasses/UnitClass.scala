@@ -687,6 +687,19 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else  if (isTransport)                  20
     else                                    10)
 
+  lazy val repairThreshold: Int =
+          if (this == Terran.SCV)           10
+    else  if (this == Terran.Vulture)       20
+    else  if (this == Terran.Goliath)       50
+    else  if (isTank)                       50
+    else  if (this == Terran.Wraith)        50
+    else  if (this == Terran.Dropship)      80
+    else  if (this == Terran.Valkyrie)      100
+    else  if (this == Terran.Battlecruiser) 100
+    else  if (this == Terran.ScienceVessel) 100
+    else                                    -1
+
+
   /////////////////
   // Convenience //
   /////////////////

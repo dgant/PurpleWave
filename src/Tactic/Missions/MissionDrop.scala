@@ -7,9 +7,10 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Points
-import Micro.Actions.Basic.{DoNothing, ReloadScarabs}
+import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander

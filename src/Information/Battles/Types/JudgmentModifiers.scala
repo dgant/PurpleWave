@@ -178,7 +178,7 @@ object JudgmentModifiers {
     val paidPrice    =   Math.max(0, 1 - incomingShot * Math.max(0, With.framesSince(unit.lastFrameTakingDamage) / Seconds(5)()))
     val stickiness   =   recentEngage * paidPrice
     val staticThreat =   Maff.fromBoolean(unit.matchups.threatDeepest.exists(t => t.unitClass.isBuilding || Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)))
-    val obscurity    =   unit.presumptiveTarget.map(target => Math.min(1, With.framesSince(target.lastSeen).toDouble / Seconds(60)())).getOrElse(0d)
+    val obscurity    =   unit.presumptiveTarget.filter(_.isEnemyOf(unit)).map(target => Math.min(1, With.framesSince(target.lastSeen).toDouble / Seconds(60)())).getOrElse(0d)
     val pace         =   unit.squad.map(_.pace01).getOrElse(0)
     val patience     =   1 - Maff.clamp01(unit.hysteresis.bloodlustFrames.toDouble / Seconds(15)())
     val displacement =   Math.max(0, Maff.clamp01(Math.abs(unit.matchups.pixelsToTargetRange.flatMap(distance => unit.squad.map(_.meanAttackerTargetDistance - distance)).getOrElse(0d)) / speed / Seconds(15)()) - 0.333)

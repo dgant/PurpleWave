@@ -1,6 +1,6 @@
 package Gameplans.Terran.TvP
 
-import Gameplans.All.GameplanImperative
+import Gameplans.Terran.TvE.TerranGameplan
 import Lifecycle.With
 import Macro.Actions.Enemy
 import Macro.Requests.RequestUnit
@@ -8,9 +8,11 @@ import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.Time.Seconds
 import Utilities.UnitFilters.IsWarrior
 
-class TvP2Fac extends GameplanImperative {
+class TvP2Fac extends TerranGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     scoutAt(13)
     once(9, Terran.SCV)
     once(Terran.SupplyDepot)

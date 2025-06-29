@@ -17,7 +17,7 @@ trait AgencySortOrder {
     categoryOrder = unit.unitClass.agencySortOrder
     if (unit.intent.toBuild.nonEmpty) {
       categoryOrder = 1e6
-    } else if (unit.intent.toRepair.isDefined || (Terran.SCV(unit) && unit.orderTarget.exists(u => u.isOurs && u.unitClass.isMechanical))) {
+    } else if (unit.intent.toHeal.isDefined || (Terran.SCV(unit) && unit.orderTarget.exists(u => u.isOurs && u.unitClass.isMechanical))) {
       categoryOrder = 3e6
     } else if (unit.intent.toScoutTiles.nonEmpty) {
       categoryOrder = 9e6

@@ -1,7 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
-import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, ProxyGround, Tech}
+import Placement.Access.PlaceLabels._
 import Placement.Templating.Template
 
 object TemplatesTerran {
@@ -181,22 +181,25 @@ object TemplatesTerran {
       "xxxxxxxxxxxx",
       "xxxxxxxxxxxx"),
     new Template().from(
-      "------",
-      "6xxxxx",
-      "xxxxxx",
-      "xxxxxx",
-      "6xxxxx",
-      "xxxxxx",
-      "xxxxxx"),
+      "--------",
+      "-6xxxxx-",
+      "-xxxxxx-",
+      "-xxxxxx-",
+      "-6xxxxx-",
+      "-xxxxxx-",
+      "-xxxxxx-",
+      "--------"),
     new Template().from(
-      "------",
-      "6xxxxx",
-      "xxxxxx",
-      "xxxxxx"))
+      "--------",
+      "-6xxxxx-",
+      "-xxxxxx-",
+      "-xxxxxx-",
+      "--------"))
 
   val supply: Seq[Template] = Seq(
     new Template()
       .from(
+      "-----",
       "-Yxx-",
       "-xxx-",
       "-Yxx-",
@@ -211,6 +214,7 @@ object TemplatesTerran {
       "-xxx-",
       "-----"),
     new Template().from(
+      "-----",
       "-Yxx-",
       "-xxx-",
       "-Yxx-",
@@ -223,6 +227,7 @@ object TemplatesTerran {
       "-xxx-",
       "-----"),
     new Template().from(
+      "-----",
       "-Yxx-",
       "-xxx-",
       "-Yxx-",
@@ -233,6 +238,7 @@ object TemplatesTerran {
       "-xxx-",
       "-----"),
     new Template().from(
+      "--------",
       "-YxxYxx-",
       "-xxxxxx-",
       "-YxxYxx-",
@@ -241,6 +247,7 @@ object TemplatesTerran {
       "-xxxYxx-",
       "--------"),
     new Template().from(
+      "--------",
       "-YxxYxx-",
       "-xxxxxx-",
       "-YxxYxx-",

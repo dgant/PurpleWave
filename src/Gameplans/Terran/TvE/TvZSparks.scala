@@ -81,7 +81,9 @@ class TvZSparks extends TerranGameplan {
         get(Terran.Lockdown)
       }
     }
+
     get(5 * miningBases, Terran.Barracks)
+    pumpWorkers(oversaturate = true)
     requireMiningBases(8)
 
     if (Terran.Stim()) {

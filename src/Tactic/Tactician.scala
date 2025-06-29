@@ -1,6 +1,7 @@
 package Tactic
 
 import Information.Battles.Types.{Division, DivisionRadius}
+import Information.Counting.MacroCounter
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Facts.MacroFacts
@@ -14,7 +15,9 @@ import Tactic.Squads._
 import Tactic.Tactics._
 import Utilities.?
 import Utilities.Time.Minutes
+import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters._
+import Utilities.UnitPreferences.PreferClose
 import _root_.Tactic.Squads.Qualities.Qualities
 
 import scala.collection.mutable
@@ -268,6 +271,27 @@ final class Tactician extends TimedTask {
             .map(adjustDefenseBase)
             .map(defenseSquads).toSeq
       freelancersPick(freelancers, squadsDefendingOrWaiting)
+    }
+
+    // SCVs for Terran attacks
+    if (With.self.isTerran) {
+      val bcs     = attackSquad.lock.units.count(Terran.Battlecruiser)
+      val tanks   = attackSquad.lock.units.count(IsTank)
+      val valks   = attackSquad.lock.units.count(Terran.Valkyrie)
+      val others  = attackSquad.lock.units.count(_.isAny(Terran.Vulture, Terran.Goliath, Terran.Wraith))
+
+      val workers = MacroCounter.countOursComplete(Terran.SCV)
+      val jobs    = With.geography.ourBases.view.map(b => 2 * b.minerals.length + 3 * b.gas.length).sum + 3
+      val excess  = workers - jobs
+
+      val scvsMin = 3 * bcs + tanks + valks
+      val scvsMax = scvsMin + tanks + valks + (4 + others) / 5
+      val scvs    = Maff.clamp(scvsMax, scvsMin, excess)
+
+      attackSquad.workerLock
+        .setPreference(PreferClose(attackSquad.vicinity))
+        .setCounter(CountUpTo(scvs))
+        .acquire()
     }
   }
 }

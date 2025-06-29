@@ -38,7 +38,7 @@ class TvE3Fac extends TerranGameplan {
   }
 
   override def doWorkers(): Unit = {
-    pumpWorkers(oversaturate = false, maximumTotal = 23)
+    pump(Terran.SCV, 30)
   }
 
   override def executeMain(): Unit = {

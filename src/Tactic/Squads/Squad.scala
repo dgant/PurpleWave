@@ -4,6 +4,8 @@ import Debugging.ToString
 import Lifecycle.With
 import Micro.Formation.Formation
 import Performance.Cache
+import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.IndexedSet
@@ -18,6 +20,7 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
   var targets           : Option[IndexedSet[UnitInfo]]  = None
   var formations        : ArrayBuffer[Formation]        = ArrayBuffer.empty
   val qualityCounter    : QualityCounter                = new QualityCounter
+  val scvLock           : LockUnits                     = new LockUnits(this).setMatcher(Terran.SCV)
 
   private var _unitsNow       = new ArrayBuffer[FriendlyUnitInfo]
   private var _unitsNext      = new ArrayBuffer[FriendlyUnitInfo]
@@ -36,7 +39,6 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     commission()
     qualityCounter.utility(candidate)
   }
-
 
   @inline final override def units      : Seq[FriendlyUnitInfo] = _unitsNow
   @inline final def unitsNext           : Seq[FriendlyUnitInfo] = _unitsNext

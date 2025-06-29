@@ -11,16 +11,16 @@ import scala.util.Try
 
 class Squads extends TimedTask {
 
-  var frameRun          :  Int = 0
+  var frameRun          : Int = 0
   var frameRunPrevious  : Int = 0
-
 
   private case class SquadBatch(var id: Int, squads: mutable.ArrayBuffer[Squad] = ArrayBuffer.empty)
 
-  private var _batchActive: SquadBatch = SquadBatch(0)
-  private var _batchNext: SquadBatch = SquadBatch(1)
+  private var _batchActive  : SquadBatch = SquadBatch(0)
+  private var _batchNext    : SquadBatch = SquadBatch(1)
 
-  def all: Seq[Squad] = _batchActive.squads
+  def all   : Seq[Squad] = _batchActive.squads
+  def next  : Seq[Squad] = _batchNext.squads
 
   def enemies: Map[Squad, Set[UnitInfo]] = _enemies()
   private val _enemies = new Cache(() => all.filter(_.enemies.nonEmpty).map(s => (s, s.enemies.toSet)).toMap)
@@ -41,8 +41,8 @@ class Squads extends TimedTask {
     all.foreach(_.clearUnits())
     all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     val batchSwap = _batchActive
-    _batchActive = _batchNext
-    _batchNext = batchSwap
+    _batchActive  = _batchNext
+    _batchNext    = batchSwap
     _batchNext.id = _batchActive.id + 1
     _batchNext.squads.clear()
     all.foreach(_.prepareToRun())

@@ -6,21 +6,18 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Mathematics.Shapes.Spiral
 import Performance.Cache
-import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Tactic.Squads.AttackModes._
 import Utilities.In
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsBuilding, IsWorker}
+import Utilities.UnitFilters.IsBuilding
 
 import scala.collection.mutable.ArrayBuffer
 
 class SquadAttack extends Squad {
 
   var mode: AttackMode = PushMain
-
-  val workerLock: LockUnits = new LockUnits(this).setMatcher(IsWorker)
 
   override def launch(): Unit = {} // This squad receives its units from Tactician
   override def toString: String = f"$mode ${vicinity.base.map(_.name).getOrElse(vicinity.zone.name).take(4)}"

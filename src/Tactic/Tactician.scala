@@ -275,23 +275,29 @@ final class Tactician extends TimedTask {
 
     // SCVs for Terran attacks
     if (With.self.isTerran) {
-      val bcs     = attackSquad.lock.units.count(Terran.Battlecruiser)
-      val tanks   = attackSquad.lock.units.count(IsTank)
-      val valks   = attackSquad.lock.units.count(Terran.Valkyrie)
-      val others  = attackSquad.lock.units.count(_.isAny(Terran.Vulture, Terran.Goliath, Terran.Wraith))
-
       val workers = MacroCounter.countOursComplete(Terran.SCV)
       val jobs    = With.geography.ourBases.view.map(b => 2 * b.minerals.length + 3 * b.gas.length).sum + 3
-      val excess  = workers - jobs
+      var excess  = workers - jobs
 
-      val scvsMin = 3 * bcs + tanks + valks
-      val scvsMax = scvsMin + tanks + valks + (4 + others) / 5
-      val scvs    = Maff.clamp(scvsMax, scvsMin, excess)
+      With.squads.next.foreach(squad =>
+        if ( ! squad.vicinity.metro.exists(_.isOurs) || squad.engagedUpon || squad.engagingOn) {
+          val bcs     = squad.lock.units.count(Terran.Battlecruiser)
+          val tanks   = squad.lock.units.count(IsTank)
+          val valks   = squad.lock.units.count(Terran.Valkyrie)
+          val others  = squad.lock.units.count(_.isAny(Terran.Vulture, Terran.Goliath, Terran.Wraith))
 
-      attackSquad.workerLock
-        .setPreference(PreferClose(attackSquad.vicinity))
-        .setCounter(CountUpTo(scvs))
-        .acquire()
+          val scvsMin = 3 * bcs + tanks + valks
+          val scvsMax = scvsMin + tanks + valks + (4 + others) / 5
+          val scvs    = Maff.clamp(scvsMax, scvsMin, excess)
+
+          squad
+            .scvLock
+            .setPreference(PreferClose(squad.vicinity))
+            .setCounter(CountUpTo(scvs))
+            .acquire()
+
+          excess -= squad.scvLock.units.size
+        })
     }
   }
 }

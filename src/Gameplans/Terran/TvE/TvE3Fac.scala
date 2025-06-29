@@ -2,6 +2,7 @@ package Gameplans.Terran.TvE
 
 import Lifecycle.With
 import Macro.Actions.Enemy
+import Macro.Requests.RequestUnit
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitFilters.IsWarrior
@@ -54,22 +55,25 @@ class TvE3Fac extends TerranGameplan {
       get(Terran.MachineShop),
       once(3, Terran.Vulture))
 
-    if (enemyMutalisksLikely || enemyHasShown(Protoss.Scout, Protoss.Carrier, Terran.Wraith)) {
-      get(Terran.Armory)
-      get(Terran.GoliathAirRange)
-    }
     if (enemyLurkersLikely || enemyDarkTemplarLikely || enemyHasTech(Terran.WraithCloak)) {
       get(Terran.Academy)
       get(Terran.Comsat)
     }
+
+    if (enemyIsZerg) {
+      get(RequestUnit(Terran.Armory, 1, With.scouting.earliestArrival(Zerg.Mutalisk) - Terran.Armory.buildFrames - 2 * Terran.Goliath.buildFrames))
+      get(Terran.GoliathAirRange)
+      once(6, Terran.Goliath)
+    } else if (enemyMutalisksLikely || enemyHasShown(Protoss.Scout, Protoss.Carrier, Terran.Wraith)) {
+      get(Terran.Armory)
+      get(Terran.GoliathAirRange)
+    }
+    pumpRatio(Terran.Goliath, ?(enemyIsZerg, 8, 1), 18, Seq(Enemy(Zerg.Mutalisk, 2.0), Enemy(Protoss.Scout, 2.0), Enemy(Terran.Wraith, 1.0), Enemy(Protoss.Carrier, 4.0)))
+
     if (enemyHasShown(Terran.Bunker, Protoss.PhotonCannon, Zerg.SunkenColony)) {
       get(Terran.SiegeMode)
       get(2, Terran.MachineShop)
       once(2, Terran.SiegeTankUnsieged)
-    }
-
-    if (enemyStrategy(With.fingerprints.fiveRax, With.fingerprints.eightRax, With.fingerprints.twoGate, With.fingerprints.ninePool) && ! haveComplete(Terran.Vulture) && unitsComplete(Terran.Factory) < 2) {
-      pump(Terran.Marine, 6)
     }
 
     SwapIf(
@@ -77,7 +81,7 @@ class TvE3Fac extends TerranGameplan {
       get(Terran.VultureSpeed),
       get(Terran.SpiderMinePlant))
 
-    pumpRatio(Terran.Goliath, ?(enemyMutalisksLikely, 3, 1), 18, Seq(Enemy(Zerg.Mutalisk, 2.0), Enemy(Protoss.Scout, 2.0), Enemy(Terran.Wraith, 1.0), Enemy(Protoss.Carrier, 4.0)))
+
     once(7, Terran.Vulture)
     get(3, Terran.Factory)
     get(Terran.SiegeMode)

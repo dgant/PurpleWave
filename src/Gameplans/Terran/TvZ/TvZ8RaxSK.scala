@@ -56,11 +56,8 @@ class TvZ8RaxSK extends TerranGameplan {
         get(Terran.ScienceVesselEnergy)
       })
 
-    if (With.fingerprints.fourPool()) {
-      buildBunkersAtMain(1)
-    }
     if (With.fingerprints.ninePool() || With.fingerprints.overpool() || miningBases > 1) {
-      buildBunkersAtNatural(1)
+      buildBunkersAtNatural(1, PlaceLabels.DefendEntrance)
     }
     if (safeDefending && ! have(Terran.Refinery)) {
       requireMiningBases(2)

@@ -20,12 +20,6 @@ class TvP2Fac extends TerranGameplan {
     once(Terran.Barracks)
     once(12, Terran.SCV)
     once(Terran.Refinery)
-    if (unitsEver(Terran.Vulture) < 3 && enemyStrategy(With.fingerprints.workerRush, With.fingerprints.proxyGateway)) {
-      pump(Terran.Vulture, 3)
-      pump(Terran.Marine, 4)
-      buildBunkersAtMain(1)
-      get(Terran.Factory)
-    }
     once(15, Terran.SCV)
     once(2, Terran.SupplyDepot)
     if (unitsComplete(Terran.Factory) < 2 && ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)) {

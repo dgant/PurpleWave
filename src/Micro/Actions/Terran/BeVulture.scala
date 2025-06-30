@@ -7,7 +7,7 @@ import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitFilters.IsTank
 
@@ -51,7 +51,7 @@ object BeVulture extends Action {
   protected def sabotage(vulture: FriendlyUnitInfo): Unit = {
 
     lazy val t = vulture.matchups.targetNearest
-      .orElse(vulture.matchups.threatNearest.filter(_.effectivelyCloaked))
+      .orElse(vulture.matchups.threatNearest.filter(Protoss.DarkTemplar))
       .filter(_.unitClass.triggersSpiderMines)
 
     if (t.isEmpty) return
@@ -63,6 +63,7 @@ object BeVulture extends Action {
     abort ||= ! vulture.agent.shouldFight
     abort ||= vulture.pixelsToGetInRange(t.get) > 32
     abort ||= t.get.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
+    abort &&= ! Protoss.DarkTemplar(t.get) || ! t.get.effectivelyCloaked
 
     if (abort) return
 

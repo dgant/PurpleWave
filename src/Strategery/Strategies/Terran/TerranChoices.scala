@@ -20,7 +20,7 @@ object TvT1Port     extends TvTStrategy { override def gameplan: Option[Plan] = 
 object TvT3FacVult  extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT3FacVult) }
 object TvP2Fac      extends TvPStrategy { override def gameplan: Option[Plan] = Some(new TvP2Fac)     }
 object TvZ8RaxSK    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZ8RaxSK)   }
-object TvZSparks    extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvZSparks)   }
+object TvZSparks    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZSparks)   }
 
 object TerranChoices {
 

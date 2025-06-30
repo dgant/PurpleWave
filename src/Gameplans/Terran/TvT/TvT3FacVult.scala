@@ -4,6 +4,7 @@ import Gameplans.Terran.TvE.TerranGameplan
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Terran
+import Utilities.Time.Seconds
 import Utilities.UnitFilters.{IsTank, IsWarrior}
 
 class TvT3FacVult extends TerranGameplan {
@@ -35,10 +36,16 @@ class TvT3FacVult extends TerranGameplan {
 
   // Reference: https://youtu.be/Xcs9oRtjAz4?t=7180
   override def executeMain(): Unit = {
-    if (safePushing && unitsComplete(IsWarrior) > 2) {
+    var canAttack = false
+    canAttack ||= enemyStrategy(With.fingerprints.fourteenCC, With.fingerprints.oneRaxFE, With.fingerprints.bio, With.fingerprints.proxyRax)
+    canAttack ||= enemyHasShown(Terran.SiegeTankUnsieged, Terran.SiegeTankSieged, Terran.Goliath) && techComplete(Terran.SpiderMinePlant, Seconds(15)())
+    canAttack ||= upgradeComplete(Terran.VultureSpeed) && ! enemyHasUpgrade(Terran.VultureSpeed)
+    canAttack &&= ! enemyStrategy(With.fingerprints.twoFacVultures, With.fingerprints.threeFacVultures)
+    canAttack ||= unitsEver(Terran.Vulture) >= 11
+    if (safePushing && canAttack) {
       attack()
     }
-    if (miningBases < 2) {
+    if (units(Terran.Factory) < 3 && ! haveGasForUnit(Terran.Factory)) {
       gasWorkerCeiling(2)
     }
     if (haveComplete(Terran.Factory)) {

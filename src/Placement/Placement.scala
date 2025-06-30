@@ -48,7 +48,7 @@ class Placement extends Fitter {
     }
     basesSorted.foreach(base => {
       protoss (fitAndIndexConstrained(5, 1, ?(base.isMain, TemplatesProtoss.mainBases, TemplatesProtoss.bases), base))
-      terran  (fitAndIndexConstrained(5, 1, TemplatesTerran.bases, base))
+      terran  (fitAndIndexConstrained(0, 1, TemplatesTerran.bases, base))
     })
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
@@ -79,7 +79,7 @@ class Placement extends Fitter {
     protoss (fitAndIndexRectangle(3, 1, TemplatesProtoss.production,      cornerFront,    bounds, directionToBack))
     protoss (fitAndIndexRectangle(4, 1, TemplatesProtoss.tech,            cornerBack,     bounds, directionToFront))
     protoss (fitAndIndexRectangle(4, 7, TemplatesProtoss.production,      cornerFront,    bounds, directionToBack))
-    terran  (fitAndIndexProximity(0, 1, TemplatesTerran.initialLayouts,   zone.downtown,  zone))
+    terran  (fitAndIndexProximity(1, 1, TemplatesTerran.initialLayouts,   zone.downtown,  zone))
     terran  (fitAndIndexRectangle(2, 1, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
     terran  (fitAndIndexRectangle(3, 1, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
     terran  (fitAndIndexRectangle(4, 1, TemplatesTerran.tech6,            cornerBack,     bounds, directionToFront))

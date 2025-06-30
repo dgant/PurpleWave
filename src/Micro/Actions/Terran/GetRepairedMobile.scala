@@ -9,11 +9,12 @@ import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
-object GetRepaired extends Action {
+object GetRepairedMobile extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.self.isTerran
     && unit.unitClass.isMechanical
+    && ! unit.unitClass.isBuilding
     && ! unit.sieged
     && ! unit.agent.commit
     && ! unit.loaded

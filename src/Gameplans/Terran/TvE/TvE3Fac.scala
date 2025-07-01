@@ -38,14 +38,14 @@ class TvE3Fac extends TerranGameplan {
     once(2, Terran.Factory)
   }
 
-  override def doWorkers(): Unit = {
-    pump(Terran.SCV, 30)
-  }
-
   override def executeMain(): Unit = {
     if (units(Terran.Factory) < 3 && minerals < 300) {
       gasWorkerCeiling(2)
     }
+    if (haveComplete(Terran.Factory)) {
+      With.blackboard.floatableBuildings.set(Vector(Terran.Barracks))
+    }
+
     gasLimitCeiling(300)
 
     once(Terran.Vulture)
@@ -62,8 +62,11 @@ class TvE3Fac extends TerranGameplan {
 
     if (enemyIsZerg) {
       get(RequestUnit(Terran.Armory, 1, With.scouting.earliestArrival(Zerg.Mutalisk) - Terran.Armory.buildFrames - 2 * Terran.Goliath.buildFrames))
-      get(Terran.GoliathAirRange)
       once(6, Terran.Goliath)
+      if (enemyMutalisksLikely) {
+        get(Terran.GoliathAirRange)
+        buildTurretsAtMain(2)
+      }
     } else if (enemyMutalisksLikely || enemyHasShown(Protoss.Scout, Protoss.Carrier, Terran.Wraith)) {
       get(Terran.Armory)
       get(Terran.GoliathAirRange)
@@ -81,7 +84,6 @@ class TvE3Fac extends TerranGameplan {
       get(Terran.VultureSpeed),
       get(Terran.SpiderMinePlant))
 
-
     once(7, Terran.Vulture)
     get(3, Terran.Factory)
     get(Terran.SiegeMode)
@@ -89,6 +91,11 @@ class TvE3Fac extends TerranGameplan {
     pump(Terran.Vulture)
     get(4, Terran.Factory)
     get(2, Terran.MachineShop)
+    requireMiningBases(2)
+    pumpGasPumps()
+    get(4 * miningBases, Terran.Factory)
+    get(2 * miningBases, Terran.MachineShop)
+    requireMiningBases(5)
 
     if (unitsComplete(Terran.Vulture) > 0 && (safePushing || unitsComplete(IsWarrior) >= 5)) {
       attack()

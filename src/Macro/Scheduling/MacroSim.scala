@@ -73,21 +73,25 @@ final class MacroSim {
     insert(initialStep)
 
     // Construct events for production in progress
-    // TODO: Count Eggs/Cocoon/Lurker Egg as what they're making
-    // TODO: Don't occupy Probes
-    // TODO: Don't replace morphers
+    With.units.ours.filter(u => u.unitClass.isHatchlike && u.complete).foreach(hatch => larvaSteps(hatch.completionFrame % 342, ASAP = true).foreach(insert))
     With.units.ours.filter(trulyUnoccupied).foreach(u => initialState.producers(u.unitClass) += 1)
     With.units.ours.filterNot(trulyUnoccupied).foreach(u => {
       val step      = new MacroStep
       val event     = step.event
       event.dFrames = u.remainingOccupationFrames
       if ( ! u.complete) {
-        step.request = Some(RequestUnit(u.unitClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
-        event.dUnitComplete       = u.unitClass
+        val newbornClass =
+          if (u.isAny(Zerg.Egg, Zerg.Cocoon, Zerg.LurkerEgg)) {
+            u.buildType
+          } else {
+            u.unitClass
+        }
+        step.request = Some(RequestUnit(newbornClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
+        event.dUnitComplete       = newbornClass
         event.dUnitCompleteN      = 1
-        event.dUnitCompleteASAP   = u.unitClass
+        event.dUnitCompleteASAP   = newbornClass
         event.dUnitCompleteASAPN  = 1
-        if ( ! u.isAny(Zerg.Lair, Zerg.Hive)) {
+        if (u.isNone(Zerg.Lair, Zerg.Hive)) {
           event.dSupplyAvailable += u.unitClass.supplyProvided
         }
       }
@@ -235,7 +239,7 @@ final class MacroSim {
         if (request.gasCost     <= stepBefore.state.gas)      0 else stepBefore.event.dFrames + Maff.nanToN((request.gasCost      - stepBefore.state.gas)       / _simIncomeGasPerFrame,       Forever()))
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
-        val (stepStart, stepFinish) = constructStepsForRequest(request, framesAfter)
+        val (stepStart, stepFinish, stepsExtra) = constructStepsForRequest(request, framesAfter)
         lazy val atSupply   = fit(stepStart.event.dFrames + Terran.SupplyDepot.buildFrames)
         lazy val stepSupply = ?(atSupply < steps.length, steps(atSupply), steps.last)
 
@@ -255,6 +259,7 @@ final class MacroSim {
         } else {
           val iStart = insert(stepStart)
           insert(stepFinish)
+          stepsExtra.foreach(insert)
           updateStatesFrom(iStart)
           allowSupplyInjection = true
         }
@@ -375,7 +380,9 @@ final class MacroSim {
     at
   }
 
-  private def constructStepsForRequest(request: RequestBuildable, framesAfter: Int): (MacroStep, MacroStep) = {
+  val consumingProducers: Array[UnitClass] = Array(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Hydralisk, Zerg.Hatchery, Zerg.Lair, Zerg.CreepColony, Zerg.Spire)
+  private def constructStepsForRequest(request: RequestBuildable, framesAfter: Int): (MacroStep, MacroStep, Seq[MacroStep]) = {
+    val consumeProducer     =   request.unit.isDefined && consumingProducers.contains(request.producerRequired)
     val stepStart           =   new MacroStep
     val stepFinish          =   new MacroStep
     val eventStart          =   stepStart.event
@@ -390,10 +397,12 @@ final class MacroSim {
     eventStart.dAddon       =   request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(UnitClasses.None)
     eventStart.dAddonN      = - request.addonRequired.size
     eventFinish.dFrames     =   eventStart.dFrames + request.buildFrames
-    eventFinish.dProducer1  =   eventStart.dProducer1
-    eventFinish.dProducer1N = - eventStart.dProducer1N
+    if ( ! consumeProducer) {
+      eventFinish.dProducer1  =   eventStart.dProducer1
+      eventFinish.dProducer1N = - eventStart.dProducer1N
+    }
+    val ASAP = request.unit.exists(u => request.minStartFrame <= With.frame + Maff.div4(u.buildFrames))
     request.unit.foreach(u => {
-      val ASAP                        = request.minStartFrame <= With.frame + Maff.div4(u.buildFrames)
       eventStart.dUnitExtant1         = u
       eventStart.dUnitExtant1N        = u.copiesProduced
       eventFinish.dUnitComplete       = u
@@ -416,7 +425,25 @@ final class MacroSim {
       eventFinish.dUpgrade      = upgrade
       eventFinish.dUpgradeLevel = request.quantity
     })
-    (stepStart, stepFinish)
+    val stepsExtra = ?(eventFinish.dUnitComplete.isHatchlike, larvaSteps(stepFinish.event.dFrames, ASAP), Seq.empty)
+    (stepStart, stepFinish, stepsExtra)
+  }
+
+  private def larvaSteps(startFrame: Int, ASAP: Boolean): Seq[MacroStep] = {
+    (0 until 12).map(i => {
+      val larvaStep = new MacroStep
+      val larvaEvent = larvaStep.event
+      larvaEvent.dFrames            = startFrame + 342 * i
+      larvaEvent.dUnitExtant1       = Zerg.Larva
+      larvaEvent.dUnitExtant1N      = 1
+      larvaEvent.dUnitComplete      = Zerg.Larva
+      larvaEvent.dUnitCompleteN     = 1
+      larvaEvent.dUnitCompleteASAP  = ?(ASAP, Zerg.Larva, UnitClasses.None)
+      larvaEvent.dUnitCompleteASAPN = ?(ASAP, 1, 0)
+      larvaEvent.dProducer1         = Zerg.Larva
+      larvaEvent.dProducer1N        = 1
+      larvaStep
+    })
   }
 
   lazy val suppliers: Vector[UnitClass] = UnitClasses.all.filter(_.supplyProvided > 0)

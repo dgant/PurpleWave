@@ -7,7 +7,7 @@ import Mathematics.Shapes.Spiral
 import Micro.Actions.Action
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitFilters.IsTank
 
@@ -50,26 +50,29 @@ object BeVulture extends Action {
   
   protected def sabotage(vulture: FriendlyUnitInfo): Unit = {
 
-    lazy val t = vulture.matchups.targetNearest
+    lazy val target = vulture.matchups.targetNearest
       .orElse(vulture.matchups.threatNearest.filter(Protoss.DarkTemplar))
       .filter(_.unitClass.triggersSpiderMines)
 
-    if (t.isEmpty) return
+    if (target.isEmpty) return
+    
+    val t = target.get
 
     var abort = false
-    abort ||= ! t.get.unitClass.triggersSpiderMines
-    abort ||= t.get.subjectiveValue > vulture.subjectiveValue
+    abort ||= ! t.unitClass.triggersSpiderMines
+    abort ||= t.subjectiveValue < vulture.subjectiveValue
     abort ||= vulture.confidence11 > 0.5
     abort ||= ! vulture.agent.shouldFight
-    abort ||= vulture.pixelsToGetInRange(t.get) > 32
-    abort ||= t.get.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
-    abort &&= ! Protoss.DarkTemplar(t.get) || ! t.get.effectivelyCloaked
+    abort ||= vulture.pixelsToGetInRange(t) > 32
+    abort ||= t.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
+    abort &&= ! Protoss.DarkTemplar(t) || ! t.effectivelyCloaked
+    abort &&= ! t.isAny(Zerg.Egg, Zerg.LurkerEgg)
 
     if (abort) return
 
     Potshot.delegate(vulture)
     if (vulture.unready) return
 
-    placeMine(vulture, t.get.pixel.project(vulture.pixel, 48))
+    placeMine(vulture, t.pixel.project(vulture.pixel, 48))
   }
 }

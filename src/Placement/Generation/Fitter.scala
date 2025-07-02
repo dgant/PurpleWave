@@ -81,6 +81,9 @@ trait Fitter extends Fits {
     } else if (requirement.isGas) {
       return pointTile.base.exists(_.gas.exists(_.tileTopLeft == pointTile))
     } else {
+      if (requirement.isMacroHatch && ! With.grids.buildableTownHall.get(pointTile)) {
+        return false
+      }
       if ( ! With.grids.buildableW(requirement.width).get(pointTile)) {
         return false
       }

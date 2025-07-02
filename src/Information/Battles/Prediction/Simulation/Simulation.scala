@@ -83,19 +83,20 @@ final class Simulation {
   def runAsynchronously(): Unit = {
     if (thread == null) {
       thread = new Thread(() =>
-        try {
-          while ( ! terminateThread) {
+        while ( ! terminateThread) {
             if (simulatingAsynchronously) {
               while ( ! battle.simulationComplete) {
-                step()
+                try {
+                  step()
+                } catch { case exception: Exception =>
+                  simulatingAsynchronously = false
+                  With.logger.onException(exception)
+                  Thread.sleep(1) // Hopefully whatever caused the problem is gone 1ms later
+                }
               }
               simulatingAsynchronously = false
             }
             SpinWait()
-          }
-        } catch { case exception: Exception =>
-          simulatingAsynchronously = false
-          With.logger.onException(exception)
         })
       thread.setName("CombatSimulation")
       thread.setPriority(Math.max(Thread.currentThread().getPriority - 1, Thread.MIN_PRIORITY))

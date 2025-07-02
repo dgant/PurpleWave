@@ -3,7 +3,7 @@ package Gameplans.Terran.TvE
 import Lifecycle.With
 import Macro.Actions.Friendly
 import Placement.Access.PlaceLabels.DefendHall
-import Placement.Access.PlacementQuery
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Terran}
 import Utilities.UnitFilters.{IsTank, IsWarrior}
 
@@ -49,6 +49,11 @@ class TvEBBS extends TerranGameplan {
     if (techStarted(Terran.SiegeMode)) {
       pump(Terran.SiegeTankUnsieged)
     }
+    if ( ! safeDefending && (enemyIsZerg || enemyHasShown(Terran.Factory, Terran.Vulture, Protoss.Dragoon))) {
+      pump(Terran.Marine, 4)
+      buildBunkersAtFoyer(1, PlaceLabels.DefendEntrance)
+    }
+
     pumpRatio(Terran.Medic, 0, 3, Seq(Friendly(Terran.Marine, 0.2)))
     pump(Terran.Marine)
     pumpGasPumps()

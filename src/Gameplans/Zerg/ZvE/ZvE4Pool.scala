@@ -29,8 +29,6 @@ class ZvE4Pool extends GameplanImperative {
 
   doAutosupply = false
   doBasics = false
-  override def doWorkers(): Unit = {}
-
 
   var enableDroneWarfare: Boolean = false
 

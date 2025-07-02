@@ -61,7 +61,7 @@ class Template extends TemplateFilter {
           case 'L' => new TemplatePointRequirement(Zerg.SpawningPool).withLabels(GroundProduction, Important)
           case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); null
           case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); null
-          case 'O' => null
+          case 'O' => new TemplatePointRequirement(4, 3).withLabels(MacroHatch)
           case 'P' => new TemplatePointRequirement(Protoss.Pylon).withLabels(Important, Supply)
           case 'Q' => null
           case 'R' => new TemplatePointRequirement(3, 2).withLabels(GroundProduction) // 3x2 ground production, eg. Robotics

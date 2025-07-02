@@ -7,6 +7,7 @@ object PlaceLabels {
   object Important            extends PlaceLabel
   object Unimportant          extends PlaceLabel
   object TownHall             extends PlaceLabel
+  object MacroHatch           extends PlaceLabel
   object Gas                  extends PlaceLabel
   object GroundProduction     extends PlaceLabel
   object Tech                 extends PlaceLabel

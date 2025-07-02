@@ -255,7 +255,7 @@ object TemplatesZerg {
   val macroHatch: Seq[Template] = Seq(
     new Template().from(
       "------",
-      "-Hxxx-",
+      "-Oxxx-",
       "-xxxx-",
       "-xxxx-",
       "------")

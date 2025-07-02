@@ -1,7 +1,7 @@
 package Placement.Templating
 
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.{Gas, PlaceLabel, TownHall}
+import Placement.Access.PlaceLabels.{Gas, MacroHatch, PlaceLabel, TownHall}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 
@@ -30,6 +30,7 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
   def dimensions: (Int, Int) = (width, height)
 
   def isTownHall  : Boolean = labels.contains(TownHall)
+  def isMacroHatch: Boolean = labels.contains(MacroHatch)
   def isGas       : Boolean = labels.contains(Gas)
   def powers      : Boolean = buildings.contains(Protoss.Pylon)
 

@@ -1,5 +1,6 @@
 package Gameplans.All
 
+import Lifecycle.With
 import Macro.Actions.{MacroActions, RequireEssentials}
 import Planning.Plans.Plan
 
@@ -13,7 +14,9 @@ abstract class GameplanImperative extends Plan with Modal with MacroActions  {
   var doAutosupply  : Boolean = true
 
   def doWorkers(): Unit = {
-    pumpWorkers(maximumConcurrently = 2, oversaturate = false)
+    if ( ! With.self.isZerg) {
+      pumpWorkers(maximumConcurrently = 2, oversaturate = false)
+    }
   }
 
   override def onUpdate(): Unit = {

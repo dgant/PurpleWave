@@ -165,7 +165,7 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     // Find some workers to reassign to minerals
     else if (gasWorkersToAdd < 0) {
       val reassignableGasSlots = bases.view
-        .flatMap(gasSlots(_).view.filterNot(_.free)) // Find gas workers to unassign
+        .flatMap(gasSlots(_).view.filter(_.worker.isDefined)) // Find gas workers to unassign
         .sortBy(slot => mineralSaturation(slot.base))
         .take(-gasWorkersToAdd)
         .flatMap(_.worker)

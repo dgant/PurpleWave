@@ -73,26 +73,26 @@ final class MacroSim {
     insert(initialStep)
 
     // Construct events for production in progress
-    With.units.ours.filter(u => u.unitClass.isHatchlike && u.complete).foreach(hatch => larvaSteps(hatch.completionFrame % 342, ASAP = true).foreach(insert))
+    With.units.ours.filter(_.hasEverBeenCompleteHatch).foreach(hatch => larvaSteps(hatch.completionFrame % 342, ASAP = true).foreach(insert))
     With.units.ours.filter(trulyUnoccupied).foreach(u => initialState.producers(u.unitClass) += 1)
     With.units.ours.filterNot(trulyUnoccupied).foreach(u => {
       val step      = new MacroStep
       val event     = step.event
       event.dFrames = u.remainingOccupationFrames
-      if ( ! u.complete) {
-        val newbornClass =
-          if (u.isAny(Zerg.Egg, Zerg.Cocoon, Zerg.LurkerEgg)) {
-            u.buildType
-          } else {
-            u.unitClass
+      val finalClass =
+        if (u.isAny(Zerg.Egg, Zerg.Cocoon, Zerg.LurkerEgg)) {
+          u.buildType
+        } else {
+          u.unitClass
         }
-        step.request = Some(RequestUnit(newbornClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
-        event.dUnitComplete       = newbornClass
+      if (u.morphing || ! u.complete) {
+        step.request = Some(RequestUnit(finalClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
+        event.dUnitComplete       = finalClass
         event.dUnitCompleteN      = 1
-        event.dUnitCompleteASAP   = newbornClass
+        event.dUnitCompleteASAP   = finalClass
         event.dUnitCompleteASAPN  = 1
         if (u.isNone(Zerg.Lair, Zerg.Hive)) {
-          event.dSupplyAvailable += u.unitClass.supplyProvided
+          event.dSupplyAvailable += finalClass.supplyProvided
         }
       }
       if (u.upgrading) {
@@ -102,14 +102,14 @@ final class MacroSim {
       } else if (u.teching) {
         step.request = Some(RequestTech(u.techingType))
         event.dTech = u.techingType
-      } else if (u.unitClass.isGas) {
+      } else if (finalClass.isGas) {
         event.dGeysers += 1
       } else if ( ! u.complete && u.unitClass.isResourceDepot && u.isNone(Zerg.Lair, Zerg.Hive)) {
         val base = u.base.filter(_.townHall.contains(u))
         base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
       }
-      event.dProducer1 = u.unitClass
-      event.dProducer1N = 1
+      event.dProducer1  = finalClass
+      event.dProducer1N = Maff.fromBoolean(! u.morphing)
       insert(step)
     })
     if (With.self.isTerran) {
@@ -240,20 +240,21 @@ final class MacroSim {
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
         val (stepStart, stepFinish, stepsExtra) = constructStepsForRequest(request, framesAfter)
-        lazy val atSupply   = fit(stepStart.event.dFrames + Terran.SupplyDepot.buildFrames)
-        lazy val stepSupply = ?(atSupply < steps.length, steps(atSupply), steps.last)
+        lazy val indexAfterSupplyWouldFinish  = fit(stepStart.event.dFrames + Terran.SupplyDepot.buildFrames)
+        lazy val stepAfterSupplyWouldFinish   = steps(Math.min(indexAfterSupplyWouldFinish, steps.length - 1))
 
         if (_autosupply
           && allowSupplyInjection
           && stepStart.event.dSupplyUsed > 0
-          && stepSupply.state.supplyAvailable < Math.min(
+          && stepAfterSupplyWouldFinish.state.supplyAvailable < Math.min(
             400,
             stepBefore.state.supplyUsed
             + stepStart.event.dSupplyUsed
             + stepBefore.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames / 2)) {
 
-          val farm = With.self.supplyClass
-          tryInsertRequest(RequestUnit(farm, stepBefore.state.unitsExtant(farm) + 1, With.frame + stepBefore.event.dFrames - Terran.SupplyDepot.buildFrames))
+          val
+          farm = With.self.supplyClass
+          tryInsertRequest(RequestUnit(farm, stepBefore.state.unitsExtant(farm) + 1, With.frame + stepBefore.event.dFrames - With.self.supplyClass.buildFrames))
           iDiff -= 1
           allowSupplyInjection = false
         } else {

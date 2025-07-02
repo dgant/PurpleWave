@@ -12,10 +12,10 @@ object TemplatesZerg {
       .from(
         "CMGxxx",
         "xxxxxxLxx",
-        "--CN--xxx",
-        "--xx----",
+        "JxCN--xxx",
+        "xxxx----",
         "------Cx",
-        "JxHxxxxx",
+        "CMHxxxxx",
         "xxxxxx--",
         "--xxxxCx",
         "CM----xx",

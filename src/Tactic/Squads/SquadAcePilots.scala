@@ -8,7 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
 import Utilities.UnitCounters.CountEverything
-import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, UnitFilter}
+import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, IsTank, IsWorker, UnitFilter}
 
 class SquadAcePilots extends Squad {
   val acePilots         : Seq[UnitClass]  = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
@@ -91,6 +91,23 @@ class SquadAcePilots extends Squad {
       activity = "AceHelpSquad"
       followSquad(squad)
       return
+    }
+
+    // Unleash hell!
+    if (units.exists(_.isAny(Zerg.Mutalisk, Protoss.Scout) && With.geography.enemyBases.nonEmpty)) {
+      val bombingBases = With.geography.enemyBases.map(b => (
+        b,
+        b.enemies.view.filter(_.isAny(IsWorker, IsTank, Terran.ScienceVessel, Protoss.HighTemplar, Protoss.Shuttle, Protoss.Reaver)).map(_.subjectiveValue).sum,
+        b.enemies.view.filter(_.canAttackAir).map(u => u.subjectiveValue * Maff.or1(4, u.isAny(Terran.MissileTurret, Protoss.Archon, Zerg.SporeColony))).sum,
+        b.heart.center.pixelDistance(centroidAir)))
+      val bombingBaseScores = bombingBases.map(b => (b._1, b._2 / (1 + b._3) / (640 + b._4)))
+      val bombingTarget     = Maff.maxBy(bombingBaseScores)(_._2)
+      if (bombingTarget.isDefined) {
+        activity = "Bombing"
+        vicinity = bombingTarget.get._1.heart.center
+        SquadAutomation.targetAndSend(this)
+        return
+      }
     }
 
     // Monitor their bases

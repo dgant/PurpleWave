@@ -92,7 +92,7 @@ object Build extends Action {
         if (unit.y < movePixel.y) - unit.unitClass.dimensionDownInclusive  - building.dimensionUp   - 1 else unit.unitClass.dimensionUp   + building.dimensionDownInclusive + 1).walkablePixel
     } else if (Zerg.Drone(unit)) {
       // McRave found that positioning Drone (0, -7) from building location minimizes wiggling
-      movePixel = movePixel.add(building.tileWidth * 16, building.tileHeight * 16 - 7)
+      movePixel = movePixel.add(0, - 7)
     }
 
     unit.agent.decision.set(movePixel)

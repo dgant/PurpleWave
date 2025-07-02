@@ -6,6 +6,53 @@ import Placement.Templating.Template
 
 object TemplatesZerg {
 
+  val mainBases: Seq[Template] = Seq(
+    new Template()
+      .forMineralDirection(Directions.Left)
+      .from(
+        "CMGxxx",
+        "xxxxxxLxx",
+        "--CN--xxx",
+        "--xx----",
+        "------Cx",
+        "JxHxxxxx",
+        "xxxxxx--",
+        "--xxxxCx",
+        "CM----xx",
+        "xx-"),
+    new Template()
+      .forMineralDirection(Directions.Right)
+      .from(
+        "xxxGxxx",
+        "LxxxxxxCM",
+        "xxxCN--xx",
+        "-Jxxx----",
+        "-xx----Cx",
+        "---Hxxxxx",
+        "xCxxxxx--",
+        "xXxxxxxCM",
+        "x------xx"),
+    new Template()
+      .from(
+        "-Cx--Cx-",
+        "-xx--xx-",
+        "---------",
+        "---HxxxJx",
+        "Lxxxxxxxx",
+        "xxxxxxx--",
+        "Cx-----Cx"),
+    new Template()
+      .from(
+        "Cx--Cx-Cx",
+        "xx--xx-Cx",
+        "--Hxxx---",
+        "JxxxxxLxx",
+        "xxxxxxxxx",
+        "Cx------Cx"),
+    new Template().from(
+      "Hxxx",
+      "xxxx",
+      "xxxx"))
   val expansions: Seq[Template] = Seq(
     new Template()
       .forExitDirection(Directions.Left)
@@ -159,10 +206,41 @@ object TemplatesZerg {
         "xx-Hxxx--",
         "---xxxx-",
         "x--xxxx-",
-        "x-------CN",
-        "x-CNCNCNxx-",
-        "x-xxxxxx"),
-
+        "x-------",
+        "x-CNCNCNCN",
+        "x-xxxxxxxx"),
+    new Template()
+      .forExitDirection(Directions.Right)
+      .from(
+        "-CM-CxCN",
+        "-xx-xxxx",
+        "--------",
+        "-Hxxx-CN",
+        "-xxxx-xx",
+        "-xxxx-CN",
+        "------xx",
+        "-CM-CxCN",
+        "-xx-xxxx"),
+    new Template()
+      .forExitDirection(Directions.Left)
+      .from(
+        "---Cx-CM-",
+        "CN-xx-xx-",
+        "xx-------",
+        "CN-Hxxx-CM",
+        "xx-xxxx---",
+        "CN-xxxx-CM",
+        "xx------xx",
+        "CNCN-CM-",
+        "xxxx-xx-"),
+    new Template().from(
+      "x-Cx-Cx",
+      "--xx-xx",
+      "CxHxxx-",
+      "xxxxxxCx",
+      "--xxxxxx",
+      "Cx-----",
+      "xx-"),
     new Template().from(
       "------",
       "-Hxxx-",
@@ -174,229 +252,21 @@ object TemplatesZerg {
       "xxxx",
       "xxxx"))
 
-  val initialLayouts: Seq[Template] = Seq(
-    new Template().from(
-      "------------",
-      "-WxxxFxxx---",
-      "-xxxxxxxxxx-",
-      "-xxxxxxxxxx-",
-      "-WxxxFxxx---",
-      "-xxxxxxxxxx-",
-      "-xxxxxxxxxx-",
-      "------------"),
+  val macroHatch: Seq[Template] = Seq(
     new Template().from(
       "------",
-      "-Wxxx-----",
-      "-xxxxFxxx---",
-      "-xxxxxxxxxx-",
-      "-Fxxxxxxxxx-",
-      "-xxxxxx-----",
-      "-xxxxxx-",
-      "--------"))
+      "-Hxxx-",
+      "-xxxx-",
+      "-xxxx-",
+      "------")
+  .addLabels(GroundProduction))
 
-  val production: Seq[Template] = Seq(
+  val tech: Seq[Template] = Seq(
     new Template().from(
-      "xxxx------",
-      "xxxx-Fxxx-------",
-      "-----xxxxxxFxxx---",
-      "-Fxxxxxxxxxxxxxxx-",
-      "-xxxxxxFxxxxxxxxx-",
-      "-xxxxxxxxxxxx-----",
-      "-------xxxxxx-",
-      "xxxxxx--------"),
+      "4xxx",
+      "xxxx"),
     new Template().from(
-      "--------",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"),
-    new Template().from(
-      "--------",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"),
-    new Template().from(
-      "--------",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"),
-    new Template().from(
-      "------------------",
-      "-Fxxx--Fxxx--Fxxx---",
-      "-xxxxxxxxxxxxxxxxxx-",
-      "-xxxxxxxxxxxxxxxxxx-",
-      "--------------------"),
-    new Template().from(
-      "------------",
-      "-Fxxx--Fxxx---",
-      "-xxxxxxxxxxxx-",
-      "-xxxxxxxxxxxx-",
-      "--------------"),
-    new Template().from(
-      "------",
-      "-Fxxx---",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"))
-
-  val tech6: Seq[Template] = Seq(
-    new Template().from(
-      "6xxxxx6xxxxx",
-      "xxxxxxxxxxxx",
-      "xxxxxxxxxxxx"),
-    new Template().from(
-      "--------",
-      "-6xxxxx-",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "-6xxxxx-",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"),
-    new Template().from(
-      "--------",
-      "-6xxxxx-",
-      "-xxxxxx-",
-      "-xxxxxx-",
-      "--------"))
-
-  val supply: Seq[Template] = Seq(
-    new Template()
-      .from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "--------",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxYxx-",
-      "--------"),
-    new Template().from(
-      "--------",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxYxx-",
-      "--------"),
-    new Template().from(
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "Yxx",
-      "xxx",
-      "Yxx",
-      "xxx",
-      "---"))
+      "3xx",
+      "xxx"))
     .map(_.addLabels(Tech))
-
-  val bunkerTurret: Seq[Template] = Seq(
-    new Template()
-      .forExitDirection(Directions.Left, Directions.Down)
-      .from(
-        "BxxCx",
-        "xxxxx"),
-    new Template()
-      .forExitDirection(Directions.Right, Directions.Up)
-      .from(
-        "CxBxx",
-        "xxxxx"),
-    new Template()
-      .forExitDirection(Directions.Up, Directions.Left)
-      .from(
-        "Bxx",
-        "xxx",
-        "Cx",
-        "xx"),
-    new Template()
-      .forExitDirection(Directions.Down, Directions.Right)
-      .from(
-        "xCx",
-        "xxx",
-        "Bxx",
-        "xxx"))
-    .map(_.addLabels(DefendEntrance, DefendGround))
-
-  val proxy2: Seq[Template] = Seq(
-    new Template()
-      .from(
-        "----------",
-        "-4xxx4xxx-",
-        "-xxxxxxxx-",
-        "-xxxxxxxx-",
-        "----------"),
-    new Template()
-      .from(
-        "------",
-        "-4xxx-",
-        "-xxxx-",
-        "-xxxx-",
-        "-4xxx-",
-        "-xxxx-",
-        "-xxxx-",
-        "------"))
-    .map(_.addLabels(AnyProxy, ProxyGround))
 }

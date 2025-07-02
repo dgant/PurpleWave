@@ -56,9 +56,9 @@ class Template extends TemplateFilter {
           case 'G' => new TemplatePointRequirement(4, 2).withLabels(Gas)
           case 'H' => new TemplatePointRequirement(4, 3).withLabels(TownHall)
           case 'I' => last.labels += Important; null
-          case 'J' => null
+          case 'J' => new TemplatePointRequirement(Zerg.Spire).withLabels(Tech, Important)
           case 'K' => new TemplatePointRequirement(Terran.Barracks).withLabels(GroundProduction, Important)
-          case 'L' => null
+          case 'L' => new TemplatePointRequirement(Zerg.SpawningPool).withLabels(GroundProduction, Important)
           case 'M' => last.labels ++= Seq(Defensive, DefendHall, DefendAir); null
           case 'N' => last.labels ++= Seq(Defensive, DefendHall, DefendGround); null
           case 'O' => null

@@ -6,7 +6,6 @@ import Information.Battles.Prediction.Skimulation.SkimulationUnit
 import Information.Battles.Types.{Battle, Team}
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
-import Macro.Allocation.Prioritized
 import Mathematics.Maff
 import Mathematics.Physics.Force
 import Mathematics.Points._
@@ -21,6 +20,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
 import ProxyBwapi.Upgrades.Upgrade
+import Tactic.Production.Production
 import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
 import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
@@ -126,9 +126,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     remainingCompletionFrames,
     With.framesUntil(lastFrameStartingAttack + unitClass.stopFrames))
 
-  private var _producer: Option[Prioritized] = None
-  @inline final def setProducer(plan: Prioritized): Unit = { _producer = Some(plan) }
-  @inline final def producer: Option[Prioritized] = _producer
+  private var _producer: Option[Production] = None
+  def setProducer(plan: Production): Unit = {
+    _producer = Some(plan)
+  }
+  @inline final def producer: Option[Production] = _producer
 
   @inline final def exitTile  : Tile          = tileTopLeft.add(0, unitClass.tileHeight).walkableTile
   @inline final def addonArea : TileRectangle = TileRectangle(Tile(0, 0), Tile(2, 2)).add(tileTopLeft).add(4,1)
@@ -138,7 +140,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private lazy val cacheTileArea = new Cache(() => unitClass.tileArea.add(tileTopLeft), refreshPeriod = tileCacheDuration)
   private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
 
-  @inline final def zone: Zone = if (unitClass.isBuilding) tileTopLeft.zone else tile.zone // Hack to get buildings categorized in zone they were intended to be constructed in
+  @inline final def zone: Zone = ?(unitClass.isBuilding, tileTopLeft, tile).zone // Hack to get buildings categorized in zone they were intended to be constructed in
   @inline final def base: Option[Base] = tile.base
   @inline final def metro: Option[Metro] = tile.metro
 
@@ -544,6 +546,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   def techProducing: Option[Tech]
   def upgradeProducing: Option[Upgrade]
+
+  def framesUntilLarva: Int = (With.frame - completionFrame) % 342
 
   def addonOf: Option[UnitInfo] = tileTopLeft.subtract(4, 1).units.find(u => u.isAny(Terran.CommandCenter, Terran.Factory, Terran.Starport, Terran.ScienceFacility) && ! u.flying)
 

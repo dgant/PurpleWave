@@ -53,7 +53,7 @@ object MacroCounter {
     if ( ! unit.alive) return output
 
     output(unit.unitClass) = 1
-    if (unit.buildType != UnitClasses.None) {
+    if (unit.morphing && unit.buildType != UnitClasses.None) {
       output(unit.buildType) = unit.buildType.copiesProduced
     }
 

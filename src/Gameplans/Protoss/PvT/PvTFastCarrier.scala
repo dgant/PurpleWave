@@ -44,14 +44,13 @@ class PvTFastCarrier extends PvTOpeners {
       requireMiningBases(3)
     }
 
-    get(Protoss.Stargate)
-    get(Protoss.FleetBeacon)
-    get(2, Protoss.Assimilator)
     get(2, Protoss.Stargate)
+    get(Protoss.FleetBeacon)
     once(4, Protoss.Carrier)
-    get(?(PvTArmy.counterBio, Protoss.AirArmor,   Protoss.AirDamage))
+    get(?(PvTArmy.counterBio, Protoss.AirArmor, Protoss.AirDamage))
     get(Protoss.CarrierCapacity)
-    get(?(PvTArmy.counterBio, Protoss.AirDamage,  Protoss.AirArmor))
+    get(2, Protoss.Assimilator)
+    get(?(PvTArmy.counterBio, Protoss.AirDamage, Protoss.AirArmor))
     get(2, Protoss.Gateway)
     requireMiningBases(3)
 

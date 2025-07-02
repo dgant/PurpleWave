@@ -3,7 +3,7 @@ package Placement
 import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Points.{Direction, Points, Tile}
-import Placement.Generation.{Fit, Fitter, TemplatesGeneric, TemplatesProtoss, TemplatesTerran}
+import Placement.Generation.{Fit, Fitter, TemplatesGeneric, TemplatesProtoss, TemplatesTerran, TemplatesZerg}
 import Placement.Walls.{FindWall, Wall, WallFinder}
 import Utilities.?
 
@@ -42,13 +42,13 @@ class Placement extends Fitter {
         .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
         .sortBy( ! _.metro.exists(_.isOurs))
         .foreach(preplaceWalls)
-      //zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceWalls)
     } else if ( ! With.self.isProtoss || With.enemies.exists( ! _.isProtoss)) {
       preplaceWalls(With.geography.ourFoyer.zone)
     }
     basesSorted.foreach(base => {
-      protoss (fitAndIndexConstrained(5, 1, ?(base.isMain, TemplatesProtoss.mainBases, TemplatesProtoss.bases), base))
-      terran  (fitAndIndexConstrained(0, 1, TemplatesTerran.bases, base))
+      protoss (fitAndIndexConstrained(5, 1, ?(base.isOurMain, TemplatesProtoss.mainBases, TemplatesProtoss.expansions), base))
+      terran  (fitAndIndexConstrained(0, 1, TemplatesTerran.bases,                                                      base))
+      zerg    (fitAndIndexConstrained(0, 1, ?(base.isOurMain, TemplatesZerg.mainBases,    TemplatesZerg.expansions),    base))
     })
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
@@ -87,6 +87,8 @@ class Placement extends Fitter {
     terran  (fitAndIndexRectangle(6, 3, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
     terran  (fitAndIndexRectangle(7, 3, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
     terran  (fitAndIndexRectangle(8, 7, TemplatesTerran.production,       cornerFront,    bounds, directionToBack))
+    zerg    (fitAndIndexProximity(2, 3, TemplatesZerg.tech,               zone.heart,     zone))
+    zerg    (fitAndIndexRectangle(2, 8, TemplatesZerg.macroHatch,         cornerFront,    bounds, directionToBack))
   }
 
   def preplaceWalls(zone: Zone): Unit = {

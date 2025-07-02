@@ -15,7 +15,7 @@ object TemplatesProtoss {
     "xxxx")
 
   // Generic defense for town hall areas
-  val bases: Seq[Template] = Seq(
+  val expansions: Seq[Template] = Seq(
     /////////////////////////
     // Wide heavy defenses //
     /////////////////////////
@@ -206,7 +206,7 @@ object TemplatesProtoss {
         "--Uxxxxxxx-",
         "--CM2UTxxx-",
         "--xxxxxxxx-",
-        "xxxxxxx----")) ++ bases // Default to generic base layouts if needed
+        "xxxxxxx----")) ++ expansions // Default to generic base layouts if needed
 
   val initialLayouts: Seq[Template] = Seq(
     // It's critical that the Gateways not have tech buildings below them.

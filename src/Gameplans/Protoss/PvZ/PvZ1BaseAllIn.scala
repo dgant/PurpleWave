@@ -42,7 +42,7 @@ abstract class PvZ1BaseAllIn extends PvZ1BaseOpenings {
       }
       if (needToAllIn) {
         status("NeedToAllIn")
-        allIn()
+        aggression(1e10)
       }
     }
   }

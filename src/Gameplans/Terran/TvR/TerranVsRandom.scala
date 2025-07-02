@@ -53,7 +53,7 @@ class TerranVsRandom extends GameplanImperative {
     get(4, Terran.Barracks)
 
     if (enemyDarkTemplarLikely && ! have(Terran.Comsat)) {
-      allIn()
+      aggression(1e10)
     }
     attack()
   }

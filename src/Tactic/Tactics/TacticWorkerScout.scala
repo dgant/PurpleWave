@@ -6,6 +6,7 @@ import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Strategery.Strategies.Zerg.ZvE4Pool
 import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountUpTo
@@ -32,30 +33,32 @@ class TacticWorkerScout extends Tactic {
     scoutingAbandoned ||= scouts.exists( ! _.alive)
     scoutingAbandoned ||= basesToScout.isEmpty
 
-    // Abandon scouting when we have a closer unit approaching
-    scoutingAbandoned ||= (
-      With.blackboard.wantToAttack()
-      && scouts.nonEmpty
-      && vicinity.metro.exists(m => ! scouts.exists(_.metro.contains(m)))
-      && With.units.ours.exists(u =>
-        u.complete
-        && ! IsWorker(u)
-        && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)()))))
+    if ( ! ZvE4Pool()) {
+      // Abandon scouting when we have a closer unit approaching
+      scoutingAbandoned ||= (
+        With.blackboard.wantToAttack()
+        && scouts.nonEmpty
+        && vicinity.metro.exists(m => ! scouts.exists(_.metro.contains(m)))
+        && With.units.ours.exists(u =>
+          u.complete
+          && ! IsWorker(u)
+          && With.geography.enemyBases.view.map(_.heart).exists(h => scouts.forall(_.framesToTravelTo(h) > u.framesToTravelTo(h) - Seconds(5)()))))
 
-    // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
-    scoutingAbandoned ||= With.units.enemy.exists(_.isAll(
-      IsComplete,
-      IsAny(
-        Terran.Marine,
-        Terran.Vulture,
-        Terran.Factory,
-        IsTank,
-        Protoss.Dragoon,
-        IsSpeedling,
-        Zerg.Hydralisk,
-        Zerg.Mutalisk,
-        Zerg.Spire)))
-    scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
+      // Abandon scouting when they can catch our scout (and we're not counting on the scout to help fight)
+      scoutingAbandoned ||= With.units.enemy.exists(_.isAll(
+        IsComplete,
+        IsAny(
+          Terran.Marine,
+          Terran.Vulture,
+          Terran.Factory,
+          IsTank,
+          Protoss.Dragoon,
+          IsSpeedling,
+          Zerg.Hydralisk,
+          Zerg.Mutalisk,
+          Zerg.Spire)))
+      scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
+    }
 
     if (scoutingAbandoned) return
 

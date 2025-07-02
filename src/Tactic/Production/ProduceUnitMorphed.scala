@@ -27,16 +27,21 @@ class ProduceUnitMorphed(requestArg: RequestBuildable, expectedFramesArg: Int) e
   def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classOutput) > 0)
   def hasSpent  : Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
+  def claimable(unit: FriendlyUnitInfo): Boolean = unit.alive && (unit.producer.forall(p => p == this || ! With.tactics.produce.queue.contains(p)))
+
   def onUpdate(): Unit = {
     // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production
     // Shared somewhat with BuildBuilding
-    lazy val alreadyMorphing = With.units.ours.filter(u =>
+
+    lazy val claimables = With.units.ours.filter(u =>
       MacroCounter.countExtant(u)(classOutput) > 0
       && MacroCounter.countComplete(u)(classOutput) == 0
-      && u.producer.forall(p => p == this || ! p.isPrioritized))
+      && claimable(u))
+
     morpher = morpher
-      .filter(m => m.alive && (m.is(classInput) || MacroCounter.countExtant(m)(classOutput) > 0))
-      .orElse(Maff.minBy(alreadyMorphing)(_.frameDiscovered))
+      .filter(claimable)
+      .filter(m => classInput(m) || MacroCounter.countExtant(m)(classOutput) > 0)
+      .orElse(Maff.minBy(claimables)(_.frameDiscovered))
 
     // Shared somewhat with TrainUnit
     if (hasSpent || currencyLock.acquire()) {

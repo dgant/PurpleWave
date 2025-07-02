@@ -10,7 +10,7 @@ import Performance.Cache
 import Placement.Access.{Foundation, PlacementQuery}
 import Placement.Architecture.ArchitecturalAssessment
 import Planning.ResourceLocks.{LockCurrencyFor, LockTiles, LockUnits}
-import ProxyBwapi.Races.{Neutral, Protoss}
+import ProxyBwapi.Races.{Neutral, Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
@@ -29,19 +29,22 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
   var orderedTile     : Option[Tile]        = None
   var foundation      : Option[Foundation]  = None
   var intendAfter     : Option[Int]         = None
+
   private var _trainee: Option[FriendlyUnitInfo] = None
-  private val recycledBuilder = new Cache(() => ?(builderMatcher == Protoss.Probe,
+  private val recycledBuilder = new Cache(() => ?(
+    builderMatcher == Protoss.Probe,
     Maff.minBy(With.units.ours.filter(u =>
       Protoss.Probe(u)
         && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 40))
           ||  u.intent.toBuild      .exists(b =>  foundation.exists(_.tile.groundTiles(b.tile)  < 40)))))(u => foundation.map(f => u.pixelDistanceTravelling(f.tile)).getOrElse(0.0)),
     None))
   private val proposedBuilder = new Cache(() => recycledBuilder().orElse(builderLock.inquire().flatMap(_.headOption)))
-  def builder: Option[FriendlyUnitInfo] = recycledBuilder().orElse(builderLock.units.headOption)
-  def desiredTile: Option[Tile] = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
-  override def trainee: Option[FriendlyUnitInfo] = _trainee
-  override def hasSpent: Boolean = trainee.isDefined
-  override def isComplete: Boolean = trainee.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
+
+  def builder             : Option[FriendlyUnitInfo]  = recycledBuilder().orElse(builderLock.units.headOption)
+  def desiredTile         : Option[Tile]              = trainee.map(_.tileTopLeft).orElse(foundation.map(_.tile))
+  override def trainee    : Option[FriendlyUnitInfo]  = _trainee
+  override def hasSpent   : Boolean                   = trainee.exists(b => MacroCounter.countExtant(b)(buildingClass) > 0)
+  override def isComplete : Boolean                   = trainee.exists(b => MacroCounter.countComplete(b)(buildingClass) > 0)
   override def expectTrainee(candidate: FriendlyUnitInfo): Boolean = {
     var output = orderedTile.contains(candidate.tileTopLeft) && buildingClass(candidate)
     output ||= candidate.buildUnit.exists(builder.contains)
@@ -70,6 +73,7 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
     _trainee = _trainee
       .filter(_.alive)
       .filterNot(Neutral.Geyser)
+      .filter(t => MacroCounter.countExtant(t)(buildingClass) > 0)
       .orElse(underConstructionByBuilder)
       .orElse(candidates.find(candidate => orderedTile.contains(candidate.tileTopLeft)))
       .orElse(candidates.find(candidate => desiredTile.contains(candidate.tileTopLeft)))
@@ -158,6 +162,7 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
             .setCanFight(false)
             .addBuild(BuildIntent(buildingClass, desiredTile.get, startNow = hasSpent || currencyLock.satisfied))
             .setTerminus(orderedTile.map(_.center))
+          builder.filter(Zerg.Drone).foreach(drone => _trainee = Some(drone))
         }
       } else if (buildingClass.isTerran) {
         intent

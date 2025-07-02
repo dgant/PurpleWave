@@ -8,8 +8,10 @@ abstract class GameplanImperative extends Plan with Modal with MacroActions  {
   def completed: Boolean = false
   final def isComplete: Boolean = completed || ! activated
 
-  var doBasics: Boolean = true
-  var doBuildOrder: Boolean = true
+  var doBasics      : Boolean = true
+  var doBuildOrder  : Boolean = true
+  var doAutosupply  : Boolean = true
+
   def doWorkers(): Unit = {
     pumpWorkers(maximumConcurrently = 2, oversaturate = false)
   }
@@ -24,8 +26,10 @@ abstract class GameplanImperative extends Plan with Modal with MacroActions  {
     if (doBuildOrder) {
       executeBuild()
     }
+    if (doAutosupply) {
+      autosupply()
+    }
     if (doBasics) {
-      autosupply() // This currently just prioritizes Supplier
       doWorkers()
     }
     executeMain()

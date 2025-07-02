@@ -8,6 +8,7 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import Utilities.UnitFilters.IsTank
 
 object GetRepairedMobile extends Action {
 
@@ -75,6 +76,9 @@ object GetRepairedMobile extends Action {
       } else {
         Potshot.delegate(unit)
         if (unit.ready) {
+          if (Terran.SiegeTankUnsieged(unit) && Terran.SiegeMode()) {
+            Commander.useTech(unit, Terran.SiegeMode)
+          }
           Commander.hold(unit)
         }
       }

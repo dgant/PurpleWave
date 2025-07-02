@@ -45,7 +45,7 @@ class PvTSpeedlotDT extends GameplanImperative {
       pump(Protoss.Zealot)
       attack()
       if ((GameTime(7, 18) - Seconds(18)).minutes % 2 == 1) {
-        allIn()
+        aggression(1e10)
       }
     }
     pump(Protoss.Zealot, units(Protoss.Dragoon))

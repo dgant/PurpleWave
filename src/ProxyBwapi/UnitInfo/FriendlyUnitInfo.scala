@@ -31,7 +31,9 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _framesIdleConsecutive  : Int = 0
   override def update(): Unit = {
     if (frameDiscovered <  With.frame) readProxy()
-    if (frameDiscovered == With.frame) With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
+    if (frameDiscovered == With.frame) {
+      With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
+    }
     super.update()
     lazy val tryingToAttackHere = canAttack && target.exists(t => t.player.isEnemy &&   inRangeToAttack(t))
     lazy val tryingToAttackAway = canAttack && target.exists(t => t.player.isEnemy && ! inRangeToAttack(t))

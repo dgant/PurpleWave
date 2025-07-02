@@ -251,11 +251,14 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
     updateGridsIfNecessary(onChange = false)
   }
 
+  @inline private final def updateTopLeftTile(pixel: Pixel): Unit = {
+    _tileTopLeft = pixel.subtract(16 * unitClass.tileWidth, 16 * unitClass.tileHeight).tile
+    updateGridsIfNecessary(onChange = true)
+  }
   @inline final def changePixel(pixelNew: Pixel): Unit = {
     val tileNew = pixelNew.tile
     if (_tile != tileNew) {
-      _tileTopLeft = pixelNew.subtract(16 * unitClass.tileWidth, 16 * unitClass.tileHeight).tile
-      updateGridsIfNecessary(onChange = true)
+      updateTopLeftTile(pixelNew)
     }
     _pixel = pixelNew
     _tile  = pixelNew.tile
@@ -267,6 +270,7 @@ abstract class BWAPICachedUnitProxy(bwapiUnit: bwapi.Unit, id: Int) extends Unit
       _lastClassChangeHealth  = bwapiUnit.getHitPoints
       _lastClassChangeShields = bwapiUnit.getShields
       _unitClass              = unitClassNew
+      updateTopLeftTile(new Pixel(bwapiUnit.getPosition)) // Top left tile may change when unit type changes
       updateGridsIfNecessary(onChange = true)
     }
   }

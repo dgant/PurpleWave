@@ -60,7 +60,9 @@ class TacticWorkerScout extends Tactic {
       scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
     }
 
-    if (scoutingAbandoned) return
+    if (scoutingAbandoned) {
+      return
+    }
 
     val scoutCount = Maff.vmin(
       With.blackboard.maximumScouts(),

@@ -12,7 +12,12 @@ class ZvE4Pool extends GameplanImperative {
     get(Zerg.SpawningPool)
     once(5, Zerg.Drone)
     pump(Zerg.Zergling)
-    if (supplyUsed200 > supplyTotal200 || With.units.ours.exists(u => Zerg.Extractor(u) && u.remainingCompletionFrames < 72)) {
+
+    var cancelExtractor = have(Zerg.Extractor)
+    cancelExtractor ||= supplyUsed200 >= supplyTotal200
+    cancelExtractor ||= supplyUsed200 < supplyTotal200 - 1
+    cancelExtractor ||= With.units.ours.exists(u => Zerg.Extractor(u) && u.remainingCompletionFrames < 72)
+    if (cancelExtractor) {
       cancel(Zerg.Extractor)
     } else if (supplyUsed200 == supplyTotal200 && have(Zerg.Larva) && minerals >= 100) {
       get(Zerg.Extractor)
@@ -37,7 +42,7 @@ class ZvE4Pool extends GameplanImperative {
     if (supplyUsed400 > supplyTotal400 && units(Zerg.Larva) >= 3) {
       aggression(1e10) // Not allin() because that screws up targeting logic
     }
-    enableDroneWarfare ||= With.units.existsOurs(u => Zerg.Zergling(u) && u.friendly.exists(_.agent.shouldFight) && u.matchups.targetsInRange.nonEmpty)
+    enableDroneWarfare ||= With.units.existsOurs(u => Zerg.Zergling(u) && (u.matchups.targetsInRange.nonEmpty || u.matchups.threatsInRange.nonEmpty))
     With.blackboard.droneWarfare.set(enableDroneWarfare)
   }
 }

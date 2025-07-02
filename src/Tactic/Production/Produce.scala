@@ -14,6 +14,7 @@ class Produce extends Tactic {
   private var _queueNext: ListBuffer[Production] = ListBuffer.empty
 
   def queue: Seq[Production] = _queueNext
+  def queueNextAndLast: Seq[Production] = _queueNext.view ++ _queueLast.view
 
   def launch(): Unit = {
     _queueLast = _queueNext

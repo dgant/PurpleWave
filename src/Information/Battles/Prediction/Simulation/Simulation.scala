@@ -82,17 +82,21 @@ final class Simulation {
   @volatile var simulatingAsynchronously = false
   def runAsynchronously(): Unit = {
     if (thread == null) {
-      thread = new Thread(() => {
-        while ( ! terminateThread) {
-          if (simulatingAsynchronously) {
-            while ( ! battle.simulationComplete) {
-              step()
+      thread = new Thread(() =>
+        try {
+          while ( ! terminateThread) {
+            if (simulatingAsynchronously) {
+              while ( ! battle.simulationComplete) {
+                step()
+              }
+              simulatingAsynchronously = false
             }
-            simulatingAsynchronously = false
+            SpinWait()
           }
-          SpinWait()
-        }
-      })
+        } catch { case exception: Exception =>
+          simulatingAsynchronously = false
+          With.logger.onException(exception)
+        })
       thread.setName("CombatSimulation")
       thread.setPriority(Math.max(Thread.currentThread().getPriority - 1, Thread.MIN_PRIORITY))
       thread.start()

@@ -31,7 +31,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   private var _framesIdleConsecutive  : Int = 0
   override def update(): Unit = {
     if (frameDiscovered <  With.frame) readProxy()
-    if (frameDiscovered == With.frame) {
+    if (frameDiscovered == With.frame && ! unitClass.isTwoUnitsInOneEgg) {
       With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     }
     super.update()

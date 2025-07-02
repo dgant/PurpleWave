@@ -3,7 +3,6 @@ package Tactic.Production
 import Information.Counting.MacroCounter
 import Lifecycle.With
 import Macro.Requests.RequestBuildable
-import Mathematics.Maff
 import Planning.ResourceLocks.{LockCurrency, LockCurrencyFor, LockUnits}
 import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
@@ -27,21 +26,18 @@ class ProduceUnitMorphed(requestArg: RequestBuildable, expectedFramesArg: Int) e
   def isComplete: Boolean = morpher.exists(t => MacroCounter.countComplete(t)(classOutput) > 0)
   def hasSpent  : Boolean = morpher.exists(m => MacroCounter.countExtant(m)(classOutput) > 0)
 
-  def claimable(unit: FriendlyUnitInfo): Boolean = unit.alive && (unit.producer.forall(p => p == this || ! With.tactics.produce.queue.contains(p)))
+  def claimable(unit: FriendlyUnitInfo): Boolean = unit.alive && (unit.producer.forall(p => p == this || ! With.tactics.produce.queueNextAndLast.contains(p)))
 
   def onUpdate(): Unit = {
     // Claim an in-progress but unmanaged morphing unit, to avoid duplicating production
     // Shared somewhat with BuildBuilding
 
-    lazy val claimables = With.units.ours.filter(u =>
-      MacroCounter.countExtant(u)(classOutput) > 0
-      && MacroCounter.countComplete(u)(classOutput) == 0
-      && claimable(u))
-
-    morpher = morpher
-      .filter(claimable)
-      .filter(m => classInput(m) || MacroCounter.countExtant(m)(classOutput) > 0)
-      .orElse(Maff.minBy(claimables)(_.frameDiscovered))
+    if (morpher.exists( ! claimable(_))) {
+      morpher = None
+    }
+    if (morpher.exists(m => ! classInput(m) && MacroCounter.countExtant(m)(classOutput) == 0)) {
+      morpher = None
+    }
 
     // Shared somewhat with TrainUnit
     if (hasSpent || currencyLock.acquire()) {
@@ -53,9 +49,9 @@ class ProduceUnitMorphed(requestArg: RequestBuildable, expectedFramesArg: Int) e
         .setTrain(classOutput)
         .setCanFlee(shouldHide)
         .setCanFight( ! shouldHide))
+      morpher.foreach(_.setProducer(this))
     }
 
     // TODO: Send Hydras/Mutas somewhere smart soon before they morph based on currency projection
-    morpher.foreach(_.setProducer(this))
   }
 }

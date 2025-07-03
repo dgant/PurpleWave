@@ -122,7 +122,7 @@ trait MacroCounting {
   }
 
   def haveGasForUpgrade(upgrade: Upgrade, level: Int = 1): Boolean = {
-    gas >= upgrade.gasCost(level) || upgradeComplete(upgrade, level)
+    gas >= upgrade.gasCost(level) || upgradeComplete(upgrade, level, upgrade.upgradeFrames(level))
   }
 
   def haveGasForUnit(unitClass: UnitClass, quantity: Int = 1): Boolean = {

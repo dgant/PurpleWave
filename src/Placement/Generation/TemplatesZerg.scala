@@ -263,9 +263,6 @@ object TemplatesZerg {
 
   val tech: Seq[Template] = Seq(
     new Template().from(
-      "4xxx",
-      "xxxx"),
-    new Template().from(
       "3xx",
       "xxx"))
     .map(_.addLabels(Tech))

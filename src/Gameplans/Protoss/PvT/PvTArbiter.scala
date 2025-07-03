@@ -69,6 +69,9 @@ class PvTArbiter extends PvTOpeners {
     get(Protoss.ObserverSpeed)
     get(Protoss.ObserverVisionRange)
     get(Protoss.ArbiterEnergy)
+    if (armySupply200 < 80) {
+      armyNormalPriority()
+    }
     get(2, Protoss.RoboticsFacility)
     get(6, Protoss.Gateway)
     requireMiningBases(4)
@@ -77,6 +80,7 @@ class PvTArbiter extends PvTOpeners {
     // Four Base //
     ///////////////
 
+    armyNormalPriority()
     (1 to 3).foreach(count =>
       With.geography.ourMiningBases
         .sortBy(-_.tiles.size)

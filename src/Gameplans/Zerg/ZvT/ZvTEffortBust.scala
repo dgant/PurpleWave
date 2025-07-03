@@ -37,6 +37,8 @@ class ZvTEffortBust extends GameplanImperative {
       attack()
       if (timingAttack && enemiesHave(Terran.Vulture) && unitsComplete(Zerg.Mutalisk) == 0) {
         aggression(1e6)
+      } else if (unitsCompleteFor(20, Zerg.Mutalisk) >= 6) {
+        aggression(2.0)
       }
     }
 

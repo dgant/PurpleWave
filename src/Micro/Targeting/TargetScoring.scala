@@ -94,7 +94,8 @@ object TargetScoring {
       output += combatBonus
 
       // Protect our fliers
-      output += add(2.0, target.presumptiveTarget.exists(t => t.isEnemyOf(target) && t.flying && t.attacksAgainstGround > 0))
+      // Disabled because use of presumptiveTarget() was causing NPEs in the combat sim thread, though we did seem to have a solution for this prior to introducing presumptiveTarget
+      //output += add(2.0, target.presumptiveTarget.exists(t => t.isEnemyOf(target) && t.flying && t.attacksAgainstGround > 0))
 
       // Goose chase penalties
       output += add(2.0, ! target.canMove)

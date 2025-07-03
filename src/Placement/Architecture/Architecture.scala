@@ -183,9 +183,12 @@ class Architecture {
     }
 
     if (building.isTownHall) {
-      if ( ! zone.bases.exists(_.townHallTile == topLeft)) {
-        return ArchitecturalAssessment.IsntBasePosition
-      }
+      // Disabling to enable macro hatches.
+      // We now filter out non-base locations upstream, when choosing candidate locations, based on the PlacementQuery
+      //
+      //if ( ! zone.bases.exists(_.townHallTile == topLeft)) {
+      //  return ArchitecturalAssessment.IsntBasePosition
+      //}
       if ( ! townhallable(topLeft, Some(request))) {
         return ArchitecturalAssessment.IsntLegalForTownHall
       }

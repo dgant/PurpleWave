@@ -1,5 +1,5 @@
 package Gameplans.Zerg.ZvZ
 
-import Gameplans.All.ModalGameplan
+import Gameplans.Zerg.ZvE.ZvZ10Hatch
 
-class ZergVsZerg extends ModalGameplan()
+class ZergVsZerg extends ZvZ10Hatch

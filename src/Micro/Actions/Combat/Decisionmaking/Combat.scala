@@ -377,7 +377,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         // Maintain formation if we're not ready to attack yet
         readyToApproachTarget
         // Maintain formation until arriving at a fight or the destinatation
-        && (unit.battle.isDefined || unit.pixelDistanceEdge(targ) <= unit.sightPixels)
+        && (unit.battle.isDefined || unit.pixelDistanceEdge(targ) <= unit.sightPixels || (unit.pixelDistanceEdge(targ) <= 256 && targ.visible))
         // Maintain formation while flanking
         && ! unit.formationEngage.exists(_.flanking)
         // Maintain formation until battle breaks out

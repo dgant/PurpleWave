@@ -6,7 +6,7 @@ import Macro.Actions.Rounding.Rounding
 import Macro.Facts.MacroCounting
 import Macro.Requests._
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.PlaceLabel
+import Placement.Access.PlaceLabels.{MacroHatch, PlaceLabel}
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -171,6 +171,10 @@ trait MacroActions extends MacroCounting {
   def buildSporesAtFoyer          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SporeColony,       labels)
   def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels)
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
+
+  def fillMacroHatches(totalHatcheryCount: Int, preferredBases: Base*): Unit = {
+    get(totalHatcheryCount, Zerg.Hatchery, new PlacementQuery(Zerg.Hatchery).requireLabelYes(MacroHatch).preferBase(preferredBases: _*))
+  }
 
   def sneakyCitadel(): Unit = {
     SneakyCitadel()

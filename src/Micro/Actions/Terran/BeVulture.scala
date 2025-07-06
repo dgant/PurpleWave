@@ -50,23 +50,26 @@ object BeVulture extends Action {
   
   protected def sabotage(vulture: FriendlyUnitInfo): Unit = {
 
-    lazy val target = vulture.matchups.targetNearest
-      .orElse(vulture.matchups.threatNearest.filter(Protoss.DarkTemplar))
-      .filter(_.unitClass.triggersSpiderMines)
+    lazy val target =
+      Maff.minBy(
+        Maff.orElseFiltered(
+          vulture.matchups.targetNearest.toSeq,
+          vulture.matchups.threatNearest.toSeq,
+          vulture.matchups.threatsInPixels(32))(t =>
+            t.unitClass.triggersSpiderMines
+            && (t.subjectiveValue > vulture.subjectiveValue || t.isAny(Zerg.Egg, Zerg.LurkerEgg))
+            && ! t.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
+            && ( ! Protoss.DarkTemplar(t) || ! t.effectivelyCloaked)))(t =>
+          vulture.pixelDistanceCenter(t))
 
     if (target.isEmpty) return
     
     val t = target.get
 
     var abort = false
-    abort ||= ! t.unitClass.triggersSpiderMines
-    abort ||= t.subjectiveValue < vulture.subjectiveValue
     abort ||= vulture.confidence11 > 0.5
     abort ||= ! vulture.agent.shouldFight
-    abort ||= vulture.pixelsToGetInRange(t) > 32
-    abort ||= t.tile.toRectangle.expand(2, 2).tiles.exists(_.units.exists(u => u.isFriendly && u.isAny(IsTank, Terran.Goliath, Terran.SCV)))
-    abort &&= ! Protoss.DarkTemplar(t) || ! t.effectivelyCloaked
-    abort &&= ! t.isAny(Zerg.Egg, Zerg.LurkerEgg)
+    abort ||= t.matchups.threatDeepest.exists(IsTank)
 
     if (abort) return
 

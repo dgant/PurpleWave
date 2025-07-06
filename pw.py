@@ -13,8 +13,17 @@ def main():
   parser.add_argument('--schnail',        action='store_true', default=False, help='Step 3: Compile SCHNAIL launcher')
   parser.add_argument('--stage',          action='store_true', default=False, help='Step 4: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
   parser.add_argument('--package',        action='store_true', default=False, help='Step 5: Re-zip directories')
+  parser.add_argument('--t',              action='store_true', default=False, help='Deploy Terran (PurpleSpirit) to BASIL')
+  parser.add_argument('--p',              action='store_true', default=False, help='Deploy Protoss (PurpleSpirit) to BASIL')
+  parser.add_argument('--z',              action='store_true', default=False, help='Deploy Zerg (PurpleSpirit) to BASIL')
   
   args = parser.parse_args()
+  
+  do_basil = args.t or args.p or args.z
+  if do_basil:
+    args.stage = True
+    args.package = True
+  
   did_anything = False
   if args.all or args.jre:
     did_anything = True
@@ -31,6 +40,8 @@ def main():
   if args.all or args.package:
     did_anything = True
     package()
+  if do_basil:
+    copy_basil(args.t, args.p, args.z)
   
   if not did_anything:
     maven_build()
@@ -52,6 +63,7 @@ dir_pw            = "c:/p/pw/"
 dir_maven_target  = "c:/p/pw/target/"
 dir_scbwbots      = "c:/Users/d/AppData/Roaming/scbw/bots/"
 dir_localschnail  = "c:/Program Files (x86)/SCHNAIL Client/bots/PurpleWave/"
+dir_basiluploads  = "d:/Dropbox/StarcraftBots/"
 dir_out           = pathjoin(dir_pw,  "out/")
 dir_configs       = pathjoin(dir_pw,  "configs/")
 dir_staging       = pathjoin(dir_out, "staging/")
@@ -68,6 +80,8 @@ def path_staging(path):
   return pathjoin(dir_staging, path)
 def path_scbwbots(path):
   return pathjoin(dir_scbwbots, path)
+def path_basiluploads(path):
+  return pathjoin(dir_basiluploads, path)
   
 def log(*args, **kwargs):
   print(*args, **kwargs, flush=True)
@@ -221,7 +235,14 @@ def package():
       logf(os.remove,         path_staging(f"{package_name}.zip"))
     logf(shutil.make_archive, path_staging(package_name), 'zip', path_staging(package_name))
     logf(rmtree,              path_staging(package_name))
-  logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_staging("PurpleSpiritBASIL.zip"))
+  
+def copy_basil(t, p, z):
+  if t:
+    logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_basiluploads("PurpleSpiritBASIL.zip"))
+  if p:
+    logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_basiluploads("PurpleWaveBASIL.zip"))
+  if z:
+    logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_basiluploads("PurpleSwarmBASIL.zip"))
     
 if __name__ == "__main__":
   main()

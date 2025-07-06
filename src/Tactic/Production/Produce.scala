@@ -1,9 +1,7 @@
 package Tactic.Production
 
 import Lifecycle.With
-import ProxyBwapi.Buildable
 import Tactic.Tactics.Tactic
-import Utilities.CountMap
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -19,16 +17,13 @@ class Produce extends Tactic {
   def launch(): Unit = {
     _queueLast = _queueNext
     _queueNext = ListBuffer.empty
-    val requests      = With.macroSim.queue
-    val typesCounted  = new CountMap[Buildable]
-    val typesNeeded   = new CountMap[Buildable]
-    val matched       = new mutable.HashSet[Production]
 
     // Requeue any paid-for production, in the same order
     _queueNext ++= _queueLast.view.filter(_.hasSpent)
 
     // Retain required production or add new production
-    requests.foreach(upcomingRequest => {
+    val matched = new mutable.HashSet[Production]
+    With.macroSim.queue.foreach(upcomingRequest => {
       val (request, expectedFrames) = upcomingRequest
       val       existingNext = _queueNext.view                        .find(production => production.satisfies(request) && ! matched.contains(production))
       lazy val  existingLast = _queueLast.view.filterNot(_.hasSpent)  .find(production => production.satisfies(request) && ! matched.contains(production))

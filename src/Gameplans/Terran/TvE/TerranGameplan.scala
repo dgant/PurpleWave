@@ -193,7 +193,7 @@ abstract class TerranGameplan extends GameplanImperative {
     if (have(Terran.MachineShop)) {
       pump(Terran.SiegeTankUnsieged, 1)
     } else {
-      buildBunkersAtFoyer(1)
+      buildBunkersAtFoyer(1, PlaceLabels.DefendEntrance)
       if (With.frame < Minutes(6)()) {
         pump(Terran.Marine, 4)
       }

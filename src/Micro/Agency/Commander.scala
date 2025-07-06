@@ -111,6 +111,7 @@ object Commander {
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
 
     // We shouldn't target interceptors anymore, but in case we do:
+
     if (Protoss.Interceptor(target)) {
       attackMove(unit, attackFrom); return
     }
@@ -121,7 +122,12 @@ object Commander {
     }
 
     if (Zerg.Lurker(unit) && ! unit.burrowed) {
-      move(unit, attackFrom); return
+      if (unit.inRangeToAttack(target)) {
+        burrow(unit)
+      } else {
+        move(unit, attackFrom)
+      }
+      return
     }
 
     // If we should be attack-commanding

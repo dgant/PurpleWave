@@ -1,6 +1,5 @@
 package Gameplans.Zerg.ZvE
 
-import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
@@ -8,7 +7,7 @@ import ProxyBwapi.Races.Zerg
 import Utilities.Time.{GameTime, Minutes, Seconds}
 import Utilities.{?, SwapIf}
 
-class ZvZ10Hatch extends GameplanImperative {
+class ZvZ10Hatch extends ZergGameplan {
 
   override def executeBuild(): Unit = {
     once(10, Zerg.Drone)

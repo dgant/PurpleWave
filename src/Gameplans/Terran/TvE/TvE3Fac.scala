@@ -36,6 +36,8 @@ class TvE3Fac extends TerranGameplan {
     once(Terran.Factory)
     once(18, Terran.SCV)
     once(2, Terran.Factory)
+
+    pump(Terran.Comsat)
   }
 
   override def executeMain(): Unit = {
@@ -44,6 +46,11 @@ class TvE3Fac extends TerranGameplan {
     }
     if (haveComplete(Terran.Factory)) {
       With.blackboard.floatableBuildings.set(Vector(Terran.Barracks))
+    }
+    if (enemyHasTech(Terran.WraithCloak)) {
+      requireBases(2)
+      get(Terran.Academy)
+      buildTurretsAtOpenings(1)
     }
 
     gasLimitCeiling(300)
@@ -57,7 +64,6 @@ class TvE3Fac extends TerranGameplan {
 
     if (enemyLurkersLikely || enemyDarkTemplarLikely || enemyHasTech(Terran.WraithCloak)) {
       get(Terran.Academy)
-      get(Terran.Comsat)
     }
 
     if (enemyIsZerg) {

@@ -69,11 +69,13 @@ class TacticWorkerScout extends Tactic {
       With.units.countOurs(IsWorker) - 3,
       basesToScout.size)
     if (lock.units.size > scoutCount) { lock.release() }
+
     scouts = lock
       .setCounter(CountUpTo(scoutCount))
       .setPreference(new PreferScout(basesToScout.map(_.townHallArea.center): _*))
       .acquire().toVector // The copy is important since the source is mutable
     if (scouts.isEmpty) return
+
     val enemyHasCombatUnits = With.units.enemy.exists(u => u.canAttack && ! IsWorker(u))
     val orderedScouts       = scouts.sortBy(s => basesToScout.view.map(_.townHallTile).map(s.pixelDistanceTravelling).min)
     val basesToScoutQueue   = new UnorderedBuffer[Base]()

@@ -196,78 +196,26 @@ object TemplatesTerran {
       "-xxxxxx-",
       "--------"))
 
-  val supply: Seq[Template] = Seq(
-    new Template()
-      .from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "-----",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "--------",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxYxx-",
-      "--------"),
-    new Template().from(
-      "--------",
-      "-YxxYxx-",
-      "-xxxxxx-",
-      "-YxxYxx-",
-      "-xxxYxx-",
-      "--------"),
-    new Template().from(
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-Yxx-",
-      "-xxx-",
-      "-----"),
-    new Template().from(
-      "Yxx",
-      "xxx",
-      "Yxx",
-      "xxx",
-      "---"))
-    .map(_.addLabels(Tech))
+  val supplyStrings: Seq[Seq[String]] =
+    (10 to 1 by -1).flatMap(x =>
+      (2 to 1 by -1).flatMap(y =>
+        Seq(
+          // Horizontal
+          Seq("---" * x + "--")
+          ++ (0 until y).flatMap(yy =>
+            Seq(
+              "-" + "Yxx" * x + "-",
+              "-" + "xxx" * x + "-"))
+          :+ "---" * x + "--",
+          // Vertical
+          Seq("---" * y + "--")
+          ++ (0 until x).flatMap(xx =>
+            Seq(
+              "-" + "Yxx" * y + "-",
+              "-" + "xxx" * y + "-"))
+          :+ "---" * y + "--")))
+
+  val supply: Seq[Template] = supplyStrings.distinct.map(new Template().from(_: _*)).map(_.addLabels(Tech))
 
   val bunkerTurret: Seq[Template] = Seq(
     new Template()

@@ -1,14 +1,12 @@
 package Gameplans.Zerg.ZvP
 
-import Gameplans.All.GameplanImperative
+import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
-import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.SwapIf
-import Utilities.Time.Seconds
-import Utilities.UnitFilters.IsHatchlike
+import Utilities.UnitFilters.IsWarrior
 
-class ZvP3HatchBust extends GameplanImperative {
+class ZvP3HatchBust extends ZergGameplan {
 
   override def executeBuild(): Unit = {
     once(9, Zerg.Drone)
@@ -17,52 +15,32 @@ class ZvP3HatchBust extends GameplanImperative {
     requireMiningBases(2)
     get(Zerg.SpawningPool)
     once(15, Zerg.Drone)
-    //requireMiningBases(3)
-    get(1, Zerg.Hatchery, PlaceLabels.MacroHatch)
+    requireMiningBases(3)
+    once(8, Zerg.Zergling)
     get(Zerg.Extractor, new PlacementQuery(Zerg.Extractor).requireBase(With.geography.ourMain))
-    once(6, Zerg.Zergling)
     once(3, Zerg.Overlord)
     get(Zerg.ZerglingSpeed)
-    scoutOn(Zerg.Hatchery, 3)
+
+    if ( ! foundEnemyBase) {
+      scoutOn(Zerg.Hatchery, 3)
+    }
   }
 
   override def executeMain(): Unit = {
-    if (upgradeComplete(Zerg.HydraliskSpeed) || unitsComplete(Zerg.Hydralisk) < 3 || ! enemyHasUpgrade(Protoss.DragoonRange)) {
-      attack()
+    attack()
+    once(18, Zerg.Zergling)
+    if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
+      gasWorkerCeiling(units(Zerg.Drone) / 7)
     }
-
-    if ( ! haveGasForUpgrade(Zerg.ZerglingSpeed)) {
-      gasLimitCeiling(100)
-    } else if ( ! upgradeComplete(Zerg.ZerglingSpeed)) {
-      gasLimitCeiling(0)
-    } else if ( ! have(Zerg.HydraliskDen)) {
-      gasLimitCeiling(50)
-    } else if ( ! haveGasForUpgrade(Zerg.HydraliskRange)) {
-      gasLimitCeiling(250)
-    } else {
-      gasLimitCeiling(125)
-    }
-
-    once(24, Zerg.Zergling)
-    if ( ! upgradeComplete(Zerg.ZerglingSpeed, 1, Zerg.Zergling.buildFrames + Seconds(15)())) {
-      pump(Zerg.Zergling)
-    }
-    get(Zerg.HydraliskDen)
-    get(Zerg.HydraliskSpeed)
-    get(Zerg.HydraliskRange)
-    get(18, Zerg.Drone)
-
-    if (upgradeComplete(Zerg.ZerglingAttackSpeed, 1, Zerg.Zergling.buildFrames * 2) || ! upgradeComplete(Zerg.HydraliskSpeed, 1, Zerg.Hydralisk.buildFrames)) {
-      pump(Zerg.Zergling)
-    }
-    once(9, Zerg.Hydralisk)
-    SwapIf(
-      safeDefending || With.scouting.enemyProximity < 0.4,
-      pump(Zerg.Hydralisk),
-      pump(Zerg.Drone, 7 * unitsComplete(IsHatchlike)))
-
-    pumpGasPumps(units(Zerg.Drone) / 7)
+    get(Zerg.Lair, Zerg.Spire, Zerg.QueensNest, Zerg.Hive)
+    get(Zerg.ZerglingAttackSpeed)
+    pump(Zerg.Scourge, 2 + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
+    pump(Zerg.Zergling, 8 + (4 * enemies(IsWarrior) * (0.5 + enemyProximity)).toInt)
+    pump(Zerg.Drone, miningBases * 5)
     pump(Zerg.Zergling)
-    get(6, Zerg.Hatchery)
+    get(2, Zerg.EvolutionChamber)
+    upgradeContinuously(Zerg.GroundArmor)
+    upgradeContinuously(Zerg.GroundMeleeDamage)
+    requireMiningBases(8)
   }
 }

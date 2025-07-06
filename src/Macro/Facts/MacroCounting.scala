@@ -11,6 +11,7 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.Upgrades.Upgrade
 import Strategery.StarCraftMap
 import Strategery.Strategies.Strategy
+import Utilities.?
 import Utilities.Time.FrameCount
 import Utilities.UnitFilters._
 import bwapi.Race
@@ -74,7 +75,10 @@ trait MacroCounting {
 
   def units(matchers: UnitFilter*): Int = (
     With.units.countOurs(IsAny(matchers: _*)) +
-      (if (With.self.isZerg) With.units.ours.map(u => if (matchers.contains(u.buildType)) u.buildType.copiesProduced else 0).sum else 0)
+      ?(
+        With.self.isZerg,
+        With.units.ours.map(u => ?(matchers.contains(u.buildType), u.buildType.copiesProduced, 0)).sum,
+        0)
   )
 
   def unitsComplete(matchers: UnitFilter*): Int = {
@@ -166,6 +170,9 @@ trait MacroCounting {
     With.tactics.attackSquad.units.nonEmpty
   }
 
+  def enemyProximity  : Double = With.scouting.enemyProximity
+  def ourProximity    : Double = With.scouting.ourProximity
+
   def gasCapsUntouched: Boolean = (
     ! With.blackboard.gasWorkerCeiling.isSet
     && ! With.blackboard.gasWorkerFloor.isSet
@@ -189,6 +196,10 @@ trait MacroCounting {
   def enemiesCompleteFor(frames: Int, matchers: UnitFilter*): Int = With.units.countEnemy(IsAll(IsCompleteFor(frames), IsAny(matchers: _*)))
 
   def enemiesHaveComplete(matchers: UnitFilter*): Boolean = matchers.exists(m => With.units.existsEnemy(IsAll(IsComplete, m)))
+
+  def enemiesEver(matchers: UnitFilter*): Boolean = {
+    matchers.exists(With.units.existsEverEnemy(_))
+  }
 
   def enemiesShown(unitClasses: UnitClass*): Int = unitClasses.view.map(With.unitsShown.allEnemies(_)).sum
 

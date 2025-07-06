@@ -1,5 +1,5 @@
 package Gameplans.Zerg.ZvR
 
-import Gameplans.All.ModalGameplan
+import Gameplans.Zerg.ZvE.ZvE4Pool
 
-class ZergVsRandom extends ModalGameplan()
+class ZergVsRandom extends ZvE4Pool

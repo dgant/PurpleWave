@@ -4,11 +4,9 @@
 ## About
 [PurpleWave](https://github.com/dgant/PurpleWave) is a *StarCraft: Brood War* AI written in Scala. It can play all three races and a large variety of professional-style strategies.
 
-[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleWave)](https://www.basil-ladder.net/ranking.html) as Protoss
-
-[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleSpirit)](https://www.basil-ladder.net/ranking.html) offracing as Terran
-
-[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleSwarm)](https://www.basil-ladder.net/ranking.html) offracing as Zerg
+[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleWave)](https://www.basil-ladder.net/ranking.html) as Protoss \
+[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleSpirit)](https://www.basil-ladder.net/ranking.html) offracing as Terran \
+[![BASIL](https://img.shields.io/endpoint?url=https%3A//basil-badge-production.up.railway.app/badge/PurpleSwarm)](https://www.basil-ladder.net/ranking.html) offracing as Zerg \
 
 PurpleWave has won:
  * :trophy: 1st Place in the [2019-20 SSCAIT](https://sscaitournament.com/index.php?action=2019)

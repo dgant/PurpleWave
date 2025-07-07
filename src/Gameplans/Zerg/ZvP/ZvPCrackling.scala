@@ -2,11 +2,12 @@ package Gameplans.Zerg.ZvP
 
 import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
+import Mathematics.Maff
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.UnitFilters.IsWarrior
 
-class ZvP3HatchBust extends ZergGameplan {
+class ZvPCrackling extends ZergGameplan {
 
   override def executeBuild(): Unit = {
     once(9, Zerg.Drone)
@@ -32,15 +33,21 @@ class ZvP3HatchBust extends ZergGameplan {
     if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
       gasWorkerCeiling(units(Zerg.Drone) / 7)
     }
-    get(Zerg.Lair, Zerg.Spire, Zerg.QueensNest, Zerg.Hive)
+    get(Zerg.Lair, Zerg.QueensNest)
+    if (enemiesHaveComplete(Protoss.CyberneticsCore, Protoss.Stargate, Protoss.Corsair, Protoss.Scout)) {
+      get(Zerg.Spire)
+    }
+    get(Zerg.Hive)
     get(Zerg.ZerglingAttackSpeed)
-    pump(Zerg.Scourge, 2 + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
-    pump(Zerg.Zergling, 8 + (4 * enemies(IsWarrior) * (0.5 + enemyProximity)).toInt)
-    pump(Zerg.Drone, miningBases * 5)
+    pump(Zerg.Scourge, 2 * Maff.fromBoolean(enemiesShown(Protoss.Corsair) > 0) + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
+    pump(Zerg.Zergling, 4 + (4 * enemies(IsWarrior) * (0.5 + 2 * enemyProximity)).toInt)
+    pump(Zerg.Drone, Math.min(miningBases * 8, 30))
     pump(Zerg.Zergling)
+    requireMiningBases(5)
     get(2, Zerg.EvolutionChamber)
     upgradeContinuously(Zerg.GroundArmor)
     upgradeContinuously(Zerg.GroundMeleeDamage)
-    requireMiningBases(8)
+    requireMiningBases(6)
+    fillMacroHatches(12)
   }
 }

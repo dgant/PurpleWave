@@ -301,7 +301,7 @@ class SquadDefendBase(base: Base) extends Squad {
             Commander.hold(unit)
             return
           } else if (unit.seeminglyStuck) {
-            to = plugEdge().get._1.centroid.center.walkablePixel
+            to = plugEdge().map(_._1.centroid.center.walkablePixel).getOrElse(pixel)
           }
           unit.agent.redoubt.set(to)
           unit.agent.decision.set(to)

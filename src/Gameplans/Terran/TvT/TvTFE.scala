@@ -44,6 +44,7 @@ class TvTFE extends TerranGameplan {
     get(2, Terran.Factory)
     get(2, Terran.MachineShop)
     get(Terran.SiegeMode)
+    once(3, Terran.SiegeTankUnsieged)
 
     if (enemyHasShown(Terran.Wraith, Terran.Dropship, Terran.Valkyrie, Terran.Battlecruiser)) {
       get(Terran.GoliathAirRange)

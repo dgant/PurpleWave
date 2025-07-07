@@ -173,7 +173,18 @@ trait MacroActions extends MacroCounting {
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
 
   def fillMacroHatches(totalHatcheryCount: Int, preferredBases: Base*): Unit = {
-    get(totalHatcheryCount, Zerg.Hatchery, new PlacementQuery(Zerg.Hatchery).requireLabelYes(MacroHatch).preferBase(preferredBases: _*))
+    get(
+      totalHatcheryCount,
+      Zerg.Hatchery,
+      new PlacementQuery(Zerg.Hatchery)
+        .requireLabelYes(MacroHatch)
+        .preferBase(
+          Maff.orElse(
+            preferredBases,
+            With.geography.ourMiningBases,
+            With.geography.ourBases,
+            With.geography.ourMetros.flatMap(_.bases),
+            With.geography.ourBasesAndSettlements).toSeq: _*))
   }
 
   def sneakyCitadel(): Unit = {

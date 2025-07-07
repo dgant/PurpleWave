@@ -37,7 +37,7 @@ class ZvE4Pool extends GameplanImperative {
     if (With.self.gatheredMinerals >= 382) {
       scout()
     }
-    if (supplyUsed400 > supplyTotal400 && units(Zerg.Larva) >= 3) {
+    if (supplyUsed400 >= 33 && units(Zerg.Larva) >= 3) {
       aggression(1e10) // Not allin() because that screws up targeting logic
     }
     enableDroneWarfare ||= With.units.existsOurs(u => Zerg.Zergling(u) && (u.matchups.targetsInRange.nonEmpty || u.matchups.threatsInRange.nonEmpty))

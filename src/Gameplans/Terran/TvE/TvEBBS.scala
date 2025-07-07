@@ -1,13 +1,12 @@
 package Gameplans.Terran.TvE
 
-import Lifecycle.With
 import Macro.Actions.Friendly
-import Placement.Access.PlaceLabels.DefendHall
-import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran}
-import Utilities.UnitFilters.{IsTank, IsWarrior}
+import Utilities.UnitFilters.IsTank
 
 class TvEBBS extends TerranGameplan {
+
 
   override def executeBuild(): Unit = {
     emergencyReactions()
@@ -21,13 +20,7 @@ class TvEBBS extends TerranGameplan {
     once(4, Terran.Marine)
     once(12, Terran.SCV)
 
-    With.scouting.enemyNatural
-      .filter(_.townHall.isDefined)
-      .foreach(natural => {
-        if (enemies(IsWarrior, Protoss.PhotonCannon) == 0) {
-          get(1, Terran.Bunker, new PlacementQuery(Terran.Bunker).requireBase(natural).preferLabelYes(DefendHall))
-        }
-      })
+    BunkerRush()
 
     once(2, Terran.SupplyDepot)
     once(8, Terran.Marine)

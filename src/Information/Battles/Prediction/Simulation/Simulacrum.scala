@@ -49,9 +49,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var injury              : Double = _
   // Simulacrum properties
   var simulation          : Simulation = _
-  var behavior            : SimulacrumBehavior = _
-  var target              : Option[Simulacrum] = _
-  var threat              : Option[Simulacrum] = _
+  var behavior            : SimulacrumBehavior = BehaviorInitial
+  var target              : Option[Simulacrum] = None
+  var threat              : Option[Simulacrum] = None
   val targets             : UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
   var gridTile            : SimulationGridTile = _
   var measureHealth       : Boolean = _

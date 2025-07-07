@@ -3,7 +3,7 @@ package Strategery.Strategies.Terran
 import Gameplans.Terran.TvE.{TvE3Fac, TvEBBS, TvZSparks}
 import Gameplans.Terran.TvP.TvP2Fac
 import Gameplans.Terran.TvT.{TvT1Port, TvT3FacVult, TvTFE}
-import Gameplans.Terran.TvZ.TvZ8RaxSK
+import Gameplans.Terran.TvZ.{TvZ111, TvZ8RaxSK}
 import Planning.Plans.Plan
 import Strategery.Strategies._
 import bwapi.Race
@@ -22,6 +22,7 @@ object TvTFE        extends TvTStrategy { override def gameplan: Option[Plan] = 
 object TvP2Fac      extends TvPStrategy { override def gameplan: Option[Plan] = Some(new TvP2Fac)     }
 object TvZ8RaxSK    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZ8RaxSK)   }
 object TvZSparks    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZSparks)   }
+object TvZ111       extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZ111)      }
 
 object TerranChoices {
 
@@ -38,7 +39,7 @@ object TerranChoices {
   )
   
   val tvzOpeners: Vector[Strategy] = Vector(
-    TvZ8RaxSK, TvZSparks
+    TvZ8RaxSK, TvZSparks, TvZ111
   )
 
   val all: Vector[Strategy] = (tvr ++ tvtOpeners ++ tvpOpeners ++ tvzOpeners).distinct

@@ -274,7 +274,6 @@ class SquadDefendBase(base: Base) extends Squad {
       val pixel     = pixels.minBy(p => dts.map(_.pixelDistanceTravelling(p)).min)
       units.foreach(_.intend(this).setAction(new HugAt(pixel)))
     }
-
     shouldHug
   }
 

@@ -1,8 +1,9 @@
 package Gameplans.Terran.TvZ
 
-import Gameplans.Terran.TvE.TerranGameplan
+import Gameplans.Terran.TvE.{BunkerRush, TerranGameplan}
 import Lifecycle.With
 import Macro.Actions.{Enemy, Friendly}
+import Mathematics.Maff
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Terran, Zerg}
 import Utilities.Time.Minutes
@@ -25,10 +26,21 @@ class TvZ8RaxSK extends TerranGameplan {
   override def doWorkers(): Unit = {
     if (enemyLurkersLikely) {
       get(Terran.Academy)
-      pump(Terran.Comsat)
     }
+    pump(Terran.Comsat)
     pumpWorkers(oversaturate = true, 38)
     pumpWorkers(oversaturate = false)
+  }
+
+  def directToVessels(): Unit = {
+    get(Terran.Factory, Terran.Starport)
+    pumpGasPumps()
+    get(2, Terran.Starport)
+    get(Terran.ScienceFacility)
+    get(2, Terran.ControlTower)
+    once(2, Terran.ScienceVessel)
+    get(Terran.Irradiate)
+    once(4, Terran.ScienceVessel)
   }
 
   override def executeMain(): Unit = {
@@ -36,10 +48,13 @@ class TvZ8RaxSK extends TerranGameplan {
     requireMiningBases(armySupply200 / 40)
     With.blackboard.floatableBuildings.set(Vector(Terran.Factory))
 
+    if (units(Terran.Barracks) >= 3 && safeDefending) {
+      directToVessels()
+    }
+
     once(2, Terran.Medic)
     once(2, Terran.Firebat)
     once(1, Terran.Wraith)
-    once(2, Terran.ScienceVessel)
     SwapIf(
       safeDefending, {
         pump(Terran.Wraith, 1)
@@ -56,8 +71,9 @@ class TvZ8RaxSK extends TerranGameplan {
         get(Terran.ScienceVesselEnergy)
       })
 
+    BunkerRush()
     if (With.fingerprints.ninePool() || With.fingerprints.overpool() || miningBases > 1) {
-      buildBunkersAtNatural(1, PlaceLabels.DefendEntrance)
+      buildBunkersAtFoyer(1, PlaceLabels.DefendEntrance)
     }
     if (safeDefending && ! have(Terran.Refinery)) {
       requireMiningBases(2)
@@ -71,18 +87,12 @@ class TvZ8RaxSK extends TerranGameplan {
     get(Terran.Stim)
     get(Terran.EngineeringBay)
     requireMiningBases(2)
-    pump(Terran.Comsat, unitsComplete(Terran.CommandCenter))
     get(Terran.MarineRange)
     buildTurretsAtFoyer(?(enemyLurkersLikely, 2, 1), PlaceLabels.DefendEntrance)
     buildTurretsAtBases(?(enemyMutalisksLikely, 4, ?(enemyLurkersLikely, 2, 3)))
-    get(4, Terran.Barracks)
-    get(Terran.Factory)
-    get(Terran.Starport)
-    pumpGasPumps()
-    get(Terran.ScienceFacility)
+    get(3, Terran.Barracks)
+    directToVessels()
     get(2, Terran.EngineeringBay)
-    get(2, Terran.Starport)
-    get(2, Terran.ControlTower)
     get(7, Terran.Barracks)
     requireMiningBases(3)
 
@@ -104,11 +114,11 @@ class TvZ8RaxSK extends TerranGameplan {
     if (safePushing
       && Terran.Stim()
       && unitsComplete(IsWarrior) >= 12
-      && ! enemyHasShown(Zerg.Mutalisk)
-      && ! enemyHasShown(Zerg.Lurker)
-      && ! enemyHasUpgrade(Zerg.ZerglingSpeed)
-      && (enemiesComplete(Zerg.SunkenColony) < 3 || enemyBases > 2)
-      && With.frame < Minutes(8)()) {
+        + 4 * Maff.fromBoolean(enemyHasUpgrade(Zerg.ZerglingSpeed))
+        + 6 * Maff.fromBoolean(enemyHasShown(Zerg.Mutalisk))
+        + 6 * Maff.fromBoolean(enemyHasShown(Zerg.Lurker, Zerg.LurkerEgg))
+      && (enemiesComplete(Zerg.SunkenColony) < 4 || enemyBases > 2)
+      && With.frame < Minutes(10)()) {
       attack()
     }
 

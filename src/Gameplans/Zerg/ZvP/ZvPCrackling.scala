@@ -30,16 +30,25 @@ class ZvPCrackling extends ZergGameplan {
   }
 
   override def executeMain(): Unit = {
+    val airThreat = enemiesHaveComplete(Protoss.Stargate, Protoss.Corsair, Protoss.Scout)
+
     attack()
     once(18, Zerg.Zergling)
     if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
       gasWorkerCeiling(units(Zerg.Drone) / 7)
     }
-    get(Zerg.Lair, Zerg.QueensNest)
-    if (enemiesHaveComplete(Protoss.CyberneticsCore, Protoss.Stargate, Protoss.Corsair, Protoss.Scout)) {
+    if ( ! upgradeStarted(Zerg.ZerglingAttackSpeed) || airThreat) {
+      get(Zerg.Lair)
+    }
+    if ( ! upgradeStarted(Zerg.ZerglingAttackSpeed)) {
+      get(Zerg.QueensNest)
+    }
+    if (airThreat) {
       get(Zerg.Spire)
     }
-    get(Zerg.Hive)
+    if ( ! upgradeStarted(Zerg.ZerglingAttackSpeed)) {
+      get(Zerg.Hive)
+    }
     get(Zerg.ZerglingAttackSpeed)
     pump(Zerg.Scourge, 2 * Maff.fromBoolean(enemiesShown(Protoss.Corsair) > 0) + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
     pump(Zerg.Zergling, 4 + (4 * enemies(IsWarrior) * (0.5 + 2 * enemyProximity)).toInt)

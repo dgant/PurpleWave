@@ -28,7 +28,7 @@ class ZvP10HatchSpeed extends ZergGameplan {
     once(Zerg.ZerglingSpeed)
     once(12, Zerg.Zergling)
     once(3, Zerg.Overlord)
-    once(26, Zerg.Zergling)
+    once(26, Zerg.Zergling) // 18 done as speed finishes, 8 following shortly thereafter
     get(Zerg.Lair, Zerg.Spire)
   }
 

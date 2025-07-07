@@ -2,7 +2,7 @@ package Strategery.Strategies.Terran
 
 import Gameplans.Terran.TvE.{TvE3Fac, TvEBBS, TvZSparks}
 import Gameplans.Terran.TvP.TvP2Fac
-import Gameplans.Terran.TvT.{TvT1Port, TvT3FacVult}
+import Gameplans.Terran.TvT.{TvT1Port, TvT3FacVult, TvTFE}
 import Gameplans.Terran.TvZ.TvZ8RaxSK
 import Planning.Plans.Plan
 import Strategery.Strategies._
@@ -18,6 +18,7 @@ object TvEBBS       extends TvEStrategy { override def gameplan: Option[Plan] = 
 object TvE3Fac      extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvE3Fac)     }
 object TvT1Port     extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT1Port)    }
 object TvT3FacVult  extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT3FacVult) }
+object TvTFE        extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvTFE)       }
 object TvP2Fac      extends TvPStrategy { override def gameplan: Option[Plan] = Some(new TvP2Fac)     }
 object TvZ8RaxSK    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZ8RaxSK)   }
 object TvZSparks    extends TvZStrategy { override def gameplan: Option[Plan] = Some(new TvZSparks)   }
@@ -29,7 +30,7 @@ object TerranChoices {
   )
   
   val tvtOpeners: Vector[Strategy] = Vector(
-    TvT1Port, TvT3FacVult
+    TvT1Port, TvT3FacVult, TvTFE
   )
   
   val tvpOpeners: Vector[Strategy] = Vector(

@@ -3,6 +3,7 @@ package Gameplans.Zerg.ZvZ
 import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
 import Mathematics.Maff
+import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.Zerg
 import Utilities.UnitFilters.IsHatchlike
 
@@ -29,7 +30,7 @@ class ZvZ9Pool extends ZergGameplan {
     }
     once(12, Zerg.Zergling)
     once(6, Zerg.Mutalisk)
-    if (enemyProximity < 0.5) {
+    if (enemyProximity < 0.5 && unitsComplete(Zerg.Spire) >  0) {
       pump(Zerg.Drone,
         Math.max(
           8 * miningBases,
@@ -48,10 +49,15 @@ class ZvZ9Pool extends ZergGameplan {
     pump(Zerg.Scourge, 2 * enemies(Zerg.Mutalisk))
     pump(Zerg.Zergling)
     pumpGasPumps((units(Zerg.Drone) + 5) / 8)
-    requireMiningBases(3)
-    fillMacroHatches(6)
+    if ( ! safeDefending && miningBases == 1 && ! haveComplete(Zerg.Spire) && enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.twoHatchMain, With.fingerprints.fourPool)) {
+      buildSunkensAtMain(1, PlaceLabels.DefendHall)
+    }
+    if (haveComplete(Zerg.Spire)) {
+      requireMiningBases(3)
+      fillMacroHatches(6)
+    }
 
-    if (safePushing) {
+    if (safePushing && ( ! With.fingerprints.fourPool() || unitsComplete(Zerg.Mutalisk) >= 4)) {
       attack()
     }
     harass()

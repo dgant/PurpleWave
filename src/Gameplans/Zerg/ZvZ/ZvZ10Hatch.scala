@@ -43,8 +43,8 @@ class ZvZ10Hatch extends ZergGameplan {
     once(Zerg.ZerglingSpeed)
     once(12, Zerg.Zergling)
     once(3, Zerg.Overlord)
-    once(28, Zerg.Zergling)
-    get(Zerg.Lair)
+    once(26, Zerg.Zergling)
+    get(Zerg.Lair, Zerg.Spire)
   }
 
   override def executeMain(): Unit = {
@@ -72,7 +72,6 @@ class ZvZ10Hatch extends ZergGameplan {
     pump(Zerg.SporeColony)
     pump(Zerg.Drone, 6)
 
-    once(12, Zerg.Zergling)
     pump(Zerg.Scourge, Math.min(2 * units(Zerg.Mutalisk), 2 * enemies(Zerg.Mutalisk)))
     if (units(Zerg.Mutalisk) >= 6) {
       SwapIf(
@@ -93,8 +92,6 @@ class ZvZ10Hatch extends ZergGameplan {
       Zerg.Drone)
     pumpGasPumps((units(Zerg.Drone) + 2) / 8)
     pump(Zerg.Zergling)
-    get(Zerg.Lair)
-    get(Zerg.Spire)
     requireMiningBases(3)
     get(9, Zerg.Hatchery, PlaceLabels.MacroHatch)
   }

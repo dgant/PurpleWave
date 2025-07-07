@@ -9,6 +9,8 @@ import ProxyBwapi.Races.Zerg
 class ZvTOneBaseLurker extends ZergGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Zerg.Drone)
     get(2, Zerg.Overlord)
     once(11, Zerg.Drone)

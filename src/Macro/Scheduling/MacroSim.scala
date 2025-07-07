@@ -88,9 +88,11 @@ final class MacroSim {
       if (u.morphing || ! u.complete) {
         step.request = Some(RequestUnit(finalClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
         event.dUnitComplete       = finalClass
-        event.dUnitCompleteN      = 1
+        event.dUnitCompleteN      = finalClass.copiesProduced
         event.dUnitCompleteASAP   = finalClass
-        event.dUnitCompleteASAPN  = 1
+        event.dUnitCompleteASAPN  = finalClass.copiesProduced
+        event.dProducer1          = finalClass
+        event.dProducer1N         = finalClass.copiesProduced
         if (u.isNone(Zerg.Lair, Zerg.Hive)) {
           event.dSupplyAvailable += finalClass.supplyProvided
         }
@@ -191,7 +193,7 @@ final class MacroSim {
     // Units:
     // - (Default) If there is no placement query, use our state count
     // - (Special) If there is a  placement query, count our complete units which the tile filter accepts
-    val unitDiff = request.unit
+    var unitDiff = request.unit
       .map(u =>
         request.quantity -
           ?(request.placement.isEmpty,
@@ -203,6 +205,9 @@ final class MacroSim {
               .map(_.tileTopLeft)
               .count(request.placement.get.acceptExisting)))
       .getOrElse(0)
+    if (request.unit.exists(_.isTwoUnitsInOneEgg)) {
+      unitDiff = (unitDiff + 1) / 2
+    }
     val upgradeDiff = request.upgrade.map(u => request.quantity - steps.last.state.upgrades(u)).getOrElse(0)
     val techDiff    = Maff.fromBoolean(request.tech.exists(t => ! steps.last.state.techs.contains(t)))
     val diff        = Maff.vmax(unitDiff, upgradeDiff, techDiff)

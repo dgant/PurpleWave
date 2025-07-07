@@ -31,6 +31,7 @@ abstract class ZergGameplan extends GameplanImperative {
     if (With.frame > Minutes(5)()) return
     once(9, Zerg.Drone)
     get(Zerg.SpawningPool)
+    once(10, Zerg.Drone)
     once(2, Zerg.Overlord)
     once(11, Zerg.Drone)
     once(10, Zerg.Zergling)
@@ -65,6 +66,7 @@ abstract class ZergGameplan extends GameplanImperative {
     if (With.frame > Minutes(7)()) return
     once(9, Zerg.Drone)
     get(Zerg.SpawningPool)
+    once(10, Zerg.Drone)
     once(2, Zerg.Overlord)
     once(11, Zerg.Drone)
     once(12, Zerg.Zergling)

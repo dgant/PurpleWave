@@ -10,6 +10,8 @@ import Utilities.UnitFilters.IsWarrior
 class ZvPCrackling extends ZergGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Zerg.Drone)
     once(2, Zerg.Overlord)
     once(12, Zerg.Drone)

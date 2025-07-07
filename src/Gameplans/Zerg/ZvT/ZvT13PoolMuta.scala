@@ -7,6 +7,8 @@ import ProxyBwapi.Races.{Terran, Zerg}
 class ZvT13PoolMuta extends ZergGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(9, Zerg.Drone)
     get(2, Zerg.Overlord)
     once(13, Zerg.Drone)

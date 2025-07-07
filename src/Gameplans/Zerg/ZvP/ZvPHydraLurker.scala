@@ -15,6 +15,8 @@ class ZvPHydraLurker extends ZergGameplan {
   def isTwoGatey: Boolean = With.fingerprints.proxyGateway() || With.fingerprints.twoGate() || enemies(Protoss.Gateway) > 2 || enemiesShown(Protoss.Zealot) >= 3
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     scoutAt(11)
 
     once(9, Zerg.Drone)

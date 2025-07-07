@@ -1,8 +1,9 @@
 package Strategery.Strategies.Zerg
 
-import Gameplans.Zerg.ZvE.{ZvE4Pool, ZvZ10Hatch}
+import Gameplans.Zerg.ZvE.ZvE4Pool
 import Gameplans.Zerg.ZvP.{ZvPCrackling, ZvPHydraLurker}
 import Gameplans.Zerg.ZvT.{ZvT13PoolMuta, ZvTEffortBust, ZvTOneBaseLurker}
+import Gameplans.Zerg.ZvZ.{ZvZ10Hatch, ZvZ9Pool}
 import Planning.Plans.Plan
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -19,6 +20,7 @@ object ZvT13PoolMuta      extends ZvTStrategy { override def gameplan: Option[Pl
 object ZvPCrackling       extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPCrackling) }
 object ZvPHydraLurker     extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPHydraLurker) }
 object ZvZ10Hatch         extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ10Hatch) }
+object ZvZ9Pool           extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ9Pool) }
 
 object ZergChoices {
 
@@ -38,7 +40,8 @@ object ZergChoices {
   )
 
   val zvz: Vector[Strategy] = Vector(
-    ZvZ10Hatch
+    ZvZ10Hatch,
+    ZvZ9Pool
   )
   
   val all: Vector[Strategy] = (zvr ++ zvt ++ zvp ++ zvz).distinct

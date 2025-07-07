@@ -435,11 +435,14 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val gasValue     : Int = if (this == Zerg.Larva) 0                                       else gasPrice     + buildUnitsSpent.map(_.gasValue).sum
   lazy val copiesProduced: Int = ?(isTwoUnitsInOneEgg, 2, 1)
   lazy val subjectiveValue: Double =
-    if (isSpell) 0 else if (this == Zerg.LurkerEgg) Zerg.Lurker.subjectiveValue else if (this == Zerg.Cocoon) Zerg.Guardian.subjectiveValue else (
+    if (isSpell) 0
+    else if (this == Zerg.LurkerEgg)   Zerg.Lurker.subjectiveValue
+    else if (this == Zerg.Cocoon)     Zerg.Guardian.subjectiveValue
+    else (
       (mineralValue
           + 1.5 * gasValue
           + 6.25 * supplyRequired // 100 minerals buys 16 supply; 100 / 16 = 6.25
-          + ?(isZerg, 25.0 / copiesProduced, 0.0)) // Larva value
+          + ?(isZerg && ! With.self.isZerg, 25.0 / copiesProduced, 0.0)) // Larva value
         * ?(isWorker,                         1.3,  1.0)
         * ?(whatBuilds._1 == Terran.Factory,  1.2 , 1.0)
         * ?(this == Protoss.Carrier,          2.0,  1.0)

@@ -1,5 +1,6 @@
-package Gameplans.Zerg.ZvE
+package Gameplans.Zerg.ZvZ
 
+import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
 import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
@@ -10,6 +11,8 @@ import Utilities.{?, SwapIf}
 class ZvZ10Hatch extends ZergGameplan {
 
   override def executeBuild(): Unit = {
+    emergencyReactions()
+
     once(10, Zerg.Drone)
     if (With.frame < GameTime(1, 25)() && unitsEver(Zerg.Hatchery) == 1 && supplyTotal200 == 9) {
       if (haveEver(Zerg.Extractor)) {

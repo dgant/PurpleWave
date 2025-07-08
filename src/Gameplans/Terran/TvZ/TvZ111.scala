@@ -1,7 +1,6 @@
 package Gameplans.Terran.TvZ
 
-import Gameplans.Terran.TvE.{BunkerRush, TerranGameplan}
-import Lifecycle.With
+import Gameplans.Terran.TvE.TerranGameplan
 import Macro.Actions.{Enemy, Friendly}
 import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}

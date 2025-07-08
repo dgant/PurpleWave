@@ -8,7 +8,6 @@ import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import Utilities.UnitFilters.IsTank
 
 object GetRepairedMobile extends Action {
 
@@ -26,7 +25,8 @@ object GetRepairedMobile extends Action {
       interested &&= unit.healers.nonEmpty || (unit.base.exists(_.isOurs) && unit.matchups.pixelsToThreatRange.exists(_ < 256))
       interested ||= unit.hitPoints <= unit.unitClass.repairThreshold
       interested
-    })
+    }
+    && (unit.matchups.targetsInRange.nonEmpty || unit.matchups.threatsInRange.isEmpty))
 
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     if (unit.unready) return

@@ -5,6 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Utilities.?
 import Utilities.UnitFilters.IsWarrior
 
 class ZvPCrackling extends ZergGameplan {
@@ -49,6 +50,19 @@ class ZvPCrackling extends ZergGameplan {
     if ( ! upgradeStarted(Zerg.ZerglingAttackSpeed)) {
       get(Zerg.Hive)
     }
+
+    if ( ! upgradeStarted(Zerg.ZerglingSpeed)) {
+      gasLimitCeiling(200)
+    } else if ( ! haveEver(Zerg.Lair)) {
+      gasLimitCeiling(100)
+    } else if ( ! haveEver(Zerg.QueensNest)) {
+      gasLimitCeiling(?(airThreat, 250, 100))
+    } else if ( ! haveEver(Zerg.Hive)) {
+      gasLimitCeiling(?(airThreat, 350, 200))
+    } else if (miningBases < 5) {
+      gasLimitCeiling(?(airThreat, 400, 250))
+    }
+
     get(Zerg.ZerglingAttackSpeed)
     pump(Zerg.Scourge, 2 * Maff.fromBoolean(enemiesShown(Protoss.Corsair) > 0) + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
     pump(Zerg.Zergling, 4 + (4 * enemies(IsWarrior) * (0.5 + 2 * enemyProximity)).toInt)

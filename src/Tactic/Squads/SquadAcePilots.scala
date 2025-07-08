@@ -11,7 +11,7 @@ import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, IsTank, IsWorker, UnitFilter}
 
 class SquadAcePilots extends Squad {
-  val acePilots         : Seq[UnitClass]  = Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
+  val acePilots         : Seq[UnitClass]  = Seq(Protoss.Corsair) //Seq(Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Zerg.Mutalisk, Zerg.Scourge)
   val acePilotMatcher   : UnitFilter      = IsAny(acePilots: _*)
   val splashPilots      : Seq[UnitClass]  = Seq(Terran.Valkyrie, Protoss.Corsair)
   val splashPilotMatcher: UnitFilter      = IsAny(splashPilots: _*)

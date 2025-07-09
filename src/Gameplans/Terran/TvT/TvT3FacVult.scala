@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import ProxyBwapi.Races.Terran
 import Utilities.Time.Seconds
-import Utilities.UnitFilters.{IsTank, IsWarrior}
+import Utilities.UnitFilters.IsTank
 
 class TvT3FacVult extends TerranGameplan {
 
@@ -57,7 +57,7 @@ class TvT3FacVult extends TerranGameplan {
       get(Terran.VultureSpeed)
       get(Terran.SpiderMinePlant)
     }
-    if (units(Terran.Vulture) >= 24) {
+    if (units(Terran.Vulture) >= 24 || enemies(IsTank) >= 3) {
       get(Terran.SiegeMode)
     }
     upgradeContinuously(Terran.MechDamage)

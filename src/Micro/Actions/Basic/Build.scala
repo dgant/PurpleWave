@@ -70,7 +70,7 @@ object Build extends Action {
 
     val pushPixel = buildArea.center
     Commander.defaultEscalation(unit)
-    val priority = if (unit.pixelDistanceCenter(pushPixel) < 128) TrafficPriorities.Shove else TrafficPriorities.Bump
+    val priority = ?(unit.pixelDistanceCenter(pushPixel) < 128, TrafficPriorities.Shove, TrafficPriorities.Bump)
 
     With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + building.radialHypotenuse, unit))
 

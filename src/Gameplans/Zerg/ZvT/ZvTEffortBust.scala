@@ -2,7 +2,7 @@ package Gameplans.Zerg.ZvT
 
 import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
-import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Terran, Zerg}
 import Utilities.Time.Seconds
 
@@ -44,12 +44,26 @@ class ZvTEffortBust extends ZergGameplan {
       }
     }
 
+    upgradeContinuously(Zerg.GroundArmor)
+    upgradeContinuously(Zerg.GroundMeleeDamage)
+    get(Zerg.UltraliskArmor)
+    get(Zerg.UltraliskSpeed)
+    pump(Zerg.Ultralisk)
+    pump(Zerg.Mutalisk, 12)
+    pump(Zerg.Mutalisk, 24)
+    get(Zerg.QueensNest)
+    get(Zerg.Hive)
+    get(Zerg.ZerglingAttackSpeed)
+    get(Zerg.EvolutionChamber)
+    get(Zerg.UltraliskCavern)
+    get(2, Zerg.EvolutionChamber)
     pump(Zerg.Mutalisk)
-    pump(Zerg.Drone, 20)
-    requireMiningBases(3)
-    pump(Zerg.Drone, 24)
-    pumpGasPumps()
+    pump(Zerg.Drone, miningBases * 13)
     pump(Zerg.Zergling)
-    get(4, Zerg.Hatchery, PlaceLabels.MacroHatch)
+    if (gas < 250) {
+      pumpGasPumps(units(Zerg.Drone) / 10)
+    }
+    requireMiningBases(6)
+    fillMacroHatches(18)
   }
 }

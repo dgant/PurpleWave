@@ -24,7 +24,7 @@ class ZvZ9Pool extends ZergGameplan {
   }
 
   override def executeMain(): Unit = {
-    if (With.self.gatheredGas >= 200 && ! have(Zerg.Spire)) {
+    if (gatheredGas >= 200 && ! have(Zerg.Spire)) {
       gasLimitCeiling(150)
       gasWorkerCeiling(2)
     }

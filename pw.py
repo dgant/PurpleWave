@@ -16,8 +16,16 @@ def main():
   parser.add_argument('--t',              action='store_true', default=False, help='Deploy Terran (PurpleSpirit) to BASIL')
   parser.add_argument('--p',              action='store_true', default=False, help='Deploy Protoss (PurpleSpirit) to BASIL')
   parser.add_argument('--z',              action='store_true', default=False, help='Deploy Zerg (PurpleSpirit) to BASIL')
+  parser.add_argument('--tp',             action='store_true', default=False, help='Deploy Terran and Protoss to BASIL')
+  parser.add_argument('--tz',             action='store_true', default=False, help='Deploy Terran and Zerg to BASIL')
+  parser.add_argument('--pz',             action='store_true', default=False, help='Deploy Protoss and Zerg to BASIL')
+  parser.add_argument('--tpz',            action='store_true', default=False, help='Deploy all races to BASIL')
   
   args = parser.parse_args()
+  
+  args.t = args.t or args.tp or args.tz or args.tpz
+  args.p = args.p or args.tp or args.pz or args.tpz
+  args.z = args.z or args.tz or args.pz or args.tpz
   
   do_basil = args.t or args.p or args.z
   if do_basil:

@@ -7,7 +7,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsSlowling, IsTank, IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsBurrowedLurker, IsSlowling, IsTank, IsWarrior, IsWorker}
 
 object FightOrFlee extends Action {
 
@@ -34,9 +34,10 @@ object FightOrFlee extends Action {
     decide(true,  "Irradiated", () => u.painfullyIrradiated)
     decide(true,  "Safe",       () => u.battle.exists( ! _.enemy.canAttack(u)))
     decide(true,  "Detonated",  () => u.unitClass.suicides && u.matchups.targetsInRange.exists(_.canAttack(u)))
+    decide(false, "CantFight",  () => ! u.intent.canFight)
     decide(true,  "HugTank",    () => ! u.flying && u.agent.ride.isEmpty && With.enemies.exists(_.isTerran) && u.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(u)))
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
-    decide(false, "CantFight",  () => ! u.intent.canFight)
+    decide(true,  "CoverFire",  () => u.matchups.targetNearest.exists(_.matchups.threatDeepestInRange.exists(_.isAny(IsTank, Terran.Bunker, Terran.MissileTurret, Protoss.Reaver, Protoss.PhotonCannon, Zerg.Guardian, IsBurrowedLurker, Zerg.SunkenColony, Zerg.SporeColony))))
     decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.metro.exists(_.isOurs) && ! u.team.exists(_.catchesGround) && u.matchups.threats.exists(Terran.Vulture))
     decide(true,  "Cloaked",    () => u.effectivelyCloaked && ( ! Terran.Wraith(u) || u.energy > 10))
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)

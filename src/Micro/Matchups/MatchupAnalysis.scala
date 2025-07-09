@@ -50,6 +50,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatNearest               : Option[UnitInfo]  = _threatNearest()
   def targetsInRange              : Seq[UnitInfo]     = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
   def targetNearest               : Option[UnitInfo]  = _targetNearest()
+  def targetNearestInRange        : Option[UnitInfo]  = _targetNearestInRange()
   def enemyDetectorDeepest        : Option[UnitInfo]  = _enemyDetectorDeepest()
   def wantsToVolley               : Option[Boolean]   = _wantsToVolley() // None means no opinion
   def dpfReceiving                : Double            = _dpfReceiving()
@@ -73,6 +74,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _threatSoonest        = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
   private val _threatNearest        = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
   private val _targetNearest        = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
+  private val _targetNearestInRange = new Cache(() => _targetNearest().filter(me.inRangeToAttack))
   private val _enemyDetectorDeepest = new Cache(() => Maff.minBy(groupVs.detectors.filter(_.remainingCompletionFrames < Seconds(5)()))(e => e.sightPixels - e.pixelDistanceCenter(me.pixel)))
   private val _pixelsEntangled      = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse( - With.mapPixelWidth.toDouble))
   private val _dpfReceiving         = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)

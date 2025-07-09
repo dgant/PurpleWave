@@ -25,10 +25,10 @@ class TacticRalph extends Tactic with MacroCounting {
     if (With.tactics.workerScout.units.nonEmpty) return
     if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)()) return
     if (With.framesSince(lastDeath) < Seconds(20)()) return
-    if (With.scouting.ourProximity > 0.8) return
+    if (With.scouting.ourProximity < 0.2) return
 
     val ralphClass: UnitFilter =
-      Utilities.?(haveComplete(Terran.Vulture), Terran.Vulture,
+      ?(haveComplete(Terran.Vulture),           Terran.Vulture,
       ?(haveComplete(Protoss.Observer),         Protoss.Observer,
       ?(haveComplete(Zerg.Queen),               Zerg.Queen,
       ?(upgradeComplete(Zerg.OverlordSpeed),    Zerg.Overlord,
@@ -42,9 +42,10 @@ class TacticRalph extends Tactic with MacroCounting {
       vicinity = vicinity.metro.get.natural.map(nat =>
         Maff.centroid(
           Seq(
-            nat.entranceNow.map(_.pixelCenter),
-            nat.exitNow.map(_.pixelCenter),
-            Some(nat.townHallArea.center))
+            nat.entranceOriginal.map(_.pixelCenter),
+            nat.exitOriginal.map(_.pixelCenter),
+            Some(nat.townHallArea.center),
+            Some(nat.zone.downtown.center))
           .flatten)
           .walkablePixel
       ).getOrElse(vicinity)

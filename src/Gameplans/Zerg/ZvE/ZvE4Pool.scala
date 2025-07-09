@@ -34,7 +34,7 @@ class ZvE4Pool extends GameplanImperative {
 
   override def executeMain(): Unit = {
     attack()
-    if (With.self.gatheredMinerals >= 382) {
+    if (gatheredMinerals >= 382) {
       scout()
     }
     if (supplyUsed400 >= 33 && units(Zerg.Larva) >= 3) {

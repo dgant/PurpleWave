@@ -20,7 +20,7 @@ class ZvT13PoolMuta extends ZergGameplan {
     once(4, Zerg.Zergling)
     once(Zerg.Spire)
     once(16, Zerg.Drone)
-    buildBunkersAtFoyer(1, PlaceLabels.DefendEntrance)
+    buildSunkensAtFoyer(1, PlaceLabels.DefendEntrance)
   }
   override def executeMain(): Unit = {
     if (haveComplete(Zerg.Mutalisk)) {

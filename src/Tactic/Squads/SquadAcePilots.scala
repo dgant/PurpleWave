@@ -19,6 +19,9 @@ class SquadAcePilots extends Squad {
   lock.matcher = acePilotMatcher
   lock.counter = CountEverything
   override def launch(): Unit = {
+
+    return // Maybe we're better off without this in its current state
+
     if (With.yolo.active) return
     lock.acquire()
   }

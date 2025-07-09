@@ -6,7 +6,7 @@ import Mathematics.Maff
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.?
-import Utilities.UnitFilters.IsWarrior
+import Utilities.UnitFilters.{IsLairlike, IsWarrior}
 
 class ZvPCrackling extends ZergGameplan {
 
@@ -35,6 +35,11 @@ class ZvPCrackling extends ZergGameplan {
 
     attack()
     once(18, Zerg.Zergling)
+
+    upgradeContinuously(Zerg.ZerglingAttackSpeed)
+    upgradeContinuously(Zerg.GroundArmor)
+    upgradeContinuously(Zerg.GroundMeleeDamage)
+
     if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
       gasWorkerCeiling(units(Zerg.Drone) / 7)
     }
@@ -53,7 +58,7 @@ class ZvPCrackling extends ZergGameplan {
 
     if ( ! upgradeStarted(Zerg.ZerglingSpeed)) {
       gasLimitCeiling(200)
-    } else if ( ! haveEver(Zerg.Lair)) {
+    } else if ( ! haveEver(IsLairlike)) {
       gasLimitCeiling(100)
     } else if ( ! haveEver(Zerg.QueensNest)) {
       gasLimitCeiling(?(airThreat, 250, 100))
@@ -70,8 +75,6 @@ class ZvPCrackling extends ZergGameplan {
     pump(Zerg.Zergling)
     requireMiningBases(5)
     get(2, Zerg.EvolutionChamber)
-    upgradeContinuously(Zerg.GroundArmor)
-    upgradeContinuously(Zerg.GroundMeleeDamage)
     requireMiningBases(6)
     fillMacroHatches(12)
   }

@@ -4,7 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import ProxyBwapi.Buildable
 import ProxyBwapi.UnitClasses.UnitClass
-import Utilities.Property
+import Utilities.{?, Property}
 import Utilities.Time.Seconds
 
 class Blackboard {
@@ -32,7 +32,7 @@ class Blackboard {
   val gasLimitFloor           : Property[Int]               = add(new Property(0))      // Max gas mining until at least this much gas
   val gasLimitCeiling         : Property[Int]               = add(new Property(500))    // Stop gas mining (if minerals are available) after this much gas
   val maxBuilderTravelFrames  : Property[Int]               = add(new Property(Seconds(50)()))
-  val gasWorkerRatio          : Property[Double]            = add(new Property(if (With.self.isProtoss) 3.0 / 10.0 else 3.0 / 8.0))
+  val gasWorkerRatio          : Property[Double]            = add(new Property(?(With.self.isProtoss, 3.0 / 10.0, 3.0 / 8.0)))
   val crossScout              : Property[Boolean]           = add(new Property(false))
   val yoloing                 : Property[Boolean]           = add(new Property(false))
   val allowIslandBases        : Property[Boolean]           = add(new Property(false))

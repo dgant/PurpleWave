@@ -303,6 +303,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canAttackGround : Boolean = canAttack && attacksAgainstGround > 0
   @inline final def canBurrow       : Boolean = canDoAnything && (is(Zerg.Lurker) || (Zerg.Burrow(player) && unitClass.canBurrow))
 
+  def confidence01: Double = (confidence11 + 1) / 2
   def confidence11: Double = _confidence()
   private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))
 

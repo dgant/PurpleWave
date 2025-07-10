@@ -114,20 +114,19 @@ trait MacroActions extends MacroCounting {
   def maintainMiningBases (max: Int = 10) : Unit = approachMiningBases(Math.min(max, With.geography.maxMiningBasesOurs))
 
   def buildDefensesAtBase(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], base: Base): Unit = {
-    def query(buildingClass: UnitClass): PlacementQuery = new PlacementQuery(buildingClass)
-      .requireBase(base)
-      .requireLabelYes(PlaceLabels.Defensive)
-      .preferLabelYes(labels: _*)
-    if (defenseClass.requiresPsi) get(Protoss.Pylon, query(Protoss.Pylon))
-    get(count, defenseClass, query(defenseClass))
+    if (count > 0) {
+      def query(unitClass: UnitClass) = new PlacementQuery(unitClass)
+        .requireBase(base)
+        .requireLabelYes(PlaceLabels.Defensive)
+        .preferLabelYes(labels: _*)
+      BuildDefense(count, defenseClass, query)
+    }
   }
-  def buildDefensesAt(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], bases: Seq[Base]): Unit = {
-    if (defenseClass == Terran.MissileTurret)  get(Terran.EngineeringBay)
-    if (defenseClass == Protoss.PhotonCannon)  get(Protoss.Forge)
-    if (defenseClass == Zerg.SporeColony)      get(Zerg.EvolutionChamber)
-    bases.foreach(buildDefensesAtBase(count, defenseClass, labels, _))
 
+  def buildDefensesAt(count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel], bases: Seq[Base]): Unit = {
+    bases.foreach(buildDefensesAtBase(count, defenseClass, labels, _))
   }
+
   def buildDefenseAtBases         (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, With.geography.ourBases)
   def buildDefenseAtMain          (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourMain))
   def buildDefenseAtNatural       (count: Int, defenseClass: UnitClass, labels: Seq[PlaceLabel]): Unit = buildDefensesAt(count, defenseClass, labels, Seq(With.geography.ourNatural))

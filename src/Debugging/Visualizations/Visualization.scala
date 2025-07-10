@@ -38,6 +38,7 @@ class Visualization extends TimedTask {
     ShowProduction,
     ShowEfficiency,
 
+    ShowMutalisks,
     //ShowZones,
     //ShowWall,
     //ShowFoundations,
@@ -74,6 +75,7 @@ class Visualization extends TimedTask {
     ShowKills,
     ShowMacroSim,
     ShowHealthAndCooldown,
+    ShowMutalisks,
     ShowUnitsEnemy,
     ShowUnitsFriendly,
     ShowUtilization,

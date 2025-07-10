@@ -7,7 +7,7 @@ import Micro.Actions.Combat.Tactics.Unbunk
 import Micro.Actions.Commands.{Attack, Travel}
 import Micro.Actions.Protoss.{Meld, ReloadInterceptors, ReloadScarabs}
 import Micro.Actions.Scouting.Scout
-import Micro.Actions.Terran.{GetRepairedBuilding, FinishConstruction, GetRepairedMobile, Liftoff, Repair, Scan}
+import Micro.Actions.Terran.{FinishConstruction, GetRepairedBuilding, GetRepairedMobile, Liftoff, Repair, Scan}
 import Micro.Actions.Transportation.Transport
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 

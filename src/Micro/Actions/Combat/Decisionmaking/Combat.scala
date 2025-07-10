@@ -65,7 +65,9 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     restrainedFrames = Math.max(0, restrainedFrames)
   }
   def innerPerform(): Unit = {
-    Target.choose(unit)
+    if (unit.agent.toAttack.isEmpty) {
+      Target.choose(unit)
+    }
     unit.agent.choosePerch()
     Commander.defaultEscalation(unit)
 
@@ -85,6 +87,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     transition(Aim,       ! unit.canMove)
     transition(Dodge,     unit.agent.receivedPushPriority() >= TrafficPriorities.Dodge)
     transition(Abuse,     unit.unitClass.abuseAllowed && unit.agent.receivedPushPriority() == TrafficPriorities.Freedom && unit.matchups.targetNearest.exists(canAbuse) && (hasSpacetimeToPoke || allThreatsAbusable) && (shouldRetreat || framesUntilShot < unit.cooldownMaxAirGround))
+    transition(SuperKite, unit.isAny(Terran.Wraith, Zerg.Mutalisk))
     transition(Scavenge,
       target.exists(_.matchups.framesToLive > unit.matchups.framesToLive)
       && unit.matchups.threatDeepest.exists(t => unit.canAttack(t) && unit.pixelRangeAgainst(t) >= t.pixelRangeAgainst(unit))
@@ -110,14 +113,15 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       }
     }
 
-    if (technique == Walk     && walk())        return
-    if (technique == Aim      && aim())         return
-    if (technique == Dodge    && dodge())       return
-    if (technique == Fallback && potshot())     return
-    if (shouldRetreat         && Retreat(unit)) return
-    if (shouldEngage          && Brawl(unit))   return
-    if (technique == Abuse    && abuse())       return
-    if (shouldEngage          && engage())      {}
+    if (technique == Walk       && walk())        return
+    if (technique == Aim        && aim())         return
+    if (technique == Dodge      && dodge())       return
+    if (technique == Fallback   && potshot())     return
+    if (shouldRetreat           && Retreat(unit)) return
+    if (shouldEngage            && Brawl(unit))   return
+    if (technique == Abuse      && abuse())       return
+    if (technique == SuperKite  && superkite())   return
+    if (shouldEngage            && engage())      {}
   }
 
   ////////////////
@@ -253,9 +257,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (unit.ready) {
       unit.agent.escalatePriority(TrafficPriorities.Shove) // Just lower than the dodge itself
       unit.agent.forces(Forces.threat) = Potential.followPushes(unit)
-      if (MicroPathing.setWaypointForcefully(unit)) {
-        move()
-      }
+      MicroPathing.moveForcefully(unit)
     }
     unit.unready
   }
@@ -367,6 +369,37 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       chase()
     }
     charge()
+    unit.unready
+  }
+
+  protected def superkite(): Boolean = {
+    target.foreach(t => {
+      var kite  = false
+      var chase = false
+      if (unit.readyForAttackOrder) {
+        if (unit.framesToGetInRange(t) < With.game.getRemainingLatencyFrames) {
+          if (unit.orderTarget.contains(t)) {
+            kite = true
+          } else {
+            Commander.attack(unit)
+          }
+        } else {
+          chase = true
+        }
+      } else if (unit.matchups.framesOfSafety < unit.cooldownLeft + unit.cooldownMaxAgainst(t)) {
+        kite = true
+      }
+      if (kite) {
+        unit.agent.forces(Forces.threat)      = Potential.hardAvoidThreatRange(unit)
+        unit.agent.forces(Forces.regrouping)  = Potential.regroup(unit)
+        MicroPathing.moveForcefully(unit)
+      } else if (chase) {
+        unit.agent.forces(Forces.target)      = Potential.towards(unit, t.pixel)
+        unit.agent.forces(Forces.regrouping)  = Potential.regroup(unit) * 0.5
+        MicroPathing.moveForcefully(unit)
+      }
+    })
+
     unit.unready
   }
 

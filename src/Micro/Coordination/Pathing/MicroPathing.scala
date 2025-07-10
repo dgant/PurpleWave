@@ -88,7 +88,12 @@ object MicroPathing {
   }
 
   def setWaypointForcefully(unit: FriendlyUnitInfo): Boolean = {
-    unit.agent.forced.setAsWaypoint(MicroPathing.getPushRadians(unit).flatMap(MicroPathing.getWaypointInDirection(unit, _))).isDefined
+    val radians = MicroPathing
+      .getPushRadians(unit)
+      .getOrElse(unit.agent.forces.sum.radians)
+    val waypoint = MicroPathing.getWaypointInDirection(unit, radians)
+    unit.agent.forced.setAsWaypoint(waypoint)
+    waypoint.isDefined
   }
 
   // More rays = more accurate movement, but more expensive

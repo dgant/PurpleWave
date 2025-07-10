@@ -2,7 +2,7 @@ package Gameplans.All
 
 import Lifecycle.With
 import Placement.Access.{PlaceLabels, PlacementQuery}
-import ProxyBwapi.Races.Terran
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 
 class Sandbox extends GameplanImperative {
@@ -17,31 +17,26 @@ class Sandbox extends GameplanImperative {
       .preferLabelYes(PlaceLabels.Wall)
 
   override def executeBuild(): Unit = {
-    once(9, Terran.SCV)
-    get(Terran.SupplyDepot, wallPlacement(Terran.SupplyDepot))
-    once(11, Terran.SCV)
-    get(Terran.Barracks, wallPlacement(Terran.Barracks))
-    once(13, Terran.SCV)
-    get(2, Terran.Barracks)
-    once(15, Terran.SCV)
-    get(2, Terran.SupplyDepot, wallPlacement(Terran.SupplyDepot))
-    once(Terran.Marine)
-    scoutOn(Terran.Barracks)
-  }
-
-  override def doWorkers(): Unit = {
-    pumpWorkers(oversaturate = true, maximumTotal = 150)
+    once(9, Zerg.Drone)
+    once(2, Zerg.Overlord)
+    get(Zerg.Extractor)
+    once(11, Zerg.Drone)
+    get(Zerg.SpawningPool)
+    once(13, Zerg.Drone)
+    once(6, Zerg.Zergling)
+    get(Zerg.Lair)
   }
 
   override def executeMain(): Unit = {
-    pump(Terran.Marine, 50)
-    requireMiningBases(3)
-    buildBunkersAtBases(2, PlaceLabels.DefendEntrance)
-    buildBunkersAtBases(2, PlaceLabels.DefendHall)
-    requireMiningBases(12)
-    get(Terran.EngineeringBay)
-    buildTurretsAtBases(6, PlaceLabels.DefendHall)
-    buildTurretsAtBases(1, PlaceLabels.DefendEntrance)
-    pumpGasPumps()
+    pump(Zerg.Mutalisk)
+    if (enemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
+      fillMacroHatches(2)
+    } else {
+      requireMiningBases(2)
+    }
+    once(6, Zerg.Mutalisk)
+    get(Zerg.Spire)
+    pump(Zerg.Zergling)
+    attack()
   }
 }

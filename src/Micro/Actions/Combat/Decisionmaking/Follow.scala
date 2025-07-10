@@ -3,13 +3,14 @@ package Micro.Actions.Combat.Decisionmaking
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 object Follow extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.unitClass.followingAllowed
     && unit.canMove
+    && ! Zerg.Mutalisk(unit)
     && ! unit.matchups.groupVs.splashesAir
     && unit.agent.leader().exists(unit !=)
     && unit.matchups.threatsInRange.forall(_.inRangeToAttack(unit.agent.leader().get)))

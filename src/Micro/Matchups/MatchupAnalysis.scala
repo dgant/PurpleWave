@@ -84,7 +84,9 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _threateningMiners    = new Cache(() => me.metro.exists(m => m.owner != me.player && m.units.exists(t => t.isEnemyOf(me) && IsWorker(t) && t.friendly.flatMap(_.intent.toGather).orElse(t.orderTarget).exists(r => r.unitClass.isResource && r.base.exists(t.base.contains) && me.pixelDistanceEdge(r) + me.pixelDistanceEdge(t) < 96 + 2 * me.pixelRangeGround))))
   private val _targetedByScarab     = new Cache(() => me.battle.exists(_.scarabTargets.exists(_._2 == me)))
   private val _framesToLive         = new Cache(() => me.likelyDoomedInFrames)
-  private val _wantsToVolley        = new Cache(() => ?( ! me.canMove, None, // If we're stationary, we're unopinionated
+  private val _wantsToVolley        = new Cache(() => ?(
+    ! me.canMove,
+    None, // If we're stationary, we're unopinionated
     targetNearest.flatMap(target =>
       threatDeepest.flatMap(deepest =>
         threatNearest.flatMap(nearest =>

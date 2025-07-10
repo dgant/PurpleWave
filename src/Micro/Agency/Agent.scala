@@ -10,7 +10,9 @@ import Micro.Coordination.Pushing.{TrafficPriorities, TrafficPriority}
 import Performance.{Cache, KeyedCache}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.reflect.ClassTag
 
 class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySortOrder {
 
@@ -144,6 +146,31 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
   }
   def setRideGoal(to: Pixel): Unit = {
     _rideGoal = Some(to)
+  }
+
+  ////////////////
+  // Blackboard //
+  ////////////////
+
+  val blackboard: mutable.Map[Any, Any] = new mutable.HashMap[Any, Any]
+
+  def put(key: Any, value: Any = "Blank"): Unit = {
+    blackboard(key) = value
+  }
+
+  def get(key: Any): Option[Any] = {
+    blackboard.get(key)
+  }
+
+  def get[T](key: Any)(implicit tag: ClassTag[T]): Option[T] = {
+    blackboard.get(key).filter(tag.runtimeClass.isInstance).map(_.asInstanceOf[T])
+  }
+  def contains(key: Any): Boolean = {
+    blackboard.contains(key)
+  }
+
+  def remove(key: Any): Option[Any] = {
+    blackboard.remove(key)
   }
 
   ///////////

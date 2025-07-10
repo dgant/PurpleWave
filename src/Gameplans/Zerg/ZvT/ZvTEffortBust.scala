@@ -53,10 +53,12 @@ class ZvTEffortBust extends ZergGameplan {
     pump(Zerg.Mutalisk, 24)
     get(Zerg.QueensNest)
     get(Zerg.Hive)
+    if (have(Zerg.Hive)) {
     get(Zerg.ZerglingAttackSpeed)
-    get(Zerg.EvolutionChamber)
-    get(Zerg.UltraliskCavern)
-    get(2, Zerg.EvolutionChamber)
+      get(Zerg.EvolutionChamber)
+      get(Zerg.UltraliskCavern)
+      get(2, Zerg.EvolutionChamber)
+    }
     pump(Zerg.Mutalisk)
     pump(Zerg.Drone, miningBases * 13)
     pump(Zerg.Zergling)

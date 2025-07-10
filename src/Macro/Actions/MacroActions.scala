@@ -6,7 +6,7 @@ import Macro.Actions.Rounding.Rounding
 import Macro.Facts.MacroCounting
 import Macro.Requests._
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.{MacroHatch, PlaceLabel}
+import Placement.Access.PlaceLabels.{DefendAir, DefendEntrance, DefendGround, MacroHatch, PlaceLabel}
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -152,24 +152,24 @@ trait MacroActions extends MacroCounting {
   def buildBunkersAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Terran.Bunker,          labels)
   def buildBunkersAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Terran.Bunker,          labels)
   def buildBunkersAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Terran.Bunker,          labels)
-  def buildTurretsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Terran.MissileTurret,   labels)
-  def buildTurretsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Terran.MissileTurret,   labels)
-  def buildTurretsAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Terran.MissileTurret,   labels)
-  def buildTurretsAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Terran.MissileTurret,   labels)
-  def buildTurretsAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Terran.MissileTurret,   labels)
-  def buildTurretsAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Terran.MissileTurret,   labels)
-  def buildSunkensAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SunkenColony,      labels)
-  def buildSunkensAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SunkenColony,      labels)
-  def buildSunkensAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SunkenColony,      labels)
-  def buildSunkensAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SunkenColony,      labels)
-  def buildSunkensAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SunkenColony,      labels)
-  def buildSunkensAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SunkenColony,      labels)
-  def buildSporesAtBases          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SporeColony,       labels)
-  def buildSporesAtMain           (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SporeColony,       labels)
-  def buildSporesAtNatural        (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SporeColony,       labels)
-  def buildSporesAtFoyer          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SporeColony,       labels)
-  def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels)
-  def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels)
+  def buildTurretsAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildTurretsAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildTurretsAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildTurretsAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildTurretsAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildTurretsAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Terran.MissileTurret,   ?(labels.contains(DefendEntrance) || labels.contains(DefendGround), labels, labels :+ DefendAir))
+  def buildSunkensAtBases         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSunkensAtMain          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSunkensAtNatural       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSunkensAtFoyer         (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSunkensAtExpansions    (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSunkensAtOpenings      (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SunkenColony,      labels :+ DefendGround)
+  def buildSporesAtBases          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtBases       (count, Zerg.SporeColony,       labels :+ DefendAir)
+  def buildSporesAtMain           (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtMain        (count, Zerg.SporeColony,       labels :+ DefendAir)
+  def buildSporesAtNatural        (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtNatural     (count, Zerg.SporeColony,       labels :+ DefendAir)
+  def buildSporesAtFoyer          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SporeColony,       labels :+ DefendAir)
+  def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels :+ DefendAir)
+  def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels :+ DefendAir)
 
   def fillMacroHatches(totalHatcheryCount: Int, preferredBases: Base*): Unit = {
     get(

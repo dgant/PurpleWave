@@ -36,6 +36,7 @@ class ZvT13PoolMuta extends ZergGameplan {
     once(8, Zerg.Mutalisk)
     pump(Zerg.Mutalisk)
     pump(Zerg.Drone, miningBases * 11)
+    buildSunkensAtExpansions(1, PlaceLabels.DefendHall)
 
     requireMiningBases(6)
   }

@@ -23,15 +23,6 @@ class ZvZ10Hatch extends ZergGameplan {
     }
     if (With.fingerprints.fourPool() && With.frame < Minutes(6)()) {
       cancel(Zerg.Hatchery)
-      pump(Zerg.SunkenColony)
-      pump(Zerg.Drone, 8)
-      buildDefenseAtBases(2, Zerg.CreepColony, Seq(PlaceLabels.Defensive, PlaceLabels.DefendHall))
-      if ( ! safeDefending && minerals < 100) {
-        gasWorkerCeiling(0)
-      }
-      pump(Zerg.Mutalisk)
-      pump(Zerg.Zergling)
-      get(Zerg.Extractor, Zerg.Lair, Zerg.Spire)
     }
 
     requireMiningBases(2)

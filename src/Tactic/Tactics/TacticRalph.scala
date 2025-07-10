@@ -37,6 +37,8 @@ class TacticRalph extends Tactic with MacroCounting {
       ?(upgradeComplete(Protoss.ZealotSpeed),   Protoss.Zealot,
       IsWorker)))))))
 
+    if (ralphClass == IsWorker && With.units.countOurs(IsWorker) < 22) return
+
     vicinity = With.scouting.enemyThreatOrigin.walkableTile.center
     if (vicinity.metro.exists(_.isEnemy)) {
       vicinity = vicinity.metro.get.natural.map(nat =>

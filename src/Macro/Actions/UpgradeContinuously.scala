@@ -11,7 +11,7 @@ object UpgradeContinuously extends MacroActions {
     val nextUpgradeLevel  = With.self.getUpgradeLevel(upgrade) + 1
     val nextRequirement   = upgrade.whatsRequired(nextUpgradeLevel)
     val haveUpgrader      = With.units.existsOurs(upgrade.whatUpgrades)
-    val haveRequirement   = nextRequirement == UnitClasses.None || With.units.existsOurs(nextRequirement)
+    val haveRequirement   = nextRequirement == UnitClasses.None || With.macroCounts.oursExtant(nextRequirement) > 0
 
     if (With.self.getUpgradeLevel(upgrade) < Math.min(maxLevel, upgrade.levels.size) && haveUpgrader && haveRequirement) {
       get(upgrade, nextUpgradeLevel)

@@ -21,7 +21,6 @@ object StrategyGroups {
 
     PvTProxy2Gate,
     PvPProxy2Gate,
-    PvT910,
     PvT1015,
     PvT1BaseReaver,
     PvT29Arbiter,

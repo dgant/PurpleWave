@@ -3,7 +3,6 @@ package Gameplans.Terran.TvE
 import Lifecycle.With
 import Macro.Actions.Enemy
 import Macro.Requests.RequestUnit
-import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, SwapIf}
@@ -23,13 +22,7 @@ class TvE3Fac extends TerranGameplan {
     scoutAt(13)
 
     once(14, Terran.SCV)
-    once(Terran.Marine)
-
-    if (With.fingerprints.fourPool() || With.fingerprints.proxyGateway() || With.fingerprints.proxyRax()) {
-      buildBunkersAtMain(1, PlaceLabels.DefendHall)
-      pump(Terran.Marine, 4)
-      pumpWorkers(oversaturate = false)
-    }
+    once(6, Terran.Marine)
     once(15, Terran.SCV)
     get(2, Terran.SupplyDepot)
     once(16, Terran.SCV)

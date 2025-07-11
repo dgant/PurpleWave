@@ -22,9 +22,7 @@ class TvP2Fac extends TerranGameplan {
     once(Terran.Refinery)
     once(15, Terran.SCV)
     once(2, Terran.SupplyDepot)
-    if (unitsComplete(Terran.Factory) < 2 && ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)) {
-      pumpRatio(Terran.Marine, 2, 9, Seq(Enemy(Protoss.Zealot, 3.0)))
-    }
+    once(6, Terran.Marine)
     once(16, Terran.SCV)
     once(Terran.Factory)
     once(18, Terran.SCV)

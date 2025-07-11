@@ -81,6 +81,7 @@ class ZvPHydraLurker extends ZergGameplan {
       get(Zerg.HydraliskSpeed)
       get(Zerg.HydraliskRange)
       val hydraliskTarget = Maff.clamp((5 + enemies(IsWarrior) * 3 * enemyProximity).toInt, 5, 24)
+      pump(Zerg.Scourge, 2 * enemies(Protoss.Corsair))
       pump(Zerg.Hydralisk, hydraliskTarget)
       pump(Zerg.Zergling, 3 * (hydraliskTarget - units(Zerg.Hydralisk)))
       pump(Zerg.Drone,  miningBases * 12)
@@ -98,6 +99,9 @@ class ZvPHydraLurker extends ZergGameplan {
     get(Zerg.Lair)
     if (enemyDarkTemplarLikely) {
       get(Zerg.OverlordSpeed)
+    }
+    if (enemyHasShown(Protoss.Corsair)) {
+      get(Zerg.Spire)
     }
     get(Zerg.EvolutionChamber)
     get(Zerg.LurkerMorph)

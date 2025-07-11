@@ -317,7 +317,7 @@ class PvPOpening extends GameplanImperative {
       getObservers    ||= dtSmell
       getReavers      ||= ! getObservatory && ! have(Protoss.Observatory)
       if ( ! have(Protoss.Shuttle, Protoss.RoboticsSupportBay, Protoss.Observatory)) {
-        shuttleFirst = getReavers && ! enemyCitadel
+        shuttleFirst = getReavers && ! enemyCitadel && ! With.fingerprints.cannonRush()
       }
       shuttleSpeed = shuttleFirst && gctech && ! getObservatory && ! getObservers && ! have(Protoss.Observatory, Protoss.Observer) && roll("ShuttleSpeedRush", 0.0)
     } else if (PvPDT()) {

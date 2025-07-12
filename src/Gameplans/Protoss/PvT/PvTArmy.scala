@@ -18,7 +18,7 @@ object PvTArmy extends MacroActions {
       once(2, Protoss.DarkTemplar)
     }
     if ( ! enemyHasShown(Terran.MissileTurret, Terran.ScienceVessel)) {
-      pump(Protoss.DarkTemplar)
+      pump(Protoss.DarkTemplar, maximumConcurrently = 2)
     }
     pump(Protoss.Observer, ?(enemyHasShown(Terran.SpiderMine), 2, 1))
     pumpRatio(

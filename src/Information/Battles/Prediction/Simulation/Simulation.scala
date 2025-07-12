@@ -23,16 +23,21 @@ final class Simulation {
 
   @inline def step(): Unit = {
     if (shouldReset) {
-      shouldReset = false
-      realUnits       .clear()
-      realUnitsOurs   .clear()
-      realUnitsEnemy  .clear()
-      realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
-      realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
-      realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
-      enemyVanguard     = battle.enemy.vanguardKey()
-      engaged           = battle.units.exists(_.matchups.engagedUpon)
-      simulacra.foreach(_.reset(this))
+      try {
+        With.units.mutex.lock()
+        realUnits       .clear()
+        realUnitsOurs   .clear()
+        realUnitsEnemy  .clear()
+        realUnits       ++= battle.teams.view.flatMap(_.units).filter(simulatable).toVector.sortBy(_.pixelDistanceSquared(battle.focus))
+        realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
+        realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
+        enemyVanguard     = battle.enemy.vanguardKey()
+        engaged           = battle.units.exists(_.matchups.engagedUpon)
+        simulacra.foreach(_.reset(this))
+        shouldReset = false
+      } finally {
+        With.units.mutex.unlock()
+      }
     }
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())

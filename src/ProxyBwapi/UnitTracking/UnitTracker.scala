@@ -10,6 +10,7 @@ import Tactic.Squads.{GenericFriendlyUnitGroup, GenericUnitGroup, UnitGroup}
 import Utilities.?
 import Utilities.UnitFilters.{IsAny, UnitFilter}
 
+import java.util.concurrent.locks.ReentrantLock
 import scala.collection.JavaConverters._
 
 final class UnitTracker {
@@ -21,6 +22,8 @@ final class UnitTracker {
   private val bufferNeutral   = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
   private val bufferHistoric  = new UnorderedBuffer[HistoricalUnitInfo](bwapiIds)
   private val hypothetical    = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
+
+  val mutex: ReentrantLock = new ReentrantLock()
 
   @inline def getId(id: Int): Option[UnitInfo] = units(id)
   @inline def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else units(unit.getID)
@@ -54,9 +57,14 @@ final class UnitTracker {
     birthAll()
   }
   def onFrame(): Unit = {
-    birthAll()
-    all.foreach(_.update())
-    foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
+    try {
+      mutex.lock()
+      birthAll()
+      all.foreach(_.update())
+      foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
+    } finally {
+      mutex.unlock()
+    }
   }
   def onUnitRenegade(bwapiUnit: bwapi.Unit): Unit = {
     kill(bwapiUnit.getID)

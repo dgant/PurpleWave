@@ -69,7 +69,7 @@ class ZvPCrackling extends ZergGameplan {
     }
 
     get(Zerg.ZerglingAttackSpeed)
-    pump(Zerg.Scourge, 2 * Maff.fromBoolean(enemiesShown(Protoss.Corsair) > 0) + 3 * enemies(Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
+    pump(Zerg.Scourge, 2 * Maff.fromBoolean(enemiesShown(Protoss.Corsair) > 0) + 2 * enemies(Protoss.Shuttle, Protoss.Corsair, Protoss.Scout) + 8 * enemies(Protoss.Carrier))
     pump(Zerg.Zergling, 4 + (4 * enemies(IsWarrior) * (0.5 + 2 * enemyProximity)).toInt)
     pump(Zerg.Drone, Math.min(miningBases * 8, 30))
     pump(Zerg.Zergling)

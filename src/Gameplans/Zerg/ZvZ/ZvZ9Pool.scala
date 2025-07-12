@@ -46,12 +46,14 @@ class ZvZ9Pool extends ZergGameplan {
       upgradeContinuously(Zerg.AirArmor, 2)
     }
     pump(Zerg.Mutalisk)
+    if (enemiesComplete(IsHatchlike) > unitsComplete(IsHatchlike) && ! haveComplete(Zerg.Mutalisk)) {
+      pump(Zerg.Drone, 10)
+      buildSunkensAtMain(2, PlaceLabels.DefendHall)
+    }
     pump(Zerg.Scourge, 2 * enemies(Zerg.Mutalisk))
     pump(Zerg.Zergling)
     pumpGasPumps((units(Zerg.Drone) + 5) / 8)
-    if ( ! safeDefending && miningBases == 1 && ! haveComplete(Zerg.Spire) && enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.twelvePool, With.fingerprints.tenHatch, With.fingerprints.twoHatchMain, With.fingerprints.fourPool)) {
-      buildSunkensAtMain(1, PlaceLabels.DefendHall)
-    }
+
     if (haveComplete(Zerg.Spire)) {
       requireMiningBases(3)
       fillMacroHatches(6)

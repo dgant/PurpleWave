@@ -81,7 +81,7 @@ class ZvPHydraLurker extends ZergGameplan {
       get(Zerg.HydraliskSpeed)
       get(Zerg.HydraliskRange)
       val hydraliskTarget = Maff.clamp((5 + enemies(IsWarrior) * 3 * enemyProximity).toInt, 5, 24)
-      pump(Zerg.Scourge, 2 * enemies(Protoss.Corsair))
+      pump(Zerg.Scourge, 2 * enemies(Protoss.Corsair, Protoss.Scout, Protoss.Shuttle))
       pump(Zerg.Hydralisk, hydraliskTarget)
       pump(Zerg.Zergling, 3 * (hydraliskTarget - units(Zerg.Hydralisk)))
       pump(Zerg.Drone,  miningBases * 12)

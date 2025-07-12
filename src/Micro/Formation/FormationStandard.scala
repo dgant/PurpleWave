@@ -178,7 +178,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       Shapes.Ray(face, vanguardCentroid).map(_.tile).foreach(With.grids.formationSlots.block) // Clear path for Scarabs
     }
     val classCount = groundUnits
-      .groupBy(_.unitClass)
+      .groupBy(_.unitClass.baseClass)
       .map(g => (ClassSlots(g._1, g._2.size, g._2.head.formationRangePixels * Maff.inv32)))
       .toVector
       .sortBy(_.formationRangePixels)
@@ -205,7 +205,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       })
     }
     val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)
-    val classSlotsAir       = airUnits.groupBy(_.unitClass).map(u => (u._1, u._2.map(x => groundExemplar)))
+    val classSlotsAir       = airUnits.groupBy(_.unitClass.baseClass).map(u => (u._1, u._2.map(x => groundExemplar)))
     val output              = classSlotsOverlook ++ classSlotsArc ++ classSlotsAir
     output
   }
@@ -217,8 +217,9 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     val overlooks = goal.base.filter(base => argZone.forall(_.bases.contains(base))).map(_.overlooks).getOrElse(Vector.empty)
     var i = 0
     val output = classSlots
-      .filter(slots => ! slots.unitClass.isFlyer && slots.unitClass != Protoss.Reaver && slots.unitClass != Terran.Medic && slots.unitClass.effectiveRangePixels >= 128)
-      .map(slots => (slots.unitClass, (0 until slots.slots)
+      .filter(slots => slots.unitClass.isTank && Terran.SiegeMode())
+      //.filter(slots => ! slots.unitClass.isFlyer && slots.unitClass != Protoss.Reaver && slots.unitClass != Terran.Medic && slots.unitClass.effectiveRangePixels >= 128)
+      .map(slots => (slots.unitClass.baseClass, (0 until slots.slots)
         .map(unused => {
           var output: Pixel = null
           while (output == null && i < overlooks.length) {
@@ -264,7 +265,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     // Why can't Scala just have break statements like a normal language
     var i = 0
     while (i < classSlots.length) {
-      unitClass = classSlots(i).unitClass
+      unitClass = classSlots(i).unitClass.baseClass
       var j = 0
       while (j < classSlots(i).slots) {
         var proceed = true

@@ -2,9 +2,10 @@ package Gameplans.Zerg.ZvP
 
 import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
-import Placement.Access.PlacementQuery
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.GameTime
+import Utilities.UnitFilters.IsHatchlike
 
 class ZvP10HatchSpeed extends ZergGameplan {
 
@@ -33,18 +34,27 @@ class ZvP10HatchSpeed extends ZergGameplan {
   }
 
   override def executeMain(): Unit = {
-    attack()
+    var shouldAttack = true
+    shouldAttack &&= Zerg.ZerglingSpeed() || ! enemyHasUpgrade(Zerg.ZerglingSpeed)
+    shouldAttack &&= enemiesComplete(IsHatchlike) <= unitsComplete(IsHatchlike) || confidenceAttacking01 > 0.6
+    shouldAttack &&= unitsComplete(Zerg.Mutalisk) >= enemies(Zerg.Mutalisk) || unitsComplete(Zerg.Zergling) > enemies(Zerg.Zergling)
+    attack(shouldAttack)
+
     if (haveGasForUpgrade(Zerg.ZerglingSpeed) && ! haveEver(Zerg.Spire)) {
       gasWorkerCeiling(2)
     }
     once(8, Zerg.Mutalisk)
+    upgradeContinuously(Zerg.ZerglingAttackSpeed)
     if (enemyProximity < 0.5) {
-      get(10 * miningBases, Zerg.Drone)
+      get(11 * miningBases, Zerg.Drone)
       pumpGasPumps(units(Zerg.Drone) / 16)
       get(Zerg.QueensNest, Zerg.Hive)
     }
     pump(Zerg.Mutalisk)
-    get(Zerg.ZerglingAttackSpeed)
+    if ( ! enemiesHave(Zerg.Spire) && enemiesComplete(IsHatchlike) > unitsComplete(IsHatchlike)) {
+      pump(Zerg.Drone, 11)
+      buildSunkensAtFoyer(3, PlaceLabels.DefendHall)
+    }
     pump(Zerg.Zergling)
     requireMiningBases(5)
     fillMacroHatches(10)

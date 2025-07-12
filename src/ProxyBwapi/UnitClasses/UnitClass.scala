@@ -234,6 +234,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val isSpirelike    : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
   lazy val isTank         : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
 
+  lazy val baseClass: UnitClass = ?(isTank, Terran.SiegeTankUnsieged, this)
 
   private def _buildUnitsEnabling: Vector[UnitClass] = {
     lazy val output = new ListBuffer[UnitClass]

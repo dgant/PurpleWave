@@ -40,10 +40,10 @@ trait Expansions {
       .map(b => (b, Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).minBy(_.groundPixels(b.heart))))
       .map(bh => (bh._1, bh._2, {
           val profile = new PathfindProfile(bh._2, Some(bh._1.heart))
-          profile.threatMaximum = Some(0)
-          profile.employGroundDist = true
-          profile.endDistanceMaximum = 32 + bh._2.groundTiles(bh._1.heart)
-          profile.lengthMaximum = Some(64)
+          profile.threatMaximum       = Some(0)
+          profile.employGroundDist    = true
+          profile.endDistanceMaximum  = 32 + bh._2.groundTiles(bh._1.heart)
+          profile.lengthMaximum       = Some(64)
           profile.find
         }))
       .toVector
@@ -57,10 +57,10 @@ trait Expansions {
   private def rankForPlayer(player: PlayerInfo): Vector[Base] = {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
-    val tileHome        = if (player.isFriendly)  With.geography.home     else With.scouting.enemyHome
-    val tileEnemy       = if (player.isEnemy)     With.scouting.enemyHome else With.geography.home
-    val friendlyPlayers = if (player.isFriendly)  Vector(player)          else With.enemies
-    val opposingPlayers = if (player.isEnemy)     Vector(player)          else With.enemies
+    val tileHome        = ?(player.isFriendly,  With.geography.home,     With.scouting.enemyHome)
+    val tileEnemy       = ?(player.isEnemy,     With.scouting.enemyHome, With.geography.home)
+    val friendlyPlayers = ?(player.isFriendly,  Vector(player),          With.enemies)
+    val opposingPlayers = ?(player.isEnemy,     Vector(player),          With.enemies)
     val friendlyBases   = With.geography.bases.filter(b => friendlyPlayers.contains(b.owner))
     val opposingBases   = With.geography.bases.filter(b => opposingPlayers.contains(b.owner))
     val friendlyTiles   = Maff.orElse(friendlyBases.map(_.heart), Seq(tileHome))
@@ -73,8 +73,9 @@ trait Expansions {
     val gasBasesNeeded  = Maff.max(opposingRaces.flatMap(raceGasBases.get) ++ Seq(4).filter(x => With.unitsShown(player, Protoss.FleetBeacon) > 0)).getOrElse(3)
 
     def scoreBase(base: Base, player: PlayerInfo): Double = {
-      val originStrength    = if (player.isFriendly)  With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin
-      val originThreat      = if (player.isEnemy)     With.scouting.ourMuscleOrigin else With.scouting.enemyMuscleOrigin
+      val sameMetro         = ?(base.metro.bases.exists(_.owner == player), 10, 1)
+      val originStrength    = ?(player.isFriendly,  With.scouting.ourMuscleOrigin, With.scouting.enemyMuscleOrigin)
+      val originThreat      = ?(player.isEnemy,     With.scouting.ourMuscleOrigin, With.scouting.enemyMuscleOrigin)
       val distanceHome      = Maff.mean(friendlyTiles.map(base.heart.groundTiles).map(_.toDouble))
       val distanceEnemy     = Maff.mean(opposingTiles.map(base.heart.groundTiles).map(_.toDouble))
       val distanceStrength  = originStrength.groundTiles(base.heart)
@@ -87,7 +88,7 @@ trait Expansions {
       val factorGas         = ?(adequateGas(base) || gasBases > gasBasesNeeded || player.gas > 800, 1.0, ?(gasBases == gasBasesNeeded, 0.75, 0.1))
       val factorSafe        = ?(_safeExpansions.contains(base) || player.isEnemy, 1.0, 0.2)
       val factorFullness    = ?(MacroFacts.isMiningBase(base), 1.0, 0.1)
-      val output            = nearHome * nearStrength * factorNatural * factorGas * factorSafe * factorFullness - nearEnemy * nearThreat * shyness
+      val output            = sameMetro * nearHome * nearStrength * factorNatural * factorGas * factorSafe * factorFullness - nearEnemy * nearThreat * shyness
       output
     }
 

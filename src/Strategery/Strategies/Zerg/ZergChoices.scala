@@ -2,7 +2,7 @@ package Strategery.Strategies.Zerg
 
 import Gameplans.Zerg.ZvE.ZvE4Pool
 import Gameplans.Zerg.ZvP.{ZvP10HatchSpeed, ZvPCrackling, ZvPHydraLurker}
-import Gameplans.Zerg.ZvT.{ZvT13PoolMuta, ZvTEffortBust, ZvTOneBaseLurker}
+import Gameplans.Zerg.ZvT.{ZvT13PoolMuta, ZvT3HatchCrazy, ZvTEffortBust, ZvTOneBaseLurker}
 import Gameplans.Zerg.ZvZ.{ZvZ10Hatch, ZvZ9Pool}
 import Lifecycle.With
 import Planning.Plans.Plan
@@ -18,6 +18,7 @@ object ZvE4Pool           extends ZvEStrategy { override def gameplan: Option[Pl
 object ZvTEffortBust      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTEffortBust)     }
 object ZvTOneHatchLurker  extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTOneBaseLurker)  }
 object ZvT13PoolMuta      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT13PoolMuta)   ; blacklistVs(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)  }
+object ZvT3HatchCrazy     extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT3HatchCrazy)    }
 object ZvPCrackling       extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPCrackling)      }
 object ZvPHydraLurker     extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPHydraLurker)    }
 object ZvP10HatchSpeed    extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvP10HatchSpeed)   }
@@ -33,7 +34,8 @@ object ZergChoices {
   val zvt: Vector[Strategy] = Vector(
     ZvTEffortBust,
     ZvTOneHatchLurker,
-    ZvT13PoolMuta
+    ZvT13PoolMuta,
+    ZvT3HatchCrazy
   )
 
   val zvp: Vector[Strategy] = Vector(

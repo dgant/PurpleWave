@@ -2,9 +2,10 @@ package Gameplans.Terran.TvP
 
 import Gameplans.Terran.TvE.TerranGameplan
 import Lifecycle.With
-import Macro.Actions.Enemy
+import Macro.Actions.{Enemy, Flat}
 import Macro.Requests.RequestUnit
 import ProxyBwapi.Races.{Protoss, Terran}
+import Utilities.?
 import Utilities.Time.Seconds
 import Utilities.UnitFilters.IsWarrior
 
@@ -51,7 +52,7 @@ class TvP2Fac extends TerranGameplan {
       }
       get(Terran.GoliathAirRange)
     }
-    pumpRatio(Terran.Goliath, 1, 36, Seq(Enemy(Protoss.Corsair, 0.5), Enemy(Protoss.Scout, 1.5), Enemy(Protoss.Carrier, 6.0)))
+    pumpRatio(Terran.Goliath, 1, 36, Seq(Flat(?(enemyHasShown(Protoss.Carrier, Protoss.FleetBeacon), 8, 1)), Enemy(Protoss.Corsair, 0.5), Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Carrier, 6.0)))
     pumpRatio(Terran.Vulture, 0, 8, Seq(Enemy(Protoss.DarkTemplar, 2.0)))
     once(Terran.MachineShop)
     once(Terran.SiegeTankUnsieged)

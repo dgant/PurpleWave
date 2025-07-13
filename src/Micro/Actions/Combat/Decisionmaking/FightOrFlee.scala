@@ -38,7 +38,7 @@ object FightOrFlee extends Action {
     decide(true,  "HugTank",    () => ! u.flying && u.agent.ride.isEmpty && With.enemies.exists(_.isTerran) && u.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(u)))
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(true,  "CoverFire",  () => u.matchups.targetNearest.exists(_.matchups.threatDeepestInRange.exists(_.isAny(IsTank, Terran.Bunker, Terran.MissileTurret, Protoss.Reaver, Protoss.PhotonCannon, Zerg.Guardian, IsBurrowedLurker, Zerg.SunkenColony, Zerg.SporeColony))))
-    decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.metro.exists(_.isOurs) && ! u.team.exists(_.catchesGround) && u.matchups.threats.exists(Terran.Vulture))
+    decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.team.exists(_.catchesGround) && u.matchups.threatDeepest.exists(td => Terran.Vulture(td) && td.matchups.targetNearest.exists(tn => td.pixelsToGetInRange(tn) < 32 && tn.unitClass == u.unitClass)))
     decide(true,  "Cloaked",    () => u.effectivelyCloaked && ( ! Terran.Wraith(u) || u.energy > 10))
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)
     decide(true,  "Lurking",    () => Zerg.Lurker(u)                                              && u.matchups.groupVs.detectors.isEmpty)

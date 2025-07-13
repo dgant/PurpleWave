@@ -32,7 +32,7 @@ final class Simulation {
         realUnitsOurs   ++= realUnits.view.filter(_.isOurs)
         realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
         enemyVanguard     = battle.enemy.vanguardKey()
-        engaged           = battle.units.exists(_.matchups.engagedUpon)
+        engaged           = false
         simulacra.foreach(_.reset(this))
         shouldReset = false
       } finally {

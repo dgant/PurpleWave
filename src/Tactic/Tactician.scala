@@ -187,6 +187,10 @@ final class Tactician extends TimedTask {
 
   private def runCoreTactics(): Unit = {
 
+    /////////////
+    // DEFENSE //
+    /////////////
+
     val defenseDivisions = With.battles.divisions
       .filter(d => d.bases.exists(b => (b.isOurs || b.plannedExpoRecently) && ! b.isEnemy))
       .map(new DefenseDivision(_))
@@ -235,10 +239,10 @@ final class Tactician extends TimedTask {
         && ! defenseDivisionsActive.exists(_.division.bases.contains(b)) // If it was in a defense division, it should have received some defenders already
         && b.metro.bases.view.flatMap(_.ourUnits).count(_.isAny(IsAll(IsComplete, IsAny(Terran.Factory, Terran.Barracks, Protoss.Gateway, IsHatchlike, Protoss.PhotonCannon, Terran.Bunker, Zerg.SunkenColony)))) < 3)
 
-      val qualifiedClasses = if (With.enemies.exists(_.isTerran))
-        Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker)
-      else
-        Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker)
+      val qualifiedClasses =
+        ?(With.enemies.exists(_.isTerran),
+        Seq(Terran.Marine, Terran.Vulture, Terran.Goliath, Protoss.Dragoon, Protoss.Archon, Zerg.Hydralisk, Zerg.Lurker),
+        Seq(Terran.Marine, Terran.Firebat, Terran.Vulture, Terran.Goliath, Protoss.Zealot, Protoss.Dragoon, Protoss.Archon, Zerg.Zergling, Zerg.Hydralisk, Zerg.Lurker))
 
       freelancersPick(
         freelancers,

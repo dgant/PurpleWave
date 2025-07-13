@@ -12,6 +12,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
+import Utilities.UnitFilters.IsLairlike
 
 // Commander is responsible for issuing unit commands
 // in a way that Brood War handles gracefully,
@@ -362,7 +363,7 @@ object Commander {
       // Spamming return cargo can cause path wobbling
       if ( ! Vector(Orders.ResetCollision, Orders.ReturnMinerals, Orders.ReturnGas).contains(unit.order)) {
         lazy val nextClosestFrames = Maff.min(With.geography.ourBases.view.flatMap(_.townHall).filter(_.complete).map(h => unit.framesToTravelTo(h.exitTile)))
-        val incompleteHall = unit.base.flatMap(_.townHall.filterNot(_.complete))
+        val incompleteHall = unit.base.flatMap(_.townHall.filter(t => ! t.complete && ! IsLairlike(t)))
         if (incompleteHall.exists(hall => nextClosestFrames.forall(_ * 2 > hall.remainingCompletionFrames))) {
           move(unit, incompleteHall.get.pixel)
         } else {

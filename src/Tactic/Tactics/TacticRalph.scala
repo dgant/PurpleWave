@@ -25,7 +25,8 @@ class TacticRalph extends Tactic with MacroCounting {
     if (With.tactics.workerScout.units.nonEmpty) return
     if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)()) return
     if (With.framesSince(lastDeath) < Seconds(20)()) return
-    if (With.scouting.ourProximity < 0.25) return
+    if (With.scouting.ourProximity < 0.5) return
+    if (With.self.supplyUsed400 < 60) return
     if (With.tactics.attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy)) return
 
     val ralphClass: UnitFilter =

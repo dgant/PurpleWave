@@ -10,6 +10,8 @@ import Utilities.Time.Seconds
 
 class ZvT3HatchCrazy extends ZergGameplan {
 
+  var scoutTrigger: Boolean = false
+
   override def executeBuild(): Unit = {
     once(9, Zerg.Drone)
     once(2, Zerg.Overlord)
@@ -23,7 +25,10 @@ class ZvT3HatchCrazy extends ZergGameplan {
     get(Zerg.Extractor, new PlacementQuery(Zerg.Extractor).preferBase(With.geography.ourMain))
     once(6, Zerg.Zergling)
 
-    scoutOn(Zerg.Hatchery, 3)
+    scoutTrigger ||= minerals >= 275
+    if (scoutTrigger) {
+      scout()
+    }
   }
 
   override def executeMain(): Unit = {
@@ -85,13 +90,13 @@ class ZvT3HatchCrazy extends ZergGameplan {
         pump(Zerg.Zergling, 4)
       })
 
-    pump(Zerg.Drone, miningBases * 12)
+    pump(Zerg.Drone, Math.min(72, miningBases * 12))
     get(Zerg.EvolutionChamber, Zerg.QueensNest)
 
     pumpGasPumps(units(Zerg.Drone) / 2)
     requireMiningBases(4)
-    get(2, Zerg.EvolutionChamber)
-    requireMiningBases(7)
     pump(Zerg.Zergling)
+    requireMiningBases(8)
+    fillMacroHatches(24)
   }
 }

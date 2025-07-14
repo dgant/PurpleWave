@@ -6,6 +6,7 @@ import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.Zerg
 import Utilities.Time.{GameTime, Minutes, Seconds}
+import Utilities.UnitFilters.IsHatchlike
 import Utilities.{?, SwapIf}
 
 class ZvZ10Hatch extends ZergGameplan {
@@ -39,9 +40,12 @@ class ZvZ10Hatch extends ZergGameplan {
   }
 
   override def executeMain(): Unit = {
-    if (safePushing && (Zerg.ZerglingSpeed() || enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool))) {
-      attack()
-    }
+    var shouldAttack = safePushing
+    shouldAttack &&= Zerg.ZerglingSpeed() || enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool)
+    shouldAttack &&= enemiesComplete(IsHatchlike) <= unitsComplete(IsHatchlike) || confidenceAttacking01 > 0.6
+    shouldAttack &&= unitsComplete(Zerg.Mutalisk) >= enemies(Zerg.Mutalisk) || unitsComplete(Zerg.Zergling) > enemies(Zerg.Zergling)
+    attack(shouldAttack)
+
     harass()
     if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
       if ( ! have(Zerg.Spire)) {

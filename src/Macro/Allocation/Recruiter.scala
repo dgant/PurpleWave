@@ -1,6 +1,7 @@
 package Macro.Allocation
 
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -20,7 +21,20 @@ class Recruiter {
 
   def update(): Unit = {
     // Remove ineligible units
-    unitsByLock.values.foreach(_.view.filterNot(recruitable).foreach(unlock))
+    unitsByLock.foreach { case (lock, units) => units.view
+      .filterNot(recruitable)
+      .filterNot(lock.matcher)
+      .foreach(unlock)
+    }
+
+    // Ablate locks
+    unitsByLock.foreach { case (lock, units) => {
+      val excess = units.size - lock.counter.maximum
+      if (excess > 0) {
+        val ablate = Maff.takeN(excess, units)(Ordering.by(u => lock.preference(u))) // TakeN uses PriorityQueue, so it's high-to-low
+        ablate.foreach(unlock)
+      }
+    }}
 
     // 1. Deactivate all locks that haven't been renewed.
     // 2. Clear active locks. If they are not renewed on this update, deactivate them on the next.

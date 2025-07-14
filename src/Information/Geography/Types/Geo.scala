@@ -24,14 +24,17 @@ trait Geo {
   lazy val isInterior       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z))))
   lazy val isBackyard       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
   lazy val isPocket         : Boolean           = isInterior && ! isMain && ! island
+  lazy val maxAltitude      : Int               = Maff.max(tiles.view.map(_.altitude)).getOrElse(0)
   lazy val radians          : Double            = Points.middle.radiansTo(heart.center)
   lazy val rushDistanceMin  : Double            = Maff.max(rushDistances).getOrElse(0)
   lazy val rushDistanceMax  : Double            = Maff.max(rushDistances).getOrElse(0)
   lazy val arrow            : String            = RadianArrow(Points.tileMiddle.radiansTo(heart))
   lazy val adjective        : String            = if (island) "island " else if (isBackyard) "backyard " else if (isPocket) "pocket " else ""
   lazy val centroid         : Tile              = Maff.centroidTiles(Maff.orElse(tiles.filter(_.walkableUnchecked), tiles))
+  lazy val peak             : Option[Tile]      = Maff.minBy(peaks)(_.pixelDistance(heart)).filter(_.pixelDistance(heart) < 320).orElse(Maff.minBy(peaks)(p => Maff.min(edges.map(_.pixelCenter.pixelDistance(p.center))).getOrElse(heart.pixelDistance(p))))
   lazy val boundary         : TileRectangle     = new TileRectangle(tiles)
   lazy val border           : Set[Tile]         = tiles.filter( ! _.adjacent8.forall(tiles.contains))
+  lazy val peaks            : Set[Tile]         = tiles.filter(_.altitude >= maxAltitude && maxAltitude > heart.altitude)
   lazy val selfAndChildren  : Vector[Geo]       = (Vector[Geo](this) ++ zones ++ bases).distinct
   lazy val edges            : Vector[Edge]      = With.geography.edges.filter(_.zones.exists(zones.contains))
   lazy val exits            : Vector[Edge]      = edges.filter(_.zones.exists( ! zones.contains(_))).distinct

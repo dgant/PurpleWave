@@ -23,10 +23,13 @@ class TacticPylonBlock extends Tactic {
     }
     lastWorker = None
 
-    if (With.self.isZerg)                           return
-    if (With.enemies.exists(_.isZerg))              return
-    if (With.framesSince(lastDeath) < Minutes(1)()) return
-    if (With.units.countOurs(IsWorker) < 38)        return
+    var abort = false
+    abort ||= With.self.isZerg
+    abort ||= With.enemies.exists(_.isZerg)
+    abort ||= With.framesSince(lastDeath) < Minutes(1)()
+    abort ||= With.units.countOurs(IsWorker) < 38
+    abort ||= With.scouting.enemyProximity > 0.5 && units.isEmpty
+    if (abort) return
 
     bases = With.geography.preferredExpansionsEnemy
     bases = bases.filter(base => With.scouting.weControl(base.townHallTile))

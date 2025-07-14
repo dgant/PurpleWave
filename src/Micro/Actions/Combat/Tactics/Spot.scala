@@ -76,7 +76,8 @@ object Spot extends Action {
     ?(unit.targetsAssigned.isDefined, Seq.empty, unit.enemiesBattle))
 
   def groupSupported(unit: FriendlyUnitInfo): Option[UnitGroup] = {
-    unit.squad.orElse(Some(unit.matchups.groupOf).filter(g => g.attacksGround || g.attacksAir))
+    unit.squad
+    //   unit.squad.orElse(Some(unit.matchups.groupOf).filter(g => g.attacksGround || g.attacksAir))
   }
 
   def detectionTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {

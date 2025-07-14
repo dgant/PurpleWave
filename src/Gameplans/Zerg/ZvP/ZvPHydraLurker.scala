@@ -106,7 +106,7 @@ class ZvPHydraLurker extends ZergGameplan {
     get(Zerg.EvolutionChamber)
     get(Zerg.LurkerMorph)
     get(Zerg.GroundArmor)
-    pump(Zerg.Lurker, units(Zerg.Hydralisk) / 4)
+    pump(Zerg.Lurker, Math.min(units(Zerg.Hydralisk) / 4, enemies(Protoss.Zealot) / 4))
     pumpGasPumps(3)
     requireMiningBases(4)
 

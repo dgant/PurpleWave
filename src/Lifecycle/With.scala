@@ -4,7 +4,7 @@ import Debugging.Visualizations.{Animations, Viewport, Visualization}
 import Debugging.{Camera, LambdaQueue, Logger, Storyteller}
 import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.Simulation
-import Information.Counting.{Accounting, Efficiency, MacroCounts, ProductionHistory, Projections}
+import Information.Counting._
 import Information.Fingerprinting.Fingerprints
 import Information.GameSense.GameSensor
 import Information.Geography.Geography
@@ -13,7 +13,6 @@ import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
 import Lifecycle.Configure.{BwapiData, Configuration, ConfigurationLoader}
-import Macro.Actions.Supplier
 import Macro.Allocation._
 import Macro.Gathering.Gathering
 import Macro.Scheduling.{MacroSim, Scheduler}

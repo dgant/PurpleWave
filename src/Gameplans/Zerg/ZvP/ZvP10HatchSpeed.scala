@@ -2,10 +2,9 @@ package Gameplans.Zerg.ZvP
 
 import Gameplans.Zerg.ZvE.ZergGameplan
 import Lifecycle.With
-import Placement.Access.{PlaceLabels, PlacementQuery}
-import ProxyBwapi.Races.Zerg
+import Placement.Access.PlacementQuery
+import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.Time.GameTime
-import Utilities.UnitFilters.IsHatchlike
 
 class ZvP10HatchSpeed extends ZergGameplan {
 
@@ -29,34 +28,69 @@ class ZvP10HatchSpeed extends ZergGameplan {
     once(Zerg.ZerglingSpeed)
     once(12, Zerg.Zergling)
     once(3, Zerg.Overlord)
-    once(26, Zerg.Zergling) // 18 done as speed finishes, 8 following shortly thereafter
+    once(20, Zerg.Zergling) // 18 done as speed finishes, 8 following shortly thereafter
     get(Zerg.Lair, Zerg.Spire)
   }
 
   override def executeMain(): Unit = {
-    var shouldAttack = true
-    shouldAttack &&= Zerg.ZerglingSpeed() || ! enemyHasUpgrade(Zerg.ZerglingSpeed)
-    shouldAttack &&= enemiesComplete(IsHatchlike) <= unitsComplete(IsHatchlike) || confidenceAttacking01 > 0.6
-    shouldAttack &&= unitsComplete(Zerg.Mutalisk) >= enemies(Zerg.Mutalisk) || unitsComplete(Zerg.Zergling) > enemies(Zerg.Zergling)
-    attack(shouldAttack)
+    attack()
 
-    if (haveGasForUpgrade(Zerg.ZerglingSpeed) && ! haveEver(Zerg.Spire)) {
+    if ( ! upgradeComplete(Zerg.ZerglingSpeed)) {
+      aggression(0.5)
+    }
+
+    once(23, Zerg.Drone)
+    if (With.fingerprints.twoGate()) {
+      buildSunkensAtFoyer(2)
+    } else {
+      requireMiningBases(3)
+    }
+
+    if (haveGasForUpgrade(Zerg.ZerglingSpeed)) {
+      if (haveEver(Zerg.Spire)) {
+        pumpGasPumps(units(Zerg.Drone) / 9)
+      } else {
+        gasWorkerCeiling(2)
+
+      }
+    } else {
       gasWorkerCeiling(2)
     }
-    once(8, Zerg.Mutalisk)
+
+    once(10, Zerg.Mutalisk)
+
+    if (haveComplete(Zerg.Hive)) {
+      get(Zerg.GreaterSpire)
+    }
+    upgradeContinuously(Zerg.AirDamage) && upgradeContinuously(Zerg.AirArmor)
     upgradeContinuously(Zerg.ZerglingAttackSpeed)
-    if (enemyProximity < 0.5) {
-      get(11 * miningBases, Zerg.Drone)
-      pumpGasPumps(units(Zerg.Drone) / 16)
-      get(Zerg.QueensNest, Zerg.Hive)
+    upgradeContinuously(Zerg.GroundArmor)
+    upgradeContinuously(Zerg.GroundMeleeDamage)
+
+    if (enemyProximity < 0.3) {
+      pump(Zerg.Guardian, units(Zerg.Mutalisk) / 4)
     }
+    pump(Zerg.Scourge, 2 * Math.min(enemies(Protoss.Corsair),  units(Zerg.Mutalisk)))
     pump(Zerg.Mutalisk)
-    if ( ! enemiesHave(Zerg.Spire) && enemiesComplete(IsHatchlike) > unitsComplete(IsHatchlike)) {
-      pump(Zerg.Drone, 11)
-      buildSunkensAtFoyer(3, PlaceLabels.DefendHall)
+    pump(Zerg.Zergling, 10)
+    if (enemyProximity > 0.5) {
+      pump(Zerg.Zergling)
+    } else {
+      pump(Zerg.Drone, Math.min(miningBases, 5) * 13)
     }
+
+    get(Zerg.QueensNest, Zerg.Hive)
+    if (miningBases >= 4 && have(Zerg.Hive)) {
+      get(2, Zerg.EvolutionChamber)
+    }
+    get(Zerg.OverlordSpeed)
+
     pump(Zerg.Zergling)
-    requireMiningBases(5)
-    fillMacroHatches(10)
+
+    if (enemyProximity < 0.4) {
+      requireMiningBases(7)
+    } else {
+      fillMacroHatches(21)
+    }
   }
 }

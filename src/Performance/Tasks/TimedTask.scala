@@ -72,7 +72,7 @@ abstract class TimedTask {
     runMsEnqueue(0)
   }
 
-  final def run(budgetMs: Long) {
+  final def run(budgetMs: Long): Unit = {
     budgetMsEnqueue(budgetMs)
     val budgetMsCapped        = Math.min(budgetMs, With.performance.msBeforeTarget)
     val millisecondsBefore    = With.performance.systemMillis

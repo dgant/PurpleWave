@@ -62,6 +62,9 @@ class PlacementQuery {
     if (Seq(Terran.SupplyDepot, Protoss.Pylon).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.Supply
     }
+    if (building.isGas) {
+      preferBase(Maff.orElse(preferences.base.filter(b => b.townHall.exists(_.complete) && b.workerCount >= 4), preferences.base).toSeq: _*)
+    }
   }
 
   def requireWidth        (value: Int)          : PlacementQuery = { requirements.width     = Some(value);  this }

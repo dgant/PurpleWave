@@ -12,6 +12,8 @@ class PvTFastCarrier extends PvTOpeners {
 
   override def activated: Boolean = PvTFastCarrier()
 
+  var getMuscle: Boolean = enemyRecentStrategy(With.fingerprints.oneBaseBioMech, With.fingerprints.twoFac, With.fingerprints.twoRaxAcad)
+
   override def executeMain(): Unit = {
     val armyNormalPriority = new DoQueue(PvTArmy.normalPriority)
 
@@ -42,6 +44,20 @@ class PvTFastCarrier extends PvTOpeners {
       get(Protoss.RoboticsSupportBay)
       once(2, Protoss.Reaver)
       requireMiningBases(3)
+    }
+
+    if ( ! haveEver(Protoss.RoboticsFacility)) {
+      getMuscle &&= enemyBases < 2
+    }
+
+    if (getMuscle) {
+      get(Protoss.RoboticsFacility)
+      get(2, Protoss.Gateway)
+      once(Protoss.Shuttle)
+      get(Protoss.RoboticsSupportBay)
+      once(2, Protoss.Reaver)
+      once(Protoss.Observatory)
+      once(Protoss.Observer)
     }
 
     get(2, Protoss.Stargate)

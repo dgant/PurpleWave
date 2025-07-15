@@ -28,16 +28,16 @@ abstract class ZergGameplan extends GameplanImperative {
   }
 
   def reactTo4Pool(): Unit = {
-    if (With.frame > Minutes(5)()) return
+    if (With.frame > Minutes(7)()) return
     once(9, Zerg.Drone)
     get(Zerg.SpawningPool)
     once(10, Zerg.Drone)
     once(2, Zerg.Overlord)
     once(11, Zerg.Drone)
-    once(10, Zerg.Zergling)
     buildSunkensAtMain(1, PlaceLabels.DefendHall)
+    once(10, Zerg.Zergling)
     pump(Zerg.Mutalisk)
-    pump(Zerg.Zergling, enemies(Zerg.Zergling) + 4)
+    pump(Zerg.Zergling, enemies(Zerg.Zergling) + 4 - 6 * unitsComplete(Zerg.SunkenColony))
     pump(Zerg.Drone, 8)
     if (unitsEver(Zerg.CreepColony) == 0 && unitsEver(Zerg.Zergling) < 12) {
       gasLimitCeiling(0)

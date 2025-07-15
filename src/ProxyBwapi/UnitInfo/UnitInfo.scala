@@ -23,7 +23,7 @@ import ProxyBwapi.Upgrades.Upgrade
 import Tactic.Production.Production
 import Utilities.?
 import Utilities.Time.{Forever, Frames, Seconds}
-import Utilities.UnitFilters.{IsHatchlike, UnitFilter}
+import Utilities.UnitFilters.UnitFilter
 import bwapi.Color
 
 abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProxy with CombatUnit with SkimulationUnit with Targeted with UnitFilter {
@@ -57,7 +57,6 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastFrameMiningGas          : Int = - Forever()
   var lastFrameCarrying           : Int = - Forever()
   var firstFrameMiningGas         : Int =   Forever()
-  var hasEverBeenCompleteHatch    : Boolean = false // Stupid AIST hack fix for detecting whether a base is mineable
   var lastHitPoints               : Int = _
   @inline final def completionFrameFull: Int = completionFrame +  unitClass.framesToFinishCompletion
   private var lastUnitClass       : UnitClass = _
@@ -94,11 +93,12 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lastShieldPoints  = shieldPoints
     lastMatrixPoints  = matrixPoints
     lastCooldown      = cooldownLeft
-    hasEverBeenCompleteHatch ||= complete && is(IsHatchlike)
     previousPixels(With.frame % previousPixels.length) = pixel
   }
 
-  @inline final def aliveAndComplete: Boolean = alive && complete
+  @inline final def aliveAndComplete  : Boolean = alive && complete
+  @inline final def openForBusiness   : Boolean = complete || isAny(Zerg.Lair, Zerg.Hive, Zerg.GreaterSpire)
+
   @inline final def energyMax     : Int = unitClass.maxEnergy // TODO: Count effects of upgrades
   @inline final def mineralsLeft  : Int = if (unitClass.isMinerals) resourcesLeft else 0
   @inline final def gasLeft       : Int = if (unitClass.isGas)      resourcesLeft else 0

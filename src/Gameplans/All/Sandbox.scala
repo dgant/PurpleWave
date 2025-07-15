@@ -19,24 +19,20 @@ class Sandbox extends GameplanImperative {
   override def executeBuild(): Unit = {
     once(9, Zerg.Drone)
     once(2, Zerg.Overlord)
-    get(Zerg.Extractor)
-    once(11, Zerg.Drone)
-    get(Zerg.SpawningPool)
+    once(12, Zerg.Drone)
+    fillMacroHatches(2)
     once(13, Zerg.Drone)
-    once(6, Zerg.Zergling)
-    get(Zerg.Lair)
+    requireMiningBases(2)
+    once(14, Zerg.Drone)
+    fillMacroHatches(4)
+    once(15, Zerg.Drone)
+    requireMiningBases(3)
+    once(16, Zerg.Drone)
+    fillMacroHatches(6)
+    once(17, Zerg.Drone)
+    requireMiningBases(4)
   }
 
   override def executeMain(): Unit = {
-    pump(Zerg.Mutalisk)
-    if (enemyStrategy(With.fingerprints.fourPool, With.fingerprints.ninePool)) {
-      fillMacroHatches(2)
-    } else {
-      requireMiningBases(2)
-    }
-    once(6, Zerg.Mutalisk)
-    get(Zerg.Spire)
-    pump(Zerg.Zergling)
-    attack()
   }
 }

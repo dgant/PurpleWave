@@ -8,6 +8,7 @@ import Macro.Requests._
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.{DefendAir, DefendEntrance, DefendGround, MacroHatch, PlaceLabel}
 import Placement.Access.{PlaceLabels, PlacementQuery}
+import Placement.FoundationSources
 import ProxyBwapi.Buildable
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.Techs.Tech
@@ -100,12 +101,9 @@ trait MacroActions extends MacroCounting {
 
   // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
   private def completeBases       : Int = ourBaseTownHalls.count(b => b.complete)
-  1
-
   private def completeMiningBases : Int = ourBaseTownHalls.count(b => b.complete && b.base.exists(isMiningBase))
-  def expandNTimes        (times: Int)    : Unit = if (times > 0) get(completeBases + times, With.self.townHallClass)
-  1
 
+  def expandNTimes        (times: Int)    : Unit = if (times > 0) get(times, With.self.townHallClass, new PlacementQuery(With.self.townHallClass).requireBase(With.geography.bases.filterNot(_.townHall.exists(_.openForBusiness)): _*))
   def expandOnce()                        : Unit = expandNTimes(1)
   def requireBases        (count: Int)    : Unit = expandNTimes(count - completeBases)
   def requireMiningBases  (count: Int)    : Unit = expandNTimes(count - completeMiningBases)
@@ -176,7 +174,9 @@ trait MacroActions extends MacroCounting {
       totalHatcheryCount,
       Zerg.Hatchery,
       new PlacementQuery(Zerg.Hatchery)
-        .requireLabelYes(MacroHatch)
+        .foundationSource(FoundationSources.Default)
+        .requireLabelYes()
+        .preferLabelYes(MacroHatch)
         .preferBase(
           Maff.orElse(
             preferredBases,

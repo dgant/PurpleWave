@@ -72,83 +72,94 @@ final class MacroSim {
     initialState.techs ++= Techs.all.view.filter(With.self.hasTech)
     insert(initialStep)
 
-    // Construct events for production in progress
-    With.units.ours.filter(_.hasEverBeenCompleteHatch).foreach(hatch => larvaSteps(hatch.completionFrame % 342, ASAP = true).foreach(insert))
-    With.units.ours.filter(trulyUnoccupied).foreach(u => initialState.producers(u.unitClass) += 1)
-    With.units.ours.filterNot(trulyUnoccupied).foreach(u => {
-      val step      = new MacroStep
-      val event     = step.event
-      event.dFrames = u.remainingOccupationFrames
-      val finalClass =
-        if (u.isAny(Zerg.Egg, Zerg.Cocoon, Zerg.LurkerEgg)) {
-          u.buildType
-        } else {
-          u.unitClass
+    /////////////////////////////////////////////////
+    // Construct events for production in progress //
+    /////////////////////////////////////////////////
+
+    With.units.ours
+      .filter(u => u.unitClass.isHatchlike && u.openForBusiness)
+      .foreach(hatch => larvaSteps(hatch.completionFrame % 342, ASAP = true).foreach(insert))
+
+    With.units.ours
+      .filter(trulyUnoccupied)
+      .foreach(u => initialState.producers(u.unitClass) += 1)
+
+    With.units.ours
+      .filterNot(trulyUnoccupied)
+      .foreach(u => {
+        val step      = new MacroStep
+        val event     = step.event
+        event.dFrames = u.remainingOccupationFrames
+        val finalClass =
+          if (u.isAny(Zerg.Egg, Zerg.Cocoon, Zerg.LurkerEgg)) {
+            u.buildType
+          } else {
+            u.unitClass
+          }
+        if (u.morphing || ! u.complete) {
+          step.request = Some(RequestUnit(finalClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
+          event.dUnitComplete       = finalClass
+          event.dUnitCompleteN      = finalClass.copiesProduced
+          event.dUnitCompleteASAP   = finalClass
+          event.dUnitCompleteASAPN  = finalClass.copiesProduced
+          event.dProducer1          = finalClass
+          event.dProducer1N         = finalClass.copiesProduced
+          if (u.isNone(Zerg.Lair, Zerg.Hive)) {
+            event.dSupplyAvailable += finalClass.supplyProvided
+          }
         }
-      if (u.morphing || ! u.complete) {
-        step.request = Some(RequestUnit(finalClass, initialState.unitsExtant(u.unitClass), specificTraineeArg = Some(u)))
-        event.dUnitComplete       = finalClass
-        event.dUnitCompleteN      = finalClass.copiesProduced
-        event.dUnitCompleteASAP   = finalClass
-        event.dUnitCompleteASAPN  = finalClass.copiesProduced
-        event.dProducer1          = finalClass
-        event.dProducer1N         = finalClass.copiesProduced
-        if (u.isNone(Zerg.Lair, Zerg.Hive)) {
-          event.dSupplyAvailable += finalClass.supplyProvided
+        if (u.upgrading) {
+          step.request = Some(RequestUpgrade(u.upgradingType, 1 + With.self.getUpgradeLevel(u.upgradingType)))
+          event.dUpgrade = u.upgradingType
+          event.dUpgradeLevel = 1 + initialState.upgrades(u.upgradingType)
+        } else if (u.teching) {
+          step.request = Some(RequestTech(u.techingType))
+          event.dTech = u.techingType
+        } else if (finalClass.isGas) {
+          event.dGeysers += 1
+        } else if ( ! u.complete && u.unitClass.isResourceDepot && u.isNone(Zerg.Lair, Zerg.Hive)) {
+          val base = u.base.filter(_.townHall.contains(u))
+          base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
         }
-      }
-      if (u.upgrading) {
-        step.request = Some(RequestUpgrade(u.upgradingType, 1 + With.self.getUpgradeLevel(u.upgradingType)))
-        event.dUpgrade = u.upgradingType
-        event.dUpgradeLevel = 1 + initialState.upgrades(u.upgradingType)
-      } else if (u.teching) {
-        step.request = Some(RequestTech(u.techingType))
-        event.dTech = u.techingType
-      } else if (finalClass.isGas) {
-        event.dGeysers += 1
-      } else if ( ! u.complete && u.unitClass.isResourceDepot && u.isNone(Zerg.Lair, Zerg.Hive)) {
-        val base = u.base.filter(_.townHall.contains(u))
-        base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
-      }
-      event.dProducer1  = finalClass
-      event.dProducer1N = Maff.fromBoolean(! u.morphing)
-      insert(step)
-    })
-    if (With.self.isTerran) {
-      val addons = With.units.ours.filter(_.isAny(Terran.MachineShop, Terran.ControlTower))
-      addons.foreach(addon => addon.addonOf.foreach(parent => {
-        val substitute  = AddonSubstitution.fromReal(addon.unitClass)
-        initialState.unitsExtant(substitute) += 1
-        if (addon.complete && trulyUnoccupied(parent)) {
-          initialState.unitsComplete(substitute) += 1
-          initialState.producers(AddonSubstitution.fromReal(addon.unitClass)) += 1
-        }
-      }))
-      addons.foreach(addon =>addon.addonOf.foreach(parent => {
-        if ( ! addon.complete) {
+        event.dProducer1  = finalClass
+        event.dProducer1N = Maff.fromBoolean(! u.morphing)
+        insert(step)
+      })
+      if (With.self.isTerran) {
+        val addons = With.units.ours.filter(_.isAny(Terran.MachineShop, Terran.ControlTower))
+        addons.foreach(addon => addon.addonOf.foreach(parent => {
           val substitute  = AddonSubstitution.fromReal(addon.unitClass)
-          val step        = new MacroStep
-          val event       = step.event
-          step.request = Some(RequestUnit(substitute, initialState.unitsExtant(substitute), specificTraineeArg = Some(addon)))
-          event.dFrames             = addon.remainingCompletionFrames
-          event.dUnitComplete       = substitute
-          event.dUnitCompleteN      = 1
-          event.dUnitCompleteASAP   = substitute
-          event.dUnitCompleteASAPN  = 1
-          event.dAddon              = substitute
-          event.dAddonN             = 1
-          insert(step)
-        } else if ( ! trulyUnoccupied(parent)) {
-          val substitute  = AddonSubstitution.fromReal(addon.unitClass)
-          val step        = new MacroStep
-          val event       = step.event
-          event.dFrames   = parent.remainingOccupationFrames
-          event.dAddon    = substitute
-          event.dAddonN   = 1
-          insert(step)
-        }
-      }))
-    }
+          initialState.unitsExtant(substitute) += 1
+          if (addon.complete && trulyUnoccupied(parent)) {
+            initialState.unitsComplete(substitute) += 1
+            initialState.producers(AddonSubstitution.fromReal(addon.unitClass)) += 1
+          }
+        }))
+        addons.foreach(addon =>addon.addonOf.foreach(parent => {
+          if ( ! addon.complete) {
+            val substitute  = AddonSubstitution.fromReal(addon.unitClass)
+            val step        = new MacroStep
+            val event       = step.event
+            step.request = Some(RequestUnit(substitute, initialState.unitsExtant(substitute), specificTraineeArg = Some(addon)))
+            event.dFrames             = addon.remainingCompletionFrames
+            event.dUnitComplete       = substitute
+            event.dUnitCompleteN      = 1
+            event.dUnitCompleteASAP   = substitute
+            event.dUnitCompleteASAPN  = 1
+            event.dAddon              = substitute
+            event.dAddonN             = 1
+            insert(step)
+          } else if ( ! trulyUnoccupied(parent)) {
+            val substitute  = AddonSubstitution.fromReal(addon.unitClass)
+            val step        = new MacroStep
+            val event       = step.event
+            event.dFrames   = parent.remainingOccupationFrames
+            event.dAddon    = substitute
+            event.dAddonN   = 1
+            insert(step)
+          }
+        }))
+      }
 
     // Populate states as of each event
     updateStatesFrom(1)

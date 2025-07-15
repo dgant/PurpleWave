@@ -39,7 +39,8 @@ class TacticRalph extends Tactic with MacroCounting {
       ?(haveComplete(Zerg.Scourge),             Zerg.Scourge,
       ?(haveComplete(Zerg.Zergling),            Zerg.Zergling,
       ?(upgradeComplete(Protoss.ZealotSpeed),   Protoss.Zealot,
-      IsWorker)))))))
+      ?(haveComplete(Protoss.Observer),         Protoss.Observer,
+      IsWorker))))))))
 
     if (ralphClass == IsWorker && With.units.countOurs(IsWorker) < 22) return
 

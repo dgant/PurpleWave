@@ -82,7 +82,9 @@ class ZvP11Hatch extends GameplanImperative {
     once(2, Zerg.Scourge)
     once(9, Zerg.Hydralisk)
 
-    pump(Zerg.Scourge, 2 + 2 * enemies(Protoss.Corsair, Protoss.Observer, Protoss.Shuttle, Protoss.Scout) + 6 * enemies(Protoss.Carrier))
+    if (enemies(Protoss.Corsair) < 5) {
+      pump(Zerg.Scourge, 2 + 2 * enemies(Protoss.Corsair, Protoss.Observer, Protoss.Shuttle, Protoss.Scout) + 6 * enemies(Protoss.Carrier))
+    }
     SwapIf(
       safeDefending || enemyProximity < 0.3,
       {

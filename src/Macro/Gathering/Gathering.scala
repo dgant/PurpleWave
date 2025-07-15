@@ -13,7 +13,7 @@ import Utilities.Time.Forever
 import scala.collection.mutable
 
 class Gathering extends TimedTask with AccelerantMinerals with Zippers {
-  private def isValidBase     (base: Base): Boolean = base.townHall.exists(t => t.isOurs && (t.hasEverBeenCompleteHatch || t.remainingCompletionFrames < 360))
+  private def isValidBase     (base: Base): Boolean = base.townHall.exists(t => t.isOurs && (t.openForBusiness || t.remainingCompletionFrames < 360))
   private def isValidResource (unit: UnitInfo): Boolean = isValidMineral(unit) || isValidGas(unit)
   private def isValidMineral  (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.mineralsLeft > 0
   private def isValidGas      (unit: UnitInfo): Boolean = unit.alive && (unit.base.exists(longDistanceBases.contains) || unit.base.exists(isValidBase)) && unit.isOurs && unit.unitClass.isGas && unit.remainingCompletionFrames < 24 * 5

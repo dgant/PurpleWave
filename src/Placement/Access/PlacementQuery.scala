@@ -5,14 +5,18 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
 import Placement.Access.PlaceLabels.PlaceLabel
+import Placement.FoundationSources
+import Placement.FoundationSources.FoundationSource
 import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
 
 class PlacementQuery {
-  var requirements  = new PlacementQueryParameters
-  var preferences   = new PlacementQueryParameters
+  var requirements      : PlacementQueryParameters  = new PlacementQueryParameters
+  var preferences       : PlacementQueryParameters  = new PlacementQueryParameters
+  var foundationSource  : FoundationSource          = FoundationSources.Default
+
   // Required for Produce to match requests against existing production
   override def equals(other: Any): Boolean = {
     if ( ! other.isInstanceOf[PlacementQuery]) return false
@@ -28,8 +32,6 @@ class PlacementQuery {
     resetDefaults(building)
   }
 
-  private def defaultPreferenceBases(building: UnitClass) = With.geography.ourBases.filter(b => ! building.isGas || b.townHall.exists(b => b.hasEverBeenCompleteHatch || b.remainingCompletionFrames < Terran.Refinery.buildFrames))
-  private def defaultPreferenceTiles(building: UnitClass) = ?(building.isGas, Seq(With.geography.home), Seq.empty)
   def resetDefaults(building: UnitClass): Unit = {
     requirements.width    = Some(building.tileWidth) //Some(building.tileWidthPlusAddon)
     requirements.height   = Some(building.tileHeight)
@@ -45,8 +47,9 @@ class PlacementQuery {
     preferences.labelYes  = Seq.empty
     preferences.labelNo   = Seq.empty
     preferences.zone      = Seq.empty
-    preferences.base      = defaultPreferenceBases(building)
-    preferences.tile      = defaultPreferenceTiles(building)
+    preferences.base      = With.geography.ourBases
+    preferences.tile      = Seq.empty
+
     if (Seq(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.RoboticsFacility).contains(building)) {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.GroundProduction
     }
@@ -63,7 +66,17 @@ class PlacementQuery {
       preferences.labelYes = preferences.labelYes :+ PlaceLabels.Supply
     }
     if (building.isGas) {
-      preferBase(Maff.orElse(preferences.base.filter(b => b.townHall.exists(_.complete) && b.workerCount >= 4), preferences.base).toSeq: _*)
+      foundationSource = FoundationSources.Gas
+      lazy val basesOpening   = preferences.base.filter(_.townHall.exists(th => th.openForBusiness || th.remainingCompletionFrames < building.buildFrames))
+      lazy val basesPopulated = basesOpening.filter(_.workerCount >= 4)
+      preferBase(
+        Maff.orElse(
+          basesOpening,
+          basesPopulated,
+          preferences.base).toSeq: _*)
+    }
+    if (building.isTownHall) {
+      foundationSource = FoundationSources.TownHall
     }
   }
 
@@ -83,6 +96,7 @@ class PlacementQuery {
   def preferZone          (value: Zone*)        : PlacementQuery = { preferences.zone       = value;        this }
   def preferBase          (value: Base*)        : PlacementQuery = { preferences.base       = value;        this }
   def preferTile          (value: Tile*)        : PlacementQuery = { preferences.tile       = value;        this }
+  def foundationSource(value: FoundationSource) : PlacementQuery = { foundationSource       = value;        this }
 
   def acceptExisting(tile: Tile): Boolean = {
     if ( ! tile.valid) return false
@@ -103,30 +117,19 @@ class PlacementQuery {
   }
 
   def foundations: Seq[Foundation] = {
-    if (requirements.building.exists(_.isGas)) return gasFoundations
-    if (requirements.labelYes.contains(PlaceLabels.TownHall)) return townHallFoundations
-
-    // As a performance optimization, start filtering from the smallest matching collection
-    val foundationSources = IndexedSeq(
-      requirements.labelYes.flatMap(With.placement.get),
-      requirements.zone.flatMap(With.placement.get),
-      requirements.base.flatMap(With.placement.get),
-      requirements.building.map(With.placement.get).getOrElse(IndexedSeq.empty),
-      requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
-      With.placement.foundations)
-    val foundationSourceSmallest = foundationSources.filter(_.nonEmpty).minBy(_.size)
-
-    foundationSourceSmallest
-      .view
-      .filter(accept)
-      .map(f => (f, score(f))) // Keep the score in the container so we don't need to keep recalculating it as we sort
-      .toVector
-      .sortBy(-_._2)
-      .view // Rather than construct a new container without the scores, return a view which hides them
-      .map(_._1)
+    ?(foundationSource == FoundationSources.Gas,
+      gasFoundations,
+    ?(foundationSource == FoundationSources.TownHall,
+      townHallFoundations,
+      defaultFoundations))
   }
 
-  def townHallFoundations: Seq[Foundation] = With.geography.preferredExpansionsOurs.map(_.townHallTile).map(With.placement.get).flatten
+  def townHallFoundations: Seq[Foundation] = {
+    With.geography.preferredExpansionsOurs
+      .map(_.townHallTile)
+      .map(With.placement.get)
+      .flatten
+  }
 
   def gasFoundations: Seq[Foundation] = {
     val bases: Iterable[Base] =
@@ -142,6 +145,30 @@ class PlacementQuery {
       .map(_.tileTopLeft)
       .map(Foundation(_, new PointGas))
       .toSeq
+  }
+
+  def defaultFoundations: Seq[Foundation] = {
+    // As a performance optimization, start filtering from the smallest matching collection
+    val foundationSources = Seq(
+      requirements.labelYes.flatMap(With.placement.get),
+      requirements.zone.flatMap(With.placement.get),
+      requirements.base.flatMap(With.placement.get),
+      requirements.building.map(With.placement.get).getOrElse(IndexedSeq.empty),
+      requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
+      With.placement.foundations)
+
+    val foundationSourceSmallest = foundationSources
+      .filter(_.nonEmpty)
+      .minBy(_.size)
+
+    foundationSourceSmallest
+      .view
+      .filter(accept)
+      .map(f => (f, score(f))) // Keep the score in the container so we don't need to keep recalculating it as we sort
+      .toVector
+      .sortBy(-_._2)
+      .view // Rather than construct a new container without the scores, return a view which hides them
+      .map(_._1)
   }
 
   def auditTiles: Vector[Tile] = foundations.view.map(_.tile).toVector

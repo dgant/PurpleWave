@@ -34,9 +34,11 @@ class TvT1Port extends TerranGameplan {
   }
 
   override def executeMain(): Unit = {
-    if (safePushing && techComplete(Terran.WraithCloak)) {
-      attack()
-    } else if (unitsComplete(Terran.Battlecruiser) >= 12) {
+    var shouldAttack = false
+    shouldAttack ||= unitsComplete(Terran.Wraith) >= 3 && ( ! enemyHasShown(Terran.Goliath, Terran.Wraith, Terran.Valkyrie) || (Terran.WraithCloak() && ! enemyHasShown(Terran.ScienceVessel, Terran.Comsat, Terran.SpellScannerSweep)))
+    shouldAttack ||= unitsComplete(Terran.Wraith) >= 9
+    shouldAttack ||= unitsComplete(Terran.Battlecruiser) >= 8
+    if (shouldAttack) {
       attack()
     }
     harass()

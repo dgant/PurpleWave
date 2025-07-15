@@ -19,13 +19,15 @@ class TacticRalph extends Tactic with MacroCounting {
   override def launch(): Unit = {
     if (lastRalph.exists( ! _.alive)) {
       lastDeath = With.frame
+      lastRalph = None
     }
     lastRalph = lastRalph.filter(_.client != this)
 
     if (With.tactics.workerScout.units.nonEmpty) return
     if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)()) return
-    if (With.framesSince(lastDeath) < Seconds(20)()) return
+    if (With.framesSince(lastDeath) < Seconds(10)()) return
     if (With.scouting.ourProximity < 0.5) return
+    if (With.tactics.attackSquad.units.exists(_.proximity < 0.3)) return
     if (With.self.supplyUsed400 < 60) return
     if (With.tactics.attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy)) return
 

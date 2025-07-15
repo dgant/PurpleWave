@@ -50,17 +50,23 @@ class ZvP11Hatch extends GameplanImperative {
       attack()
     }
 
-    upgradeContinuously(Zerg.GroundRangeDamage)
+    upgradeContinuously(Zerg.GroundRangeDamage) && upgradeContinuously(Zerg.GroundMeleeDamage)
     upgradeContinuously(Zerg.GroundArmor)
     upgradeContinuously(Zerg.HydraliskSpeed)
     upgradeContinuously(Zerg.HydraliskRange)
+    upgradeContinuously(Zerg.ZerglingAttackSpeed)
     if (upgradeStarted(Zerg.GroundRangeDamage, 2) && safeDefending) {
       get(Zerg.QueensNest, Zerg.Hive)
     }
+    if (units(Zerg.Zergling) >= 12) {
+      get(Zerg.ZerglingSpeed)
+    }
 
     if (openMutas) {
-      get(Zerg.Lair, Zerg.Spire)
+      buildSunkensAtFoyer(2)
+      once(10, Zerg.Zergling)
       once(26, Zerg.Drone)
+      get(Zerg.Lair, Zerg.Spire)
       buildSunkensAtFoyer(5)
       get(2, Zerg.Extractor)
       get(Zerg.ZerglingSpeed)
@@ -70,21 +76,17 @@ class ZvP11Hatch extends GameplanImperative {
       get(Zerg.HydraliskDen)
     }
 
-    if (units(Zerg.Zergling) >= 12) {
-      get(Zerg.ZerglingSpeed)
-    }
-
-    if (With.fingerprints.twoGate()) {
-      get(Zerg.ZerglingSpeed)
-      buildSunkensAtFoyer(1)
-      once(18, Zerg.Zergling)
-    }
+    get(Zerg.HydraliskDen, Zerg.Lair)
+    get(Zerg.HydraliskSpeed)
+    get(Zerg.Spire)
     once(2, Zerg.Scourge)
-    pump(Zerg.Scourge, 2 * enemies(Protoss.Corsair))
+    once(9, Zerg.Hydralisk)
+
+    pump(Zerg.Scourge, 2 + 2 * enemies(Protoss.Corsair, Protoss.Observer, Protoss.Shuttle, Protoss.Scout) + 6 * enemies(Protoss.Carrier))
     SwapIf(
       safeDefending || enemyProximity < 0.3,
       {
-        if ( ! upgradeComplete(Zerg.HydraliskSpeed)) {
+        if (openMutas && ! upgradeComplete(Zerg.HydraliskSpeed)) {
           pump(Zerg.Mutalisk)
         }
         pump(Zerg.Lurker, Maff.vmax(1, enemies(Protoss.Zealot) / 4, units(Zerg.Hydralisk) / 6))
@@ -96,19 +98,15 @@ class ZvP11Hatch extends GameplanImperative {
         pump(Zerg.Drone, Math.min(6, miningBases) * 12)
       })
 
-    if (miningBases >= 3 || Zerg.HydraliskSpeed()) {
-      get(Zerg.HydraliskDen)
-    }
-    get(Zerg.HydraliskDen, Zerg.Lair, Zerg.Spire)
     if (gas < 300) {
-      pumpGasPumps(units(Zerg.Drone) / 9)
+      pumpGasPumps(units(Zerg.Drone) / 9 + minerals / 500)
     }
     get(Zerg.EvolutionChamber)
     get(Zerg.LurkerMorph)
     requireMiningBases(4)
     fillMacroHatches(6)
-    get(2, Zerg.EvolutionChamber)
     get(Zerg.OverlordSpeed)
+    get(2, Zerg.EvolutionChamber)
     get(Zerg.QueensNest, Zerg.Hive)
     requireMiningBases(8)
     fillMacroHatches(24)

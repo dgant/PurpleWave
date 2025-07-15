@@ -3,10 +3,9 @@ package Macro.Actions
 import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Macro.Requests.RequestUnit
-import ProxyBwapi.Races.{Terran, Zerg}
+import ProxyBwapi.Races.Zerg
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
-import Utilities.UnitFilters._
 
 object Pump {
   def apply(
@@ -23,17 +22,10 @@ object Pump {
 
     if ( ! canBuild) return
 
-    val getBuildersExisting: Int = With.units.ours.count(builder =>
-      builderClass(builder)
-        && ( unitClass != Terran.NuclearMissile                           || ! builder.hasNuke)
-        && ( ! unitClass.requiresPsi                                      || builder.powered)
-        && ( ! unitClass.isAddon                                          || builder.addon.isEmpty)
-        && ( ! unitClass.buildUnitsEnabling.contains(Terran.MachineShop)  || builder.addon.isDefined)
-        && ( ! unitClass.buildUnitsEnabling.contains(Terran.ControlTower) || builder.addon.isDefined))
-
+    lazy val builders = With.macroCounts.oursExtant(builderClass)
+    lazy val hatches  = With.macroCounts.oursExtant(Zerg.Hatchery)
+    lazy val capacity = ?(builderClass == Zerg.Larva, hatches * unitClass.copiesProduced, builders)
     val unitsComplete = With.macroCounts.oursComplete(unitClass)
-    val larvaSpawning = ?(builderClass == Zerg.Larva, With.units.countOurs(IsAll(IsHatchlike, IsComplete)), 0)
-    val capacity      = (getBuildersExisting + larvaSpawning) * unitClass.copiesProduced
     val wavesAhead    = 4
 
     if (maximumConcurrently < 400) {

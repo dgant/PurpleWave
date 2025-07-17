@@ -60,9 +60,9 @@ class TvZ8RaxSK extends TerranGameplan {
         pump(Terran.Wraith, 1)
         pump(Terran.ScienceVessel, 3)
         pump(Terran.Battlecruiser)
-        pump(Terran.ScienceVessel)
         pumpRatio(Terran.Firebat, 0, 4, Seq(Enemy(Zerg.Zergling, 0.125), Friendly(Terran.Dropship, 1.0)))
         pumpRatio(Terran.Medic, 0, 12, Seq(Friendly(Terran.Marine, 0.25), Friendly(Terran.Firebat, 0.25)))
+        pump(Terran.ScienceVessel)
         pump(Terran.Marine)
       }, {
         upgradeContinuously(Terran.BioDamage)

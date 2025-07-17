@@ -42,7 +42,7 @@ class ZvZ9Pool extends ZergGameplan {
             + 3 * With.units.countEverEnemy(Zerg.SunkenColony)
             + 6 * With.units.everEnemy.count(u => IsHatchlike(u) && ! u.base.filter(_.isMain).exists(_.townHall.contains(u)))))
     }
-    if (units(Zerg.Mutalisk) >= 6 && enemyHasShown(Zerg.Spire, Zerg.Mutalisk, Zerg.Scourge)) {
+    if (units(Zerg.Mutalisk) >= 6 && enemyHasShown(Zerg.Spire, Zerg.Mutalisk, Zerg.Scourge, Zerg.Hydralisk)) {
       upgradeContinuously(Zerg.AirArmor, 2)
     }
     pump(Zerg.Mutalisk)

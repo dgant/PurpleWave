@@ -103,7 +103,7 @@ trait MacroActions extends MacroCounting {
   private def completeBases       : Int = ourBaseTownHalls.count(b => b.complete)
   private def completeMiningBases : Int = ourBaseTownHalls.count(b => b.complete && b.base.exists(isMiningBase))
 
-  def expandNTimes        (times: Int)    : Unit = if (times > 0) get(times, With.self.townHallClass, new PlacementQuery(With.self.townHallClass).requireBase(With.geography.bases.filterNot(_.townHall.exists(_.openForBusiness)): _*))
+  def expandNTimes        (times: Int)    : Unit = if (times > 0) get(times, With.self.townHallClass)
   def expandOnce()                        : Unit = expandNTimes(1)
   def requireBases        (count: Int)    : Unit = expandNTimes(count - completeBases)
   def requireMiningBases  (count: Int)    : Unit = expandNTimes(count - completeMiningBases)

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module type="JAVA_MODULE" version="4">
+<module version="4">
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$" dumb="true">
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/javajps/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/jbwapi/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/jbweb/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/3rdparty/mjson/src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/bwapi-data" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
     </content>

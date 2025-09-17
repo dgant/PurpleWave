@@ -3,6 +3,7 @@ import contextlib
 import subprocess
 import shutil
 import sys
+import textwrap
 import os
 
 def main():
@@ -20,7 +21,7 @@ def main():
   parser.add_argument('--tz',             action='store_true', default=False, help='Deploy Terran and Zerg to BASIL')
   parser.add_argument('--pz',             action='store_true', default=False, help='Deploy Protoss and Zerg to BASIL')
   parser.add_argument('--tpz',            action='store_true', default=False, help='Deploy all races to BASIL')
-  
+  parser.add_argument('--play',           action='store_true', default=False, help='Play ladder games')
   args = parser.parse_args()
   
   args.t = args.t or args.tp or args.tz or args.tpz
@@ -50,6 +51,9 @@ def main():
     package()
   if do_basil:
     copy_basil(args.t, args.p, args.z)
+  if args.play:
+    did_anything = True
+    play(4)
   
   if not did_anything:
     maven_build()
@@ -251,6 +255,30 @@ def copy_basil(t, p, z):
     logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_basiluploads("PurpleWaveBASIL.zip"))
   if z:
     logf(shutil.copy2, path_staging("PurpleWaveBASIL.zip"), path_basiluploads("PurpleSwarmBASIL.zip"))
+
+def play(threads=3):
+  ladder_command = "/c/p/shorts/ladder.sh"
+  log_path = "/c/Users/d/AppData/Roaming/scbw/ladder.log"
+  bash_command = textwrap.dedent(fr'''
+    set -e
+    trap 'kill -- -$$' INT TERM EXIT
+    LOG="{log_path}"
+    THREADS={threads}
+    t=0
+    while [ $t -lt $THREADS ]; do
+      THREADS=$THREADS THREAD=$t sh -lc "{ladder_command} | tee -a \"$LOG\"" &
+      t=$((t+1))
+    done
+    tail -f "$LOG" &
+    wait
+  ''')
+  bash_process = subprocess.Popen(["bash", "-lc", bash_command])
+  try:
+    bash_process.wait()
+  except KeyboardInterrupt:
+    bash_process.wait()
+    subprocess.Popen(["dockerstop.sh"])
+
     
 if __name__ == "__main__":
   main()

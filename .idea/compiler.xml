@@ -8,8 +8,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="PurpleWave" />
+      </profile>
+      <profile name="Annotation profile for PurpleWave" enabled="true">
+        <sourceOutputDir name="../generated-sources/annotations" />
+        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="PurpleWave.main" target="1.8" />
+      <module name="PurpleWave.test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

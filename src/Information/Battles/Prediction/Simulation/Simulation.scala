@@ -47,7 +47,7 @@ final class Simulation {
     simulacra.foreach(_.update())
     battle.simulationFrames += 1
     if (battle.logSimulation) {
-      val sb = new StringBuilder(512)
+      val sb = new StringBuilder(1024)
       sb.append(battle.simulationFrames).append('|')
       // Log all units in a stable order (realUnits order is stable during a sim)
       var i = 0
@@ -56,14 +56,47 @@ final class Simulation {
         val s = sims(i)
         val w = s.unitClass.dimensionRightInclusive + s.unitClass.dimensionLeft + 1
         val h = s.unitClass.dimensionDownInclusive + s.unitClass.dimensionUp + 1
+        val hpNow = Math.max(0, s.hitPoints)
+        val shNow = Math.max(0, s.shieldPoints)
+        val hpMax = Math.max(hpNow, s.hitPointsInitial)
+        val shMax = Math.max(shNow, s.shieldPointsInitial)
+        val tgtId = s.target.map(_.realUnit.id).getOrElse(-1)
         sb.append(s.realUnit.id).append(',')
           .append(s.isFriendly).append(',')
           .append(s.pixel.x).append(',')
           .append(s.pixel.y).append(',')
           .append(s.alive).append(',')
           .append(w).append(',')
-          .append(h).append(';')
+          .append(h).append(',')
+          .append(hpNow).append(',')
+          .append(shNow).append(',')
+          .append(hpMax).append(',')
+          .append(shMax).append(',')
+          .append(tgtId).append(';')
         i += 1
+      }
+      // Append per-frame events (attacks and deaths)
+      import Information.Battles.Prediction.Simulation.{SimulationEventAttack, SimulationEventDeath}
+      sb.append('|')
+      var j = 0
+      while (j < sims.length) {
+        val s = sims(j)
+        var k = 0
+        val evs = s.events
+        while (k < evs.length) {
+          val e = evs(k)
+          if (e.frame == battle.simulationFrames - 1) {
+            e match {
+              case a: SimulationEventAttack =>
+                sb.append("a:").append(a.shooter.realUnit.id).append('>').append(a.victim.realUnit.id).append(';')
+              case d: SimulationEventDeath =>
+                sb.append("d:").append(d.simulacrum.realUnit.id).append(';')
+              case _ =>
+            }
+          }
+          k += 1
+        }
+        j += 1
       }
       framesLog += sb.toString()
     }

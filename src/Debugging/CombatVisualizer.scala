@@ -26,8 +26,8 @@ object CombatVisualizer {
   }
 
   case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int)
-  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int)
-  case class FrameData(f: Int, units: Vector[UnitFrame])
+  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None)
+  case class FrameData(f: Int, units: Vector[UnitFrame], attacks: Vector[(Int, Int)] = Vector.empty, deaths: Vector[Int] = Vector.empty)
 
   final class MapData(val tileW: Int, val tileH: Int, val walkW: Int, val walkH: Int,
                       val tileHeights: Array[Byte], val walkable: Array[Byte]) {
@@ -118,17 +118,34 @@ object CombatVisualizer {
         val fnum = Try(fj.at("f").asInteger()).getOrElse(0)
         val unitsArr = Option(fj.at("u")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
         val units = unitsArr.flatMap { uj =>
-          Try(UnitFrame(
-            id = uj.at("id").asInteger(),
-            friendly = uj.at("friendly").asBoolean(),
-            x = uj.at("x").asInteger(),
-            y = uj.at("y").asInteger(),
-            alive = uj.at("alive").asBoolean(),
-            width = uj.at("width").asInteger(),
-            height = uj.at("height").asInteger()
+          val base = Try((
+            uj.at("id").asInteger(),
+            uj.at("friendly").asBoolean(),
+            uj.at("x").asInteger(),
+            uj.at("y").asInteger(),
+            uj.at("alive").asBoolean(),
+            uj.at("width").asInteger(),
+            uj.at("height").asInteger()
           )).toOption
+          base.map { case (id, fr, x, y, alive, w, h) =>
+            val hp    = Try(uj.at("hp").asInteger()).getOrElse(-1)
+            val sh    = Try(uj.at("sh").asInteger()).getOrElse(-1)
+            val hpMax = Try(uj.at("hpMax").asInteger()).getOrElse(-1)
+            val shMax = Try(uj.at("shMax").asInteger()).getOrElse(-1)
+            val tgt   = Try(uj.at("tgt").asInteger()).toOption
+            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt)
+          }
         }
-        Some(FrameData(fnum, units))
+        val attacksArr = Option(fj.at("a")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+        val attacks = attacksArr.flatMap { pair =>
+          if (pair.isArray) {
+            val arr = pair.asJsonList()
+            Try((arr.get(0).asInteger(), arr.get(1).asInteger())).toOption
+          } else None
+        }
+        val deathsArr = Option(fj.at("d")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+        val deaths = deathsArr.flatMap(jv => Try(jv.asInteger()).toOption)
+        Some(FrameData(fnum, units, attacks, deaths))
       }
       (mapHash, metas, frames)
     }.toOption
@@ -163,19 +180,82 @@ object CombatVisualizer {
         g2.drawImage(m.image, offX, offY, drawW, drawH, null)
       }
 
-      // Draw units for current frame
+      // Draw units and events for current frame
       currentFrameData.foreach { fd =>
+        // Build a lookup map for positions by id
+        val posById = fd.units.map(u => u.id -> u).toMap
+        val teal = new Color(0, 255, 200)
+        val orange = new Color(255, 140, 0)
+        val tealDark = teal.darker()
+        val orangeDark = orange.darker()
+        val pink = new Color(255, 105, 180)
+        // Draw target lines (darker team color)
+        fd.units.foreach { u =>
+          u.tgt.foreach { tid =>
+            posById.get(tid).foreach { tv =>
+              if (u.alive) {
+                val sx = (offX + u.x * scale).toInt
+                val sy = (offY + u.y * scale).toInt
+                val tx = (offX + tv.x * scale).toInt
+                val ty = (offY + tv.y * scale).toInt
+                g2.setColor(if (u.friendly) new Color(tealDark.getRed, tealDark.getGreen, tealDark.getBlue, 180) else new Color(orangeDark.getRed, orangeDark.getGreen, orangeDark.getBlue, 180))
+                g2.drawLine(sx, sy, tx, ty)
+              }
+            }
+          }
+        }
+        // First draw units with health fill and outline
         fd.units.foreach { u =>
           if (u.alive) {
-            val color = if (u.friendly) new Color(0, 128, 255, 200) else new Color(220, 30, 30, 200)
-            g2.setColor(color)
+            val color = if (u.friendly) teal else orange
             val left = u.x - u.width / 2
             val top  = u.y - u.height / 2
             val sx = (offX + left * scale).toInt
             val sy = (offY + top  * scale).toInt
             val sw = Math.max(1, (u.width  * scale).toInt)
             val sh = Math.max(1, (u.height * scale).toInt)
+            // Health fill: fraction of total HP+shields remaining
+            val maxTotal = Math.max(0, u.hpMax) + Math.max(0, u.shMax)
+            val curTotal = Math.max(0, u.hp) + Math.max(0, u.sh)
+            val frac = if (maxTotal > 0) Math.max(0.0, Math.min(1.0, curTotal.toDouble / maxTotal)) else 1.0
+            val filled = Math.max(1, (sh * frac).toInt)
+            // Fill bottom portion
+            g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
+            g2.fillRect(sx, sy + (sh - filled), sw, filled)
+            // Outline
+            g2.setColor(color)
             g2.drawRect(sx, sy, sw, sh)
+          }
+        }
+        // Draw death outlines (pink) for deaths on this frame
+        if (fd.deaths.nonEmpty) {
+          g2.setColor(pink)
+          fd.deaths.foreach { id =>
+            posById.get(id).foreach { u =>
+              val left = u.x - u.width / 2
+              val top  = u.y - u.height / 2
+              val sx = (offX + left * scale).toInt
+              val sy = (offY + top  * scale).toInt
+              val sw = Math.max(1, (u.width  * scale).toInt)
+              val sh = Math.max(1, (u.height * scale).toInt)
+              g2.drawRect(sx - 1, sy - 1, sw + 2, sh + 2)
+            }
+          }
+        }
+        // Draw attack lines in attacker bright color
+        if (fd.attacks.nonEmpty) {
+          fd.attacks.foreach { case (a, v) =>
+            (posById.get(a), posById.get(v)) match {
+              case (Some(ua), Some(uv)) =>
+                val ax = (offX + ua.x * scale).toInt
+                val ay = (offY + ua.y * scale).toInt
+                val vx = (offX + uv.x * scale).toInt
+                val vy = (offY + uv.y * scale).toInt
+                val ac = if (ua.friendly) teal else orange
+                g2.setColor(new Color(ac.getRed, ac.getGreen, ac.getBlue, 220))
+                g2.drawLine(ax, ay, vx, vy)
+              case _ =>
+            }
           }
         }
       }
@@ -236,6 +316,18 @@ object CombatVisualizer {
       controls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT))
       controls.add(playPause)
       controls.add(slider)
+      // Playback speed slider (1x,2x,3x,4x,6x,8x)
+      val speedOptions = Array(1, 2, 3, 4, 6, 8)
+      val speedSlider = new JSlider(0, speedOptions.length - 1, 0)
+      val speedLabels = new java.util.Hashtable[Integer, JComponent]()
+      var si = 0
+      while (si < speedOptions.length) { speedLabels.put(Integer.valueOf(si), new JLabel(speedOptions(si) + "x")); si += 1 }
+      speedSlider.setLabelTable(speedLabels)
+      speedSlider.setPaintLabels(true)
+      speedSlider.setPaintTicks(true)
+      speedSlider.setSnapToTicks(true)
+      controls.add(new JLabel("Speed:"))
+      controls.add(speedSlider)
       controls.add(timeLabel)
       controls.add(autoReload)
       controls.add(reloadBtn)
@@ -269,9 +361,20 @@ object CombatVisualizer {
       }
 
       val timer = new javax.swing.Timer(1000 / 24, (_: java.awt.event.ActionEvent) => {
-        reloadIfChanged(force = false)
+        // If no frames, attempt auto-reload opportunistically
+        if (panel.frames.isEmpty) {
+          if (autoReloadRef.get()) reloadIfChanged(force = false)
+        }
         if (panel.frames.nonEmpty && playingRef.get()) {
-          panel.frameIndex = (panel.frameIndex + 1) % panel.frames.length
+          val lastIdx = panel.frames.length - 1
+          val speed = speedOptions(speedSlider.getValue)
+          if (panel.frameIndex >= lastIdx) {
+            // At end of playback: attempt auto-reload if enabled
+            if (autoReloadRef.get()) reloadIfChanged(force = false)
+            panel.frameIndex = 0
+          } else {
+            panel.frameIndex = Math.min(lastIdx, panel.frameIndex + speed)
+          }
           slider.setValue(panel.frameIndex)
         }
         updateTimeLabel()

@@ -87,7 +87,7 @@ object CombatVisIO {
         val buf = new scala.collection.mutable.ArrayBuffer[(Int, Int, Int, Boolean)]()
         framesLog.headOption.foreach { line =>
           val parts = line.split("\\|")
-          if (parts.length == 2) {
+          if (parts.length >= 2) {
             val units = parts(1).split(';')
             var i = 0
             while (i < units.length) {
@@ -134,7 +134,7 @@ object CombatVisIO {
         // We control the format; convert to a JSON-ish object
         // line: frame|id,isFriendly,x,y,alive,width,height;
         val parts = line.split("\\|")
-        if (parts.length == 2) {
+        if (parts.length >= 2) {
           val fnum = parts(0)
           val unitsStr = parts(1)
           if (!firstFrame) sb.append(',') else firstFrame = false
@@ -158,12 +158,54 @@ object CombatVisIO {
                 sb.append("\"alive\":").append(fields(4)).append(',')
                 sb.append("\"width\":").append(fields(5)).append(',')
                 sb.append("\"height\":").append(fields(6))
+                if (fields.length >= 11) {
+                  sb.append(',')
+                  sb.append("\"hp\":").append(fields(7)).append(',')
+                  sb.append("\"sh\":").append(fields(8)).append(',')
+                  sb.append("\"hpMax\":").append(fields(9)).append(',')
+                  sb.append("\"shMax\":").append(fields(10))
+                }
+                if (fields.length >= 12) {
+                  sb.append(',')
+                  sb.append("\"tgt\":").append(fields(11))
+                }
                 sb.append('}')
               }
             }
             i += 1
           }
           sb.append("]")
+          // Optional events part
+          if (parts.length >= 3) {
+            val evStr = parts(2)
+            var firstAttack = true
+            var firstDeath = true
+            // We'll buffer attacks and deaths separately
+            val attacksSb = new StringBuilder()
+            val deathsSb = new StringBuilder()
+            val tokens = evStr.split(';')
+            var ti = 0
+            while (ti < tokens.length) {
+              val t = tokens(ti)
+              if (t.nonEmpty) {
+                if (t.startsWith("a:")) {
+                  val pv = t.substring(2)
+                  val gt = pv.indexOf('>')
+                  if (gt > 0) {
+                    if (!firstAttack) attacksSb.append(',') else firstAttack = false
+                    attacksSb.append('[').append(pv.substring(0, gt)).append(',').append(pv.substring(gt + 1)).append(']')
+                  }
+                } else if (t.startsWith("d:")) {
+                  val id = t.substring(2)
+                  if (!firstDeath) deathsSb.append(',') else firstDeath = false
+                  deathsSb.append(id)
+                }
+              }
+              ti += 1
+            }
+            if (attacksSb.nonEmpty) { sb.append(',').append("\"a\":[").append(attacksSb.toString()).append(']') }
+            if (deathsSb.nonEmpty)  { sb.append(',').append("\"d\":[").append(deathsSb.toString()).append(']') }
+          }
           sb.append('}')
         }
       }

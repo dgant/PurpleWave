@@ -72,7 +72,8 @@ final class Simulation {
           .append(shNow).append(',')
           .append(hpMax).append(',')
           .append(shMax).append(',')
-          .append(tgtId).append(';')
+          .append(tgtId).append(',')
+          .append(s.flying).append(';')
         i += 1
       }
       // Append per-frame events (attacks and deaths)

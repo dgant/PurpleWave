@@ -169,6 +169,10 @@ object CombatVisIO {
                   sb.append(',')
                   sb.append("\"tgt\":").append(fields(11))
                 }
+                if (fields.length >= 13) {
+                  sb.append(',')
+                  sb.append("\"fly\":").append(fields(12))
+                }
                 sb.append('}')
               }
             }

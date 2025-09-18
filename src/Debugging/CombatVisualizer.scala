@@ -3,7 +3,7 @@ package Debugging
 import mjson.Json
 
 import java.awt.image.BufferedImage
-import java.awt.{BorderLayout, Color, Dimension, Graphics, RenderingHints}
+import java.awt._
 import java.io.{DataInputStream, File, FileInputStream}
 import javax.swing._
 import scala.util.Try
@@ -26,7 +26,7 @@ object CombatVisualizer {
   }
 
   case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int)
-  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None)
+  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None, fly: Boolean = false)
   case class FrameData(f: Int, units: Vector[UnitFrame], attacks: Vector[(Int, Int)] = Vector.empty, deaths: Vector[Int] = Vector.empty)
 
   final class MapData(val tileW: Int, val tileH: Int, val walkW: Int, val walkH: Int,
@@ -133,7 +133,8 @@ object CombatVisualizer {
             val hpMax = Try(uj.at("hpMax").asInteger()).getOrElse(-1)
             val shMax = Try(uj.at("shMax").asInteger()).getOrElse(-1)
             val tgt   = Try(uj.at("tgt").asInteger()).toOption
-            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt)
+            val fly   = Try(uj.at("fly").asBoolean()).getOrElse(false)
+            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt, fly)
           }
         }
         val attacksArr = Option(fj.at("a")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
@@ -208,57 +209,158 @@ object CombatVisualizer {
         fd.units.foreach { u =>
           if (u.alive) {
             val color = if (u.friendly) teal else orange
-            val left = u.x - u.width / 2
-            val top  = u.y - u.height / 2
-            val sx = (offX + left * scale).toInt
-            val sy = (offY + top  * scale).toInt
-            val sw = Math.max(1, (u.width  * scale).toInt)
-            val sh = Math.max(1, (u.height * scale).toInt)
-            // Health fill: fraction of total HP+shields remaining
+            // Health fraction
             val maxTotal = Math.max(0, u.hpMax) + Math.max(0, u.shMax)
             val curTotal = Math.max(0, u.hp) + Math.max(0, u.sh)
             val frac = if (maxTotal > 0) Math.max(0.0, Math.min(1.0, curTotal.toDouble / maxTotal)) else 1.0
-            val filled = Math.max(1, (sh * frac).toInt)
-            // Fill bottom portion
-            g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
-            g2.fillRect(sx, sy + (sh - filled), sw, filled)
-            // Outline
-            g2.setColor(color)
-            g2.drawRect(sx, sy, sw, sh)
-          }
-        }
-        // Draw death outlines (pink) for deaths on this frame
-        if (fd.deaths.nonEmpty) {
-          g2.setColor(pink)
-          fd.deaths.foreach { id =>
-            posById.get(id).foreach { u =>
+            if (u.fly) {
+              // Draw circle with clipped health fill
+              val cx = offX + u.x * scale
+              val cy = offY + u.y * scale
+              val diam = Math.max(u.width, u.height) * scale
+              val r = diam / 2.0
+              val ellipse = new java.awt.geom.Ellipse2D.Double(cx - r, cy - r, diam, diam)
+              val oldClip = g2.getClip
+              g2.setClip(ellipse)
+              g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
+              val filled = Math.max(1, (diam * frac).toInt)
+              g2.fillRect((cx - r).toInt, (cy + r - filled).toInt, Math.max(1, diam.toInt), filled)
+              g2.setClip(oldClip)
+              g2.setColor(color)
+              g2.draw(ellipse)
+            } else {
               val left = u.x - u.width / 2
               val top  = u.y - u.height / 2
               val sx = (offX + left * scale).toInt
               val sy = (offY + top  * scale).toInt
               val sw = Math.max(1, (u.width  * scale).toInt)
               val sh = Math.max(1, (u.height * scale).toInt)
-              g2.drawRect(sx - 1, sy - 1, sw + 2, sh + 2)
+              val filled = Math.max(1, (sh * frac).toInt)
+              // Fill bottom portion
+              g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
+              g2.fillRect(sx, sy + (sh - filled), sw, filled)
+              // Outline
+              g2.setColor(color)
+              g2.drawRect(sx, sy, sw, sh)
             }
           }
         }
-        // Draw attack lines in attacker bright color
-        if (fd.attacks.nonEmpty) {
-          fd.attacks.foreach { case (a, v) =>
-            (posById.get(a), posById.get(v)) match {
-              case (Some(ua), Some(uv)) =>
-                val ax = (offX + ua.x * scale).toInt
-                val ay = (offY + ua.y * scale).toInt
-                val vx = (offX + uv.x * scale).toInt
-                val vy = (offY + uv.y * scale).toInt
-                val ac = if (ua.friendly) teal else orange
-                g2.setColor(new Color(ac.getRed, ac.getGreen, ac.getBlue, 220))
-                g2.drawLine(ax, ay, vx, vy)
-              case _ =>
+        // Draw death indicators (solid red) for deaths in the last 8 frames
+        val recentIdxs = {
+          val buf = new scala.collection.mutable.ArrayBuffer[Int](8)
+          var k = 0
+          while (k < 8) { val idx = frameIndex - k; if (idx >= 0 && idx < frames.length) buf += idx; k += 1 }
+          buf.toVector
+        }
+        if (recentIdxs.nonEmpty) {
+          g2.setColor(Color.RED)
+          recentIdxs.foreach { idx =>
+            val fdr = frames(idx)
+            val pos = fdr.units.map(u => u.id -> u).toMap
+            fdr.deaths.foreach { id =>
+              pos.get(id).foreach { u =>
+                if (u.fly) {
+                  val cx = offX + u.x * scale
+                  val cy = offY + u.y * scale
+                  val diam = Math.max(u.width, u.height) * scale
+                  val r = diam / 2.0
+                  val ellipse = new java.awt.geom.Ellipse2D.Double(cx - r, cy - r, diam, diam)
+                  g2.fill(ellipse)
+                } else {
+                  val left = u.x - u.width / 2
+                  val top  = u.y - u.height / 2
+                  val sx = (offX + left * scale).toInt
+                  val sy = (offY + top  * scale).toInt
+                  val sw = Math.max(1, (u.width  * scale).toInt)
+                  val sh = Math.max(1, (u.height * scale).toInt)
+                  g2.fillRect(sx - 1, sy - 1, sw + 2, sh + 2)
+                }
+              }
             }
           }
+        }
+        // Draw attack lines in attacker bright color, persisted for 3 frames and on top with thicker stroke
+        if (recentIdxs.nonEmpty) {
+          val oldStroke = g2.getStroke
+          g2.setStroke(new BasicStroke(3f))
+          recentIdxs.foreach { idx =>
+            val fdr = frames(idx)
+            val pos = fdr.units.map(u => u.id -> u).toMap
+            fdr.attacks.foreach { case (a, v) =>
+              (pos.get(a), pos.get(v)) match {
+                case (Some(ua), Some(uv)) =>
+                  val ax = (offX + ua.x * scale).toInt
+                  val ay = (offY + ua.y * scale).toInt
+                  val vx = (offX + uv.x * scale).toInt
+                  val vy = (offY + uv.y * scale).toInt
+                  val ac = if (ua.friendly) teal else orange
+                  g2.setColor(new Color(ac.getRed, ac.getGreen, ac.getBlue, 220))
+                  g2.drawLine(ax, ay, vx, vy)
+                case _ =>
+              }
+            }
+          }
+          g2.setStroke(oldStroke)
         }
       }
+    }
+  }
+
+  // Sidebar panel showing a tally of unit deaths per side up to the current frame
+  private class DeathTallyPanel(
+    metasRef: java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]],
+    framesRef: java.util.concurrent.atomic.AtomicReference[Vector[FrameData]],
+    currentIndex: () => Int
+  ) extends JPanel {
+    setPreferredSize(new Dimension(140, 200))
+    override def paintComponent(g: Graphics): Unit = {
+      super.paintComponent(g)
+      val g2 = g.asInstanceOf[java.awt.Graphics2D]
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+      val teal = new Color(0, 255, 200)
+      val orange = new Color(255, 140, 0)
+      val frames = framesRef.get()
+      val idx = Math.max(0, Math.min(currentIndex(), Math.max(0, frames.length - 1)))
+      val metas = metasRef.get().map(m => m.id -> m).toMap
+      val deadF = new scala.collection.mutable.ArrayBuffer[Int]()
+      val deadE = new scala.collection.mutable.ArrayBuffer[Int]()
+      var i = 0
+      while (i <= idx && i < frames.length) {
+        val f = frames(i)
+        var j = 0
+        while (j < f.deaths.length) {
+          val id = f.deaths(j)
+          metas.get(id).foreach { m =>
+            if (m.friendly) deadF += id else deadE += id
+          }
+          j += 1
+        }
+        i += 1
+      }
+      val uniqF = deadF.distinct
+      val uniqE = deadE.distinct
+      val w = getWidth
+      val pad = 10
+      val colW = (w - pad * 3) / 2
+      val box = 10
+      g2.setColor(Color.WHITE)
+      g2.drawString("Deaths", pad, 14)
+      // Columns from top
+      var y = 28
+      g2.setColor(teal)
+      uniqF.foreach { _ =>
+        g2.fillRect(pad, y, box, box)
+        y += box + 4
+      }
+      y = 28
+      g2.setColor(orange)
+      uniqE.foreach { _ =>
+        g2.fillRect(pad * 2 + colW, y, box, box)
+        y += box + 4
+      }
+      g2.setColor(Color.WHITE)
+      g2.drawString(s"F: ${uniqF.size}", pad, getHeight - 10)
+      g2.drawString(s"E: ${uniqE.size}", pad * 2 + colW, getHeight - 10)
     }
   }
 
@@ -275,9 +377,11 @@ object CombatVisualizer {
     val framesRef = new java.util.concurrent.atomic.AtomicReference[Vector[FrameData]](Vector.empty)
 
     // Initial load
-    parseSimulation(simFile).foreach { case (hash, _, frames) =>
+    val metasRef = new java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]](Vector.empty)
+    parseSimulation(simFile).foreach { case (hash, metas, frames) =>
       mapRef.set(loadMap(mapDir, hash))
       framesRef.set(frames)
+      metasRef.set(metas)
       lastModifiedRef.set(simFile.lastModified())
     }
 
@@ -312,6 +416,10 @@ object CombatVisualizer {
       frame.setLayout(new BorderLayout())
       frame.getContentPane.add(panel, BorderLayout.CENTER)
 
+      // Death tally panel on the right
+      val tally = new DeathTallyPanel(metasRef, framesRef, () => panel.frameIndex)
+      frame.getContentPane.add(tally, BorderLayout.EAST)
+
       val controls = new JPanel()
       controls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT))
       controls.add(playPause)
@@ -333,7 +441,7 @@ object CombatVisualizer {
       controls.add(reloadBtn)
       frame.getContentPane.add(controls, BorderLayout.SOUTH)
 
-      frame.setSize(new Dimension(1000, 800))
+      frame.setSize(new Dimension(1200, 800))
       frame.setLocationByPlatform(true)
       frame.setVisible(true)
 
@@ -343,9 +451,10 @@ object CombatVisualizer {
       def reloadIfChanged(force: Boolean = false): Unit = {
         val lm = simFile.lastModified()
         if (force || (autoReloadRef.get() && lm > lastModifiedRef.get())) {
-          parseSimulation(simFile).foreach { case (hash, _, frames) =>
+          parseSimulation(simFile).foreach { case (hash, metas, frames) =>
             mapRef.set(loadMap(mapDir, hash))
             framesRef.set(frames)
+            metasRef.set(metas)
             panel.map = mapRef.get()
             panel.frames = frames
             // Update slider range and keep current index within bounds
@@ -354,6 +463,7 @@ object CombatVisualizer {
             slider.setValue(panel.frameIndex)
             panel.revalidate()
             panel.repaint()
+            tally.repaint()
             updateTimeLabel()
           }
           lastModifiedRef.set(lm)
@@ -379,6 +489,7 @@ object CombatVisualizer {
         }
         updateTimeLabel()
         panel.repaint()
+        tally.repaint()
       })
       timerRef = timer
       frame.addWindowListener(new java.awt.event.WindowAdapter() {

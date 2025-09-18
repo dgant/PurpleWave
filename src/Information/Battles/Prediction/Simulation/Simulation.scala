@@ -7,6 +7,7 @@ import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.SpinWait
+import Debugging.CombatVisIO
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -20,6 +21,8 @@ final class Simulation {
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
   var shouldReset     : Boolean               = true
+  // Frames log for visualizer (only when debugging)
+  private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
 
   @inline def step(): Unit = {
     if (shouldReset) {
@@ -34,6 +37,7 @@ final class Simulation {
         enemyVanguard     = battle.enemy.vanguardKey()
         engaged           = false
         simulacra.foreach(_.reset(this))
+        if (battle.logSimulation) framesLog.clear()
         shouldReset = false
       } finally {
         With.units.mutex.unlock()
@@ -42,6 +46,27 @@ final class Simulation {
     simulacra.foreach(_.act())
     simulacra.foreach(_.update())
     battle.simulationFrames += 1
+    if (battle.logSimulation) {
+      val sb = new StringBuilder(512)
+      sb.append(battle.simulationFrames).append('|')
+      // Log all units in a stable order (realUnits order is stable during a sim)
+      var i = 0
+      val sims = simulacra
+      while (i < sims.length) {
+        val s = sims(i)
+        val w = s.unitClass.dimensionRightInclusive + s.unitClass.dimensionLeft + 1
+        val h = s.unitClass.dimensionDownInclusive + s.unitClass.dimensionUp + 1
+        sb.append(s.realUnit.id).append(',')
+          .append(s.isFriendly).append(',')
+          .append(s.pixel.x).append(',')
+          .append(s.pixel.y).append(',')
+          .append(s.alive).append(',')
+          .append(w).append(',')
+          .append(h).append(';')
+        i += 1
+      }
+      framesLog += sb.toString()
+    }
     battle.simulationComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
     battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
     battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
@@ -64,6 +89,8 @@ final class Simulation {
     if (battle.logSimulation) {
       battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
       battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
+      // Write simulation frames for visualizer
+      try { CombatVisIO.writeSimulationLog(battle, framesLog) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
     }
     checkpoint()
   }

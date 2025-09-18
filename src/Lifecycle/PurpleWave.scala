@@ -78,6 +78,8 @@ class PurpleWave extends DefaultBWListener {
       With.storyteller.onEnd()
       With.simulation.onEnd()
       With.manners.onEnd(isWinner)
+      // Terminate the combat visualizer if we launched it at start
+      try { if (With.configuration != null && With.configuration.debugging) Debugging.CombatVisIO.terminateVisualizer() } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
       With.logger.flush()
     })
   }

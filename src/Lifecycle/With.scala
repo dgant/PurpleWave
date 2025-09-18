@@ -163,6 +163,16 @@ object With {
     logger            = new Logger
     ConfigurationLoader.load()
 
+    // Live debugging: prepare combat visualizer IO and launch
+    try {
+      if (configuration != null && configuration.debugging) {
+        Debugging.CombatVisIO.ensureDirs()
+        Debugging.CombatVisIO.exportMapData()
+        Debugging.CombatVisIO.prepareEmptySimFile()
+        Debugging.CombatVisIO.launchVisualizer()
+      }
+    } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
+
     ////////////////////
     // Normal systems //
     ////////////////////

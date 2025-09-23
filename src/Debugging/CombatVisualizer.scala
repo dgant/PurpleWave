@@ -10,12 +10,15 @@ import scala.util.Try
 
 /**
   * Combat simulation viewer with scaling, playback controls, and auto-reload toggle.
-  * Usage: Debugging.CombatVisualizer <path-to-simulation.json>
+  * Usage: Debugging.CombatVisualizer <path-to-simulation.pwcs>
+  * If no path is provided, defaults to simulation.pwcs in the working directory (falls back to simulation.json).
   */
 object CombatVisualizer {
 
   @volatile private var window: JFrame = _
   @volatile private var timerRef: javax.swing.Timer = _
+  // Directory of the current simulation file (used to find images)
+  @volatile private var currentSimDir: File = new File(".")
   def requestClose(): Unit = {
     try {
       SwingUtilities.invokeLater(new Runnable { override def run(): Unit = {
@@ -25,8 +28,8 @@ object CombatVisualizer {
     } catch { case _: Throwable => }
   }
 
-  case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int)
-  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None, fly: Boolean = false)
+  case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int, unitType: String)
+  case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None, fly: Boolean = false, cd: Int = -1)
   case class FrameData(f: Int, units: Vector[UnitFrame], attacks: Vector[(Int, Int)] = Vector.empty, deaths: Vector[Int] = Vector.empty)
 
   final class MapData(val tileW: Int, val tileH: Int, val walkW: Int, val walkH: Int,
@@ -110,7 +113,8 @@ object CombatVisualizer {
           id = u.at("id").asInteger(),
           friendly = u.at("friendly").asBoolean(),
           width = u.at("width").asInteger(),
-          height = u.at("height").asInteger()
+          height = u.at("height").asInteger(),
+          unitType = Try(u.at("type").asString()).getOrElse("")
         )).toOption
       }
       val framesJ = Option(j.at("frames")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
@@ -134,7 +138,8 @@ object CombatVisualizer {
             val shMax = Try(uj.at("shMax").asInteger()).getOrElse(-1)
             val tgt   = Try(uj.at("tgt").asInteger()).toOption
             val fly   = Try(uj.at("fly").asBoolean()).getOrElse(false)
-            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt, fly)
+            val cd    = Try(uj.at("cd").asInteger()).getOrElse(-1)
+            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt, fly, cd)
           }
         }
         val attacksArr = Option(fj.at("a")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
@@ -152,12 +157,94 @@ object CombatVisualizer {
     }.toOption
   }
 
+  // Image loading/cache
+  private val imageCache = new java.util.concurrent.ConcurrentHashMap[String, java.awt.Image]()
+  private val missingCache = new java.util.concurrent.ConcurrentHashMap[String, java.lang.Boolean]()
+  private def candidateImageDirs(): Vector[File] = {
+    val dirs = new scala.collection.mutable.ArrayBuffer[File]()
+
+    def addIfValid(base: File): Unit = {
+      if (base != null) {
+        var cur: File = base.getAbsoluteFile
+        var depth = 0
+        while (cur != null && depth < 8) {
+          val f = new File(cur, "images" + File.separator + "units")
+          if (f.exists() && f.isDirectory) dirs += f
+          cur = cur.getParentFile
+          depth += 1
+        }
+      }
+    }
+
+    // Try from simulation file directory, current working dir, and user.dir
+    addIfValid(currentSimDir)
+    addIfValid(new File("."))
+    addIfValid(new File(System.getProperty("user.dir", ".")))
+
+    // Also try alongside the code location (jar/class directory)
+    try {
+      val url = CombatVisualizer.getClass.getProtectionDomain.getCodeSource.getLocation
+      if (url != null) addIfValid(new File(url.toURI))
+    } catch { case _: Throwable => }
+
+    dirs.distinct.toVector
+  }
+  private def getUnitImage(name: String): Option[java.awt.Image] = {
+    if (name == null || name.isEmpty) return None
+    // Try several filename variants to match repository naming conventions
+    val variants = Vector(
+      name,
+      name.replace(' ', '_'),
+      name.replace('_', ' ')
+    ).distinct
+    // Return cached if any variant cached
+    variants.foreach { v =>
+      val c = imageCache.get(v)
+      if (c != null) return Some(c)
+    }
+    // If any variant is known missing, still try others
+    val dirs = candidateImageDirs()
+    var img: java.awt.Image = null
+    var cachedKey: String = null
+    var i = 0
+    while (i < dirs.length && img == null) {
+      var vi = 0
+      while (vi < variants.length && img == null) {
+        val key = variants(vi)
+        val f = new File(dirs(i), key + ".png")
+        if (f.exists()) {
+          try {
+            img = javax.imageio.ImageIO.read(f)
+            cachedKey = key
+          } catch { case _: Throwable => img = null }
+        }
+        vi += 1
+      }
+      i += 1
+    }
+    if (img != null) {
+      imageCache.put(cachedKey, img)
+      Some(img)
+    } else {
+      variants.foreach(v => missingCache.put(v, true))
+      None
+    }
+  }
+
   private class ViewPanel(var map: Option[MapData], var frames: Vector[FrameData]) extends JPanel {
     setPreferredSize(new Dimension(map.map(_.pixelW).getOrElse(800), map.map(_.pixelH).getOrElse(600)))
     setDoubleBuffered(true)
 
     // Playback state
     @volatile var frameIndex = 0
+
+    // Metas and cooldown maxima (set from main on load/reload)
+    @volatile var metas: Vector[UnitMeta] = Vector.empty
+    @volatile var cdMaxById: Map[Int, Int] = Map.empty
+
+    // Fallback world size when map is not available
+    @volatile var worldW: Int = 0
+    @volatile var worldH: Int = 0
 
     def currentFrameData: Option[FrameData] = if (frames.isEmpty) None else Some(frames(Math.max(0, Math.min(frameIndex, frames.length - 1))))
 
@@ -169,16 +256,23 @@ object CombatVisualizer {
       val w = getWidth
       val h = getHeight
 
-      // Compute scaling to fit entire map
-      val scale = map.map(m => Math.min(w.toDouble / m.pixelW, h.toDouble / m.pixelH)).getOrElse(1.0)
-      val drawW = map.map(m => (m.pixelW * scale).toInt).getOrElse(w)
-      val drawH = map.map(m => (m.pixelH * scale).toInt).getOrElse(h)
+      // Compute scaling to fit entire map (or fallback world size if map missing)
+      val (worldWidth, worldHeight) = map match {
+        case Some(m) => (m.pixelW, m.pixelH)
+        case None    => (if (worldW > 0) worldW else 1024, if (worldH > 0) worldH else 768)
+      }
+      val scale = Math.min(w.toDouble / worldWidth, h.toDouble / worldHeight)
+      val drawW = Math.max(1, (worldWidth * scale).toInt)
+      val drawH = Math.max(1, (worldHeight * scale).toInt)
       val offX = (w - drawW) / 2
       val offY = (h - drawH) / 2
 
-      // Draw terrain
-      map.foreach { m =>
-        g2.drawImage(m.image, offX, offY, drawW, drawH, null)
+      // Draw terrain or fallback background
+      map match {
+        case Some(m) => g2.drawImage(m.image, offX, offY, drawW, drawH, null)
+        case None =>
+          g2.setColor(new Color(32, 32, 32))
+          g2.fillRect(offX, offY, drawW, drawH)
       }
 
       // Draw units and events for current frame
@@ -206,6 +300,7 @@ object CombatVisualizer {
           }
         }
         // First draw units with health fill and outline
+        val metaById: Map[Int, UnitMeta] = metas.map(m => m.id -> m).toMap
         fd.units.foreach { u =>
           if (u.alive) {
             val color = if (u.friendly) teal else orange
@@ -228,6 +323,24 @@ object CombatVisualizer {
               g2.setClip(oldClip)
               g2.setColor(color)
               g2.draw(ellipse)
+              // Draw unit image centered over circle, at intrinsic image size scaled by global scale
+              metaById.get(u.id).flatMap(m => getUnitImage(m.unitType)).foreach { img =>
+                val iw = Math.max(1, (img.getWidth(null).toDouble  * scale).toInt)
+                val ih = Math.max(1, (img.getHeight(null).toDouble * scale).toInt)
+                val ix = (cx - iw / 2.0).toInt
+                val iy = (cy - ih / 2.0).toInt
+                g2.drawImage(img, ix, iy, iw, ih, null)
+              }
+              // Cooldown bar over image at bottom of circle bounds
+              val cdMax = cdMaxById.getOrElse(u.id, Math.max(1, u.cd))
+              if (u.cd >= 0 && cdMax > 0) {
+                val fracCd = Math.max(0.0, Math.min(1.0, u.cd.toDouble / cdMax))
+                val barH = Math.max(2, (2 * scale).toInt)
+                val barY = (cy + r - barH).toInt
+                val barW = Math.max(1, (diam * fracCd).toInt)
+                g2.setColor(new Color(255, 215, 0, 220))
+                g2.fillRect((cx - r).toInt, barY, barW, barH)
+              }
             } else {
               val left = u.x - u.width / 2
               val top  = u.y - u.height / 2
@@ -242,6 +355,26 @@ object CombatVisualizer {
               // Outline
               g2.setColor(color)
               g2.drawRect(sx, sy, sw, sh)
+              // Draw unit image at intrinsic size scaled by global scale, centered on unit position
+              metaById.get(u.id).flatMap(m => getUnitImage(m.unitType)).foreach { img =>
+                val cx = offX + u.x * scale
+                val cy = offY + u.y * scale
+                val iw = Math.max(1, (img.getWidth(null).toDouble  * scale).toInt)
+                val ih = Math.max(1, (img.getHeight(null).toDouble * scale).toInt)
+                val ix = (cx - iw / 2.0).toInt
+                val iy = (cy - ih / 2.0).toInt
+                g2.drawImage(img, ix, iy, iw, ih, null)
+              }
+              // Cooldown bar at bottom of box
+              val cdMax = cdMaxById.getOrElse(u.id, Math.max(1, u.cd))
+              if (u.cd >= 0 && cdMax > 0) {
+                val fracCd = Math.max(0.0, Math.min(1.0, u.cd.toDouble / cdMax))
+                val barH = Math.max(2, (2 * scale).toInt)
+                val barY = sy + sh - barH
+                val barW = Math.max(1, (sw * fracCd).toInt)
+                g2.setColor(new Color(255, 215, 0, 220))
+                g2.fillRect(sx, barY, barW, barH)
+              }
             }
           }
         }
@@ -313,6 +446,8 @@ object CombatVisualizer {
     currentIndex: () => Int
   ) extends JPanel {
     setPreferredSize(new Dimension(140, 200))
+    setOpaque(true)
+    setBackground(new Color(24, 24, 24))
     override def paintComponent(g: Graphics): Unit = {
       super.paintComponent(g)
       val g2 = g.asInstanceOf[java.awt.Graphics2D]
@@ -365,9 +500,23 @@ object CombatVisualizer {
   }
 
   def main(args: Array[String]): Unit = {
-    val simPath = if (args != null && args.length > 0) args(0) else "simulation.json"
-    val simFile = new File(simPath)
+    // Determine simulation file path (.pwcs preferred, fallback to .json)
+    val argPathOpt = if (args != null && args.length > 0) Option(args(0)) else None
+    val simFile: File = {
+      val candidate = argPathOpt.map(new File(_)).getOrElse(new File("simulation.pwcs"))
+      val f =
+        if (candidate.isDirectory) {
+          val pwcs = new File(candidate, "simulation.pwcs")
+          if (pwcs.exists()) pwcs else new File(candidate, "simulation.json")
+        } else if (candidate.exists()) candidate
+        else {
+          val pwcs = new File("simulation.pwcs")
+          if (pwcs.exists()) pwcs else new File("simulation.json")
+        }
+      f
+    }
     val baseDir = simFile.getParentFile
+    currentSimDir = baseDir
     val mapDir = new File(baseDir, "maps")
 
     // State shared with UI thread
@@ -376,17 +525,61 @@ object CombatVisualizer {
     val mapRef = new java.util.concurrent.atomic.AtomicReference[Option[MapData]](None)
     val framesRef = new java.util.concurrent.atomic.AtomicReference[Vector[FrameData]](Vector.empty)
 
+    // cooldown maxima per unit id
+    def computeCdMax(frames: Vector[FrameData]): Map[Int, Int] = {
+      val m = new scala.collection.mutable.HashMap[Int, Int]()
+      var i = 0
+      while (i < frames.length) {
+        val f = frames(i)
+        var j = 0
+        while (j < f.units.length) {
+          val u = f.units(j)
+          if (u.cd >= 0) m.put(u.id, Math.max(m.getOrElse(u.id, 0), u.cd))
+          j += 1
+        }
+        i += 1
+      }
+      m.toMap
+    }
+    val cdMaxRef = new java.util.concurrent.atomic.AtomicReference[Map[Int, Int]](Map.empty)
+
     // Initial load
     val metasRef = new java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]](Vector.empty)
+    def computeWorldSize(frames: Vector[FrameData]): (Int, Int) = {
+      var maxX = 0
+      var maxY = 0
+      var i = 0
+      while (i < frames.length) {
+        val f = frames(i)
+        var j = 0
+        while (j < f.units.length) {
+          val u = f.units(j)
+          if (u.x > maxX) maxX = u.x
+          if (u.y > maxY) maxY = u.y
+          j += 1
+        }
+        i += 1
+      }
+      (Math.max(1024, maxX + 64), Math.max(768, maxY + 64))
+    }
     parseSimulation(simFile).foreach { case (hash, metas, frames) =>
       mapRef.set(loadMap(mapDir, hash))
       framesRef.set(frames)
       metasRef.set(metas)
+      cdMaxRef.set(computeCdMax(frames))
       lastModifiedRef.set(simFile.lastModified())
     }
 
     SwingUtilities.invokeLater(new Runnable { override def run(): Unit = {
       val panel = new ViewPanel(mapRef.get(), framesRef.get())
+      panel.metas = metasRef.get()
+      panel.cdMaxById = cdMaxRef.get()
+      // Initialize fallback world size if map missing
+      if (panel.map.isEmpty) {
+        val (ww, wh) = computeWorldSize(framesRef.get())
+        panel.worldW = ww
+        panel.worldH = wh
+      }
 
       // Controls
       val playPause = new JButton("Pause")
@@ -455,8 +648,17 @@ object CombatVisualizer {
             mapRef.set(loadMap(mapDir, hash))
             framesRef.set(frames)
             metasRef.set(metas)
+            cdMaxRef.set(computeCdMax(frames))
             panel.map = mapRef.get()
             panel.frames = frames
+            panel.metas = metas
+            panel.cdMaxById = cdMaxRef.get()
+            // Update fallback world size if map missing
+            if (panel.map.isEmpty) {
+              val (ww, wh) = computeWorldSize(frames)
+              panel.worldW = ww
+              panel.worldH = wh
+            }
             // Update slider range and keep current index within bounds
             slider.setMaximum(Math.max(0, frames.length - 1))
             panel.frameIndex = Math.min(panel.frameIndex, Math.max(0, frames.length - 1))

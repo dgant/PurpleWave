@@ -11,4 +11,5 @@
 .gradle/
 /out/
 /target/
+/images/
 dependency-reduced-pom.xml

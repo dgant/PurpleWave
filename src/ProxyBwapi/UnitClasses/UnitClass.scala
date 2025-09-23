@@ -106,9 +106,15 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     .contains(this)
 
   lazy val maxTotalHealth: Int = maxHitPoints + maxShields
-
-  lazy val hitPointsHealthRatio : Double = maxHitPoints / (maxHitPoints + maxShields)
-  lazy val shieldsHealthRatio   : Double = maxShields   / (maxHitPoints + maxShields)
+  
+  lazy val hitPointsHealthRatio : Double = {
+    val total = maxHitPoints + maxShields
+    if (total > 0) maxHitPoints.toDouble / total.toDouble else 1.0
+  }
+  lazy val shieldsHealthRatio   : Double = {
+    val total = maxHitPoints + maxShields
+    if (total > 0) maxShields.toDouble / total.toDouble else 0.0
+  }
 
   // Via http://www.starcraftai.com/wiki/Regeneration
   lazy val repairHpPerFrame: Double = if (isMechanical) 0.9 * maxHitPoints / Math.max(1.0, buildFrames) else 0.0

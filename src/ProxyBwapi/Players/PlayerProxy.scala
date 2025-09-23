@@ -35,6 +35,8 @@ abstract class PlayerProxy(bwapiPlayer: bwapi.Player) {
   def gatheredMinerals  : Int = bwapiPlayer.gatheredMinerals
   def supplyUsed400     : Int = supplyUsedCache()
   def supplyTotal400    : Int = supplyTotalCache()
+  def supplyUsed200     : Int = supplyUsed400 / 2
+  def supplyTotal200    : Int = supplyTotal400 / 2
 
   private val upgradeLevelCaches = new mutable.HashMap[Upgrade, Cache[Int]]
   private lazy val maxUpgradeLevels = new CountMap[Upgrade]

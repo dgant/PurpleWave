@@ -1,7 +1,7 @@
 package Tactic.Tactics
 
 import Lifecycle.With
-import Macro.Facts.MacroCounting
+import Macro.Actions.MacroActions
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -11,7 +11,7 @@ import Utilities.UnitCounters.CountOne
 import Utilities.UnitFilters.{IsWorker, UnitFilter}
 import Utilities.UnitPreferences.PreferClose
 
-class TacticRalph extends Tactic with MacroCounting {
+class TacticRalph extends Tactic with MacroActions {
 
   var lastRalph: Option[FriendlyUnitInfo] = None
   var lastDeath: Int = - Forever()
@@ -23,13 +23,13 @@ class TacticRalph extends Tactic with MacroCounting {
     }
     lastRalph = lastRalph.filter(_.client != this)
 
-    if (With.tactics.workerScout.units.nonEmpty) return
-    if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)()) return
-    if (With.framesSince(lastDeath) < Seconds(10)()) return
-    if (With.scouting.ourProximity < 0.5) return
-    if (With.tactics.attackSquad.units.exists(_.proximity < 0.3)) return
-    if (With.self.supplyUsed400 < 60) return
-    if (With.tactics.attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy)) return
+    if (With.tactics.workerScout.units.nonEmpty)                                                                  return
+    if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)())                               return
+    if (With.framesSince(lastDeath) < Seconds(10)())                                                              return
+    if (With.scouting.ourProximity < 0.5)                                                                         return
+    if (With.tactics.attackSquad.units.exists(_.proximity < 0.3))                                                 return
+    if (With.self.supplyUsed200 < 30)                                                                             return
+    if (With.tactics.attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy))  return
 
     val ralphClass: UnitFilter =
       ?(haveComplete(Terran.Vulture),           Terran.Vulture,
@@ -65,6 +65,9 @@ class TacticRalph extends Tactic with MacroCounting {
 
     lock.acquire()
     lastRalph = lock.units.headOption
+    if (lastRalph.isDefined) {
+      status("Ralph")
+    }
     lock.units.foreach(ralph =>
       ralph.intend(this)
         .setTerminus(vicinity)

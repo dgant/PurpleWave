@@ -13,7 +13,7 @@ object CombatVisIO {
 
   private def baseDir: File = new File(With.bwapiData.write, "combatvis")
   private def mapsDir: File = new File(baseDir, "maps")
-  private def simFile: File = new File(baseDir, "simulation.json")
+  private def simFile: File = new File(baseDir, "simulation.pwcs")
 
   def ensureDirs(): Unit = {
     try {
@@ -82,9 +82,9 @@ object CombatVisIO {
       ensureDirs()
       val hash = With.game.mapHash()
 
-      // Collect unit metadata (id -> (width,height, side)) from framesLog first frame
-      val metas: Vector[(Int, Int, Int, Boolean)] = {
-        val buf = new scala.collection.mutable.ArrayBuffer[(Int, Int, Int, Boolean)]()
+      // Collect unit metadata (id -> (width,height, side, type)) from framesLog first frame
+      val metas: Vector[(Int, Int, Int, Boolean, String)] = {
+        val buf = new scala.collection.mutable.ArrayBuffer[(Int, Int, Int, Boolean, String)]()
         framesLog.headOption.foreach { line =>
           val parts = line.split("\\|")
           if (parts.length >= 2) {
@@ -94,12 +94,13 @@ object CombatVisIO {
               val u = units(i)
               if (u.nonEmpty) {
                 val f = u.split(',')
-                if (f.length >= 7) {
+                if (f.length >= 8) { // expect at least to include width,height and more
                   val id = try f(0).toInt catch { case _: Exception => -1 }
                   val friendly = f(1).toBoolean
                   val w = try f(5).toInt catch { case _: Exception => 0 }
                   val h = try f(6).toInt catch { case _: Exception => 0 }
-                  if (id >= 0) buf += ((id, w, h, friendly))
+                  val t = try f.lastOption.getOrElse("") catch { case _: Exception => "" }
+                  if (id >= 0) buf += ((id, w, h, friendly, t))
                 }
               }
               i += 1
@@ -116,13 +117,14 @@ object CombatVisIO {
       // Units meta
       sb.append("\"units\":[")
       var first = true
-      metas.foreach { case (id, w, h, friendly) =>
+      metas.foreach { case (id, w, h, friendly, tpe) =>
         if (!first) sb.append(',') else first = false
         sb.append('{')
         sb.append("\"id\":").append(id).append(',')
         sb.append("\"friendly\":").append(if (friendly) "true" else "false").append(',')
         sb.append("\"width\":").append(w).append(',')
-        sb.append("\"height\":").append(h)
+        sb.append("\"height\":").append(h).append(',')
+        sb.append("\"type\":").append('"').append(tpe.replace("\"", "")).append('"')
         sb.append('}')
       }
       sb.append("],")
@@ -172,6 +174,10 @@ object CombatVisIO {
                 if (fields.length >= 13) {
                   sb.append(',')
                   sb.append("\"fly\":").append(fields(12))
+                }
+                if (fields.length >= 14) {
+                  sb.append(',')
+                  sb.append("\"cd\":").append(fields(13))
                 }
                 sb.append('}')
               }

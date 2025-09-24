@@ -352,7 +352,7 @@ class PvPOpening extends GameplanImperative {
     earlyTimingClosed   ||= gcgate            && enemyHasUpgrade(Protoss.DragoonRange) && ! safePushing && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     mainTimingClosed    ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
     mainTimingClosed    ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
-    mainTimingClosed    ||= PvPDT()           && enemiesHaveComplete(Protoss.Observer, Protoss.PhotonCannon)
+    mainTimingClosed    ||= PvPDT()           && enemiesHaveComplete(Protoss.Observer, Protoss.PhotonCannon) && unitsComplete(Protoss.Gateway)< 3
     shouldAttack          = atEarlyTiming  && ! earlyTimingClosed
     shouldAttack        ||= atMainTiming   && ! mainTimingClosed
     shouldAttack        ||= timingVsProxy
@@ -847,7 +847,9 @@ class PvPOpening extends GameplanImperative {
       if (unitsComplete(Protoss.Gateway) < 2) {
         trainGatewayUnits()
       }
-      if (shouldExpand) { expand() }
+      if (shouldExpand) {
+        expand()
+      }
       pumpWorkers(oversaturate = true)
       trainGatewayUnits()
       get(2, Protoss.Gateway)

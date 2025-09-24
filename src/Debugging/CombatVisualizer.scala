@@ -160,6 +160,8 @@ object CombatVisualizer {
   // Image loading/cache
   private val imageCache = new java.util.concurrent.ConcurrentHashMap[String, java.awt.Image]()
   private val missingCache = new java.util.concurrent.ConcurrentHashMap[String, java.lang.Boolean]()
+  // Cache for recolored (team-tinted) images: key = name + "|F" or "|E"
+  private val recolorCache = new java.util.concurrent.ConcurrentHashMap[String, java.awt.Image]()
   private def candidateImageDirs(): Vector[File] = {
     val dirs = new scala.collection.mutable.ArrayBuffer[File]()
 
@@ -231,6 +233,66 @@ object CombatVisualizer {
     }
   }
 
+  // Return a team-recolored version of the unit image where saturated pink pixels are remapped
+  // to blue (friendly) or red (enemy), preserving brightness. Cached per (name, team).
+  private def getRecoloredUnitImage(name: String, friendly: Boolean): Option[java.awt.Image] = {
+    if (name == null || name.isEmpty) return None
+    val cacheKey = name + (if (friendly) "|F" else "|E")
+    val cached = recolorCache.get(cacheKey)
+    if (cached != null) return Some(cached)
+    val baseOpt = getUnitImage(name)
+    baseOpt.flatMap { base =>
+      try {
+        val bw = base.getWidth(null)
+        val bh = base.getHeight(null)
+        val src = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB)
+        val g = src.getGraphics
+        try { g.drawImage(base, 0, 0, null) } finally { g.dispose() }
+        val out = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB)
+        var y = 0
+        while (y < bh) {
+          var x = 0
+          while (x < bw) {
+            val argb = src.getRGB(x, y)
+            val a = (argb >>> 24) & 0xFF
+            val r = (argb >>> 16) & 0xFF
+            val gch = (argb >>> 8) & 0xFF
+            val b = argb & 0xFF
+            if (a == 0) {
+              out.setRGB(x, y, argb)
+            } else if (isTeamPink(r, gch, b)) {
+              // Use the original brightness to set the chosen channel
+              val intensity = Math.max(r, b)
+              val nr = if (friendly) 0 else intensity
+              val ng = 0
+              val nb = if (friendly) intensity else 0
+              val newArgb = (a << 24) | (nr << 16) | (ng << 8) | nb
+              out.setRGB(x, y, newArgb)
+            } else {
+              out.setRGB(x, y, argb)
+            }
+            x += 1
+          }
+          y += 1
+        }
+        recolorCache.put(cacheKey, out)
+        Some(out)
+      } catch { case _: Throwable => None }
+    }
+  }
+
+  // Heuristic to detect saturated pink placeholder pixels in art
+  private def isTeamPink(r: Int, g: Int, b: Int): Boolean = {
+    // Very saturated pink/magenta: R and B high, G low; allow varying brightness
+    val max = Math.max(r, Math.max(g, b))
+    val min = Math.min(r, Math.min(g, b))
+    val sat = if (max == 0) 0.0 else (max - min).toDouble / max.toDouble
+    val brightEnough = max >= 60
+    val rbHigh = r >= 180 && b >= 180
+    val glow = g <= 80
+    (rbHigh && glow) || (brightEnough && sat >= 0.6 && r > g + 60 && b > g + 60)
+  }
+
   private class ViewPanel(var map: Option[MapData], var frames: Vector[FrameData]) extends JPanel {
     setPreferredSize(new Dimension(map.map(_.pixelW).getOrElse(800), map.map(_.pixelH).getOrElse(600)))
     setDoubleBuffered(true)
@@ -246,21 +308,56 @@ object CombatVisualizer {
     @volatile var worldW: Int = 0
     @volatile var worldH: Int = 0
 
+    // Auto-zoom state
+    @volatile var autoZoomEnabled: Boolean = false
+    // zoomRect: (x, y, w, h) in world pixels (pre-zoom, including margins)
+    @volatile var zoomRect: Option[(Int, Int, Int, Int)] = None
+
+    private val margin: Int = 64 // pixels (pre-zoom)
+
     def currentFrameData: Option[FrameData] = if (frames.isEmpty) None else Some(frames(Math.max(0, Math.min(frameIndex, frames.length - 1))))
 
     override def paintComponent(g: Graphics): Unit = {
       super.paintComponent(g)
       val g2 = g.asInstanceOf[java.awt.Graphics2D]
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
 
       val w = getWidth
       val h = getHeight
 
-      // Compute scaling to fit entire map (or fallback world size if map missing)
-      val (worldWidth, worldHeight) = map match {
-        case Some(m) => (m.pixelW, m.pixelH)
-        case None    => (if (worldW > 0) worldW else 1024, if (worldH > 0) worldH else 768)
+      // Determine base world rect (either full world or auto-zoom bounds), then adjust to panel aspect to fill area
+      val (baseX, baseY, worldWidth, worldHeight) = {
+        val fullW = map.map(_.pixelW).getOrElse(if (worldW > 0) worldW else 1024)
+        val fullH = map.map(_.pixelH).getOrElse(if (worldH > 0) worldH else 768)
+        val init = if (autoZoomEnabled) zoomRect.getOrElse((0, 0, fullW, fullH)) else (0, 0, fullW, fullH)
+        var ax = init._1; var ay = init._2; var aw = Math.max(1, init._3); var ah = Math.max(1, init._4)
+        val panelAR = if (h > 0) w.toDouble / h.toDouble else 1.0
+        val rectAR = aw.toDouble / ah.toDouble
+        if (Math.abs(rectAR - panelAR) > 1e-6) {
+          if (rectAR < panelAR) {
+            // Too tall: need to expand width
+            val desiredW = Math.max(1, (ah * panelAR).toInt)
+            val delta = desiredW - aw
+            ax -= delta / 2
+            aw = desiredW
+          } else {
+            // Too wide: need to expand height
+            val desiredH = Math.max(1, (aw / panelAR).toInt)
+            val delta = desiredH - ah
+            ay -= delta / 2
+            ah = desiredH
+          }
+          // Clamp to map/world bounds
+          if (ax < 0) ax = 0
+          if (ay < 0) ay = 0
+          if (ax + aw > fullW) ax = Math.max(0, fullW - aw)
+          if (ay + ah > fullH) ay = Math.max(0, fullH - ah)
+        }
+        (ax, ay, Math.max(1, Math.min(aw, fullW)), Math.max(1, Math.min(ah, fullH)))
       }
+
       val scale = Math.min(w.toDouble / worldWidth, h.toDouble / worldHeight)
       val drawW = Math.max(1, (worldWidth * scale).toInt)
       val drawH = Math.max(1, (worldHeight * scale).toInt)
@@ -269,7 +366,17 @@ object CombatVisualizer {
 
       // Draw terrain or fallback background
       map match {
-        case Some(m) => g2.drawImage(m.image, offX, offY, drawW, drawH, null)
+        case Some(m) =>
+          if (autoZoomEnabled) {
+            // Clamp source rect to map bounds
+            val sx1 = Math.max(0, baseX)
+            val sy1 = Math.max(0, baseY)
+            val sx2 = Math.min(m.pixelW, baseX + worldWidth)
+            val sy2 = Math.min(m.pixelH, baseY + worldHeight)
+            g2.drawImage(m.image, offX, offY, offX + drawW, offY + drawH, sx1, sy1, sx2, sy2, null)
+          } else {
+            g2.drawImage(m.image, offX, offY, drawW, drawH, null)
+          }
         case None =>
           g2.setColor(new Color(32, 32, 32))
           g2.fillRect(offX, offY, drawW, drawH)
@@ -279,21 +386,21 @@ object CombatVisualizer {
       currentFrameData.foreach { fd =>
         // Build a lookup map for positions by id
         val posById = fd.units.map(u => u.id -> u).toMap
-        val teal = new Color(0, 255, 200)
-        val orange = new Color(255, 140, 0)
-        val tealDark = teal.darker()
-        val orangeDark = orange.darker()
+        val blue = new Color(0, 0, 255)
+        val red = new Color(255, 0, 0)
+        val blueDark = blue.darker()
+        val redDark = red.darker()
         val pink = new Color(255, 105, 180)
         // Draw target lines (darker team color)
         fd.units.foreach { u =>
           u.tgt.foreach { tid =>
             posById.get(tid).foreach { tv =>
               if (u.alive) {
-                val sx = (offX + u.x * scale).toInt
-                val sy = (offY + u.y * scale).toInt
-                val tx = (offX + tv.x * scale).toInt
-                val ty = (offY + tv.y * scale).toInt
-                g2.setColor(if (u.friendly) new Color(tealDark.getRed, tealDark.getGreen, tealDark.getBlue, 180) else new Color(orangeDark.getRed, orangeDark.getGreen, orangeDark.getBlue, 180))
+                val sx = (offX + (u.x - baseX) * scale).toInt
+                val sy = (offY + (u.y - baseY) * scale).toInt
+                val tx = (offX + (tv.x - baseX) * scale).toInt
+                val ty = (offY + (tv.y - baseY) * scale).toInt
+                g2.setColor(if (u.friendly) new Color(blueDark.getRed, blueDark.getGreen, blueDark.getBlue, 180) else new Color(redDark.getRed, redDark.getGreen, redDark.getBlue, 180))
                 g2.drawLine(sx, sy, tx, ty)
               }
             }
@@ -303,28 +410,28 @@ object CombatVisualizer {
         val metaById: Map[Int, UnitMeta] = metas.map(m => m.id -> m).toMap
         fd.units.foreach { u =>
           if (u.alive) {
-            val color = if (u.friendly) teal else orange
+            val color = if (u.friendly) blue else red
             // Health fraction
             val maxTotal = Math.max(0, u.hpMax) + Math.max(0, u.shMax)
             val curTotal = Math.max(0, u.hp) + Math.max(0, u.sh)
             val frac = if (maxTotal > 0) Math.max(0.0, Math.min(1.0, curTotal.toDouble / maxTotal)) else 1.0
             if (u.fly) {
               // Draw circle with clipped health fill
-              val cx = offX + u.x * scale
-              val cy = offY + u.y * scale
+              val cx = offX + (u.x - baseX) * scale
+              val cy = offY + (u.y - baseY) * scale
               val diam = Math.max(u.width, u.height) * scale
               val r = diam / 2.0
               val ellipse = new java.awt.geom.Ellipse2D.Double(cx - r, cy - r, diam, diam)
               val oldClip = g2.getClip
               g2.setClip(ellipse)
-              g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
+              g2.setColor(if (u.friendly) new Color(0, 0, 255, 140) else new Color(255, 0, 0, 140))
               val filled = Math.max(1, (diam * frac).toInt)
               g2.fillRect((cx - r).toInt, (cy + r - filled).toInt, Math.max(1, diam.toInt), filled)
               g2.setClip(oldClip)
               g2.setColor(color)
               g2.draw(ellipse)
               // Draw unit image centered over circle, at intrinsic image size scaled by global scale
-              metaById.get(u.id).flatMap(m => getUnitImage(m.unitType)).foreach { img =>
+              metaById.get(u.id).flatMap(m => getRecoloredUnitImage(m.unitType, u.friendly)).foreach { img =>
                 val iw = Math.max(1, (img.getWidth(null).toDouble  * scale).toInt)
                 val ih = Math.max(1, (img.getHeight(null).toDouble * scale).toInt)
                 val ix = (cx - iw / 2.0).toInt
@@ -344,21 +451,21 @@ object CombatVisualizer {
             } else {
               val left = u.x - u.width / 2
               val top  = u.y - u.height / 2
-              val sx = (offX + left * scale).toInt
-              val sy = (offY + top  * scale).toInt
+              val sx = (offX + (left - baseX) * scale).toInt
+              val sy = (offY + (top  - baseY) * scale).toInt
               val sw = Math.max(1, (u.width  * scale).toInt)
               val sh = Math.max(1, (u.height * scale).toInt)
               val filled = Math.max(1, (sh * frac).toInt)
               // Fill bottom portion
-              g2.setColor(new Color(color.getRed, color.getGreen, color.getBlue, 140))
+              g2.setColor(if (u.friendly) new Color(0, 0, 255, 140) else new Color(255, 0, 0, 140))
               g2.fillRect(sx, sy + (sh - filled), sw, filled)
               // Outline
               g2.setColor(color)
               g2.drawRect(sx, sy, sw, sh)
               // Draw unit image at intrinsic size scaled by global scale, centered on unit position
-              metaById.get(u.id).flatMap(m => getUnitImage(m.unitType)).foreach { img =>
-                val cx = offX + u.x * scale
-                val cy = offY + u.y * scale
+              metaById.get(u.id).flatMap(m => getRecoloredUnitImage(m.unitType, u.friendly)).foreach { img =>
+                val cx = offX + (u.x - baseX) * scale
+                val cy = offY + (u.y - baseY) * scale
                 val iw = Math.max(1, (img.getWidth(null).toDouble  * scale).toInt)
                 val ih = Math.max(1, (img.getHeight(null).toDouble * scale).toInt)
                 val ix = (cx - iw / 2.0).toInt
@@ -393,8 +500,8 @@ object CombatVisualizer {
             fdr.deaths.foreach { id =>
               pos.get(id).foreach { u =>
                 if (u.fly) {
-                  val cx = offX + u.x * scale
-                  val cy = offY + u.y * scale
+                  val cx = offX + (u.x - baseX) * scale
+                  val cy = offY + (u.y - baseY) * scale
                   val diam = Math.max(u.width, u.height) * scale
                   val r = diam / 2.0
                   val ellipse = new java.awt.geom.Ellipse2D.Double(cx - r, cy - r, diam, diam)
@@ -402,8 +509,8 @@ object CombatVisualizer {
                 } else {
                   val left = u.x - u.width / 2
                   val top  = u.y - u.height / 2
-                  val sx = (offX + left * scale).toInt
-                  val sy = (offY + top  * scale).toInt
+                  val sx = (offX + (left - baseX) * scale).toInt
+                  val sy = (offY + (top  - baseY) * scale).toInt
                   val sw = Math.max(1, (u.width  * scale).toInt)
                   val sh = Math.max(1, (u.height * scale).toInt)
                   g2.fillRect(sx - 1, sy - 1, sw + 2, sh + 2)
@@ -422,12 +529,12 @@ object CombatVisualizer {
             fdr.attacks.foreach { case (a, v) =>
               (pos.get(a), pos.get(v)) match {
                 case (Some(ua), Some(uv)) =>
-                  val ax = (offX + ua.x * scale).toInt
-                  val ay = (offY + ua.y * scale).toInt
-                  val vx = (offX + uv.x * scale).toInt
-                  val vy = (offY + uv.y * scale).toInt
-                  val ac = if (ua.friendly) teal else orange
-                  g2.setColor(new Color(ac.getRed, ac.getGreen, ac.getBlue, 220))
+                  val ax = (offX + (ua.x - baseX) * scale).toInt
+                  val ay = (offY + (ua.y - baseY) * scale).toInt
+                  val vx = (offX + (uv.x - baseX) * scale).toInt
+                  val vy = (offY + (uv.y - baseY) * scale).toInt
+                  val ac = if (ua.friendly) new Color(0, 0, 255, 220) else new Color(255, 0, 0, 220)
+                  g2.setColor(ac)
                   g2.drawLine(ax, ay, vx, vy)
                 case _ =>
               }
@@ -452,8 +559,10 @@ object CombatVisualizer {
       super.paintComponent(g)
       val g2 = g.asInstanceOf[java.awt.Graphics2D]
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-      val teal = new Color(0, 255, 200)
-      val orange = new Color(255, 140, 0)
+      g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+      val blue = new Color(0, 0, 255)
+      val red = new Color(255, 0, 0)
       val frames = framesRef.get()
       val idx = Math.max(0, Math.min(currentIndex(), Math.max(0, frames.length - 1)))
       val metas = metasRef.get().map(m => m.id -> m).toMap
@@ -480,18 +589,55 @@ object CombatVisualizer {
       val box = 10
       g2.setColor(Color.WHITE)
       g2.drawString("Deaths", pad, 14)
-      // Columns from top
+      // Columns from top with portraits
+      val maxThumb = Math.max(12, Math.min(48, colW - 8))
       var y = 28
-      g2.setColor(teal)
-      uniqF.foreach { _ =>
-        g2.fillRect(pad, y, box, box)
-        y += box + 4
+      // Friendly (left column)
+      uniqF.foreach { id =>
+        val xCol = pad
+        metas.get(id).flatMap(m => getRecoloredUnitImage(m.unitType, friendly = true)) match {
+          case Some(img) =>
+            val iw = Math.max(1, img.getWidth(null))
+            val ih = Math.max(1, img.getHeight(null))
+            val scale = Math.min(maxThumb.toDouble / iw.toDouble, maxThumb.toDouble / ih.toDouble)
+            val dw = Math.max(1, (iw * scale).toInt)
+            val dh = Math.max(1, (ih * scale).toInt)
+            val dx = xCol + (colW - dw) / 2
+            val dy = y
+            // Border
+            g2.setColor(blue)
+            g2.drawRect(dx - 1, dy - 1, dw + 2, dh + 2)
+            // Image
+            g2.drawImage(img, dx, dy, dw, dh, null)
+            y += dh + 6
+          case None =>
+            g2.setColor(blue)
+            g2.fillRect(xCol + (colW - box) / 2, y, box, box)
+            y += box + 6
+        }
       }
+      // Enemy (right column)
       y = 28
-      g2.setColor(orange)
-      uniqE.foreach { _ =>
-        g2.fillRect(pad * 2 + colW, y, box, box)
-        y += box + 4
+      uniqE.foreach { id =>
+        val xCol = pad * 2 + colW
+        metas.get(id).flatMap(m => getRecoloredUnitImage(m.unitType, friendly = false)) match {
+          case Some(img) =>
+            val iw = Math.max(1, img.getWidth(null))
+            val ih = Math.max(1, img.getHeight(null))
+            val scale = Math.min(maxThumb.toDouble / iw.toDouble, maxThumb.toDouble / ih.toDouble)
+            val dw = Math.max(1, (iw * scale).toInt)
+            val dh = Math.max(1, (ih * scale).toInt)
+            val dx = xCol + (colW - dw) / 2
+            val dy = y
+            g2.setColor(red)
+            g2.drawRect(dx - 1, dy - 1, dw + 2, dh + 2)
+            g2.drawImage(img, dx, dy, dw, dh, null)
+            y += dh + 6
+          case None =>
+            g2.setColor(red)
+            g2.fillRect(xCol + (colW - box) / 2, y, box, box)
+            y += box + 6
+        }
       }
       g2.setColor(Color.WHITE)
       g2.drawString(s"F: ${uniqF.size}", pad, getHeight - 10)
@@ -543,6 +689,9 @@ object CombatVisualizer {
     }
     val cdMaxRef = new java.util.concurrent.atomic.AtomicReference[Map[Int, Int]](Map.empty)
 
+    // Auto-zoom bounds
+    val zoomRef = new java.util.concurrent.atomic.AtomicReference[Option[(Int, Int, Int, Int)]](None)
+
     // Initial load
     val metasRef = new java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]](Vector.empty)
     def computeWorldSize(frames: Vector[FrameData]): (Int, Int) = {
@@ -562,11 +711,61 @@ object CombatVisualizer {
       }
       (Math.max(1024, maxX + 64), Math.max(768, maxY + 64))
     }
+    def computeAutoZoomBounds(frames: Vector[FrameData]): Option[(Int, Int, Int, Int)] = {
+      if (frames.isEmpty) return None
+      // Collect IDs that deal or receive damage (attackers, victims) and deaths
+      val ids = new scala.collection.mutable.HashSet[Int]()
+      var i = 0
+      while (i < frames.length) {
+        val f = frames(i)
+        var k = 0
+        while (k < f.attacks.length) {
+          val pair = f.attacks(k)
+          ids += pair._1; ids += pair._2
+          k += 1
+        }
+        var d = 0
+        while (d < f.deaths.length) { ids += f.deaths(d); d += 1 }
+        i += 1
+      }
+      if (ids.isEmpty) return None
+      var minX = Int.MaxValue
+      var minY = Int.MaxValue
+      var maxX = Int.MinValue
+      var maxY = Int.MinValue
+      i = 0
+      while (i < frames.length) {
+        val f = frames(i)
+        var j = 0
+        while (j < f.units.length) {
+          val u = f.units(j)
+          if (ids.contains(u.id)) {
+            if (u.x < minX) minX = u.x
+            if (u.y < minY) minY = u.y
+            if (u.x > maxX) maxX = u.x
+            if (u.y > maxY) maxY = u.y
+          }
+          j += 1
+        }
+        i += 1
+      }
+      if (minX == Int.MaxValue) None
+      else {
+        val margin = 64
+        // Best-fit rectangle including margin (no squaring)
+        val bx = Math.max(0, minX - margin)
+        val by = Math.max(0, minY - margin)
+        val bw = Math.max(1, (maxX - minX) + margin * 2)
+        val bh = Math.max(1, (maxY - minY) + margin * 2)
+        Some((bx, by, bw, bh))
+      }
+    }
     parseSimulation(simFile).foreach { case (hash, metas, frames) =>
       mapRef.set(loadMap(mapDir, hash))
       framesRef.set(frames)
       metasRef.set(metas)
       cdMaxRef.set(computeCdMax(frames))
+      zoomRef.set(computeAutoZoomBounds(frames))
       lastModifiedRef.set(simFile.lastModified())
     }
 
@@ -580,11 +779,15 @@ object CombatVisualizer {
         panel.worldW = ww
         panel.worldH = wh
       }
+      // Initialize auto-zoom
+      panel.zoomRect = zoomRef.get()
+      panel.autoZoomEnabled = true
 
       // Controls
       val playPause = new JButton("Pause")
       val reloadBtn = new JButton("Reload")
       val autoReload = new JCheckBox("Auto-reload", true)
+      val autoZoom = new JCheckBox("Auto Zoom", true)
       val timeLabel = new JLabel("")
       val slider = new JSlider()
       slider.setMinimum(0)
@@ -629,6 +832,8 @@ object CombatVisualizer {
       speedSlider.setSnapToTicks(true)
       controls.add(new JLabel("Speed:"))
       controls.add(speedSlider)
+      controls.add(new JLabel(" "))
+      controls.add(autoZoom)
       controls.add(timeLabel)
       controls.add(autoReload)
       controls.add(reloadBtn)
@@ -649,10 +854,12 @@ object CombatVisualizer {
             framesRef.set(frames)
             metasRef.set(metas)
             cdMaxRef.set(computeCdMax(frames))
+            zoomRef.set(computeAutoZoomBounds(frames))
             panel.map = mapRef.get()
             panel.frames = frames
             panel.metas = metas
             panel.cdMaxById = cdMaxRef.get()
+            panel.zoomRect = zoomRef.get()
             // Update fallback world size if map missing
             if (panel.map.isEmpty) {
               val (ww, wh) = computeWorldSize(frames)
@@ -714,6 +921,11 @@ object CombatVisualizer {
 
       autoReload.addActionListener(_ => {
         autoReloadRef.set(autoReload.isSelected)
+      })
+
+      autoZoom.addActionListener(_ => {
+        panel.autoZoomEnabled = autoZoom.isSelected
+        panel.repaint()
       })
 
       reloadBtn.addActionListener(_ => reloadIfChanged(force = true))

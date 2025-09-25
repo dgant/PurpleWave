@@ -23,6 +23,7 @@ final class Simulation {
   var shouldReset     : Boolean               = true
   // Frames log for visualizer (only when debugging)
   private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
+  private var simulationStartGameFrame: Int = 0
 
   @inline def step(): Unit = {
     if (shouldReset) {
@@ -37,7 +38,11 @@ final class Simulation {
         enemyVanguard     = battle.enemy.vanguardKey()
         engaged           = false
         simulacra.foreach(_.reset(this))
-        if (battle.logSimulation) framesLog.clear()
+        if (battle.logSimulation) {
+          framesLog.clear()
+          simulationStartGameFrame = With.frame
+          try { Debugging.CombatVisIO.diag(s"sim reset: realUnits=${realUnits.length} startGameFrame=$simulationStartGameFrame battleFrames=${battle.simulationFrames}") } catch { case _: Throwable => }
+        }
         shouldReset = false
       } finally {
         With.units.mutex.unlock()
@@ -125,8 +130,17 @@ final class Simulation {
     if (battle.logSimulation) {
       battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
       battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
-      // Write simulation frames for visualizer
-      try { CombatVisIO.writeSimulationLog(battle, framesLog) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
+      // Diagnostics
+      try {
+        val rFramesLimit = battle.simulationFrames >= With.configuration.simulationFrames
+        val rNoOurs      = ! simulacraOurs.exists(_.alive)
+        val rNoEnemy     = ! simulacraEnemy.exists(_.alive)
+        val rNoFighting  = ! simulacra.exists(s => s.alive && s.behavior.fighting)
+        Debugging.CombatVisIO.diag(s"cleanup: framesLogSz=${framesLog.length} startGameFrame=$simulationStartGameFrame gameFrame=${With.frame} reasons framesLimit=$rFramesLimit noOurs=$rNoOurs noEnemy=$rNoEnemy noFighting=$rNoFighting")
+      } catch { case _: Throwable => }
+      // Write simulation frames for visualizer (async to avoid blocking main thread)
+      try { CombatVisIO.writeSimulationLogAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
+      try { CombatVisIO.writeCompressedSimDumpIfNeededAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
     }
     checkpoint()
   }

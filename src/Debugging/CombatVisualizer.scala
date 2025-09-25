@@ -4,7 +4,8 @@ import mjson.Json
 
 import java.awt.image.BufferedImage
 import java.awt._
-import java.io.{DataInputStream, File, FileInputStream}
+import java.io.{DataInputStream, File, FileInputStream, RandomAccessFile}
+import java.util.zip.GZIPInputStream
 import javax.swing._
 import scala.util.Try
 
@@ -14,6 +15,20 @@ import scala.util.Try
   * If no path is provided, defaults to simulation.pwcs in the working directory (falls back to simulation.json).
   */
 object CombatVisualizer {
+
+  // External diagnostics to c:\p\pw\out\logs for robust investigation
+  private def extVisLog(message: String): Unit = {
+    try {
+      val dir = new java.io.File("C:\\p\\pw\\out\\logs")
+      if (!dir.exists()) dir.mkdirs()
+      val ts = System.currentTimeMillis()
+      val sdf = new java.text.SimpleDateFormat("HH:mm:ss.SSS")
+      val line = s"[$ts ${sdf.format(new java.util.Date(ts))}] $message\n"
+      val f = new java.io.File(dir, "combatvis.log")
+      val fos = new java.io.FileOutputStream(f, true)
+      try fos.write(line.getBytes(java.nio.charset.StandardCharsets.UTF_8)) finally try fos.close() catch { case _: Throwable => }
+    } catch { case _: Throwable => }
+  }
 
   @volatile private var window: JFrame = _
   @volatile private var timerRef: javax.swing.Timer = _
@@ -28,7 +43,7 @@ object CombatVisualizer {
     } catch { case _: Throwable => }
   }
 
-  case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int, unitType: String)
+  case class UnitMeta(id: Int, friendly: Boolean, width: Int, height: Int, unitType: String, fly: Boolean = false)
   case class UnitFrame(id: Int, friendly: Boolean, x: Int, y: Int, alive: Boolean, width: Int, height: Int, hp: Int = -1, sh: Int = -1, hpMax: Int = -1, shMax: Int = -1, tgt: Option[Int] = None, fly: Boolean = false, cd: Int = -1)
   case class FrameData(f: Int, units: Vector[UnitFrame], attacks: Vector[(Int, Int)] = Vector.empty, deaths: Vector[Int] = Vector.empty)
 
@@ -101,60 +116,308 @@ object CombatVisualizer {
     }.toOption
   }
 
-  private def parseSimulation(jsonFile: File): Option[(String, Vector[UnitMeta], Vector[FrameData])] = {
+  // Safe JSON accessors (mjson can return nulls; guard them carefully)
+  private def jAt(j: Json, key: String): Json = {
+    if (j == null) null.asInstanceOf[Json]
+    else try j.at(key) catch { case _: Throwable => null.asInstanceOf[Json] }
+  }
+  private def getIntOpt(j: Json, key: String): Option[Int] = {
+    val n = jAt(j, key)
+    if (n == null) None
+    else try {
+      val v: java.lang.Integer = n.asInteger()
+      if (v == null) None else Some(v.intValue())
+    } catch { case _: Throwable => None }
+  }
+  private def getBoolOpt(j: Json, key: String): Option[Boolean] = {
+    val n = jAt(j, key)
+    if (n == null) None
+    else try {
+      val v: java.lang.Boolean = n.asBoolean()
+      if (v == null) None else Some(v.booleanValue())
+    } catch { case _: Throwable => None }
+  }
+  private def getStringOpt(j: Json, key: String): Option[String] = {
+    val n = jAt(j, key)
+    if (n == null) None
+    else try {
+      val v: String = n.asString()
+      if (v == null) None else Some(v)
+    } catch { case _: Throwable => None }
+  }
+  private def getInt(j: Json, key: String, default: Int): Int = getIntOpt(j, key).getOrElse(default)
+  private def getBool(j: Json, key: String, default: Boolean): Boolean = getBoolOpt(j, key).getOrElse(default)
+  private def getString(j: Json, key: String, default: String): String = getStringOpt(j, key).getOrElse(default)
+
+  case class SimPack(mapHash: String, metas: Vector[UnitMeta], frames: Vector[FrameData], startGameFrame: Int)
+
+  private def parseSimulation(jsonFile: File): Option[SimPack] = {
     if (!jsonFile.exists()) return None
     Try {
-      val txt = scala.io.Source.fromFile(jsonFile)(scala.io.Codec.UTF8).mkString
-      val j = Json.read(txt)
-      val mapHash = j.at("mapHash").asString()
-      val unitsJ = Option(j.at("units")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
-      val metas = unitsJ.flatMap { u =>
-        Try(UnitMeta(
-          id = u.at("id").asInteger(),
-          friendly = u.at("friendly").asBoolean(),
-          width = u.at("width").asInteger(),
-          height = u.at("height").asInteger(),
-          unitType = Try(u.at("type").asString()).getOrElse("")
-        )).toOption
+      def readAll(f: File): String = {
+        var fis: java.io.FileInputStream = null
+        var bis: java.io.BufferedInputStream = null
+        try {
+          fis = new FileInputStream(f)
+          bis = new java.io.BufferedInputStream(fis)
+          bis.mark(4)
+          val b1 = bis.read()
+          val b2 = bis.read()
+          bis.reset()
+          val isGz = (b1 == 0x1f && b2 == 0x8b)
+          val in: java.io.InputStream = if (isGz) new GZIPInputStream(bis) else bis
+          try scala.io.Source.fromInputStream(in)(scala.io.Codec.UTF8).mkString finally in.close()
+        } finally {
+          try if (bis != null) bis.close() catch { case _: Throwable => }
+          try if (fis != null) fis.close() catch { case _: Throwable => }
+        }
       }
-      val framesJ = Option(j.at("frames")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
-      val frames = framesJ.flatMap { fj =>
-        val fnum = Try(fj.at("f").asInteger()).getOrElse(0)
-        val unitsArr = Option(fj.at("u")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
-        val units = unitsArr.flatMap { uj =>
-          val base = Try((
-            uj.at("id").asInteger(),
-            uj.at("friendly").asBoolean(),
-            uj.at("x").asInteger(),
-            uj.at("y").asInteger(),
-            uj.at("alive").asBoolean(),
-            uj.at("width").asInteger(),
-            uj.at("height").asInteger()
-          )).toOption
-          base.map { case (id, fr, x, y, alive, w, h) =>
-            val hp    = Try(uj.at("hp").asInteger()).getOrElse(-1)
-            val sh    = Try(uj.at("sh").asInteger()).getOrElse(-1)
-            val hpMax = Try(uj.at("hpMax").asInteger()).getOrElse(-1)
-            val shMax = Try(uj.at("shMax").asInteger()).getOrElse(-1)
-            val tgt   = Try(uj.at("tgt").asInteger()).toOption
-            val fly   = Try(uj.at("fly").asBoolean()).getOrElse(false)
-            val cd    = Try(uj.at("cd").asInteger()).getOrElse(-1)
-            UnitFrame(id, fr, x, y, alive, w, h, hp, sh, hpMax, shMax, tgt, fly, cd)
+      val txt = readAll(jsonFile)
+      if (txt.startsWith("PW2\n") || txt.startsWith("PW2\r\n")) {
+        // Support multi-simulation files: select the newest complete block ending with Z
+        val blocks = {
+          val lines = txt.split("\r?\n")
+          val out = new scala.collection.mutable.ArrayBuffer[String]()
+          var i = 0
+          var cur = new StringBuilder()
+          var in = false
+          while (i < lines.length) {
+            val line = lines(i)
+            if (line == "PW2") {
+              if (in) {
+                // previous block without terminator: drop it
+                cur = new StringBuilder()
+              }
+              in = true
+              cur.append("PW2\n")
+            } else if (in) {
+              cur.append(line).append('\n')
+              if (line == "Z") {
+                out += cur.toString()
+                cur = new StringBuilder()
+                in = false
+              }
+            }
+            i += 1
+          }
+          out.toVector
+        }
+        if (blocks.nonEmpty) parsePW2(blocks.last) else parsePW2(txt) // fallback to whole text
+      } else parseJsonSim(txt)
+    }.toOption
+  }
+
+  private def parseJsonSim(txt: String): SimPack = {
+    val j = Json.read(txt)
+    val mapHash = getString(j, "mapHash", "")
+    val unitsJ = Option(j.at("units")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+    val metas = unitsJ.flatMap { u =>
+      val idOpt = getIntOpt(u, "id")
+      idOpt.map { id =>
+        UnitMeta(
+          id = id,
+          friendly = getBool(u, "friendly", default = false),
+          width = getInt(u, "width", default = 16),
+          height = getInt(u, "height", default = 16),
+          unitType = getString(u, "type", default = ""),
+          fly = getBool(u, "fly", default = false)
+        )
+      }
+    }
+    val metaById: Map[Int, UnitMeta] = metas.map(m => m.id -> m).toMap
+    val framesJ = Option(j.at("frames")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+    val frames = framesJ.flatMap { fj =>
+      val fnum = getInt(fj, "f", 0)
+      val unitsArr = Option(fj.at("u")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+      val units = unitsArr.flatMap { uj =>
+        val idOpt = getIntOpt(uj, "id")
+        idOpt.flatMap { id =>
+          val xOpt = getIntOpt(uj, "x")
+          val yOpt = getIntOpt(uj, "y")
+          val aliveOpt = getBoolOpt(uj, "alive")
+          if (xOpt.isEmpty || yOpt.isEmpty || aliveOpt.isEmpty) None
+          else {
+            val meta: UnitMeta = metaById.getOrElse(id, UnitMeta(
+              id,
+              friendly = getBool(uj, "friendly", default = true),
+              width    = getInt(uj, "width", default = 16),
+              height   = getInt(uj, "height", default = 16),
+              unitType = getString(uj, "type", default = ""),
+              fly      = getBool(uj, "fly", default = false)
+            ))
+            val fr  = getBool(uj, "friendly", default = meta.friendly)
+            val w   = getInt(uj, "width", default = meta.width)
+            val h   = getInt(uj, "height", default = meta.height)
+            val hp    = getIntOpt(uj, "hp").getOrElse(-1)
+            val sh    = getIntOpt(uj, "sh").getOrElse(-1)
+            val hpMax = getIntOpt(uj, "hpMax").getOrElse(-1)
+            val shMax = getIntOpt(uj, "shMax").getOrElse(-1)
+            val tgt   = getIntOpt(uj, "tgt")
+            val fly   = getBool(uj, "fly", default = meta.fly)
+            val cd    = getIntOpt(uj, "cd").getOrElse(-1)
+            Some(UnitFrame(id, fr, xOpt.get, yOpt.get, aliveOpt.get, w, h, hp, sh, hpMax, shMax, tgt, fly, cd))
           }
         }
-        val attacksArr = Option(fj.at("a")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
-        val attacks = attacksArr.flatMap { pair =>
-          if (pair.isArray) {
-            val arr = pair.asJsonList()
-            Try((arr.get(0).asInteger(), arr.get(1).asInteger())).toOption
-          } else None
-        }
-        val deathsArr = Option(fj.at("d")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
-        val deaths = deathsArr.flatMap(jv => Try(jv.asInteger()).toOption)
-        Some(FrameData(fnum, units, attacks, deaths))
       }
-      (mapHash, metas, frames)
-    }.toOption
+      val attacksArr = Option(fj.at("a")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+      val attacks = attacksArr.flatMap { pair =>
+        if (pair.isArray) {
+          val arr = pair.asJsonList()
+          Try((arr.get(0).asInteger(), arr.get(1).asInteger())).toOption
+        } else None
+      }
+      val deathsArr = Option(fj.at("d")).map(_.asJsonList()).map(_.toArray(new Array[Json](0)).toVector).getOrElse(Vector.empty)
+      val deaths = deathsArr.flatMap(jv => Try(jv.asInteger()).toOption)
+      Some(FrameData(fnum, units, attacks, deaths))
+    }
+    SimPack(mapHash, metas, frames, 0)
+  }
+
+  private def parsePW2(txt: String): SimPack = {
+    val lines = txt.split("\r?\n").toVector
+    var i = 0
+    var mapHash = ""
+    val metasBuf = new scala.collection.mutable.ArrayBuffer[UnitMeta]()
+    val metaById = new scala.collection.mutable.HashMap[Int, UnitMeta]()
+    // We'll derive hpMax/shMax and geometry from JBWAPI UnitType via typeId from U lines
+    case class St(var x: Int, var y: Int, var alive: Boolean, var hp: Int, var sh: Int, var tgt: Option[Int], var cd: Int)
+    val last = new scala.collection.mutable.HashMap[Int, St]()
+    val framesBuf = new scala.collection.mutable.ArrayBuffer[FrameData]()
+
+    var currentFrameNum = 0
+    var startGameFrame = 0
+    def snapshotUnits(): Vector[UnitFrame] = {
+      val out = new scala.collection.mutable.ArrayBuffer[UnitFrame]()
+      val it = last.iterator
+      while (it.hasNext) {
+        val (id, st) = it.next()
+        if (st.alive) {
+          val m = metaById.getOrElse(id, UnitMeta(id, friendly = false, 16, 16, "", fly = false))
+          // Derive hp/shield maxima from unit type via JBWAPI (based on resolved unitType in meta)
+          val utOpt = try Option(bwapi.UnitType.valueOf(m.unitType)) catch { case _: Throwable => None }
+          val hpM = utOpt.map(_.maxHitPoints()).getOrElse(-1)
+          val shM = utOpt.map(_.maxShields()).getOrElse(0)
+          out += UnitFrame(id, m.friendly, st.x, st.y, st.alive, m.width, m.height, st.hp, st.sh, hpM, shM, st.tgt, m.fly, st.cd)
+        }
+      }
+      out.toVector
+    }
+
+    i = 0
+    while (i < lines.length) {
+      val line = lines(i)
+      if (line.startsWith("H|")) {
+        mapHash = line.substring(2)
+      } else if (line.startsWith("U|")) {
+        val f = line.substring(2).split("\\|")
+        if (f.length >= 3) {
+          val id = Try(f(0).toInt).getOrElse(-1)
+          if (id >= 0) {
+            val fr = f(1) == "1"
+            if (f.length == 3) {
+              // New compact format: id|friendly|typeId
+              val typeId = Try(f(2).toInt).getOrElse(-1)
+              val utOpt = bwapi.UnitType.values().find(_.id == typeId)
+              utOpt.foreach { ut =>
+                val flyInf = if (ut.getRace() == bwapi.Race.Terran && ut.isBuilding()) false else ut.isFlyer()
+                val meta = UnitMeta(id, fr, ut.width(), ut.height(), ut.toString, flyInf)
+                metasBuf += meta
+                metaById.put(id, meta)
+              }
+            } else if (f.length >= 8) {
+              // Legacy extended format: preserve behavior
+              val w = Try(f(2).toInt).getOrElse(16)
+              val h = Try(f(3).toInt).getOrElse(16)
+              val tpe = if (f(4) == null) "" else f(4)
+              val fly = f(5) == "1"
+              val meta = UnitMeta(id, fr, w, h, tpe, fly)
+              metasBuf += meta
+              metaById.put(id, meta)
+            }
+          }
+        }
+      } else if (line.startsWith("S|")) {
+        startGameFrame = Try(line.substring(2).toInt).getOrElse(0)
+      } else if (line.startsWith("F|")) {
+        currentFrameNum = Try(line.substring(2).toInt).getOrElse(0)
+        // Start a new frame; we'll add after processing following lines (C/A/D) or immediately if none
+        // Ensure we at least append a frame with current snapshot at the F line to match previous behavior
+        // We'll delay adding until we see next F or EOF to include events collected below
+        // So do nothing here
+      } else if (line.startsWith("C|")) {
+        val body = line.substring(2)
+        if (body.nonEmpty) {
+          val ents = body.split(';')
+          var ei = 0
+          while (ei < ents.length) {
+            val e = ents(ei)
+            val ff = e.split(',')
+            if (ff.length >= 8) {
+              val id = Try(ff(0).toInt).getOrElse(-1)
+              if (id >= 0) {
+                val x = Try(ff(1).toInt).getOrElse(0)
+                val y = Try(ff(2).toInt).getOrElse(0)
+                val alive = ff(3) == "1"
+                val hp = Try(ff(4).toInt).getOrElse(-1)
+                val sh = Try(ff(5).toInt).getOrElse(-1)
+                val tgt = Try(ff(6).toInt).toOption
+                val cd = Try(ff(7).toInt).getOrElse(-1)
+                val st = last.getOrElseUpdate(id, St(x, y, alive, hp, sh, None, -1))
+                st.x = x; st.y = y; st.alive = alive; st.hp = hp; st.sh = sh; st.tgt = tgt.filter(_ >= 0); st.cd = cd
+              }
+            }
+            ei += 1
+          }
+        }
+        // After applying changes for this frame, create a snapshot frame (we'll attach events possibly in following lines by separate data structure)
+        framesBuf += FrameData(currentFrameNum, snapshotUnits(), Vector.empty, Vector.empty)
+      } else if (line.startsWith("A|")) {
+        val body = line.substring(2)
+        // Ensure a snapshot exists for this frame even if no C| was recorded
+        if (framesBuf.isEmpty || framesBuf(framesBuf.length - 1).f != currentFrameNum) {
+          framesBuf += FrameData(currentFrameNum, snapshotUnits(), Vector.empty, Vector.empty)
+        }
+        if (framesBuf.nonEmpty) {
+          val lastF = framesBuf(framesBuf.length - 1)
+          val pairs = new scala.collection.mutable.ArrayBuffer[(Int, Int)]()
+          val ents = if (body.isEmpty) Array.empty[String] else body.split(';')
+          var k = 0
+          while (k < ents.length) {
+            val s = ents(k)
+            val gt = s.indexOf('>')
+            if (gt > 0) {
+              val a = Try(s.substring(0, gt).toInt).getOrElse(-1)
+              val v = Try(s.substring(gt + 1).toInt).getOrElse(-1)
+              if (a >= 0 && v >= 0) pairs += ((a, v))
+            }
+            k += 1
+          }
+          framesBuf(framesBuf.length - 1) = lastF.copy(attacks = pairs.toVector)
+        }
+      } else if (line.startsWith("D|")) {
+        val body = line.substring(2)
+        // Ensure a snapshot exists for this frame even if no C| was recorded
+        if (framesBuf.isEmpty || framesBuf(framesBuf.length - 1).f != currentFrameNum) {
+          framesBuf += FrameData(currentFrameNum, snapshotUnits(), Vector.empty, Vector.empty)
+        }
+        if (framesBuf.nonEmpty) {
+          val lastF = framesBuf(framesBuf.length - 1)
+          val ids = new scala.collection.mutable.ArrayBuffer[Int]()
+          val ents = if (body.isEmpty) Array.empty[String] else body.split(';')
+          var k = 0
+          while (k < ents.length) {
+            val s = ents(k)
+            val id = Try(s.toInt).getOrElse(-1)
+            if (id >= 0) ids += id
+            k += 1
+          }
+          framesBuf(framesBuf.length - 1) = lastF.copy(deaths = ids.toVector)
+        }
+      }
+      i += 1
+    }
+
+    SimPack(mapHash, metasBuf.toVector, framesBuf.toVector, startGameFrame)
   }
 
   // Image loading/cache
@@ -519,8 +782,42 @@ object CombatVisualizer {
             }
           }
         }
-        // Draw attack lines in attacker bright color, persisted for 3 frames and on top with thicker stroke
+        // Flash victims white for the same recent window as attack lines, then draw attack lines on top
         if (recentIdxs.nonEmpty) {
+          // Compute set of recent victims
+          val victims = new java.util.HashSet[Int]()
+          var vi = 0
+          while (vi < recentIdxs.length) {
+            val fdr = frames(recentIdxs(vi))
+            var ak = 0
+            while (ak < fdr.attacks.length) { victims.add(fdr.attacks(ak)._2); ak += 1 }
+            vi += 1
+          }
+          if (!victims.isEmpty) {
+            // Build a lookup for most recent positions to place the flash
+            val latest = frames(recentIdxs.head).units.map(u => u.id -> u).toMap
+            val it = victims.iterator()
+            while (it.hasNext) {
+              val id = it.next()
+              latest.get(id).foreach { u =>
+                // Flash the sprite image, not the HP background
+                metas.find(_.id == u.id).flatMap(m => getRecoloredUnitImage(m.unitType, u.friendly)).foreach { img =>
+                  val cx = offX + (u.x - baseX) * scale
+                  val cy = offY + (u.y - baseY) * scale
+                  val iw = Math.max(1, (img.getWidth(null).toDouble  * scale).toInt)
+                  val ih = Math.max(1, (img.getHeight(null).toDouble * scale).toInt)
+                  val ix = (cx - iw / 2.0).toInt
+                  val iy = (cy - ih / 2.0).toInt
+                  val oldComp = g2.getComposite
+                  g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f))
+                  g2.setColor(Color.WHITE)
+                  g2.fillRect(ix, iy, iw, ih)
+                  g2.setComposite(oldComp)
+                }
+              }
+            }
+          }
+          // Draw attack lines in attacker bright color, persisted for 3 frames and on top with thicker stroke
           val oldStroke = g2.getStroke
           g2.setStroke(new BasicStroke(3f))
           recentIdxs.foreach { idx =>
@@ -589,9 +886,12 @@ object CombatVisualizer {
       val box = 10
       g2.setColor(Color.WHITE)
       g2.drawString("Deaths", pad, 14)
+      // Totals just below header
+      g2.drawString(s"F: ${uniqF.size}", pad, 26)
+      g2.drawString(s"E: ${uniqE.size}", pad * 2 + colW, 26)
       // Columns from top with portraits
       val maxThumb = Math.max(12, Math.min(48, colW - 8))
-      var y = 28
+      var y = 42
       // Friendly (left column)
       uniqF.foreach { id =>
         val xCol = pad
@@ -639,9 +939,6 @@ object CombatVisualizer {
             y += box + 6
         }
       }
-      g2.setColor(Color.WHITE)
-      g2.drawString(s"F: ${uniqF.size}", pad, getHeight - 10)
-      g2.drawString(s"E: ${uniqE.size}", pad * 2 + colW, getHeight - 10)
     }
   }
 
@@ -663,13 +960,163 @@ object CombatVisualizer {
     }
     val baseDir = simFile.getParentFile
     currentSimDir = baseDir
-    val mapDir = new File(baseDir, "maps")
+    val mapDir = baseDir
 
     // State shared with UI thread
     val lastModifiedRef = new java.util.concurrent.atomic.AtomicLong(0L)
     val autoReloadRef = new java.util.concurrent.atomic.AtomicBoolean(true)
     val mapRef = new java.util.concurrent.atomic.AtomicReference[Option[MapData]](None)
     val framesRef = new java.util.concurrent.atomic.AtomicReference[Vector[FrameData]](Vector.empty)
+    val metasRef = new java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]](Vector.empty)
+    val simsRef = new java.util.concurrent.atomic.AtomicReference[Vector[SimPack]](Vector.empty)
+    // Incremental reading state
+    val fileLenRef = new java.util.concurrent.atomic.AtomicLong(0L)
+    val pendingRef = new java.util.concurrent.atomic.AtomicReference[String]("")
+
+    def readAllText(f: File): String = {
+      var fis: java.io.FileInputStream = null
+      var bis: java.io.BufferedInputStream = null
+      try {
+        fis = new FileInputStream(f)
+        bis = new java.io.BufferedInputStream(fis)
+        bis.mark(4)
+        val b1 = bis.read(); val b2 = bis.read(); bis.reset()
+        val isGz = (b1 == 0x1f && b2 == 0x8b)
+        val in: java.io.InputStream = if (isGz) new GZIPInputStream(bis) else bis
+        try scala.io.Source.fromInputStream(in)(scala.io.Codec.UTF8).mkString finally in.close()
+      } finally {
+        try if (bis != null) bis.close() catch { case _: Throwable => }
+        try if (fis != null) fis.close() catch { case _: Throwable => }
+      }
+    }
+
+    def splitPW2Blocks(txt: String): Vector[String] = {
+      val lines = txt.split("\r?\n")
+      val out = new scala.collection.mutable.ArrayBuffer[String]()
+      var i = 0
+      var cur = new StringBuilder()
+      var in = false
+      while (i < lines.length) {
+        val line = lines(i)
+        if (line == "PW2") {
+          if (in) { cur = new StringBuilder() }
+          in = true
+          cur.append("PW2\n")
+        } else if (in) {
+          cur.append(line).append('\n')
+          if (line == "Z") { out += cur.toString(); cur = new StringBuilder(); in = false }
+        }
+        i += 1
+      }
+      out.toVector
+    }
+
+    // Streaming splitter: returns (completeBlocks, remainder)
+    def splitPW2BlocksWithRemainder(txt: String): (Vector[String], String) = {
+      val lines = txt.split("\r?\n", -1) // keep trailing empty
+      val out = new scala.collection.mutable.ArrayBuffer[String]()
+      val cur = new StringBuilder()
+      var in = false
+      var i = 0
+      while (i < lines.length) {
+        val line = lines(i)
+        if (line == "PW2") {
+          if (in) {
+            // Unexpected new PW2 without Z; discard previous partial and start fresh
+            cur.clear()
+          }
+          in = true
+          cur.append("PW2\n")
+        } else if (in) {
+          cur.append(line).append('\n')
+          if (line == "Z") {
+            out += cur.toString()
+            cur.clear()
+            in = false
+          }
+        }
+        i += 1
+      }
+      val rem = if (in && cur.length > 0) cur.toString() else ""
+      (out.toVector, rem)
+    }
+
+    def readAppended(file: File): (String, Long, Boolean) = {
+      var raf: RandomAccessFile = null
+      try {
+        raf = new RandomAccessFile(file, "r")
+        val curLen = fileLenRef.get()
+        val fileLen = raf.length()
+        if (fileLen < curLen) {
+          // Truncated (new game) – reset
+          fileLenRef.set(0L)
+          raf.seek(0L)
+          val bytes = new Array[Byte](fileLen.toInt)
+          raf.readFully(bytes)
+          (new String(bytes, java.nio.charset.StandardCharsets.UTF_8), fileLen, true)
+        } else if (fileLen > curLen) {
+          raf.seek(curLen)
+          val toRead = (fileLen - curLen).toInt
+          val bytes = new Array[Byte](toRead)
+          raf.readFully(bytes)
+          (new String(bytes, java.nio.charset.StandardCharsets.UTF_8), fileLen, false)
+        } else {
+          ("", fileLen, false)
+        }
+      } catch { case _: Throwable => ("", fileLenRef.get(), false) }
+      finally { try if (raf != null) raf.close() catch { case _: Throwable => } }
+    }
+
+    def parseAllSims(file: File): Vector[SimPack] = {
+      if (!file.exists()) return Vector.empty
+      // Stream the file and keep only the last N complete PW2 blocks to bound memory
+      val MaxSimsToKeep = 200
+      var fis: java.io.FileInputStream = null
+      var bis: java.io.BufferedInputStream = null
+      try {
+        fis = new FileInputStream(file)
+        bis = new java.io.BufferedInputStream(fis, 1 << 16)
+        val buf = new Array[Byte](1 << 15) // 32 KB chunks
+        val deque = new java.util.ArrayDeque[String]()
+        var pending = ""
+        var read = 0
+        while ({ read = bis.read(buf); read } != -1) {
+          val seg = new String(buf, 0, read, java.nio.charset.StandardCharsets.UTF_8)
+          val (blocks, rem) = splitPW2BlocksWithRemainder(pending + seg)
+          pending = rem
+          var i = 0
+          while (i < blocks.length) {
+            if (deque.size() >= MaxSimsToKeep) deque.pollFirst()
+            deque.addLast(blocks(i))
+            i += 1
+          }
+        }
+        // If we saw no PW2 blocks at all, try legacy JSON by reading the entire (likely small) file
+        if (deque.isEmpty) {
+          val txt = readAllText(file)
+          if (txt.startsWith("PW2")) {
+            val blocks = splitPW2Blocks(txt)
+            val sims = blocks.flatMap { b => Try(parsePW2(b)).toOption }
+            sims.sortBy(s => -s.startGameFrame)
+          } else {
+            Vector(parseJsonSim(txt))
+          }
+        } else {
+          // Parse the kept blocks to SimPacks and sort newest first
+          val sims = new scala.collection.mutable.ArrayBuffer[SimPack](deque.size())
+          val it = deque.iterator()
+          while (it.hasNext) {
+            val blk = it.next()
+            Try(parsePW2(blk)).foreach(sims += _)
+          }
+          sims.toVector.sortBy(s => -s.startGameFrame)
+        }
+      } catch { case _: Throwable => Vector.empty }
+      finally {
+        try if (bis != null) bis.close() catch { case _: Throwable => }
+        try if (fis != null) fis.close() catch { case _: Throwable => }
+      }
+    }
 
     // cooldown maxima per unit id
     def computeCdMax(frames: Vector[FrameData]): Map[Int, Int] = {
@@ -693,7 +1140,6 @@ object CombatVisualizer {
     val zoomRef = new java.util.concurrent.atomic.AtomicReference[Option[(Int, Int, Int, Int)]](None)
 
     // Initial load
-    val metasRef = new java.util.concurrent.atomic.AtomicReference[Vector[UnitMeta]](Vector.empty)
     def computeWorldSize(frames: Vector[FrameData]): (Int, Int) = {
       var maxX = 0
       var maxY = 0
@@ -760,14 +1206,20 @@ object CombatVisualizer {
         Some((bx, by, bw, bh))
       }
     }
-    parseSimulation(simFile).foreach { case (hash, metas, frames) =>
-      mapRef.set(loadMap(mapDir, hash))
-      framesRef.set(frames)
-      metasRef.set(metas)
-      cdMaxRef.set(computeCdMax(frames))
-      zoomRef.set(computeAutoZoomBounds(frames))
-      lastModifiedRef.set(simFile.lastModified())
+    // Initial parse of all sims and load newest
+    val all0 = parseAllSims(simFile)
+    simsRef.set(all0)
+    if (all0.nonEmpty) {
+      val pack = all0.head
+      mapRef.set(loadMap(mapDir, pack.mapHash))
+      framesRef.set(pack.frames)
+      metasRef.set(pack.metas)
+      cdMaxRef.set(computeCdMax(pack.frames))
+      zoomRef.set(computeAutoZoomBounds(pack.frames))
     }
+    lastModifiedRef.set(simFile.lastModified())
+    fileLenRef.set(if (simFile.exists()) simFile.length() else 0L)
+    pendingRef.set("")
 
     SwingUtilities.invokeLater(new Runnable { override def run(): Unit = {
       val panel = new ViewPanel(mapRef.get(), framesRef.get())
@@ -810,11 +1262,77 @@ object CombatVisualizer {
       window = frame
       frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
       frame.setLayout(new BorderLayout())
-      frame.getContentPane.add(panel, BorderLayout.CENTER)
+
+      // Left simulation list
+      val simListModel = new DefaultListModel[String]()
+      val simList = new JList[String](simListModel)
+      simList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+      val simScroll = new JScrollPane(simList)
+      simScroll.setPreferredSize(new Dimension(100, 200))
+      frame.getContentPane.add(simScroll, BorderLayout.WEST)
+
+      def labelFor(pack: SimPack): String = {
+        val totalSec = Math.max(0, pack.startGameFrame / 24)
+        val mm = totalSec / 60
+        val ss = totalSec % 60
+        val fmod = Math.floorMod(pack.startGameFrame, 24)
+        f"$mm%d:$ss%02d +$fmod%d"
+      }
+      def populateSimList(sims: Vector[SimPack]): Unit = {
+        simListModel.clear()
+        // Only show simulations that actually have frames; hide placeholder empty blocks
+        val nonEmpty = sims.filter(p => p.frames.nonEmpty)
+        var i = 0
+        val labels = new scala.collection.mutable.ArrayBuffer[String]()
+        while (i < nonEmpty.length) { val lab = labelFor(nonEmpty(i)); simListModel.addElement(lab); labels += lab; i += 1 }
+        try { extVisLog(s"populateSimList: count=${nonEmpty.length} labels=${labels.mkString(", ")}") } catch { case _: Throwable => }
+      }
+      def loadSimAt(index: Int): Unit = {
+        val sims = simsRef.get()
+        val nonEmpty = sims.filter(p => p.frames.nonEmpty)
+        if (index >= 0 && index < nonEmpty.length) {
+          val pack = nonEmpty(index)
+          mapRef.set(loadMap(mapDir, pack.mapHash))
+          framesRef.set(pack.frames)
+          metasRef.set(pack.metas)
+          cdMaxRef.set(computeCdMax(pack.frames))
+          zoomRef.set(computeAutoZoomBounds(pack.frames))
+          panel.map = mapRef.get()
+          panel.frames = pack.frames
+          panel.metas = pack.metas
+          panel.cdMaxById = cdMaxRef.get()
+          panel.zoomRect = zoomRef.get()
+          if (panel.map.isEmpty) {
+            val (ww, wh) = computeWorldSize(pack.frames)
+            panel.worldW = ww; panel.worldH = wh
+          }
+          slider.setMaximum(Math.max(0, pack.frames.length - 1))
+          panel.frameIndex = Math.min(panel.frameIndex, Math.max(0, pack.frames.length - 1))
+          slider.setValue(panel.frameIndex)
+          panel.revalidate(); panel.repaint(); updateTimeLabel()
+        }
+      }
 
       // Death tally panel on the right
       val tally = new DeathTallyPanel(metasRef, framesRef, () => panel.frameIndex)
+      frame.getContentPane.add(panel, BorderLayout.CENTER)
       frame.getContentPane.add(tally, BorderLayout.EAST)
+
+      // Populate list initially
+      populateSimList(simsRef.get())
+      if (simsRef.get().nonEmpty) { simList.setSelectedIndex(0); loadSimAt(0) }
+
+      // Disable auto-reload on manual selection and load selected sim
+      simList.addListSelectionListener(_ => {
+        if (!simList.getValueIsAdjusting) {
+          val idx = simList.getSelectedIndex
+          if (idx >= 0) {
+            autoReloadRef.set(false)
+            autoReload.setSelected(false)
+            loadSimAt(idx)
+          }
+        }
+      })
 
       val controls = new JPanel()
       controls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT))
@@ -822,7 +1340,7 @@ object CombatVisualizer {
       controls.add(slider)
       // Playback speed slider (1x,2x,3x,4x,6x,8x)
       val speedOptions = Array(1, 2, 3, 4, 6, 8)
-      val speedSlider = new JSlider(0, speedOptions.length - 1, 0)
+      val speedSlider = new JSlider(0, speedOptions.length - 1, 4)
       val speedLabels = new java.util.Hashtable[Integer, JComponent]()
       var si = 0
       while (si < speedOptions.length) { speedLabels.put(Integer.valueOf(si), new JLabel(speedOptions(si) + "x")); si += 1 }
@@ -846,59 +1364,120 @@ object CombatVisualizer {
       // Timer ~24 FPS
       val playingRef = new java.util.concurrent.atomic.AtomicBoolean(true)
 
+      // Async reload machinery
+      val reloadInProgress = new java.util.concurrent.atomic.AtomicBoolean(false)
+      val bgExecutor = java.util.concurrent.Executors.newSingleThreadExecutor(new java.util.concurrent.ThreadFactory {
+        override def newThread(r: Runnable): Thread = {
+          val t = new Thread(r, "CombatVisualizer-Reload")
+          t.setDaemon(true)
+          t
+        }
+      })
       def reloadIfChanged(force: Boolean = false): Unit = {
         val lm = simFile.lastModified()
-        if (force || (autoReloadRef.get() && lm > lastModifiedRef.get())) {
-          parseSimulation(simFile).foreach { case (hash, metas, frames) =>
-            mapRef.set(loadMap(mapDir, hash))
-            framesRef.set(frames)
-            metasRef.set(metas)
-            cdMaxRef.set(computeCdMax(frames))
-            zoomRef.set(computeAutoZoomBounds(frames))
-            panel.map = mapRef.get()
-            panel.frames = frames
-            panel.metas = metas
-            panel.cdMaxById = cdMaxRef.get()
-            panel.zoomRect = zoomRef.get()
-            // Update fallback world size if map missing
-            if (panel.map.isEmpty) {
-              val (ww, wh) = computeWorldSize(frames)
-              panel.worldW = ww
-              panel.worldH = wh
+        val lenNow = try simFile.length() catch { case _: Throwable => 0L }
+        if (!(force || (autoReloadRef.get() && (lm > lastModifiedRef.get() || lenNow > fileLenRef.get())))) return
+        if (!reloadInProgress.compareAndSet(false, true)) return
+        bgExecutor.submit(new Runnable { override def run(): Unit = {
+          val t0 = System.nanoTime()
+          try {
+            // Incremental read of appended bytes
+            val (seg, newLen, truncated) = readAppended(simFile)
+            var newBlocks = Vector.empty[String]
+            if (truncated) {
+              // File was truncated (new game). Reparse recent sims using streaming bounded loader to avoid OOM.
+              pendingRef.set("")
+              val sims = parseAllSims(simFile)
+              javax.swing.SwingUtilities.invokeLater(new Runnable { override def run(): Unit = {
+                try {
+                  simsRef.set(sims)
+                  populateSimList(sims)
+                  val nonEmptySims = sims.filter(p => p.frames.nonEmpty)
+                  val idxToLoad = if (nonEmptySims.nonEmpty) 0 else -1
+                  if (idxToLoad >= 0) loadSimAt(idxToLoad)
+                } catch { case _: Throwable => () }
+              }})
+              // Update length and modified time, then return (no merging needed)
+              lastModifiedRef.set(lm)
+              fileLenRef.set(newLen)
+              val ms = (System.nanoTime() - t0) / 1000000L
+              try { System.out.println(s"[CV] reload truncated; rebuilt list with ${sims.length} sims in ${ms}ms") } catch { case _: Throwable => () }
+              return
+            } else if (seg.nonEmpty) {
+              val combined = pendingRef.get() + seg
+              val (blocks, rem) = splitPW2BlocksWithRemainder(combined)
+              newBlocks = blocks
+              pendingRef.set(rem)
             }
-            // Update slider range and keep current index within bounds
-            slider.setMaximum(Math.max(0, frames.length - 1))
-            panel.frameIndex = Math.min(panel.frameIndex, Math.max(0, frames.length - 1))
-            slider.setValue(panel.frameIndex)
-            panel.revalidate()
-            panel.repaint()
-            tally.repaint()
-            updateTimeLabel()
-          }
-          lastModifiedRef.set(lm)
-        }
+            if (newBlocks.nonEmpty) {
+              val parsed = newBlocks.flatMap(b => Try(parsePW2(b)).toOption)
+              if (parsed.nonEmpty) {
+                // Merge into existing, de-duplicate, bound to last 200, sort newest first
+                def keyFor(p: SimPack): String = {
+                  val ids = p.metas.map(_.id).sorted.mkString(",")
+                  p.startGameFrame.toString + "|" + ids
+                }
+                val before = simsRef.get()
+                val mergedAll = parsed ++ before
+                val dedupMap = new scala.collection.mutable.LinkedHashMap[String, SimPack]()
+                var mi = 0
+                while (mi < mergedAll.length) {
+                  val sp = mergedAll(mi)
+                  val k = keyFor(sp)
+                  if (!dedupMap.contains(k)) dedupMap.put(k, sp)
+                  mi += 1
+                }
+                val dedup = dedupMap.values.toVector.sortBy(s => -s.startGameFrame)
+                val bounded = if (dedup.length > 200) dedup.take(200) else dedup
+                javax.swing.SwingUtilities.invokeLater(new Runnable { override def run(): Unit = {
+                  try {
+                    simsRef.set(bounded)
+                    populateSimList(bounded)
+                    val hasManualSelection = !autoReloadRef.get()
+                    val nonEmptySims = bounded.filter(p => p.frames.nonEmpty)
+                    val sel = simList.getSelectedIndex
+                    val idxToLoad = if (hasManualSelection && sel >= 0 && sel < nonEmptySims.length) sel else 0
+                    loadSimAt(idxToLoad)
+                    try { extVisLog(s"merge parsed=${parsed.length} before=${before.length} after=${bounded.length} nonEmpty=${nonEmptySims.length}") } catch { case _: Throwable => }
+                  } catch { case _: Throwable => () }
+                }})
+              }
+            }
+            lastModifiedRef.set(lm)
+            fileLenRef.set(newLen)
+            val ms = (System.nanoTime() - t0) / 1000000L
+            try { System.out.println(s"[CV] reload parsed ${newBlocks.size} new blocks in ${ms}ms; sims=${simsRef.get().length}") } catch { case _: Throwable => () }
+          } catch { case _: Throwable => () }
+          finally { reloadInProgress.set(false) }
+        }})
       }
 
       val timer = new javax.swing.Timer(1000 / 24, (_: java.awt.event.ActionEvent) => {
-        // If no frames, attempt auto-reload opportunistically
-        if (panel.frames.isEmpty) {
-          if (autoReloadRef.get()) reloadIfChanged(force = false)
-        }
-        if (panel.frames.nonEmpty && playingRef.get()) {
-          val lastIdx = panel.frames.length - 1
-          val speed = speedOptions(speedSlider.getValue)
-          if (panel.frameIndex >= lastIdx) {
-            // At end of playback: attempt auto-reload if enabled
+        try {
+          // If no frames, attempt auto-reload opportunistically
+          if (panel.frames.isEmpty) {
             if (autoReloadRef.get()) reloadIfChanged(force = false)
-            panel.frameIndex = 0
-          } else {
-            panel.frameIndex = Math.min(lastIdx, panel.frameIndex + speed)
           }
-          slider.setValue(panel.frameIndex)
-        }
-        updateTimeLabel()
-        panel.repaint()
-        tally.repaint()
+          if (panel.frames.nonEmpty && playingRef.get()) {
+            val lastIdx = panel.frames.length - 1
+            val speed = {
+              val idx = speedSlider.getValue
+              val clamped = Math.max(0, Math.min(idx, speedOptions.length - 1))
+              speedOptions(clamped)
+            }
+            if (panel.frameIndex >= lastIdx) {
+              // At end of playback: attempt auto-reload if enabled
+              if (autoReloadRef.get()) reloadIfChanged(force = false)
+              panel.frameIndex = 0
+            } else {
+              panel.frameIndex = Math.min(lastIdx, panel.frameIndex + speed)
+            }
+            slider.setValue(panel.frameIndex)
+          }
+          updateTimeLabel()
+          panel.repaint()
+          tally.repaint()
+        } catch { case _: Throwable => () }
       })
       timerRef = timer
       frame.addWindowListener(new java.awt.event.WindowAdapter() {

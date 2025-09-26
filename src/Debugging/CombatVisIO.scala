@@ -581,7 +581,7 @@ object CombatVisIO {
       // Prefer launching an external Java process to isolate UI from the bot JVM
       val cp = System.getProperty("java.class.path", ".")
       val logFile = new File(baseDir, "combatvis.log")
-      val pb = new ProcessBuilder("java", "-cp", cp, "Debugging.CombatVisualizer", path)
+      val pb = new ProcessBuilder("java", "-cp", cp, "Debugging.PurpleSimViz", path)
       pb.directory(baseDir)
       pb.redirectErrorStream(true)
       pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile))

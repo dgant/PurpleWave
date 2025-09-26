@@ -30,6 +30,13 @@ object PurpleSimViz {
     } catch { case _: Throwable => }
   }
 
+  // Stderr logger for immediate user diagnostics
+  private def err(message: String): Unit = {
+    try {
+      System.err.println("[PurpleSimViz] " + message)
+    } catch { case _: Throwable => () }
+  }
+
   @volatile private var window: JFrame = _
   @volatile private var timerRef: javax.swing.Timer = _
   // Directory of the current simulation file (used to find images)
@@ -944,7 +951,15 @@ object PurpleSimViz {
 
   def main(args: Array[String]): Unit = {
     // Determine simulation file path (.pwcs preferred, fallback to .json)
-    val argPathOpt = if (args != null && args.length > 0) Option(args(0)) else None
+    // Sanitize Launch4j-injected literal "%1" and pick a usable path argument if provided
+    val cleanedArgs: Vector[String] =
+      Option(args).map(_.toVector).getOrElse(Vector.empty)
+        .filter(s => s != null && s.trim.nonEmpty)
+        .filterNot(_ == "%1")
+    // Prefer the first argument that points to an existing file; otherwise use the first remaining
+    val chosenArgOpt: Option[String] =
+      cleanedArgs.find(p => try new File(p).exists() catch { case _: Throwable => false }).orElse(cleanedArgs.headOption)
+    val argPathOpt = chosenArgOpt
     val simFile: File = {
       val candidate = argPathOpt.map(new File(_)).getOrElse(new File("simulation.pwcs"))
       val f =
@@ -958,6 +973,10 @@ object PurpleSimViz {
         }
       f
     }
+    val argStr = Option(args).map(_.mkString(" ")).getOrElse("<none>")
+    err("Startup args: " + argStr)
+    err("Resolved sim file: " + simFile.getAbsolutePath + s" exists=${simFile.exists()} len=${if (simFile.exists()) simFile.length() else -1} lm=${simFile.lastModified()}")
+    try { extVisLog(s"Startup args='$argStr' file='${simFile.getAbsolutePath}' exists=${simFile.exists()} len=${if (simFile.exists()) simFile.length() else -1}") } catch { case _: Throwable => }
     val baseDir = simFile.getParentFile
     currentSimDir = baseDir
     val mapDir = baseDir
@@ -1068,7 +1087,7 @@ object PurpleSimViz {
     }
 
     def parseAllSims(file: File): Vector[SimPack] = {
-      if (!file.exists()) return Vector.empty
+      if (!file.exists()) { err("parseAllSims: file does not exist: " + file.getAbsolutePath); return Vector.empty }
       // Stream the file and keep only the last N complete PW2 blocks to bound memory
       val MaxSimsToKeep = 200
       var fis: java.io.FileInputStream = null
@@ -1080,7 +1099,9 @@ object PurpleSimViz {
         val deque = new java.util.ArrayDeque[String]()
         var pending = ""
         var read = 0
+        var totalRead = 0L
         while ({ read = bis.read(buf); read } != -1) {
+          totalRead += read
           val seg = new String(buf, 0, read, java.nio.charset.StandardCharsets.UTF_8)
           val (blocks, rem) = splitPW2BlocksWithRemainder(pending + seg)
           pending = rem
@@ -1093,25 +1114,37 @@ object PurpleSimViz {
         }
         // If we saw no PW2 blocks at all, try legacy JSON by reading the entire (likely small) file
         if (deque.isEmpty) {
+          err(s"parseAllSims: no PW2 blocks found in streaming read (bytes=$totalRead); trying full read")
           val txt = readAllText(file)
+          val head = if (txt.length > 32) txt.substring(0, 32).replace('\n', ' ') else txt
+          err("parseAllSims: full-read head='" + head + "'")
           if (txt.startsWith("PW2")) {
             val blocks = splitPW2Blocks(txt)
+            err("parseAllSims: PW2 full-read blocks=" + blocks.length)
             val sims = blocks.flatMap { b => Try(parsePW2(b)).toOption }
-            sims.sortBy(s => -s.startGameFrame)
+            val out = sims.sortBy(s => -s.startGameFrame)
+            err("parseAllSims: PW2 sims parsed=" + out.length)
+            out
           } else {
-            Vector(parseJsonSim(txt))
+            err("parseAllSims: non-PW2; attempting legacy JSON parse")
+            val out = Vector(parseJsonSim(txt))
+            err("parseAllSims: legacy JSON yielded sims=" + out.length)
+            out
           }
         } else {
           // Parse the kept blocks to SimPacks and sort newest first
+          err("parseAllSims: streaming PW2 blocks found=" + deque.size())
           val sims = new scala.collection.mutable.ArrayBuffer[SimPack](deque.size())
           val it = deque.iterator()
           while (it.hasNext) {
             val blk = it.next()
             Try(parsePW2(blk)).foreach(sims += _)
           }
-          sims.toVector.sortBy(s => -s.startGameFrame)
+          val out = sims.toVector.sortBy(s => -s.startGameFrame)
+          err("parseAllSims: sims parsed=" + out.length)
+          out
         }
-      } catch { case _: Throwable => Vector.empty }
+      } catch { case t: Throwable => err("parseAllSims exception: " + t.toString); Vector.empty }
       finally {
         try if (bis != null) bis.close() catch { case _: Throwable => }
         try if (fis != null) fis.close() catch { case _: Throwable => }
@@ -1207,7 +1240,21 @@ object PurpleSimViz {
       }
     }
     // Initial parse of all sims and load newest
-    val all0 = parseAllSims(simFile)
+    var all0 = parseAllSims(simFile)
+    // Fallback: if nothing parsed (e.g., gzipped or legacy), try a full read
+    if (all0.isEmpty && simFile.exists()) {
+      try {
+        val txt = readAllText(simFile)
+        if (txt != null && txt.nonEmpty) {
+          if (txt.startsWith("PW2")) {
+            val blocks = splitPW2Blocks(txt)
+            all0 = blocks.flatMap(b => Try(parsePW2(b)).toOption).sortBy(s => -s.startGameFrame)
+          } else {
+            all0 = Vector(parseJsonSim(txt))
+          }
+        }
+      } catch { case _: Throwable => () }
+    }
     simsRef.set(all0)
     if (all0.nonEmpty) {
       val pack = all0.head
@@ -1216,6 +1263,8 @@ object PurpleSimViz {
       metasRef.set(pack.metas)
       cdMaxRef.set(computeCdMax(pack.frames))
       zoomRef.set(computeAutoZoomBounds(pack.frames))
+    } else {
+      try { extVisLog(s"Initial load found no simulations in ${simFile.getAbsolutePath}") } catch { case _: Throwable => }
     }
     lastModifiedRef.set(simFile.lastModified())
     fileLenRef.set(if (simFile.exists()) simFile.length() else 0L)
@@ -1280,18 +1329,16 @@ object PurpleSimViz {
       }
       def populateSimList(sims: Vector[SimPack]): Unit = {
         simListModel.clear()
-        // Only show simulations that actually have frames; hide placeholder empty blocks
-        val nonEmpty = sims.filter(p => p.frames.nonEmpty)
+        // Show all simulations, including empty placeholders, so the user always has a selectable tab
         var i = 0
         val labels = new scala.collection.mutable.ArrayBuffer[String]()
-        while (i < nonEmpty.length) { val lab = labelFor(nonEmpty(i)); simListModel.addElement(lab); labels += lab; i += 1 }
-        try { extVisLog(s"populateSimList: count=${nonEmpty.length} labels=${labels.mkString(", ")}") } catch { case _: Throwable => }
+        while (i < sims.length) { val lab = labelFor(sims(i)); simListModel.addElement(lab); labels += lab; i += 1 }
+        try { extVisLog(s"populateSimList: count=${sims.length} labels=${labels.mkString(", ")}") } catch { case _: Throwable => }
       }
       def loadSimAt(index: Int): Unit = {
         val sims = simsRef.get()
-        val nonEmpty = sims.filter(p => p.frames.nonEmpty)
-        if (index >= 0 && index < nonEmpty.length) {
-          val pack = nonEmpty(index)
+        if (index >= 0 && index < sims.length) {
+          val pack = sims(index)
           mapRef.set(loadMap(mapDir, pack.mapHash))
           framesRef.set(pack.frames)
           metasRef.set(pack.metas)
@@ -1434,11 +1481,10 @@ object PurpleSimViz {
                     simsRef.set(bounded)
                     populateSimList(bounded)
                     val hasManualSelection = !autoReloadRef.get()
-                    val nonEmptySims = bounded.filter(p => p.frames.nonEmpty)
                     val sel = simList.getSelectedIndex
-                    val idxToLoad = if (hasManualSelection && sel >= 0 && sel < nonEmptySims.length) sel else 0
+                    val idxToLoad = if (hasManualSelection && sel >= 0 && sel < bounded.length) sel else 0
                     loadSimAt(idxToLoad)
-                    try { extVisLog(s"merge parsed=${parsed.length} before=${before.length} after=${bounded.length} nonEmpty=${nonEmptySims.length}") } catch { case _: Throwable => }
+                    try { extVisLog(s"merge parsed=${parsed.length} before=${before.length} after=${bounded.length}") } catch { case _: Throwable => }
                   } catch { case _: Throwable => () }
                 }})
               }

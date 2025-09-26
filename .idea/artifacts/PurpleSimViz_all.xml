@@ -3,6 +3,12 @@
     <output-path>$PROJECT_DIR$/out/artifacts</output-path>
     <root id="archive" name="PurpleSimViz.jar">
       <element id="module-output" name="PurpleWave" />
+      <!-- Bundle required runtime libraries into the fat jar -->
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/scala-lang/scala-reflect/2.12.18/scala-reflect-2.12.18.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna/5.1.0/jna-5.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna-platform/5.1.0/jna-platform-5.1.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

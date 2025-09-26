@@ -1,8 +1,9 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
+  <!-- Wrap the IDEA-built fat jar so Maven is not required -->
   <jar>C:\p\pw\out\artifacts\PurpleSimViz.jar</jar>
-  <outfile>C:\p\pw\out\artifacts\PurpleSimViz.exe</outfile>  
+  <outfile>C:\p\pw\out\artifacts\PurpleSimViz.exe</outfile>
   <errTitle></errTitle>
   <classPath>
     <mainClass>Debugging.PurpleSimViz</mainClass>
@@ -15,6 +16,5 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <singleInstance>false</singleInstance>
-  <cmdLine>%1</cmdLine>
   <stayAlive>false</stayAlive>
 </launch4jConfig>

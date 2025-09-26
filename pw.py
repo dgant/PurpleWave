@@ -22,6 +22,7 @@ def main():
   parser.add_argument('--pz',             action='store_true', default=False, help='Deploy Protoss and Zerg to BASIL')
   parser.add_argument('--tpz',            action='store_true', default=False, help='Deploy all races to BASIL')
   parser.add_argument('--play',           action='store_true', default=False, help='Play ladder games')
+  parser.add_argument('--viz',            action='store_true', default=False, help='Construct PurpleSimViz.exe')
   args = parser.parse_args()
   
   args.t = args.t or args.tp or args.tz or args.tpz
@@ -54,6 +55,9 @@ def main():
   if args.play:
     did_anything = True
     play(4)
+  if args.viz:
+    did_anything = True
+    package_sim_viz()
   
   if not did_anything:
     maven_build()
@@ -278,8 +282,10 @@ def play(threads=3):
   except KeyboardInterrupt:
     bash_process.wait()
     subprocess.Popen(["dockerstop.sh"])
-
     
-if __name__ == "__main__":
+def package_sim_viz():
+  subprocess.run(file_launch4j + " " +  path_configs("launch4jPurpleSimViz.xml"))
+    
+if __name__ == "__main__":  
   main()
 

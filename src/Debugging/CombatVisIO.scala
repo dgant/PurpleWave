@@ -598,7 +598,7 @@ object CombatVisIO {
           try { visProcess.destroy() } catch { case _: Throwable => }
           visProcess = null
         } else {
-          try Debugging.CombatVisualizer.requestClose() catch { case exception: Exception => With.logger.quietlyOnException(exception) }
+          try Debugging.PurpleSimViz.requestClose() catch { case exception: Exception => With.logger.quietlyOnException(exception) }
         }
       }
     } catch { case exception: Exception => With.logger.quietlyOnException(exception) } finally { launched = false }

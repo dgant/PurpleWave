@@ -14,7 +14,7 @@ import scala.util.Try
   * Usage: Debugging.CombatVisualizer <path-to-simulation.pwcs>
   * If no path is provided, defaults to simulation.pwcs in the working directory (falls back to simulation.json).
   */
-object CombatVisualizer {
+object PurpleSimViz {
 
   // External diagnostics to c:\p\pw\out\logs for robust investigation
   private def extVisLog(message: String): Unit = {
@@ -448,7 +448,7 @@ object CombatVisualizer {
 
     // Also try alongside the code location (jar/class directory)
     try {
-      val url = CombatVisualizer.getClass.getProtectionDomain.getCodeSource.getLocation
+      val url = PurpleSimViz.getClass.getProtectionDomain.getCodeSource.getLocation
       if (url != null) addIfValid(new File(url.toURI))
     } catch { case _: Throwable => }
 
@@ -1258,7 +1258,7 @@ object CombatVisualizer {
       }
 
       // Frame
-      val frame = new JFrame("PurpleWave Combat Visualizer")
+      val frame = new JFrame("PurpleSimViz")
       window = frame
       frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
       frame.setLayout(new BorderLayout())

@@ -158,6 +158,49 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Build a Windows EXE for the Combat Visualizer using Launch4j -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.7.25</version>
+                <executions>
+                    <execution>
+                        <id>make-combat-visualizer-exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Use the shaded jar that includes all dependencies -->
+                            <outfile>${project.basedir}/out/artifacts/PurpleSimViz.exe</outfile>
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
+                            <headerType>gui</headerType>
+                            <classPath>
+                                <!-- Override the entry point to the visualizer main class -->
+                                <mainClass>Debugging.PurpleSimViz</mainClass>
+                            </classPath>
+                            <jre>
+                                <minVersion>1.8.0</minVersion>
+                                <jdkPreference>preferJre</jdkPreference>
+                                <runtimeBits>64/32</runtimeBits>
+                            </jre>
+                            <!-- Pass through the first argument (path to .pwcs/.pwsim) when double-clicked -->
+                            <cmdLine>%1</cmdLine>
+                            <versionInfo>
+                                <fileVersion>${project.version}.0.0</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>PurpleSimViz</fileDescription>
+                                <productName>PurpleSimViz</productName>
+                                <productVersion>${project.version}</productVersion>
+                                <copyright>© PurpleWave</copyright>
+                                <internalName>PurpleSimViz</internalName>
+                                <originalFilename>PurpleSimViz.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

@@ -5,8 +5,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Utilities.Time.GameTime
-import bwapi.Race
+import Utilities.Time.{GameTime, Minutes, Seconds}
 
 abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.proxyGateway),
@@ -15,83 +14,69 @@ abstract class FingerprintFFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.oneGateCore),
   new FingerprintNot(With.fingerprints.nexusFirst)) {
   
-  private class Status {
-    def couldBeWall(unit: UnitInfo) = unit.base.forall(_.naturalOf.isDefined) && ! unit.proxied
-    lazy val forge                  = With.units.enemy.find(u => Protoss.Forge(u)    && couldBeWall(u))
-    lazy val gateway                = With.units.enemy.find(u => Protoss.Gateway(u)  && couldBeWall(u))
-    lazy val expanded               = With.units.countEnemy(Protoss.Nexus) > 1 || With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isMain))
-    lazy val cannonsWalled          = With.units.enemy.view.filter(u => Protoss.PhotonCannon(u) && couldBeWall(u)).toVector
-    lazy val buildingsProxied       = With.units.enemy.view.filter(_.proxied).toVector
-    lazy val zealot                 = With.units.enemy.view.filter(Protoss.Zealot).toVector
-    lazy val forgeOrCannon          = cannonsWalled ++ forge
-    lazy val gatewayOrZealot        = gateway ++ zealot
-    lazy val forgeCompletionFrame   = forge.map(_.completionFrame).orElse(Maff.min(cannonsWalled.map(_.frameDiscovered)))
-    lazy val gatewayCompletionFrame = gateway.map(_.completionFrame).orElse(Maff.min(zealot.map(_.frameDiscovered)))
-    lazy val isSomeKindOfFFE        = forgeOrCannon.nonEmpty || (gateway.isDefined && expanded)
-  }
-  
-  private val expectedFFEForge          = GameTime(2, 6)()
-  private val expectedGatewayFEForge    = GameTime(2, 26)()
-  private val expectedFFEGateway        = GameTime(3, 20)()
-  private val expectedGatewayFEGateway  = GameTime(2, 24)()
-  
-  private def readyToDecide(status: Status): Boolean = (
-    With.frame < GameTime(5, 0)() && (
-      (status.forgeCompletionFrame.isDefined && status.gatewayCompletionFrame.isDefined)
-      || status.forgeOrCannon.exists(u => u.complete && With.framesSince(u.frameDiscovered) > 24 * 5)
-    )
-  )
-  
-  private def gatewayUnlikely(status: Status): Boolean = status.gatewayOrZealot.isEmpty
-  
-  private def conclusivelyForge(status: Status): Boolean = (
-    status.buildingsProxied.isEmpty
-      && readyToDecide(status)
-      && (gatewayUnlikely(status) || lossFFE(status) < lossGatewayFE(status))
-  )
-  
-  private def conclusivelyGateway(status: Status): Boolean = (
-    status.buildingsProxied.isEmpty
-      && (
-      (With.fingerprints.gatewayFirst() && With.units.existsEnemy(Protoss.Forge))
-      || (With.units.enemy.filter(_.complete).exists(Protoss.Gateway) && With.units.enemy.filterNot(_.complete).exists(Protoss.Gateway))
-      || (readyToDecide(status) && ! gatewayUnlikely(status) && lossFFE(status) >= lossGatewayFE(status)))
-  )
+  private val expectedFFEForge    = GameTime(1, 50)()
+  private val expectedGFEForge    = GameTime(2, 26)()
+  private val expectedFFEGateway  = GameTime(3, 20)()
+  private val expectedGFEGateway  = GameTime(2,  3)()
 
-  private def lossFFE(status: Status): Int = (
-    Math.abs(status.forgeCompletionFrame.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge)
-    + status.gatewayCompletionFrame.map(f => Math.abs(f - expectedFFEGateway)).sum
-  )
-  
-  private def lossGatewayFE(status: Status): Int = (
-    Math.abs(status.forgeCompletionFrame.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedGatewayFEForge)
-    + status.gatewayCompletionFrame.map(f => Math.abs(f - expectedGatewayFEGateway)).sum
-  )
+  trait Conclusion
+  object Undecided    extends Conclusion
+  object ConcludeFFE  extends Conclusion
+  object ConcludeGFE  extends Conclusion
   
   var decidedForge = false
   var decidedGateway = false
+
+  var conclusion: Conclusion = Undecided
   override def investigate: Boolean = {
     if ( ! super.investigate) return false
-  
-    val status = new Status
-    if (status.isSomeKindOfFFE) {
-      decidedForge = conclusivelyForge(status)
-      decidedGateway = conclusivelyGateway(status)
-      if (decidedForge) return isFFE
-      if (decidedGateway) return !isFFE
+    if ( With.frame > Minutes(5)()) return false
+    conclusion = getConclusion
+    conclusion != Undecided
+  }
+
+  private def getConclusion: Conclusion = {
+
+    def couldBeWall(unit: UnitInfo) = ! unit.proxied && Maff.minBy(With.geography.mains.view.filterNot(_.isOurs))(_.heart.groundTiles(unit.tileTopLeft)).exists(m => m.natural.exists(n => unit.base.contains(n) || unit.proximity > n.townHallTile.proximity))
+    val wallUnits = With.units.enemy.filter(couldBeWall)
+
+    val noProxies         = ! With.units.enemy.exists(_.proxied)
+    val expanded          = With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isMain))
+    val forge             = Maff.minBy(wallUnits.filter(Protoss.Forge))       (_.completionFrame)
+    val gateway           = Maff.minBy(wallUnits.filter(Protoss.Gateway))     (_.completionFrame)
+    val cannon            = Maff.minBy(wallUnits.filter(Protoss.PhotonCannon))(_.completionFrame)
+    val zealot            = Maff.minBy(With.units.enemy.filter(Protoss.Zealot))(_.arrivalFrame)
+
+    val forgeOrCannon     = forge.orElse(cannon)
+    val forgeCompletion   = Maff.vmin(forge    .map(_.completionFrame), cannon.map(_.completionFrame - Protoss.Forge.buildFrames))
+    val gatewayCompletion = Maff.vmin(gateway  .map(_.completionFrame), zealot.map(_.frameDiscovered - Protoss.Zealot.buildFrames), zealot.map(_.arrivalFrame - Protoss.Zealot.buildFrames - Seconds(25)()))
+    val readyToDecide     = (forgeCompletion.isDefined && gatewayCompletion.isDefined) || (expanded && gatewayCompletion.isDefined) || (forge.toSeq ++ cannon).exists(u => With.framesSince(u.frameDiscovered) > Seconds(5)())
+    val lossFFE           = Math.abs(forgeCompletion.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge) + gatewayCompletion.map(f => Math.abs(f - expectedFFEGateway)).sum
+    val lossGFE           = Math.abs(forgeCompletion.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedGFEForge) + gatewayCompletion.map(f => Math.abs(f - expectedGFEGateway)).sum
+
+    var predictFFE    = gatewayCompletion.isEmpty
+        predictFFE  ||= lossFFE < lossGFE
+    var predictGFE    = gateway.isDefined && forge.isEmpty
+        predictGFE  ||= lossFFE >= lossGFE
+    
+    if (readyToDecide && noProxies) {
+      if (gateway .exists(_.completionFrame < GameTime(2, 18)())) return ConcludeGFE
+      if (forge   .exists(_.completionFrame < GameTime(2, 5)()))  return ConcludeFFE
+      if (predictFFE) return ConcludeFFE
+      if (predictGFE) return ConcludeGFE
     }
-    false
+    Undecided
   }
   
-  val isFFE: Boolean
+  val requiredConclusion: Conclusion
   
-  override def sticky = With.frame > GameTime(4, 45)()
+  override def sticky: Boolean = With.frame > GameTime(4, 45)()
 }
 
 class FingerprintForgeFE extends FingerprintFFE {
-  override val isFFE: Boolean = true
+  override val requiredConclusion: Conclusion = ConcludeFFE
 }
 
 class FingerprintGatewayFE extends FingerprintFFE {
-  override val isFFE: Boolean = false
+  override val requiredConclusion: Conclusion = ConcludeGFE
 }

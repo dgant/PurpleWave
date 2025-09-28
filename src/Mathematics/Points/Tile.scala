@@ -1,8 +1,10 @@
 package Mathematics.Points
 
+import Debugging.Visualizations.Forces
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Physics.Force
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
@@ -349,5 +351,24 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   }
   @inline def enemiesNearlyAttacking(friendly: FriendlyUnitInfo): Seq[UnitInfo] = {
     ?(friendly.flying, enemiesNearlyAttackingAir, enemiesNearlyAttackingGround)
+  }
+  @inline def slowGroundDirectionTo(to: Tile): Force = {
+    val d = groundTiles(to)
+    var f =
+         Forces.up        * Maff.clamp11(d - up         .groundTiles(to))
+    f += Forces.down      * Maff.clamp11(d - down       .groundTiles(to))
+    f += Forces.left      * Maff.clamp11(d - left       .groundTiles(to))
+    f += Forces.right     * Maff.clamp11(d - right      .groundTiles(to))
+    f += Forces.upLeft    * Maff.clamp11(d - up.left    .groundTiles(to))
+    f += Forces.upRight   * Maff.clamp11(d - up.right   .groundTiles(to))
+    f += Forces.downLeft  * Maff.clamp11(d - down.left  .groundTiles(to))
+    f += Forces.downRight * Maff.clamp11(d - down.right .groundTiles(to))
+    f.normalize
+  }
+  @inline def flowTo(to: Tile): Force = {
+    if (zone == to.zone) {
+      return slowGroundDirectionTo(to)
+    }
+    to.zone.flowField.get(this)
   }
 }

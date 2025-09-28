@@ -1,6 +1,6 @@
 package Information.Geography.Types
 
-import Information.Grids.Movement.GridGroundDistance
+import Information.Grids.Movement.{GridFlowField, GridGroundDistance}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Tile
@@ -14,8 +14,10 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
         val zones             : Vector[Zone]              = Vector(this)
         val units             : UnorderedBuffer[UnitInfo] = new UnorderedBuffer
   lazy  val bases             : Vector[Base]              = With.geography.bases.filter(_.townHallTile.zone == this)
+  lazy  val gridOrigin        : Tile                      = ?(bases.length == 1, bases.head.heart, centroid)
   lazy  val metro             : Option[Metro]             = With.geography.metros.find(_.zones.contains(this))
-  lazy  val distanceGrid      : GridGroundDistance        = new GridGroundDistance(?(bases.length == 1, bases.head.heart, centroid))
+  lazy  val distanceGrid      : GridGroundDistance        = new GridGroundDistance(gridOrigin)
+  lazy  val flowField         : GridFlowField             = new GridFlowField(gridOrigin)
   var contested               : Boolean                   = false
   var walledIn                : Boolean                   = false
 

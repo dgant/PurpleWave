@@ -38,7 +38,8 @@ class Visualization extends TimedTask {
     ShowProduction,
     ShowEfficiency,
 
-    ShowMutalisks,
+    //ShowMutalisks,
+    ShowFlowField,
     //ShowZones,
     //ShowWall,
     //ShowFoundations,
@@ -59,12 +60,12 @@ class Visualization extends TimedTask {
     ShowEconomicModel,
     ShowEfficiency,
     ShowExpansions,
+    ShowFlowField,
     ShowHeader,
     ShowFingerprints,
     ShowFormations,
     ShowFoundations,
     ShowGas,
-
     ShowGradients,
     ShowGrids,
     ShowHappyUnits,

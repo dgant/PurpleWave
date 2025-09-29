@@ -12,118 +12,117 @@ import Utilities.?
 import scala.collection.mutable.ArrayBuffer
 
 final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
-  var initialized : Boolean = false
+  var initialized     : Boolean = false
   // Real unit properties
-  var visibility          : Visibility.Value = _
-  var player              : PlayerInfo = _
-  var unitClass           : UnitClass = _
-  var pixel               : Pixel = _
-  var visible             : Boolean = _
-  var alive               : Boolean = _
-  var complete            : Boolean = _
-  var burrowed            : Boolean = _
-  var cloaked             : Boolean = _
-  var detected            : Boolean = _
-  var flying              : Boolean = _
-  var plagued             : Boolean = _
-  var ensnared            : Boolean = _
-  var invincible          : Boolean = _
-  var irradiated          : Boolean = _
-  var lockedDown          : Boolean = _
-  var maelstrommed        : Boolean = _
-  var stasised            : Boolean = _
-  var stimmed             : Boolean = _
-  var hitPoints           : Int = _
-  var shieldPoints        : Int = _
-  var matrixPoints        : Int = _
-  var armorHealth         : Int = _
-  var armorShield         : Int = _
-  var cooldownLeft        : Int = _
-  var loadedUnitCount     : Int = _
-  var angleRadians        : Double = _
-  var speed               : Double = _
-  var topSpeed            : Double = _
-  var topSpeedPossible    : Double = _
-  var subjectiveValue     : Double = _
-  var _targetValue        : Double = _
-  var injury              : Double = _
+  var visibility              : Visibility.Value = _
+  var player                  : PlayerInfo = _
+  var unitClass               : UnitClass = _
+  var pixel                   : Pixel = _
+  var visible                 : Boolean = _
+  var alive                   : Boolean = _
+  var complete                : Boolean = _
+  var burrowed                : Boolean = _
+  var cloaked                 : Boolean = _
+  var detected                : Boolean = _
+  var flying                  : Boolean = _
+  var plagued                 : Boolean = _
+  var ensnared                : Boolean = _
+  var invincible              : Boolean = _
+  var irradiated              : Boolean = _
+  var lockedDown              : Boolean = _
+  var maelstrommed            : Boolean = _
+  var stasised                : Boolean = _
+  var stimmed                 : Boolean = _
+  var hitPoints               : Int = _
+  var shieldPoints            : Int = _
+  var matrixPoints            : Int = _
+  var armorHealth             : Int = _
+  var armorShield             : Int = _
+  var cooldownLeft            : Int = _
+  var loadedUnitCount         : Int = _
+  var angleRadians            : Double = _
+  var speed                   : Double = _
+  var topSpeed                : Double = _
+  var topSpeedPossible        : Double = _
+  var subjectiveValue         : Double = _
+  var _targetValue            : Double = _
+  var injury                  : Double = _
   // Simulacrum properties
-  var simulation          : Simulation = _
-  var behavior            : SimulacrumBehavior = BehaviorInitial
-  var target              : Option[Simulacrum] = None
-  var threat              : Option[Simulacrum] = None
-  val targets             : UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
-  var gridTile            : SimulationGridTile = _
-  var measureHealth       : Boolean = _
-  var hitPointsInitial    : Int = _
-  var shieldPointsInitial : Int = _
-  var cooldownMoving      : Int = _
-  var tweenFramesDone     : Int = _
-  var tweenFramesLeft     : Int = 0
-  var tweenFrom           : Pixel = _
-  var tweenGoal           : Pixel = _
-  var valuePerDamage      : Double = _
-  var kills               : Int = _
-  var damageDealt         : Double = _
-  var valueDealt          : Double = _
-  var damageReceived      : Double = _
-  var valueReceived       : Double = _
-  var events              : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
+  var simulation              : Simulation = _
+  var behavior                : SimulacrumBehavior = BehaviorInitial
+  var target                  : Option[Simulacrum] = None
+  var threat                  : Option[Simulacrum] = None
+  val targets                 : UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
+  var gridTile                : SimulationGridTile = _
+  var measureHealth           : Boolean = _
+  var hitPointsInitial        : Int = _
+  var shieldPointsInitial     : Int = _
+  var cooldownMoving          : Int = _
+  var moveGoal                : Option[Pixel] = None
+  var moveGoalDistanceSquared : Double = _
+  var valuePerDamage          : Double = _
+  var kills                   : Int = _
+  var damageDealt             : Double = _
+  var valueDealt              : Double = _
+  var damageReceived          : Double = _
+  var valueReceived           : Double = _
+  var events                  : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
 
   def reset(newSimulation: Simulation): Unit = {
-    initialized         = true
-    simulation          = newSimulation
-    visibility          = realUnit.visibility
-    player              = realUnit.player
-    unitClass           = realUnit.unitClass
-    pixel               = realUnit.pixel
-    gridTile            = simulation.grid.tiles(pixel.tile.i)
-    gridTile            += this
-    visible             = realUnit.visible
-    alive               = realUnit.alive
-    complete            = realUnit.complete
-    burrowed            = realUnit.burrowed
-    cloaked             = realUnit.cloaked
-    detected            = realUnit.detected
-    flying              = realUnit.flying
-    plagued             = realUnit.plagued
-    ensnared            = realUnit.ensnared
-    invincible          = realUnit.invincible
-    irradiated          = realUnit.irradiated
-    lockedDown          = realUnit.lockedDown
-    maelstrommed        = realUnit.maelstrommed
-    stasised            = realUnit.stasised
-    stimmed             = realUnit.stimmed
-    hitPoints           = realUnit.hitPoints
-    shieldPoints        = realUnit.shieldPoints
-    matrixPoints        = realUnit.matrixPoints
-    armorHealth         = realUnit.armorHealth
-    armorShield         = realUnit.armorShield
-    cooldownLeft        = realUnit.cooldownLeft
-    loadedUnitCount     = realUnit.loadedUnitCount
-    angleRadians        = realUnit.angleRadians
-    speed               = 0 // TODO: Model speed and start with baseUnit.speed
-    topSpeed            = realUnit.topSpeed
-    topSpeedPossible    = realUnit.topSpeedPossible
-    subjectiveValue     = realUnit.subjectiveValue
-    _targetValue        = realUnit.targetValue
+    initialized             = true
+    simulation              = newSimulation
+    visibility              = realUnit.visibility
+    player                  = realUnit.player
+    unitClass               = realUnit.unitClass
+    pixel                   = realUnit.pixel
+    gridTile                = simulation.grid.tiles(pixel.tile.i)
+    gridTile                += this
+    visible                 = realUnit.visible
+    alive                   = realUnit.alive
+    complete                = realUnit.complete
+    burrowed                = realUnit.burrowed
+    cloaked                 = realUnit.cloaked
+    detected                = realUnit.detected
+    flying                  = realUnit.flying
+    plagued                 = realUnit.plagued
+    ensnared                = realUnit.ensnared
+    invincible              = realUnit.invincible
+    irradiated              = realUnit.irradiated
+    lockedDown              = realUnit.lockedDown
+    maelstrommed            = realUnit.maelstrommed
+    stasised                = realUnit.stasised
+    stimmed                 = realUnit.stimmed
+    hitPoints               = realUnit.hitPoints
+    shieldPoints            = realUnit.shieldPoints
+    matrixPoints            = realUnit.matrixPoints
+    armorHealth             = realUnit.armorHealth
+    armorShield             = realUnit.armorShield
+    cooldownLeft            = realUnit.cooldownLeft
+    loadedUnitCount         = realUnit.loadedUnitCount
+    angleRadians            = realUnit.angleRadians
+    speed                   = 0 // TODO: Model speed and start with baseUnit.speed
+    topSpeed                = realUnit.topSpeed
+    topSpeedPossible        = realUnit.topSpeedPossible
+    subjectiveValue         = realUnit.subjectiveValue
+    _targetValue            = realUnit.targetValue
     recalculateInjury()
     // Simulacrum properties
-    simulation          = newSimulation
-    behavior            = BehaviorInitial
-    target              = None
-    threat              = None
+    simulation              = newSimulation
+    behavior                = BehaviorInitial
+    target                  = None
+    threat                  = None
     targets.clear()
-    measureHealth       = true
-    hitPointsInitial    = realUnit.hitPoints
-    shieldPointsInitial = realUnit.shieldPoints
-    cooldownMoving      = realUnit.remainingFramesUntilMoving
-    tweenFramesLeft     = 0
-    kills               = 0
-    damageDealt         = 0
-    valueDealt          = 0
-    damageReceived      = 0
-    valueReceived       = 0
+    measureHealth           = true
+    hitPointsInitial        = realUnit.hitPoints
+    shieldPointsInitial     = realUnit.shieldPoints
+    cooldownMoving          = realUnit.remainingFramesUntilMoving
+    moveGoal                = None
+    moveGoalDistanceSquared = 0
+    kills                   = 0
+    damageDealt             = 0
+    valueDealt              = 0
+    damageReceived          = 0
+    valueReceived           = 0
     events.clear()
   }
 
@@ -141,11 +140,13 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       } else {
         cooldownLeft    = Math.max(0, cooldownLeft    - 1)
         cooldownMoving  = Math.max(0, cooldownMoving  - 1)
-        if (tweenFramesLeft > 0) {
-          tweenFramesDone += 1
-          tweenFramesLeft -= 1
-          // TODO: Account for adjusted paths from eg. moving around obstacles
-          simulation.grid.tryMove(this, ?(tweenFramesLeft == 0, tweenGoal, tweenFrom.project(tweenGoal, topSpeed * tweenFramesDone)))
+        if (moveGoal.isDefined) {
+          val goal = moveGoal.get
+          if (pixel.pixelDistanceSquared(goal) > moveGoalDistanceSquared) {
+            simulation.grid.tryMove(this, goal)
+          } else {
+            moveGoal = None
+          }
         }
       }
     }
@@ -164,28 +165,15 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     target = targetNew
   }
 
-  @inline def tween(to: => Pixel, reason: Option[String]): Unit = {
+  @inline def move(goal: => Pixel, reason: Option[String], goalDistance: Double = 0): Unit = {
     if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
-    tweenFramesDone = 0
-    tweenFrom       = pixel
     if (ableToMove) {
-      val durationRequired  = (0.999 + pixelDistanceCenter(to) / topSpeed).toInt
-      tweenFramesLeft       = Maff.clamp(durationRequired, 1, 8 * With.configuration.simulationResolution)
-      tweenGoal             = ?(durationRequired >= tweenFramesLeft, to, pixel.project(to, tweenFramesLeft * topSpeed))
-      cooldownMoving        = Math.min(With.configuration.simulationResolution, tweenFramesLeft)
-    } else {
-      tweenFramesLeft       = With.configuration.simulationResolution
-      tweenGoal             = pixel
-      cooldownMoving        = tweenFramesLeft
+      moveGoal                = Some(goal)
+      moveGoalDistanceSquared = goalDistance * goalDistance
+      cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(goal) - goalDistance) / topSpeed).toInt)
     }
-    addEvent(SimulationEventTween(this, to, tweenGoal, tweenFramesLeft, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
-  }
-
-  @inline def stop(): Unit = {
-    // Would it be helpful for this to emit an event?
-    tweenFramesLeft = 0
-    cooldownMoving  = 0
+    addEvent(SimulationEventMove(this, goal, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
 
   @inline def recalculateInjury(): Unit = {

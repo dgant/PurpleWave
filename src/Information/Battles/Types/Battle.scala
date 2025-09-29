@@ -97,5 +97,5 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
     // Only events which communicate action
     && (e.isInstanceOf[SimulationEventAttack]
       || e.isInstanceOf[SimulationEventDeath]
-      || e.isInstanceOf[SimulationEventTween])).toVector
+      || e.isInstanceOf[SimulationEventMove])).toVector
 }

@@ -10,7 +10,7 @@ object BehaviorGather extends SimulacrumBehavior {
     base.foreach(b => {
       val to = b.heart.center
       if (simulacrum.pixelDistanceCenter(to) > 16) {
-        simulacrum.tween(to, Some("Gather"))
+        simulacrum.move(to, Some("Gather"))
       } else {
         simulacrum.sleep(Forever(), Some("Gathering"))
       }

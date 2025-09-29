@@ -4,6 +4,6 @@ object BehaviorAssemble extends SimulacrumBehavior {
   override val fighting: Boolean = false
 
   override def act(simulacrum: Simulacrum): Unit = {
-    simulacrum.tween(simulacrum.simulation.enemyVanguard, Some("Assemble"))
+    simulacrum.move(simulacrum.simulation.enemyVanguard, Some("Assemble"))
   }
 }

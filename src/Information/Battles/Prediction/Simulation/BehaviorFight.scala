@@ -43,7 +43,7 @@ object BehaviorFight extends SimulacrumBehavior {
       && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {
       val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - distance
       if (freeDistance > 0) {
-        simulacrum.tween(
+        simulacrum.move(
           threat.get.pixel.project(
             simulacrum.pixel,
             threat.get.pixelDistanceCenter(simulacrum) + freeDistance * 0.5),
@@ -55,9 +55,7 @@ object BehaviorFight extends SimulacrumBehavior {
     // Fire!
     if (distance <= range) {
       simulacrum.simulation.engaged = true
-      simulacrum.tweenGoal          = simulacrum.pixel
-      simulacrum.tweenFramesLeft    = 0
-      simulacrum.stop()
+      simulacrum.moveGoal           = None
       if (simulacrum.cooldownLeft <= 0) {
         simulacrum.dealDamageTo(target)
       } else {
@@ -65,7 +63,7 @@ object BehaviorFight extends SimulacrumBehavior {
       }
     } else if (simulacrum.canMove) {
       // TODO: Find walkable firing pixel (that's still in range)
-      simulacrum.tween(simulacrum.pixel.project(target.pixel, distance - range + 2), Some("Approaching target"))
+      simulacrum.move(simulacrum.pixel.project(target.pixel, distance - range + 2), Some("Approaching target"))
     } else {
       simulacrum.sleep(simulacrum.simulation.resolution, Some("Target out of reach"))
     }

@@ -558,62 +558,62 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   // But that won't strictly tell you how many frames you lose.
   //
   lazy val stopFrames: Int =
-    if (this == Terran.SCV) 2
-    else if (this == Terran.Marine) 8
-    else if (this == Terran.Firebat) 8
-    else if (this == Terran.Ghost) 3
-    else if (this == Terran.Vulture) 2
-    else if (this == Terran.Goliath) 1
-    else if (this == Terran.SiegeTankUnsieged) 1
-    else if (this == Terran.SiegeTankSieged) 1
-    else if (this == Terran.Wraith) 2
-    else if (this == Terran.Battlecruiser) 2
-    else if (this == Terran.Valkyrie) 40
-    else if (this == Protoss.Probe) 2
-    else if (this == Protoss.Zealot) 7
-    else if (this == Protoss.Dragoon) 7
-    else if (this == Protoss.DarkTemplar) 9
-    else if (this == Protoss.Archon) 15
-    else if (this == Protoss.Reaver) 1
-    else if (this == Protoss.Scout) 2
-    else if (this == Protoss.Corsair) 8
-    else if (this == Protoss.Arbiter) 4
-    else if (this == Protoss.PhotonCannon) 7 // I counted this myself but not sure I got it right
-    else if (this == Zerg.Drone) 2
-    else if (this == Zerg.Zergling) 4
-    else if (this == Zerg.Hydralisk) 3
-    else if (this == Zerg.Lurker) 2
-    else if (this == Zerg.Ultralisk) 14
-    else if (this == Zerg.Mutalisk) 2
-    else if (this == Zerg.Devourer) 9
-    else 2 // Arbitrary default.
+          if (this == Terran.SCV)               2
+    else  if (this == Terran.Marine)            8
+    else  if (this == Terran.Firebat)           8
+    else  if (this == Terran.Ghost)             3
+    else  if (this == Terran.Vulture)           2
+    else  if (this == Terran.Goliath)           1
+    else  if (this == Terran.SiegeTankUnsieged) 1
+    else  if (this == Terran.SiegeTankSieged)   1
+    else  if (this == Terran.Wraith)            2
+    else  if (this == Terran.Battlecruiser)     2
+    else  if (this == Terran.Valkyrie)          40
+    else  if (this == Protoss.Probe)            2
+    else  if (this == Protoss.Zealot)           7
+    else  if (this == Protoss.Dragoon)          7
+    else  if (this == Protoss.DarkTemplar)      9
+    else  if (this == Protoss.Archon)           15
+    else  if (this == Protoss.Reaver)           1
+    else  if (this == Protoss.Scout)            2
+    else  if (this == Protoss.Corsair)          8
+    else  if (this == Protoss.Arbiter)          4
+    else  if (this == Protoss.PhotonCannon)     7 // I counted this myself but not sure I got it right
+    else  if (this == Zerg.Drone)               2
+    else  if (this == Zerg.Zergling)            4
+    else  if (this == Zerg.Hydralisk)           3
+    else  if (this == Zerg.Lurker)              2
+    else  if (this == Zerg.Ultralisk)           14
+    else  if (this == Zerg.Mutalisk)            2
+    else  if (this == Zerg.Devourer)            9
+    else                                        2 // Arbitrary default.
 
   // These numbers are taken from Dave Churchill's table,
   // but the Dragoon number at least doesn't seem to correlate to the required delay to prevent attack cancelling.
   lazy val minStop: Int =
-    if (this == Protoss.Dragoon) 5
-    else if (this == Zerg.Devourer) 7
-    else if (this == Protoss.Carrier) 48
-    else 0
+          if (this == Protoss.Dragoon)          5
+    else  if (this == Zerg.Devourer)            7
+    else  if (this == Protoss.Carrier)          48
+    else                                        0
 
   lazy val attackAnimationFrames: Int =
-    if (this == Terran.SCV) 2
-    else if (this == Terran.Marine) 8
-    else if (this == Terran.Firebat) 8
-    else if (this == Terran.Ghost) 4
-    else if (this == Terran.Goliath) 1
-    else if (this == Terran.SiegeTankUnsieged) 1
-    else if (this == Terran.SiegeTankSieged) 1
-    else if (this == Protoss.Zealot) 8
-    else if (this == Protoss.Dragoon) 9
-    else if (this == Protoss.DarkTemplar) 9
-    else if (this == Protoss.Reaver) 1
-    else if (this == Protoss.Corsair) 8
-    else if (this == Protoss.Arbiter) 5
-    else if (this == Zerg.Zergling) 5
-    else if (this == Zerg.Hydralisk) 3
-    else if (this == Zerg.Ultralisk) 15
-    else 0
+          if (this == Terran.SCV)               2
+    else  if (this == Terran.Marine)            8
+    else  if (this == Terran.Firebat)           8
+    else  if (this == Terran.Ghost)             4
+    else  if (this == Terran.Goliath)           1
+    else  if (this == Terran.SiegeTankUnsieged) 1
+    else  if (this == Terran.SiegeTankSieged)   1
+    else  if (this == Protoss.Zealot)           8
+    else  if (this == Protoss.Dragoon)          9
+    else  if (this == Protoss.DarkTemplar)      9
+    else  if (this == Protoss.Reaver)           1
+    else  if (this == Protoss.Corsair)          8
+    else  if (this == Protoss.Arbiter)          5
+    else  if (this == Zerg.Zergling)            5
+    else  if (this == Zerg.Hydralisk)           3
+    else  if (this == Zerg.Ultralisk)           15
+    else                                        0
 
   /**
     * For the very small number of units with substantial stop frames AND a travelling projectile,

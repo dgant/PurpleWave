@@ -3,6 +3,7 @@ package Mathematics.Points
 import Information.Geography.Types.{Base, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Physics.Force
 import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.{?, SomeIf}
@@ -198,6 +199,12 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
         center.y + 16 - Math.min(16, unit.unitClass.dimensionDownInclusive)))
   }
   @inline def offsetFromTileCenter: Pixel = Pixel(Maff.mod32(x) - 16, Maff.mod32(x) - 16)
+  @inline def flowTo(to: Pixel): Force = {
+    if (zone == to.zone) {
+      return new Force(to.subtract(this)).normalize
+    }
+    tile.flowTo(to.tile)
+  }
 
   override def toString: String = f"[$x, $y](${Maff.signum101(x) * Math.abs(x / 32)}, ${Maff.signum101(y) * Math.abs(y / 32)})"
 }

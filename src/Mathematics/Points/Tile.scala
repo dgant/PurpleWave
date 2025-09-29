@@ -353,6 +353,9 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     ?(friendly.flying, enemiesNearlyAttackingAir, enemiesNearlyAttackingGround)
   }
   @inline def slowGroundDirectionTo(to: Tile): Force = {
+    if ( ! adjacent9.exists(_.walkable)) {
+      return new Force(walkableTile.subtract(this)).normalize
+    }
     val d = groundTiles(to)
     var f =
          Forces.up        * Maff.clamp11(d - up         .groundTiles(to))
@@ -363,11 +366,14 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     f += Forces.upRight   * Maff.clamp11(d - up.right   .groundTiles(to))
     f += Forces.downLeft  * Maff.clamp11(d - down.left  .groundTiles(to))
     f += Forces.downRight * Maff.clamp11(d - down.right .groundTiles(to))
-    f.normalize
+    if (f.lengthSquared > 0) {
+      return f.normalize
+    }
+    new Force(adjacent8.minBy(_.groundTiles(to)).subtract(this)).normalize
   }
   @inline def flowTo(to: Tile): Force = {
     if (zone == to.zone) {
-      return slowGroundDirectionTo(to)
+      return new Force(to.subtract(this)).normalize
     }
     to.zone.flowField.get(this)
   }

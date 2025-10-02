@@ -35,13 +35,20 @@ final case class Force(x: Double, y: Double) {
         scale * y / length)
   }
 
-
   @inline def clipAtLeast(scale: Double): Force = {
     if (scale * scale >= lengthSquared) this else normalize(scale)
   }
 
   @inline def clipAtMost(scale: Double): Force = {
     if (scale * scale <= lengthSquared) this else normalize(scale)
+  }
+
+  @inline def rotate(degrees: Double): Force = {
+    if (lengthSquared == 0) return this
+    val r = degrees * Maff.x2PiInv360
+    val c = Math.cos(r)
+    val s = Math.sin(r)
+    Force(x * c - y * s, x * s + y * c)
   }
 
   @inline def toPoint: Point = Point(x.toInt, y.toInt)

@@ -8,6 +8,11 @@ final class SimulationGridTile(val i: Int) {
   val units = new UnorderedBuffer[Simulacrum](12)
   var occupancy: Int = 0
 
+  @inline def reset(): Unit = {
+    units.clear()
+    occupancy = 0
+  }
+
   @inline def +=(unit: Simulacrum): Unit = {
     units.add(unit)
     occupancy += unit.unitClass.occupancy
@@ -15,5 +20,18 @@ final class SimulationGridTile(val i: Int) {
   @inline def -=(unit: Simulacrum): Unit = {
     units.remove(unit)
     occupancy -= unit.unitClass.occupancy
+  }
+  @inline def fits(unit: Simulacrum): Boolean = {
+    if (unit.gridTile.contains(this)) {
+      return true
+    }
+
+    if ( ! unit.flying && ! tile.walkable) {
+      return false
+    }
+
+    (unit.target.exists(_.gridTile.contains(this))
+    || occupancy + unit.unitClass.occupancy < Occupancy.Resolution
+    || true)
   }
 }

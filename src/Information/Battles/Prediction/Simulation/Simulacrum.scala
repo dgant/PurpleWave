@@ -53,7 +53,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var target                  : Option[Simulacrum] = None
   var threat                  : Option[Simulacrum] = None
   val targets                 : UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
-  var gridTile                : SimulationGridTile = _
+  var gridTile                : Option[SimulationGridTile] = None
   var measureHealth           : Boolean = _
   var hitPointsInitial        : Int = _
   var shieldPointsInitial     : Int = _
@@ -75,8 +75,6 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     player                  = realUnit.player
     unitClass               = realUnit.unitClass
     pixel                   = realUnit.pixel
-    gridTile                = simulation.grid.tiles(pixel.tile.i)
-    gridTile                += this
     visible                 = realUnit.visible
     alive                   = realUnit.alive
     complete                = realUnit.complete
@@ -124,6 +122,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     damageReceived          = 0
     valueReceived           = 0
     events.clear()
+    With.simulation.grid.populate(this)
   }
 
   @inline def canMove: Boolean = topSpeedPossible > 0

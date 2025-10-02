@@ -1,5 +1,6 @@
 package Information.Battles.Prediction.Simulation
 
+import Debugging.CombatVisIO
 import Information.Battles.Prediction.SimulationCheckpoint
 import Information.Battles.Types.Battle
 import Lifecycle.With
@@ -7,7 +8,6 @@ import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.SpinWait
-import Debugging.CombatVisIO
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -37,6 +37,7 @@ final class Simulation {
         realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
         enemyVanguard     = battle.enemy.vanguardKey()
         engaged           = false
+        With.simulation.grid.reset()
         simulacra.foreach(_.reset(this))
         if (battle.logSimulation) {
           framesLog.clear()

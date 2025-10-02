@@ -1,5 +1,6 @@
 package ProxyBwapi.UnitClasses
 
+import Information.Battles.Prediction.Simulation.Occupancy
 import Information.GameSense.Budgets
 import Lifecycle.With
 import Mathematics.Maff
@@ -25,7 +26,6 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val area         : Int = dimensionMin * dimensionMax
   lazy val sqrtArea     : Int = Math.sqrt(area).toInt
   lazy val perimeter    : Int = 2 * width + 2 * height
-  lazy val occupancy    : Int = if (isFlyer) 0 else (dimensionMin * dimensionMax) / (Math.max(1, tileWidth) * Math.max(1, tileHeight))
   lazy val radialHypotenuse: Double = Math.sqrt(width.toDouble * width.toDouble + height.toDouble * height.toDouble) / 2.0
 
   lazy val topLeft              : Point         = Point(  - dimensionLeft,            - dimensionUp)
@@ -546,6 +546,8 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else if (isBuilding && unitsTrained.exists(_.budgetCategory == Budgets.War))  Budgets.Production
     else                                                                          Budgets.Science
   }
+
+  lazy val occupancy: Int = ?(isFlyer, 0, Math.min(Occupancy.Resolution, Occupancy.Resolution * (width * height) / (32 * 32)))
 
   //////////////////////
   // Micro frame data //

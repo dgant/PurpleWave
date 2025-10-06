@@ -30,8 +30,6 @@ final class SimulationGridTile(val i: Int) {
       return false
     }
 
-    (unit.target.exists(_.gridTile.contains(this))
-    || occupancy + unit.unitClass.occupancy < Occupancy.Resolution
-    || true)
+    occupancy + unit.unitClass.occupancy < Occupancy.Resolution || unit.target.exists(_.gridTile.contains(this))
   }
 }

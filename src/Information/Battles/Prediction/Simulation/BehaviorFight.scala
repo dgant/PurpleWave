@@ -10,8 +10,9 @@ object BehaviorFight extends SimulacrumBehavior {
     // Remove target if invalid
     // If no valid target, pick target
     simulacrum.setTarget(simulacrum.target
-      .filter(t => validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t))
+      .filter(t => simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t))
       .orElse({
+        simulacrum.cooldownTargeting = 72
         simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
         Maff.maxBy(simulacrum.targets)(TargetScoring.fast(simulacrum, _))
       }))

@@ -39,7 +39,7 @@ trait MacroActions extends MacroCounting {
     With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
   }
   def scoutOn(unitMatcher: UnitFilter, quantity: Int = 1, scouts: Int = 1): Unit = if (With.units.ours.count(unitMatcher) >= quantity)  scout(scouts)
-  def scoutAt(minimumSupply: Int,                         scouts: Int = 1): Unit = if (supplyUsed200 >= minimumSupply)                  scout(scouts)
+  def scoutAt(minimumSupply200: Int,                      scouts: Int = 1): Unit = if (supplyUsed200 >= minimumSupply200)                  scout(scouts)
 
   def gasWorkerFloor  (value: Int): Unit = With.blackboard.gasWorkerFloor   .set(value)
   def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling .set(value)

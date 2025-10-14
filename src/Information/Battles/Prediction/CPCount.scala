@@ -11,7 +11,10 @@ object CPCount {
     val length = units.length
     var i = 0
     while (i < length) {
-      output += extract(units(i).simulacrum)
+      val simulacrum = units(i).simulacrum
+      if (simulacrum.shouldScoreIfOurs || simulacrum.isEnemy) {
+        output += extract(simulacrum)
+      }
       i += 1
     }
     output

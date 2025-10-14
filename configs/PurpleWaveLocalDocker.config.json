@@ -2,7 +2,7 @@
 "human"           : false,
 "ladder"          : false,
 "livestream"      : false,
-"tournament"      : false,
+"tournament"      : true,
 "roundrobin"      : true,
 "elimination"     : false,
 "pretraining"     : false,
@@ -10,7 +10,7 @@
 "debugginglive"   : false,
 "logstd"          : true,
 "multiCPU"        : true,
-"framemstarget"   : 25,
-"framemslimit"    : 30,
+"framemstarget"   : 35,
+"framemslimit"    : 35,
 "comments"        : "SC-Docker does not enforce per-frame limits."
 }

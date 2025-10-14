@@ -37,12 +37,26 @@ final class SimulationGrid {
       move(unit, tiles(toClamped.tile.i))
       return
     }
+    moveGrid(unit, toClamped)
+  }
+
+  @inline private def moveGrid(unit: Simulacrum, to: Pixel): Unit = {
+    val from  = unit.pixel
+    val path = from
+      .tile
+      .adjacent4
+      .filter(_.walkable)
+      .sortBy(_.groundTiles(to))
+      .find(toTile => tryForce(unit, from.flowTo(toTile.center.add(from.offsetFromTileCenter))))
+  }
+
+  @inline private def moveFlow(unit: Simulacrum, to: Pixel): Unit = {
 
     val from  = unit.pixel
-    val force = from.flowTo(toClamped)
+    val force = from.flowTo(to)
 
     // Choose the rotation direction (+90 or -90) that brings us closer to the goal direction
-    lazy val targetRadians = from.radiansTo(toClamped)
+    lazy val targetRadians = from.radiansTo(to)
     lazy val fRad          = force.radians
     lazy val dPlus         = Math.abs(Maff.radiansTo(fRad + Maff.halfPi, targetRadians))
     lazy val dMinus        = Math.abs(Maff.radiansTo(fRad - Maff.halfPi, targetRadians))

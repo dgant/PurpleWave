@@ -31,9 +31,9 @@ object JudgmentModifiers {
             output += m })
     }
     add("Proximity",    Colors.NeonRed,       proximity(battle))
-    add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
+    //add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
     add("HiddenTanks",  Colors.MediumIndigo,  hiddenTanks(battle))
-    add("Choke",        Colors.MediumOrange,  choke(battle))
+    //add("Choke",        Colors.MediumOrange,  choke(battle))
     //add("TankLock",     Colors.MediumRed,     tankLock(battle))
     add("Caught",       Colors.BrightGreen,   caught(battle))
     add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))
@@ -125,7 +125,7 @@ object JudgmentModifiers {
     val tankInRangeRatio  = valueRatio(battle.us.attackers, _.matchups.targetsInRange.exists(Terran.SiegeTankSieged))
     val inRankRangeScore  = inTankRangeRatio * 1/3d
     val tankInRangeScore  = tankInRangeRatio * 2/3d
-    val score             = - 0.5 * (inRankRangeScore + tankInRangeScore)
+    val score             = -0.5 * (inRankRangeScore + tankInRangeScore)
     modifyTarget(score)
   }
 

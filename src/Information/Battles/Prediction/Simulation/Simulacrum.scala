@@ -53,6 +53,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var target                  : Option[Simulacrum] = None
   var threat                  : Option[Simulacrum] = None
   val targets                 : UnorderedBuffer[Simulacrum] = new UnorderedBuffer[Simulacrum](50)
+  var cooldownTargeting       : Int = _
   var gridTile                : Option[SimulationGridTile] = None
   var measureHealth           : Boolean = _
   var hitPointsInitial        : Int = _
@@ -60,8 +61,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var cooldownMoving          : Int = _
   var moveGoal                : Option[Pixel] = None
   var moveGoalDistanceSquared : Double = _
-  var valuePerDamage          : Double = _
-  var kills                   : Int = _
+  var valuePerDamage          : Double  = _
+  var shouldScoreIfOurs       : Boolean = _
+  var kills                   : Int     = _
   var damageDealt             : Double = _
   var valueDealt              : Double = _
   var damageReceived          : Double = _
@@ -110,12 +112,14 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     target                  = None
     threat                  = None
     targets.clear()
+    cooldownTargeting       = 0
     measureHealth           = true
     hitPointsInitial        = realUnit.hitPoints
     shieldPointsInitial     = realUnit.shieldPoints
     cooldownMoving          = realUnit.remainingFramesUntilMoving
     moveGoal                = None
     moveGoalDistanceSquared = 0
+    shouldScoreIfOurs       = unitClass.attacksOrCastsOrDetectsOrTransports
     kills                   = 0
     damageDealt             = 0
     valueDealt              = 0
@@ -137,8 +141,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
         alive = false
         addEvent(SimulationEventDeath(this))
       } else {
-        cooldownLeft    = Math.max(0, cooldownLeft    - 1)
-        cooldownMoving  = Math.max(0, cooldownMoving  - 1)
+        cooldownLeft      = Math.max(0, cooldownLeft      - 1)
+        cooldownMoving    = Math.max(0, cooldownMoving    - 1)
+        cooldownTargeting = Math.max(0, cooldownTargeting - 1)
         if (moveGoal.isDefined) {
           val goal = moveGoal.get
           if (pixel.pixelDistanceSquared(goal) > moveGoalDistanceSquared) {

@@ -26,6 +26,7 @@ object BehaviorInitial extends SimulacrumBehavior {
     if (simulacrum.unitClass.isWorker) {
       if ( ! simulacrum.visible || simulacrum.realUnit.gathering || simulacrum.pixel.base.exists(b => b.owner == simulacrum.player && (b.harvestingArea.contains(simulacrum.pixel)))) {
         simulacrum.doBehavior(BehaviorGather)
+        simulacrum.shouldScoreIfOurs = false
         return
       }
     }

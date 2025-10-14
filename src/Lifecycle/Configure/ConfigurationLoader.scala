@@ -32,11 +32,12 @@ object ConfigurationLoader {
       With.logger.warn("Didn't find any matching configurations")
       return
     }
-    val configFile = configFiles.head
     if (configFilesMatching.length > 1) {
-      With.logger.warn("Found multiple matching configurations: " + configFilesMatching.map(_.getName).mkString(", "))
+      With.logger.warn("Found multiple matching configurations; using newest: " + configFilesMatching.map(f => f"{f.getName} (${f.lastModified()})").mkString(", "))
     }
-    With.logger.debug("Using configuration file " + configFile.getName)
+
+    val configFile = configFilesMatching.maxBy(_.lastModified())
+    With.logger.debug(f"Using configuration file ${configFile.getName}")
     try {
       val configSource  = scala.io.Source.fromFile(configFile)
       val configText    = configSource.mkString

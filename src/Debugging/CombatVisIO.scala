@@ -223,7 +223,7 @@ object CombatVisIO {
         return
       }
       // Global 10s cooldown for live .pwcs appends regardless of slight participant changes
-      if (startGameFrame - lastPwcsAppendGameFrame < 240) {
+      if (startGameFrame - lastPwcsAppendGameFrame < With.configuration.simulationRecordingPeriod) {
         diag(s"append skip: global cooldown (${startGameFrame - lastPwcsAppendGameFrame} < 240) start=$startGameFrame lastPwcs=$lastPwcsAppendGameFrame")
         return
       }

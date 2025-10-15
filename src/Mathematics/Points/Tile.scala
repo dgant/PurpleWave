@@ -74,6 +74,12 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def pixelDistance(pixel: Pixel): Double = {
     center.pixelDistance(pixel)
   }
+  @inline def pixelDistanceSquared(tile: Tile): Double = {
+    center.pixelDistanceSquared(tile.center)
+  }
+  @inline def pixelDistanceSquared(pixel: Pixel): Double = {
+    center.pixelDistanceSquared(pixel)
+  }
   @inline def groundPixels(other: Pixel): Double = {
     With.paths.groundPixels(center, other)
   }

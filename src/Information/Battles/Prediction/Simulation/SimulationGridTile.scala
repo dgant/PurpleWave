@@ -2,6 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Mathematics.Points.Tile
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Utilities.?
 
 final class SimulationGridTile(val i: Int) {
   val tile: Tile = new Tile(i)
@@ -22,14 +23,21 @@ final class SimulationGridTile(val i: Int) {
     occupancy -= unit.unitClass.occupancy
   }
   @inline def fits(unit: Simulacrum): Boolean = {
+    if (unit.flying) {
+      return true
+    }
     if (unit.gridTile.contains(this)) {
       return true
     }
-
-    if ( ! unit.flying && ! tile.walkable) {
+    if ( ! tile.walkable) {
       return false
     }
 
-    occupancy + unit.unitClass.occupancy < Occupancy.Resolution || unit.target.exists(_.gridTile.contains(this))
+    val occupancyCost = ?(unit.target.exists(_.gridTile.contains(this)), 0, unit.unitClass.occupancy)
+    if (occupancy + occupancyCost > Occupancy.Resolution) {
+      //return false
+    }
+
+    true
   }
 }

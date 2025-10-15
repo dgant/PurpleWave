@@ -37,17 +37,30 @@ final class SimulationGrid {
       move(unit, tiles(toClamped.tile.i))
       return
     }
-    moveGrid(unit, toClamped)
+    if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){
+      return
+    }
+    if (moveGrid(unit, toClamped)) {
+      return
+    }
+    val fail = "Fail!"
   }
 
-  @inline private def moveGrid(unit: Simulacrum, to: Pixel): Unit = {
+  @inline private def moveGrid(unit: Simulacrum, to: Pixel): Boolean = {
     val from  = unit.pixel
-    val path = from
-      .tile
+    val fromTile = from.tile
+    val path = fromTile
       .adjacent4
-      .filter(_.walkable)
-      .sortBy(_.groundTiles(to))
-      .find(toTile => tryForce(unit, from.flowTo(toTile.center.add(from.offsetFromTileCenter))))
+      .filter(t => t.walkable && ! unit.lastTile.contains(t))
+      .sortBy(t => t.groundTiles(to) +  t.pixelDistanceSquared(to))
+      .map(toTile => from.add(32 * (toTile.x - fromTile.x), 32 * (toTile.y - fromTile.y)))
+      .find(to => tryForceV2(unit, from.flowTo(to)))
+
+    if (path.isDefined) {
+      true
+    } else {
+      false
+    }
   }
 
   @inline private def moveFlow(unit: Simulacrum, to: Pixel): Unit = {
@@ -100,8 +113,28 @@ final class SimulationGrid {
     unit.gridTile = Some(tileNext)
   }
 
+  @inline def tryForceV2(unit: Simulacrum, force: Force): Boolean = {
+          val from      = unit.pixel
+          val forceJump = force.normalize(32)
+    lazy  val forceStep = force.normalize(unit.topSpeed)
+          val toJump    = from.add(forceJump.x.toInt, forceJump.y.toInt)
+    lazy  val toStep    = from.add(forceStep.x.toInt, forceStep.y.toInt)
+          val tileJump  = tiles(toJump.tile.clip.i)
+    lazy  val tileStep  = tiles(toStep.tile.clip.i)
+          val accept    = tileJump.fits(unit) && tileStep.fits(unit)
+
+    if (accept) {
+      unit.pixel = toStep
+      move(unit, tileStep)
+    } else {
+      unit.pixel = unit.pixel
+    }
+    accept
+  }
+
   @inline def tryForce(unit: Simulacrum, force: Force): Boolean = {
-          val to        = unit.pixel.add((unit.topSpeed * force.x).toInt, (unit.topSpeed * force.y).toInt).clamp()
+          val from      = unit.pixel
+          val to        = from.add((unit.topSpeed * force.x).toInt, (unit.topSpeed * force.y).toInt).clamp()
           val tile      = to.tile
     lazy  val gridTile  = tiles(tile.i)
           val accept    = gridTile.fits(unit)

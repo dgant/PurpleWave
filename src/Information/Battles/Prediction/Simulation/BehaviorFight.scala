@@ -10,7 +10,10 @@ object BehaviorFight extends SimulacrumBehavior {
     // Remove target if invalid
     // If no valid target, pick target
     simulacrum.setTarget(simulacrum.target
-      .filter(t => simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t))
+      .filter(t =>
+        simulacrum.cooldownTargeting > 0
+        && validTarget(simulacrum, t)
+        && simulacrum.inRangeToAttack(t))
       .orElse({
         simulacrum.cooldownTargeting = 72
         simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
@@ -71,6 +74,8 @@ object BehaviorFight extends SimulacrumBehavior {
   }
 
   @inline def validTarget(attacker: Simulacrum, target: Simulacrum): Boolean = {
-    target.alive && attacker.canAttack(target)
+    (target.alive
+      && attacker.canAttack(target)
+      && (attacker.isFriendly || target.shouldScoreIfOurs)) // Enemy units should not target unscored units
   }
 }

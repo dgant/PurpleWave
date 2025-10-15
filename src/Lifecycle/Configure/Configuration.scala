@@ -46,6 +46,7 @@ class Configuration {
   var simulationFrames              = Seconds(15)()
   var simulationResolution          = 8
   var simulationDamageValueRatio    = 0.1
+  var simulationRecordingPeriod     = 240
 
   /////////////////
   // Performance //

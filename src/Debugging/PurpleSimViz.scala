@@ -149,7 +149,7 @@ object PurpleSimViz {
     if (n == null) None
     else try {
       val v: String = n.asString()
-      if (v == null) None else Some(v)
+      Option(v)
     } catch { case _: Throwable => None }
   }
   private def getInt(j: Json, key: String, default: Int): Int = getIntOpt(j, key).getOrElse(default)

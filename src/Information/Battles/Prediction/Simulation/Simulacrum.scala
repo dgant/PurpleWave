@@ -2,7 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
@@ -60,14 +60,15 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var shieldPointsInitial     : Int = _
   var cooldownMoving          : Int = _
   var moveGoal                : Option[Pixel] = None
-  var moveGoalDistanceSquared : Double = _
+  var moveGoalDistanceSquared : Double  = _
+  var lastTile                : Option[Tile] = None
   var valuePerDamage          : Double  = _
   var shouldScoreIfOurs       : Boolean = _
   var kills                   : Int     = _
-  var damageDealt             : Double = _
-  var valueDealt              : Double = _
-  var damageReceived          : Double = _
-  var valueReceived           : Double = _
+  var damageDealt             : Double  = _
+  var valueDealt              : Double  = _
+  var damageReceived          : Double  = _
+  var valueReceived           : Double  = _
   var events                  : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
 
   def reset(newSimulation: Simulation): Unit = {
@@ -119,6 +120,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     cooldownMoving          = realUnit.remainingFramesUntilMoving
     moveGoal                = None
     moveGoalDistanceSquared = 0
+    lastTile                = None
     shouldScoreIfOurs       = unitClass.attacksOrCastsOrDetectsOrTransports
     kills                   = 0
     damageDealt             = 0
@@ -173,7 +175,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
     if (ableToMove) {
-      moveGoal                = Some(goal)
+      var goalAdjusted        = goal.clamp(unitClass.dimensionMax)
+      goalAdjusted            = ?(flying, goalAdjusted, goalAdjusted.walkablePixel)
+      moveGoal                = Some(goalAdjusted)
       moveGoalDistanceSquared = goalDistance * goalDistance
       cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(goal) - goalDistance) / topSpeed).toInt)
     }

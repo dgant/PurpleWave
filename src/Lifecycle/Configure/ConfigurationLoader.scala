@@ -143,9 +143,10 @@ object ConfigurationLoader {
 
   private def setDebugLiveMode(): Unit = {
     setDebugMode()
-    config.camera             = true
-    config.visualizeDebug     = true
-    config.detectBreakpoints  = true
+    config.camera                 = true
+    config.visualizeDebug         = true
+    config.detectBreakpoints      = true
+    config.simulationRecordingPeriod  = 24 * 3
     //config.forcedPlaybook     = Some(new TestingPlaybook)
   }
 

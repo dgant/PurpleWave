@@ -9,9 +9,6 @@ import scala.collection.mutable.ArrayBuffer
 
 object CombatVisIO {
 
-  // Public diagnostic hook (writes to bwapi-data\\write\\junie.log when live debugging is enabled)
-  def diag(message: String): Unit = { junieLog(message); extLog(message) }
-
   @volatile private var launched: Boolean = false
   @volatile private var visProcess: Process = _
 
@@ -33,35 +30,6 @@ object CombatVisIO {
   @volatile private var lastAppendStartFrame: Int = -1000000
   @volatile private var lastAppendParticipantsKey: String = ""
   @volatile private var lastPwcsAppendGameFrame: Int = -1000000
-
-  // Lightweight Junie debug log (appends when live debugging is enabled)
-  private def junieLog(message: String): Unit = {
-    try {
-      if (!With.configuration.debugging) return
-      ensureDirs()
-      val ts = System.currentTimeMillis()
-      val sdf = new java.text.SimpleDateFormat("HH:mm:ss.SSS")
-      val line = s"[$ts ${sdf.format(new java.util.Date(ts))}] $message\n"
-      val f = new File(baseDir, "junie.log")
-      val fos = new FileOutputStream(f, true)
-      try fos.write(line.getBytes(StandardCharsets.UTF_8)) finally try fos.close() catch { case _: Throwable => }
-    } catch { case _: Throwable => }
-  }
-
-  // External diagnostics to c:\p\pw\out\logs so the viewer can read without manual copying
-  private def extLog(message: String): Unit = {
-    try {
-      if (!With.configuration.debugging) return
-      val dir = new File("C:\\p\\pw\\out\\logs")
-      if (!dir.exists()) dir.mkdirs()
-      val ts = System.currentTimeMillis()
-      val sdf = new java.text.SimpleDateFormat("HH:mm:ss.SSS")
-      val line = s"[$ts ${sdf.format(new java.util.Date(ts))}] $message\n"
-      val f = new File(dir, "junie-writer.log")
-      val fos = new FileOutputStream(f, true)
-      try fos.write(line.getBytes(StandardCharsets.UTF_8)) finally try fos.close() catch { case _: Throwable => }
-    } catch { case _: Throwable => }
-  }
 
   // Background IO workers to avoid blocking the main game thread
   // Fast lane for lightweight .pwcs appends
@@ -185,7 +153,7 @@ object CombatVisIO {
         }
         li_guard += 1
       }
-      if (!interesting) { diag(s"append skip: no attacks or deaths; frames=${framesLog.length} startGameFrame=$startGameFrame"); return }
+      if (!interesting) return
 
       // Parse metas: collect id, side, and unit type ID from first frame
       case class Meta(id: Int, friendly: Boolean, typeId: Int)
@@ -215,18 +183,11 @@ object CombatVisIO {
         buf.distinct.sortBy(_.id).toVector
       }
 
-      // Coalescing: skip near-duplicate sims (same participants) within 10s of last append
+      // Coalescing: skip near-duplicate sims (same participants) within cooldown of last append
       val participantsKey = metas.map(_.id).sorted.mkString(",")
-      val withinLastAppendCooldown = startGameFrame - lastAppendStartFrame < 240
-      if (withinLastAppendCooldown && participantsKey == lastAppendParticipantsKey) {
-        diag(s"append skip: coalesce near-duplicate start=$startGameFrame last=$lastAppendStartFrame participants=${metas.length}")
-        return
-      }
-      // Global 10s cooldown for live .pwcs appends regardless of slight participant changes
-      if (startGameFrame - lastPwcsAppendGameFrame < With.configuration.simulationRecordingPeriod) {
-        diag(s"append skip: global cooldown (${startGameFrame - lastPwcsAppendGameFrame} < 240) start=$startGameFrame lastPwcs=$lastPwcsAppendGameFrame")
-        return
-      }
+      val withinLastAppendCooldown = startGameFrame - lastAppendStartFrame < With.configuration.simulationRecordingPeriod
+      if (withinLastAppendCooldown && participantsKey == lastAppendParticipantsKey) return
+      if (startGameFrame - lastPwcsAppendGameFrame < With.configuration.simulationRecordingPeriod) return
 
       // Build PW2 compact delta format
       val sb = new StringBuilder(1024 * 64)
@@ -334,7 +295,6 @@ object CombatVisIO {
         lastAppendStartFrame = startGameFrame
         lastAppendParticipantsKey = participantsKey
         lastPwcsAppendGameFrame = startGameFrame
-        diag(s"append complete #$n: wrote ${bytes.length} bytes to ${new File(outPath).getName} startGameFrame=$startGameFrame participants=${participantsKey.split(',').length}")
       } catch { case _: Throwable => }
       // local log
       try {
@@ -357,8 +317,6 @@ object CombatVisIO {
       val outPath: String = try opponentFile.getAbsolutePath catch { case _: Throwable => new File(With.bwapiData.write, With.enemy.name + ".pwcs").getAbsolutePath }
       val copy = new ArrayBuffer[String](framesLog.length)
       copy ++= framesLog
-      // Diagnostics before enqueue
-      diag(s"enqueue append: frames=${copy.length} startGameFrame=$startGameFrame ioQ=${ioQueue.size()} dumpQ=${dumpQueue.size()} out=${outPath}")
       enqueueIO(new Runnable { override def run(): Unit = writeSimulationLogPrepared(outPath, mapHash, copy, startGameFrame) })
     } catch { case _: Throwable => }
   }
@@ -381,8 +339,6 @@ object CombatVisIO {
       val gsEpoch: Long = gameStartEpochSeconds
       val copy = new ArrayBuffer[String](framesLog.length)
       copy ++= framesLog
-      // Log queue sizes and gating for diagnostics
-      diag(s"enqueue dump: frame=$curFrame lastDumpGameFrame=$lastDumpGameFrame nextAllowedMs=${nextDumpAllowedMs.get()} ioQ=${ioQueue.size()} dumpQ=${dumpQueue.size()}")
       enqueueDump(new Runnable { override def run(): Unit = {
         try {
           writeCompressedSimDumpIfNeededPrepared(basePath, oppSan, curFrame, mapHash, gsEpoch, copy, startGameFrame)
@@ -397,13 +353,11 @@ object CombatVisIO {
   // Prepared variant that avoids With.* and uses provided context
   private def writeCompressedSimDumpIfNeededPrepared(basePath: String, opponentSanitized: String, currentFrame: Int, mapHash: String, startEpochSeconds: Long, framesLog: ArrayBuffer[String], startGameFrame: Int): Unit = {
     try {
-      diag(s"dumpPrepared enter: frame=$currentFrame lastDumpGameFrame=$lastDumpGameFrame framesLogSz=${framesLog.length}")
-      if (framesLog.isEmpty) { diag("dumpPrepared skip: framesLog empty"); return }
       // Enforce 10-second cooldown in game time (24 fps => 240 frames)
-      if (currentFrame - lastDumpGameFrame < 240) { diag(s"dumpPrepared skip: game-time cooldown blocks (${currentFrame - lastDumpGameFrame} < 240)"); return }
+      if (currentFrame - lastDumpGameFrame < 240) return
       val now = System.currentTimeMillis()
       // Keep wall-clock throttle as a secondary guard
-      if (now - lastDumpMs < 10000L) { diag(s"dumpPrepared skip: wall-clock cooldown blocks (${now - lastDumpMs}ms < 10000ms)"); return }
+      if (now - lastDumpMs < 10000L) return
       val t0 = System.nanoTime()
 
       // Build unit metas with type IDs for worker filtering
@@ -449,7 +403,7 @@ object CombatVisIO {
         if (parts.length >= 3) {
           val tokens = parts(2).split(';')
           var ti = 0
-          while (ti < tokens.length && !nonWorkerDeath) {
+          while (ti < tokens.length && ! nonWorkerDeath) {
             val t = tokens(ti)
             if (t.nonEmpty && t.startsWith("d:")) {
               val idStr = t.substring(2)
@@ -464,7 +418,7 @@ object CombatVisIO {
         }
         li += 1
       }
-      if (!nonWorkerDeath) { diag("dumpPrepared skip: no non-worker deaths in framesLog"); return }
+      if ( ! nonWorkerDeath) return
 
       // Build PW2 content
       val sb = new StringBuilder(1024 * 64)
@@ -563,7 +517,6 @@ object CombatVisIO {
       try { gos.write(bytes) } finally { try gos.close() catch { case _: Throwable => }; try fos.close() catch { case _: Throwable => } }
       lastDumpMs = now
       lastDumpGameFrame = currentFrame
-      diag(s"dumpPrepared wrote ${outFile.getName} bytes=${bytes.length} frame=$currentFrame lastDumpGameFrame=$lastDumpGameFrame")
       // Lightweight local log without touching With.*
       try {
         val log = new File(basePath, "junie.log")

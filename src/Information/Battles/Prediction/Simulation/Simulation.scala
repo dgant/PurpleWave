@@ -42,7 +42,6 @@ final class Simulation {
         if (battle.logSimulation) {
           framesLog.clear()
           simulationStartGameFrame = With.frame
-          try { Debugging.CombatVisIO.diag(s"sim reset: realUnits=${realUnits.length} startGameFrame=$simulationStartGameFrame battleFrames=${battle.simulationFrames}") } catch { case _: Throwable => }
         }
         shouldReset = false
       } finally {
@@ -137,7 +136,6 @@ final class Simulation {
         val rNoOurs      = ! simulacraOurs.exists(_.alive)
         val rNoEnemy     = ! simulacraEnemy.exists(_.alive)
         val rNoFighting  = ! simulacra.exists(s => s.alive && s.behavior.fighting)
-        Debugging.CombatVisIO.diag(s"cleanup: framesLogSz=${framesLog.length} startGameFrame=$simulationStartGameFrame gameFrame=${With.frame} reasons framesLimit=$rFramesLimit noOurs=$rNoOurs noEnemy=$rNoEnemy noFighting=$rNoFighting")
       } catch { case _: Throwable => }
       // Write simulation frames for visualizer (async to avoid blocking main thread)
       try { CombatVisIO.writeSimulationLogAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }

@@ -296,14 +296,6 @@ object CombatVisIO {
         lastAppendParticipantsKey = participantsKey
         lastPwcsAppendGameFrame = startGameFrame
       } catch { case _: Throwable => }
-      // local log
-      try {
-        val dir = new File(outPath).getParentFile
-        val log = new File(dir, "junie.log")
-        val line = s"[${System.currentTimeMillis()}] writeSimulationLog: wrote ${bytes.length} bytes to ${new File(outPath).getName}\n"
-        val fos2 = new FileOutputStream(log, true)
-        try fos2.write(line.getBytes(StandardCharsets.UTF_8)) finally try fos2.close() catch { case _: Throwable => }
-      } catch { case _: Throwable => }
     } catch { case _: Throwable => }
   }
 

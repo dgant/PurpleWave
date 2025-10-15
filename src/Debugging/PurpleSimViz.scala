@@ -1367,7 +1367,17 @@ object PurpleSimViz {
 
       // Populate list initially
       populateSimList(simsRef.get())
-      if (simsRef.get().nonEmpty) { simList.setSelectedIndex(0); loadSimAt(0) }
+      if (simsRef.get().nonEmpty) {
+        val simsNow = simsRef.get()
+        var idx = 0
+        var found = false
+        while (idx < simsNow.length && !found) {
+          if (simsNow(idx).frames.nonEmpty) found = true else idx += 1
+        }
+        val sel = if (found) idx else 0
+        simList.setSelectedIndex(sel)
+        loadSimAt(sel)
+      }
 
       // Disable auto-reload on manual selection and load selected sim
       simList.addListSelectionListener(_ => {

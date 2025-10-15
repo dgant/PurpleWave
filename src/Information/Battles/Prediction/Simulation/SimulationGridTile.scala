@@ -35,7 +35,7 @@ final class SimulationGridTile(val i: Int) {
 
     val occupancyCost = ?(unit.target.exists(_.gridTile.contains(this)), 0, unit.unitClass.occupancy)
     if (occupancy + occupancyCost > Occupancy.Resolution) {
-      //return false
+      return false
     }
 
     true

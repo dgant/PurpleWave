@@ -29,12 +29,11 @@ final class SimulationGrid {
   @inline def tryMove(unit: Simulacrum, to: Pixel): Unit = {
     val toClamped = to.clamp()
     if (unit.pixel.tile == toClamped.tile) {
-      unit.pixel = toClamped
+      unit.pixel = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
       return
     }
     if (unit.flying) {
-      unit.pixel = toClamped
-      move(unit, tiles(toClamped.tile.i))
+      relocateUnit(unit, unit.pixel.projectUpTo(toClamped, unit.topSpeed), Some(tiles(toClamped.tile.i)))
       return
     }
     if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){
@@ -99,11 +98,31 @@ final class SimulationGrid {
     */
   }
 
+  @inline def relocateUnit(unit: Simulacrum, to: Pixel, knownTile: Option[SimulationGridTile] = None): Unit = {
+    val tileFrom  = unit.gridTile
+    val tileTo    = knownTile.getOrElse(tiles(to.tile.clip.i))
+
+    if ( ! unit.gridTile.contains(tileTo)) {
+      unit.gridTile.foreach(tileLast => {
+        tileLast -= unit
+        if (tileLast.units.isEmpty) {
+          populatedTiles.remove(tileLast)
+        }
+      })
+      if (tileTo.units.isEmpty) {
+        populatedTiles.add(tileTo)
+      }
+      tileTo += unit
+      unit.gridTile = Some(tileTo)
+    }
+    unit.pixel = to
+  }
+
   @inline def move(unit: Simulacrum, tileNext: SimulationGridTile): Unit = {
     unit.gridTile.foreach(tileLast => {
       tileLast -= unit
       if (tileLast.units.isEmpty) {
-        populatedTiles.remove(tileNext)
+        populatedTiles.remove(tileLast)
       }
     })
     if (tileNext.units.isEmpty) {
@@ -124,8 +143,7 @@ final class SimulationGrid {
           val accept    = tileJump.fits(unit) && tileStep.fits(unit)
 
     if (accept) {
-      unit.pixel = toStep
-      move(unit, tileStep)
+      relocateUnit(unit, toStep, Some(tileStep))
     } else {
       unit.pixel = unit.pixel
     }
@@ -139,8 +157,7 @@ final class SimulationGrid {
     lazy  val gridTile  = tiles(tile.i)
           val accept    = gridTile.fits(unit)
     if (accept) {
-      unit.pixel = to
-      move(unit, gridTile)
+      relocateUnit(unit, to)
     }
     accept
   }

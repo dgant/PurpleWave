@@ -517,13 +517,6 @@ object CombatVisIO {
       try { gos.write(bytes) } finally { try gos.close() catch { case _: Throwable => }; try fos.close() catch { case _: Throwable => } }
       lastDumpMs = now
       lastDumpGameFrame = currentFrame
-      // Lightweight local log without touching With.*
-      try {
-        val log = new File(basePath, "junie.log")
-        val line = s"[${System.currentTimeMillis()}] writeCompressedSimDumpIfNeeded: wrote ${outFile.getName} (${bytes.length} pre-gzip bytes)\n"
-        val fos2 = new FileOutputStream(log, true)
-        try fos2.write(line.getBytes(StandardCharsets.UTF_8)) finally try fos2.close() catch { case _: Throwable => }
-      } catch { case _: Throwable => }
     } catch { case _: Throwable => }
   }
 
@@ -533,14 +526,11 @@ object CombatVisIO {
       val path = opponentFile.getAbsolutePath
       // Prefer launching an external Java process to isolate UI from the bot JVM
       val cp = System.getProperty("java.class.path", ".")
-      val logFile = new File(baseDir, "combatvis.log")
       val pb = new ProcessBuilder("java", "-cp", cp, "Debugging.PurpleSimViz", path)
       pb.directory(baseDir)
       pb.redirectErrorStream(true)
-      pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile))
       visProcess = pb.start()
       launched = true
-      junieLog(s"launchVisualizer: started external process pid? path=${path}")
     } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
   }
 

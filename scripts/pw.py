@@ -54,7 +54,7 @@ def main():
     copy_basil(args.t, args.p, args.z)
   if args.play:
     did_anything = True
-    play(4)
+    play()
   if args.viz:
     did_anything = True
     package_sim_viz()

@@ -190,7 +190,8 @@ object PurpleSimViz {
           var in = false
           while (i < lines.length) {
             val line = lines(i)
-            if (line == "PW2") {
+            val lt = if (line == null) "" else line.trim
+            if (lt == "PW2") {
               if (in) {
                 // previous block without terminator: drop it
                 cur = new StringBuilder()
@@ -199,7 +200,7 @@ object PurpleSimViz {
               cur.append("PW2\n")
             } else if (in) {
               cur.append(line).append('\n')
-              if (line == "Z") {
+              if (lt == "Z") {
                 out += cur.toString()
                 cur = new StringBuilder()
                 in = false
@@ -1017,13 +1018,14 @@ object PurpleSimViz {
       var in = false
       while (i < lines.length) {
         val line = lines(i)
-        if (line == "PW2") {
+        val lt = if (line == null) "" else line.trim
+        if (lt == "PW2") {
           if (in) { cur = new StringBuilder() }
           in = true
           cur.append("PW2\n")
         } else if (in) {
           cur.append(line).append('\n')
-          if (line == "Z") { out += cur.toString(); cur = new StringBuilder(); in = false }
+          if (lt == "Z") { out += cur.toString(); cur = new StringBuilder(); in = false }
         }
         i += 1
       }
@@ -1039,7 +1041,8 @@ object PurpleSimViz {
       var i = 0
       while (i < lines.length) {
         val line = lines(i)
-        if (line == "PW2") {
+        val lt = if (line == null) "" else line.trim
+        if (lt == "PW2") {
           if (in) {
             // Unexpected new PW2 without Z; discard previous partial and start fresh
             cur.clear()
@@ -1048,7 +1051,7 @@ object PurpleSimViz {
           cur.append("PW2\n")
         } else if (in) {
           cur.append(line).append('\n')
-          if (line == "Z") {
+          if (lt == "Z") {
             out += cur.toString()
             cur.clear()
             in = false
@@ -1115,22 +1118,37 @@ object PurpleSimViz {
         // If we saw no PW2 blocks at all, try legacy JSON by reading the entire (likely small) file
         if (deque.isEmpty) {
           err(s"parseAllSims: no PW2 blocks found in streaming read (bytes=$totalRead); trying full read")
-          val txt = readAllText(file)
-          val head = if (txt.length > 32) txt.substring(0, 32).replace('\n', ' ') else txt
-          err("parseAllSims: full-read head='" + head + "'")
-          if (txt.startsWith("PW2")) {
-            val blocks = splitPW2Blocks(txt)
-            err("parseAllSims: PW2 full-read blocks=" + blocks.length)
-            val sims = blocks.flatMap { b => Try(parsePW2(b)).toOption }
-            val out = sims.sortBy(s => -s.startGameFrame)
-            err("parseAllSims: PW2 sims parsed=" + out.length)
-            out
-          } else {
-            err("parseAllSims: non-PW2; attempting legacy JSON parse")
-            val out = Vector(parseJsonSim(txt))
-            err("parseAllSims: legacy JSON yielded sims=" + out.length)
-            out
+          var txt = readAllText(file)
+          if (txt != null && txt.nonEmpty && txt.charAt(0) == '\uFEFF') {
+            // Strip UTF-8 BOM if present
+            txt = txt.substring(1)
           }
+          val head = if (txt.length > 64) txt.substring(0, 64).replace('\n', ' ') else txt
+          err("parseAllSims: full-read head='" + head + "'")
+          val parseFromText: Vector[SimPack] = {
+            if (txt.startsWith("PW2")) {
+              val blocks = splitPW2Blocks(txt)
+              err("parseAllSims: PW2 full-read blocks=" + blocks.length)
+              blocks.flatMap { b => Try(parsePW2(b)).toOption }.sortBy(s => -s.startGameFrame)
+            } else {
+              // Try regex-based extraction tolerant to extra whitespace lines and mixed endings
+              try {
+                val pattern = java.util.regex.Pattern.compile("(?ms)^\\s*PW2\\s*$.*?^\\s*Z\\s*$")
+                val m = pattern.matcher(txt)
+                val buf = new scala.collection.mutable.ArrayBuffer[String]()
+                while (m.find()) { buf += m.group() }
+                if (buf.nonEmpty) {
+                  err("parseAllSims: regex PW2 blocks found=" + buf.length)
+                  buf.flatMap(b => Try(parsePW2(b)).toOption).toVector.sortBy(s => -s.startGameFrame)
+                } else {
+                  err("parseAllSims: non-PW2; attempting legacy JSON parse")
+                  Vector(parseJsonSim(txt))
+                }
+              } catch { case _: Throwable => Vector(parseJsonSim(txt)) }
+            }
+          }
+          err("parseAllSims: fallback sims parsed=" + parseFromText.length)
+          parseFromText
         } else {
           // Parse the kept blocks to SimPacks and sort newest first
           err("parseAllSims: streaming PW2 blocks found=" + deque.size())

@@ -74,6 +74,7 @@ class TacticWorkerScout extends Tactic {
       .setCounter(CountUpTo(scoutCount))
       .setPreference(new PreferScout(basesToScout.map(_.townHallArea.center): _*))
       .acquire().toVector // The copy is important since the source is mutable
+
     if (scouts.isEmpty) return
 
     val enemyHasCombatUnits = With.units.enemy.exists(u => u.canAttack && ! IsWorker(u))

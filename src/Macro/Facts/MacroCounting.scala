@@ -111,6 +111,10 @@ trait MacroCounting {
     matchers.exists(With.units.existsEverOurs(_))
   }
 
+  def haveEverComplete(matchers: UnitFilter*): Boolean = {
+    matchers.exists(m => With.units.existsOurs(u => m(u) && u.complete))
+  }
+
   def framesUntilUnit(unitClass: UnitClass): Int = {
     With.projections.unit(unitClass)
   }

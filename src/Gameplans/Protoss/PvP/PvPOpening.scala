@@ -127,7 +127,7 @@ class PvPOpening extends GameplanImperative {
           PvP3Zealot.swapOut()
         }
       }
-      if ( ! haveComplete(Protoss.CyberneticsCore)) {
+      if ( ! haveEverComplete(Protoss.CyberneticsCore)) {
         sevenZealot = PvP5Zealot()
         sevenZealot &&= enemyStrategy(With.fingerprints.proxyGateway, With.fingerprints.twoGate, With.fingerprints.nexusFirst)
       }
@@ -138,7 +138,7 @@ class PvPOpening extends GameplanImperative {
         zBeforeCore ||= With.fingerprints.twoGate()
         zBeforeCore ||= gcgate
       }
-      if ( ! haveComplete(Protoss.CyberneticsCore)) {
+      if ( ! haveEverComplete(Protoss.CyberneticsCore)) {
         zAfterCore = true
         zAfterCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.coreBeforeZ)
         zAfterCore ||= enemyStrategy(With.fingerprints.mannerPylon, With.fingerprints.gasSteal, With.fingerprints.cannonRush)
@@ -200,7 +200,7 @@ class PvPOpening extends GameplanImperative {
     // Robo is a very middle-of-the-road build, and has a few pointed weaknesses.
     // It's good against opponents playing diverse strategies but unimpressive against one-dimensional opponents.
     if (PvPRobo()
-      && ! haveComplete(Protoss.CyberneticsCore)
+      && ! haveEverComplete(Protoss.CyberneticsCore)
       && ! have(Protoss.RoboticsFacility)
       && ! enemiesHave(Protoss.Forge, Protoss.CitadelOfAdun)) {
 
@@ -218,7 +218,7 @@ class PvPOpening extends GameplanImperative {
     }
     // If we catch them going Robo or Forge against our DT, abandon ship
     lazy val earlyForge = enemyStrategy(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
-    if (PvPDT() && ! haveComplete(Protoss.TemplarArchives) && (enemyRobo || earlyForge)) {
+    if (PvPDT() && ! haveEverComplete(Protoss.TemplarArchives) && (enemyRobo || earlyForge)) {
       PvPDT.swapOut()
       if (With.fingerprints.dtRush() && ! PvPIdeas.preferObserverForDetection && roll("CannonExpand", 0.75)) {
         cannonExpand = true
@@ -234,7 +234,7 @@ class PvPOpening extends GameplanImperative {
       }
     }
     // Consider swapping out of DT if we've been caught, or if we scout them going DT first
-    if (PvPDT() && scoutCleared && ! haveComplete(Protoss.Dragoon)) {
+    if (PvPDT() && scoutCleared && ! haveEverComplete(Protoss.Dragoon)) {
       val caught            = With.units.ours.filter(u => u.isAny(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && u.knownToOpponents && ! u.visibleToOpponents).toVector
       val archivesComplete  = caught.exists(c => Protoss.TemplarArchives(c) &&    c.complete)
       val archivesStarted   = caught.exists(c => Protoss.TemplarArchives(c) &&  ! c.complete)
@@ -335,7 +335,7 @@ class PvPOpening extends GameplanImperative {
     atEarlyTiming ||= PvP1012()         && unitsComplete(Protoss.Zealot)  >= 3
     atEarlyTiming ||= gcgate            && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
     atEarlyTiming ||=                      unitsComplete(Protoss.Dragoon) > 0 && With.fingerprints.proxyGateway()
-    atEarlyTiming ||= PvPDT()           && upgradeComplete(Protoss.DragoonRange, Seconds(30)()) && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
+    atEarlyTiming ||= PvPDT()           && upgradeStarted(Protoss.DragoonRange)   && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
     atMainTiming  ||= PvP3GateGoon()    && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
     atMainTiming  ||= PvP4GateGoon()    && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
     atMainTiming  ||= PvPRobo()         && upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
@@ -853,6 +853,9 @@ class PvPOpening extends GameplanImperative {
       pumpWorkers(oversaturate = true)
       trainGatewayUnits()
       get(2, Protoss.Gateway)
+      if (PvPIdeas.enemyDarkTemplarPossible) {
+        get(Protoss.Forge)
+      }
       expand()
 
     } else if (PvPCoreExpand()) {

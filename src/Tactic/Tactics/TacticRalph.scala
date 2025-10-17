@@ -21,15 +21,17 @@ class TacticRalph extends Tactic with MacroActions {
       lastDeath = With.frame
       lastRalph = None
     }
-    lastRalph = lastRalph.filter(_.client != this)
 
-    if (With.tactics.workerScout.units.nonEmpty)                                                                  return
-    if ( ! With.tactics.workerScout.scoutingAbandoned && With.frame < Minutes(4)())                               return
-    if (With.framesSince(lastDeath) < Seconds(10)())                                                              return
-    if (With.scouting.ourProximity < 0.5)                                                                         return
-    if (With.tactics.attackSquad.units.exists(_.proximity < 0.3))                                                 return
-    if (With.self.supplyUsed200 < 30)                                                                             return
-    if (With.tactics.attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy))  return
+    val workerScout = With.tactics.workerScout
+    val attackSquad = With.tactics.attackSquad
+
+    if (With.framesSince(lastDeath) < Seconds(10)())                                                return
+    if (With.scouting.ourProximity < 0.5)                                                           return
+    if (With.self.supplyUsed200 < 30)                                                               return
+    if (workerScout.units.nonEmpty)                                                                 return
+    if ( ! workerScout.scoutingAbandoned && With.frame < Minutes(4)())                              return
+    if (attackSquad.units.exists(_.proximity < 0.3))                                                return
+    if (attackSquad.units.nonEmpty && With.tactics.attackSquad.centroidKey.metro.exists(_.isEnemy)) return
 
     val ralphClass: UnitFilter =
       ?(haveComplete(Terran.Vulture),           Terran.Vulture,
@@ -41,8 +43,6 @@ class TacticRalph extends Tactic with MacroActions {
       ?(upgradeComplete(Protoss.ZealotSpeed),   Protoss.Zealot,
       ?(haveComplete(Protoss.Observer),         Protoss.Observer,
       IsWorker))))))))
-
-    if (ralphClass == IsWorker && With.units.countOurs(IsWorker) < 22) return
 
     vicinity = With.scouting.enemyThreatOrigin.walkableTile.center
     if (vicinity.metro.exists(_.isEnemy)) {
@@ -62,6 +62,12 @@ class TacticRalph extends Tactic with MacroActions {
       .setCounter(CountOne)
       .setMatcher(ralphClass)
       .setPreference(PreferClose(vicinity))
+
+    if (ralphClass == IsWorker
+      && With.units.countOurs(IsWorker) < 22
+      && lock.inquire().forall(_.forall(_.proximity > 0.5))) {
+      return
+    }
 
     lock.acquire()
     lastRalph = lock.units.headOption

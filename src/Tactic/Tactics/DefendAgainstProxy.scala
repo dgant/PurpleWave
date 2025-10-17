@@ -24,7 +24,11 @@ class DefendAgainstProxy extends Tactic {
 
     // Get sorted list of proxies
     val proxies = With.units.enemy
-      .filter(e => e.likelyStillThere && e.isAny(scaryTypes: _*) && e.proxied && (e.metro.exists(_.isOurs) || Protoss.PhotonCannon(e)))
+      .filter(e =>
+        e.likelyStillThere
+          && e.isAny(scaryTypes: _*)
+          && e.proxied
+          && (e.metro.exists(_.isOurs) || Protoss.PhotonCannon(e)))
       .toVector
       .sortBy(_.remainingCompletionFrames)
       .sortBy(_.totalHealth)

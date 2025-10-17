@@ -67,6 +67,13 @@ object PvPIdeas extends MacroActions {
   def preferObserverForDetection  : Boolean = detectWithObserverOrCannon(auditing = true)
   def requireTimelyDetection()    : Boolean = detectWithObserverOrCannon(auditing = false)
 
+  def enemyDarkTemplarPossible: Boolean = (
+    enemyDarkTemplarLikely
+    || enemyContained
+    || ! With.scouting.enemyMainFullyScouted
+    || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon())
+    || (With.frame > twoBaseDTFrame && safePushing))
+
   private def detectWithObserverOrCannon(auditing: Boolean): Boolean = {
     // Performance shortcut
     if (With.units.existsOurs(Protoss.Observer, Protoss.Observatory)) {
@@ -78,7 +85,7 @@ object PvPIdeas extends MacroActions {
       expectEarliestArrival ||= enemyRecentStrategy(With.fingerprints.dtRush)
       expectEarliestArrival ||= ! With.fingerprints.dragoonRange()
     }
-    lazy val dtArePossibility    = enemyDarkTemplarLikely || enemyContained || ! With.scouting.enemyMainFullyScouted || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon()) || (With.frame > twoBaseDTFrame && safePushing)
+    lazy val dtArePossibility    = enemyDarkTemplarPossible
     lazy val earliestArrival     = With.scouting.earliestArrival(Protoss.DarkTemplar)
     lazy val expectedArrival     = if (expectEarliestArrival) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame
@@ -146,9 +153,9 @@ object PvPIdeas extends MacroActions {
         get(Protoss.Forge)
         if ( ! With.strategy.isMoneyMap) {
           requestTower(Protoss.PhotonCannon, 1, With.geography.ourFoyer,  DefendEntrance, 0)
+          requestTower(Protoss.PhotonCannon, 1, With.geography.ourFoyer,  DefendHall,     0)
         }
         requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, 0)
-        requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendHall,     0)
 
       // Take reasonable precautions
       } else {
@@ -181,6 +188,7 @@ object PvPIdeas extends MacroActions {
     get(RequestUnit(unitClass, quantity, minStartFrameArg = startFrame,
       placementQueryArg = Some(new PlacementQuery(unitClass)
         .requireBase(base)
-        .preferLabelYes(Defensive, DefendGround, label))))
+        .requireLabelYes(Defensive)
+        .preferLabelYes(Wall, DefendGround, label))))
   }
 }

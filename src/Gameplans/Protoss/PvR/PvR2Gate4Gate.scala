@@ -25,6 +25,8 @@ class PvR2Gate4Gate extends GameplanImperative {
     once(15, Protoss.Probe)
     once(5, Protoss.Zealot)
     once(17, Protoss.Probe)
+
+    scoutOn(Protoss.Gateway, 2)
   }
 
   override def executeMain(): Unit = {
@@ -32,6 +34,11 @@ class PvR2Gate4Gate extends GameplanImperative {
     if (enemyDarkTemplarLikely) {
       shouldAttack = true
       PvPIdeas.requireTimelyDetection()
+    } else if (enemyLurkersLikely || enemyShownCloakedThreat) {
+      shouldAttack = true
+      buildCannonsAtOpenings(1)
+      get(Protoss.RoboticsFacility, Protoss.Observatory)
+      pump(Protoss.Observer, 2)
     }
     if (safePushing && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24)) {
       shouldAttack = true
@@ -41,17 +48,41 @@ class PvR2Gate4Gate extends GameplanImperative {
       attack()
     }
     if (enemyHasShown(Terran.Factory, Terran.Vulture)) {
-      once(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
+      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
       get(Protoss.DragoonRange)
     }
-    if (units(Protoss.Dragoon) >= 4) get(Protoss.DragoonRange)
-    scoutOn(Protoss.Gateway, 2)
+    if (units(Protoss.Dragoon) >= 2) {
+      get(Protoss.DragoonRange)
+    }
+    if (units(Protoss.Zealot) >= 12) {
+      get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.CitadelOfAdun)
+      get(Protoss.ZealotSpeed)
+    }
+
     maintainMiningBases(1)
+    requireMiningBases(unitsComplete(IsWarrior) / 24)
+
+    upgradeContinuously(Protoss.DragoonRange)
+    upgradeContinuously(Protoss.GroundDamage)
+    upgradeContinuously(Protoss.GroundArmor)
+    upgradeContinuously(Protoss.ZealotSpeed)
+
+    pump(Protoss.DarkTemplar, 1)
     pump(Protoss.Dragoon)
     pump(Protoss.Zealot)
+
     get(Protoss.Assimilator, Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
     get(4, Protoss.Gateway)
+    requireMiningBases(2)
+
+    get(2, Protoss.Forge)
+    get(Protoss.CitadelOfAdun)
+    get(Protoss.TemplarArchives)
+
+    get(4 * miningBases, Protoss.Gateway)
     pumpGasPumps()
+
+    requireMiningBases(3)
   }
 }

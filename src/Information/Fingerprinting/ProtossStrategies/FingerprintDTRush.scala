@@ -15,7 +15,10 @@ class FingerprintDTRush extends FingerprintOr(
   new FingerprintAnd(
     new FingerprintCompleteBy(Protoss.CitadelOfAdun, GameTime(6, 15)),
     new FingerprintNot(With.fingerprints.dragoonRange),
-    new FingerprintNot(With.fingerprints.fourGateGoon))) {
+    new FingerprintNot(With.fingerprints.fourGateGoon)),
+  new FingerprintAnd(
+    new FingerprintMissingDragoonRange,
+    new FingerprintNot(With.fingerprints.robo))) {
   
   override def sticky: Boolean = (
     With.frame >= FingerprintDTRushConstants.dtArrivalFrame()

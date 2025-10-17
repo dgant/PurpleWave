@@ -33,9 +33,9 @@ trait Expansions {
   }
 
   protected def updateExpansions(): Unit = {
-    _maxMiningBasesOurs = Math.max(_maxMiningBasesOurs, With.geography.ourMiningBases.size)
-    _maxMiningBasesEnemy = Math.max(_maxMiningBasesOurs, With.geography.enemyMiningBases.size)
-    _safeExpansionPaths = eligibleExpansions(With.self)
+    _maxMiningBasesOurs   = Math.max(_maxMiningBasesOurs, With.geography.ourMiningBases.size)
+    _maxMiningBasesEnemy  = Math.max(_maxMiningBasesOurs, With.geography.enemyMiningBases.size)
+    _safeExpansionPaths   = eligibleExpansions(With.self)
       .filter(_.isNeutral)
       .map(b => (b, Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).minBy(_.groundPixels(b.heart))))
       .map(bh => (bh._1, bh._2, {

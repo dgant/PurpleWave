@@ -10,7 +10,12 @@ import Utilities.UnitFilters.IsAny
 object TargetScoring {
 
   @inline private def pixelCost(attacker: CombatUnit, target: CombatUnit): Double = {
-    Math.max(0, attacker.pixelDistanceCenter(target) - attacker.pixelRangeAgainst(target) - attacker.unitClass.dimensionMin - target.unitClass.dimensionMin - 0.5 * attacker.cooldownLeft * attacker.topSpeed)
+    Math.max(0,
+          attacker.pixelDistanceCenter(target)
+      -   attacker.pixelRangeAgainst(target)
+      -   attacker.unitClass.dimensionMin
+      -   target.unitClass.dimensionMin
+      -   0.5 * attacker.cooldownLeft * attacker.topSpeed)
   }
 
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
@@ -79,7 +84,7 @@ object TargetScoring {
     */
   private lazy val baseValue = 1.0 / Protoss.Dragoon.subjectiveValueOverHealth
   private lazy val cloakyMatcher = IsAny(Zerg.Lurker, Protoss.Arbiter, Protoss.DarkTemplar)
-  private val combatBonus = 8.0
+  private val combatBonus = 12.0
   def apply(target: UnitInfo): Double = {
     var output = 4.0 * baseValue * target.unitClass.subjectiveValueOverHealth
 

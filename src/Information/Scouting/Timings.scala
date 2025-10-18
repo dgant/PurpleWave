@@ -7,9 +7,9 @@ import Performance.Cache
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{ForeignUnitInfo, UnitInfo}
-import Utilities.{?, CountMap}
 import Utilities.Time.{Forever, GameTime, Minutes}
 import Utilities.UnitFilters.IsLandedBuilding
+import Utilities.{?, CountMap}
 
 trait Timings {
   private val enemyCompletions  = new CountMap[UnitClass](Forever())
@@ -58,12 +58,15 @@ trait Timings {
 
   def earliestCompletion(unitClass: UnitClass): Int = {
     var earliestCompletionFrame = enemyCompletions(unitClass)
+    lazy val scoutingVision = With.units.ours.map(_.proximity).min
+    lazy val earliestCompletionFrameScouted = (With.frame - scoutingVision * rushFrames(unitClass)).toInt
     if (unitClass == Protoss.DarkTemplar) {
       // Super-fast DT finishes 4:40. BetaStar and Locutus demonstrate this on replay.
       // BananaBrain completes DT after proxy 99 at 6:50
       earliestCompletionFrame                                       =  GameTime(4, 40)()
       if (With.fingerprints.twoGate())      earliestCompletionFrame += GameTime(1, 10)()
       if (With.fingerprints.dragoonRange()) earliestCompletionFrame += GameTime(0, 30)()
+      earliestCompletionFrame = Math.max(earliestCompletionFrame, earliestCompletionFrameScouted)
       timestampedBuildings.filter(Protoss.CyberneticsCore).foreach(u => earliestCompletionFrame = u.completionFrame + Protoss.CitadelOfAdun.buildFramesFull + Protoss.TemplarArchives.buildFramesFull + Protoss.DarkTemplar.buildFrames)
       timestampedBuildings.filter(Protoss.CitadelOfAdun)  .foreach(u => earliestCompletionFrame = u.completionFrame                                         + Protoss.TemplarArchives.buildFramesFull + Protoss.DarkTemplar.buildFrames)
       timestampedBuildings.filter(Protoss.TemplarArchives).foreach(u => earliestCompletionFrame = u.completionFrame                                                                                   + Protoss.DarkTemplar.buildFrames)

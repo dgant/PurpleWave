@@ -111,7 +111,9 @@ class Recruiter {
   }
   
   private def unlock(unit: FriendlyUnitInfo): Unit = {
-    unlockedUnits.add(unit)
+    if (recruitable(unit)) {
+      unlockedUnits.add(unit)
+    }
     unitsByLock.find(_._2.contains(unit)).foreach(pair => unitsByLock(pair._1).remove(unit))
   }
 

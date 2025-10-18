@@ -17,7 +17,7 @@ class FingerprintDTRush extends FingerprintOr(
     new FingerprintNot(With.fingerprints.dragoonRange),
     new FingerprintNot(With.fingerprints.fourGateGoon)),
   new FingerprintAnd(
-    new FingerprintMissingDragoonRange,
+    With.fingerprints.dragoonRangeMissing,
     new FingerprintNot(With.fingerprints.robo))) {
   
   override def sticky: Boolean = (

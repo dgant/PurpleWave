@@ -90,8 +90,9 @@ object PvPIdeas extends MacroActions {
     lazy val expectedArrival     = if (expectEarliestArrival) earliestArrival else if (enemyContained || With.fingerprints.proxyGateway()) lateOneBaseDTFrame else twoBaseDTFrame
     lazy val framesUntilArrival  = expectedArrival - With.frame
     lazy val framesUntilObserver = framesUntilUnit(Protoss.Observer)
-    lazy val dtPrecedesCannon    = framesUntilArrival - cannonSafetyFrames  < framesUntilUnit(Protoss.PhotonCannon)
-    lazy val dtPrecedesObserver  = framesUntilArrival                       < framesUntilObserver
+    lazy val dtTimingConfirmed   = enemiesHave(Protoss.CitadelOfAdun, Protoss.TemplarArchives, Protoss.DarkTemplar)
+    lazy val dtPrecedesCannon    = framesUntilArrival - cannonSafetyFrames  < framesUntilUnit(Protoss.PhotonCannon) && dtTimingConfirmed
+    lazy val dtPrecedesObserver  = framesUntilArrival                       < framesUntilObserver                   && dtTimingConfirmed
     lazy val cannonsAreReady = (
       haveComplete(Protoss.PhotonCannon)
       && With.units.ours.filter(Protoss.PhotonCannon).forall(_.complete)

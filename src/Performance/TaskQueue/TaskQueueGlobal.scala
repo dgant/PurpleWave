@@ -39,6 +39,7 @@ class TaskQueueGlobal extends TaskQueueParallel(
       With.strategy.gameplan.update()
       With.macroSim.simulate()
       With.yolo.updateBlackboard() // YOLO trumps gameplan
+      With.blackboard.lastStatus = With.blackboard.status()
     }),
     With.tactics,
     With.gathering)

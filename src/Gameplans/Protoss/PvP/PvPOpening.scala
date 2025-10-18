@@ -7,6 +7,7 @@ import Macro.Actions.{Enemy, Flat}
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import ProxyBwapi.Races.Protoss
+import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._
 import Strategery._
 import Utilities.?
@@ -56,6 +57,7 @@ class PvPOpening extends GameplanImperative {
   // DT
   var greedyDT            : Boolean = false
   var cannonExpand        : Boolean = false
+  var speedlotAllIn       : Boolean = false
 
   trait CoreSequence  extends SimpleString
   object GCRange      extends CoreSequence
@@ -324,6 +326,10 @@ class PvPOpening extends GameplanImperative {
       greedyDT    = have(Protoss.TemplarArchives)
       greedyDT  &&= ! enemyStrategy(With.fingerprints.twoGate, With.fingerprints.dtRush)
       greedyDT  &&= roll("DTGreedyExpand", ?(enemyRecentStrategy(With.fingerprints.dtRush), 0.0, 0.5))
+
+      if (have(Protoss.CitadelOfAdun) && have(Protoss.RoboticsFacility) && bases < 2) {
+        speedlotAllIn = true
+      }
     }
 
     had2GateBeforeCore  ||= units(Protoss.Gateway) >= 2 && ! have(Protoss.CyberneticsCore)
@@ -331,28 +337,35 @@ class PvPOpening extends GameplanImperative {
     rangeDelayed        =   ! Protoss.DragoonRange() && (Maff.fromBoolean(With.fingerprints.twoGate() || With.fingerprints.nexusFirst()) - Maff.fromBoolean(had2GateBeforeCore) - Maff.fromBoolean(hadTechBeforeRange) > 0) // TODO: Count enemy tech before range
     timingVs2Gate       ||= With.fingerprints.twoGate() && ! enemyHasShown(Protoss.Dragoon) && ! had2GateBeforeCore && haveComplete(Protoss.Dragoon)
     timingVsProxy       ||= With.fingerprints.proxyGateway() && unitsComplete(IsWarrior) > 5
+
     // Identify when we reach an attack timing
-    atEarlyTiming ||= PvP1012()         && unitsComplete(Protoss.Zealot)  >= 3
-    atEarlyTiming ||= gcgate            && unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
-    atEarlyTiming ||=                      unitsComplete(Protoss.Dragoon) > 0 && With.fingerprints.proxyGateway()
-    atEarlyTiming ||= PvPDT()           && upgradeStarted(Protoss.DragoonRange)   && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
-    atMainTiming  ||= PvP3GateGoon()    && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
-    atMainTiming  ||= PvP4GateGoon()    && upgradeComplete(Protoss.DragoonRange)  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
-    atMainTiming  ||= PvPRobo()         && upgradeComplete(Protoss.DragoonRange)  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
-    atMainTiming  ||= PvPDT()                                                     && haveComplete(Protoss.DarkTemplar)
-    atMainTiming  ||= haveComplete(Protoss.Observer)  && With.fingerprints.dtRush()
-    atMainTiming  ||= haveComplete(Protoss.Reaver)    && With.fingerprints.cannonRush()
+    atEarlyTiming ||= PvP1012()                             &&  unitsComplete(Protoss.Zealot)  >= 3
+    atEarlyTiming ||= gcgate                                &&  unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
+    atEarlyTiming ||= With.fingerprints.proxyGateway()      &&  unitsComplete(Protoss.Dragoon) > 0
+    atEarlyTiming ||= PvPDT()                               &&  upgradeStarted(Protoss.DragoonRange)   && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
+    atEarlyTiming ||= Protoss.DragoonRange()                &&  enemyDarkTemplarLikely
+    atMainTiming  ||= PvP3GateGoon()                        &&  Protoss.DragoonRange()  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
+    atMainTiming  ||= PvP4GateGoon()                        &&  Protoss.DragoonRange()  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
+    atMainTiming  ||= PvPRobo()                             &&  Protoss.DragoonRange()  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
+    atMainTiming  ||= PvPDT()                               &&  haveComplete(Protoss.DarkTemplar)
+    atMainTiming  ||= speedlotAllIn                         &&  upgradeComplete(Protoss.ZealotSpeed) && haveComplete(Protoss.Observer) || ! enemiesHave(Protoss.DarkTemplar)
+    atMainTiming  ||= With.fingerprints.dtRush()            &&  haveComplete(Protoss.Observer)
+    atMainTiming  ||= With.fingerprints.cannonRush()        &&  haveComplete(Protoss.Reaver)
     atMainTiming  ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst, With.fingerprints.rampBlock)
     atMainTiming  ||= enemyBases > 1
     atMainTiming  ||= With.fingerprints.cannonRush.recently && ! With.fingerprints.gatewayFirst()
+
+
     // There may not be a timing depending on what our opponent does,
     // or the timing window might close permanently.
     earlyTimingClosed   ||= PvP1012()         && With.fingerprints.twoGate()
-    earlyTimingClosed   ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! upgradeComplete(Protoss.DragoonRange)
+    earlyTimingClosed   ||= PvP1012()         && (enemyHasUpgrade(Protoss.DragoonRange) || With.fingerprints.oneGateCore()) && With.frame > GameTime(5, 10)() && ! Protoss.DragoonRange()
     earlyTimingClosed   ||= gcgate            && enemyHasUpgrade(Protoss.DragoonRange) && ! safePushing && enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     mainTimingClosed    ||= PvP3GateGoon()    && enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon)
     mainTimingClosed    ||= PvP4GateGoon()    && With.fingerprints.fourGateGoon()
-    mainTimingClosed    ||= PvPDT()           && enemiesHaveComplete(Protoss.Observer, Protoss.PhotonCannon) && unitsComplete(Protoss.Gateway)< 3
+    mainTimingClosed    ||= PvPDT()           && enemiesHaveComplete(Protoss.Observer, Protoss.PhotonCannon) && unitsComplete(Protoss.Gateway) < 3
+    mainTimingClosed    &&= ! reaverAllIn
+    mainTimingClosed    &&= ! speedlotAllIn
     shouldAttack          = atEarlyTiming  && ! earlyTimingClosed
     shouldAttack        ||= atMainTiming   && ! mainTimingClosed
     shouldAttack        ||= timingVsProxy
@@ -424,6 +437,7 @@ class PvPOpening extends GameplanImperative {
     status(getReavers,        "Reaver")
     status(reaverAllIn,       "ReaverAllIn")
     status(greedyDT,          "GreedyDT")
+    status(speedlotAllIn,     "SpeedlotAllIn")
     status(atEarlyTiming,     "Timing1")
     status(earlyTimingClosed, "Timing1Done")
     status(atMainTiming,      "Timing2")
@@ -772,47 +786,69 @@ class PvPOpening extends GameplanImperative {
     if ( ! gctech) { get(Protoss.DragoonRange) }
 
     //////////
-    // Tech //
+    // Tech /////////////////////////////////////////////////////////////////////
+    //////////
+
+    //////////
+    // Robo //
     //////////
 
     if (PvPRobo()) {
+      def minFramesUntil(unitClass: UnitClass): Int = ?(haveEverComplete(unitClass), 0, Maff.min(With.units.ours.filter(unitClass).map(_.remainingCompletionFrames)).getOrElse(unitClass.buildFrames))
       get(Protoss.RoboticsFacility)
+
       if (shuttleFirst) {
         once(Protoss.Shuttle)
       }
+
+      ///////////////
+      // Observers //
+      ///////////////
+
       if (getObservers || getObservatory) {
         if (enemyDarkTemplarLikely && ! have(Protoss.Observer)) {
           if ( ! have(Protoss.Observatory)) {
             if (gas < 100) {
               cancel(Protoss.RoboticsSupportBay, Protoss.ShuttleSpeed)
             }
-          } else if (haveComplete(Protoss.Observatory) && ! have(Protoss.Observer)) {
-            // TODO: Could cancel a little sooner if Observatory is in progress
+          } else if (have(Protoss.Observatory) && ! have(Protoss.Observer)) {
             cancel(Protoss.Shuttle, Protoss.Reaver)
           }
         }
-        get(RequestUnit(Protoss.Observatory, minStartFrameArg =
-          With.units.ours
-            .find(Protoss.Shuttle)
-            .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
-            .getOrElse(?(shuttleFirst, Forever(), 0))))
+
+        get(RequestUnit(Protoss.Observatory,
+          minStartFrameArg =
+            With.units.ours
+              .find(Protoss.Shuttle)
+              .map(With.frame + _.remainingCompletionFrames - Protoss.Observatory.buildFrames)
+              .getOrElse(?(shuttleFirst, Forever(), 0))))
+
         if (getObservers) {
-          once(Protoss.Observer)
+          if (enemyDarkTemplarLikely) {
+            get(2, Protoss.Observer)
+          } else {
+            once(Protoss.Observer)
+          }
         }
       } else {
         cancel(Protoss.Observer)
         cancel(Protoss.Observatory)
       }
+
+      /////////////////////
+      // Shuttle/Reavers //
+      /////////////////////
+
       if (getReavers) {
         var bayStartFrame = With.frame - Protoss.RoboticsSupportBay.buildFrames
-        if (shuttleFirst && ! With.units.everOurs.exists(u => u.complete && Protoss.Shuttle(u))) {
-          bayStartFrame += With.units.ours.find(Protoss.Shuttle).map(_.remainingCompletionFrames).getOrElse(Protoss.Shuttle.buildFrames)
+        if (shuttleFirst) {
+          bayStartFrame += minFramesUntil(Protoss.Shuttle)
         }
-        if (getObservatory && getObservers) {
-          bayStartFrame += With.units.ours.find(Protoss.Observatory).map(_.remainingCompletionFrames).getOrElse(Protoss.Observatory.buildFrames)
-          if (! With.units.everOurs.exists(u => u.complete && Protoss.Observer(u))) {
-            bayStartFrame += With.units.ours.find(Protoss.Observer).map(_.remainingCompletionFrames).getOrElse(Protoss.Observer.buildFrames)
-          }
+        if (getObservatory) {
+          bayStartFrame += minFramesUntil(Protoss.Observatory)
+        }
+        if (getObservers) {
+          bayStartFrame += minFramesUntil(Protoss.Observer)
         }
         get(RequestUnit(Protoss.RoboticsSupportBay, minStartFrameArg = bayStartFrame))
       }
@@ -823,12 +859,17 @@ class PvPOpening extends GameplanImperative {
         once(Protoss.ShuttleSpeed)
         once(Protoss.Shuttle)
       }
+
+      ////////////
+      // Basics //
+      ////////////
+
       get(Protoss.DragoonRange)
       if (shouldExpand && (With.scouting.weControlOurFoyer || units(Protoss.Reaver) > 1)) {
         expand()
       }
       trainRoboUnits()
-      if (enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
+      if (reaverAllIn || enemyStrategy(With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)) {
         get(3, Protoss.Gateway)
       } else {
         pumpWorkers(oversaturate = true) // Need to keep worker production up in case they just expand
@@ -836,6 +877,11 @@ class PvPOpening extends GameplanImperative {
       trainGatewayUnits()
       pumpWorkers(oversaturate = true)
       get(3, Protoss.Gateway)
+
+    ////////
+    // DT //
+    ////////
+
     } else if (PvPDT()) {
       if (cannonExpand) {
         expand()
@@ -844,6 +890,14 @@ class PvPOpening extends GameplanImperative {
         get(Protoss.TemplarArchives)
         once(Math.min(2, unitsComplete(Protoss.Gateway)), Protoss.DarkTemplar)
       }
+
+      if (speedlotAllIn) {
+        get(Protoss.ZealotSpeed)
+        pump(Protoss.Zealot)
+        get(5, Protoss.Gateway)
+        cancel(Protoss.DragoonRange)
+      }
+
       if (unitsComplete(Protoss.Gateway) < 2) {
         trainGatewayUnits()
       }
@@ -868,7 +922,10 @@ class PvPOpening extends GameplanImperative {
       expand()
       get(3, Protoss.Gateway)
 
-    // 3/4-Gate Goon
+    ///////////////////
+    // 3/4-Gate Goon //
+    ///////////////////
+
     } else {
       get(Protoss.DragoonRange)
       if (With.scouting.ourProximity < 0.5 && safePushing && ! With.fingerprints.robo() && With.sense.netDamage > 400) {

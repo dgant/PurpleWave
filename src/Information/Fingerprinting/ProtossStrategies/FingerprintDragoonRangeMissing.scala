@@ -6,7 +6,7 @@ import Mathematics.Maff
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.{GameTime, Minutes, Seconds}
 
-class FingerprintMissingDragoonRange extends Fingerprint {
+class FingerprintDragoonRangeMissing extends Fingerprint {
 
   override protected def investigate: Boolean = {
     if ( ! With.enemies.exists(_.isProtoss))          return false

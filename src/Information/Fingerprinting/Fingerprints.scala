@@ -139,6 +139,7 @@ class Fingerprints {
   lazy val gatewayFe            = addFingerprint(new FingerprintGatewayFE)
   lazy val dtRush               = addFingerprint(new FingerprintDTRush)
   lazy val dragoonRange         = addFingerprint(new FingerprintDragoonRange)
+  lazy val dragoonRangeMissing  = addFingerprint(new FingerprintDragoonRangeMissing)
   lazy val coreBeforeZ          = addFingerprint(new FingerprintCoreBeforeZealot)
   lazy val mannerPylon          = addFingerprint(new FingerprintMannerPylon)
   // Zerg

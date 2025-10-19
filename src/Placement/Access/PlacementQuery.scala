@@ -67,12 +67,16 @@ class PlacementQuery {
     }
     if (building.isGas) {
       foundationSource = FoundationSources.Gas
-      lazy val basesOpening   = preferences.base.filter(_.townHall.exists(th => th.openForBusiness || th.remainingCompletionFrames < building.buildFrames))
-      lazy val basesPopulated = basesOpening.filter(_.workerCount >= 4)
+      lazy val basesOpening       = preferences.base.filter(_.townHall.exists(th => th.openForBusiness || th.remainingCompletionFrames < building.buildFrames))
+      lazy val basesPopulated     = basesOpening.filter(_.workerCount >= 4)
+      lazy val basesHalfSaturated = basesOpening.filter(_.workerCount >= 11)
+      lazy val basesFullSaturated = basesOpening.filter(_.workerCount >= 19)
       preferBase(
         Maff.orElse(
-          basesOpening,
+          basesFullSaturated,
+          basesHalfSaturated,
           basesPopulated,
+          basesOpening,
           preferences.base).toSeq: _*)
     }
     if (building.isTownHall) {

@@ -16,10 +16,10 @@ class TacticMonitor extends Tactic {
 
   override def launch(): Unit = {
     var bases = With.geography.enemyBases
-    if (bases.isEmpty) return
-    if ( ! With.blackboard.monitorBases()) return
-    if (With.units.existsEnemy(IsMobileDetector)) return
-    if (With.units.countEnemy(Terran.Factory) > 7) return
+    if (bases.isEmpty)                                      return
+    if ( ! With.blackboard.monitorBases())                  return
+    if (With.units.existsEnemy(IsMobileDetector))           return
+    if (With.units.countEnemy(Terran.Factory) > 7)          return
     if (With.enemies.exists(_.hasTech(Terran.WraithCloak))) return
     if (With.units.countOurs(Protoss.Observer) < 3 && MacroFacts.enemyHasShown(Terran.SpiderMine)) return
     scouts

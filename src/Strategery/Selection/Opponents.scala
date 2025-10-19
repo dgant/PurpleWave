@@ -36,8 +36,9 @@ object Opponents {
   add("Stardust",        .6,  new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
 
   // Z
-  add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
-  add("Microwave",       .8,   aggroPvZ)
+  //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
+  add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
+  add("Microwave",       .8,   StrategySelectionGreedy())
   add("InfestedArtosis", .9,   aggroPvZ)
 
   // R

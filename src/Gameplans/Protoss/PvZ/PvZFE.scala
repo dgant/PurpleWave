@@ -5,7 +5,7 @@ import Lifecycle.With
 import Macro.Actions.{Enemy, Friendly}
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.DefendAir
+import Placement.Access.PlaceLabels.{DefendAir, DefendHall}
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
 import ProxyBwapi.Races.{Protoss, Zerg}
@@ -96,16 +96,13 @@ class PvZFE extends GameplanImperative {
         once(Protoss.Zealot)
         once(16, Protoss.Probe)
       }
-    } else if (With.fingerprints.twelvePool() || With.fingerprints.overpool()) {
+    } else if (With.fingerprints.twelvePool()) { // Overpool can do this too IF we probe block the gap. Probably not worth attempting
       once(13, Protoss.Probe)
       naturalNexus()
       buildInWall(1, Protoss.Forge)
     } else {
-      val no4PoolDelay = ?(With.fingerprints.fourPool.recently, 0, 2)
-      //get(10 + no4PoolDelay, Protoss.Probe)
       once(12, Protoss.Probe)
       buildInWall(1, Protoss.Forge)
-      //once(12 + no4PoolDelay, Protoss.Probe)
       once(14, Protoss.Probe)
       buildInWall(2, Protoss.PhotonCannon)
     }
@@ -128,6 +125,8 @@ class PvZFE extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
+    With.blackboard.acePilots.set(true)
+
     if (wallOption.isEmpty) return
 
     // Cannons vs. ling/hydra bust
@@ -162,12 +161,13 @@ class PvZFE extends GameplanImperative {
       With.geography.ourBases.foreach(base => {
         tryBuildInWall(1, Protoss.Forge)
         get(RequestUnit(Protoss.Pylon,        1,                pylonTime,  Some(new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))))
-        get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.Pylon)       .requireBase(base).requireLabelYes(DefendAir))))
+        get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.PhotonCannon).requireBase(base).requireLabelYes(DefendAir))))
       })
+      get(Maff.clamp(enemies(Zerg.Mutalisk) / 6, 1, 2), Protoss.Stargate)
       pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
       once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
-      get(Maff.clamp(enemies(Zerg.Mutalisk) / 8, 1, 2), Protoss.Stargate)
       get(Protoss.DragoonRange)
+      get(Protoss.AirArmor)
       get(Protoss.AirDamage)
       pumpGasPumps()
     }
@@ -216,7 +216,18 @@ class PvZFE extends GameplanImperative {
     }
     pump(Protoss.Zealot)
 
+    ////////////
+    // Basics //
+    ////////////
+
     once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
+    get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain).requireLabelYes(DefendHall, DefendAir)) // We need this Pylon to properly place StarGate
+    get(Protoss.Stargate, Protoss.CitadelOfAdun)
+    pumpGasPumps()
+    once(Protoss.Corsair)
+    get(Protoss.ZealotSpeed)
+    get(Protoss.GroundDamage)
+    get(Protoss.TemplarArchives)
     get(5, Protoss.Gateway)
     doTech()
     get(15, Protoss.Gateway)

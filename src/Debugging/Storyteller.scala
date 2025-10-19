@@ -96,7 +96,7 @@ class Storyteller extends MacroCounting {
     new Story                           ("Want to harass",      () => With.blackboard.wantToHarass.get),
     new Story                           ("Monitor bases",       () => With.blackboard.monitorBases.get),
     new Story[Iterable[String]]         ("Fingerprints",        () => With.fingerprints.status,                                                                                    _.mkString(" "), expand = true),
-    new Story[Iterable[String]]         ("Status",              () => With.blackboard.status.get,                                                                                  _.mkString(", "), expand = true),
+    new Story[Iterable[String]]         ("Status",              () => With.blackboard.lastStatus,                                                                                  _.mkString(", "), expand = true),
     new Story                           ("Performance danger",  () => With.performance.disqualificationDanger),
     new Story                           ("Sluggishness",        () => With.reaction.sluggishness),
     new Story                           ("Gas worker floor",    () => With.blackboard.gasWorkerFloor()),

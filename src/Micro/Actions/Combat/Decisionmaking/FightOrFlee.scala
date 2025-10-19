@@ -7,7 +7,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.{IsBurrowedLurker, IsSlowling, IsTank, IsWarrior, IsWorker}
+import Utilities.UnitFilters.{IsSlowling, IsTank, IsWarrior, IsWorker}
 
 object FightOrFlee extends Action {
 
@@ -37,7 +37,7 @@ object FightOrFlee extends Action {
     decide(false, "CantFight",  () => ! u.intent.canFight)
     decide(true,  "HugTank",    () => ! u.flying && u.agent.ride.isEmpty && With.enemies.exists(_.isTerran) && u.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(u)))
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
-    decide(true,  "CoverFire",  () => u.matchups.targetNearest.exists(_.matchups.threatDeepestInRange.exists(_.isAny(IsTank, Terran.Bunker, Terran.MissileTurret, Protoss.Reaver, Protoss.PhotonCannon, Zerg.Guardian, IsBurrowedLurker, Zerg.SunkenColony, Zerg.SporeColony))))
+    decide(true,  "CoverFire",  () => u.unitClass.supportsAnchor && u.matchups.allies.exists(ally => ally.unitClass.isAnchor && u.matchups.threatDeepest.exists(enemy => u.canAttack(enemy) && ally.canAttack(enemy) && enemy.pixelsToGetInRange(ally) <= Math.min(32 * 8, 16 + u.pixelsToGetInRange(enemy)))))
     decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.team.exists(_.catchesGround) && u.matchups.threatDeepest.exists(td => Terran.Vulture(td) && td.matchups.targetNearest.exists(tn => td.pixelsToGetInRange(tn) < 32 && tn.unitClass == u.unitClass)))
     decide(true,  "Cloaked",    () => u.effectivelyCloaked && ( ! Terran.Wraith(u) || u.energy > 10))
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)

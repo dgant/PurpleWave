@@ -22,6 +22,6 @@ object ShowHeader extends DebugView {
     DrawScreen.text(365, 1 * h, f"A:${With.reaction.agencyAverage} C:${With.reaction.clusteringAverage} P:${With.reaction.planningAverage}")
     DrawScreen.text(5,   2 * h, MapIdentifier(With.game.mapFileName))
     DrawScreen.text(125, 2 * h, f"${With.strategy.strategiesSelected.map(_.toString).mkString(" ")} ${if (With.fingerprints.status.nonEmpty) " | " else ""} ${With.fingerprints.status.map(Tags.cleanFingerprintTag).mkString(" ")}")
-    DrawScreen.text(5,   3 * h, With.blackboard.status.get.mkString(", "))
+    DrawScreen.text(5,   3 * h, With.blackboard.lastStatus.mkString(", "))
   }
 }

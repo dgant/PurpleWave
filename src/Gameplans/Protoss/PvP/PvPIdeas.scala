@@ -28,8 +28,8 @@ object PvPIdeas extends MacroActions {
   def monitorSafely(): Unit = {
     With.blackboard.monitorBases.set(
       ! enemyRobo
-      && ! enemiesHave(Protoss.Observer, Protoss.DarkTemplar)
-      && ( ! enemyRecentStrategy(With.fingerprints.dtRush) || With.fingerprints.fourGateGoon() || With.fingerprints.threeGateGoon()))
+      && ! enemyDarkTemplarLikely
+      && (enemyStrategy(With.fingerprints.fourGateGoon, With.fingerprints.threeGateGoon) || ! enemyRecentStrategy(With.fingerprints.dtRush)))
   }
 
   def dtBraveryAbroad : Boolean = unitsComplete(Protoss.DarkTemplar) > 0 && With.frame < With.scouting.earliestCompletion(Protoss.Observer)
@@ -41,9 +41,9 @@ object PvPIdeas extends MacroActions {
     output
   }
   def pvpSafeAtHome: Boolean = {
-    var output = safeDefending
-    output ||= dtBraveryHome
-    output &&= ! enemiesHave(Protoss.DarkTemplar) || haveComplete(Protoss.Observer, Protoss.PhotonCannon)
+    var output    = safeDefending
+    output      ||= dtBraveryHome
+    output      &&= ! enemiesHave(Protoss.DarkTemplar) || haveComplete(Protoss.Observer, Protoss.PhotonCannon)
     output
   }
 

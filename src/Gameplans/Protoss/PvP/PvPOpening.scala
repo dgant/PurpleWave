@@ -348,7 +348,7 @@ class PvPOpening extends GameplanImperative {
     atMainTiming  ||= PvP4GateGoon()                        &&  Protoss.DragoonRange()  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
     atMainTiming  ||= PvPRobo()                             &&  Protoss.DragoonRange()  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8
     atMainTiming  ||= PvPDT()                               &&  haveComplete(Protoss.DarkTemplar)
-    atMainTiming  ||= speedlotAllIn                         &&  upgradeComplete(Protoss.ZealotSpeed) && haveComplete(Protoss.Observer) || ! enemiesHave(Protoss.DarkTemplar)
+    atMainTiming  ||= speedlotAllIn                         &&  Protoss.ZealotSpeed()   && (haveComplete(Protoss.Observer) || ! enemiesHave(Protoss.DarkTemplar))
     atMainTiming  ||= With.fingerprints.dtRush()            &&  haveComplete(Protoss.Observer)
     atMainTiming  ||= With.fingerprints.cannonRush()        &&  haveComplete(Protoss.Reaver)
     atMainTiming  ||= enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.cannonRush, With.fingerprints.nexusFirst, With.fingerprints.rampBlock)
@@ -381,7 +381,11 @@ class PvPOpening extends GameplanImperative {
       shouldExpand    = haveComplete(Protoss.Reaver)
       shouldExpand  ||= ! getReavers && unitsComplete(IsWarrior) >= ?(enemyBases > 1, 6, 12)
       shouldExpand  ||= enemyRobo
-      shouldExpand  &&= PvPIdeas.pvpSafeToMoveOut
+      if ( ! PvPReaver()) {
+        shouldExpand ||= enemyBases > 1
+        shouldExpand ||= units(Protoss.Observer) >= 2 && unitsComplete(IsWarrior) >= 9
+      }
+      shouldExpand  &&= PvPIdeas.pvpSafeAtHome
       shouldExpand  &&= ! shuttleSpeed
       shouldExpand  &&= Protoss.DragoonRange()
       shouldExpand  ||= unitsComplete(Protoss.Reaver) > 1

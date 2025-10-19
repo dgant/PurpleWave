@@ -687,6 +687,31 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     Protoss.Dragoon,
     Zerg.Hydralisk).contains(this)
 
+  lazy val isAnchor: Boolean = Vector(
+    Terran.Battlecruiser,
+    Terran.SiegeTankSieged,
+    Terran.Bunker,
+    Terran.MissileTurret,
+    Protoss.Reaver,
+    Protoss.HighTemplar,
+    Protoss.PhotonCannon,
+    Zerg.Lurker,
+    Zerg.Guardian,
+    Zerg.SunkenColony,
+    Zerg.SporeColony).contains(this)
+
+  lazy val supportsAnchor: Boolean = Vector(
+    Terran.Marine,
+    Terran.Firebat,
+    Terran.Medic,
+    Terran.Vulture,
+    Terran.Goliath,
+    Protoss.Zealot,
+    Protoss.Dragoon,
+    Protoss.Archon,
+    Zerg.Zergling,
+    Zerg.Hydralisk).contains(this)
+
   lazy val agencySortOrder: Double = 1e6 * (
           if (this == Protoss.Reaver)       0
     else  if (this.isTank)                  2

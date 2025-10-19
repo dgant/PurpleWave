@@ -136,6 +136,7 @@ class PvZ1BaseReactive extends PvZ1BaseReactiveUtilities {
   }
 
   override def executeBuild(): Unit = {
+    With.blackboard.acePilots.set(true)
     makeArchons()
     chooseOpening()
     chooseComposition()

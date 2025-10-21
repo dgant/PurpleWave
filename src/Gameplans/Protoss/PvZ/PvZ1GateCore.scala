@@ -59,7 +59,7 @@ class PvZ1GateCore extends GameplanImperative {
     shouldAttack ||= safePushing && confidenceAttacking01 > 0.6
     shouldAttack ||= miningBases < 1
     attack(shouldAttack)
-    With.blackboard.acePilots.set(true)
+    //With.blackboard.acePilots.set(true)
 
     /////////////
     // Economy //
@@ -85,10 +85,10 @@ class PvZ1GateCore extends GameplanImperative {
         get(Protoss.ObserverVisionRange)
       }
     }
-    if (enemyMutalisksLikely) {
-      get(Protoss.Stargate)
-    }
     pump(Protoss.Corsair, enemies(Zerg.Mutalisk))
+    if (enemyMutalisksLikely) {
+      get(Maff.clamp(1 + enemies(Zerg.Mutalisk) / 6, 1, miningBases), Protoss.Stargate)
+    }
     if (have(Protoss.Dragoon)) {
       get(Protoss.DragoonRange)
     }
@@ -127,11 +127,9 @@ class PvZ1GateCore extends GameplanImperative {
     get(Protoss.GroundDamage)
     get(Protoss.ZealotSpeed)
     get(Protoss.TemplarArchives)
-    requireMiningBases(2)
     get(5, Protoss.Gateway)
-    if (enemyMutalisksLikely) {
-      get(Maff.clamp(1 + enemies(Zerg.Mutalisk) / 6, 1, 3), Protoss.Stargate)
-    }
+
+    requireMiningBases(2)
     get(2, Protoss.Forge)
     get(7, Protoss.Gateway)
     requireMiningBases(3)

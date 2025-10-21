@@ -139,7 +139,8 @@ final class Simulation {
       } catch { case _: Throwable => }
       // Write simulation frames for visualizer (async to avoid blocking main thread)
       try { CombatVisIO.writeSimulationLogAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
-      try { CombatVisIO.writeCompressedSimDumpIfNeededAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
+      // Disabled because we don't want -- and never wanted -- separate files for each simulation.
+      //try { CombatVisIO.writeCompressedSimDumpIfNeededAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
     }
     checkpoint()
   }

@@ -32,13 +32,14 @@ object Opponents {
   add("Void",            .95,  defaultPvT)
 
   // P
-  add("BananaBrain",     .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), PvP1012, PvP5Zealot, PvPDT) { duration = 3 })
-  add("Stardust",        .6,  new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
+  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvP1012, PvP5Zealot, PvPDT) { duration = 3 })
+  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
 
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
-  add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("Microwave",       .8,   StrategySelectionGreedy())
+  //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
+  add("McRave",          .7,   StrategySelectionFixed(PvZ1GateCore), "McRaveZ")
+  add("Microwave",       .7,   StrategySelectionGreedy())
   add("InfestedArtosis", .9,   aggroPvZ)
 
   // R

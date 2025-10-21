@@ -2,17 +2,24 @@ package Gameplans.Protoss.PvZ
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
+import Mathematics.Maff
+import Placement.Access.PlaceLabels.DefendAir
+import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import Utilities.SwapIf
-import Utilities.UnitFilters.IsWarrior
+import ProxyBwapi.UnitClasses.UnitClass
+import Utilities.?
 
 class PvZ1GateCore extends GameplanImperative {
 
+  private def wallPlacement (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
+  private def requireWall   (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }
+  private def preferWall    (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .preferLabelYes(PlaceLabels.Wall))  }
+
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
-    once(Protoss.Pylon)
+    preferWall(1, Protoss.Pylon)
     once(9, Protoss.Probe)
-    once(Protoss.Gateway)
+    preferWall(1, Protoss.Gateway)
     once(11, Protoss.Probe)
     once(2, Protoss.Pylon)
     once(12, Protoss.Probe)
@@ -22,91 +29,85 @@ class PvZ1GateCore extends GameplanImperative {
     once(14, Protoss.Probe)
     once(2, Protoss.Zealot)
     once(15, Protoss.Probe)
-    once(Protoss.CyberneticsCore)
+    preferWall(1, Protoss.CyberneticsCore)
     once(16, Protoss.Probe)
     once(3, Protoss.Zealot)
     once(17, Protoss.Probe)
     once(3, Protoss.Pylon)
 
-    scoutOn(Protoss.Gateway)
+    scoutOn(Protoss.Pylon)
   }
 
   override def executeMain(): Unit = {
 
     var shouldAttack: Boolean = false
-
     if (enemyLurkersLikely) {
       shouldAttack = true
       buildCannonsAtOpenings(1)
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       pump(Protoss.Observer, 2)
     }
-
-    if (enemyMutalisksLikely) {
-      if ( ! enemiesHave(Zerg.Mutalisk)) {
-        shouldAttack = true
-      }
-    } else {
-      With.blackboard.acePilots.set(true)
-    }
-
-    if (safePushing && confidenceAttacking01 > 0.6 && upgradeComplete(Protoss.DragoonRange)) {
-      shouldAttack = true
-    }
-
+    shouldAttack ||= enemyMutalisksLikely &&  ! enemiesHave(Zerg.Mutalisk)
+    shouldAttack ||= safePushing && confidenceAttacking01 > 0.6
+    shouldAttack ||= miningBases < 1
     attack(shouldAttack)
+    With.blackboard.acePilots.set(true)
+
     maintainMiningBases(1)
+
     if ( ! haveEver(Protoss.CyberneticsCore)) {
       gasWorkerCeiling(1)
     }
-    gasLimitCeiling(400)
 
-    if (enemyMutalisksLikely) {
-      get(Protoss.Stargate)
-      pump(Protoss.Corsair, 3 + 2 * enemies(Zerg.Mutalisk))
-      get(Protoss.DragoonRange)
-      if (enemyHasShown(Zerg.Spire, Zerg.Mutalisk, Zerg.Scourge)) {
-        get(Protoss.AirArmor)
-        get(Protoss.AirDamage)
+    if (enemyLurkersLikely) {
+      buildCannonsAtOpenings(1)
+      get(Protoss.RoboticsFacility, Protoss.Observatory)
+      pump(Protoss.Observer, 2)
+      if (safeDefending) {
+        get(Protoss.ObserverSpeed)
+        get(Protoss.ObserverVisionRange)
       }
-      pump(Protoss.Dragoon, 8 + 3 * enemies(Zerg.Mutalisk))
     }
-
-    requireMiningBases(Math.min(4, unitsComplete(IsWarrior) / 18))
-
-    SwapIf(
-      safeDefending,
-      {
-        pump(Protoss.DarkTemplar, 1)
-        if (upgradeStarted(Protoss.DragoonRange)) {
-          if (upgradeStarted(Protoss.ZealotSpeed)) {
-            pump(Protoss.Zealot, unitsComplete(Protoss.Dragoon) / 2)
-          }
-          pump(Protoss.Dragoon)
-        }
-        buildCannonsAtExpansions(2)
-        pump(Protoss.Zealot)
-      },
-      if (have(Protoss.Forge)) {
-        get(Protoss.CitadelOfAdun)
-        get(Protoss.ZealotSpeed)
-        get(Protoss.GroundDamage)
-        upgradeContinuously(Protoss.GroundArmor) && upgradeContinuously(Protoss.GroundDamage)
-      })
-
-
-    get(Protoss.Stargate)
-    once(2, Protoss.Corsair)
-    get(Protoss.DragoonRange)
-    get(3, Protoss.Gateway)
-
-    requireBases(2)
-    if (gas < 300) {
-      pumpGasPumps()
+    pump(Protoss.Corsair, enemies(Zerg.Mutalisk))
+    if (have(Protoss.Dragoon)) {
+      get(Protoss.DragoonRange)
     }
+    pump(Protoss.Dragoon, Math.max(0, units(Protoss.Zealot) - 12) + ?(enemyMutalisksLikely, 6 + enemies(Zerg.Mutalisk) - units(Protoss.Corsair), 0))
+    if (have(Protoss.Corsair) && upgradeStarted(Protoss.DragoonRange)) {
+      get(Protoss.AirArmor)
+      get(Protoss.AirDamage)
+    }
+    pump(Protoss.DarkTemplar, 1)
+    val capArchons = units(Protoss.Archon) >= 4
+    makeArchons(?(capArchons, 49, 300))
+    if (capArchons) {
+      get(Protoss.PsionicStorm)
+      get(Protoss.HighTemplarEnergy)
+      pump(Protoss.Shuttle, 1)
+    }
+    pump(Protoss.HighTemplar)
+    if (enemyMutalisksLikely) {
+      buildCannonsAtBases(Maff.clamp(2 + enemies(Zerg.Mutalisk) / 5, 2, 4), DefendAir)
+    }
+    pump(Protoss.Zealot)
+
     get(Protoss.Forge)
+    get(Protoss.CitadelOfAdun)
+    get(Protoss.GroundDamage)
+    get(Protoss.ZealotSpeed)
+    get(3, Protoss.Gateway)
+    requireMiningBases(2)
     get(Protoss.TemplarArchives)
-
-    get(5 * miningBases, Protoss.Gateway)
+    get(5, Protoss.Gateway)
+    pumpGasPumps()
+    if (enemyMutalisksLikely) {
+      get(Maff.clamp(1 + enemies(Zerg.Mutalisk) / 6, 1, 3), Protoss.Stargate)
+    }
+    get(2, Protoss.Forge)
+    upgradeContinuously(Protoss.GroundArmor)
+    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
+    get(7, Protoss.Gateway)
+    requireMiningBases(3)
+    get(14, Protoss.Gateway)
   }
 }

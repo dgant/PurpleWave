@@ -49,7 +49,7 @@ abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }
 object PvZFFE extends PvZFFEOpening {
-  addSelectionRequirement(() => With.placement.wall.isDefined)
+  addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
 }
 object PvZGatewayFE extends PvZFFEOpening {
   addSelectionRequirement(() => With.placement.wall.isDefined)

@@ -7,6 +7,7 @@ import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
+import Utilities.?
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, IsTank, IsWorker, UnitFilter}
 
@@ -57,17 +58,17 @@ class SquadAcePilots extends Squad {
     }
 
     // Aggressively engage air divisions
-    val aceDivisions = With.battles.divisions
+    val airDivisions = With.battles.divisions
       .view
       .filter(_.enemies.exists(IsFlyingWarrior))
       .filter(d => hasFleet || units.size > d.enemies.count(IsFlyingWarrior))
-    val aceDivision = aceDivisions
+    val airDivision = airDivisions
       .sortBy(d => d.centroidAir.pixelDistanceSquared(centroidAir))
-      .sortBy(d => if (weSplash) d.enemies.size else 1)
+      .sortBy(d => ?(weSplash, -d.enemies.size, 1))
       .headOption
-    if (aceDivision.isDefined) {
+    if (airDivision.isDefined) {
       activity = "AceAir2Air"
-      vicinity = aceDivision.get.centroidAir
+      vicinity = airDivision.get.centroidAir
       SquadAutomation.targetAndSend(this)
       return
     }

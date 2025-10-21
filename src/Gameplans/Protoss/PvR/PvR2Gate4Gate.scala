@@ -3,6 +3,7 @@ package Gameplans.Protoss.PvR
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPIdeas
 import ProxyBwapi.Races.{Protoss, Terran}
+import Utilities.SwapIf
 import Utilities.UnitFilters.IsWarrior
 
 class PvR2Gate4Gate extends GameplanImperative {
@@ -69,10 +70,14 @@ class PvR2Gate4Gate extends GameplanImperative {
 
     pump(Protoss.DarkTemplar, 1)
     pump(Protoss.Dragoon)
-    pump(Protoss.Zealot)
+    SwapIf(
+      enemyMutalisksLikely,
+      {
+        get(Protoss.Assimilator, Protoss.CyberneticsCore)
+        get(Protoss.DragoonRange)
+      },
+      pump(Protoss.Zealot))
 
-    get(Protoss.Assimilator, Protoss.CyberneticsCore)
-    get(Protoss.DragoonRange)
     get(4, Protoss.Gateway)
     requireMiningBases(2)
 

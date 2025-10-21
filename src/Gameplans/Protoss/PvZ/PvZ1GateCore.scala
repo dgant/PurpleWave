@@ -8,6 +8,7 @@ import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
+import Utilities.UnitFilters.IsWarrior
 
 class PvZ1GateCore extends GameplanImperative {
 
@@ -17,9 +18,11 @@ class PvZ1GateCore extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
-    preferWall(1, Protoss.Pylon)
+    once(Protoss.Pylon)
+    //preferWall(1, Protoss.Pylon)
+    //preferWall(1, Protoss.Gateway)
     once(9, Protoss.Probe)
-    preferWall(1, Protoss.Gateway)
+    once(Protoss.Gateway)
     once(11, Protoss.Probe)
     once(2, Protoss.Pylon)
     once(12, Protoss.Probe)
@@ -29,16 +32,21 @@ class PvZ1GateCore extends GameplanImperative {
     once(14, Protoss.Probe)
     once(2, Protoss.Zealot)
     once(15, Protoss.Probe)
-    preferWall(1, Protoss.CyberneticsCore)
+    once(1, Protoss.CyberneticsCore)
     once(16, Protoss.Probe)
     once(3, Protoss.Zealot)
     once(17, Protoss.Probe)
     once(3, Protoss.Pylon)
+    once(Protoss.Dragoon)
 
     scoutOn(Protoss.Pylon)
   }
 
   override def executeMain(): Unit = {
+
+    //////////
+    // Army //
+    //////////
 
     var shouldAttack: Boolean = false
     if (enemyLurkersLikely) {
@@ -53,11 +61,20 @@ class PvZ1GateCore extends GameplanImperative {
     attack(shouldAttack)
     With.blackboard.acePilots.set(true)
 
-    maintainMiningBases(1)
+    /////////////
+    // Economy //
+    /////////////
 
+    maintainMiningBases(1)
+    requireMiningBases(Math.min(3, unitsComplete(IsWarrior) / 20))
     if ( ! haveEver(Protoss.CyberneticsCore)) {
       gasWorkerCeiling(1)
     }
+    gasLimitCeiling(600)
+
+    ///////////////////
+    // High priority //
+    ///////////////////
 
     if (enemyLurkersLikely) {
       buildCannonsAtOpenings(1)
@@ -68,17 +85,25 @@ class PvZ1GateCore extends GameplanImperative {
         get(Protoss.ObserverVisionRange)
       }
     }
+    if (enemyMutalisksLikely) {
+      get(Protoss.Stargate)
+    }
     pump(Protoss.Corsair, enemies(Zerg.Mutalisk))
     if (have(Protoss.Dragoon)) {
       get(Protoss.DragoonRange)
     }
-    pump(Protoss.Dragoon, Math.max(0, units(Protoss.Zealot) - 12) + ?(enemyMutalisksLikely, 6 + enemies(Zerg.Mutalisk) - units(Protoss.Corsair), 0))
+    if (safeDefending && units(IsWarrior) >= 24) {
+      get(Protoss.GroundDamage)
+      upgradeContinuously(Protoss.GroundArmor)
+      upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
+    }
+    pump(Protoss.Dragoon, 2 * units(Protoss.Archon) + units(Protoss.Zealot) / 2 - 6)
     if (have(Protoss.Corsair) && upgradeStarted(Protoss.DragoonRange)) {
       get(Protoss.AirArmor)
       get(Protoss.AirDamage)
     }
     pump(Protoss.DarkTemplar, 1)
-    val capArchons = units(Protoss.Archon) >= 4
+    val capArchons = units(Protoss.Archon) >= 3
     makeArchons(?(capArchons, 49, 300))
     if (capArchons) {
       get(Protoss.PsionicStorm)
@@ -89,25 +114,28 @@ class PvZ1GateCore extends GameplanImperative {
     if (enemyMutalisksLikely) {
       buildCannonsAtBases(Maff.clamp(2 + enemies(Zerg.Mutalisk) / 5, 2, 4), DefendAir)
     }
+    buildCannonsAtExpansions(2)
+    pumpGasPumps()
     pump(Protoss.Zealot)
+
+    //////////////////
+    // Low priority //
+    //////////////////
 
     get(Protoss.Forge)
     get(Protoss.CitadelOfAdun)
     get(Protoss.GroundDamage)
     get(Protoss.ZealotSpeed)
-    get(3, Protoss.Gateway)
-    requireMiningBases(2)
     get(Protoss.TemplarArchives)
+    requireMiningBases(2)
     get(5, Protoss.Gateway)
-    pumpGasPumps()
     if (enemyMutalisksLikely) {
       get(Maff.clamp(1 + enemies(Zerg.Mutalisk) / 6, 1, 3), Protoss.Stargate)
     }
     get(2, Protoss.Forge)
-    upgradeContinuously(Protoss.GroundArmor)
-    upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.Shields)
     get(7, Protoss.Gateway)
     requireMiningBases(3)
-    get(14, Protoss.Gateway)
+    get(Protoss.RoboticsFacility, Protoss.Observatory)
+    get(18, Protoss.Gateway)
   }
 }

@@ -32,7 +32,7 @@ final class SimulationGrid {
       unit.pixel = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
       return
     }
-    if (unit.flying) {
+    if (unit.flying || true) { // Disabling collisions/pathfinding for now
       relocateUnit(unit, unit.pixel.projectUpTo(toClamped, unit.topSpeed), Some(tiles(toClamped.tile.i)))
       return
     }
@@ -116,20 +116,6 @@ final class SimulationGrid {
       unit.gridTile = Some(tileTo)
     }
     unit.pixel = to
-  }
-
-  @inline def move(unit: Simulacrum, tileNext: SimulationGridTile): Unit = {
-    unit.gridTile.foreach(tileLast => {
-      tileLast -= unit
-      if (tileLast.units.isEmpty) {
-        populatedTiles.remove(tileLast)
-      }
-    })
-    if (tileNext.units.isEmpty) {
-      populatedTiles.add(tileNext)
-    }
-    tileNext += unit
-    unit.gridTile = Some(tileNext)
   }
 
   @inline def tryForceV2(unit: Simulacrum, force: Force): Boolean = {

@@ -33,7 +33,7 @@ object JudgmentModifiers {
     add("Proximity",    Colors.NeonRed,       proximity(battle))
     //add("Gatherers",    Colors.MediumBlue,    gatherers(battle))
     add("HiddenTanks",  Colors.MediumIndigo,  hiddenTanks(battle))
-    //add("Choke",        Colors.MediumOrange,  choke(battle))
+    add("Choke",        Colors.MediumOrange,  choke(battle))
     //add("TankLock",     Colors.MediumRed,     tankLock(battle))
     add("Caught",       Colors.BrightGreen,   caught(battle))
     add("Hysteresis",   Colors.MediumViolet,  hysteresis(battle))

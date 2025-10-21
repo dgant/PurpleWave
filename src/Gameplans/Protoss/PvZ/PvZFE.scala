@@ -44,7 +44,7 @@ class PvZFE extends GameplanImperative {
     // GFE: Scout with Zealot or just on gate
     // GFE: Can attack with first Zealot unless Zerg made 6 Zerglings
     if (With.geography.startLocations.length >= ?(With.geography.mains.count(_.scoutedByUs) >= 2, 4, 5)) {
-      scoutOn(Protoss.Pylon, 2)
+      scoutOn(Protoss.Pylon, scouts = 2)
     } else {
       scoutOn(Protoss.Pylon)
     }
@@ -90,8 +90,9 @@ class PvZFE extends GameplanImperative {
         if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
           cancel(Protoss.Forge, Protoss.PhotonCannon)
         }
-        once(15, Protoss.Probe)
+        once(14, Protoss.Probe) // Should really be 15 gate but this gates gate ~6 seconds earlier which helps vs 6th ling
         buildInWall(1, Protoss.Gateway)
+        once(15, Protoss.Probe)
         buildInWall(1, Protoss.Forge)
         once(Protoss.Zealot)
         once(16, Protoss.Probe)
@@ -118,7 +119,7 @@ class PvZFE extends GameplanImperative {
               With.tactics.workerScout.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
               With.fingerprints.twoHatchMain).count(_ == true),
             (3 + enemies(Zerg.Zergling)) / 3)
-          - unitsComplete(IsWarrior)),
+          - units(IsWarrior)),
         Protoss.PhotonCannon)
     }
     naturalNexus()
@@ -173,8 +174,8 @@ class PvZFE extends GameplanImperative {
     }
 
     if (enemyHydralisksLikely || enemyLurkersLikely) {
-      if (With.frame < GameTime(6, 30)()) {
-        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 8 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
+      if (With.frame < GameTime(7, 10)()) {
+        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 9 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
       }
     }
     if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {

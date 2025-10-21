@@ -4,6 +4,7 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Actions.MacroActions
 import Macro.Requests.RequestUnit
+import Mathematics.Maff
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
@@ -148,22 +149,26 @@ object PvPIdeas extends MacroActions {
             .preferTile(bestTile)
             .preferLabelYes(Defensive, DefendGround, label))))
 
-      // If DTs will arrive before cannons, try a tiered approach to maximize our potential outcomes
+      // If DTs will arrive before cannons, spam to maximize survival
       } else if (enemyDarkTemplarLikely && dtPrecedesCannon) {
         status("DTPrecedesCannon")
         get(Protoss.Forge)
-        if ( ! With.strategy.isMoneyMap) {
-          requestTower(Protoss.PhotonCannon, 1, With.geography.ourFoyer,  DefendEntrance, 0)
-          requestTower(Protoss.PhotonCannon, 1, With.geography.ourFoyer,  DefendHall,     0)
+
+        if (bases > 1) {
+          requestTower(Protoss.PhotonCannon, 4, With.geography.ourFoyer,  DefendEntrance)
+        } else {
+          requestTower(Protoss.PhotonCannon, 2, With.geography.ourFoyer,  DefendEntrance)
+          requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,   DefendEntrance)
+          requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,   DefendHall)
         }
-        requestTower(Protoss.PhotonCannon, 1, With.geography.ourMain,     DefendEntrance, 0)
 
       // Take reasonable precautions
       } else {
         val cannonMinStartFrame = expectedArrival - Protoss.PhotonCannon.buildFramesFull - cannonSafetyFrames
-        val forgeMinStartFrame  = earliestArrival - Protoss.Forge.buildFramesFull
-        val pylonMinStartFrame  = earliestArrival - Protoss.Pylon.buildFramesFull
+        val forgeMinStartFrame  = cannonMinStartFrame - Protoss.Forge.buildFramesFull
+        val pylonMinStartFrame  = cannonMinStartFrame - Protoss.Pylon.buildFramesFull
         val naturalPylonNow     = With.units.ours.filter(Protoss.Pylon).forall(_.complete) && With.scouting.weControlOurFoyer && With.units.ours.count(Protoss.Pylon) > 3
+        val injectPylon         = ! With.strategy.isMoneyMap
         val doForgeCannon       = dtArePossibility && (PvPDT() || enemyHasShown(Protoss.CitadelOfAdun))
 
         status(f"DTAfterCannon@${Frames(forgeMinStartFrame)}-${Frames(pylonMinStartFrame)}-${Frames(cannonMinStartFrame)}")
@@ -171,22 +176,25 @@ object PvPIdeas extends MacroActions {
 
         if (doForgeCannon) {
           status("DoForgeCannon")
-          get(RequestUnit(Protoss.Forge, minStartFrameArg = forgeMinStartFrame))
-        }
-        if ( ! With.strategy.isMoneyMap) {
-          requestTower(Protoss.Pylon,         1, With.geography.ourFoyer,   DefendEntrance, if (naturalPylonNow) 0 else pylonMinStartFrame)
-        }
-        if (doForgeCannon) {
-          requestTower(Protoss.PhotonCannon,  1, With.geography.ourFoyer,   DefendEntrance, cannonMinStartFrame)
-          requestTower(Protoss.PhotonCannon,  1, With.geography.ourMain,    DefendEntrance, cannonMinStartFrame)
+          get(RequestUnit(Protoss.Forge,                                 minStartFrameArg = forgeMinStartFrame))
+          if (injectPylon) {
+            requestTower(Protoss.Pylon,       1, With.geography.ourFoyer,   DefendHall,     pylonMinStartFrame)
+          }
+          val n = Maff.clamp(enemies(Protoss.DarkTemplar) + 1, 2, 4)
+          requestTower(Protoss.PhotonCannon,  n, With.geography.ourFoyer,   DefendHall,     cannonMinStartFrame)
+        } else if (injectPylon) {
+          requestTower(Protoss.Pylon,         1, With.geography.ourFoyer,   DefendHall,     ?(naturalPylonNow, 0, pylonMinStartFrame))
         }
       }
     }
 
     goObserver
   }
-  private def requestTower(unitClass: UnitClass, quantity: Int, base: Base, label: PlaceLabel, startFrame: Int): Unit = {
-    get(RequestUnit(unitClass, quantity, minStartFrameArg = startFrame,
+  private def requestTower(unitClass: UnitClass, quantity: Int, base: Base, label: PlaceLabel, startFrame: Int = 0): Unit = {
+    get(RequestUnit(
+      unitClass,
+      quantity,
+      minStartFrameArg = startFrame,
       placementQueryArg = Some(new PlacementQuery(unitClass)
         .requireBase(base)
         .requireLabelYes(Defensive)

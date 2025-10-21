@@ -28,8 +28,9 @@ class FingerprintDragoonRangeMissing extends Fingerprint {
           GameTime(3, 11)()
         })
     val rangeCompletion = coreCompletion + upgradeFrames
-    val rangeIsLate     = With.frame > rangeCompletion + Seconds(10)()
-    val goonIsVisible   = With.units.enemy.exists(u => Protoss.Dragoon(u) && u.visible)
+    val latenessFrame   = rangeCompletion + Seconds(10)()
+    val rangeIsLate     = With.frame > latenessFrame
+    val goonIsVisible   = With.units.enemy.exists(u => Protoss.Dragoon(u) && u.lastSeen > latenessFrame)
 
     rangeIsLate && goonIsVisible
   }

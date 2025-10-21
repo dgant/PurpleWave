@@ -342,8 +342,8 @@ class PvPOpening extends GameplanImperative {
     atEarlyTiming ||= PvP1012()                             &&  unitsComplete(Protoss.Zealot)  >= 3
     atEarlyTiming ||= gcgate                                &&  unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
     atEarlyTiming ||= With.fingerprints.proxyGateway()      &&  unitsComplete(Protoss.Dragoon) > 0
-    atEarlyTiming ||= PvPDT()                               &&  upgradeStarted(Protoss.DragoonRange)   && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
-    atEarlyTiming ||= Protoss.DragoonRange()                &&  enemyDarkTemplarLikely
+    atEarlyTiming ||= PvPDT()                               &&  upgradeStarted(Protoss.DragoonRange)  && safePushing && ! enemyStrategy(With.fingerprints.dragoonRange, With.fingerprints.twoGateGoon, With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon, With.fingerprints.robo) // Attack if we're not clear on their plan to suss out DT mirror
+    atEarlyTiming ||= Protoss.DragoonRange()                &&  enemyDarkTemplarLikely                && safePushing
     atMainTiming  ||= PvP3GateGoon()                        &&  Protoss.DragoonRange()  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 3 && unitsComplete(IsWarrior) >= 6
     atMainTiming  ||= PvP4GateGoon()                        &&  Protoss.DragoonRange()  && unitsCompleteFor(Protoss.Dragoon.buildFrames, Protoss.Gateway) >= 4 && unitsComplete(IsWarrior) >= 7
     atMainTiming  ||= PvPRobo()                             &&  Protoss.DragoonRange()  && unitsComplete(Protoss.Reaver) * unitsComplete(Protoss.Shuttle) >= 2 && unitsComplete(IsWarrior) >= 8

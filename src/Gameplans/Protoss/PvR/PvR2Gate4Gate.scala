@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvR
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPIdeas
 import ProxyBwapi.Races.{Protoss, Terran}
-import Utilities.SwapIf
+import Utilities.{?, SwapIf}
 import Utilities.UnitFilters.IsWarrior
 
 class PvR2Gate4Gate extends GameplanImperative {
@@ -41,7 +41,7 @@ class PvR2Gate4Gate extends GameplanImperative {
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       pump(Protoss.Observer, 2)
     }
-    if (safePushing && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24)) {
+    if (safePushing && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24 || enemyBases >= ?(enemyIsZerg, 3, 2))) {
       shouldAttack = true
     }
     if (shouldAttack) {

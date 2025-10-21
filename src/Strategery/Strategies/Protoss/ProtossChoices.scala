@@ -6,6 +6,7 @@ object ProtossChoices {
   
   val pvr = Vector(
     PvR2Gate4Gate,
+    PvRDT
   )
 
   val oddball = Vector(

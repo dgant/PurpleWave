@@ -17,13 +17,12 @@ object Opponents {
     add(new Opponent(name, other))
   }
 
-  val aggroPvZ  : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ1BaseReactive, PvZSpeedlot, PvZMuscle) { duration = 10 }
   val ecoPvZ    : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZFFE) { duration = 10 }
 
-  val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ)
+  val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvTDoubleRobo)
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = aggroPvZ
-  val defaultPvR: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate4Gate)
+  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvR2Gate4Gate)
 
   // AIIDE 2025
 
@@ -32,18 +31,18 @@ object Opponents {
   add("Void",            .95,  defaultPvT)
 
   // P
-  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvP1012, PvP5Zealot, PvPDT) { duration = 3 })
-  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 6 })
+  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy()))
+  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 10 })
 
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
   //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
   add("McRave",          .7,   StrategySelectionFixed(PvZ1GateCore), "McRaveZ")
-  add("Microwave",       .7,   StrategySelectionGreedy())
-  add("InfestedArtosis", .9,   aggroPvZ)
+  add("Microwave",       .7,   defaultPvZ)
+  add("InfestedArtosis", .9,   defaultPvZ)
 
   // R
-  add("UAlbertaBot",     .95,  StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
+  add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
   add("C0mputer",        .9,   defaultPvR)
   add("Steamhammer",     .9,   defaultPvR, "Randomhammer")
 

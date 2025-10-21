@@ -165,11 +165,11 @@ object JudgmentModifiers {
   }
 
   def hysteresis(battle: Battle): Option[JudgmentModifier] = {
-    modifyTarget(Maff.weightedMean(battle.us.attackers.flatMap(_.friendly.map(hysteresis))))
+    modifyTarget(Maff.weightedMean(battle.us.warriorsCasters.flatMap(_.friendly.map(hysteresis))))
   }
   private case class Motivation(var amount: Double = 0, var weight: Double = 0)
   def hysteresis(unit: FriendlyUnitInfo): (Double, Double) = {
-    var amount: Double    =   0
+    var amount       =   0.0
     val fighting     =   unit.matchups.engagedUpon || unit.matchups.engagingOn
     val speed        =   Math.max(unit.topSpeed, 0.1)
     val entanglement =   Maff.clamp01(unit.matchups.pixelsEntangled / speed / Math.min(unit.matchups.framesToLive, Seconds(5)()))
@@ -198,7 +198,7 @@ object JudgmentModifiers {
     if (With.frame < 0) {
       With.logger.debug(f"$fighting $speed $entanglement $stickiness $staticThreat $obscurity $pace $patience $displacement $tankLock")
     }
-    (amount, unit.subjectiveValue * ?(fighting, 2, 1))
+    (amount, unit.subjectiveValue * ?(fighting, 5, 1))
   }
 
   /*

@@ -8,6 +8,7 @@ import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Tactic.Missions.MissionDrop
 import Utilities.?
+import Utilities.Time.Seconds
 import Utilities.UnitCounters.CountEverything
 import Utilities.UnitFilters.{IsAny, IsFlyingWarrior, IsTank, IsWorker, UnitFilter}
 
@@ -60,7 +61,7 @@ class SquadAcePilots extends Squad {
     // Aggressively engage air divisions
     val airDivisions = With.battles.divisions
       .view
-      .filter(_.enemies.exists(IsFlyingWarrior))
+      .filter(_.enemies.exists(e => IsFlyingWarrior(e) && With.framesSince(e.lastSeen) < Seconds(10)()))
       .filter(d => hasFleet || units.size > d.enemies.count(IsFlyingWarrior))
     val airDivision = airDivisions
       .sortBy(d => d.centroidAir.pixelDistanceSquared(centroidAir))

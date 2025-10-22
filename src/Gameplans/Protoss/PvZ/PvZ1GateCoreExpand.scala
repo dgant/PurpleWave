@@ -10,7 +10,7 @@ import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
 import Utilities.UnitFilters.IsWarrior
 
-class PvZ1GateCore extends GameplanImperative {
+class PvZ1GateCoreExpand extends GameplanImperative {
 
   private def wallPlacement (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
   private def requireWall   (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }

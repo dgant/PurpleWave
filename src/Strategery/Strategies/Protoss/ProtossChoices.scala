@@ -85,7 +85,9 @@ object ProtossChoices {
 
   val vsZerg_OpenersTransitioningFrom_1GateCore = Vector(
     PvZ1BaseReactive,
-    PvZ1GateCore
+    PvZ1GateCoreExpand,
+    PvZ1GateCoreYoloSpeedlot,
+    PvZ1GateCoreYoloDragoon
   )
 
   val vsZerg_OpenersTransitioningFrom_2Gate = Vector(

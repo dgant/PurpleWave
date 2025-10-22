@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Gameplans.Protoss.PvR.PvR2Gate4Gate
-import Gameplans.Protoss.PvZ.PvZ1GateCore
+import Gameplans.Protoss.PvZ.{PvZ1GateCoreExpand, PvZ1GateCoreYoloDragoon, PvZ1GateCoreYoloSpeedlot}
 import Lifecycle.With
 import Planning.Plans.Plan
 import ProxyBwapi.Races.Protoss
@@ -16,8 +16,14 @@ abstract class PvZStrategy extends Strategy {
 object PvZ2Gate4Gate extends PvZStrategy {
   override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
-object PvZ1GateCore extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1GateCore)
+object PvZ1GateCoreExpand extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreExpand)
+}
+object PvZ1GateCoreYoloSpeedlot extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreYoloSpeedlot)
+}
+object PvZ1GateCoreYoloDragoon extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreYoloDragoon)
 }
 
 object PvZ1BaseReactive extends PvZStrategy {

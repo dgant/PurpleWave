@@ -37,7 +37,7 @@ object Opponents {
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
   //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("McRave",          .7,   StrategySelectionFixed(PvZ1GateCore), "McRaveZ")
+  add("McRave",          .7,   defaultPvZ, "McRaveZ", "McRaveZB", "McRaveZC")
   add("Microwave",       .7,   defaultPvZ)
   add("InfestedArtosis", .9,   defaultPvZ)
 

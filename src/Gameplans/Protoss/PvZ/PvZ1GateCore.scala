@@ -2,8 +2,8 @@ package Gameplans.Protoss.PvZ
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
+import Macro.Actions.BuildDefense
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.DefendAir
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -59,7 +59,7 @@ class PvZ1GateCore extends GameplanImperative {
     shouldAttack ||= safePushing && confidenceAttacking01 > 0.6
     shouldAttack ||= miningBases < 1
     attack(shouldAttack)
-    //With.blackboard.acePilots.set(true)
+    With.blackboard.acePilots.set( ! enemyHasShown(Zerg.Mutalisk))
 
     /////////////
     // Economy //
@@ -85,11 +85,11 @@ class PvZ1GateCore extends GameplanImperative {
         get(Protoss.ObserverVisionRange)
       }
     }
-    pump(Protoss.Corsair, enemies(Zerg.Mutalisk))
+    pump(Protoss.Corsair, Math.max(?(enemyHydralisksLikely, 1, 3), enemies(Zerg.Mutalisk)))
     if (enemyMutalisksLikely) {
       get(Maff.clamp(1 + enemies(Zerg.Mutalisk) / 6, 1, miningBases), Protoss.Stargate)
     }
-    if (have(Protoss.Dragoon)) {
+    if (units(Protoss.Dragoon) > 1) {
       get(Protoss.DragoonRange)
     }
     if (safeDefending && units(IsWarrior) >= 24) {
@@ -112,7 +112,14 @@ class PvZ1GateCore extends GameplanImperative {
     }
     pump(Protoss.HighTemplar)
     if (enemyMutalisksLikely) {
-      buildCannonsAtBases(Maff.clamp(2 + enemies(Zerg.Mutalisk) / 5, 2, 4), DefendAir)
+      With.geography.ourMiningBases.foreach(base =>
+        BuildDefense(
+          Maff.clamp(2 + enemies(Zerg.Mutalisk) / 5, 2, 4),
+          Protoss.PhotonCannon,
+          new PlacementQuery(_)
+          .requireBase(base)
+          .requireLabelYes(PlaceLabels.DefendHall)
+          .preferLabelYes(PlaceLabels.DefendAir)))
     }
     buildCannonsAtExpansions(2)
     pumpGasPumps()
@@ -122,14 +129,16 @@ class PvZ1GateCore extends GameplanImperative {
     // Low priority //
     //////////////////
 
+    get(Protoss.Stargate)
+    once(Protoss.Corsair)
     get(Protoss.Forge)
     get(Protoss.CitadelOfAdun)
     get(Protoss.GroundDamage)
     get(Protoss.ZealotSpeed)
     get(Protoss.TemplarArchives)
-    get(5, Protoss.Gateway)
 
     requireMiningBases(2)
+    get(5, Protoss.Gateway)
     get(2, Protoss.Forge)
     get(7, Protoss.Gateway)
     requireMiningBases(3)

@@ -21,7 +21,7 @@ object Opponents {
 
   val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvTDoubleRobo)
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZ2Gate4Gate)
+  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvR2Gate4Gate)
 
   // AIIDE 2025

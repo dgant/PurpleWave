@@ -71,7 +71,7 @@ class PvR2Gate4Gate extends GameplanImperative {
     pump(Protoss.DarkTemplar, 1)
     pump(Protoss.Dragoon)
     SwapIf(
-      enemyMutalisksLikely,
+      enemyIsZerg && unitsEver(Protoss.Zealot) >= 7 && safeDefending,
       {
         get(Protoss.Assimilator, Protoss.CyberneticsCore)
         get(Protoss.DragoonRange)

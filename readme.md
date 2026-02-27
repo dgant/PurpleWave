@@ -15,7 +15,7 @@ PurpleWave has won:
  * :trophy: 1st Place in the [2019-20 SSCAIT](https://sscaitournament.com/index.php?action=2019)
  * :trophy: 1st Place in the [2019 IEEE CoG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2019/?cat=17)
  * :trophy: 1st Place in the [2018-19 SSCAIT](https://sscaitournament.com/index.php?action=2018)
- * :trophy: 1st Place in the [2018 AIST S1](https://sites.google.com/view/aistarcrafttournament/aist-s1)
+ * :trophy: 1st Place in the [2018 AIST S1](https://sites.google.com/view/aistarcrafttournament/aist-s1) 
  * :2nd_place_medal: 2nd Place in the [2024 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2024/)
  * :2nd_place_medal: 2nd Place in the [2023 IEEE COG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition/?cat=17)
  * :2nd_place_medal: 2nd Place in the [2022 IEEE COG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2022/?cat=17)
@@ -26,6 +26,7 @@ PurpleWave has won:
  * :2nd_place_medal: 2nd Place in the [2019 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2019/)
  * :2nd_place_medal: 2nd Place in the [2017 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2017/)
  * :2nd_place_medal: 2nd Place in the [2018 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2018/?cat=17)
+ * :3rd_place_medal: 3rd Place in the [2025 AIIDE StarCraft AI Competition](https://davechurchill.ca/starcraft/aiide/results/2025/)
  * :3rd_place_medal: 3rd Place in the [2023 AIIDE StarCraft AI Competition](https://www.cs.mun.ca/~dchurchill/starcraftaicomp/2023/)
  * :3rd_place_medal: 3rd Place in the [2022-23 SSCAIT](https://sscaitournament.com/index.php?action=2022)
  * :3rd_place_medal: 3rd Place in the [2017 IEEE CIG StarCraft AI Competition](https://cilab.gist.ac.kr/sc_competition2017/?cat=17)
@@ -83,3 +84,4 @@ Say hi! Post an issue here on Github or email dsgant at gmail
 
 ## License
 PurpleWave is published under the MIT License. I encourage you to use PurpleWave as a starting point for your own creation!
+

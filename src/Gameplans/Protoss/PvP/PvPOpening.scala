@@ -26,6 +26,7 @@ class PvPOpening extends GameplanImperative {
   // CoreZ  Range   2Goon   Nexus Robo    GateGate      (2p Ramped):    https://youtu.be/dCn9WWIk4so?t=6884 Obs
 
   var complete            : Boolean = false
+  var initialZealotAttack : Boolean = false
   var atEarlyTiming       : Boolean = false
   var atMainTiming        : Boolean = false
   var earlyTimingClosed   : Boolean = false
@@ -338,6 +339,8 @@ class PvPOpening extends GameplanImperative {
     timingVs2Gate       ||= With.fingerprints.twoGate() && ! enemyHasShown(Protoss.Dragoon) && ! had2GateBeforeCore && haveComplete(Protoss.Dragoon)
     timingVsProxy       ||= With.fingerprints.proxyGateway() && unitsComplete(IsWarrior) > 5
 
+    initialZealotAttack = zBeforeCore && PvPIdeas.attackFirstZealot && haveComplete(Protoss.Zealot) && safePushing && ! enemyHasUpgrade(Protoss.DragoonRange)
+
     // Identify when we reach an attack timing
     atEarlyTiming ||= PvP1012()                             &&  unitsComplete(Protoss.Zealot)  >= 3
     atEarlyTiming ||= gcgate                                &&  unitsComplete(Protoss.Dragoon) > enemies(Protoss.Dragoon)
@@ -366,7 +369,8 @@ class PvPOpening extends GameplanImperative {
     mainTimingClosed    ||= PvPDT()           && enemiesHaveComplete(Protoss.Observer, Protoss.PhotonCannon) && unitsComplete(Protoss.Gateway) < 3
     mainTimingClosed    &&= ! reaverAllIn
     mainTimingClosed    &&= ! speedlotAllIn
-    shouldAttack          = atEarlyTiming  && ! earlyTimingClosed
+    shouldAttack          = initialZealotAttack
+    shouldAttack        ||= atEarlyTiming  && ! earlyTimingClosed
     shouldAttack        ||= atMainTiming   && ! mainTimingClosed
     shouldAttack        ||= timingVsProxy
     shouldAttack        &&= safePushing
@@ -432,26 +436,27 @@ class PvPOpening extends GameplanImperative {
           ?(zAfterCore, "CoreZ",  "NZCore")))
       status(sequence.toString)
     }
-    status(sevenZealot,       "SevenZealots")
-    status(commitZealots,     "CommitZealots")
-    status(shuttleFirst,      "ShuttleFirst")
-    status(shuttleSpeed,      "ShuttleSpeed")
-    status(getObservers,      "Obs")
-    status(getObservatory,    "Observatory")
-    status(getReavers,        "Reaver")
-    status(reaverAllIn,       "ReaverAllIn")
-    status(greedyDT,          "GreedyDT")
-    status(speedlotAllIn,     "SpeedlotAllIn")
-    status(atEarlyTiming,     "Timing1")
-    status(earlyTimingClosed, "Timing1Done")
-    status(atMainTiming,      "Timing2")
-    status(mainTimingClosed,  "Timing2Done")
-    status(timingVs2Gate,     "TimingVs2Gate")
-    status(timingVsProxy,     "TimingVsProxy")
-    status(shouldAttack,      "Attack")
-    status(shouldHarass,      "Harass")
-    status(shouldExpand,      "Expand")
-    status(shouldHoldNatural, "HoldNat")
+    status(sevenZealot,         "SevenZealots")
+    status(commitZealots,       "CommitZealots")
+    status(shuttleFirst,        "ShuttleFirst")
+    status(shuttleSpeed,        "ShuttleSpeed")
+    status(getObservers,        "Obs")
+    status(getObservatory,      "Observatory")
+    status(getReavers,          "Reaver")
+    status(reaverAllIn,         "ReaverAllIn")
+    status(greedyDT,            "GreedyDT")
+    status(speedlotAllIn,       "SpeedlotAllIn")
+    status(initialZealotAttack, "InitialZealotAttack")
+    status(atEarlyTiming,       "Timing1")
+    status(earlyTimingClosed,   "Timing1Done")
+    status(atMainTiming,        "Timing2")
+    status(mainTimingClosed,    "Timing2Done")
+    status(timingVs2Gate,       "TimingVs2Gate")
+    status(timingVsProxy,       "TimingVsProxy")
+    status(shouldAttack,        "Attack")
+    status(shouldHarass,        "Harass")
+    status(shouldExpand,        "Expand")
+    status(shouldHoldNatural,   "HoldNat")
 
     if (shouldAttack) { attack() }
     if (shouldHarass) { harass() }

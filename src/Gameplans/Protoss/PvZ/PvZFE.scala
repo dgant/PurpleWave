@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvZ
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Macro.Actions.{Enemy, Friendly}
+import Macro.Actions.Enemy
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.{DefendAir, DefendHall}
@@ -126,6 +126,7 @@ class PvZFE extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
+    // Disabling because it's bugged
     //With.blackboard.acePilots.set(true)
 
     if (wallOption.isEmpty) return
@@ -154,7 +155,7 @@ class PvZFE extends GameplanImperative {
     ///////////////////
 
     if (enemyMutalisksLikely) {
-      pumpRatio(Protoss.Corsair, 6, 24, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+      pumpRatio(Protoss.Corsair, 6, 36, Seq(Enemy(Zerg.Mutalisk, 1.0)))
       val mutaliskCannons = Maff.clamp(1 + enemies(Zerg.Mutalisk) / 3, 2, 5)
       val cannonTime      = Math.min(With.scouting.expectedArrival(Zerg.Mutalisk), GameTime(7, 0)())
       val pylonTime       = cannonTime - Protoss.Pylon.buildFramesFull
@@ -165,9 +166,11 @@ class PvZFE extends GameplanImperative {
         get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.PhotonCannon).requireBase(base).requireLabelYes(DefendAir))))
       })
       get(Maff.clamp(enemies(Zerg.Mutalisk) / 6, 1, 2), Protoss.Stargate)
-      pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
-      once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
-      get(Protoss.DragoonRange)
+
+      // Disabling everything Dragoon-related because we're walling ourselves in
+      //pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
+      //once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
+      //get(Protoss.DragoonRange)
       get(Protoss.AirArmor)
       get(Protoss.AirDamage)
       pumpGasPumps()
@@ -180,7 +183,7 @@ class PvZFE extends GameplanImperative {
     }
     if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {
       once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
-      get(Protoss.DragoonRange)
+      //get(Protoss.DragoonRange)
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       pumpGasPumps()
     }
@@ -190,7 +193,7 @@ class PvZFE extends GameplanImperative {
     if (unitsComplete(IsWarrior) >= 16
       && unitsComplete(Protoss.Gateway) >= 6
       && safePushing
-      && upgradeComplete(Protoss.DragoonRange)
+      //&& upgradeComplete(Protoss.DragoonRange)
       && upgradeComplete(Protoss.ZealotSpeed)
       && haveComplete(Protoss.Observer)) {
       requireMiningBases(3)
@@ -204,16 +207,19 @@ class PvZFE extends GameplanImperative {
     // Army //
     //////////
 
-    makeArchons()
+
     if (upgradeStarted(Protoss.DragoonRange)) {
-      pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
+      //pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
     }
     pumpRatio(Protoss.Observer, 1, 3, Seq(Enemy(Zerg.Lurker, 0.5)))
     pumpShuttleAndReavers()
     pump(Protoss.DarkTemplar, 2)
+    once(2, Protoss.HighTemplar)
+    get(Protoss.PsionicStorm)
+    get(Protoss.HighTemplarEnergy)
     pump(Protoss.HighTemplar)
     if (upgradeStarted(Protoss.DragoonRange) && ! upgradeStarted(Protoss.ZealotSpeed)) {
-      pump(Protoss.Dragoon)
+      //pump(Protoss.Dragoon)
     }
     pump(Protoss.Zealot)
 
@@ -239,7 +245,7 @@ class PvZFE extends GameplanImperative {
     if (safePushing && ! enemyHasUpgrade(Zerg.ZerglingSpeed) && ! enemyHasUpgrade(Zerg.HydraliskSpeed) && enemiesComplete(Zerg.SunkenColony) < 2) {
       attack()
     }
-    if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && upgradeComplete(Protoss.DragoonRange) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {
+    if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {
       attack()
     }
   }
@@ -258,7 +264,7 @@ class PvZFE extends GameplanImperative {
         get(Protoss.AirArmor)
       }
     }
-    get(Protoss.DragoonRange)
+    //get(Protoss.DragoonRange)
     get(Protoss.GroundArmor)
     once(Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.RoboticsSupportBay)
     get(Protoss.ObserverSpeed)

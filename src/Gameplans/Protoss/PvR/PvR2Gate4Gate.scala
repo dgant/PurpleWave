@@ -40,6 +40,8 @@ class PvR2Gate4Gate extends GameplanImperative {
       buildCannonsAtOpenings(1)
       get(Protoss.RoboticsFacility, Protoss.Observatory)
       pump(Protoss.Observer, 2)
+    } else if (safeDefending && ! enemyIsTerran && unitsComplete(IsWarrior) >= 24) {
+      get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
     }
     if (safePushing && (upgradeComplete(Protoss.DragoonRange) || unitsComplete(IsWarrior) >= 24 || enemyBases >= ?(enemyIsZerg, 3, 2))) {
       shouldAttack = true

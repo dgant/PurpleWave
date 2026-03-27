@@ -13,3 +13,5 @@
 /target/
 /images/
 dependency-reduced-pom.xml
+.codex/
+agent-notes/

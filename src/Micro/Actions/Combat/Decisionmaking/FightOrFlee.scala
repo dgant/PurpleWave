@@ -50,8 +50,7 @@ object FightOrFlee extends Action {
     decide(false, "Disrupted",  () => ! u.flying && u.underDisruptionWeb && u.matchups.groupVs.canAttack(u))
     decide(false, "BideSiege",  () => Terran.SiegeTankUnsieged(u) && ! With.blackboard.wantToAttack()  && ! With.self.hasTech(Terran.SiegeMode) && u.matchups.groupVs.has(Protoss.Dragoon) && With.units.ours.exists(_.techProducing.contains(Terran.SiegeMode)) && u.alliesBattle.exists(a => Terran.Bunker(a) && a.complete))
     decide(false, "CarrierVuln",() => Protoss.Carrier(u) && u.matchups.threats.exists(t => ! t.flying && t.pixelsToGetInRange(u) < 32))
-    decide(true,  "CarrierTrap",() => Protoss.Carrier(u) && u.matchups.groupOf.airToAirStrength >= u.matchups.groupVs.airToAirStrength || u.matchups.groupVs.has(Terran.Battlecruiser, Protoss.Carrier))
-    decide(true,  "Raze",       () => ((IsTank(u) && Terran.SiegeMode()) || u.isAny(Protoss.Reaver, Zerg.Guardian) && u.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding)))
+    decide(true,  "Raze",       () => ((IsTank(u) && Terran.SiegeMode()) || u.isAny(Protoss.Reaver, Zerg.Guardian)) && u.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding))
     decide(true,  "Miners",     () => ! u.isAny(IsWorker, Protoss.Carrier) && u.canAttack && u.battle.exists(_.us.minersThreatened) && u.presumptiveTarget.exists(t => t.isEnemyOf(u) && t.matchups.threateningMiners))
 
     decide(true,  "Energized",  () =>

@@ -56,7 +56,10 @@ object GetRepairedMobile extends Action {
         if (unit.pixelDistanceCenter(goal) < 128) {
           repairUnit = Maff.minBy(hospital.get.ourUnits.view
             .flatMap(_.friendly)
-            .filter(u => u.intent.toGather.isDefined && u.intent.toHeal.forall(unit==)))(scv => unit.pixelDistanceTravelling(unit.pixel))
+            .filter(u =>
+              u.intent.toGather.isDefined
+              && u.intent.toHeal.forall(unit==)))(scv =>
+            scv.pixelDistanceTravelling(unit.pixel))
         }
       })
     }

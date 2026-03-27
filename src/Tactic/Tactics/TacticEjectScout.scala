@@ -32,7 +32,7 @@ class TacticEjectScout extends Tactic {
         unit.canMove
         && unit.unitClass.attacksGround
         && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
-        && With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32))
+        && (With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)))
       .setCounter(CountOne)
       .setPreference(PreferClose(targetScout().get.pixel))
       .acquire()

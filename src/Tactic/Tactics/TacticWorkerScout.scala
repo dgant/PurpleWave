@@ -57,7 +57,7 @@ class TacticWorkerScout extends Tactic {
           Zerg.Hydralisk,
           Zerg.Mutalisk,
           Zerg.Spire)))
-      scoutingAbandoned ||= With.units.enemy.exists(e => e.isAll(IsComplete, Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
+      scoutingAbandoned ||= With.units.enemy.exists(e => e.complete && e.isAny(Protoss.PhotonCannon, Zerg.SunkenColony) && scouts.forall(_.proximity > e.proximity))
     }
 
     if (scoutingAbandoned) {

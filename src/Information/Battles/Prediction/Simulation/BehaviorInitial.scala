@@ -31,7 +31,7 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     }
     if (simulacrum.unitClass == Protoss.HighTemplar) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemiesOf(simulacrum).view.filterNot(_.unitClass.canBeStormed))
+      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemiesOf(simulacrum).view.filter(_.unitClass.canBeStormed))
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorStorm)
         return

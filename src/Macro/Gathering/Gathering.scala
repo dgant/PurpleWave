@@ -145,11 +145,16 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
     // Find workers to populate new base
     val newBases = bases.filterNot(basesBefore.contains)
     if (newBases.nonEmpty) {
-      val missingCandidates = newBases.view.map(_.minerals.size).sum - unassigned.size
-      bases.find( ! basesBefore.contains(_)).foreach(b => getWorkersClosestToBase(b, 1, b.minerals.size).foreach(unassignWorker))
+      var remainingUnassigned = unassigned.size
+      newBases.foreach(base => {
+        val freePrimaryMineralSlots = mineralSlots(base).count(s => s.free && s.order == 0)
+        val workersToReassign = Math.max(0, freePrimaryMineralSlots - remainingUnassigned)
+        getWorkersClosestToBase(base, 1, workersToReassign).foreach(unassignWorker)
+        remainingUnassigned = Math.max(0, remainingUnassigned - freePrimaryMineralSlots)
+      })
     }
     // Find some workers to reassign to gas
-   else if (gasWorkersToAdd > unassigned.size) {
+    else if (gasWorkersToAdd > unassigned.size) {
       val reassignableMineralSlots = bases.view
         .flatMap(gasSlots(_).view.filter(_.free)) // For each free gas slot,
         .sortBy(slot => mineralSaturation(slot.base)) // ordered by same-base mineral saturation,
@@ -252,7 +257,13 @@ class Gathering extends TimedTask with AccelerantMinerals with Zippers {
         With.geography.bases.minBy(b => worker.pixelDistanceTravelling(b.heart)))
 
   private def getWorkersClosestToBase(base: Base, minimumOrder: Int, count: Int): Iterable[FriendlyUnitInfo] = {
-    Iterable.empty // TODO
+    Maff.takeN(count, assignments.view
+      .filter(a =>
+        a._2.resource.unitClass.isMinerals
+        && a._2.order >= minimumOrder
+        && a._2.base != base
+        && a._2.base.metro == base.metro))(Ordering.by(a => (-a._1.pixelDistanceTravelling(base.heart), a._2.order, -a._1.id)))
+      .map(_._1)
   }
 
   private def tryMinerals(worker: FriendlyUnitInfo): Boolean = {

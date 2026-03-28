@@ -84,10 +84,15 @@ object Spot extends Action {
 
   def detectionTarget(unit: FriendlyUnitInfo): Option[UnitInfo] = {
     if ( ! unit.unitClass.isDetector) return None
+    val mobileDetectors = groupSupported(unit).map(_.mobileDetectors).getOrElse(Seq.empty).filter(_.friendly.exists(_.squad == unit.squad))
     val spookies = Maff.orElseFiltered(enemiesToConsider(unit): _*)(e =>
         (e.cloakedOrBurrowed || canEventuallyCloak(e))
         && (unit.squad.exists(_.canAttackIfVisible(e)) || unit.matchups.groupOf.canAttackIfVisible(e)))
-    val spookiesResponsible = spookies.filter(_.matchups.enemyDetectorDeepest.filter(d => d.canMove && d.friendly.exists(_.squad == unit.squad)).forall(unit==))
+    val spookiesResponsible = spookies.filter(spooky =>
+      spooky.matchups.enemyDetectorDeepest
+        .filter(d => d.canMove && d.friendly.exists(_.squad == unit.squad))
+        .map(_ == unit)
+        .getOrElse(Maff.minBy(mobileDetectors)(_.pixelDistanceSquared(spooky)).contains(unit)))
     Maff.minBy(spookiesResponsible)(_.pixelDistanceSquared(unit))
   }
 

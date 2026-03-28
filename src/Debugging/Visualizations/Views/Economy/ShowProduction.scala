@@ -63,9 +63,9 @@ object ShowProduction extends DebugView {
           paid = production.hasSpent
         )})
 
-    producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)
-    producibles.indices.take(18).foreach(i => {
-      val p = producibles(i)
+    val produciblesSorted = producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)
+    produciblesSorted.indices.take(18).foreach(i => {
+      val p = produciblesSorted(i)
       val y0 = 45 + 14 * i
       val y1 = y0 + 12
       val colorDenominator = if (p.paid && ! p.started) Colors.BrightGray else p.colorDenominator

@@ -87,6 +87,7 @@ class SquadAcePilots extends Squad {
     if (dropMissions.nonEmpty) {
       activity = "AceEscortDrop"
       followSquad(dropMissions.maxBy(_.duration))
+      return
     }
 
     // Help other squads with anti-air
@@ -176,7 +177,7 @@ class SquadAcePilots extends Squad {
       otherSquad.targets.map(_.filter(_.flying)).getOrElse(Seq.empty),
       base.map(_.enemies.filter(_.flying)).getOrElse(Seq.empty),
       SquadAutomation.unrankedAround(this, vicinity))
-     Some(targetsUnsorted.toVector.sortBy(_.pixelDistanceSquared(base.map(_.heart.center).getOrElse(vicinity))))
+    setTargets(targetsUnsorted.toVector.sortBy(_.pixelDistanceSquared(base.map(_.heart.center).getOrElse(vicinity))))
     SquadAutomation.send(this)
   }
 }

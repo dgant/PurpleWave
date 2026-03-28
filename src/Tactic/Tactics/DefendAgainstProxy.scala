@@ -47,7 +47,7 @@ class DefendAgainstProxy extends Tactic {
     defenders.matcher = IsAny(IsWorker, IsWarrior)
     defenders.inquire().foreach(defendersAvailable++=)
 
-    val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony))
+    val isCannony = proxies.exists(_.isAny(Terran.Bunker, Protoss.PhotonCannon, Zerg.CreepColony, Zerg.SunkenColony))
 
     // For each proxy, in priority order, decide who if anyone to assign to it
     proxies.foreach(proxy => {
@@ -61,7 +61,7 @@ class DefendAgainstProxy extends Tactic {
           && u.pixelDistanceCenter(proxy) < u.effectiveRangePixels + 96).map(_.remainingCompletionFrames))
         .getOrElse(Forever())
       val isEmergency = (
-        proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon)
+        proxy.isAny(Terran.Barracks, Terran.Bunker, Protoss.PhotonCannon, Zerg.SunkenColony)
           && (proxy.powered || ! proxy.unitClass.isProtoss || With.units.enemy.exists(u =>
             Protoss.Pylon(u)
               && With.grids.psi3Height.psiPoints.view.exists(p => u.tileTopLeft.add(p) == proxy.tileTopLeft))))

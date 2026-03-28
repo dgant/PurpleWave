@@ -91,7 +91,7 @@ class TacticWorkerScout extends Tactic {
       val scout     = orderedScouts(i)
       val ovieBase  = With.tactics.scoutWithOverlord.vicinity.base.filter(b => With.tactics.scoutWithOverlord.units.nonEmpty)
       val base      = Maff
-        .orElse(basesToScout.filter(_.isCross || i > 0 || ! With.blackboard.crossScout()), basesToScout)
+        .orElse(basesToScoutQueue.filter(_.isCross || i > 0 || ! With.blackboard.crossScout()), basesToScoutQueue)
         .minBy(b => scout.pixelDistanceTravelling(b.townHallTile) + 32 * 64 * Maff.fromBoolean(ovieBase.contains(b)))
       val bases     = Seq(base) ++ base.natural.filter(natural => ! enemyHasCombatUnits && ! base.tiles.exists(t => t.buildable && ! t.explored))
       val explored  = base.townHallArea.tiles.exists(_.explored)

@@ -71,7 +71,6 @@ abstract class MissionDrop extends Mission {
   }
 
   private def ignore(base: Base): Boolean = {
-    if (base.owner.isNeutral) return true
     if (base.owner.isFriendly) return true
     if (base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
     if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true
@@ -111,8 +110,8 @@ abstract class MissionDrop extends Mission {
     val targetBase = Maff.sampleWeighted[Base](bases, b =>
       if (b.owner.isNeutral) Maff.nanToOne(
         With.framesSince(b.lastFrameScoutedByUs).toDouble
-        * Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin),      10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))
-        / Math.min(b.heart.groundTiles(With.scouting.enemyHome),  10 * b.heart.tileDistanceFast(With.scouting.enemyHome)))
+        * Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin),  10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))
+        / Math.min(b.heart.groundTiles(With.scouting.enemyHome),          10 * b.heart.tileDistanceFast(With.scouting.enemyHome)))
       else if (With.scouting.enemyMain.contains(b))     if ( ! b.owner.isZerg && With.frame > Minutes(13)()) 0 else 16 * (With.scouting.enemyProximity + 1)
       else if (With.scouting.enemyNatural.contains(b))  if ( ! b.owner.isZerg && With.frame > Minutes(16)()) 0 else 16 * (With.scouting.enemyProximity - 0.5)
       else Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin), 10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))).get

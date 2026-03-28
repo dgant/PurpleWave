@@ -248,13 +248,13 @@ class PvPOpening extends GameplanImperative {
       if (archivesComplete) {
         // We've come too far; no point switching
       } else if (archivesStarted) {
-        swapOutOfDT = roll("DTSwap", 0.65 * mirrorMultiplier)
+        swapOutOfDT = roll("SwapFromDT", 0.65 * mirrorMultiplier)
       } else if (citadelComplete) {
-        swapOutOfDT = roll("DTSwap", 0.75 * mirrorMultiplier)
+        swapOutOfDT = roll("SwapFromDT", 0.75 * mirrorMultiplier)
       } else if (caught.nonEmpty) {
-        swapOutOfDT = roll("DTSwap", 0.85 * mirrorMultiplier)
-      } else if (maybeMirror && enemyDarkTemplarLikely && unitsComplete(Protoss.CitadelOfAdun) < 0 && ! have(Protoss.Forge)) {
-        swapOutOfDT = roll("DTSwap", 0.75)
+        swapOutOfDT = roll("SwapFromDT", 0.85 * mirrorMultiplier)
+      } else if (maybeMirror && enemyDarkTemplarLikely && ! haveComplete(Protoss.CitadelOfAdun) && ! have(Protoss.Forge)) {
+        swapOutOfDT = roll("SwapFromDT", 0.75)
       }
       if (swapOutOfDT) {
         PvPDT.swapOut()

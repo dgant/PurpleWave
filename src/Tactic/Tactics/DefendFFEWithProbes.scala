@@ -53,12 +53,13 @@ class DefendFFEWithProbes extends Tactic {
     val defensePoints = Maff.orElse(
       With.units.ours.filter(Protoss.PhotonCannon)  .filter(_.base.contains(With.geography.ourMain)),
       With.units.ours.filter(Protoss.Forge)         .filter(_.base.contains(With.geography.ourMain)))
+      .toVector
+      .sortBy(_.totalHealth)
     
     lazy val zerglings    = With.units.enemy.find(Zerg.Zergling)
     lazy val threatSource = zerglings.map(_.pixel).getOrElse(With.scouting.enemyHome.center)
 
     if (defensePoints.isEmpty) return
-    defensePoints.toVector.sortBy(_.totalHealth)
     
     val probesRequired = probeCount
     if (defenders.units.size > probesRequired) {
@@ -103,7 +104,9 @@ class DefendFFEWithProbes extends Tactic {
         }
       })
 
-      val targets = With.units.enemy.filter(e => e.canAttack && defensePoints.exists(_.pixelDistanceCenter(toDefend) < 96)).toVector
+      val targets = With.units.enemy
+        .filter(e => e.canAttack && defensePoints.exists(e.pixelDistanceEdge(_) < 96))
+        .toVector
       workers.foreach(_.intend(this)
         .setCanFlee(false)
         .setTerminus(toDefend)

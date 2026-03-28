@@ -135,7 +135,9 @@ final class Tactician extends TimedTask {
     }
 
     // Proactive drop/harassment defense
-    if (With.scouting.enemyProximity < 0.5 && (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)()) || With.unitsShown.any(Terran.Vulture, Terran.Dropship)) {
+    if (With.scouting.enemyProximity < 0.5 && (
+      (With.geography.ourBases.map(_.metro).distinct.size > 1 && With.frame > Minutes(10)())
+      || With.unitsShown.any(Terran.Vulture, Terran.Dropship))) {
 
       val dropVulnerableBases = With.geography.ourBases.filter(b =>
         b.workerCount >= 3

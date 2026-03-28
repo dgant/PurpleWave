@@ -26,7 +26,7 @@ trait Geo {
   lazy val isPocket         : Boolean           = isInterior && ! isMain && ! island
   lazy val maxAltitude      : Int               = Maff.max(tiles.view.map(_.altitude)).getOrElse(0)
   lazy val radians          : Double            = Points.middle.radiansTo(heart.center)
-  lazy val rushDistanceMin  : Double            = Maff.max(rushDistances).getOrElse(0)
+  lazy val rushDistanceMin  : Double            = Maff.min(rushDistances).getOrElse(0)
   lazy val rushDistanceMax  : Double            = Maff.max(rushDistances).getOrElse(0)
   lazy val arrow            : String            = RadianArrow(Points.tileMiddle.radiansTo(heart))
   lazy val adjective        : String            = if (island) "island " else if (isBackyard) "backyard " else if (isPocket) "pocket " else ""

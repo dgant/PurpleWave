@@ -29,7 +29,7 @@ class SquadDefendBase(base: Base) extends Squad {
   private var lastAction = "Def"
   override def toString: String = f"$lastAction ${base.name.take(5)}"
 
-  val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.base.filter(_.isOurs).forall(base==), CountEverything)
+  val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.metro.contains(base.metro), CountEverything)
 
   val plugWall = new Cache(() => With.placement.wall
     .filter(wall => With.units.ours.filter(IsBuilding).map(_.tileTopLeft).exists(t => wall.buildings.exists(_._1 == t)))
@@ -45,8 +45,7 @@ class SquadDefendBase(base: Base) extends Squad {
   val zoneAndChoke: Cache[(Zone, Option[Edge])] = new Cache(() => {
     if (plugWall().isDefined) {
       (plugWall().get.zone, Maff.minBy(plugWall().get.zone.edges)(_.pixelCenter.groundPixels(plugWall().get.center)))
-    }
-    if (plugEdge().isDefined) {
+    } else if (plugEdge().isDefined) {
       plugEdge().get
     } else {
       val zone        = base.zone

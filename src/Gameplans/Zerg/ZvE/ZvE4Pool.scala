@@ -13,7 +13,7 @@ class ZvE4Pool extends GameplanImperative {
     once(5, Zerg.Drone)
     pump(Zerg.Zergling)
 
-    var cancelExtractor = have(Zerg.Extractor)
+    var cancelExtractor = false
     cancelExtractor ||= supplyUsed200 >= supplyTotal200
     cancelExtractor ||= supplyUsed200 < supplyTotal200 - 1
     cancelExtractor ||= With.units.ours.exists(u => Zerg.Extractor(u) && u.remainingCompletionFrames < 72)

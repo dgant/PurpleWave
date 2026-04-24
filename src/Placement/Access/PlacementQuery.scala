@@ -11,6 +11,7 @@ import Placement.Templating.PointGas
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
+import Utilities.Time.Forever
 
 class PlacementQuery {
   var requirements      : PlacementQueryParameters  = new PlacementQueryParameters
@@ -141,11 +142,15 @@ class PlacementQuery {
         requirements.tile.flatMap(_.base),
         requirements.base,
         requirements.zone.flatMap(_.bases),
-        With.geography.ourBases,
         With.geography.ourBasesAndSettlements)
     bases
       .flatMap(_.gas)
       .filter(_.isNeutral)
+      .toVector
+      .sortBy(gas => (
+        ?(gas.gasLeft > 500, 0, 1),
+        gas.base.flatMap(_.townHall.map(_.frameDiscovered)).getOrElse(Forever()),
+        -gas.gasLeft))
       .map(_.tileTopLeft)
       .map(Foundation(_, new PointGas))
       .toSeq

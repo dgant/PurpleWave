@@ -34,8 +34,7 @@ abstract class Action {
         previousCredit.foreach(unit.agent.act)
       }
     }
-    With.agents.actionPerformance(this.name) = With.agents.actionPerformance.getOrElse(this.name, new ActionPerformance)
-    val performance = With.agents.actionPerformance(this.name)
+    val performance = With.agents.actionPerformance.getOrElseUpdate(name, new ActionPerformance)
     val nanosAfter = System.nanoTime()
     performance.durationNanos += Math.max(0, nanosAfter - nanosBefore)
     performance.invocations += 1

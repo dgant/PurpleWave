@@ -25,11 +25,7 @@ class DefenseDivision(val division: Division) extends UnitGroup {
 
   lazy val base: Base =
     GetDefenseBase(division.bases
-      .toVector
-      .sortBy( - _.economicValue())
-      .sortBy( ! _.isEnemy)
-      .sortBy( ! _.isOurs)
-      .minBy( ! _.plannedExpoRecently)) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
+      .minBy(b => (! b.plannedExpoRecently, ! b.isOurs, ! b.isEnemy, - b.economicValue()))) // TODO: Base defense logic needs to handle case where OTHER bases need scouring and not concave in just one
 
   override def groupUnits: Seq[UnitInfo] = enemiesInner
 

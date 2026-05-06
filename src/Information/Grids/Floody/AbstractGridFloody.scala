@@ -78,20 +78,33 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] with GridUpdate
 
   private final def addUnit(floody: FloodyUnit): Unit = {
     units(floody.unit) = floody
-    flood(floody).foreach {
-      case (tile, value) =>
-        val floodyTile = tiles(tile.i)
-        floodyTile.depths.add(FloodyUnitDepth(floody, value))
-        floodyTile.maxDepth = Math.max(floodyTile.maxDepth, value) }
+    val pattern = AbstractGridFloody.pattern(floody.radius + margin)
+    var i = 0
+    while (i < pattern.length) {
+      val offset = pattern(i)
+      val x = floody.tile.x + offset.x
+      val y = floody.tile.y + offset.y
+      if (x >= 0 && y >= 0 && x < width && y < height) {
+        val floodyTile = tiles(x + y * width)
+        floodyTile.depths.add(FloodyUnitDepth(floody, offset.value))
+        floodyTile.maxDepth = Math.max(floodyTile.maxDepth, offset.value)
+      }
+      i += 1
+    }
   }
 
   private final def removeUnit(floody: FloodyUnit): Unit = {
     units.remove(floody.unit)
-    flood(floody).foreach {
-      case (tile, value) =>
-        val floodyTile = tiles(tile.i)
+    val pattern = AbstractGridFloody.pattern(floody.radius + margin)
+    var i = 0
+    while (i < pattern.length) {
+      val offset = pattern(i)
+      val x = floody.tile.x + offset.x
+      val y = floody.tile.y + offset.y
+      if (x >= 0 && y >= 0 && x < width && y < height) {
+        val floodyTile = tiles(x + y * width)
         floodyTile.depths.removeIf(_.unit.unit == floody.unit)
-        if (value >= floodyTile.maxDepth) {
+        if (offset.value >= floodyTile.maxDepth) {
           var j = 0
           val size = floodyTile.depths.size
           floodyTile.maxDepth = defaultValue
@@ -100,11 +113,36 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] with GridUpdate
             j += 1
           }
         }
+      }
+      i += 1
+    }
+  }
+}
+
+private object AbstractGridFloody {
+  private final case class FloodOffset(x: Int, y: Int, value: Int)
+  @volatile private var cache = Array.empty[Array[FloodOffset]]
+
+  private def pattern(max: Int): Array[FloodOffset] = {
+    val current = cache
+    if (max < current.length) return current(max)
+    this.synchronized {
+      if (max >= cache.length) {
+        val updated = cache.toBuffer
+        while (updated.length <= max) updated += build(updated.length)
+        cache = updated.toArray
+      }
+      cache(max)
     }
   }
 
-  @inline private final def flood(floody: FloodyUnit): Seq[(Tile, Int)] = {
-    val max = floody.radius + margin
-    (0 to max).view.flatMap(d => Ring(d).map(p => (floody.tile.add(p), max - d))).filter(_._1.valid)
+  private def build(max: Int): Array[FloodOffset] = {
+    val output = Array.newBuilder[FloodOffset]
+    var d = 0
+    while (d <= max) {
+      Ring(d).foreach(p => output += FloodOffset(p.x, p.y, max - d))
+      d += 1
+    }
+    output.result()
   }
 }

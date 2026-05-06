@@ -4,18 +4,12 @@ import Information.Battles.BattleFilters
 import Information.Battles.Types.{Division, DivisionRadius}
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 class BattleProcessDivisions extends BattleProcessState {
   override def step(): Unit = {
 
     val battles = With.battles.nextBattlesLocal
-
-    var zones = (With.geography.enemyBases ++ With.geography.ourBasesAndSettlements).map(_.zone).distinct
-    if (zones.isEmpty) {
-      zones = Vector(With.geography.home.zone, With.scouting.enemyHome.zone).distinct
-    }
 
     val salientBaseGroups = Seq(
       With.geography.enemyBases,
@@ -35,11 +29,7 @@ class BattleProcessDivisions extends BattleProcessState {
             .view
             .flatMap(enemy =>
               salientBaseGroups
-                .flatMap(bases =>
-                  Maff.minBy(bases
-                    .map(base => (base, distance(enemy, base)))
-                    .filter(p => p._2 <  DivisionRadius.inner || enemy.base.contains(p._1)))(_._2)
-                    .map(_._1)))
+                .flatMap(relevantBase(enemy, _)))
             .toSet))
       .toVector
 
@@ -63,4 +53,17 @@ class BattleProcessDivisions extends BattleProcessState {
   }
 
   private def distance(unit: UnitInfo, base: Base): Double = unit.pixelDistanceTravelling(base.heart)
+
+  private def relevantBase(unit: UnitInfo, bases: Seq[Base]): Option[Base] = {
+    var output: Option[Base] = None
+    var outputDistance = Double.PositiveInfinity
+    bases.foreach(base => {
+      val d = distance(unit, base)
+      if ((d < DivisionRadius.inner || unit.base.contains(base)) && d < outputDistance) {
+        output = Some(base)
+        outputDistance = d
+      }
+    })
+    output
+  }
 }

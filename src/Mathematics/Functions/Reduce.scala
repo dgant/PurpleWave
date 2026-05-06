@@ -44,7 +44,14 @@ trait Reduce {
     value > min && value < max
   }
 
-  @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = x.dropRight(1).find(_.nonEmpty).getOrElse(x.last)
+  @inline final def orElse[T](x: Iterable[T]*): Iterable[T] = {
+    var i = 0
+    while (i < x.length - 1) {
+      if (x(i).nonEmpty) return x(i)
+      i += 1
+    }
+    x.last
+  }
   @inline final def orElseFiltered[T](x: Iterable[T]*)(predicate: T => Boolean): Iterable[T] = x
     .find(_.exists(predicate))
     .map(_.filter(predicate)).getOrElse(Iterable.empty)
@@ -134,7 +141,7 @@ trait Reduce {
       if (first) {
         first = false
         output      = next
-        outputValue = feature(next)
+        outputValue = nextValue
       } else if (ordering.compare(nextValue, outputValue) < 0) {
         output      = next
         outputValue = nextValue
@@ -155,7 +162,7 @@ trait Reduce {
       if (first) {
         first = false
         output      = next
-        outputValue = feature(next)
+        outputValue = nextValue
       } else if (ordering.compare(nextValue, outputValue) > 0) {
         output      = next
         outputValue = nextValue

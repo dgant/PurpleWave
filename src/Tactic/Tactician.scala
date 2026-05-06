@@ -115,8 +115,7 @@ final class Tactician extends TimedTask {
 
     // Get freelancers
     val freelancers = (new ListBuffer[FriendlyUnitInfo] ++ With.recruiter.available.view.filter(u => IsRecruitableForCombat(u) && ! Zerg.Overlord(u)))
-      .sortBy( - _.frameDiscovered)     // Assign new units first, as they're most likely to be able to help on defense and least likely to have to abandon a push
-      .sortBy(_.unitClass.isTransport)  // So transports can go to squads which need them
+      .sortBy(u => (u.unitClass.isTransport, - u.frameDiscovered)) // New units first, with transports after other candidates so squads that need them can still claim them
     val freelancerCountInitial  = freelancers.size
     def freelancerValue         = freelancers.view.map(_.subjectiveValue).sum
     val freelancerValueInitial  = freelancerValue

@@ -19,9 +19,18 @@ object Assignment {
      filter       : (FriendlyUnitInfo, Squad) => Boolean  = (f, s) => true): Unit = {
     var i = 0
     while (i < freelancers.length) {
-      val freelancer      = freelancers(i)
-      val squadsEligible  = squads.filter(squad => filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue)
-      val bestSquad       = Maff.minBy(squadsEligible)(squad => freelancer.pixelDistanceTravelling(squad.vicinity) + ?(freelancer.squad.contains(squad), 0, 320))
+      val freelancer = freelancers(i)
+      var bestSquad: Option[Squad] = None
+      var bestScore = Double.PositiveInfinity
+      squads.foreach(squad => {
+        if (filter(freelancer, squad) && squad.candidateValue(freelancer) > minimumValue) {
+          val score = freelancer.pixelDistanceTravelling(squad.vicinity) + ?(freelancer.squad.contains(squad), 0, 320)
+          if (score < bestScore) {
+            bestSquad = Some(squad)
+            bestScore = score
+          }
+        }
+      })
       if (bestSquad.isDefined) {
         bestSquad.get.addUnit(freelancers.remove(i))
         With.recruiter.lockTo(bestSquad.get.lock, freelancer)

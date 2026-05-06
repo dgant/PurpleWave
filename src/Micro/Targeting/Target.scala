@@ -40,6 +40,7 @@ object Target {
     val matchups      = attacker.matchups.targets
     val engaged       = attacker.team.exists(_.engagedUpon)
     val targetInRange = attacker.matchups.targetNearest.exists(t => hasCombatPriority(t) && attacker.inRangeToAttack(t))
+    val allFilters    = filtersRequired(attacker) ++ filters
     val strataUnfilteredInRange = ?(
       targetInRange,
       Seq(
@@ -58,14 +59,14 @@ object Target {
 
     // Returns (rank by score?, targets)
     strataUnfiltered.view
-      .map(p => (p._1, legal(attacker, p._2, filters: _*))).find(_._2.nonEmpty)
+      .map(p => (p._1, legalWithFilters(attacker, p._2, allFilters))).find(_._2.nonEmpty)
       .getOrElse((false, Seq.empty))
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
     val targets = defaultTargets(attacker, filters: _*)
     ?(targets._1,
-      bestUnfiltered(attacker, legal(attacker, targets._2, filters: _*)),
+      bestUnfiltered(attacker, targets._2),
       targets._2.headOption)
   }
 
@@ -78,7 +79,10 @@ object Target {
   }
 
   def legal(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], filters: TargetFilter*): Seq[UnitInfo] = {
-    val allFilters = filtersRequired(attacker) ++ filters
+    legalWithFilters(attacker, targets, filtersRequired(attacker) ++ filters)
+  }
+
+  private def legalWithFilters(attacker: FriendlyUnitInfo, targets: Seq[UnitInfo], allFilters: Seq[TargetFilter]): Seq[UnitInfo] = {
     targets.view.filter(target => ?(With.yolo.active,
       attacker.canAttack(target) && TargetFilterType.legal(attacker, target),
       allFilters.forall(_.legal(attacker, target))))

@@ -9,16 +9,15 @@ object BehaviorFight extends SimulacrumBehavior {
   @inline override def act(simulacrum: Simulacrum): Unit = {
     // Remove target if invalid
     // If no valid target, pick target
-    simulacrum.setTarget(simulacrum.target
-      .filter(t =>
-        simulacrum.cooldownTargeting > 0
-        && validTarget(simulacrum, t)
-        && simulacrum.inRangeToAttack(t))
-      .orElse({
+    val targetChosen = simulacrum.target match {
+      case target @ Some(t) if simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t) =>
+        target
+      case _ =>
         simulacrum.cooldownTargeting = 72
         simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
         Maff.maxBy(simulacrum.targets)(TargetScoring.fast(simulacrum, _))
-      }))
+    }
+    simulacrum.setTarget(targetChosen)
 
     // If no valid target, flee
     if (simulacrum.target.isEmpty) {

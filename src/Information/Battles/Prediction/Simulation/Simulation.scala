@@ -48,8 +48,16 @@ final class Simulation {
         With.units.mutex.unlock()
       }
     }
-    simulacra.foreach(_.act())
-    simulacra.foreach(_.update())
+    var simulacrumIndex = 0
+    while (simulacrumIndex < realUnits.length) {
+      realUnits(simulacrumIndex).simulacrum.act()
+      simulacrumIndex += 1
+    }
+    simulacrumIndex = 0
+    while (simulacrumIndex < realUnits.length) {
+      realUnits(simulacrumIndex).simulacrum.update()
+      simulacrumIndex += 1
+    }
     battle.simulationFrames += 1
     if (battle.logSimulation) {
       val sb = new StringBuilder(1024)

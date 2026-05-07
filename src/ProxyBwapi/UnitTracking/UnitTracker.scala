@@ -12,6 +12,7 @@ import Utilities.UnitFilters.{IsAny, UnitFilter}
 
 import java.util.concurrent.locks.ReentrantLock
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 
 final class UnitTracker {
   val maxHypotheticals = 100
@@ -22,6 +23,7 @@ final class UnitTracker {
   private val bufferNeutral   = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
   private val bufferHistoric  = new UnorderedBuffer[HistoricalUnitInfo](bwapiIds)
   private val hypothetical    = new UnorderedBuffer[ForeignUnitInfo](bwapiIds)
+  private val deadForeignIds  = new ArrayBuffer[Int]()
 
   val mutex: ReentrantLock = new ReentrantLock()
 
@@ -60,11 +62,32 @@ final class UnitTracker {
     try {
       mutex.lock()
       birthAll()
-      all.foreach(_.update())
-      foreign.filter(_.visibility == Visibility.Dead).map(_.id).foreach(kill)
+      updateFriendly(bufferFriendly)
+      updateForeign(bufferEnemy)
+      updateForeign(bufferNeutral)
+      killDeadForeign()
     } finally {
       mutex.unlock()
     }
+  }
+  private def updateFriendly(buffer: UnorderedBuffer[FriendlyUnitInfo]): Unit = {
+    buffer.foreach(unit => if ( ! GhostUnit(unit)) unit.update())
+  }
+  private def updateForeign(buffer: UnorderedBuffer[ForeignUnitInfo]): Unit = {
+    buffer.foreach(unit => if ( ! GhostUnit(unit)) {
+      unit.update()
+      if (unit.visibility == Visibility.Dead) {
+        deadForeignIds += unit.id
+      }
+    })
+  }
+  private def killDeadForeign(): Unit = {
+    var i = 0
+    while (i < deadForeignIds.length) {
+      kill(deadForeignIds(i))
+      i += 1
+    }
+    deadForeignIds.clear()
   }
   def onUnitRenegade(bwapiUnit: bwapi.Unit): Unit = {
     kill(bwapiUnit.getID)

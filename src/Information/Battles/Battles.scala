@@ -35,33 +35,11 @@ class Battles extends TimedTask {
   val clustering          = new BattleClustering
   val estimationRuntimes  = new mutable.Queue[Int]
 
-  def nextBattleNeedingPrediction: Option[Battle] = {
-    var i = 0
-    while (i < nextBattlesLocal.length) {
-      val battle = nextBattlesLocal(i)
-      if ( ! battle.predictionComplete) return Some(battle)
-      i += 1
-    }
-    if ( ! nextBattleGlobalDefend.predictionComplete)   return Some(nextBattleGlobalDefend)
-    if ( ! nextBattleGlobalAttack.predictionComplete)   return Some(nextBattleGlobalAttack)
-    if ( ! nextBattleGlobalSlug.predictionComplete)     return Some(nextBattleGlobalSlug)
-    if ( ! nextBattleGlobalSkirmish.predictionComplete) return Some(nextBattleGlobalSkirmish)
-    None
-  }
-
-  def nextBattleNeedingJudgment: Option[Battle] = {
-    var i = 0
-    while (i < nextBattlesLocal.length) {
-      val battle = nextBattlesLocal(i)
-      if (battle.judgement.isEmpty) return Some(battle)
-      i += 1
-    }
-    if (nextBattleGlobalDefend.judgement.isEmpty)   return Some(nextBattleGlobalDefend)
-    if (nextBattleGlobalAttack.judgement.isEmpty)   return Some(nextBattleGlobalAttack)
-    if (nextBattleGlobalSlug.judgement.isEmpty)     return Some(nextBattleGlobalSlug)
-    if (nextBattleGlobalSkirmish.judgement.isEmpty) return Some(nextBattleGlobalSkirmish)
-    None
-  }
+  def nextBattles: Seq[Battle] = nextBattlesLocal ++ Seq(
+    nextBattleGlobalDefend,
+    nextBattleGlobalAttack,
+    nextBattleGlobalSlug,
+    nextBattleGlobalSkirmish)
 
   private var _processingState: BattleProcessState = new BattleProcessInitial
   def setProcessingState(newState: BattleProcessState): Unit = {

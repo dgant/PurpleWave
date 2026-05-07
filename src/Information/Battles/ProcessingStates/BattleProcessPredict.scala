@@ -8,7 +8,7 @@ class BattleProcessPredict extends BattleProcessState {
   var battles: Seq[Battle] = _
 
   override def step(): Unit = {
-    val unpredicted = With.battles.nextBattleNeedingPrediction
+    val unpredicted = With.battles.nextBattles.find( ! _.predictionComplete)
 
     if (unpredicted.isDefined) {
       val battle = unpredicted.get

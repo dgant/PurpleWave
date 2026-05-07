@@ -86,6 +86,45 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.scala-lang</groupId>
+                        <artifactId>scala-compiler</artifactId>
+                        <version>${scala.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>compile-macros</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <path id="macro.compile.classpath">
+                                    <path refid="maven.plugin.classpath"/>
+                                    <path refid="maven.compile.classpath"/>
+                                </path>
+                                <property name="macro.compile.classpath.value" refid="macro.compile.classpath"/>
+                                <java classname="scala.tools.nsc.Main" fork="true" failonerror="true" classpathref="macro.compile.classpath">
+                                    <arg value="-classpath"/>
+                                    <arg value="${macro.compile.classpath.value}"/>
+                                    <arg value="-d"/>
+                                    <arg value="${project.build.outputDirectory}"/>
+                                    <arg value="${project.basedir}/src-macros/Utilities/TernaryMacros.scala"/>
+                                </java>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>4.5.4</version>

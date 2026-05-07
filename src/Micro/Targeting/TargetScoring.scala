@@ -20,7 +20,7 @@ object TargetScoring {
 
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
     val value = targetValue + 4.0 * injury
-    (if (value > 0) efficacy else 1.0) * value - Maff.inv32 * pixelCost
+    ?(value > 0, efficacy, 1.0) * value - Maff.inv32 * pixelCost
   }
 
   /**

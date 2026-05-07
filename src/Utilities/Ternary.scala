@@ -1,8 +1,8 @@
 package Utilities
 
+import scala.language.experimental.macros
+
 //noinspection ScalaFileName
 object ? {
-  @inline final def apply[T](predicate: Boolean, yes: => T, no: => T): T = {
-    if (predicate) yes else no
-  }
+  def apply[T](predicate: Boolean, yes: => T, no: => T): T = macro TernaryMacros.apply[T]
 }

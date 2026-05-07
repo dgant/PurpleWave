@@ -9,7 +9,7 @@ object BehaviorFight extends SimulacrumBehavior {
     // Remove target if invalid
     // If no valid target, pick target
     val targetChosen = simulacrum.target match {
-      case target @ Some(t) if simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttack(t) =>
+      case target @ Some(t) if simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttackSimulation(t) =>
         target
       case _ =>
         simulacrum.cooldownTargeting = 72
@@ -29,11 +29,11 @@ object BehaviorFight extends SimulacrumBehavior {
 
     val target    = simulacrum.target.get
     val threat    = simulacrum.threat
-    val distance  = simulacrum.pixelDistanceEdge(target)
+    val distance  = simulacrum.pixelDistanceEdgeSimulation(target)
     val range     = simulacrum.pixelRangeAgainst(target)
 
     // Update the target's threat (to help it kite)
-    if (target.threat.forall(_.pixelsToGetInRange(target) > distance - range)) {
+    if (target.threat.forall(_.pixelsToGetInRangeSimulation(target) > distance - range)) {
       target.threat = Some(simulacrum)
     }
 

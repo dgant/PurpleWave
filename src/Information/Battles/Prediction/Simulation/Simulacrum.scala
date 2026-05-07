@@ -8,7 +8,7 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
-import Utilities.?
+import Utilities.{?, LightYear}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -20,7 +20,18 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var unitClass               : UnitClass = _
   var unitSize                : Size.Type = _
   var unitDimensionMin        : Int = _
+  var affectedByDarkSwarm     : Boolean = _
+  var damageAirLarge          : Double = _
+  var damageAirMedium         : Double = _
+  var damageAirSmall          : Double = _
+  var damageGroundLarge       : Double = _
+  var damageGroundMedium      : Double = _
+  var damageGroundSmall       : Double = _
   var pixel                   : Pixel = _
+  var pixelLeft               : Int = _
+  var pixelTop                : Int = _
+  var pixelRightExclusive     : Int = _
+  var pixelBottomExclusive    : Int = _
   var altitude                : Int = _
   var visible                 : Boolean = _
   var alive                   : Boolean = _
@@ -84,8 +95,14 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     unitClass               = realUnit.unitClass
     unitSize                = unitClass.size
     unitDimensionMin        = unitClass.dimensionMin
-    pixel                   = realUnit.pixel
-    altitude                = pixel.tile.altitude
+    affectedByDarkSwarm     = unitClass.affectedByDarkSwarm
+    damageAirLarge          = unitClass.airDamageType.damageAgainstLarge
+    damageAirMedium         = unitClass.airDamageType.damageAgainstMedium
+    damageAirSmall          = unitClass.airDamageType.damageAgainstSmall
+    damageGroundLarge       = unitClass.groundDamageType.damageAgainstLarge
+    damageGroundMedium      = unitClass.groundDamageType.damageAgainstMedium
+    damageGroundSmall       = unitClass.groundDamageType.damageAgainstSmall
+    setPixel(realUnit.pixel)
     visible                 = realUnit.visible
     alive                   = realUnit.alive
     complete                = realUnit.complete
@@ -143,7 +160,23 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   @inline def canMove: Boolean = topSpeedPossible > 0
   @inline def setPixel(newPixel: Pixel): Unit = {
     pixel = newPixel
+    pixelLeft = newPixel.x - unitClass.dimensionLeft
+    pixelTop = newPixel.y - unitClass.dimensionUp
+    pixelRightExclusive = newPixel.x + unitClass.dimensionRightExclusive
+    pixelBottomExclusive = newPixel.y + unitClass.dimensionDownExclusive
     altitude = newPixel.tile.altitude
+  }
+  @inline def pixelDistanceEdgeSimulation(other: Simulacrum): Double = {
+    Maff.broodWarDistanceBox(
+      pixelLeft, pixelTop, pixelRightExclusive, pixelBottomExclusive,
+      other.pixelLeft, other.pixelTop, other.pixelRightExclusive, other.pixelBottomExclusive)
+  }
+  @inline def inRangeToAttackSimulation(target: Simulacrum): Boolean = {
+    val distance = pixelDistanceEdgeSimulation(target)
+    distance <= pixelRangeAgainst(target) && (pixelRangeMin <= 0.0 || distance > pixelRangeMin)
+  }
+  @inline def pixelsToGetInRangeSimulation(target: Simulacrum): Double = {
+    ?(canAttack(target), pixelDistanceEdgeSimulation(target) - pixelRangeAgainst(target), LightYear())
   }
   @inline def canAttack(other: CombatUnit): Boolean = ((other.flying && attacksAgainstAir > 0) || ( ! other.flying && attacksAgainstGround > 0)) && (other.detected || ! other.cloaked)
   @inline def targetValue: Double = _targetValue

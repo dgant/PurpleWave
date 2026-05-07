@@ -19,16 +19,14 @@ object TargetScoring {
     private[this] val attackerDimensionMin       = attacker.unitDimensionMin
     private[this] val attackerCooldownPixelCost  = 0.5 * attacker.cooldownLeft * attacker.topSpeed
     private[this] val attackerFlying             = attacker.flying
-    private[this] val attackerAffectedDarkSwarm  = attacker.unitClass.affectedByDarkSwarm
+    private[this] val attackerAffectedDarkSwarm  = attacker.affectedByDarkSwarm
     private[this] val attackerAltitude           = attacker.altitude
-    private[this] val damageAir                  = attacker.unitClass.airDamageType
-    private[this] val damageGround               = attacker.unitClass.groundDamageType
-    private[this] val damageAirLarge             = damageAir.damageAgainstLarge
-    private[this] val damageAirMedium            = damageAir.damageAgainstMedium
-    private[this] val damageAirSmall             = damageAir.damageAgainstSmall
-    private[this] val damageGroundLarge          = damageGround.damageAgainstLarge
-    private[this] val damageGroundMedium         = damageGround.damageAgainstMedium
-    private[this] val damageGroundSmall          = damageGround.damageAgainstSmall
+    private[this] val damageAirLarge             = attacker.damageAirLarge
+    private[this] val damageAirMedium            = attacker.damageAirMedium
+    private[this] val damageAirSmall             = attacker.damageAirSmall
+    private[this] val damageGroundLarge          = attacker.damageGroundLarge
+    private[this] val damageGroundMedium         = attacker.damageGroundMedium
+    private[this] val damageGroundSmall          = attacker.damageGroundSmall
 
     @inline def apply(target: Simulacrum): Double = {
       val targetPixel = target.pixel

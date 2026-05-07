@@ -34,25 +34,20 @@ object TargetScoring {
       val targetSize = target.unitSize
       val damageMultiplier =
         if (targetFlying) {
-          if (targetSize == Size.Large) damageAirLarge
-          else if (targetSize == Size.Medium) damageAirMedium
-          else damageAirSmall
+          TargetScoring.damageMultiplier(targetSize, damageAirLarge, damageAirMedium, damageAirSmall)
         } else {
-          if (targetSize == Size.Large) damageGroundLarge
-          else if (targetSize == Size.Medium) damageGroundMedium
-          else damageGroundSmall
+          TargetScoring.damageMultiplier(targetSize, damageGroundLarge, damageGroundMedium, damageGroundSmall)
         }
-      val guaranteedToHit = attackerFlying || targetFlying || attackerAffectedDarkSwarm || attackerAltitude >= target.altitude
-      attackValue(
+      fastScore(
         targetValue = target.targetValue,
         injury      = target.injury,
-        pixelCost   = pixelCost(
-          pixelDistance        = Maff.broodWarDistance(attackerX, attackerY, targetPixel.x, targetPixel.y),
-          pixelRange           = if (targetFlying) attackerPixelRangeAir else attackerPixelRangeGround,
-          attackerDimensionMin = attackerDimensionMin,
-          targetDimensionMin   = target.unitDimensionMin,
-          cooldownPixelCost    = attackerCooldownPixelCost),
-        efficacy    = damageMultiplier * ?(guaranteedToHit, 1.0, 0.47))
+        pixelDistance        = Maff.broodWarDistance(attackerX, attackerY, targetPixel.x, targetPixel.y),
+        pixelRange           = if (targetFlying) attackerPixelRangeAir else attackerPixelRangeGround,
+        attackerDimensionMin = attackerDimensionMin,
+        targetDimensionMin   = target.unitDimensionMin,
+        cooldownPixelCost    = attackerCooldownPixelCost,
+        damageMultiplier     = damageMultiplier,
+        guaranteedToHit      = attackerFlying || targetFlying || attackerAffectedDarkSwarm || attackerAltitude >= target.altitude)
     }
   }
 
@@ -83,17 +78,60 @@ object TargetScoring {
     val value = targetValue + 4.0 * injury
     ?(value > 0, efficacy, 1.0) * value - Maff.inv32 * pixelCost
   }
+  @inline private def hitChance(guaranteedToHit: Boolean): Double = {
+    ?(guaranteedToHit, 1.0, 0.47)
+  }
+  @inline private def damageMultiplier(
+    targetSize: Size.Type,
+    damageAgainstLarge: Double,
+    damageAgainstMedium: Double,
+    damageAgainstSmall: Double): Double = {
+    if (targetSize == Size.Large) damageAgainstLarge
+    else if (targetSize == Size.Medium) damageAgainstMedium
+    else damageAgainstSmall
+  }
+  @inline private def fastScore(
+    targetValue: Double,
+    injury: Double,
+    pixelDistance: Double,
+    pixelRange: Double,
+    attackerDimensionMin: Int,
+    targetDimensionMin: Int,
+    cooldownPixelCost: Double,
+    damageMultiplier: Double,
+    guaranteedToHit: Boolean): Double = {
+    attackValue(
+      targetValue = targetValue,
+      injury      = injury,
+      pixelCost   = pixelCost(
+        pixelDistance        = pixelDistance,
+        pixelRange           = pixelRange,
+        attackerDimensionMin = attackerDimensionMin,
+        targetDimensionMin   = targetDimensionMin,
+        cooldownPixelCost    = cooldownPixelCost),
+      efficacy    = damageMultiplier * hitChance(guaranteedToHit))
+  }
 
   /**
     * Scores the value of an (attacker, target) pair. Uses a fast formula, for use in combat sim.
     * Scores are denominated in tiles.
     */
   @inline def fast(attacker: CombatUnit, target: CombatUnit): Double = {
-    attackValue(
+    val damageType = attacker.damageTypeAgainst(target)
+    fastScore(
       targetValue = target.targetValue,
       injury      = target.injury,
-      pixelCost   = pixelCost(attacker, target),
-      efficacy    = attacker.damageMultiplierAgainst(target) * attacker.hitChanceAgainst(target))
+      pixelDistance        = attacker.pixelDistanceCenter(target),
+      pixelRange           = attacker.pixelRangeAgainst(target),
+      attackerDimensionMin = attacker.unitClass.dimensionMin,
+      targetDimensionMin   = target.unitClass.dimensionMin,
+      cooldownPixelCost    = 0.5 * attacker.cooldownLeft * attacker.topSpeed,
+      damageMultiplier     = damageMultiplier(
+        target.unitClass.size,
+        damageType.damageAgainstLarge,
+        damageType.damageAgainstMedium,
+        damageType.damageAgainstSmall),
+      guaranteedToHit      = attacker.guaranteedToHit(target))
   }
 
   @inline def fast(attacker: Simulacrum, target: Simulacrum): Double = {

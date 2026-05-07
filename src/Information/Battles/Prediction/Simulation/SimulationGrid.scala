@@ -29,7 +29,7 @@ final class SimulationGrid {
   @inline def tryMove(unit: Simulacrum, to: Pixel): Unit = {
     val toClamped = to.clamp()
     if (unit.pixel.tile == toClamped.tile) {
-      unit.pixel = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
+      unit.setPixel(unit.pixel.projectUpTo(toClamped, unit.topSpeed))
       return
     }
     if (unit.flying || true) { // Disabling collisions/pathfinding for now
@@ -115,7 +115,7 @@ final class SimulationGrid {
       tileTo += unit
       unit.gridTile = Some(tileTo)
     }
-    unit.pixel = to
+    unit.setPixel(to)
   }
 
   @inline def tryForceV2(unit: Simulacrum, force: Force): Boolean = {
@@ -131,7 +131,7 @@ final class SimulationGrid {
     if (accept) {
       relocateUnit(unit, toStep, Some(tileStep))
     } else {
-      unit.pixel = unit.pixel
+      unit.setPixel(unit.pixel)
     }
     accept
   }

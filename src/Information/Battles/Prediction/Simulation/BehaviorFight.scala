@@ -13,8 +13,7 @@ object BehaviorFight extends SimulacrumBehavior {
         target
       case _ =>
         simulacrum.cooldownTargeting = 72
-        simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-        simulacrum.targets.maxByDouble(TargetScoring.fast(simulacrum, _))
+        simulacrum.targets.removeIfAndMaxByDouble(t => ! validTarget(simulacrum, t), TargetScoring.fastSimulation(simulacrum, _))
     }
     simulacrum.setTarget(targetChosen)
 

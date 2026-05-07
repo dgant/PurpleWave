@@ -18,6 +18,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var player                  : PlayerInfo = _
   var unitClass               : UnitClass = _
   var pixel                   : Pixel = _
+  var altitude                : Int = _
   var visible                 : Boolean = _
   var alive                   : Boolean = _
   var complete                : Boolean = _
@@ -79,6 +80,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     player                  = realUnit.player
     unitClass               = realUnit.unitClass
     pixel                   = realUnit.pixel
+    altitude                = pixel.tile.altitude
     visible                 = realUnit.visible
     alive                   = realUnit.alive
     complete                = realUnit.complete
@@ -134,6 +136,10 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def canMove: Boolean = topSpeedPossible > 0
+  @inline def setPixel(newPixel: Pixel): Unit = {
+    pixel = newPixel
+    altitude = newPixel.tile.altitude
+  }
   @inline def canAttack(other: CombatUnit): Boolean = ((other.flying && attacksAgainstAir > 0) || ( ! other.flying && attacksAgainstGround > 0)) && (other.detected || ! other.cloaked)
   @inline def targetValue: Double = _targetValue
   @inline def act(): Unit = { if (alive && (cooldownLeft == 0 || cooldownMoving == 0)) { behavior.act(this) } }

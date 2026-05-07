@@ -1,7 +1,9 @@
 package Micro.Targeting
 
 import Lifecycle.With
+import Information.Battles.Prediction.Simulation.Simulacrum
 import Mathematics.Maff
+import ProxyBwapi.Size
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{CombatUnit, FriendlyUnitInfo, UnitInfo}
 import Utilities.?
@@ -33,6 +35,29 @@ object TargetScoring {
       injury      = target.injury,
       pixelCost   = pixelCost(attacker, target),
       efficacy    = attacker.damageMultiplierAgainst(target) * attacker.hitChanceAgainst(target))
+  }
+
+  @inline def fastSimulation(attacker: Simulacrum, target: Simulacrum): Double = {
+    val pixelDistance = Maff.broodWarDistance(attacker.pixel.x, attacker.pixel.y, target.pixel.x, target.pixel.y)
+    val pixelRange = if (target.flying) attacker.pixelRangeAir else attacker.pixelRangeGround
+    val pixelCost = Math.max(0,
+          pixelDistance
+      -   pixelRange
+      -   attacker.unitClass.dimensionMin
+      -   target.unitClass.dimensionMin
+      -   0.5 * attacker.cooldownLeft * attacker.topSpeed)
+    val damageType = if (target.flying) attacker.unitClass.airDamageType else attacker.unitClass.groundDamageType
+    val targetSize = target.unitClass.size
+    val damageMultiplier =
+      if (targetSize == Size.Large) damageType.damageAgainstLarge
+      else if (targetSize == Size.Medium) damageType.damageAgainstMedium
+      else damageType.damageAgainstSmall
+    val guaranteedToHit = attacker.flying || target.flying || attacker.unitClass.affectedByDarkSwarm || attacker.altitude >= target.altitude
+    attackValue(
+      targetValue = target.targetValue,
+      injury      = target.injury,
+      pixelCost   = pixelCost,
+      efficacy    = damageMultiplier * ?(guaranteedToHit, 1.0, 0.47))
   }
 
   /**

@@ -109,6 +109,29 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
     }
     if (_size == 0) None else Some(output)
   }
+  @inline def removeIfAndMaxByDouble(predicate: T => Boolean, feature: T => Double): Option[T] = {
+    var i = 0
+    var output: T = null
+    var outputValue = 0.0
+    var found = false
+    while (i < _size) {
+      val value = values(i)
+      if (predicate(value)) {
+        values(i) = values(_size - 1)
+        values(_size - 1) = null
+        _size -= 1
+      } else {
+        val nextValue = feature(value)
+        if ( ! found || java.lang.Double.compare(nextValue, outputValue) > 0) {
+          found = true
+          output = value
+          outputValue = nextValue
+        }
+        i += 1
+      }
+    }
+    if (found) Some(output) else None
+  }
 
   @inline def clear(): Unit = {
     // Empty all populated values without losing allocated space

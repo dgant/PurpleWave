@@ -4,7 +4,7 @@ import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
 import Performance.Cache
-import ProxyBwapi.Damage
+import ProxyBwapi.{Damage, Size}
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -160,7 +160,13 @@ trait CombatUnit {
   @inline final def attacksAgainst                (enemy: CombatUnit)                                 : Int     = ?(enemy.flying, attacksAgainstAir, attacksAgainstGround)
   @inline final def cooldownMaxAgainst            (enemy: CombatUnit)                                 : Int     = ?(enemy.flying, cooldownMaxAir, cooldownMaxGround)
   @inline final def pixelRangeAgainst             (enemy: CombatUnit)                                 : Double  = ?(enemy.flying, pixelRangeAir,  pixelRangeGround)
-  @inline final def damageMultiplierAgainst       (enemy: CombatUnit)                                 : Double  = damageTypeAgainst(enemy)(enemy.unitClass.size)
+  @inline final def damageMultiplierAgainst(enemy: CombatUnit): Double = {
+    val damageType = damageTypeAgainst(enemy)
+    val enemySize = enemy.unitClass.size
+    if (enemySize == Size.Large) damageType.damageAgainstLarge
+    else if (enemySize == Size.Medium) damageType.damageAgainstMedium
+    else damageType.damageAgainstSmall
+  }
   @inline final def dpfOnNextHitAgainst           (enemy: CombatUnit)                                 : Double  = ?(unitClass.suicides, damageOnNextHitAgainst(enemy), Math.max(0.0, Maff.nanToZero(damageOnNextHitAgainst(enemy).toDouble / cooldownMaxAgainst(enemy))))
   @inline final def damageTypeAgainst             (enemy: CombatUnit)                                 : Damage.Type = ?(enemy.flying, unitClass.airDamageType, unitClass.groundDamageType)
 
@@ -184,7 +190,7 @@ trait CombatUnit {
     val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShieldPoints + enemy.armorShield * hits)
     val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
     val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
-    val damageToHealthScale     = damageTypeAgainst(enemy)(enemy.unitClass.size)
+    val damageToHealthScale     = damageMultiplierAgainst(enemy)
     val damageToHealth          = Math.max(0.0, (damageAssignedToHealth - enemy.armorHealth * hits) * damageToHealthScale)
     val damageDealtTotal        = damageToHealth + damageToShields
     val hitChance               = hitChanceAgainst(enemy, from, to)

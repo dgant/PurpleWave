@@ -47,6 +47,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var subjectiveValue         : Double = _
   var _targetValue            : Double = _
   var injury                  : Double = _
+  var isFriendlyCached        : Boolean = _
   // Simulacrum properties
   var simulation              : Simulation = _
   var behavior                : SimulacrumBehavior = BehaviorInitial
@@ -107,6 +108,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     subjectiveValue         = realUnit.subjectiveValue
     _targetValue            = realUnit.targetValue
     recalculateInjury()
+    isFriendlyCached        = realUnit.isFriendly
     // Simulacrum properties
     simulation              = newSimulation
     behavior                = BehaviorInitial

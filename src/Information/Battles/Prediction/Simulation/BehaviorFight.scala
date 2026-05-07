@@ -74,6 +74,6 @@ object BehaviorFight extends SimulacrumBehavior {
   @inline def validTarget(attacker: Simulacrum, target: Simulacrum): Boolean = {
     (target.alive
       && attacker.canAttack(target)
-      && (attacker.isFriendly || target.shouldScoreIfOurs)) // Enemy units should not target unscored units
+      && (attacker.isFriendlyCached || target.shouldScoreIfOurs)) // Enemy units should not target unscored units
   }
 }

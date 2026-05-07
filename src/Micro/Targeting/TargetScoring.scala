@@ -12,12 +12,28 @@ import Utilities.UnitFilters.IsAny
 object TargetScoring {
 
   @inline private def pixelCost(attacker: CombatUnit, target: CombatUnit): Double = {
+    pixelCost(
+      pixelDistance        = attacker.pixelDistanceCenter(target),
+      pixelRange           = attacker.pixelRangeAgainst(target),
+      attackerDimensionMin = attacker.unitClass.dimensionMin,
+      targetDimensionMin   = target.unitClass.dimensionMin,
+      cooldownLeft         = attacker.cooldownLeft,
+      topSpeed             = attacker.topSpeed)
+  }
+
+  @inline private def pixelCost(
+    pixelDistance: Double,
+    pixelRange: Double,
+    attackerDimensionMin: Int,
+    targetDimensionMin: Int,
+    cooldownLeft: Int,
+    topSpeed: Double): Double = {
     Math.max(0,
-          attacker.pixelDistanceCenter(target)
-      -   attacker.pixelRangeAgainst(target)
-      -   attacker.unitClass.dimensionMin
-      -   target.unitClass.dimensionMin
-      -   0.5 * attacker.cooldownLeft * attacker.topSpeed)
+          pixelDistance
+      -   pixelRange
+      -   attackerDimensionMin
+      -   targetDimensionMin
+      -   0.5 * cooldownLeft * topSpeed)
   }
 
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
@@ -37,15 +53,9 @@ object TargetScoring {
       efficacy    = attacker.damageMultiplierAgainst(target) * attacker.hitChanceAgainst(target))
   }
 
-  @inline def fastSimulation(attacker: Simulacrum, target: Simulacrum): Double = {
+  @inline def fast(attacker: Simulacrum, target: Simulacrum): Double = {
     val pixelDistance = Maff.broodWarDistance(attacker.pixel.x, attacker.pixel.y, target.pixel.x, target.pixel.y)
     val pixelRange = if (target.flying) attacker.pixelRangeAir else attacker.pixelRangeGround
-    val pixelCost = Math.max(0,
-          pixelDistance
-      -   pixelRange
-      -   attacker.unitClass.dimensionMin
-      -   target.unitClass.dimensionMin
-      -   0.5 * attacker.cooldownLeft * attacker.topSpeed)
     val damageType = if (target.flying) attacker.unitClass.airDamageType else attacker.unitClass.groundDamageType
     val targetSize = target.unitClass.size
     val damageMultiplier =
@@ -56,7 +66,13 @@ object TargetScoring {
     attackValue(
       targetValue = target.targetValue,
       injury      = target.injury,
-      pixelCost   = pixelCost,
+      pixelCost   = pixelCost(
+        pixelDistance        = pixelDistance,
+        pixelRange           = pixelRange,
+        attackerDimensionMin = attacker.unitClass.dimensionMin,
+        targetDimensionMin   = target.unitClass.dimensionMin,
+        cooldownLeft         = attacker.cooldownLeft,
+        topSpeed             = attacker.topSpeed),
       efficacy    = damageMultiplier * ?(guaranteedToHit, 1.0, 0.47))
   }
 

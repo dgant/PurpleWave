@@ -13,7 +13,7 @@ object BehaviorFight extends SimulacrumBehavior {
         target
       case _ =>
         simulacrum.cooldownTargeting = 72
-        simulacrum.targets.removeIfAndMaxByDouble(t => ! validTarget(simulacrum, t), TargetScoring.fastSimulation(simulacrum, _))
+        chooseTarget(simulacrum)
     }
     simulacrum.setTarget(targetChosen)
 
@@ -74,5 +74,28 @@ object BehaviorFight extends SimulacrumBehavior {
     (target.alive
       && attacker.canAttack(target)
       && (attacker.isFriendlyCached || target.shouldScoreIfOurs)) // Enemy units should not target unscored units
+  }
+
+  @inline private def chooseTarget(attacker: Simulacrum): Option[Simulacrum] = {
+    val targets = attacker.targets
+    var i = 0
+    var output: Simulacrum = null
+    var outputValue = 0.0
+    var found = false
+    while (i < targets.length) {
+      val target = targets(i)
+      if ( ! validTarget(attacker, target)) {
+        targets.removeAt(i)
+      } else {
+        val targetValue = TargetScoring.fast(attacker, target)
+        if ( ! found || java.lang.Double.compare(targetValue, outputValue) > 0) {
+          found = true
+          output = target
+          outputValue = targetValue
+        }
+        i += 1
+      }
+    }
+    if (found) Some(output) else None
   }
 }

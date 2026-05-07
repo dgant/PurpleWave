@@ -64,10 +64,78 @@ object Target {
   }
 
   def best(attacker: FriendlyUnitInfo, filters: TargetFilter*): Option[UnitInfo] = {
-    val targets = defaultTargets(attacker, filters: _*)
-    ?(targets._1,
-      bestUnfiltered(attacker, targets._2),
-      targets._2.headOption)
+    val assigned      = attacker.targetsAssigned.getOrElse(Seq.empty)
+    val matchups      = attacker.matchups.targets
+    val engaged       = attacker.team.exists(_.engagedUpon)
+    val allFilters    = (filtersRequired(attacker) ++ filters).toVector
+    val targetInRange = attacker.matchups.targetNearest.exists(t => hasCombatPriority(t) && attacker.inRangeToAttack(t))
+    var output: Option[UnitInfo] = None
+    if (targetInRange) {
+      output = bestInStratum(attacker, assigned, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = true,  requireAcceleratesDemise = true)
+      if (output.isDefined) return output
+      output = bestInStratum(attacker, matchups, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = true,  requireAcceleratesDemise = true)
+      if (output.isDefined) return output
+      output = bestInStratum(attacker, assigned, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = true,  requireAcceleratesDemise = false)
+      if (output.isDefined) return output
+      output = bestInStratum(attacker, matchups, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = true,  requireAcceleratesDemise = false)
+      if (output.isDefined) return output
+    }
+    if (engaged) {
+      output = bestInStratum(attacker, assigned, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = false, requireAcceleratesDemise = true)
+      if (output.isDefined) return output
+      output = bestInStratum(attacker, assigned, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = false, requireAcceleratesDemise = false)
+      if (output.isDefined) return output
+    }
+    output = bestInStratum(attacker, assigned, allFilters, rankByScore = false, requireCombatPriority = false, requireInRange = false, requireAcceleratesDemise = false)
+    if (output.isDefined) return output
+    if (engaged) {
+      output = bestInStratum(attacker, matchups, allFilters, rankByScore = true, requireCombatPriority = true, requireInRange = false, requireAcceleratesDemise = true)
+      if (output.isDefined) return output
+      output = bestInStratum(attacker, matchups, allFilters, rankByScore = true, requireCombatPriority = true, requireInRange = false, requireAcceleratesDemise = false)
+      if (output.isDefined) return output
+    }
+    bestInStratum(attacker, matchups, allFilters, rankByScore = true, requireCombatPriority = false, requireInRange = false, requireAcceleratesDemise = false)
+  }
+
+  private def bestInStratum(
+    attacker: FriendlyUnitInfo,
+    targets: Iterable[UnitInfo],
+    allFilters: IndexedSeq[TargetFilter],
+    rankByScore: Boolean,
+    requireCombatPriority: Boolean,
+    requireInRange: Boolean,
+    requireAcceleratesDemise: Boolean): Option[UnitInfo] = {
+    var best        : UnitInfo = null
+    var bestScore   : Double   = 0.0
+    var found       : Boolean  = false
+    val targetIterator = targets.iterator
+    while (targetIterator.hasNext) {
+      val target = targetIterator.next()
+      val legal = ( ! requireCombatPriority || hasCombatPriority(target)) && ( ! requireInRange || attacker.inRangeToAttack(target)) && ( ! requireAcceleratesDemise || acceleratesDemise(attacker, target)) && legalByFilters(attacker, target, allFilters)
+      if (legal) {
+        if ( ! rankByScore) return Some(target)
+        val score = attacker.targetScore(target)
+        if ( ! found || score > bestScore) {
+          found = true
+          best = target
+          bestScore = score
+        }
+      }
+    }
+    ?(found, Some(best), None)
+  }
+
+  private def legalByFilters(attacker: FriendlyUnitInfo, target: UnitInfo, allFilters: IndexedSeq[TargetFilter]): Boolean = {
+    if (With.yolo.active) {
+      attacker.canAttack(target) && TargetFilterType.legal(attacker, target)
+    } else {
+      var filterIndex = 0
+      while (filterIndex < allFilters.length) {
+        if ( ! allFilters(filterIndex).legal(attacker, target)) return false
+        filterIndex += 1
+      }
+      true
+    }
   }
 
   def best(attacker: FriendlyUnitInfo, whitelist: Iterable[UnitInfo]): Option[UnitInfo] = {

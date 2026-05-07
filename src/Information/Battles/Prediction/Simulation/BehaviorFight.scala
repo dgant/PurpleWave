@@ -78,6 +78,7 @@ object BehaviorFight extends SimulacrumBehavior {
 
   @inline private def chooseTarget(attacker: Simulacrum): Option[Simulacrum] = {
     val targets = attacker.targets
+    val scoring = TargetScoring.forSimulation(attacker)
     var i = 0
     var output: Simulacrum = null
     var outputValue = 0.0
@@ -87,7 +88,7 @@ object BehaviorFight extends SimulacrumBehavior {
       if ( ! validTarget(attacker, target)) {
         targets.removeAt(i)
       } else {
-        val targetValue = TargetScoring.fast(attacker, target)
+        val targetValue = scoring(target)
         if ( ! found || java.lang.Double.compare(targetValue, outputValue) > 0) {
           found = true
           output = target

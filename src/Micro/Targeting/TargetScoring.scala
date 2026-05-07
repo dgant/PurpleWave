@@ -10,6 +10,53 @@ import Utilities.?
 import Utilities.UnitFilters.IsAny
 
 object TargetScoring {
+  final class SimulationScoring(attacker: Simulacrum) {
+    private[this] val attackerPixel              = attacker.pixel
+    private[this] val attackerX                  = attackerPixel.x
+    private[this] val attackerY                  = attackerPixel.y
+    private[this] val attackerPixelRangeAir      = attacker.pixelRangeAir
+    private[this] val attackerPixelRangeGround   = attacker.pixelRangeGround
+    private[this] val attackerDimensionMin       = attacker.unitDimensionMin
+    private[this] val attackerCooldownPixelCost  = 0.5 * attacker.cooldownLeft * attacker.topSpeed
+    private[this] val attackerFlying             = attacker.flying
+    private[this] val attackerAffectedDarkSwarm  = attacker.unitClass.affectedByDarkSwarm
+    private[this] val attackerAltitude           = attacker.altitude
+    private[this] val damageAir                  = attacker.unitClass.airDamageType
+    private[this] val damageGround               = attacker.unitClass.groundDamageType
+    private[this] val damageAirLarge             = damageAir.damageAgainstLarge
+    private[this] val damageAirMedium            = damageAir.damageAgainstMedium
+    private[this] val damageAirSmall             = damageAir.damageAgainstSmall
+    private[this] val damageGroundLarge          = damageGround.damageAgainstLarge
+    private[this] val damageGroundMedium         = damageGround.damageAgainstMedium
+    private[this] val damageGroundSmall          = damageGround.damageAgainstSmall
+
+    @inline def apply(target: Simulacrum): Double = {
+      val targetPixel = target.pixel
+      val targetFlying = target.flying
+      val targetSize = target.unitSize
+      val damageMultiplier =
+        if (targetFlying) {
+          if (targetSize == Size.Large) damageAirLarge
+          else if (targetSize == Size.Medium) damageAirMedium
+          else damageAirSmall
+        } else {
+          if (targetSize == Size.Large) damageGroundLarge
+          else if (targetSize == Size.Medium) damageGroundMedium
+          else damageGroundSmall
+        }
+      val guaranteedToHit = attackerFlying || targetFlying || attackerAffectedDarkSwarm || attackerAltitude >= target.altitude
+      attackValue(
+        targetValue = target.targetValue,
+        injury      = target.injury,
+        pixelCost   = pixelCost(
+          pixelDistance        = Maff.broodWarDistance(attackerX, attackerY, targetPixel.x, targetPixel.y),
+          pixelRange           = if (targetFlying) attackerPixelRangeAir else attackerPixelRangeGround,
+          attackerDimensionMin = attackerDimensionMin,
+          targetDimensionMin   = target.unitDimensionMin,
+          cooldownPixelCost    = attackerCooldownPixelCost),
+        efficacy    = damageMultiplier * ?(guaranteedToHit, 1.0, 0.47))
+    }
+  }
 
   @inline private def pixelCost(attacker: CombatUnit, target: CombatUnit): Double = {
     pixelCost(
@@ -17,8 +64,7 @@ object TargetScoring {
       pixelRange           = attacker.pixelRangeAgainst(target),
       attackerDimensionMin = attacker.unitClass.dimensionMin,
       targetDimensionMin   = target.unitClass.dimensionMin,
-      cooldownLeft         = attacker.cooldownLeft,
-      topSpeed             = attacker.topSpeed)
+      cooldownPixelCost    = 0.5 * attacker.cooldownLeft * attacker.topSpeed)
   }
 
   @inline private def pixelCost(
@@ -26,14 +72,13 @@ object TargetScoring {
     pixelRange: Double,
     attackerDimensionMin: Int,
     targetDimensionMin: Int,
-    cooldownLeft: Int,
-    topSpeed: Double): Double = {
+    cooldownPixelCost: Double): Double = {
     Math.max(0,
           pixelDistance
       -   pixelRange
       -   attackerDimensionMin
       -   targetDimensionMin
-      -   0.5 * cooldownLeft * topSpeed)
+      -   cooldownPixelCost)
   }
 
   @inline private def attackValue(targetValue: Double, injury: Double, pixelCost: Double, efficacy: Double): Double = {
@@ -54,27 +99,10 @@ object TargetScoring {
   }
 
   @inline def fast(attacker: Simulacrum, target: Simulacrum): Double = {
-    val pixelDistance = Maff.broodWarDistance(attacker.pixel.x, attacker.pixel.y, target.pixel.x, target.pixel.y)
-    val pixelRange = if (target.flying) attacker.pixelRangeAir else attacker.pixelRangeGround
-    val damageType = if (target.flying) attacker.unitClass.airDamageType else attacker.unitClass.groundDamageType
-    val targetSize = target.unitClass.size
-    val damageMultiplier =
-      if (targetSize == Size.Large) damageType.damageAgainstLarge
-      else if (targetSize == Size.Medium) damageType.damageAgainstMedium
-      else damageType.damageAgainstSmall
-    val guaranteedToHit = attacker.flying || target.flying || attacker.unitClass.affectedByDarkSwarm || attacker.altitude >= target.altitude
-    attackValue(
-      targetValue = target.targetValue,
-      injury      = target.injury,
-      pixelCost   = pixelCost(
-        pixelDistance        = pixelDistance,
-        pixelRange           = pixelRange,
-        attackerDimensionMin = attacker.unitClass.dimensionMin,
-        targetDimensionMin   = target.unitClass.dimensionMin,
-        cooldownLeft         = attacker.cooldownLeft,
-        topSpeed             = attacker.topSpeed),
-      efficacy    = damageMultiplier * ?(guaranteedToHit, 1.0, 0.47))
+    forSimulation(attacker)(target)
   }
+
+  @inline def forSimulation(attacker: Simulacrum): SimulationScoring = new SimulationScoring(attacker)
 
   /**
     * Scores the value of an (attacker, target) pair. Uses a slow formula which accounts for more factors.

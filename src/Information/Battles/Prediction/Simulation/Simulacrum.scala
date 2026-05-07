@@ -3,6 +3,7 @@ package Information.Battles.Prediction.Simulation
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile}
+import ProxyBwapi.Size
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
@@ -17,6 +18,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var visibility              : Visibility.Value = _
   var player                  : PlayerInfo = _
   var unitClass               : UnitClass = _
+  var unitSize                : Size.Type = _
+  var unitDimensionMin        : Int = _
   var pixel                   : Pixel = _
   var altitude                : Int = _
   var visible                 : Boolean = _
@@ -79,6 +82,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     visibility              = realUnit.visibility
     player                  = realUnit.player
     unitClass               = realUnit.unitClass
+    unitSize                = unitClass.size
+    unitDimensionMin        = unitClass.dimensionMin
     pixel                   = realUnit.pixel
     altitude                = pixel.tile.altitude
     visible                 = realUnit.visible

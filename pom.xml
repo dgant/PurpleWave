@@ -117,6 +117,7 @@
                                     <arg value="-d"/>
                                     <arg value="${project.build.outputDirectory}"/>
                                     <arg value="${project.basedir}/src-macros/Utilities/TernaryMacros.scala"/>
+                                    <arg value="${project.basedir}/src-macros/Mathematics/Functions/ReduceMacros.scala"/>
                                 </java>
                             </target>
                         </configuration>

@@ -5,6 +5,7 @@ import Mathematics.Points.{Pixel, Points, Tile}
 import Utilities.?
 
 import scala.collection.mutable
+import scala.language.experimental.macros
 
 trait Reduce {
 
@@ -129,7 +130,9 @@ trait Reduce {
     }
   }
 
-  @inline final def minBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
+  final def minBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = macro ReduceMacros.minBy[A, B]
+
+  @inline final def minByGeneric[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
     // The Scala-y implementation would be:
     //   values.reduceOption(Ordering.by(feature).min)
     // but this is a performance critical function so we're unrolling it.
@@ -150,7 +153,9 @@ trait Reduce {
     if (first) None else Some(output)
   }
 
-  @inline final def maxBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
+  final def maxBy[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = macro ReduceMacros.maxBy[A, B]
+
+  @inline final def maxByGeneric[A, B](values: TraversableOnce[A])(feature: A => B)(implicit ordering: Ordering[B]): Option[A] = {
     // The Scala-y implementation would be:
     //   values.reduceOption(Ordering.by(feature).min)
     // but this is a performance critical function so we're unrolling it.

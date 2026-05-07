@@ -17,9 +17,15 @@ object Idle extends Action {
   final override def allowed(unit: FriendlyUnitInfo): Boolean = true
 
   @inline
-  final override def perform(unit: FriendlyUnitInfo): Unit = actions.foreach(_(unit))
+  final override def perform(unit: FriendlyUnitInfo): Unit = {
+    var i = 0
+    while (i < actions.length) {
+      actions(i)(unit)
+      i += 1
+    }
+  }
 
-  private val actions = Vector(
+  private val actions = Array[Action](
     Cancel,
     Liftoff,
     Unbunk,

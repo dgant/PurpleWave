@@ -7,6 +7,8 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 abstract class Action {
   
   val name: String = ToString(this)
+  private var performanceAgency: AnyRef = _
+  private var performance: ActionPerformance = _
 
   protected def requiresReadiness: Boolean = true
   
@@ -34,10 +36,19 @@ abstract class Action {
         previousCredit.foreach(unit.agent.act)
       }
     }
-    val performance = With.agents.actionPerformance.getOrElseUpdate(name, new ActionPerformance)
+    val performance = actionPerformance
     val nanosAfter = System.nanoTime()
     performance.durationNanos += Math.max(0, nanosAfter - nanosBefore)
     performance.invocations += 1
     unit.unready
+  }
+
+  @inline private def actionPerformance: ActionPerformance = {
+    val agency = With.agents
+    if (performanceAgency ne agency) {
+      performanceAgency = agency
+      performance = agency.actionPerformance.getOrElseUpdate(name, new ActionPerformance)
+    }
+    performance
   }
 }

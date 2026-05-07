@@ -7,7 +7,6 @@ import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Try
 
 class Squads extends TimedTask {
 
@@ -35,9 +34,15 @@ class Squads extends TimedTask {
     frameRunPrevious = frameRun
     frameRun = With.frame
     With.units.ours.foreach(_.setSquad(None))
-    With.recruiter.locks.view
-      .flatMap(lock => Try(lock.owner.asInstanceOf[Squad]).toOption)
-      .foreach(_.commission())
+    val locks = With.recruiter.locks
+    var i = 0
+    while (i < locks.length) {
+      locks(i).owner match {
+        case squad: Squad => squad.commission()
+        case _ =>
+      }
+      i += 1
+    }
     all.foreach(_.clearUnits())
     all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     val batchSwap = _batchActive

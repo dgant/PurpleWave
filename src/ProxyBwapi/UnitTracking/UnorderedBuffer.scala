@@ -94,6 +94,21 @@ final class UnorderedBuffer[T >: Null](capacity: Int = 8) extends IndexedSeq[T] 
     remove(value)
     value
   }
+  @inline def maxByDouble(feature: T => Double): Option[T] = {
+    var i = 0
+    var output: T = null
+    var outputValue = 0.0
+    while (i < _size) {
+      val value = values(i)
+      val nextValue = feature(value)
+      if (i == 0 || java.lang.Double.compare(nextValue, outputValue) > 0) {
+        output = value
+        outputValue = nextValue
+      }
+      i += 1
+    }
+    if (_size == 0) None else Some(output)
+  }
 
   @inline def clear(): Unit = {
     // Empty all populated values without losing allocated space

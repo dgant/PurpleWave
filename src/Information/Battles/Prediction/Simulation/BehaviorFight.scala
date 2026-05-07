@@ -1,6 +1,5 @@
 package Information.Battles.Prediction.Simulation
 
-import Mathematics.Maff
 import Micro.Targeting.TargetScoring
 import ProxyBwapi.Races.Protoss
 
@@ -15,7 +14,7 @@ object BehaviorFight extends SimulacrumBehavior {
       case _ =>
         simulacrum.cooldownTargeting = 72
         simulacrum.targets.removeIf(t => ! validTarget(simulacrum, t))
-        Maff.maxBy(simulacrum.targets)(TargetScoring.fast(simulacrum, _))
+        simulacrum.targets.maxByDouble(TargetScoring.fast(simulacrum, _))
     }
     simulacrum.setTarget(targetChosen)
 

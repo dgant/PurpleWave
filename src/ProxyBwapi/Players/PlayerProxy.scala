@@ -24,9 +24,9 @@ abstract class PlayerProxy(bwapiPlayer: bwapi.Player) {
   lazy val transportClass : UnitClass   = UnitClasses.get(raceInitial.getTransport)
   lazy val workerClass    : UnitClass   = UnitClasses.get(raceInitial.getWorker)
 
-  def isNeutral   : Boolean   = bwapiPlayer.isNeutral
-  def isAlly      : Boolean   = bwapiPlayer.isAlly(With.game.self) && ! isUs
-  def isEnemy     : Boolean   = bwapiPlayer.isEnemy(With.game.self)
+  lazy val isNeutral : Boolean = bwapiPlayer.isNeutral
+  lazy val isAlly    : Boolean = bwapiPlayer.isAlly(With.game.self) && ! isUs
+  lazy val isEnemy   : Boolean = bwapiPlayer.isEnemy(With.game.self)
   def isDefeated  : Boolean   = bwapiPlayer.isDefeated || bwapiPlayer.leftGame
 
   def gas               : Int = bwapiPlayer.gas

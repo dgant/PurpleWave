@@ -6,10 +6,18 @@ import ProxyBwapi.Races.Protoss
 object BehaviorFight extends SimulacrumBehavior {
   val fighting: Boolean = true
   @inline override def act(simulacrum: Simulacrum): Unit = {
+    var measuredTarget    : Simulacrum = null
+    var measuredDistance  : Double     = 0.0
+    var measuredRange     : Double     = 0.0
     // Remove target if invalid
     // If no valid target, pick target
     val targetChosen = simulacrum.target match {
-      case target @ Some(t) if simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && simulacrum.inRangeToAttackSimulation(t) =>
+      case target @ Some(t) if simulacrum.cooldownTargeting > 0 && validTarget(simulacrum, t) && {
+        measuredTarget    = t
+        measuredDistance  = simulacrum.pixelDistanceEdgeSimulation(t)
+        measuredRange     = simulacrum.pixelRangeAgainst(t)
+        measuredDistance <= measuredRange && (simulacrum.pixelRangeMin <= 0.0 || measuredDistance > simulacrum.pixelRangeMin)
+      } =>
         target
       case _ =>
         simulacrum.cooldownTargeting = 72
@@ -29,11 +37,12 @@ object BehaviorFight extends SimulacrumBehavior {
 
     val target    = simulacrum.target.get
     val threat    = simulacrum.threat
-    val distance  = simulacrum.pixelDistanceEdgeSimulation(target)
-    val range     = simulacrum.pixelRangeAgainst(target)
+    val distance  = if (target eq measuredTarget) measuredDistance else simulacrum.pixelDistanceEdgeSimulation(target)
+    val range     = if (target eq measuredTarget) measuredRange else simulacrum.pixelRangeAgainst(target)
 
     // Update the target's threat (to help it kite)
-    if (target.threat.forall(_.pixelsToGetInRangeSimulation(target) > distance - range)) {
+    val targetThreat = target.threat
+    if (targetThreat.isEmpty || targetThreat.get.pixelsToGetInRangeSimulation(target) > distance - range) {
       target.threat = Some(simulacrum)
     }
 

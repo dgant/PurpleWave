@@ -10,7 +10,7 @@ object BehaviorInitial extends SimulacrumBehavior {
       return
     }
     if (simulacrum.unitClass == Terran.Medic) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraAlliesOf(simulacrum).filter(_.unitClass.isOrganic))
+      addOrganicAllies(simulacrum)
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorHeal)
         return
@@ -31,21 +31,21 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     }
     if (simulacrum.unitClass == Protoss.HighTemplar) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemiesOf(simulacrum).view.filter(_.unitClass.canBeStormed))
+      addStormTargets(simulacrum)
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorStorm)
         return
       }
     }
     if (simulacrum.unitClass.isDetector && simulacrum.canMove) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemiesOf(simulacrum).view.filter(_.cloaked))
+      addCloakedEnemies(simulacrum)
       if (simulacrum.targets.nonEmpty) {
         simulacrum.doBehavior(BehaviorDetect)
         return
       }
     }
     if (simulacrum.attacksAgainstAir > 0 || simulacrum.attacksAgainstGround > 0) {
-      simulacrum.targets.addAll(simulacrum.simulation.simulacraEnemiesOf(simulacrum).view.filter(simulacrum.canAttack))
+      addAttackableEnemies(simulacrum)
     }
     if (simulacrum.targets.isEmpty) {
       if (simulacrum.unitClass.isBuilding) {
@@ -56,6 +56,54 @@ object BehaviorInitial extends SimulacrumBehavior {
       }
     } else {
       simulacrum.doBehavior(BehaviorFight)
+    }
+  }
+
+  @inline private def addOrganicAllies(simulacrum: Simulacrum): Unit = {
+    val units = if (simulacrum.isFriendlyCached) simulacrum.simulation.realUnitsOurs else simulacrum.simulation.realUnitsEnemy
+    var i = 0
+    while (i < units.length) {
+      val target = units(i).simulacrum
+      if ((target ne simulacrum) && target.unitClass.isOrganic) {
+        simulacrum.targets.add(target)
+      }
+      i += 1
+    }
+  }
+
+  @inline private def addStormTargets(simulacrum: Simulacrum): Unit = {
+    val units = if (simulacrum.isFriendlyCached) simulacrum.simulation.realUnitsEnemy else simulacrum.simulation.realUnitsOurs
+    var i = 0
+    while (i < units.length) {
+      val target = units(i).simulacrum
+      if (target.unitClass.canBeStormed) {
+        simulacrum.targets.add(target)
+      }
+      i += 1
+    }
+  }
+
+  @inline private def addCloakedEnemies(simulacrum: Simulacrum): Unit = {
+    val units = if (simulacrum.isFriendlyCached) simulacrum.simulation.realUnitsEnemy else simulacrum.simulation.realUnitsOurs
+    var i = 0
+    while (i < units.length) {
+      val target = units(i).simulacrum
+      if (target.cloaked) {
+        simulacrum.targets.add(target)
+      }
+      i += 1
+    }
+  }
+
+  @inline private def addAttackableEnemies(simulacrum: Simulacrum): Unit = {
+    val units = if (simulacrum.isFriendlyCached) simulacrum.simulation.realUnitsEnemy else simulacrum.simulation.realUnitsOurs
+    var i = 0
+    while (i < units.length) {
+      val target = units(i).simulacrum
+      if (simulacrum.canAttack(target)) {
+        simulacrum.targets.add(target)
+      }
+      i += 1
     }
   }
 }

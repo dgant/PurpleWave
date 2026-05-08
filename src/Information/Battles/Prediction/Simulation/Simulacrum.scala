@@ -19,6 +19,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var player                  : PlayerInfo = _
   var unitClass               : UnitClass = _
   var unitSize                : Size.Type = _
+  var unitSizeCode            : Int = _
   var unitDimensionMin        : Int = _
   var affectedByDarkSwarm     : Boolean = _
   var damageAirLarge          : Double = _
@@ -94,6 +95,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     player                  = realUnit.player
     unitClass               = realUnit.unitClass
     unitSize                = unitClass.size
+    unitSizeCode            = if (unitSize == Size.Large) 2 else if (unitSize == Size.Medium) 1 else 0
     unitDimensionMin        = unitClass.dimensionMin
     affectedByDarkSwarm     = unitClass.affectedByDarkSwarm
     damageAirLarge          = unitClass.airDamageType.damageAgainstLarge

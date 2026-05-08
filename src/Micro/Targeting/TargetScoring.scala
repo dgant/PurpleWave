@@ -31,12 +31,12 @@ object TargetScoring {
     @inline def apply(target: Simulacrum): Double = {
       val targetPixel = target.pixel
       val targetFlying = target.flying
-      val targetSize = target.unitSize
+      val targetSizeCode = target.unitSizeCode
       val damageMultiplier =
         if (targetFlying) {
-          TargetScoring.damageMultiplier(targetSize, damageAirLarge, damageAirMedium, damageAirSmall)
+          if (targetSizeCode == 2) damageAirLarge else if (targetSizeCode == 1) damageAirMedium else damageAirSmall
         } else {
-          TargetScoring.damageMultiplier(targetSize, damageGroundLarge, damageGroundMedium, damageGroundSmall)
+          if (targetSizeCode == 2) damageGroundLarge else if (targetSizeCode == 1) damageGroundMedium else damageGroundSmall
         }
       fastScore(
         targetValue = target.targetValue,

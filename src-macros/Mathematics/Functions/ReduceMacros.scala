@@ -27,6 +27,23 @@ object ReduceMacros {
     def primitive(zero: Tree, compare: (Tree, Tree) => Tree): Tree = {
       val better = (nextValue: Tree, outputValue: Tree) =>
         if (isMin) compare(nextValue, outputValue) else compare(outputValue, nextValue)
+      def nextValue(next: Tree): Tree = feature.tree match {
+        case Function(List(param), body) =>
+          val parameterSymbol = param.symbol
+          if (parameterSymbol == NoSymbol) {
+            q"$feature($next)"
+          } else {
+            val inlined = new Transformer {
+              override def transform(tree: Tree): Tree = tree match {
+                case Ident(_) if tree.symbol == parameterSymbol => next
+                case _ => super.transform(tree)
+              }
+            }.transform(body)
+            c.untypecheck(inlined)
+          }
+        case _ =>
+          q"$feature($next)"
+      }
 
       q"""
         val reduceValues = $values.toIterator
@@ -35,7 +52,7 @@ object ReduceMacros {
         var reduceOutputValue = $zero
         while (reduceValues.hasNext) {
           val reduceNext = reduceValues.next()
-          val reduceNextValue = $feature(reduceNext)
+          val reduceNextValue = ${nextValue(q"reduceNext")}
           if (reduceFirst) {
             reduceFirst = false
             reduceOutput = reduceNext

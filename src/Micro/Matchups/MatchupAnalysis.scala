@@ -69,7 +69,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def pixelsEntangled             : Double            = _pixelsEntangled()
   def pixelsToTargetRange         : Option[Double]    = targetNearest.map(me.pixelsToGetInRange)
   def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(_.pixelsToGetInRange(me))
-  private val _threatDeepest        = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
+  private val _threatDeepest        = new Cache(() => findThreatDeepest)
   private val _threatDeepestInRange = new Cache(() => _threatDeepest().filter(_.inRangeToAttack(me)))
   private val _threatSoonest        = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
   private val _threatNearest        = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
@@ -112,6 +112,25 @@ case class MatchupAnalysis(me: UnitInfo) {
     || (shooter.unitClass.canAttack(victim)
       && (shooter.remainingCompletionFrames < 72
         || (victim.cloaked && shooter.matchups.groupOf.detectors.nonEmpty))))
+
+  private def findThreatDeepest: Option[UnitInfo] = {
+    var output      : UnitInfo = null
+    var outputScore : Double   = 0.0
+    var found       : Boolean  = false
+    val iterator = enemies.iterator
+    while (iterator.hasNext) {
+      val threat = iterator.next()
+      if (threatens(threat, me) && ! Protoss.Interceptor(threat)) {
+        val threatScore = threat.pixelDistanceEdge(me) - threat.pixelRangeAgainst(me)
+        if ( ! found || java.lang.Double.compare(threatScore, outputScore) < 0) {
+          output = threat
+          outputScore = threatScore
+          found = true
+        }
+      }
+    }
+    ?(found, Some(output), None)
+  }
 
   def healers: Seq[UnitInfo] = {
     allies.view.filter(a =>

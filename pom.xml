@@ -155,7 +155,7 @@
                         <arg>-opt:closure-invocations</arg>
                         <arg>-opt:inline</arg>
                         <arg>-opt:l:default,inline</arg>
-                        <arg>'-opt-inline-from:**'</arg>
+                        <arg>-opt-inline-from:Micro.Targeting.**</arg>
                         <arg>-opt-warnings</arg>
                     </args>
                 </configuration>

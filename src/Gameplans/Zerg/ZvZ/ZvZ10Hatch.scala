@@ -35,8 +35,21 @@ class ZvZ10Hatch extends ZergGameplan {
     once(Zerg.ZerglingSpeed)
     once(12, Zerg.Zergling)
     once(3, Zerg.Overlord)
-    once(26, Zerg.Zergling) // 18 done as speed finishes, 8 following shortly thereafter
-    get(Zerg.Lair, Zerg.Spire)
+
+    if (With.fingerprints.threeHatchGas())  {
+      get(Zerg.Lair, Zerg.Spire)
+      once(19, Zerg.Drone)
+      buildSunkensAtFoyer(2)
+    } else if (enemiesHave(Zerg.SunkenColony)) {
+      get(Zerg.Lair, Zerg.Spire)
+      if ( ! have(Zerg.Spire)) {
+        get(enemies(Zerg.Zergling) + 4, Zerg.Zergling)
+        once(19, Zerg.Drone)
+      }
+    } else {
+      once(26, Zerg.Zergling) // 18 done as speed finishes, 8 following shortly thereafter
+      get(Zerg.Lair, Zerg.Spire)
+    }
   }
 
   override def executeMain(): Unit = {
@@ -44,6 +57,7 @@ class ZvZ10Hatch extends ZergGameplan {
     shouldAttack &&= Zerg.ZerglingSpeed() || enemyStrategy(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.twelvePool)
     shouldAttack &&= enemiesComplete(IsHatchlike) <= unitsComplete(IsHatchlike) || confidenceAttacking01 > 0.6
     shouldAttack &&= unitsComplete(Zerg.Mutalisk) >= enemies(Zerg.Mutalisk) || unitsComplete(Zerg.Zergling) > enemies(Zerg.Zergling)
+    shouldAttack &&= ! With.fingerprints.threeHatchGas() || ! enemyHasUpgrade(Zerg.ZerglingSpeed) || haveComplete(Zerg.Mutalisk)
     attack(shouldAttack)
 
     harass()

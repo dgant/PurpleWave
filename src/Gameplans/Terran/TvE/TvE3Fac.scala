@@ -87,6 +87,7 @@ class TvE3Fac extends TerranGameplan {
     get(3, Terran.Factory)
     get(Terran.SiegeMode)
     pump(Terran.SiegeTankUnsieged, maximumConcurrently = Math.max(1, gas / 200 + units(Terran.Factory) / 4))
+    pumpWorkers(oversaturate = true)
     pump(Terran.Vulture)
     get(4, Terran.Factory)
     get(2, Terran.MachineShop)

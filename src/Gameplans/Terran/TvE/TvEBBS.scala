@@ -1,5 +1,6 @@
 package Gameplans.Terran.TvE
 
+import Lifecycle.With
 import Macro.Actions.Friendly
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -15,16 +16,16 @@ class TvEBBS extends TerranGameplan {
     get(2, Terran.Barracks)
     once(9, Terran.SCV)
     get(Terran.SupplyDepot)
-    once(2, Terran.Marine)
+    once(3, Terran.Marine)
     once(10, Terran.SCV)
-    once(4, Terran.Marine)
-    once(12, Terran.SCV)
+    once(5, Terran.Marine)
+    once(11, Terran.SCV)
 
     BunkerRush()
 
     once(2, Terran.SupplyDepot)
-    once(8, Terran.Marine)
-    once(14, Terran.SCV)
+    once(7, Terran.Marine)
+    once(12, Terran.SCV)
 
     scoutOn(u => Terran.Barracks(u) && u.complete)
 
@@ -48,16 +49,22 @@ class TvEBBS extends TerranGameplan {
     }
 
     pumpRatio(Terran.Medic, 0, 3, Seq(Friendly(Terran.Marine, 0.2)))
+    if (have(Terran.Factory)) {
+      get(2, Terran.Factory)
+      get(Terran.SiegeMode)
+      get(2, Terran.MachineShop)
+    }
     pump(Terran.Marine)
     pumpGasPumps()
-    get(Terran.Academy)
-    get(Terran.Stim)
-    get(Terran.MarineRange)
-    pumpGasPumps()
-    get(2, Terran.Factory)
-    get(2, Terran.MachineShop)
-    get(Terran.SiegeMode)
+    if (With.enemies.exists(_.isZerg) || enemyDarkTemplarLikely || have(Terran.Academy)) {
+      get(Terran.Academy)
+      get(Terran.Stim)
+      get(Terran.MarineRange)
+    }
+    get(Terran.Factory)
 
-    attack()
+    if (safePushing || ! enemyHasUpgrade(Protoss.DragoonRange)) {
+      attack()
+    }
   }
 }

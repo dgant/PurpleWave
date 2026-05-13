@@ -51,6 +51,29 @@
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-third-party-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>3rdparty/jbwapi/src/main/java</source>
+                                <source>3rdparty/javajps/src/main/java</source>
+                                <source>3rdparty/jbweb/src/main/java</source>
+                                <source>3rdparty/mjson/src/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>                    
@@ -73,13 +96,6 @@
                             <includes>
                                 <include>**/*.java</include>
                             </includes>
-                            <compileSourceRoots>
-                                <compileSourceRoot>3rdparty/jbwapi/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>3rdparty/javajps/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>3rdparty/jbweb/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>3rdparty/javajps/src/main/java</compileSourceRoot>
-                                <compileSourceRoot>3rdparty/mjson/src/java</compileSourceRoot>
-                            </compileSourceRoots>
                         </configuration>
                     </execution>
                 </executions>
@@ -184,6 +200,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <artifactSet>
                                 <includes>
                                     <include>*:*</include>
@@ -214,7 +231,7 @@
                         <configuration>
                             <!-- Use the shaded jar that includes all dependencies -->
                             <outfile>${project.basedir}/out/artifacts/PurpleSimViz.exe</outfile>
-                            <jar>${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar</jar>
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <headerType>gui</headerType>
                             <classPath>
                                 <!-- Override the entry point to the visualizer main class -->
@@ -232,7 +249,8 @@
                                 <txtFileVersion>${project.version}</txtFileVersion>
                                 <fileDescription>PurpleSimViz</fileDescription>
                                 <productName>PurpleSimViz</productName>
-                                <productVersion>${project.version}</productVersion>
+                                <productVersion>${project.version}.0.0</productVersion>
+                                <txtProductVersion>${project.version}</txtProductVersion>
                                 <copyright>© PurpleWave</copyright>
                                 <internalName>PurpleSimViz</internalName>
                                 <originalFilename>PurpleSimViz.exe</originalFilename>

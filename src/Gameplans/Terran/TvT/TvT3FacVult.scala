@@ -87,6 +87,9 @@ class TvT3FacVult extends TerranGameplan {
     }
 
     requireMiningBases(2)
+    if (With.fingerprints.oneFac() && ! enemiesHave(Terran.MachineShop, IsTank) && have(Terran.Marine)) {
+      buildBunkersAtFoyer(1)
+    }
 
     get(3, Terran.Factory)
     get(Terran.Armory)

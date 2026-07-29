@@ -12,10 +12,12 @@
       <profile name="Annotation profile for PurpleWave" enabled="true">
         <sourceOutputDir name="../generated-sources/annotations" />
         <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <module name="PurpleWave.main.test" />
+        <module name="PurpleWave.main.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="PurpleWave" target="1.8" />
+      <module name="PurpleWave-macros" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

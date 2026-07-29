@@ -53,7 +53,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>add-third-party-sources</id>
@@ -121,7 +121,9 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <property name="macro.output.dir" location="${project.build.outputDirectory}"/>
+                                <property name="macro.source.dir" location="${project.basedir}/src-macros"/>
+                                <mkdir dir="${macro.output.dir}"/>
                                 <path id="macro.compile.classpath">
                                     <path refid="maven.plugin.classpath"/>
                                     <path refid="maven.compile.classpath"/>
@@ -131,9 +133,9 @@
                                     <arg value="-classpath"/>
                                     <arg value="${macro.compile.classpath.value}"/>
                                     <arg value="-d"/>
-                                    <arg value="${project.build.outputDirectory}"/>
-                                    <arg value="${project.basedir}/src-macros/Utilities/TernaryMacros.scala"/>
-                                    <arg value="${project.basedir}/src-macros/Mathematics/Functions/ReduceMacros.scala"/>
+                                    <arg value="${macro.output.dir}"/>
+                                    <arg value="${macro.source.dir}/Utilities/TernaryMacros.scala"/>
+                                    <arg value="${macro.source.dir}/Mathematics/Functions/ReduceMacros.scala"/>
                                 </java>
                             </target>
                         </configuration>
@@ -172,6 +174,8 @@
                         <arg>-opt:inline</arg>
                         <arg>-opt:l:default,inline</arg>
                         <arg>-opt-inline-from:Micro.Targeting.**</arg>
+                        <arg>-Ymacro-classpath</arg>
+                        <arg>${project.build.outputDirectory}</arg>
                         <arg>-opt-warnings</arg>
                     </args>
                 </configuration>
@@ -261,4 +265,38 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>idea-index-macros</id>
+            <activation>
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <id>add-macro-sources-for-idea-indexing</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src-macros</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

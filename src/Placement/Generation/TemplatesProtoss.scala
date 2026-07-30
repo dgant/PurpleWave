@@ -1,7 +1,7 @@
 package Placement.Generation
 
 import Mathematics.Points.Directions
-import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, Defensive, ProxyGround}
+import Placement.Access.PlaceLabels.{AnyProxy, DefendEntrance, DefendGround, Defensive, Proxy2Gate, Proxy4Gate, ProxyGround}
 import Placement.Templating.Template
 import bwapi.Race
 
@@ -484,7 +484,7 @@ object TemplatesProtoss {
         "--------Px--------",
         "xxxxxxx-xx-xxxxxxx",
         "xxxxxxx----xxxxxxxx"))
-    .map(_.addLabels(AnyProxy, ProxyGround))
+    .map(_.addLabels(AnyProxy, ProxyGround, Proxy4Gate))
 
   val proxy2: Seq[Template] = Seq(
     new Template()
@@ -544,5 +544,5 @@ object TemplatesProtoss {
         "-xxxx-",
         "-xxxx-",
         "------"))
-    .map(_.addLabels(AnyProxy, ProxyGround))
+    .map(_.addLabels(AnyProxy, ProxyGround, Proxy2Gate))
 }

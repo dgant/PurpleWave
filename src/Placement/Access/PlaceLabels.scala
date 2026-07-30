@@ -21,4 +21,7 @@ object PlaceLabels {
   object AnyProxy             extends PlaceLabel
   object ProxyGround          extends PlaceLabel
   object ProxyAir             extends PlaceLabel
+  object Proxy2Rax            extends PlaceLabel
+  object Proxy2Gate           extends PlaceLabel
+  object Proxy4Gate           extends PlaceLabel
 }

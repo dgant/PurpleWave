@@ -10,6 +10,7 @@ object ProtossChoices {
   )
 
   val oddball = Vector(
+    PvEProxy2Gate,
     ProtossFFA,
     ProtossFFAHunters,
     ProtossFFAMoney,

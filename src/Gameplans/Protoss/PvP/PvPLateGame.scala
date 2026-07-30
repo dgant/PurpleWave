@@ -217,7 +217,14 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doTrainArmy(): Unit = {
+
     if (expectCarriers) {
+      get(Protoss.DarkArchonEnergy)
+      makeDarkArchons()
+      if (units(Protoss.DarkArchon) + units(Protoss.DarkTemplar) / 2 >= 3) {
+        get(Protoss.MindControl)
+      }
+      pump(Protoss.DarkTemplar, 2 * enemies(Protoss.Carrier) - 2 * units(Protoss.DarkArchon) + 2)
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
     if ( ! enemiesHave(Protoss.Observer) || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {

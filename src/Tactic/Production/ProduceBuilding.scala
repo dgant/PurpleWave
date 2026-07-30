@@ -2,7 +2,7 @@ package Tactic.Production
 
 import Information.Counting.MacroCounter
 import Lifecycle.With
-import Macro.Requests.RequestBuildable
+import Macro.Requests.{RequestBuildable, RequestUnit}
 import Mathematics.Maff
 import Mathematics.Points.{Tile, TileRectangle}
 import Micro.Agency.BuildIntent
@@ -26,6 +26,7 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
   val tileLock        : LockTiles           = new LockTiles(this)
   val currencyLock    : LockCurrencyFor     = new LockCurrencyFor(this, buildingClass)
   val builderLock     : LockUnits           = new LockUnits(this, builderMatcher, CountOne, interruptable = false)
+  val requestUnit     : Option[RequestUnit] = requestArg match { case r: RequestUnit => Some(r); case _ => None }
   var orderedTile     : Option[Tile]        = None
   var foundation      : Option[Foundation]  = None
   var intendAfter     : Option[Int]         = None
@@ -35,7 +36,9 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
     builderMatcher == Protoss.Probe,
     Maff.minBy(With.units.ours.filter(u =>
       Protoss.Probe(u)
-        && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 40))
+        && requestUnit.forall(_.parentRequirement.forall(_(u)))
+        && (  requestUnit.exists(_.parentRequirement.isDefined)
+          ||  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 40))
           ||  u.intent.toBuild      .exists(b =>  foundation.exists(_.tile.groundTiles(b.tile)  < 40)))))(u => foundation.map(f => u.pixelDistanceTravelling(f.tile)).getOrElse(0.0)),
     None))
   private val proposedBuilder = new Cache(() => recycledBuilder().orElse(builderLock.inquire().flatMap(_.headOption)))
@@ -121,9 +124,9 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
         builderLock.matcher = trainee.get.buildUnit.contains
       } else if ( ! builderLock.satisfied && desiredZone.exists(_.bases.exists(_.workerCount > 5))) {
         // Performance optimization: Only consider workers in the same zone when we have a lot available
-        builderLock.matcher = unit => desiredZone.contains(unit.zone) && builderMatcher(unit)
+        builderLock.matcher = unit => desiredZone.contains(unit.zone) && builderMatcher(unit) && requestUnit.forall(_.parentRequirement.forall(r => unit.friendly.forall(r)))
       } else {
-        builderLock.matcher = builderMatcher
+        builderLock.matcher = unit => builderMatcher(unit) && requestUnit.forall(_.parentRequirement.forall(r => unit.friendly.forall(r)))
       }
 
       // When building placement changes we want a builder closer to the new placement

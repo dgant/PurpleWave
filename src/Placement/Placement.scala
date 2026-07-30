@@ -17,6 +17,7 @@ class Placement extends Fitter {
   val wallEverything                       = false
 
   def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
+  def proxyTwoGateFit: Option[Fit] = fits.find(fit => TemplatesProtoss.proxy2.contains(fit.template))
 
   private def protoss (todo: => Unit): Unit = { if (With.self.isProtoss)  { todo }}
   private def terran  (todo: => Unit): Unit = { if (With.self.isTerran)   { todo }}
@@ -51,6 +52,15 @@ class Placement extends Fitter {
       zerg    (fitAndIndexConstrained(0, 1, ?(base.isOurMain, TemplatesZerg.mainBases,    TemplatesZerg.expansions),    base))
     })
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
+    protoss {
+      val proxyZones = zonesSorted
+        .filter(zone => ! zone.isBackyard && ! zone.island)
+        .sortBy(_.heart.tileDistanceSquared(Points.tileMiddle))
+      proxyZones.find(zone =>
+        fitAndIndexProximity(1, 1, TemplatesProtoss.proxy2, Points.tileMiddle.walkableTile, zone).nonEmpty)
+      proxyZones.find(zone =>
+        fitAndIndexProximity(1, 1, TemplatesProtoss.proxy4, Points.tileMiddle.walkableTile, zone).nonEmpty)
+    }
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
   }
@@ -66,8 +76,6 @@ class Placement extends Fitter {
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
     if ( zone.tiles.contains(Points.tileMiddle)) {
-      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy4,  Points.tileMiddle.walkableTile, zone))
-      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy2,  Points.tileMiddle.walkableTile, zone))
       terran  (fitAndIndexProximity(1, 1, TemplatesTerran.proxy2,   Points.tileMiddle.walkableTile, zone))
     }
     if ( ! zone.isBackyard && ! zone.island) {

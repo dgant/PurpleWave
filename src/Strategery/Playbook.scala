@@ -19,6 +19,7 @@ object StrategyGroups {
   val disabled: Vector[Strategy] = Vector[Strategy](
     Sandbox,
 
+    PvEProxy2Gate,
     PvTProxy2Gate,
     PvPProxy2Gate,
     PvT1015,

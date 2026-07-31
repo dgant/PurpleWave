@@ -484,7 +484,7 @@ object TemplatesProtoss {
         "--------Px--------",
         "xxxxxxx-xx-xxxxxxx",
         "xxxxxxx----xxxxxxxx"))
-    .map(_.addLabels(AnyProxy, ProxyGround, Proxy4Gate))
+    .map(_.addLabels(AnyProxy, ProxyGround, Proxy4Gate, Proxy2Gate))
 
   val proxy2: Seq[Template] = Seq(
     new Template()

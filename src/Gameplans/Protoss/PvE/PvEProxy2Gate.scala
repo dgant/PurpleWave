@@ -2,11 +2,9 @@ package Gameplans.Protoss.PvE
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Mathematics.Points.Tile
-import Placement.Access.PlaceLabels.{Proxy2Gate, Proxy4Gate}
+import Placement.Access.PlaceLabels.Proxy2Gate
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Strategery.Strategies.Protoss.{PvEProxy2Gate => PvEProxy2GateStrategy}
 
 class PvEProxy2Gate extends GameplanImperative {
@@ -17,9 +15,12 @@ class PvEProxy2Gate extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
+    val enemyMains = With.geography.mains.filterNot(_.isOurMain)
     get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
-      .preferLabelYes(Proxy2Gate, Proxy4Gate)
-      .preferZone(With.geography.mains.filterNot(_.isOurs).map(_.zone): _*))
+      .requireLabelYes(Proxy2Gate)
+      .requireZone(With.geography.zones.filter(_.heart.groundTiles(With.geography.home) > 40): _*)
+      .preferBase(enemyMains: _*)
+      .preferZone(With.geography.mains.filterNot(_.isOurMain).map(_.zone): _*))
     once(9, Protoss.Probe)
     get(2, Protoss.Gateway)
   }

@@ -42,6 +42,7 @@ class Grids extends TimedTask {
   val buildable43                 = add("b4",   new GridBuildableWH(4, 3))
   val buildable32                 = add("b3",   new GridBuildableWH(3, 2))
   val buildable22                 = add("b2",   new GridBuildableWH(2, 2))
+  val buildable11                 = add("b1",   new GridBuildableWH(1, 1))
   val walkableTerrain             = add("wt",   new GridWalkableTerrain)
   val mobilityTerrain             = add("mt",   new GridMobilityTerrain)
   val scoutingPathsBases          = add("spb",  new GridScoutingPathsBases)
@@ -108,7 +109,8 @@ class Grids extends TimedTask {
       case 6 => buildable63
       case 4 => buildable43
       case 3 => buildable32
-      case _ => buildable22
+      case 2 => buildable22
+      case _ => buildable11
     }
   }
 

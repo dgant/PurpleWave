@@ -44,7 +44,7 @@ object KeyboardCommands {
       case "4"          => With.game.setLocalSpeed(0)       ; With.configuration.camera = false
       case "pm"         => With.logger.debug(PurpleBWClient.getPerformanceMetrics.toString)
       case "t"          => With.configuration.trackUnit = ! With.configuration.trackUnit
-      case "rewall"     => With.lambdas.add(() => if (With.placement.wall.isDefined) FindWall(With.geography.ourFoyer.zone) else With.placement.preplaceWalls(With.geography.ourFoyer.zone))
+      case "rewall"     => With.lambdas.add(() => if (With.placement.wall.isDefined) FindWall(With.geography.ourFoyer.zone) else With.placement.fitWall(With.geography.ourFoyer.zone))
       case "perform"    => { With.configuration.enablePerformancePauses = ! With.configuration.enablePerformancePauses; With.manners.chat("Performance stops? " + With.configuration.enablePerformancePauses) }
 
       case _            => With.grids.parseCommand(text) || With.visualization.parseCommand(text) || With.performance.parseCommand(text)

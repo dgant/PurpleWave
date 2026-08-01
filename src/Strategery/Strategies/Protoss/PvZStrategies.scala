@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Gameplans.Protoss.PvR.PvR2Gate4Gate
-import Gameplans.Protoss.PvZ.{PvZ1BaseStargate, PvZ1GateCoreExpand, PvZ1GateCoreYoloDragoon, PvZ1GateCoreYoloSpeedlot}
+import Gameplans.Protoss.PvZ.{PvZ1BaseStargate, PvZ1GateCoreExpand, PvZ1GateCoreYoloDragoon, PvZ1GateCoreYoloSpeedlot, PvZFFEPlacementTestGameplan}
 import Lifecycle.With
 import Planning.Plans.Plan
 import ProxyBwapi.Races.Protoss
@@ -58,6 +58,10 @@ abstract class PvZFFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
 }
 object PvZFFE extends PvZFFEOpening {
+  addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
+}
+object PvZFFEPlacementTest extends PvZStrategy {
+  override def gameplan: Option[Plan] = Some(new PvZFFEPlacementTestGameplan)
   addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
 }
 object PvZGatewayFE extends PvZFFEOpening {

@@ -261,6 +261,10 @@ class Storyteller extends MacroCounting {
     tell(f"Map hash: ${With.game.mapHash}")
     tell(f"Map id: ${With.mapCleanName}")
     tell(f"Start: ${With.mapClock} o'clock")
+    tell(f"Start tile: [${With.self.startTile.x}, ${With.self.startTile.y}]")
+    tell(f"Main tile: [${With.geography.ourMain.townHallTile.x}, ${With.geography.ourMain.townHallTile.y}]")
+    tell(f"Natural tile: [${With.geography.ourNatural.townHallTile.x}, ${With.geography.ourNatural.townHallTile.y}]")
+    tell(f"Foyer tile: [${With.geography.ourFoyer.townHallTile.x}, ${With.geography.ourFoyer.townHallTile.y}]")
     tell(s"Rush distance: ${With.strategy.rushDistanceMean}")
   }
 

@@ -14,7 +14,6 @@ object WallProblems {
   object IntersectsMining     extends WallProblem
   object InsufficientlyTight  extends WallProblem
   object WrongZone            extends WallProblem
-  object FailedRecursively    extends WallProblem
   object GapTooNarrow         extends WallProblem
   object GapTooWide           extends WallProblem
   object NoHallway            extends WallProblem

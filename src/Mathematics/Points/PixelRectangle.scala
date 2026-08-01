@@ -58,7 +58,7 @@ case class PixelRectangle(
     containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
   }
   
-  private def containsRectangle(otherRectangle:PixelRectangle):Boolean = {
+  private def containsRectangle(otherRectangle: PixelRectangle): Boolean = {
     contains(otherRectangle.startInclusive)                                       ||
     contains(otherRectangle.endExclusive.subtract(1, 1))                          ||
     contains(otherRectangle.startInclusive.x, otherRectangle.endExclusive.y - 1)  ||
@@ -76,4 +76,6 @@ case class PixelRectangle(
     (0 until endExclusive.x - startInclusive.x by 32).view.flatMap(x =>
       (0 until endExclusive.y - startInclusive.y by 32).view.map(y =>
         Pixel(startInclusive.x + x, startInclusive.y + y)))
+
+  lazy val tiles: TileRectangle = new TileRectangle(startPixel.tile, endExclusive.subtract(1, 1).tile.add(1, 1))
 }

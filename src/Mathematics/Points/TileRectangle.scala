@@ -64,8 +64,8 @@ final case class TileRectangle(
         Math.min(startInclusive.x, other.startInclusive.x),
         Math.min(startInclusive.y, other.startInclusive.y)),
       Tile(
-        Math.max(startInclusive.x, other.startInclusive.x),
-        Math.max(startInclusive.y, other.startInclusive.y)))
+        Math.max(endExclusive.x, other.endExclusive.x),
+        Math.max(endExclusive.y, other.endExclusive.y)))
 
   @inline def expand(xy: Int): TileRectangle = expand(xy, xy)
   @inline def expand(x: Int, y: Int): TileRectangle =

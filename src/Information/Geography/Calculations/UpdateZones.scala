@@ -22,7 +22,7 @@ object UpdateZones {
       With.geography
         .mains
         .foreach(startLocationBase =>
-          Maff.minBy(With.geography.bases.view.filterNot(_.gas.isEmpty).filterNot(startLocationBase==))(_.zone.heart.groundTiles(startLocationBase.zone.heart))
+          Maff.minBy(With.geography.bases.view.filterNot(_.gas.isEmpty).filterNot(_.isMain))(_.zone.heart.groundTiles(startLocationBase.zone.heart))
             .foreach(natural => {
               natural.naturalOf = Some(startLocationBase)
               startLocationBase.natural = Some(natural)

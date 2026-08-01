@@ -82,6 +82,7 @@ object ProtossChoices {
 
   val vsZerg_OpenersWithoutTransitions = Vector(
     PvZFFE,
+    PvZFFEPlacementTest,
   )
 
   val vsZerg_OpenersTransitioningFrom_1GateCore = Vector(

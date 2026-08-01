@@ -48,9 +48,9 @@ class Placement extends Fitter {
       With.geography.zones
         .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
         .sortBy( ! _.metro.exists(_.isOurs))
-        .foreach(preplaceWalls)
+        .foreach(fitWall)
     } else if ( ! With.self.isProtoss || With.enemies.exists( ! _.isProtoss)) {
-      preplaceWalls(With.geography.ourFoyer.zone)
+      fitWall(With.geography.ourFoyer.zone)
     }
     basesSorted.foreach(base => {
       protoss (fitAndIndexConstrained(5, 1, ?(base.isOurMain, TemplatesProtoss.mainBases, TemplatesProtoss.expansions), base))
@@ -112,7 +112,7 @@ class Placement extends Fitter {
     terran  (fitAndIndexProximity(1, 1, TemplatesTerran.proxy2,   zone.centroid, zone))
   }
 
-  def preplaceWalls(zone: Zone): Unit = {
+  def fitWall(zone: Zone): Unit = {
     val wallFinder = FindWall(zone)
     wallFinder.flatMap(_.wall).map(_.toFit).foreach(index)
     wallFinders ++= wallFinder

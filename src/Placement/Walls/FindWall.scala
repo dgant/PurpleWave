@@ -18,7 +18,12 @@ object FindWall {
       With.logger.debug(f"$zone: ${if (wallFinder.wall.isDefined) "CREATED WALL" else "FAILED to create wall"}")
       With.logger.debug(f"Permutations:       ${wallFinder.metrics.permutations}")
       With.logger.debug(f"Tiles considered:   ${wallFinder.metrics.tilesConsidered}")
+      With.logger.debug(f"Candidates:         ${wallFinder.metrics.candidatesGenerated}")
+      With.logger.debug(f"Finalists:          ${wallFinder.metrics.finalistsEvaluated}")
+      With.logger.debug(f"Wall time (ms):     ${wallFinder.metrics.milliseconds}")
+      With.logger.debug(f"Walkway length:     ${wallFinder.metrics.walkwayLength}")
       if (wallFinder.wall.isDefined) {
+        With.logger.debug(f"Selected wall:    ${wallFinder.wall.get}")
         With.logger.debug(f"Constraints:      ${wallFinder.wall.get.constraint}" )
         With.logger.debug(f"Acceptable walls:\n${wallFinder.wallsAcceptable.map(_.toString).mkString("\n")}")
       }

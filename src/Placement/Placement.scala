@@ -37,7 +37,13 @@ class Placement extends Fitter {
     val basesSorted = With.geography.bases.sortBy(b => b.heart.groundTiles(With.geography.home))
     val zonesSorted = With.geography.zones.sortBy(z => z.heart.groundTiles(With.geography.home))
 
-    basesSorted.foreach(b => index(Fit(b.townHallTile, TemplatesGeneric.townhall)))
+    basesSorted.foreach(b => {
+      // For any center base, place proxies here first.
+      if (b.tiles.contains(Points.tileMiddle)) {
+        fitProxies(b.zone)
+      }
+      index(Fit(b.townHallTile, TemplatesGeneric.townhall))
+    })
     if (wallEverything) {
       With.geography.zones
         .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
@@ -72,9 +78,7 @@ class Placement extends Fitter {
         .map(_.groundTiles(zone.heart)))
       .exists(_ < With.strategy.rushDistanceMin * 0.7)
     if (isProxyLocation) {
-      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy4,  Points.tileMiddle.walkableTile, zone))
-      protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.proxy2,  Points.tileMiddle.walkableTile, zone))
-      terran  (fitAndIndexProximity(1, 1, TemplatesTerran.proxy2,   Points.tileMiddle.walkableTile, zone))
+      fitProxies(zone)
     }
     if ( ! zone.isBackyard && ! zone.island) {
       protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.batterycannon, exitTile, zone, 10))
@@ -95,6 +99,17 @@ class Placement extends Fitter {
     terran  (fitAndIndexRectangle(8, 4, TemplatesTerran.supply,           cornerBack,     bounds, directionToFront))
     zerg    (fitAndIndexProximity(2, 3, TemplatesZerg.tech,               zone.heart,     zone))
     zerg    (fitAndIndexRectangle(2, 8, TemplatesZerg.macroHatch,         cornerFront,    bounds, directionToBack))
+  }
+
+  def fitProxies(zone: Zone): Unit = {
+    protoss {
+      val proxyBaseFit = zone.bases.find(_.tiles.contains(Points.tileMiddle)).map(fitAndIndexConstrained(1, 1, TemplatesProtoss.proxyBase, _)).getOrElse(Seq.empty)
+      if (proxyBaseFit.isEmpty) {
+        fitAndIndexProximity(1, 1, TemplatesProtoss.proxy4, zone.centroid, zone)
+        fitAndIndexProximity(1, 1, TemplatesProtoss.proxy2, zone.centroid, zone)
+      }
+    }
+    terran  (fitAndIndexProximity(1, 1, TemplatesTerran.proxy2,   zone.centroid, zone))
   }
 
   def preplaceWalls(zone: Zone): Unit = {

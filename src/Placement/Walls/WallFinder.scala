@@ -1,6 +1,5 @@
 package Placement.Walls
 
-import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Types.{Edge, Zone}
 import Lifecycle.With
 import Mathematics.Maff
@@ -8,7 +7,7 @@ import Mathematics.Points.{Point, Tile, TileRectangle}
 import Mathematics.Shapes.{Pylons, Rectangle, RoundedBox}
 import Placement.Generation.TileGeneratorRectangularSweep
 import Placement.Walls.WallFillers.{PylonsCannons, WallFiller}
-import Placement.Walls.WallProblems.{GapTooWide, InsufficientFiller, InsufficientlyTight, IntersectsHall, IntersectsMining, IntersectsPrevious, NoHallway, UnbuildableGranular, UnbuildableTerrain, UnpoweredByFiller, UnpoweredByWall, WallProblem}
+import Placement.Walls.WallProblems.{GapTooNarrow, GapTooWide, InsufficientFiller, InsufficientlyTight, IntersectsHall, IntersectsMining, IntersectsPrevious, NoHallway, UnbuildableGranular, UnbuildableTerrain, UnpoweredByFiller, UnpoweredByWall, WallProblem}
 import Placement.Walls.WallSpans.{TerrainGas, TerrainHall}
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
@@ -99,6 +98,11 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     def tryPlace(horizon: Seq[Tile], buildingsLeft: Seq[UnitClass], gapsLeft: Int): Boolean = {
       // Check if a complete placement is valid.
       if (buildingsLeft.isEmpty) {
+
+        // A gap recorded while placing a building must not be covered by that building.
+        if (wallInProgress.gap.exists(gap => wallInProgress.buildings.exists(b => b._2.tileAreaPlusAddon.add(b._1).contains(gap)))) {
+          return fail(wallInProgress, GapTooNarrow)
+        }
 
         // TODO: If gapsLeft is zero enforce constraint.blocksUnit
 
@@ -281,9 +285,10 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   def scoreWall(wall: Wall): Double = {
     if (wall.buildings.isEmpty) return 0.0
     val rectangles = wall.buildings.map(b => new TileRectangle(b._1, b._2.tileWidthPlusAddon, b._2.tileHeight))
-    val expanded  = rectangles.map(_.expand(1, 1))
+    val compactRectangles = rectangles ++ wall.gap.map(new TileRectangle(_, 1, 1))
+    val expanded  = compactRectangles.map(_.expand(1, 1))
     val union     = expanded.reduce(_.add(_))
-    val perimeter = union.tiles.count(t => ! rectangles.exists(_.contains(t)) && expanded.exists(_.contains(t)))
+    val perimeter = union.tiles.count(t => ! compactRectangles.exists(_.contains(t)) && expanded.exists(_.contains(t)))
     val distance  = union.center.walkableTile.groundTiles(zone.heart)
     val margin    = Maff.min(townHallTiles.flatMap(hallTile => rectangles.flatMap(_.tiles).map(_.tileDistanceChebyshev(hallTile)))).getOrElse(0)
     val centersX2 = wall.buildings.map(b => 2 * b._1.x + b._2.tileWidthPlusAddon)
@@ -299,10 +304,21 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
         if (2 * startOrigin.x < buildingCenterX2) b._1.x else b._1.x + b._2.tileWidthPlusAddon
       })
     val insideEdgeAlignment = insideEdges.max - insideEdges.min
+    val gapPositionPenalty = wall.gap.map(gap => {
+      val adjacentBuildings = rectangles.count(rectangle => gap.adjacent4.exists(rectangle.contains))
+      if (adjacentBuildings >= 2) {
+        0
+      } else if (gap.groundPixels(startOrigin) >= union.center.walkableTile.groundPixels(startOrigin)) {
+        400
+      } else {
+        1200
+      }
+    }).getOrElse(0)
     (10 * perimeter
     + 12 * alignment
     + 24 * insideEdgeAlignment
     + 60 * Math.max(0, margin - 6)
+    + gapPositionPenalty
     - 6 * distance)
 
   }
@@ -389,8 +405,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     if (wall.get.gap.isDefined) {
       val gap             = wall.get.gap.get
       val hallwayWalls    = (wall.get.buildings.flatMap(p => p._2.tileAreaPlusAddon.add(p._1).tiles) ++ zone.bases.flatMap(_.townHallArea.tiles)).toSet
-      val hallwayProfile  = new PathfindProfile(gap, Some(entrance), employGroundDist = true, alsoUnwalkable = hallwayWalls, allowDiagonals = false)
-      val hallwayPath     = hallwayProfile.find.tiles
+      val hallwayPath     = findHallway(gap, entrance, hallwayWalls)
       wall.get.hallway    = hallwayPath.getOrElse(Seq.empty)
       // We can't safely fill without preserving a path
       if (wall.get.hallway.isEmpty) {
@@ -406,7 +421,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   private def validateWalkway(): Unit = {
     val w = wall.get
     val walls = (w.buildings.flatMap(p => p._2.tileAreaPlusAddon.add(p._1).tiles) ++ zone.bases.flatMap(_.townHallArea.tiles)).toSet
-    val path = w.gap.flatMap(gap => new PathfindProfile(gap, Some(entrance), employGroundDist = true, alsoUnwalkable = walls, allowDiagonals = false).find.tiles)
+    val path = w.gap.flatMap(gap => findHallway(gap, entrance, walls))
     if (path.isEmpty) {
       fail(w, NoHallway)
     } else {
@@ -415,11 +430,12 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   }
 
   def fill2X2(): Unit = {
+    val inside = findInsideTiles(wall.get)
     val offsets = Vector(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1))
     val placements = new mutable.HashMap[Point, ArrayBuffer[Tile]]
     offsets.foreach(offset => {
       placements(offset) = new ArrayBuffer[Tile]()
-      fill2x2Offset(offset, placements(offset))
+      fill2x2Offset(offset, placements(offset), inside)
     })
     val tiles = placements.values.minBy(scoreFillerGeometry(wall.get, _)).take(8)
     if (filler == PylonsCannons) {
@@ -448,13 +464,89 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
           return
         }
       }
+      if (wall.nonEmpty && wall.get.buildings.count(_._2 == Protoss.Pylon) > 2) {
+        fail(wall.get, InsufficientFiller)
+      }
       if (wall.nonEmpty && wall.get.buildings.count(_._2 == Protoss.PhotonCannon) < 6) {
         fail(wall.get, InsufficientFiller)
       }
     }
   }
 
-  def fill2x2Offset(offset: Point, placements: ArrayBuffer[Tile]): Unit = {
+  private case class HallwayState(tile: Tile, direction: Int, steps: Int, turns: Int)
+
+  private val hallwayDirections = Vector(Point(0, -1), Point(1, 0), Point(0, 1), Point(-1, 0))
+
+  private def findHallway(start: Tile, endRaw: Tile, walls: Set[Tile]): Option[Seq[Tile]] = {
+    val end = endRaw.walkableTile
+    val deltaX = end.x - start.x
+    val deltaY = end.y - start.y
+    val preferredDirection = if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+      if (deltaX >= 0) 1 else 3
+    } else {
+      if (deltaY >= 0) 2 else 0
+    }
+    implicit val ordering: Ordering[HallwayState] = Ordering.by(state => (- state.steps, - state.turns))
+    val horizon = mutable.PriorityQueue.empty[HallwayState]
+    val best = new mutable.HashMap[(Int, Int), (Int, Int)]
+    val previous = new mutable.HashMap[(Int, Int), (Int, Int)]
+    val startKey = (start.i, preferredDirection)
+    best(startKey) = (0, 0)
+    horizon += HallwayState(start, preferredDirection, 0, 0)
+    while (horizon.nonEmpty) {
+      val current = horizon.dequeue()
+      val currentKey = (current.tile.i, current.direction)
+      if (best.get(currentKey).contains((current.steps, current.turns))) {
+        if (current.tile == end) {
+          val output = new ArrayBuffer[Tile]
+          var key = currentKey
+          output += new Tile(key._1)
+          while (previous.contains(key)) {
+            key = previous(key)
+            output += new Tile(key._1)
+          }
+          return Some(output.reverse)
+        }
+        hallwayDirections.indices.foreach(direction => {
+          val offset = hallwayDirections(direction)
+          val next = current.tile.add(offset.x, offset.y)
+          if (next.valid && next.walkableUnchecked && ! walls.contains(next)) {
+            val nextSteps = current.steps + 1
+            val nextTurns = current.turns + Maff.fromBoolean(direction != current.direction)
+            val nextKey = (next.i, direction)
+            val nextCost = (nextSteps, nextTurns)
+            if (best.get(nextKey).forall(cost => nextSteps < cost._1 || (nextSteps == cost._1 && nextTurns < cost._2))) {
+              best(nextKey) = nextCost
+              previous(nextKey) = currentKey
+              horizon += HallwayState(next, direction, nextSteps, nextTurns)
+            }
+          }
+        })
+      }
+    }
+    None
+  }
+
+  private def findInsideTiles(w: Wall): Set[Tile] = {
+    val blockers = (w.buildings.flatMap(p => p._2.tileAreaPlusAddon.add(p._1).tiles)
+      ++ w.gap
+      ++ zone.bases.flatMap(_.townHallArea.tiles)).toSet
+    val available = zone.tiles.filter(tile => tile.walkableUnchecked && ! blockers.contains(tile)).toSet
+    if (available.isEmpty) return Set.empty
+    val seed = available.minBy(_.groundPixels(entrance))
+    val output = new mutable.HashSet[Tile]
+    val horizon = mutable.Queue(seed)
+    output += seed
+    while (horizon.nonEmpty) {
+      horizon.dequeue().adjacent4.foreach(next => if (available.contains(next) && ! output.contains(next)) {
+        output += next
+        horizon.enqueue(next)
+      })
+    }
+    output.toSet
+  }
+
+  def fill2x2Offset(offset: Point, placements: ArrayBuffer[Tile], inside: Set[Tile]): Unit = {
     val w = wall.get
     val buildingCentroid  = Maff.centroid(w.buildings.map(b => b._1.topLeftPixel.add(16 * b._2.tileWidthPlusAddon, 16 * b._2.tileHeight))).walkablePixel
     val buildingTiles     = w.buildings.flatMap(b => b._2.tileAreaPlusAddon.add(b._1).expand(3, 3).tiles)
@@ -465,17 +557,18 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     val generatorEnd      = tiles.minBy(_.groundPixels(startOrigin))
     val direction         = generatorStart.groundDirectionTo(generatorEnd)
     val generator         = new TileGeneratorRectangularSweep(generatorStart, generatorBounds.startInclusive, generatorBounds.endExclusive, direction)
-    val inward            = startOrigin.center.subtract(buildingCentroid)
     def tryFill(tile: Tile): Unit = {
       lazy val rectangle    = new TileRectangle(tile, 2, 2)
       lazy val fillerCenter = tile.topLeftPixel.add(16 * 2, 16 * 2)
-      lazy val relative     = fillerCenter.subtract(buildingCentroid)
-      if (tile.zone == zone
+      if ((tile.x & 1) == offset.x
+        && (tile.y & 1) == offset.y
+        && tile.zone == zone
         // Don't put filler outside the wall
         && fillerCenter.groundPixels(startRemote) >= buildingCentroid.groundPixels(startRemote)
-        && relative.x * inward.x + relative.y * inward.y >= - 32 * 32
         // Is legal placement
         && canPlace(2, 2, tile, countMetrics = false)
+        // Keep filler on the base side of the wall
+        && rectangle.tiles.forall(inside.contains)
         // Don't intersect hallway
         && ! rectangle.tiles.exists(w.hallway.contains)
         // Don't intersect filler
@@ -495,7 +588,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
         placements += tile
       }
     }
-    while (generator.hasNext && placements.length < 16) { tryFill(generator.next()) }
+    while (generator.hasNext) { tryFill(generator.next()) }
 
     Maff.sortStablyInPlaceBy(placements)(_.groundPixels(buildingCentroid))
   }

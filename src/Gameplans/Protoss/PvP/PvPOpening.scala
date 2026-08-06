@@ -6,6 +6,7 @@ import Lifecycle.With
 import Macro.Actions.{Enemy, Flat}
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
+import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Strategies.Protoss._
@@ -565,6 +566,11 @@ class PvPOpening extends GameplanImperative {
     //////////////////////
     // React against FE //
     //////////////////////
+
+    lazy val proxyRoboPlace = With.placement.get(PlaceLabels.ProxyForwardRobo).find(foundation => With.geography.mains.minBy(_.groundPixels(foundation.tile)).isEnemy)
+    lazy val proxyGatePlace = Maff.minBy(With.placement.get(PlaceLabels.Proxy4Gate))(_.tile.groundTiles(With.scouting.enemyHome))
+    lazy val canProxyRobo   = proxyRoboPlace.isDefined
+    lazy val canProxyGate   = proxyGatePlace.isDefined
 
     val shouldFESafe    = shouldExpand && (With.fingerprints.forgeFe() || With.fingerprints.gatewayFe()) && (enemiesHave(Protoss.PhotonCannon) || enemyBases >= 2)
     val shouldFEGreedy  = shouldFESafe && With.fingerprints.forgeFe() && (enemies(Protoss.PhotonCannon) > 1 || enemyBases >= 2)

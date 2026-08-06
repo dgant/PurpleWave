@@ -29,7 +29,7 @@ trait Fitter extends Fits {
     * Attempts to fit each of a sequence of templates in proximity order.
     */
   def fitAndIndexProximity(order: Int, maxFits: Int, templates: Seq[Template], from: Tile, zone: Zone, maximumDistance: Int = 256): mutable.Buffer[Fit] = {
-    fitAndIndex(order, maxFits, templates, x => new TileGeneratorProximity(from.subtract(x.width / 2, x.height / 2), zone))
+    fitAndIndex(order, maxFits, templates, x => new TileGeneratorProximity(from.subtract(x.width / 2, x.height / 2), zone, maximumDistance))
   }
 
   /**
@@ -84,7 +84,7 @@ trait Fitter extends Fits {
       if (requirement.isMacroHatch && ! With.grids.buildableTownHall.get(pointTile)) {
         return false
       }
-      if ( ! With.grids.buildableW(requirement.width).get(pointTile)) {
+      if (requirement.buildableBefore && ! With.grids.buildableW(requirement.width).get(pointTile)) {
         return false
       }
       var dx = 0
@@ -106,8 +106,6 @@ trait Fitter extends Fits {
 
   private def accept(requirement: TemplatePointRequirement, relative: Point, tile: Tile): Boolean = {
     if ( ! tile.valid) {
-      return false
-    } else if ( ! tile.add(requirement.width - 1, requirement.height - 1).valid) {
       return false
     } else {
       val previous = at(tile)

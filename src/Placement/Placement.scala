@@ -1,10 +1,10 @@
 package Placement
 
-import Information.Geography.Types.Zone
+import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Direction, Points, Tile}
-import Placement.Generation.{Fit, Fitter, TemplatesGeneric, TemplatesProtoss, TemplatesTerran, TemplatesZerg}
+import Placement.Generation._
 import Placement.Walls.{FindWall, Wall, WallFinder}
 import Utilities.?
 
@@ -17,6 +17,9 @@ class Placement extends Fitter {
   val wallFinders: ArrayBuffer[WallFinder] = new ArrayBuffer[WallFinder]()
   val wallEverything                       = false
 
+  val forwardProxyNaturals = new ArrayBuffer[Base]()
+  val cannonRushes         = new ArrayBuffer[CannonRushPlacement]()
+
   def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
 
   private def protoss (todo: => Unit): Unit = { if (With.self.isProtoss)  { todo }}
@@ -26,6 +29,7 @@ class Placement extends Fitter {
   def initialize(): Unit = {
     if (_initialized) return
     _initialized = true
+    forwardProxyNaturals ++= With.geography.bases.filter(b => ! b.isBackyard && b.naturalOf.exists(n => ! n.isOurs && n.exitOriginal.isDefined))
 
     // Place walkways under neutral buildings
     With.units.neutral
@@ -40,16 +44,23 @@ class Placement extends Fitter {
     basesSorted.foreach(b => {
       // For any center base, place proxies here first.
       if (b.tiles.contains(Points.tileMiddle)) {
-        fitProxies(b.zone)
+        fitProxyGate(b.zone)
       }
       index(Fit(b.townHallTile, TemplatesGeneric.townhall))
     })
+    forwardProxyNaturals --= forwardProxyNaturals.filter(fitProxyForwardRobo)
+    protoss {
+      cannonRushes ++= basesSorted
+        .filter(base => (base.isMain || base.naturalOf.isDefined) && ! base.isOurMain && ! base.isOurNatural)
+        .flatMap(CannonRushFinder.find(_, this))
+      cannonRushes.foreach(rush => index(rush.fit))
+    }
     if (wallEverything) {
       With.geography.zones
         .filter(_.bases.exists(b => b.isNatural || With.geography.ourFoyer == b))
         .sortBy( ! _.metro.exists(_.isOurs))
         .foreach(fitWall)
-    } else if ( ! With.self.isProtoss || With.enemies.exists( ! _.isProtoss)) {
+    } else if (With.self.isProtoss) {
       fitWall(With.geography.ourFoyer.zone)
     }
     basesSorted.foreach(base => {
@@ -72,13 +83,14 @@ class Placement extends Fitter {
     val cornerBack        = tilesBack.maxBy(_.tileDistanceSquared(cornerFront))
     val directionToBack   = new Direction(cornerFront, cornerBack)
     val directionToFront  = new Direction(cornerBack, cornerFront)
-    val isProxyLocation   = zone.metro.forall(_.main.isEmpty) &&
+    val canProxyGateHere  = zone.metro.forall(_.main.isEmpty) &&
       Maff.min(With.geography.startLocations
         .filterNot(With.self.startTile==)
         .map(_.groundTiles(zone.heart)))
       .exists(_ < With.strategy.rushDistanceMin * 0.7)
-    if (isProxyLocation) {
-      fitProxies(zone)
+
+    if (canProxyGateHere) {
+      fitProxyGate(zone)
     }
     if ( ! zone.isBackyard && ! zone.island) {
       protoss (fitAndIndexProximity(1, 1, TemplatesProtoss.batterycannon, exitTile, zone, 10))
@@ -101,7 +113,35 @@ class Placement extends Fitter {
     zerg    (fitAndIndexRectangle(2, 8, TemplatesZerg.macroHatch,         cornerFront,    bounds, directionToBack))
   }
 
-  def fitProxies(zone: Zone): Unit = {
+  private def fitProxyForwardRobo(natural: Base): Boolean = {
+    if ( ! With.self.isProtoss) return false
+    if ( ! With.enemies.exists(_.isProtoss)) return false
+    val mainHeart     = natural.naturalOf.get.heart
+    val naturalHeart  = natural.heart
+    val exit          = natural.exitOriginal.get.pixelCenter.walkableTile
+    val exitDistance  = exit.groundTiles(mainHeart)
+    val tiles         = With.geography.zones.flatMap(_.tiles).distinct
+    val outwardX      = exit.x - naturalHeart.x
+    val outwardY      = exit.y - naturalHeart.y
+
+    val candidates = tiles
+      .filter(t =>
+        Maff.betweenI(t.groundTiles(exit), 13, 30)
+        && t.groundTiles(mainHeart) > exitDistance
+        && (t.x - exit.x) * outwardX + (t.y - exit.y) * outwardY > 0)
+      .sortBy(t => (t.groundTiles(exit), t.tileDistanceSquared(exit)))
+    val fit = candidates.view.flatMap(candidate =>
+      TemplatesProtoss.proxyForwardRobo.view.map(template => {
+        val robo = template.points.find(p => p.requirement.width == 3 && p.requirement.height == 2).get
+        val origin = candidate.subtract(robo.point.x + 1, robo.point.y + 1)
+        (template, origin)
+      }))
+      .find(f => fitsAt(f._1, f._2))
+    fit.foreach(f => index(Fit(f._2, f._1, 1)))
+    fit.nonEmpty
+  }
+
+  def fitProxyGate(zone: Zone): Unit = {
     protoss {
       val proxyBaseFit = zone.bases.find(_.tiles.contains(Points.tileMiddle)).map(fitAndIndexConstrained(1, 1, TemplatesProtoss.proxyBase, _)).getOrElse(Seq.empty)
       if (proxyBaseFit.isEmpty) {

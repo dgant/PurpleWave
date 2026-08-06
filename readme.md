@@ -55,28 +55,18 @@ Thanks to:
 The community around BWAPI and StarCraft AI is amazing and PurpleWave could not exist without building on the decade of work these folks have done.
 
 ## How to build PurpleWave
-[See build instructions in install.md](install/install.md)
+PurpleWave requires a 32-bit JDK 8 at runtime because it connects to 32-bit BWAPI. Maven is the source of truth for source directories, dependencies, Scala 2.12.18, compiler options, and build order.
 
-Steps: 
-* Clone or download this repository (I keep it in c:\p\pw but it should work from anywhere)
-* If you cloned the repository `git submodule sync; git submodule update --init --recursive` to clone JBWAPI 
-* Open IntelliJ IDEA
-* In IntelliJ IDEA: File -> Settings -> Plugins -> Check off Scala
-* In IntelliJ IDEA: File -> Open -> Select the PurpleWave directory
-* In IntelliJ IDEA: File -> Project Structure -> Select the Java Development Kit directory (like c:\Program Files\Java\jdk\1.8.0_121)
-* In IntelliJ IDEA: File -> Project Structure -> Modules -> The green "+" -> Scala -> Create... -> Download... -> 2.12.6... -> OK
-* In IntelliJ IDEA: File -> Project Structure -> Modules -> Dependencies -> Under "Export" check scala-sdk-2.12.6
-* In IntelliJ IDEA: Build -> Build Artifacts... -> Build
-
-This will produce PurpleWave.jar. See below for "How to run PurpleWave"
+* Clone the repository and run `git submodule sync; git submodule update --init --recursive`.
+* From a command prompt, run `mvn clean package`. The runnable fat JAR is `target/PurpleWave-1.0.jar`.
+* In IntelliJ IDEA, install the Scala plugin and open the repository as a Maven project. Select the 32-bit JDK 8 as the Project SDK and reload the Maven project. Do not add modules, source folders, dependencies, or a Scala SDK by hand.
 
 ## How to run PurpleWave
-* From IntelliJ IDEA: Run -> Run 'PurpleWave' or Debug 'PurpleWave'
+* From IntelliJ IDEA: use the shared `PurpleWave` Run/Debug configuration. It runs Maven's `compile` phase and then launches `Lifecycle.Main` with the Maven main module. Its working directory is the sibling `../bw` directory; change that field if your StarCraft directory is elsewhere.
 * As a JAR:
   - `cd` to the StarCraft directory
   - `mkdir -p bwapi-data/AI; mkdir -p bwapi-data/read; mkdir -p bwapi-data/write` to create the standard directories for BWAPI bot data
-  - Copy PurpleWave.jar to `bwapi-data/AI`
-  - `java.exe -jar bwapi-data/AI/PurpleWave.jar` <-- Run this from the StarCraft directory  
+  - Run `java.exe -Xms1024m -Xmx1024m -Dpurpledebug=true -jar C:\path\to\PurpleWave\target\PurpleWave-1.0.jar`
 
 ## Questions and feedback
 Say hi! Post an issue here on Github or email dsgant at gmail

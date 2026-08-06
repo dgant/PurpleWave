@@ -4,7 +4,7 @@
     <option name="compileOrder" value="JavaThenScala" />
     <option name="postfixOps" value="true" />
     <option name="explainTypeErrors" value="true" />
-    <profile name="Maven 2" modules="PurpleWave.main,PurpleWave.main.main,PurpleWave.main.test">
+    <profile name="Maven 1" modules="PurpleWave.main,PurpleWave.test">
       <option name="postfixOps" value="true" />
       <option name="deprecationWarnings" value="true" />
       <option name="uncheckedWarnings" value="true" />
@@ -26,5 +26,6 @@
         <parameter value="-opt-warnings" />
       </parameters>
     </profile>
+    <profile name="Maven 2" modules="PurpleWave" />
   </component>
 </project>

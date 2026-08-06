@@ -9,7 +9,6 @@ import Placement.Access.PlaceLabels.{DefendAir, DefendHall}
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitClasses.UnitClass
 import Strategery.Python
 import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGatewayFE}
 import Utilities.Time.GameTime
@@ -23,11 +22,6 @@ class PvZFE extends GameplanImperative {
   lazy val wallOption: Option[Wall] = With.placement.wall
   private def wall = wallOption.get
   private val oneBase = new PvZ1BaseReactive
-
-  private def wallPlacement   (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
-  private def buildInWall     (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }
-  private def tryBuildInWall  (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .preferLabelYes(PlaceLabels.Wall))  }
-
   private def naturalNexus(): Unit = {
     get(Protoss.Nexus, new PlacementQuery(Protoss.Nexus).requireBase(With.geography.ourNatural))
   }

@@ -2,6 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
+import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import Strategery._
@@ -105,5 +106,12 @@ object PvPProxy2Gate extends PvPStrategy {
     With.fingerprints.proxyGateway,
     With.fingerprints.forgeFe,
     With.fingerprints.earlyForge)
+}
+
+object PvPCannonRush extends PvPStrategy {
+  addSelectionRequirement(() =>
+    With.geography.mains
+      .filterNot(With.geography.ourMain==)
+      .forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.zone == b.zone)))
 }
 

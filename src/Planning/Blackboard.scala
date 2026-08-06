@@ -43,6 +43,7 @@ class Blackboard {
   val floatableBuildings      : Property[Vector[UnitClass]] = add(new Property(Vector.empty))
   val toCancel                : Property[Vector[Buildable]] = add(new Property(Vector.empty))
   val basesToHold             : Property[Vector[Base]]      = add(new Property(Vector.empty))
+  val cannonRush              : Property[Option[Base]]      = add(new Property(None))
 
   var lastStatus: Seq[String] = Seq.empty
 }

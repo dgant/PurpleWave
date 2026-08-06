@@ -39,7 +39,7 @@ trait MacroActions extends MacroCounting {
     With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
   }
   def scoutOn(unitMatcher: UnitFilter, quantity: Int = 1, scouts: Int = 1): Unit = if (With.units.ours.count(unitMatcher) >= quantity)  scout(scouts)
-  def scoutAt(minimumSupply200: Int,                      scouts: Int = 1): Unit = if (supplyUsed200 >= minimumSupply200)                  scout(scouts)
+  def scoutAt(minimumSupply200: Int,                      scouts: Int = 1): Unit = if (supplyUsed200 >= minimumSupply200)               scout(scouts)
 
   def gasWorkerFloor  (value: Int): Unit = With.blackboard.gasWorkerFloor   .set(value)
   def gasWorkerCeiling(value: Int): Unit = With.blackboard.gasWorkerCeiling .set(value)
@@ -168,6 +168,10 @@ trait MacroActions extends MacroCounting {
   def buildSporesAtFoyer          (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtFoyer       (count, Zerg.SporeColony,       labels :+ DefendAir)
   def buildSporesAtExpansions     (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtExpansions  (count, Zerg.SporeColony,       labels :+ DefendAir)
   def buildSporesAtOpenings       (count: Int, labels: PlaceLabel*): Unit = buildDefenseAtOpenings    (count, Zerg.SporeColony,       labels :+ DefendAir)
+
+  def wallPlacement   (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
+  def buildInWall     (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }
+  def tryBuildInWall  (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .preferLabelYes(PlaceLabels.Wall))  }
 
   def fillMacroHatches(totalHatcheryCount: Int, preferredBases: Base*): Unit = {
     get(

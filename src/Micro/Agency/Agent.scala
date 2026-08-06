@@ -157,18 +157,15 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
   def put(key: Any, value: Any = "Blank"): Unit = {
     blackboard(key) = value
   }
-
   def get(key: Any): Option[Any] = {
     blackboard.get(key)
   }
-
   def get[T](key: Any)(implicit tag: ClassTag[T]): Option[T] = {
     blackboard.get(key).filter(tag.runtimeClass.isInstance).map(_.asInstanceOf[T])
   }
   def contains(key: Any): Boolean = {
     blackboard.contains(key)
   }
-
   def remove(key: Any): Option[Any] = {
     blackboard.remove(key)
   }

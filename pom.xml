@@ -76,69 +76,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>                    
-                    <showDeprecation>false</showDeprecation>
-                    <!--<fork>true</fork>-->
-                    <meminitial>2048m</meminitial>
-                    <maxmem>2048m</maxmem>
-                </configuration>
                 <version>3.8.1</version>
                 <executions>
                     <execution>
                         <id>default-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                            <includes>
-                                <include>**/*.java</include>
-                            </includes>
-                        </configuration>
+                        <phase>none</phase>
                     </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.scala-lang</groupId>
-                        <artifactId>scala-compiler</artifactId>
-                        <version>${scala.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
                     <execution>
-                        <id>compile-macros</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <property name="macro.output.dir" location="${project.build.outputDirectory}"/>
-                                <property name="macro.source.dir" location="${project.basedir}/src-macros"/>
-                                <mkdir dir="${macro.output.dir}"/>
-                                <path id="macro.compile.classpath">
-                                    <path refid="maven.plugin.classpath"/>
-                                    <path refid="maven.compile.classpath"/>
-                                </path>
-                                <property name="macro.compile.classpath.value" refid="macro.compile.classpath"/>
-                                <java classname="scala.tools.nsc.Main" fork="true" failonerror="true" classpathref="macro.compile.classpath">
-                                    <arg value="-classpath"/>
-                                    <arg value="${macro.compile.classpath.value}"/>
-                                    <arg value="-d"/>
-                                    <arg value="${macro.output.dir}"/>
-                                    <arg value="${macro.source.dir}/Utilities/TernaryMacros.scala"/>
-                                    <arg value="${macro.source.dir}/Mathematics/Functions/ReduceMacros.scala"/>
-                                </java>
-                            </target>
-                        </configuration>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -149,36 +95,82 @@
                 <version>4.5.4</version>
                 <executions>
                     <execution>
+                        <id>compile-macros</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <sourceDir>${project.basedir}/src-macros</sourceDir>
+                            <outputDir>${project.build.directory}/macro-classes</outputDir>
+                            <analysisCacheFile>${project.build.directory}/analysis/macros</analysisCacheFile>
+                            <sendJavaToScalac>false</sendJavaToScalac>
+                            <includes>
+                                <include>Utilities/TernaryMacros.scala</include>
+                                <include>Mathematics/Functions/ReduceMacros.scala</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-main</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <analysisCacheFile>${project.build.directory}/analysis/main</analysisCacheFile>
+                            <classpath>
+                                <add>${project.build.directory}/${project.artifactId}-macros.jar</add>
+                            </classpath>
+                            <args>
+                                <arg>-unchecked</arg>
+                                <arg>-feature</arg>
+                                <arg>-deprecation</arg> <!-- To disable deprecation warnings -->
+                                <arg>-language:postfixOps</arg> <!-- To disable postfix operator warnings -->
+                                <arg>-opt:unreachable-code</arg>
+                                <arg>-opt:simplify-jumps</arg>
+                                <arg>-opt:compact-locals</arg>
+                                <arg>-opt:copy-propagation</arg>
+                                <arg>-opt:redundant-casts</arg>
+                                <arg>-opt:box-unbox</arg>
+                                <arg>-opt:nullness-tracking</arg>
+                                <arg>-opt:closure-invocations</arg>
+                                <arg>-opt:inline</arg>
+                                <arg>-opt:l:default,inline</arg>
+                                <arg>-opt-inline-from:Micro.Targeting.**</arg>
+                                <arg>-Ymacro-classpath</arg>
+                                <arg>${project.build.directory}/${project.artifactId}-macros.jar</arg>
+                                <arg>-opt-warnings</arg>
+                            </args>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <recompileMode>incremental</recompileMode>
-                    <args>
-                        <scalaVersion>${scala.version}</scalaVersion>
-                        <arg>-unchecked</arg>
-                        <arg>-feature</arg>                        
-                        <arg>-deprecation</arg> <!-- To disable deprecation warnings -->
-                        <arg>-language:postfixOps</arg> <!-- To disable postfix operator warnings -->
-                        <arg>-opt:unreachable-code</arg>
-                        <arg>-opt:simplify-jumps</arg>
-                        <arg>-opt:compact-locals</arg>
-                        <arg>-opt:copy-propagation</arg>
-                        <arg>-opt:redundant-casts</arg>
-                        <arg>-opt:box-unbox</arg>
-                        <arg>-opt:nullness-tracking</arg>
-                        <arg>-opt:closure-invocations</arg>
-                        <arg>-opt:inline</arg>
-                        <arg>-opt:l:default,inline</arg>
-                        <arg>-opt-inline-from:Micro.Targeting.**</arg>
-                        <arg>-Ymacro-classpath</arg>
-                        <arg>${project.build.outputDirectory}</arg>
-                        <arg>-opt-warnings</arg>
-                    </args>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>package-macros</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <jar destfile="${project.build.directory}/${project.artifactId}-macros.jar"
+                                     basedir="${project.build.directory}/macro-classes"
+                                     update="true" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
            <plugin>

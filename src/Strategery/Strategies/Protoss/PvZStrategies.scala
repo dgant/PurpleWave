@@ -54,19 +54,17 @@ object PvZSpeedlot extends PvZStrategy {
 }
 
 
-abstract class PvZFFEOpening extends PvZStrategy {
+abstract class PvZFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
-}
-object PvZFFE extends PvZFFEOpening {
   addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
 }
-object PvZFFEPlacementTest extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZFFEPlacementTestGameplan)
-  addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
-}
-object PvZGatewayFE extends PvZFFEOpening {
-  addSelectionRequirement(() => With.placement.wall.isDefined)
+object PvZFFE extends PvZFEOpening
+object PvZGatewayFE extends PvZFEOpening {
   setMinimumGamesVsOpponent(2)
   whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
   blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)
 }
+object PvZFFEPlacementTest extends PvZFEOpening {
+  override def gameplan: Option[Plan] = Some(new PvZFFEPlacementTestGameplan)
+}
+

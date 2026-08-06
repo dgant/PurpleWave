@@ -20,9 +20,9 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   private val startedNanos                = System.nanoTime()
   private val searchDeadlineNanos         = startedNanos + 45000000000L
   private val overallDeadlineNanos        = startedNanos + 58000000000L
-  private val maxCandidatesPerPermutation = 32
-  private val maxCandidatesPerConstraint  = 128
-  private val maxFillerFinalists          = 32
+  private val maxCandidatesPerPermutation = 64
+  private val maxCandidatesPerConstraint  = 256
+  private val maxFillerFinalists          = 256
   val metrics           : WallMetrics       = new WallMetrics
   val wallsUnacceptable : ArrayBuffer[Wall] = new ArrayBuffer[Wall]()
   val wallsAcceptable   : ArrayBuffer[Wall] = new ArrayBuffer[Wall]()
@@ -317,7 +317,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     (10 * perimeter
     + 12 * alignment
     + 24 * insideEdgeAlignment
-    + 60 * Math.max(0, margin - 6)
+    + 60 * Math.max(0, 6 - margin)
     + gapPositionPenalty
     - 6 * distance)
 
@@ -439,37 +439,21 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     })
     val tiles = placements.values.minBy(scoreFillerGeometry(wall.get, _)).take(8)
     if (filler == PylonsCannons) {
-      if (tiles.length + wall.get.buildings.length < 7) {
+      val requiredPylons = wall.get.buildings.filter(_._2 == Protoss.Pylon).map(_._1)
+      val maxFillerPylons = 2 - requiredPylons.length
+      val configurations = (0 to Math.max(0, maxFillerPylons)).flatMap(pylonCount => tiles.combinations(pylonCount).flatMap(fillerPylons => {
+        val pylons = requiredPylons ++ fillerPylons
+        val requiredPowered = wall.get.buildings.filter(_._2.requiresPsi).forall(b => pylons.exists(p => Pylons.powers(p, b._1, b._2)))
+        val poweredCannons = tiles.filterNot(fillerPylons.contains).filter(c => pylons.exists(p => Pylons.powers(p, c, Protoss.PhotonCannon)))
+        Some((fillerPylons, poweredCannons)).filter(_ => requiredPowered && poweredCannons.length >= 6)
+      }))
+      if (configurations.isEmpty) {
         fail(wall.get, InsufficientFiller)
         return
       }
-      val centroid          = Maff.centroid(wall.get.buildings.map(b => b._1.topLeftPixel.add(b._2.dimensionLeft, b._2.dimensionUp)))
-      wall.get.buildings  ++= tiles.map(t => (t, Protoss.PhotonCannon))
-      def pylons            = wall.get.buildings.view.filter(b => b._2.powers)
-      def convertable       = wall.get.buildings.view.filter(b => b._2 == Protoss.PhotonCannon)
-      def unpowered         = wall.get.buildings.view.filter(b => b._2.requiresPsi && ! pylons.exists(p => Pylons.powers(p._1, b._1, b._2)))
-      while (unpowered.nonEmpty && convertable.nonEmpty) {
-        val scores = convertable.map(c => (c._1, c._2, unpowered.map(u => ?(Pylons.powers(c._1, u._1, u._2), ?(u._2 == Protoss.PhotonCannon, 1, 100), 0)).sum))
-        val maxScore = scores.map(_._3).max
-        if (maxScore == 0) {
-          fail(wall.get, UnpoweredByFiller)
-          return
-        }
-        val candidates  = scores.filter(_._3 == maxScore)
-        val best        = candidates.maxBy(_._1.topLeftPixel.add(32, 32).pixelDistanceSquared(centroid))
-        wall.get.buildings -= ((best._1, best._2))
-        wall.get.buildings += ((best._1, Protoss.Pylon))
-        if (unpowered.exists(_._2.tileWidth > 2)) {
-          fail(wall.get, UnpoweredByFiller)
-          return
-        }
-      }
-      if (wall.nonEmpty && wall.get.buildings.count(_._2 == Protoss.Pylon) > 2) {
-        fail(wall.get, InsufficientFiller)
-      }
-      if (wall.nonEmpty && wall.get.buildings.count(_._2 == Protoss.PhotonCannon) < 6) {
-        fail(wall.get, InsufficientFiller)
-      }
+      val best = configurations.minBy(c => (c._1.length, scoreFillerGeometry(wall.get, c._2)))
+      wall.get.buildings ++= best._2.map(t => (t, Protoss.PhotonCannon))
+      wall.get.buildings ++= best._1.map(t => (t, Protoss.Pylon))
     }
   }
 
@@ -563,8 +547,6 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
       if ((tile.x & 1) == offset.x
         && (tile.y & 1) == offset.y
         && tile.zone == zone
-        // Don't put filler outside the wall
-        && fillerCenter.groundPixels(startRemote) >= buildingCentroid.groundPixels(startRemote)
         // Is legal placement
         && canPlace(2, 2, tile, countMetrics = false)
         // Keep filler on the base side of the wall

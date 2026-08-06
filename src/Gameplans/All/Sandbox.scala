@@ -1,20 +1,8 @@
 package Gameplans.All
 
-import Lifecycle.With
-import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.Zerg
-import ProxyBwapi.UnitClasses.UnitClass
 
 class Sandbox extends GameplanImperative {
-
-  private def wallPlacement(unitClass: UnitClass): PlacementQuery =
-    new PlacementQuery(unitClass)
-      .preferLabelYes()
-      .preferLabelNo()
-      .preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*)
-      .preferBase()
-      .preferTile()
-      .preferLabelYes(PlaceLabels.Wall)
 
   override def executeBuild(): Unit = {
     once(9, Zerg.Drone)

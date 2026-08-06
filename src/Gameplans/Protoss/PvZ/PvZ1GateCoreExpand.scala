@@ -12,10 +12,6 @@ import Utilities.UnitFilters.IsWarrior
 
 class PvZ1GateCoreExpand extends GameplanImperative {
 
-  private def wallPlacement (unitClass: UnitClass)                : PlacementQuery  = new PlacementQuery(unitClass).preferLabelYes().preferLabelNo().preferZone(With.geography.ourFoyer.edges.flatMap(_.zones).distinct: _*).preferBase().preferTile()
-  private def requireWall   (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .requireLabelYes(PlaceLabels.Wall)) }
-  private def preferWall    (quantity: Int, unitClass: UnitClass) : Unit            = { get(quantity, unitClass, wallPlacement(unitClass)  .preferLabelYes(PlaceLabels.Wall))  }
-
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
     once(Protoss.Pylon)

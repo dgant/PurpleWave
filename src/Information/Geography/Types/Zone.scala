@@ -10,6 +10,8 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Utilities.?
 import bwta.Region
 
+import scala.collection.mutable
+
 final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile]) extends Geo {
         val zones             : Vector[Zone]              = Vector(this)
         val units             : UnorderedBuffer[UnitInfo] = new UnorderedBuffer
@@ -35,13 +37,34 @@ final class Zone(val name: String, val bwemRegion: Region, val tiles: Set[Tile])
   // Wall generation //
   /////////////////////
 
-  lazy val wallPerimeter                  : Vector[Tile]  = tiles.flatMap(_.adjacent9).view.filter(tile => ! tile.walkable && tile.adjacent4.exists(_.walkable) && ! wallPerimeterHall.contains(tile) && ! wallPerimeterGas.contains(tile)).toVector.sortBy(t => exitOriginal.map(_.pixelTowards(this)).getOrElse(centroid.center).radiansTo(t.center))
+  lazy val wallPerimeter                  : Vector[Tile]  = tiles.flatMap(_.adjacent9).view.filter(tile => ! tile.walkable && tile.adjacent4.exists(_.walkable) && ! wallPerimeterHall.contains(tile) && ! wallPerimeterGas.contains(tile)).toVector
   lazy val wallPerimeterSplitStartA       : Tile          = exitOriginal.map(e => wallPerimeter.minBy(_.center.pixelDistanceSquared(e.sidePixels.head))).getOrElse(wallPerimeter.head)
   lazy val wallPerimeterSplitStartB       : Tile          = exitOriginal.map(e => wallPerimeter.minBy(_.center.pixelDistanceSquared(e.sidePixels.last))).getOrElse(wallPerimeter.last)
-  lazy val wallPerimeterSplitLongA        : Vector[Tile]  = wallPerimeter.filter(t => t.tileDistanceSquared(wallPerimeterSplitStartA) < t.tileDistanceSquared(wallPerimeterSplitStartB)).sortBy(_.tileDistanceSquared(wallPerimeterSplitStartA))
-  lazy val wallPerimeterSplitLongB        : Vector[Tile]  = wallPerimeter.filter(t => t.tileDistanceSquared(wallPerimeterSplitStartB) < t.tileDistanceSquared(wallPerimeterSplitStartA)).sortBy(_.tileDistanceSquared(wallPerimeterSplitStartB))
-  lazy val wallPerimeterA                 : Vector[Tile]  = wallPerimeterSplitLongA.take(Math.min(25, wallPerimeter.length / 2))
-  lazy val wallPerimeterB                 : Vector[Tile]  = wallPerimeterSplitLongB.take(Math.min(25, wallPerimeter.length / 2))
+  private def wallPerimeterDistances(start: Tile): Map[Tile, Int] = {
+    val perimeter = wallPerimeter.toSet
+    val output    = new mutable.HashMap[Tile, Int]
+    val horizon   = mutable.Queue(start)
+    output(start) = 0
+    while (horizon.nonEmpty) {
+      val current = horizon.dequeue()
+      current.adjacent8.foreach(next => if (perimeter.contains(next) && ! output.contains(next)) {
+        output(next) = output(current) + 1
+        horizon.enqueue(next)
+      })
+    }
+    output.toMap
+  }
+  private lazy val wallPerimeterDistancesA = wallPerimeterDistances(wallPerimeterSplitStartA)
+  private lazy val wallPerimeterDistancesB = wallPerimeterDistances(wallPerimeterSplitStartB)
+  private def wallPerimeterBelongsToA(tile: Tile): Boolean = (wallPerimeterDistancesA.get(tile), wallPerimeterDistancesB.get(tile)) match {
+    case (Some(a), Some(b)) => a < b || (a == b && tile.tileDistanceSquared(wallPerimeterSplitStartA) < tile.tileDistanceSquared(wallPerimeterSplitStartB))
+    case (Some(_), None)    => true
+    case _                  => false
+  }
+  lazy val wallPerimeterSplitLongA        : Vector[Tile]  = wallPerimeter.filter(wallPerimeterBelongsToA).sortBy(t => (wallPerimeterDistancesA(t), t.y, t.x))
+  lazy val wallPerimeterSplitLongB        : Vector[Tile]  = wallPerimeter.filter(t => wallPerimeterDistancesB.contains(t) && ! wallPerimeterBelongsToA(t)).sortBy(t => (wallPerimeterDistancesB(t), t.y, t.x))
+  lazy val wallPerimeterA                 : Vector[Tile]  = wallPerimeterSplitLongA.take(25)
+  lazy val wallPerimeterB                 : Vector[Tile]  = wallPerimeterSplitLongB.take(25)
   lazy val wallPerimeterACloserToEntrance : Boolean       = wallPerimeterA == Seq(wallPerimeterA, wallPerimeterB).minBy(wp => Maff.min(wp.view.map(_.pixelDistance(entranceOriginal.map(_.pixelCenter).getOrElse(centroid.center)))).getOrElse(0d))
   lazy val wallPerimeterEntrance          : Vector[Tile]  = if (wallPerimeterACloserToEntrance) wallPerimeterA else wallPerimeterB
   lazy val wallPerimeterExit              : Vector[Tile]  = if (wallPerimeterACloserToEntrance) wallPerimeterB else wallPerimeterA

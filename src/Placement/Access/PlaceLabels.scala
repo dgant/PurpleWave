@@ -24,4 +24,6 @@ object PlaceLabels {
   object Proxy2Rax            extends PlaceLabel
   object Proxy2Gate           extends PlaceLabel
   object Proxy4Gate           extends PlaceLabel
+  object ProxyForwardRobo     extends PlaceLabel
+  object CannonRush           extends PlaceLabel
 }

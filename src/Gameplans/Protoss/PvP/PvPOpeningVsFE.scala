@@ -1,0 +1,151 @@
+package Gameplans.Protoss.PvP
+
+import Gameplans.All.GameplanImperative
+import Lifecycle.With
+import Mathematics.Maff
+import Placement.Access.{Foundation, PlaceLabels, PlacementQuery}
+import Placement.Access.PlaceLabels.{Proxy4Gate, ProxyForwardRobo}
+import ProxyBwapi.Races.Protoss
+import Utilities.?
+
+class PvPOpeningVsFE extends GameplanImperative {
+
+  trait Response
+  object NexusFirst extends Response
+  object RoboProxy  extends Response
+  object FourGateProxy extends Response
+  object FourGateHome extends Response
+
+  var response: Option[Response] = None
+
+  def getProxyRoboPlace : Option[Foundation] = With.placement.get(PlaceLabels.ProxyForwardRobo).find(foundation => With.geography.mains.minBy(_.groundPixels(foundation.tile)).isEnemy)
+  def getProxyGatePlace   : Option[Foundation] = Maff.minBy(With.placement.get(PlaceLabels.Proxy4Gate))(_.tile.groundTiles(With.scouting.enemyHome))
+
+  override def activated: Boolean = {
+
+    lazy val proxyRoboPlace = getProxyRoboPlace
+    lazy val proxyGatePlace = getProxyGatePlace
+    lazy val canProxyRobo   = proxyRoboPlace.isDefined
+    lazy val canProxyGate   = proxyGatePlace.isDefined
+
+    if (response.isEmpty) {
+      if (With.fingerprints.forgeFe()) {
+        if (unitsComplete(Protoss.Gateway) > 1) {
+          response = Some(?(canProxyGate, FourGateProxy, FourGateHome))
+        } else if (unitsComplete(Protoss.Gateway) > 0) {
+          response = Some(?(canProxyRobo, RoboProxy, ?(canProxyGate, FourGateProxy, FourGateHome)))
+        } else {
+          response = Some(NexusFirst)
+        }
+      } else if (With.fingerprints.nexusFirst()) {
+        if (canProxyGate) {
+          response = Some(FourGateProxy)
+        } else if (haveComplete(Protoss.Assimilator)) {
+          response = Some(FourGateHome)
+        } else {
+          response = Some(NexusFirst)
+        }
+        if (haveComplete(Protoss.Gateway)) {
+          response = Some(?(canProxyGate, FourGateProxy, ?(haveComplete(Protoss.Assimilator), FourGateHome, NexusFirst)))
+        }
+
+      }
+    }
+    if (enemyRecentStrategy(With.fingerprints.cannonRush) && ! With.scouting.enemyNatural.exists(_.townHall.isDefined)) {
+      response = None
+    }
+    response.isDefined
+  }
+
+  override def completed: Boolean = bases >= 2
+
+  override def executeBuild(): Unit = {
+    scout(1)
+    once(8, Protoss.Probe)
+    once(Protoss.Pylon)
+    once(10, Protoss.Probe)
+
+    if (response.contains(NexusFirst)) {
+      once(13, Protoss.Probe)
+      requireMiningBases(2)
+      once(14, Protoss.Probe)
+
+      // Unlikely to be reached, but just in case:
+      once(Protoss.Gateway)
+      once(15, Protoss.Probe)
+      once(2, Protoss.Pylon)
+      once(16, Protoss.Probe)
+      once(Protoss.Assimilator)
+      once(17, Protoss.Probe)
+      once(Protoss.CyberneticsCore)
+      once(18, Protoss.Probe)
+
+    } else {
+      once(Protoss.Gateway)
+      once(12, Protoss.Probe)
+      once(Protoss.Assimilator)
+      once(13, Protoss.Probe)
+      once(Protoss.CyberneticsCore)
+      once(14, Protoss.Probe)
+
+      if (response.contains(RoboProxy)) {
+        get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
+          .preferZone(With.scouting.enemyNatural.map(_.zone).toSeq: _*)
+          .preferBase(With.scouting.enemyNatural.toSeq: _*)
+          .requireLabelYes(ProxyForwardRobo))
+
+        once(17, Protoss.Probe)
+        get(1, Protoss.RoboticsFacility, new PlacementQuery(Protoss.Pylon))
+        once(Protoss.Dragoon)
+
+      } else if (response.contains(FourGateProxy)) {
+        get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
+          .preferZone(With.scouting.enemyNatural.map(_.zone).toSeq: _*)
+          .preferBase(With.scouting.enemyNatural.toSeq: _*)
+          .requireLabelYes(Proxy4Gate))
+
+        once(15, Protoss.Probe)
+      }
+    }
+  }
+
+  override def executeMain(): Unit = {
+    attack()
+
+    if (PvPIdeas.enemyDarkTemplarLikely) {
+      if (response.contains(RoboProxy)) {
+        get(Protoss.Observatory)
+        once(2, Protoss.Observer)
+      } else {
+        get(Protoss.Forge)
+        buildInWall(1, Protoss.Pylon)
+        buildInWall(2, Protoss.PhotonCannon)
+        requireMiningBases(2)
+      }
+    }
+
+    if (armySupply200 >= 24) {
+      requireMiningBases(2)
+    }
+
+    if (response.contains(RoboProxy)) {
+      get(Protoss.RoboticsSupportBay)
+      pump(Protoss.Reaver)
+      pump(Protoss.Dragoon)
+      get(Protoss.DragoonRange)
+      get(2, Protoss.Gateway)
+    } else if (response.contains(FourGateProxy)) {
+      get(Protoss.DragoonRange)
+      pump(Protoss.Dragoon)
+      get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferZone().preferBase().preferLabelYes(Proxy4Gate))
+    } else {
+      get(Protoss.DragoonRange)
+      get(4, Protoss.Gateway)
+      pump(Protoss.Dragoon)
+    }
+
+    pump(Protoss.Zealot)
+    requireMiningBases(2)
+  }
+
+}

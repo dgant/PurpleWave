@@ -55,14 +55,27 @@ case class PixelRectangle(
   }
   
   def intersects(otherRectangle: PixelRectangle): Boolean = {
-    containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
+    startInclusive.x < endExclusive.x &&
+    startInclusive.y < endExclusive.y &&
+    otherRectangle.startInclusive.x < otherRectangle.endExclusive.x &&
+    otherRectangle.startInclusive.y < otherRectangle.endExclusive.y &&
+    startInclusive.x < otherRectangle.endExclusive.x &&
+    otherRectangle.startInclusive.x < endExclusive.x &&
+    startInclusive.y < otherRectangle.endExclusive.y &&
+    otherRectangle.startInclusive.y < endExclusive.y
   }
   
-  private def containsRectangle(otherRectangle: PixelRectangle): Boolean = {
+  def containsRectangle(otherRectangle: PixelRectangle): Boolean = {
     contains(otherRectangle.startInclusive)                                       ||
     contains(otherRectangle.endExclusive.subtract(1, 1))                          ||
     contains(otherRectangle.startInclusive.x, otherRectangle.endExclusive.y - 1)  ||
     contains(otherRectangle.endExclusive.x - 1, otherRectangle.startInclusive.y)
+  }
+
+  def nearestPoint(to: Pixel): Pixel = {
+    Pixel(
+      Maff.clamp(startInclusive.x, to.x, endExclusive.x - 1),
+      Maff.clamp(startInclusive.y, to.y, endExclusive.y - 1))
   }
   
   def startPixel      : Pixel = startInclusive

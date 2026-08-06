@@ -15,7 +15,9 @@ class PvPCannonRush extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     scoutOn(Protoss.Pylon)
-    scoutOn(Protoss.Forge, 1, scouts = 2)
+    if ( ! foundEnemyBase && With.geography.startLocations.length >= 4) {
+      scoutOn(Protoss.Forge, 1, scouts = 2)
+    }
 
     once(8, Protoss.Probe)
     tryBuildInWall(1, Protoss.Pylon)
@@ -30,7 +32,11 @@ class PvPCannonRush extends GameplanImperative {
     rushEnded ||= With.units.existsEverOurs(Protoss.PhotonCannon)
     rushEnded ||= With.tactics.workerScout.scoutingAbandoned
     doAutosupply = unitsEver(Protoss.Nexus) >= 2
-    if ( ! rushEnded) {
+
+    if (With.fingerprints.proxyGateway() && unitsEver(Protoss.PhotonCannon) < 3) {
+      tryBuildInWall(3, Protoss.PhotonCannon)
+    }
+    else if ( ! rushEnded) {
       With.blackboard.cannonRush.set(With.scouting.enemyMain)
       return
     }

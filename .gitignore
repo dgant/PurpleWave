@@ -3,6 +3,7 @@
 *.log
 *.class
 *.zip
+*.iml
 .idea/workspace.xml
 .idea/codeStyles
 .idea/hydra.xml
@@ -10,11 +11,12 @@
 .idea/libraries/
 .idea/modules.xml
 .idea/scala_settings.xml
-*.iml
-.gradle/
+/.codex/
+/.gradle/
+/agent-notes/
+/artifacts/
+/images/
 /out/
 /target/
-/images/
 dependency-reduced-pom.xml
-.codex/
-agent-notes/
+

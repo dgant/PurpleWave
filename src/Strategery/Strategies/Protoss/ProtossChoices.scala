@@ -7,7 +7,6 @@ object ProtossChoices {
   val pvr = Vector(
     PvR2Gate4Gate,
     PvRDT,
-    PvECannonRushTest,
     PvEProxy2Gate
   )
 

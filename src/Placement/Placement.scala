@@ -126,7 +126,7 @@ class Placement extends Fitter {
 
     val candidates = tiles
       .filter(t =>
-        Maff.betweenI(t.groundTiles(exit), 13, 30)
+        Maff.betweenI(t.groundTiles(exit), 15, 30)
         && t.groundTiles(mainHeart) > exitDistance
         && (t.x - exit.x) * outwardX + (t.y - exit.y) * outwardY > 0)
       .sortBy(t => (t.groundTiles(exit), t.tileDistanceSquared(exit)))

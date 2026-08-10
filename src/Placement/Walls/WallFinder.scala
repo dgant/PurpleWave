@@ -36,6 +36,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
   def generate(): Option[Wall] = {
     placeRequiredBuildings()
     selectWallWithFiller()
+    wall.foreach(assignOutsideHallway)
     metrics.milliseconds = (System.nanoTime() - startedNanos) / 1000000L
     wall
   }
@@ -427,6 +428,17 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     } else {
       w.hallway = path.get
     }
+  }
+
+  private def assignOutsideHallway(w: Wall): Unit = {
+    val walls = (w.buildings.flatMap(p => p._2.tileAreaPlusAddon.add(p._1).tiles) ++ zone.bases.flatMap(_.townHallArea.tiles)).toSet
+    w.hallwayOutside = w.gap.toSeq.flatMap(gap => {
+      val insideDirection = w.hallway.find(_ != gap).map(_.directionTo(gap))
+      val outsideDirection = insideDirection.getOrElse(gap.directionTo(exit.otherSideof(zone).heart))
+      (0 to 4)
+        .map(distance => gap.add(outsideDirection.x * distance, outsideDirection.y * distance))
+        .takeWhile(tile => tile.walkableUnchecked && ! walls.contains(tile))
+    })
   }
 
   def fill2X2(): Unit = {

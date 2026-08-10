@@ -98,6 +98,9 @@ trait MacroActions extends MacroCounting {
   def pumpGasPumps(quantity: Int = 400): Unit = {
     PumpGasPumps(quantity)
   }
+  def microSlush(minerals: Int): Unit = {
+    get(RequestMicroSlush(minerals))
+  }
 
   // For expansion logic, avoid relying on info from Geography, which can lag and cause float or potentially double-expanding
   private def completeBases       : Int = ourBaseTownHalls.count(b => b.complete)

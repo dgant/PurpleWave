@@ -90,6 +90,7 @@ object With {
   var macroSim          : MacroSim            = _
   var manners           : Manners             = _
   var matchups          : MatchupGraph        = _
+  var microSlush        : MicroSlush          = _
   var paths             : Paths               = _
   var performance       : PerformanceMonitor  = _
   var placement         : Placement           = _
@@ -211,6 +212,7 @@ object With {
     macroSim          = new MacroSim
     manners           = new Manners
     matchups          = new MatchupGraph
+    microSlush        = new MicroSlush
     paths             = new Paths
     placement         = new Placement
     priorities        = new Priorities

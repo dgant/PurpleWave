@@ -577,27 +577,27 @@ object TemplatesProtoss {
         "-------"),
     new Template()
       .from(
-        "-RxxP",
-        "-xxx",
+        "-RxxPx",
+        "-xxxxx",
         "----"),
     new Template()
       .from(
         "PxRxx-",
-        "  xxx-",
+        "xxxxx-",
         "  ----"),
     new Template()
       .from(
-        " Pxx",
-        " xxx",
+        " Px",
+        " xx",
         "-Rxx",
         "-xxx",
         "----"),
     new Template()
       .from(
-        " Pxx",
-        " xxx",
-        " Rxx-",
-        " xxx-",
-        " ----"))
+        "Px",
+        "xx",
+        "Rxx-",
+        "xxx-",
+        "----"))
     .map(_.addLabels(ProxyForwardRobo))
 }

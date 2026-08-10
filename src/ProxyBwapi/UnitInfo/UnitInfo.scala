@@ -221,11 +221,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   private val _proxied = new Cache(() =>
     unitClass.isBuilding
     && ! flying
-    && (tile.buildable || unitClass.isGas) // Safeguard against chasing inaccessible flying Terran buildings
     && ?(isFriendly,
-      With.scouting.proximity(tile) < 1 - _proxyThreshold
+      proximity < 1 - _proxyThreshold
         || ! metro.exists(_.bases.exists(_.isOurs)),
-      With.scouting.proximity(tile) >     _proxyThreshold + ?(metro.exists(_.owner == player) || With.scouting.firstEnemyMain.isEmpty, 0.25, 0)
+      proximity >     _proxyThreshold + ?(metro.exists(_.owner == player) || With.scouting.firstEnemyMain.isEmpty, 0.25, 0)
         || base.orElse(Maff.minBy(With.geography.bases)(_.groundPixels(tile))).exists(b => b.isOurs || (b.groundPixels(tile) > 32 * 30 && ! b.isMain))),
     240)
 

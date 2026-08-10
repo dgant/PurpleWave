@@ -2,6 +2,7 @@ package Macro.Allocation
 
 import Debugging.Visualizations.Views.Economy.ShowProduction
 import Lifecycle.With
+import Mathematics.Maff
 import Planning.ResourceLocks.LockCurrency
 import Utilities.Time.{Forever, Seconds}
 
@@ -40,6 +41,7 @@ class Bank {
   
   private def queueBuyer(request: LockCurrency): Unit = {
     val framesToEarnCost = Math.max(framesToEarnMinerals(request.minerals), framesToEarnGas(request.gas))
+    request.mineralsGranted = Maff.clamp(mineralsLeft, 0, request.minerals)
     request.satisfied = isAvailableNow(request)
     mineralsLeft -= request.minerals
     gasLeft      -= request.gas

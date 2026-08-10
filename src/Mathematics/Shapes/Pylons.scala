@@ -42,6 +42,9 @@ object Pylons {
         })
       .toArray
 
+  val points2Inverse: Array[Point] = points2.map(p => Point(-p.x, -p.y))
+  val points3Inverse: Array[Point] = points3.map(p => Point(-p.x, -p.y))
+
   val map2: Set[(Int, Int)] = points2.map(p => (p.x, p.y)).toSet
   val map3: Set[(Int, Int)] = points3.map(p => (p.x, p.y)).toSet
 
@@ -51,4 +54,10 @@ object Pylons {
     unitClass.tileHeight <= 2,
     powers2(from, to),
     powers3(from, to))
+
+  def tiles2(from: Tile): Seq[Tile] = points2.toSeq.view.map(from.add)
+  def tiles3(from: Tile): Seq[Tile] = points3.toSeq.view.map(from.add)
+
+  def tiles2Inverse(from: Tile): Seq[Tile] = points2Inverse.toSeq.view.map(from.add)
+  def tiles3Inverse(from: Tile): Seq[Tile] = points3Inverse.toSeq.view.map(from.add)
 }

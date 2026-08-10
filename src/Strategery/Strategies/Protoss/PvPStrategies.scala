@@ -108,10 +108,11 @@ object PvPProxy2Gate extends PvPStrategy {
     With.fingerprints.earlyForge)
 }
 
-object PvPCannonRush extends PvPStrategy {
+object PvPCannonRushFE extends PvPStrategy {
   addSelectionRequirement(() =>
     With.geography.mains
       .filterNot(With.geography.ourMain==)
       .forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.zone == b.zone)))
 }
 
+object PvPCannonRushMaximum extends PvPStrategy

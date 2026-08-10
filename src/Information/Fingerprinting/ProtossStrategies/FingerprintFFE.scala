@@ -32,7 +32,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     if ( ! super.investigate) return false
     if ( With.frame > Minutes(5)()) return false
     conclusion = getConclusion
-    conclusion != Undecided
+    conclusion == requiredConclusion
   }
 
   private def getConclusion: Conclusion = {

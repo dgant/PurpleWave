@@ -3,7 +3,8 @@ package Gameplans.Protoss.PvP
 import Gameplans.All.ModalGameplan
 
 class ProtossVsProtoss extends ModalGameplan(
-  new PvPCannonRush,
+  new PvPCannonRushFE,
+  new PvPCannonRushMaximum,
   new PvPOpeningVsFE,
   new PvPNexusFirst,
   new PvPOpening,

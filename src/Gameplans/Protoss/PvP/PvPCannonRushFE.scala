@@ -4,14 +4,16 @@ import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPCannonRush
+import Strategery.Strategies.Protoss.PvPCannonRushFE
 
-class PvPCannonRush extends GameplanImperative {
+class PvPCannonRushFE extends GameplanImperative {
 
-  override def activated: Boolean = PvPCannonRush()
-  override def completed: Boolean = unitsEver(Protoss.DarkTemplar) >= 2
+  override def activated: Boolean = PvPCannonRushFE()
+  override def completed: Boolean = unitsEver(Protoss.DarkTemplar) >= 2 || (enemyFE && bases >= 2)
 
   var rushEnded: Boolean = false
+
+  def enemyFE: Boolean = enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)
 
   override def executeBuild(): Unit = {
     scoutOn(Protoss.Pylon)
@@ -29,16 +31,25 @@ class PvPCannonRush extends GameplanImperative {
   override def doWorkers(): Unit = {}
 
   override def executeMain(): Unit = {
-    rushEnded ||= With.units.existsEverOurs(Protoss.PhotonCannon)
+    rushEnded ||= With.units.existsEverOurs(u => Protoss.PhotonCannon(u) && u.proxied)
     rushEnded ||= With.tactics.workerScout.scoutingAbandoned
     doAutosupply = unitsEver(Protoss.Nexus) >= 2
 
     if (With.fingerprints.proxyGateway() && unitsEver(Protoss.PhotonCannon) < 3) {
       tryBuildInWall(3, Protoss.PhotonCannon)
     }
-    else if ( ! rushEnded) {
-      With.blackboard.cannonRush.set(With.scouting.enemyMain)
-      return
+    if (rushEnded) {
+      val incompletePylons = With.units.ours.filter(u => Protoss.Pylon(u) && ! u.complete).toVector
+      if (incompletePylons.nonEmpty && incompletePylons.forall(_.proxied)) {
+        cancel(Protoss.Pylon)
+      }
+    } else {
+      With.blackboard.cannonRushBase.set(With.scouting.enemyMain)
+      microSlush(Math.max(150, 300 - 100 * With.units.ours.count(_.proxied)))
+    }
+
+    if (enemyFE) {
+      requireMiningBases(2)
     }
 
     once(13, Protoss.Probe)
@@ -52,14 +63,16 @@ class PvPCannonRush extends GameplanImperative {
     once(17, Protoss.Probe)
     once(Protoss.CyberneticsCore)
     once(18, Protoss.Probe)
-    requireMiningBases(2)
-    once(19, Protoss.Probe)
-    once(Protoss.Dragoon)
-    get(Protoss.CitadelOfAdun)
+    once(Protoss.Zealot)
     once(20, Protoss.Probe)
+    once(Protoss.Dragoon)
+    sneakyCitadel()
+    once(21, Protoss.Probe)
+    requireMiningBases(2)
     get(Protoss.TemplarArchives)
-    get(Protoss.DragoonRange)
+    once(2, Protoss.Dragoon)
     once(2, Protoss.DarkTemplar)
+    get(Protoss.DragoonRange)
     tryBuildInWall(4, Protoss.PhotonCannon)
     once(38, Protoss.Probe)
     pump(Protoss.Dragoon)

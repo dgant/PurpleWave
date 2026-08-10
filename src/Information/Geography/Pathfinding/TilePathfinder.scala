@@ -29,7 +29,7 @@ trait TilePathfinder {
   var aStarTilesExploredMax   : Long = 0
   var aStarTilesExploredTotal : Long = 0
 
-  def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end))
+  def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end), employGroundDist = true)
   private var tiles: Array[TileState] = Array.empty
   private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => - t.costToEndFloor))
 

@@ -74,7 +74,7 @@ class Recruiter {
   }
 
   def inquire(lock: LockUnits, isDryRun: Boolean): Option[Iterable[FriendlyUnitInfo]] = {
-    lock.offerUnits(lock.units.view ++ available, isDryRun)
+    lock.offerUnits(lock.units.view.filter(_.alive) ++ available, isDryRun)
   }
 
   def satisfy(lock: LockUnits): Unit = {

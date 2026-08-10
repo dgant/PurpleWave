@@ -40,7 +40,8 @@ abstract class RequestBuildable(
     else if (upgrade.isDefined) new ProduceUpgrade(this, expectedFrames)
     else {
       val unitClass = unit.get
-      if (unitClass.isAddon)                                                  new ProduceAddon(this, expectedFrames)
+      if (unitClass == UnitClasses.None)                                      new ProduceMicroSlush(this, expectedFrames)
+      else if (unitClass.isAddon)                                             new ProduceAddon(this, expectedFrames)
       else if (unitClass.isBuilding && ! unitClass.whatBuilds._1.isBuilding)  new ProduceBuilding(this, expectedFrames)
       else if (unitClass.buildUnitsSpent.exists(_.isZerg))                    new ProduceUnitMorphed(this, expectedFrames)
       else                                                                    new ProduceUnitTrained(this, expectedFrames)

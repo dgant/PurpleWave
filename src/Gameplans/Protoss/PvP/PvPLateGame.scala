@@ -5,6 +5,7 @@ import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import Placement.Access.PlaceLabels
+import Placement.Access.PlaceLabels.ProxyForwardRobo
 import PvPIdeas._
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
@@ -219,11 +220,9 @@ class PvPLateGame extends GameplanImperative {
   private def doTrainArmy(): Unit = {
 
     if (expectCarriers) {
-      get(Protoss.DarkArchonEnergy)
       makeDarkArchons()
-      if (units(Protoss.DarkArchon) + units(Protoss.DarkTemplar) / 2 >= 3) {
-        get(Protoss.MindControl)
-      }
+      get(Protoss.DarkArchonEnergy)
+      get(Protoss.MindControl)
       pump(Protoss.DarkTemplar, 2 * enemies(Protoss.Carrier) - 2 * units(Protoss.DarkArchon) + 2)
       pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
     }
@@ -246,20 +245,24 @@ class PvPLateGame extends GameplanImperative {
       }
     }
     pump(Protoss.Observer, Math.min(3, enemies(Protoss.DarkTemplar)))
-    if (shouldReaver) {
-      // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
-      if (riskingFirstExpansion || ! shouldAttack) {
-        pump(Protoss.Reaver, 2)
+    if (With.units.ours.exists(u => Protoss.RoboticsFacility(u) && u.proxied && With.placement.get(ProxyForwardRobo).exists(_.tile == u.tileTopLeft))) {
+      pump(Protoss.Reaver)
+    } else {
+      if (shouldReaver) {
+        // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
+        if (riskingFirstExpansion || ! shouldAttack) {
+          pump(Protoss.Reaver, 2)
+        }
+        pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
       }
-      pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
-    }
-    pump(Protoss.Observer, 2)
-    if (shouldReaver) {
-      pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
-    }
-    if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
-      // TODO: This is a last minute tournament panic addition. Maybe we can come up with somthing more principled
-      get(Protoss.ShuttleSpeed)
+      pump(Protoss.Observer, 2)
+      if (shouldReaver) {
+        pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
+      }
+      if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
+        // TODO: This is a last minute tournament panic addition. Maybe we can come up with somthing more principled
+        get(Protoss.ShuttleSpeed)
+      }
     }
 
     if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {

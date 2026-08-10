@@ -19,6 +19,7 @@ class Wall {
   var problems      : mutable.HashSet[WallProblem]    = new mutable.HashSet[WallProblem]
   var gap           : Option[Tile]                    = None
   var hallway       : Seq[Tile]                       = Seq.empty
+  var hallwayOutside: Seq[Tile]                       = Seq.empty
   var score         : Double                          = _
 
   lazy val defensePoint: Tile = gap.getOrElse({
@@ -38,6 +39,7 @@ class Wall {
     problems  ++= other.problems
     gap         = other.gap
     hallway     = other.hallway
+    hallwayOutside = other.hallwayOutside
     score       = other.score
   }
 
@@ -53,12 +55,12 @@ class Wall {
       Point(b._1.x - origin.x, b._1.y - origin.y),
       new TemplatePointRequirement(b._2).withLabels(PlaceLabels.Defensive, PlaceLabels.DefendEntrance, PlaceLabels.DefendGround, PlaceLabels.Wall)))
 
-    hallway.foreach(tile => fit.template.add(
+    (hallway ++ hallwayOutside).distinct.foreach(tile => fit.template.add(
       Point(tile.x - origin.x, tile.y - origin.y),
       new RequireWalkable))
 
     fit
   }
 
-  override def toString: String = f"Wall: $constraint -> Buildings: $buildings, Gap: $gap, Hallway: $hallway"
+  override def toString: String = f"Wall: $constraint -> Buildings: $buildings, Gap: $gap, Hallway: $hallway, Hallway outside: $hallwayOutside"
 }

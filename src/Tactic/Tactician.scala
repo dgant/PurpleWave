@@ -46,6 +46,7 @@ final class Tactician extends TimedTask {
           val pylonBlock                = addPriorityTactic(new TacticPylonBlock)
           val produce: Produce          = addPriorityTactic(new Produce)
           val acePilots                 = addPriorityTactic(new SquadAcePilots)
+  private val cannonRushMaximum         = addPriorityTactic(new MaximumCannonRush)
   private val clearBurrowedBlockers     = addPriorityTactic(new SquadClearExpansionBlockers)
   private val ejectScout                = addPriorityTactic(new TacticEjectScout)
           val scoutWithOverlord         = addPriorityTactic(new TacticInitialOverlordScout)

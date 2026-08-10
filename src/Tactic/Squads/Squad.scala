@@ -94,7 +94,5 @@ abstract class Squad extends Tactic with FriendlyUnitGroup {
     units.groupBy(_.unitClass).map(group => (group._1, group._2.maxBy(unit => 100000L * unit.squadAge - unit.frameDiscovered)))
   )
 
-
-
   override def toString: String = ToString(this).replace("Squad", "")
 }

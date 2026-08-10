@@ -39,7 +39,7 @@ class Visualization extends TimedTask {
     ShowEfficiency,
 
     //ShowMutalisks,
-    ShowFlowField,
+    //ShowFlowField,
     //ShowZones,
     //ShowWall,
     //ShowFoundations,

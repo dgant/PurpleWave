@@ -14,11 +14,12 @@ object AttackBuilder extends Action {
     lazy val scaries = scaryThreats(unit)
     lazy val targets = disruptableBuilders(unit)
     (unit.canAttack
-     && With.scouting.enemyMainFullyScouted
-     && With.enemies.exists(_.raceCurrent == Race.Terran)
-     && targets.nonEmpty
-     && scaries.size < 2
-     && (scaries.isEmpty || (unit.totalHealth > 5 && targets.exists(_.totalHealth < unit.totalHealth))))
+      && unit.intent.canFight
+      && With.scouting.enemyMainFullyScouted
+      && With.enemies.exists(_.raceCurrent == Race.Terran)
+      && targets.nonEmpty
+      && scaries.size < 2
+      && (scaries.isEmpty || (unit.totalHealth > 5 && targets.exists(_.totalHealth < unit.totalHealth))))
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {

@@ -5,7 +5,7 @@ import Micro.Targeting.TargetFilter
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
-object TargetFilterReaver extends TargetFilter {
+object TargetFilterShuttleReaver extends TargetFilter {
   override def appliesTo(actor: FriendlyUnitInfo): Boolean = Protoss.Reaver(actor) && actor.agent.ride.isDefined
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
 

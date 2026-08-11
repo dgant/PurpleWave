@@ -10,6 +10,7 @@ object SabotageProxy extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     unit.agent.isScout
+    && unit.intent.canFight
     && unit.canAttackGround
     && unit.matchups.targets.exists(_.proxied))
 

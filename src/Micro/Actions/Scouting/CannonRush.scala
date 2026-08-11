@@ -98,11 +98,13 @@ object CannonRush extends Action {
       }
     })
 
-    Maff.minBy(With.units.enemy.filter(_.orderTarget.contains(unit)))(_.totalHealth).foreach(target => {
-      unit.agent.toAttack = Some(target)
-      Commander.attack(unit)
-      return
-    })
+    if (unit.intent.canFight) {
+      Maff.minBy(With.units.enemy.filter(_.orderTarget.contains(unit)))(_.totalHealth).foreach(target => {
+        unit.agent.toAttack = Some(target)
+        Commander.attack(unit)
+        return
+      })
+    }
 
     // Prepare to replace a Pylon the instant it's destroyed
     if (With.units.existsOurs(u => Protoss.PhotonCannon(u) && u.proxied)) {

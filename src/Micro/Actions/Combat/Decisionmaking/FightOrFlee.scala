@@ -27,14 +27,14 @@ object FightOrFlee extends Action {
 
     val berzerkCutoff = Minutes(6)()
 
-    decide(true,  "Static",     () => ! u.canMove)
+    decide(false, "CantFight",  () => ! u.intent.canFight)
     decide(true,  "CantFlee",   () => ! u.intent.canFlee)
+    decide(true,  "Static",     () => ! u.canMove)
     decide(true,  "Committed",  () => u.agent.commit)
     decide(true,  "YOLO",       () => With.yolo.active && IsWarrior(u))
     decide(true,  "Irradiated", () => u.painfullyIrradiated)
     decide(true,  "Safe",       () => u.battle.exists( ! _.enemy.canAttack(u)))
     decide(true,  "Detonated",  () => u.unitClass.suicides && u.matchups.targetsInRange.exists(_.canAttack(u)))
-    decide(false, "CantFight",  () => ! u.intent.canFight)
     decide(true,  "HugTank",    () => ! u.flying && u.agent.ride.isEmpty && With.enemies.exists(_.isTerran) && u.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(u)))
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
     decide(true,  "CoverFire",  () => u.unitClass.supportsAnchor && u.matchups.allies.exists(ally => ally.unitClass.isAnchor && u.matchups.threatDeepest.exists(enemy => u.canAttack(enemy) && ally.canAttack(enemy) && enemy.pixelsToGetInRange(ally) <= Math.min(32 * 8, 16 + u.pixelsToGetInRange(enemy)) && u.pixelDistanceEdge(ally) < 32 * 10)))

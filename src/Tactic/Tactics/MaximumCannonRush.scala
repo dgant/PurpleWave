@@ -9,7 +9,6 @@ import Mathematics.Shapes.{Pylons, Spiral}
 import Micro.Agency.BuildIntent
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitCounters.CountExactly
 import Utilities.UnitFilters.IsBuilding
 import Utilities.UnitPreferences.PreferClose
@@ -31,9 +30,6 @@ class MaximumCannonRush extends Tactic {
     .setMatcher(Protoss.Probe)
     .setInterruptible(false)
 
-  var probeInside   : FriendlyUnitInfo = null
-  var probeOutside  : FriendlyUnitInfo = null
-
   override def launch(): Unit = {
     if ( ! With.blackboard.cannonRushMaximum()) return
 
@@ -52,7 +48,9 @@ class MaximumCannonRush extends Tactic {
       return
     }
 
-    lock.units.foreach(_.intend(this).setCanFight(false).toScoutTiles = goal.zone.tiles.toSeq)
+    lock.units.foreach(_.intend(this)
+      .setCanFight(false)
+      .setScout(goal.zone.tiles.toSeq))
 
     var mineralsLeft  = With.microSlush.available
     var builders      = lock.units
@@ -65,9 +63,10 @@ class MaximumCannonRush extends Tactic {
     def buildable(building: UnitClass, tile: Tile): Boolean = (
       new TileRectangle(tile, 2, 2).tiles.forall(t =>
         ! builtUpon.contains(t)
-          && t.buildable
-          && t.units.forall(u => u.flying || (u.isOurs && u.unitClass.isWorker)))
-        && ( ! building.requiresPsi || With.grids.psi2Height.isSet(tile) || ourPylons.exists(p => Pylons.powers2(p.tileTopLeft, tile))))
+        && t.buildable
+        && t.units.forall(u => u.flying || (u.isOurs && u.unitClass.isWorker))
+        && ! t.enemiesAttackingGround.exists(_.unitClass.isBuilding))
+      && ( ! building.requiresPsi || With.grids.psi2Height.isSet(tile) || ourPylons.exists(p => Pylons.powers2(p.tileTopLeft, tile))))
 
     def build(building: UnitClass, tile: Tile): Unit = {
       if (builders.nonEmpty && mineralsLeft >= building.mineralPrice + 72 * With.accounting.ourIncomePerFrameMinerals) {
@@ -112,9 +111,8 @@ class MaximumCannonRush extends Tactic {
             .tiles2Inverse(cannon)
             .filter(buildable(Protoss.Pylon, _))
             .filter(pylon =>
-              pylon.zone == goal.zone
+              pylon.zone != goal.zone
               && legal(pylon)
-
             && ! new TileRectangle(pylon, 2, 2).intersects(new TileRectangle(cannon, 2, 2))).toVector)(
           _.tileDistanceFast(goal)))
 
@@ -129,7 +127,7 @@ class MaximumCannonRush extends Tactic {
       ourCannons                    .map(_.tileTopLeft),
       anchorCannonTile.toSeq).toVector
 
-    (0 until 2).foreach(i => {
+    (0 to 2).foreach(i => {
 
       val safeTiles = seedCannons
         .flatMap(t => Spiral(5).map(t.add))
@@ -137,7 +135,7 @@ class MaximumCannonRush extends Tactic {
         .distinct
         .sortBy(_.add(1, 1).topLeftPixel.pixelDistance(goal.center))
 
-      val poweredTiles  = safeTiles.filter(buildable(Protoss.PhotonCannon, _))
+      val poweredTiles  = safeTiles.filter(buildable(Protoss.PhotonCannon, _)).filter(t => t.zone == goal.zone || ourCannons.size < 3)
       val cannonTileBestDistance = Maff.min(poweredTiles.map(_.add(1, 1).topLeftPixel.pixelDistance(goal.center))).getOrElse(LightYear().toDouble)
       val makePylon     = ! makingPylon && (poweredTiles.isEmpty || ourCannons.count(_.pixelDistanceCenter(goal.center) < cannonTileBestDistance) >= 3)
       val building      = ?(makePylon, Protoss.Pylon, Protoss.PhotonCannon)
@@ -145,15 +143,20 @@ class MaximumCannonRush extends Tactic {
         ?(
           makePylon,
           Maff.orElse(
-            safeTiles,
-            seedCannons.flatMap(t => Spiral(5).map(t.add)).filter(buildable(Protoss.Pylon, _)),
+            safeTiles
+              .filter(_.zone == goal.zone),
+            seedCannons.flatMap(t => Spiral(5).map(t.add))
+              .filter(buildable(Protoss.Pylon, _))
+              .filter(_.zone == goal.zone),
             goal.zone.tiles.filter(buildable(Protoss.Pylon, _))),
-          poweredTiles))(_.tileDistanceSquared(goal))
+          poweredTiles))(t =>
+        t.add(1, 1).topLeftPixel.pixelDistance(goal.center)
+        - 3200 * Maff.fromBoolean( ! makePylon && ourCannons.size < 2 && t.zone != goal.zone))
 
-      makeTile.foreach(tile => {
+      if (makeTile.isDefined){
         val building = ?(makePylon, Protoss.Pylon, Protoss.PhotonCannon)
-        build(building, tile)
-      })
+        build(building, makeTile.get)
+      }
     })
   }
 }

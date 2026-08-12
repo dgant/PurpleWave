@@ -4,14 +4,15 @@ import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
-import ProxyBwapi.Races.Zerg
+import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.{Minutes, Seconds}
 
 object Cancel extends Action {
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = {
-    if (With.framesSince(unit.frameDiscovered) < Seconds(5)()) return false
+    val maximumCannonRushBuilding = With.blackboard.cannonRushMaximum() && unit.isAny(Protoss.Pylon, Protoss.PhotonCannon)
+    if ( ! maximumCannonRushBuilding && With.framesSince(unit.frameDiscovered) < Seconds(5)()) return false
 
     // Redundant check to spare performance on .trainee()
     if (With.blackboard.toCancel().nonEmpty) {

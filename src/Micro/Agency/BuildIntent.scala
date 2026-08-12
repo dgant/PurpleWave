@@ -1,6 +1,6 @@
 package Micro.Agency
 
-import Mathematics.Points.Tile
+import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.UnitClasses.UnitClass
 
-case class BuildIntent(unitClass: UnitClass, tile: Tile, startNow: Boolean = true)
+case class BuildIntent(unitClass: UnitClass, tile: Tile, startNow: Boolean = true, approach: Option[Pixel] = None)

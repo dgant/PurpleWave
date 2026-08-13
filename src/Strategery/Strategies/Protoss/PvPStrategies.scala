@@ -114,5 +114,3 @@ object PvPCannonRushFE extends PvPStrategy {
       .filterNot(With.geography.ourMain==)
       .forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.zone == b.zone)))
 }
-
-object PvPCannonRushMaximum extends PvPStrategy

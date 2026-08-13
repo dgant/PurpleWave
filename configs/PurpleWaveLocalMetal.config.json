@@ -8,6 +8,7 @@
 "pretraining"     : false,
 "debugging"       : true,
 "debugginglive"   : true,
+"simviz"          : false,
 "logstd"          : true,
 "multiCPU"        : true,
 "framemstarget"   : 35,

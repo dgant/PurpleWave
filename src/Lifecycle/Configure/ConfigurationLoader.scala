@@ -52,6 +52,7 @@ object ConfigurationLoader {
       val pretraining   = getOrDefault(config, "pretraining",   false)
       val debugging     = getOrDefault(config, "debugging",     false)
       val debugginglive = getOrDefault(config, "debugginglive", false)
+      val simviz        = getOrDefault(config, "simviz",        false)
       val logstd        = getOrDefault(config, "logstd",        false)
       val multiCPU      = getOrDefault(config, "multiCPU",      true)
       val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
@@ -60,6 +61,7 @@ object ConfigurationLoader {
       With.configuration.fixedBuilds = new FileFlag("fixedbuilds.txt").contents
       With.configuration.frameTargetMs = frameMsTarget
       With.configuration.frameLimitMs = frameMsLimit
+      With.configuration.simviz = simviz
 
       if (tournament    && ladder)      With.logger.warn("Both tournament and ladder modes are enabled")
       if (tournament    && livestream)  With.logger.warn("Both tournament and livestream modes are enabled")
@@ -91,6 +93,7 @@ object ConfigurationLoader {
         ("Pretraining",     pretraining.toString),
         ("Debugging",       debugging.toString),
         ("DebuggingLive",   debugginglive.toString),
+        ("SimViz",          simviz.toString),
         ("Log stdout",      logstd.toString),
         ("Frame MS target", frameMsTarget),
         ("Frame MS limit",  frameMsLimit),

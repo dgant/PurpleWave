@@ -6,6 +6,7 @@ object ProtossChoices {
   
   val pvr = Vector(
     PvR2Gate4Gate,
+    PvRCannonRushMaximum,
     PvRDT,
     PvEProxy2Gate
   )
@@ -56,7 +57,6 @@ object ProtossChoices {
 
   val vsProtoss_NeverVsRandom = Vector(
     PvPCannonRushFE,
-    PvPCannonRushMaximum,
     PvPProxy2Gate,
     PvPNexusFirst
   )

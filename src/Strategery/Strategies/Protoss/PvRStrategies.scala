@@ -14,6 +14,8 @@ object PvR2Gate4Gate extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
 
+object PvRCannonRushMaximum extends PvRStrategy
+
 object PvRDT extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvRDT)
 }

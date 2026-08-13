@@ -42,7 +42,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val simWeight        : Double                = 1.0 - skimWeight
   lazy val simulated        : Boolean               = simWeight > 0 && ! isGlobal
   lazy val skimulated       : Boolean               = skimWeight > 0
-  lazy val logSimulation    : Boolean               = With.configuration.debugging
+  lazy val logSimulation    : Boolean               = With.configuration.simviz
   lazy val speedMultiplier  : Double                = ?(isGlobal, 1.0      , judgmentModifiers.map(_.speedMultiplier).product)
   lazy val judgmentModifiers: Seq[JudgmentModifier] = ?(isGlobal, Seq.empty, JudgmentModifiers(this))
   lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal

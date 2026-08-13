@@ -21,7 +21,7 @@ final class Simulation {
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
   var shouldReset     : Boolean               = true
-  // Frames log for visualizer (only when debugging)
+  // Frames log for visualizer (only when SimViz is enabled)
   private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
   private var simulationStartGameFrame: Int = 0
 

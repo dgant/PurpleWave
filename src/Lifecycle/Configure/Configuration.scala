@@ -23,6 +23,7 @@ class Configuration {
   var visualizeFun      = false
   var visualizeDebug    = false
   var debugging         = false
+  var simviz            = false
   var detectBreakpoints = false
   var camera            = false
 

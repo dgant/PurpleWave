@@ -498,42 +498,60 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else                                        0
 
   lazy val stormValue: Double =
-    if (isWorker) 0.25
-    else if (this == Terran.Marine) 0.25
-    else if (this == Terran.Firebat) 0.25
-    else if (this == Terran.Ghost) 0.25
-    else if (this == Terran.Medic) 0.25
-    else if (this == Terran.Vulture) 0.25
-    else if (this == Terran.Goliath) 0.35
-    else if (this == Terran.SiegeTankUnsieged) 0.5
-    else if (this == Terran.SiegeTankSieged) 1.0
-    else if (this == Terran.Dropship) 0.35
-    else if (this == Terran.Valkyrie) 0.35
-    else if (this == Terran.Wraith) 0.1
-    else if (this == Terran.Battlecruiser) 0.75
-    else if (this == Terran.ScienceVessel) 0.2
-    else if (this == Protoss.Zealot) 0.25
-    else if (this == Protoss.Dragoon) 0.35
-    else if (this == Protoss.DarkTemplar) 0.35
-    else if (this == Protoss.HighTemplar) 0.35
-    else if (this == Protoss.Archon) 0.4
-    else if (this == Protoss.Corsair) 0.1
-    else if (this == Protoss.Scout) 0.25
-    else if (this == Protoss.Carrier) 0.5
-    else if (this == Protoss.Arbiter) 0.25
-    else if (this == Protoss.Shuttle) 0.5
-    else if (this == Protoss.Observer) 0.25
-    else if (this == Protoss.Reaver) 1.0
-    else if (this == Zerg.Overlord) 0.15
-    else if (this == Zerg.Zergling) 0.2
-    else if (this == Zerg.Hydralisk) 0.25
-    else if (this == Zerg.Lurker) 1.0
-    else if (this == Zerg.Mutalisk) 0.1
-    else if (this == Zerg.Scourge) 0.2
-    else if (this == Zerg.Ultralisk) 0.4
-    else if (this == Zerg.InfestedTerran) 0.35
-    else if (this == Zerg.Guardian) 1.0
-    else if (this == Zerg.Devourer) 0.5
+    if (isWorker)                               0.25
+    else if (this == Terran.Marine)             0.25
+    else if (this == Terran.Firebat)            0.25
+    else if (this == Terran.Ghost)              0.25
+    else if (this == Terran.Medic)              0.25
+    else if (this == Terran.Vulture)            0.25
+    else if (this == Terran.Goliath)            0.35
+    else if (this == Terran.SiegeTankUnsieged)  0.5
+    else if (this == Terran.SiegeTankSieged)    1.0
+    else if (this == Terran.Dropship)           0.35
+    else if (this == Terran.Valkyrie)           0.35
+    else if (this == Terran.Wraith)             0.1
+    else if (this == Terran.Battlecruiser)      0.75
+    else if (this == Terran.ScienceVessel)      0.2
+    else if (this == Protoss.Zealot)            0.25
+    else if (this == Protoss.Dragoon)           0.35
+    else if (this == Protoss.DarkTemplar)       0.35
+    else if (this == Protoss.HighTemplar)       0.35
+    else if (this == Protoss.Archon)            0.4
+    else if (this == Protoss.Corsair)           0.1
+    else if (this == Protoss.Scout)             0.25
+    else if (this == Protoss.Carrier)           0.5
+    else if (this == Protoss.Arbiter)           0.25
+    else if (this == Protoss.Shuttle)           0.5
+    else if (this == Protoss.Observer)          0.25
+    else if (this == Protoss.Reaver)            1.0
+    else if (this == Zerg.Overlord)             0.15
+    else if (this == Zerg.Zergling)             0.2
+    else if (this == Zerg.Hydralisk)            0.25
+    else if (this == Zerg.Lurker)               1.0
+    else if (this == Zerg.Mutalisk)             0.1
+    else if (this == Zerg.Scourge)              0.2
+    else if (this == Zerg.Ultralisk)            0.4
+    else if (this == Zerg.InfestedTerran)       0.35
+    else if (this == Zerg.Guardian)             1.0
+    else if (this == Zerg.Devourer)             0.5
+    else 0
+
+  lazy val maelstromValue: Double =
+    if (isWorker)                               0.1
+    else if (this == Terran.Marine)             0.1
+    else if (this == Terran.Firebat)            0.1
+    else if (this == Terran.Medic)              0.05
+    else if (this == Terran.Ghost)              0.2
+    else if (this == Protoss.Zealot)            0.25
+    else if (this == Protoss.HighTemplar)       0.5
+    else if (this == Protoss.DarkTemplar)       0.5
+    else if (this == Zerg.Zergling)             0.05
+    else if (this == Zerg.Hydralisk)            0.1
+    else if (this == Zerg.Mutalisk)             0.2
+    else if (this == Zerg.Scourge)              0.1
+    else if (this == Zerg.Defiler)              0.4
+    else if (this == Zerg.Guardian)             0.4
+    else if (this == Zerg.Ultralisk)            0.25
     else 0
 
   lazy val budgetCategory: Budgets.Value = {

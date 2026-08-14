@@ -36,6 +36,7 @@ object Cast extends Action {
     Stasis,
     DisruptionWeb,
     MindControl,
+    Maelstrom,
     Feedback,
     GhostCloak,
     TacticalNuke,

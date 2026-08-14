@@ -2,9 +2,10 @@ package Tactic.Tactics
 
 import Debugging.Visualizations.Colors
 import Debugging.Visualizations.Rendering.DrawMap
+import Information.Geography.Types.Zone
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Tile, TileRectangle}
+import Mathematics.Points.{Pixel, PixelRectangle, Tile, TileRectangle}
 import Mathematics.Shapes.{Pylons, Spiral}
 import Micro.Actions.Basic.Build
 import Micro.Agency.BuildIntent
@@ -25,6 +26,51 @@ class MaximumCannonRush extends Tactic {
     && legalOneTile(tile.add(1, 1))
     && legalOneTile(tile.add(1, 0))
     && legalOneTile(tile.add(0, 1)))
+
+  def legalPlacementsOutside(zone: Zone): Set[Tile] = {
+    val outsidePerimeter = zone.tiles.view
+      .flatMap(_.adjacent4)
+      .filter(tile => tile.valid && ! zone.tiles.contains(tile))
+      .toSet
+    outsidePerimeter
+      .flatMap(tile => Seq(tile, tile.left, tile.up, tile.up.left))
+      .filter(tile => {
+        val tiles = new TileRectangle(tile, 2, 2).tiles
+        tiles.forall(t => t.valid && ! zone.tiles.contains(t)) && legal(tile)
+      })
+  }
+
+  private def unitBox(tile: Tile, unitClass: UnitClass): PixelRectangle = {
+    val center = tile.topLeftPixel.add(16 * unitClass.tileWidth, 16 * unitClass.tileHeight)
+    PixelRectangle(
+      center.subtract(unitClass.dimensionLeft, unitClass.dimensionUp),
+      center.add(unitClass.dimensionRightExclusive, unitClass.dimensionDownExclusive))
+  }
+
+  private def boxDistance(box: PixelRectangle, pixel: Pixel): Double =
+    Maff.broodWarDistanceBox(box.startInclusive, box.endExclusive, pixel, pixel)
+
+  private def farthestBoxDistance(from: PixelRectangle, to: PixelRectangle): Double = Seq(
+    to.startInclusive,
+    Pixel(to.endExclusive.x, to.startInclusive.y),
+    to.endExclusive,
+    Pixel(to.startInclusive.x, to.endExclusive.y))
+    .map(boxDistance(from, _))
+    .max
+
+  def cannonProtectionTiles(cannon: Tile, attacker: UnitClass): Set[Tile] = {
+    val cannonRange = Protoss.PhotonCannon.pixelRangeGround
+    if (! attacker.attacksGround || attacker.pixelRangeGround > cannonRange) return Set.empty
+    val cannonBox = unitBox(cannon, Protoss.PhotonCannon)
+    val radius = Math.ceil(cannonRange / 32.0).toInt + 1
+    (cannon.x - radius to cannon.x + radius).flatMap(x =>
+      (cannon.y - radius to cannon.y + radius).map(Tile(x, _)))
+      .filter(tile => new TileRectangle(tile, 2, 2).tiles.forall(_.valid))
+      // Both weapons measure range to the same attacker box, so the attacker's dimensions cancel.
+      .filter(tile => farthestBoxDistance(cannonBox, unitBox(tile, Protoss.PhotonCannon))
+        + attacker.pixelRangeGround <= cannonRange)
+      .toSet
+  }
 
   lock
     .setMatcher(Protoss.Probe)

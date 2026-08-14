@@ -74,7 +74,7 @@ object Build extends Action {
 
     With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + building.radialHypotenuse, unit))
 
-    var movePixel = intent.approach.getOrElse(tile.topLeftPixel.add(building.tileWidth * 16, building.tileHeight * 16))
+    var movePixel = tile.topLeftPixel.add(building.tileWidth * 16, building.tileHeight * 16)
 
     if (intent.startNow
       && tile.visible
@@ -85,7 +85,7 @@ object Build extends Action {
       return
     }
 
-    if (Protoss.Probe(unit) && intent.approach.isEmpty) {
+    if (Protoss.Probe(unit)) {
       // If unit doesn't have to resolve collision after moving it gets back to work faster
       movePixel = movePixel.add(
         if (unit.x < movePixel.x) - unit.unitClass.dimensionRightInclusive - building.dimensionLeft - 1 else unit.unitClass.dimensionLeft + building.dimensionRightInclusive + 1,

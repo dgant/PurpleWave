@@ -18,13 +18,19 @@ class FingerprintNexusFirst extends FingerprintOr(
     new FingerprintExistsBy(
       u =>
         Protoss.Pylon(u)
-        && With.scouting.enemyMain.exists(main => u.metro.contains(main.metro)),
+        && With.scouting.enemyMain.exists(main => u.metro.contains(main.metro))
+        && With.scouting.enemyMainFullyScouted,
       GameTime(2, 0)),
     new FingerprintNot(
       new FingerprintExistsBy(u =>
-        u.isAny(Protoss.Gateway, Protoss.Forge)
-        &&  With.scouting.enemyMainFullyScouted,
-        GameTime(2, 0)))))
+        u.isAny(Protoss.Gateway, Protoss.Forge),
+        GameTime(2, 0))),
+    new FingerprintNot(
+      With.fingerprints.gatewayFirst,
+      With.fingerprints.earlyForge)))
   {
-  override def sticky: Boolean = With.frame > GameTime(3, 20)()
+  override def sticky: Boolean =
+    With.frame > GameTime(3, 20)() &&
+    ! With.fingerprints.gatewayFirst() &&
+    ! With.fingerprints.earlyForge()
 }

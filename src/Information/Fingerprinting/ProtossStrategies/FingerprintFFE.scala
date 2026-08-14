@@ -48,7 +48,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     val zealot            = Maff.minBy(With.units.enemy.filter(Protoss.Zealot))(_.arrivalFrame)
 
     val forgeOrCannon     = forge.orElse(cannon)
-    val forgeCompletion   = Maff.vmin(forge    .map(_.completionFrame), cannon.map(_.completionFrame - Protoss.Forge.buildFrames))
+    val forgeCompletion   = Maff.vmin(forge    .map(_.completionFrame), cannon.map(_.completionFrame - Protoss.PhotonCannon.buildFrames))
     val gatewayCompletion = Maff.vmin(gateway  .map(_.completionFrame), zealot.map(_.frameDiscovered - Protoss.Zealot.buildFrames), zealot.map(_.arrivalFrame - Protoss.Zealot.buildFrames - Seconds(25)()))
     val readyToDecide     = (forgeCompletion.isDefined && gatewayCompletion.isDefined) || (expanded && gatewayCompletion.isDefined) || (forge.toSeq ++ cannon).exists(u => With.framesSince(u.frameDiscovered) > Seconds(5)())
     val lossFFE           = Math.abs(forgeCompletion.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge) + gatewayCompletion.map(f => Math.abs(f - expectedFFEGateway)).sum

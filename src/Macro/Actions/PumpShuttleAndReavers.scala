@@ -9,7 +9,7 @@ object PumpShuttleAndReavers extends MacroActions {
     }
     (0 to reavers).foreach(i => {
       pump(Protoss.Reaver, i)
-      pump(Protoss.Shuttle, (i + 1) / 2)
+      pump(Protoss.Shuttle, Math.min(units(Protoss.Reaver) + 1, (i + 1) / 2))
     })
     //pumpRatio(Protoss.Shuttle, 0, reavers / 2, Seq(Friendly(Protoss.Reaver, 0.5)))
     //pump(Protoss.Reaver, reavers)

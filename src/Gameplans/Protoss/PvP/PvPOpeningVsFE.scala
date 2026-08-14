@@ -69,6 +69,9 @@ class PvPOpeningVsFE extends GameplanImperative {
     once(10, Protoss.Probe)
 
     if (response.contains(NexusFirst)) {
+      if (miningBases < 2 && minerals < 400) {
+        cancel(Protoss.Gateway, Protoss.Forge, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Zealot)
+      }
       once(13, Protoss.Probe)
       requireMiningBases(2)
       once(14, Protoss.Probe)

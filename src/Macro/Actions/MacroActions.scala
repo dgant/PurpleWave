@@ -35,7 +35,7 @@ trait MacroActions extends MacroCounting {
     With.blackboard.aggressionRatio.set(value)
   }
 
-    def scout(scoutCount: Int = 1): Unit = {
+  def scout(scoutCount: Int = 1): Unit = {
     With.blackboard.maximumScouts.set(Math.max(With.blackboard.maximumScouts(), scoutCount))
   }
   def scoutOn(unitMatcher: UnitFilter, quantity: Int = 1, scouts: Int = 1): Unit = if (With.units.ours.count(unitMatcher) >= quantity)  scout(scouts)

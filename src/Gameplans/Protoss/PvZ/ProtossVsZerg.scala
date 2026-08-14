@@ -1,10 +1,10 @@
 package Gameplans.Protoss.PvZ
 
 import Gameplans.All.ModalGameplan
-import Gameplans.Protoss.PvR.PvRCannonRushMaximum
+import Gameplans.Protoss.PvE.PvECannonRushMaximum
 
 class ProtossVsZerg extends ModalGameplan(
-  new PvRCannonRushMaximum,
+  new PvECannonRushMaximum,
   new PvZFE,
   new PvZ1BaseReactive,
   new PvZ2022

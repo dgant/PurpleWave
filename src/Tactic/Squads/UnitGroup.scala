@@ -100,6 +100,7 @@ trait UnitGroup {
   private val _warriorsCastersCount       = new Cache(() => warriorsCasters.size)
   private val _attackersBioCount          = new Cache(() => attackersBio.size)
   private val _stormCount                 = new Cache(() => groupOrderable.view.filter(Protoss.HighTemplar).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
+  private val _maelstromCount             = new Cache(() => groupOrderable.view.filter(Protoss.DarkArchon).filter(_.player.hasTech(Protoss.PsionicStorm)).map(_.energy / 75).sum)
   private val _attacksAir                 = new Cache(() => attackers.exists(_.canAttackAir))
   private val _attacksGround              = new Cache(() => attackers.exists(_.canAttackGround))
   private val _catchesAir                 = new Cache(() => attackers.exists(a => (a.pixelRangeAir    > 96 || a.flying)  && a.canAttackAir))

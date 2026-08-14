@@ -1,10 +1,10 @@
 package Gameplans.Protoss.PvT
 
 import Gameplans.All.ModalGameplan
-import Gameplans.Protoss.PvR.PvRCannonRushMaximum
+import Gameplans.Protoss.PvE.PvECannonRushMaximum
 
 class ProtossVsTerran extends ModalGameplan(
-  new PvRCannonRushMaximum,
+  new PvECannonRushMaximum,
   new PvTFastCarrier,
   new PvTArbiter,
   new PvTDoubleRobo

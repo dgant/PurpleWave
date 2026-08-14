@@ -24,9 +24,6 @@ abstract class FingerprintFFE extends FingerprintAnd(
   object ConcludeFFE  extends Conclusion
   object ConcludeGFE  extends Conclusion
   
-  var decidedForge = false
-  var decidedGateway = false
-
   var conclusion: Conclusion = Undecided
   override def investigate: Boolean = {
     if ( ! super.investigate) return false
@@ -36,6 +33,13 @@ abstract class FingerprintFFE extends FingerprintAnd(
   }
 
   private def getConclusion: Conclusion = {
+
+    def earliestCompletion(values: Option[Int]*): Option[Int] = {
+      Maff.min(values.flatten)
+    }
+    def completionDefinitelyBefore(first: UnitInfo, second: UnitInfo): Boolean = {
+      second.completionFrame > second.frameDiscovered && first.completionFrame < second.completionFrame
+    }
 
     def couldBeWall(unit: UnitInfo) = ! unit.proxied && Maff.minBy(With.geography.mains.view.filterNot(_.isOurs))(_.heart.groundTiles(unit.tileTopLeft)).exists(m => m.natural.exists(n => unit.base.contains(n) || unit.proximity > n.townHallTile.proximity))
     val wallUnits = With.units.enemy.filter(couldBeWall)
@@ -47,9 +51,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
     val cannon            = Maff.minBy(wallUnits.filter(Protoss.PhotonCannon))(_.completionFrame)
     val zealot            = Maff.minBy(With.units.enemy.filter(Protoss.Zealot))(_.arrivalFrame)
 
-    val forgeOrCannon     = forge.orElse(cannon)
-    val forgeCompletion   = Maff.vmin(forge    .map(_.completionFrame), cannon.map(_.completionFrame - Protoss.PhotonCannon.buildFrames))
-    val gatewayCompletion = Maff.vmin(gateway  .map(_.completionFrame), zealot.map(_.frameDiscovered - Protoss.Zealot.buildFrames), zealot.map(_.arrivalFrame - Protoss.Zealot.buildFrames - Seconds(25)()))
+    val forgeCompletion   = earliestCompletion(forge    .map(_.completionFrame), cannon.map(_.completionFrame - Protoss.PhotonCannon.buildFrames))
+    val gatewayCompletion = earliestCompletion(gateway  .map(_.completionFrame), zealot.map(_.frameDiscovered - Protoss.Zealot.buildFrames), zealot.map(_.arrivalFrame - Protoss.Zealot.buildFrames - Seconds(25)()))
     val readyToDecide     = (forgeCompletion.isDefined && gatewayCompletion.isDefined) || (expanded && gatewayCompletion.isDefined) || (forge.toSeq ++ cannon).exists(u => With.framesSince(u.frameDiscovered) > Seconds(5)())
     val lossFFE           = Math.abs(forgeCompletion.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedFFEForge) + gatewayCompletion.map(f => Math.abs(f - expectedFFEGateway)).sum
     val lossGFE           = Math.abs(forgeCompletion.getOrElse(With.frame + Protoss.Forge.buildFrames) - expectedGFEForge) + gatewayCompletion.map(f => Math.abs(f - expectedGFEGateway)).sum
@@ -60,6 +63,8 @@ abstract class FingerprintFFE extends FingerprintAnd(
         predictGFE  ||= lossFFE >= lossGFE
     
     if (readyToDecide && noProxies) {
+      if (forge   .exists(f => gateway.exists(g => completionDefinitelyBefore(f, g)))) return ConcludeFFE
+      if (gateway .exists(g => forge.exists   (f => completionDefinitelyBefore(g, f)))) return ConcludeGFE
       if (gateway .exists(_.completionFrame < GameTime(2, 18)())) return ConcludeGFE
       if (forge   .exists(_.completionFrame < GameTime(2, 5)()))  return ConcludeFFE
       if (predictFFE) return ConcludeFFE

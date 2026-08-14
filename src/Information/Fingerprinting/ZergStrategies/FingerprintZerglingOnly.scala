@@ -8,6 +8,8 @@ class FingerprintZerglingOnly extends Fingerprint {
 
   private var disqualified: Boolean = false
   override protected def investigate: Boolean = {
+    disqualified ||= With.enemy.isProtoss
+    disqualified ||= With.enemy.isTerran
     disqualified ||= With.units.existsEnemy(
       Zerg.Hydralisk,
       Zerg.HydraliskDen,

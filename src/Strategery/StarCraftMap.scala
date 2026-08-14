@@ -14,7 +14,6 @@ object Aztec extends StarCraftMap
 object Benzene extends StarCraftMap
 object BlueStorm extends StarCraftMap
 object ChupungRyeong extends StarCraftMap
-object CircuitBreaker extends StarCraftMap
 object Destination extends StarCraftMap
 object Eddy extends StarCraftMap
 object EmpireOfTheSun extends StarCraftMap
@@ -28,10 +27,8 @@ object LaMancha extends StarCraftMap
 object Longinus extends StarCraftMap
 object Luna extends StarCraftMap
 object MatchPoint extends StarCraftMap
-object Medusa extends StarCraftMap
 object Pathfinder extends StarCraftMap
 object Plasma extends StarCraftMap
-object PolarisRhapsody extends StarCraftMap
 object Python extends StarCraftMap
 object Roadkill extends StarCraftMap
 object Roadrunner extends StarCraftMap

@@ -13,8 +13,6 @@ abstract class TvEStrategy extends Strategy     { setOurRace(Race.Terran)     }
 abstract class TvTStrategy extends TvEStrategy  { setEnemyRace(Race.Terran)   }
 abstract class TvPStrategy extends TvEStrategy  { setEnemyRace(Race.Protoss)  }
 abstract class TvZStrategy extends TvEStrategy  { setEnemyRace(Race.Zerg)     }
-abstract class TvRStrategy extends TvEStrategy  { setEnemyRace(Race.Unknown)  }
-
 object TvEBBS       extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvEBBS)      ; blacklistVs(With.fingerprints.oneFac, With.fingerprints.twoFac, With.fingerprints.threeFac) }
 object TvE3Fac      extends TvEStrategy { override def gameplan: Option[Plan] = Some(new TvE3Fac)     }
 object TvT1Port     extends TvTStrategy { override def gameplan: Option[Plan] = Some(new TvT1Port)    }

@@ -8,7 +8,7 @@ import Information.Counting._
 import Information.Fingerprinting.Fingerprints
 import Information.GameSense.GameSensor
 import Information.Geography.Geography
-import Information.Geography.NeoGeo.{MapIdentifier, NeoGeo}
+import Information.Geography.NeoGeo.MapIdentifier
 import Information.Geography.Pathfinding.Paths
 import Information.Grids.Grids
 import Information.Scouting.{Scouting, UnitsShown}
@@ -78,7 +78,6 @@ object With {
   var efficiency        : Efficiency          = _
   var fingerprints      : Fingerprints        = _
   var gathering         : Gathering           = _
-  var geo               : NeoGeo              = _
   var geography         : Geography           = _
   var grids             : Grids               = _
   var groundskeeper     : Groundskeeper       = _
@@ -177,11 +176,6 @@ object With {
     ////////////////////
     // Normal systems //
     ////////////////////
-
-    //geo = new NeoGeo(game)
-    if (With.configuration.visualizeDebug) {
-      //NeoRender(geo)
-    }
 
     analyzeTerrain()
 

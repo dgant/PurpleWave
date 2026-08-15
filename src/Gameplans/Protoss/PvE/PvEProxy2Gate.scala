@@ -5,12 +5,12 @@ import Lifecycle.With
 import Placement.Access.PlaceLabels.{Proxy2Gate, Proxy4Gate}
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvEProxy2Gate => PvEProxy2GateStrategy}
+import Strategery.Strategies.Protoss.PvEProxy2Gate
 import Utilities.Time.Minutes
 
 class PvEProxy2Gate extends GameplanImperative {
 
-  override def activated: Boolean = PvEProxy2GateStrategy()
+  override def activated: Boolean = PvEProxy2Gate()
   override def completed: Boolean = With.frame > Minutes(8)()
 
   override def executeBuild(): Unit = {

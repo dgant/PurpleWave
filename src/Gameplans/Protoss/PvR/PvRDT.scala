@@ -2,11 +2,17 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPIdeas
+import Lifecycle.With
 import Placement.Access.PlaceLabels.DefendHall
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Protoss.PvRDT
+import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
 
 class PvRDT extends GameplanImperative {
+
+  override def activated: Boolean = PvRDT()
+  override def completed: Boolean = With.frame > Minutes(8)()
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)

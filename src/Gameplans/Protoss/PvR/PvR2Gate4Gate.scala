@@ -2,11 +2,17 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPIdeas
+import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran}
-import Utilities.{?, SwapIf}
+import Strategery.Strategies.Protoss.PvR2Gate4Gate
+import Utilities.Time.Minutes
 import Utilities.UnitFilters.IsWarrior
+import Utilities.{?, SwapIf}
 
 class PvR2Gate4Gate extends GameplanImperative {
+
+  override def activated: Boolean = PvR2Gate4Gate()
+  override def completed: Boolean = With.frame > Minutes(9)()
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)

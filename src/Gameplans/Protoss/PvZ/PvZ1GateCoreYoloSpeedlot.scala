@@ -3,10 +3,13 @@ package Gameplans.Protoss.PvZ
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Protoss.PvZ1GateCoreYoloSpeedlot
 import Utilities.?
 import Utilities.UnitFilters.IsWarrior
 
 class PvZ1GateCoreYoloSpeedlot extends GameplanImperative {
+
+  override def activated: Boolean = PvZ1GateCoreYoloSpeedlot()
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)

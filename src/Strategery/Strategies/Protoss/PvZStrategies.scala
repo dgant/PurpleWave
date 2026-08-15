@@ -1,9 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.PvR2Gate4Gate
-import Gameplans.Protoss.PvZ.{PvZ1GateCoreExpand, PvZ1GateCoreYoloDragoon, PvZ1GateCoreYoloSpeedlot}
 import Lifecycle.With
-import Planning.Plans.Plan
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -13,18 +10,10 @@ abstract class PvZStrategy extends Strategy {
   setEnemyRace(Race.Zerg)
 }
 
-object PvZ2Gate4Gate extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
-}
-object PvZ1GateCoreExpand extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreExpand)
-}
-object PvZ1GateCoreYoloSpeedlot extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreYoloSpeedlot)
-}
-object PvZ1GateCoreYoloDragoon extends PvZStrategy {
-  override def gameplan: Option[Plan] = Some(new PvZ1GateCoreYoloDragoon)
-}
+object PvZ2Gate4Gate extends PvZStrategy
+object PvZ1GateCoreExpand extends PvZStrategy
+object PvZ1GateCoreYoloSpeedlot extends PvZStrategy
+object PvZ1GateCoreYoloDragoon extends PvZStrategy
 object PvZ1BaseReactive extends PvZStrategy {
   addChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
   addChoice(PvZMuscle,  PvZExpand,  PvZTech)
@@ -48,8 +37,6 @@ object PvZReaver extends PvZStrategy {
 object PvZSpeedlot extends PvZStrategy {
   addActivationRequirement(() => haveEver(Protoss.Forge))
 }
-
-
 abstract class PvZFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
   addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))

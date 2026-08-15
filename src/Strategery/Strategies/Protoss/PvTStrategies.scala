@@ -128,6 +128,4 @@ object PvTArbiter     extends PvTStrategy
 // Oddballs //
 //////////////
 
-object PvTSpeedlotDT extends PvTStrategy {
-  override def gameplan: Option[Plan] = Some(new PvTSpeedlotDT)
-}
+object PvTSpeedlotDT extends PvTStrategy

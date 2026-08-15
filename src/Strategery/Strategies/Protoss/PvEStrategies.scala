@@ -18,6 +18,9 @@ object PvEProxy2Gate extends PvEStrategy {
     With.fingerprints.proxyGateway,
     With.fingerprints.fourPool,
     With.fingerprints.ninePool)
+  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
+  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
+  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
 }
 
 object PvECannonRushFE extends PvEStrategy {

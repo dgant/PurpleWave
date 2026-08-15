@@ -1,7 +1,5 @@
 package Strategery.Strategies.Protoss
 
-import Lifecycle.With
-import Placement.Access.PlaceLabels
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -20,12 +18,6 @@ object PvRDT extends PvRStrategy {
   addChoice(PvPDT)
   addChoice(PvZ1BaseReactive, PvZ1GateCoreYoloSpeedlot)
 }
-object PvR2GateProxy extends PvRStrategy {
-  addSelectionRequirement(() => With.placement.get(PlaceLabels.Proxy2Gate).nonEmpty)
-  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
-  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
-  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
-}
 object PvR2Gate1012 extends PvRStrategy {
   addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
   addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
@@ -34,7 +26,7 @@ object PvR2Gate1012 extends PvRStrategy {
 object PvRZZCoreZ extends PvRStrategy {
   addChoice(ProtossChoices.vsTerran_From_GateCore: _*)
   addChoice(ProtossChoices.vsProtoss_From_GateCore: _*)
-  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
+  addChoice(ProtossChoices.vsZerg_From_GateCore: _*)
 }
 object PvRFFE extends PvRStrategy {
   addChoice(ProtossChoices.vsTerran_From_FFE: _*)

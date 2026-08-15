@@ -4,11 +4,11 @@ import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPCannonRushFE
+import Strategery.Strategies.Protoss.PvECannonRushFE
 
 class PvECannonRushFE extends GameplanImperative {
 
-  override def activated: Boolean = PvPCannonRushFE()
+  override def activated: Boolean = PvECannonRushFE()
   override def completed: Boolean = unitsEver(Protoss.DarkTemplar) >= 2 || (enemyFE && bases >= 2)
 
   var rushEnded: Boolean = false

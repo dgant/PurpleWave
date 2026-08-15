@@ -1,9 +1,7 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.{PvR2Gate4Gate, PvRDT}
 import Lifecycle.With
 import Placement.Access.PlaceLabels
-import Planning.Plans.Plan
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -13,21 +11,39 @@ abstract class PvRStrategy extends Strategy {
 }
 
 object PvR2Gate4Gate extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
+  addChoice(PvT4Gate)
+  addChoice(PvP4GateGoon)
+  addChoice(PvZ2Gate4Gate)
 }
-
 object PvRDT extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRDT)
+  addChoice(PvTDT)
+  addChoice(PvPDT)
+  addChoice(PvZ1BaseReactive, PvZ1GateCoreYoloSpeedlot)
 }
-
-object PvR2GateProxy        extends PvRStrategy {
+object PvR2GateProxy extends PvRStrategy {
   addSelectionRequirement(() => With.placement.get(PlaceLabels.Proxy2Gate).nonEmpty)
+  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
+  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
+  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
 }
-object PvRCannonRushFE      extends PvRStrategy
-object PvRCannonRushMaximum extends PvRStrategy
-object PvR2Gate1012         extends PvRStrategy
-object PvRZZCoreZ           extends PvRStrategy
-object PvRFFE               extends PvRStrategy
-object PvRGFE               extends PvRStrategy
-
+object PvR2Gate1012 extends PvRStrategy {
+  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
+  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
+  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
+}
+object PvRZZCoreZ extends PvRStrategy {
+  addChoice(ProtossChoices.vsTerran_From_GateCore: _*)
+  addChoice(ProtossChoices.vsProtoss_From_GateCore: _*)
+  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
+}
+object PvRFFE extends PvRStrategy {
+  addChoice(ProtossChoices.vsTerran_From_FFE: _*)
+  addChoice(ProtossChoices.vsProtoss_From_FFE: _*)
+  addChoice(ProtossChoices.vsZerg_From_FFE: _*)
+}
+object PvRGFE extends PvRStrategy {
+  addChoice(ProtossChoices.vsTerran_From_GFE: _*)
+  addChoice(ProtossChoices.vsProtoss_From_GFE: _*)
+  addChoice(ProtossChoices.vsZerg_From_GFE: _*)
+}
 

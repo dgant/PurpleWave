@@ -128,11 +128,6 @@ object PvTArbiter     extends PvTStrategy
 // Oddballs //
 //////////////
 
-object PvTProxy2Gate extends PvTStrategy {
-  blacklistOn(MapGroups.badForProxying: _*)
-  blacklistVs(With.fingerprints.wallIn)
-}
-
-object PvTCustom extends PvTStrategy {
+object PvTSpeedlotDT extends PvTStrategy {
   override def gameplan: Option[Plan] = Some(new PvTSpeedlotDT)
 }

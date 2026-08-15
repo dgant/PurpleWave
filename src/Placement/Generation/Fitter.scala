@@ -11,6 +11,14 @@ import scala.collection.mutable.ArrayBuffer
 
 trait Fitter extends Fits {
 
+  private val _fitsIndexOrder = new ArrayBuffer[Fit]
+  def fitsIndexOrder: Seq[Fit] = _fitsIndexOrder
+
+  override def index(fit: Fit): Unit = {
+    _fitsIndexOrder += fit
+    super.index(fit)
+  }
+
   /**
     * Attempts to fit each of a sequence of templates using a rectangular sweep.
     */

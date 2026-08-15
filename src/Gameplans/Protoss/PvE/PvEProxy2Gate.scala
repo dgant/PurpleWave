@@ -2,16 +2,16 @@ package Gameplans.Protoss.PvE
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Placement.Access.PlaceLabels.Proxy2Gate
+import Placement.Access.PlaceLabels.{Proxy2Gate, Proxy4Gate}
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvEProxy2Gate => PvEProxy2GateStrategy}
+import Utilities.Time.Minutes
 
 class PvEProxy2Gate extends GameplanImperative {
 
-  doAutosupply = false
-
   override def activated: Boolean = PvEProxy2GateStrategy()
+  override def completed: Boolean = With.frame > Minutes(8)()
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)
@@ -25,8 +25,33 @@ class PvEProxy2Gate extends GameplanImperative {
     get(2, Protoss.Gateway)
   }
 
+  override def doWorkers(): Unit = {}
+
+  doAutosupply = false
+
   override def executeMain(): Unit = {
-    pump(Protoss.Zealot)
     attack()
+    if (armySupply200 >= 20) {
+      allIn()
+    }
+    if (have(Protoss.CyberneticsCore)) {
+      gasLimitCeiling(200)
+      pumpWorkers()
+      requireMiningBases(1)
+      get(Protoss.DragoonRange)
+      pump(Protoss.Dragoon)
+      pump(Protoss.Zealot)
+    } else {
+      gasWorkerCeiling(1)
+      pump(Protoss.Zealot)
+      autosupply()
+      pumpWorkers()
+    }
+    if ( ! With.tactics.workerScout.scoutingAbandoned) {
+      //microSlush(100)
+    }
+    get(Protoss.Assimilator)
+    get(Protoss.CyberneticsCore)
+    get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
   }
 }

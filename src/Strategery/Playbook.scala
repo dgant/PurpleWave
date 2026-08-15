@@ -18,16 +18,9 @@ class Playbook extends SimpleString {
 object StrategyGroups {
   val disabled: Vector[Strategy] = Vector[Strategy](
     Sandbox,
-
-    PvEProxy2Gate,
-    PvTProxy2Gate,
-    PvPProxy2Gate,
-    PvT1015,
     PvT1BaseReaver,
-    PvT29Arbiter,
-    PvT4Gate,
-    PvTCustom,
-    PvZGatewayFE,
+    //PvT29Arbiter,
+    //PvT4Gate,
   )
 }
 

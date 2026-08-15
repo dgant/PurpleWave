@@ -13,6 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 class Placement extends Fitter {
 
   private var _initialized: Boolean = false
+  private var cachedWall: Option[Wall] = None
 
   val wallFinders: ArrayBuffer[WallFinder] = new ArrayBuffer[WallFinder]()
   val wallEverything                       = false
@@ -20,7 +21,9 @@ class Placement extends Fitter {
   val forwardProxyNaturals = new ArrayBuffer[Base]()
   val cannonRushes         = new ArrayBuffer[CannonRushPlacement]()
 
-  def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall)
+  def wall: Option[Wall] = wallFinders.headOption.flatMap(_.wall).orElse(cachedWall)
+  def restoreCachedWall(wall: Option[Wall]): Unit = cachedWall = wall
+  def finishCachedRestore(): Unit = sort()
 
   private def protoss (todo: => Unit): Unit = { if (With.self.isProtoss)  { todo }}
   private def terran  (todo: => Unit): Unit = { if (With.self.isTerran)   { todo }}
@@ -29,6 +32,14 @@ class Placement extends Fitter {
   def initialize(): Unit = {
     if (_initialized) return
     _initialized = true
+
+    PlacementCache.load(this) match {
+      case Some(rewrite) =>
+        if (rewrite) PlacementCache.write(this)
+        return
+      case None =>
+    }
+
     forwardProxyNaturals ++= With.geography.bases.filter(b => ! b.isBackyard && b.naturalOf.exists(n => ! n.isOurs && n.exitOriginal.isDefined))
 
     // Place walkways under neutral buildings
@@ -71,6 +82,7 @@ class Placement extends Fitter {
     basesSorted.foreach(_.resourcePathTiles.foreach(t => if (at(t).requirement.buildableAfter) index(Fit(t, TemplatesGeneric.walkway))))
     zonesSorted.sortBy(_.heart.groundTiles(With.geography.home)).foreach(preplaceZone)
     sort()
+    PlacementCache.write(this)
   }
 
   private def preplaceZone(zone: Zone): Unit = {

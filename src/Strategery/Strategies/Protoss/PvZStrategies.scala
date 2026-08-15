@@ -55,7 +55,7 @@ abstract class PvZFEOpening extends PvZStrategy {
   addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
 }
 object PvZFFE extends PvZFEOpening
-object PvZGatewayFE extends PvZFEOpening {
+object PvZGFE extends PvZFEOpening {
   setMinimumGamesVsOpponent(2)
   whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
   blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)

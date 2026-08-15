@@ -3,9 +3,13 @@ package Gameplans.Protoss.PvT
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Utilities.Time.{GameTime, Seconds}
+import Strategery.Strategies.Protoss.PvTSpeedlotDT
+import Utilities.Time.{GameTime, Minutes, Seconds}
 
 class PvTSpeedlotDT extends GameplanImperative {
+
+  override def activated: Boolean = PvTSpeedlotDT()
+  override def completed: Boolean = With.frame > Minutes(9)()
 
   override def executeBuild(): Unit = {
     if (With.fingerprints.workerRush()) {

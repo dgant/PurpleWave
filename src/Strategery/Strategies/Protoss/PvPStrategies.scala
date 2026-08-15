@@ -2,7 +2,6 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
-import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Strategy
 import Strategery._
@@ -90,27 +89,4 @@ object PvP4GateGoon extends PvPStrategy {
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addSelectionRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
   addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 4)
-}
-
-//////////////
-// Oddballs //
-//////////////
-
-object PvPProxy2Gate extends PvPStrategy {
-  blacklistOn(MapGroups.badForProxying: _*)
-  whitelistVs(
-    With.fingerprints.nexusFirst,
-    With.fingerprints.coreBeforeZ)
-  blacklistVs(
-    With.fingerprints.twoGate,
-    With.fingerprints.proxyGateway,
-    With.fingerprints.forgeFe,
-    With.fingerprints.earlyForge)
-}
-
-object PvPCannonRushFE extends PvPStrategy {
-  addSelectionRequirement(() =>
-    With.geography.mains
-      .filterNot(With.geography.ourMain==)
-      .forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.zone == b.zone)))
 }

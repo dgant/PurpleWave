@@ -3,14 +3,14 @@ package Gameplans.Protoss.PvT
 import Lifecycle.With
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.{PvT13Nexus, PvTArbiter}
+import Strategery.Strategies.Protoss.{PvT13Nexus, PvTArbiter, PvTSpeedlotDT}
 import Utilities.DoQueue
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
 class PvTArbiter extends PvTOpeners {
 
-  override def activated: Boolean = PvTArbiter()
+  override def activated: Boolean = PvTArbiter() || PvTSpeedlotDT()
 
   override def executeMain(): Unit = {
     val armyNormalPriority = new DoQueue(PvTArmy.normalPriority)

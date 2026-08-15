@@ -10,14 +10,14 @@ import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Python
-import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGatewayFE}
+import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGFE}
 import Utilities.Time.GameTime
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, DoQueue}
 
 class PvZFE extends GameplanImperative {
 
-  override def activated: Boolean = PvZFFE() || PvZGatewayFE()
+  override def activated: Boolean = PvZFFE() || PvZGFE()
 
   lazy val wallOption: Option[Wall] = With.placement.wall
   private def wall = wallOption.get
@@ -30,7 +30,7 @@ class PvZFE extends GameplanImperative {
     if (wallOption.isEmpty) {
       // We shouldn't even pick this strategy in the first place, but if we do here's an escape valve
       once(5, Protoss.Probe)
-      With.strategy.swapEverything(Seq(PvZ1BaseReactive), Seq(PvZFFE, PvZGatewayFE))
+      With.strategy.swapEverything(Seq(PvZ1BaseReactive), Seq(PvZFFE, PvZGFE))
       return
     }
 

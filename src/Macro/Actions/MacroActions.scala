@@ -30,6 +30,7 @@ trait MacroActions extends MacroCounting {
   def attack(value: Boolean = true) : Unit = if (value) With.blackboard.wantToAttack.set(true)
   def harass(value: Boolean = true) : Unit = if (value) With.blackboard.wantToHarass.set(true)
   def allIn (value: Boolean = true) : Unit = if (value) { With.blackboard.yoloing.set(true); attack() }
+  def considerAttacking()           : Unit = if (confidenceAttacking11 > 0) attack()
 
   def aggression(value: Double): Unit = {
     With.blackboard.aggressionRatio.set(value)

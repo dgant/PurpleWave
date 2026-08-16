@@ -6,7 +6,6 @@ import Macro.Actions.BuildDefense
 import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitClasses.UnitClass
 import Utilities.?
 import Utilities.UnitFilters.IsWarrior
 

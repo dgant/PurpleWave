@@ -10,6 +10,8 @@ import Strategery.{StarCraftMap, StrategyEvaluation, StrategyLegality}
 import Utilities.{?, LightYear}
 import bwapi.Race
 
+case class StrategyChoice(strategies: Seq[Strategy], enemyRace: Option[Race] = None)
+
 abstract class Strategy extends MacroCounting {
   override val toString: String = ToString(this)
 
@@ -33,7 +35,7 @@ abstract class Strategy extends MacroCounting {
   private var _mapsWhitelisted        : Seq[StarCraftMap]   = Seq.empty
   private var _responsesBlacklisted   : Seq[Fingerprint]    = Seq.empty
   private var _responsesWhitelisted   : Seq[Fingerprint]    = Seq.empty
-  private var _choices                : Seq[Seq[Strategy]]  = Seq.empty
+  private var _choices                : Seq[StrategyChoice] = Seq.empty
   private var _selectionRequirements  : Seq[() => Boolean]  = Seq.empty
   private var _activationRequirements : Seq[() => Boolean]  = Seq.empty
 
@@ -60,7 +62,7 @@ abstract class Strategy extends MacroCounting {
   def responsesWhitelisted    : Seq[Fingerprint]    = _responsesWhitelisted
   def selectionRequirements   : Seq[() => Boolean]  = _selectionRequirements
   def activationRequirements  : Seq[() => Boolean]  = _activationRequirements
-  def choices                 : Seq[Seq[Strategy]]  = _choices
+  def choices                 : Seq[StrategyChoice] = _choices
 
   /////////////////////////////////////////////////////
   // 2022 style of implementing strategies: Mutators //
@@ -86,7 +88,8 @@ abstract class Strategy extends MacroCounting {
   def blacklistOn               (maps: StarCraftMap*)         : Unit = _mapsBlacklisted       ++= maps
   def whitelistVs               (fingerprints: Fingerprint*)  : Unit = _responsesWhitelisted  ++= fingerprints
   def blacklistVs               (fingerprints: Fingerprint*)  : Unit = _responsesBlacklisted  ++= fingerprints
-  def addChoice                 (strategies: Strategy*)       : Unit = _choices                 = _choices :+ strategies
+  def addChoice                 (strategies: Strategy*)       : Unit = _choices                 = _choices :+ StrategyChoice(strategies)
+  def addChoiceVs               (enemyRace: Race)(strategies: Strategy*): Unit = _choices        = _choices :+ StrategyChoice(strategies, Some(enemyRace))
   def addSelectionRequirement   (predicate: () => Boolean)    : Unit = _selectionRequirements   = _selectionRequirements  :+ predicate
   def addActivationRequirement  (predicate: () => Boolean)    : Unit = _activationRequirements  = _activationRequirements :+ predicate
 

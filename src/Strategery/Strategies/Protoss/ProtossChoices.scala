@@ -4,13 +4,14 @@ import Strategery.Strategies._
 
 object ProtossChoices {
 
-  val pve = Vector(
+  lazy val pve = Vector(
     PvECannonRushMaximum,
     PvECannonRushFE,
     PvEProxy2Gate
   )
   
-  val pvr = Vector(
+  lazy val pvr = Vector(
+    PvQQ,
     PvR2Gate4Gate,
     PvRDT,
     PvRFFE,

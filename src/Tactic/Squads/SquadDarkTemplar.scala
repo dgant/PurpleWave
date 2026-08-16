@@ -22,6 +22,7 @@ class SquadDarkTemplar extends Squad {
   lock.counter = CountEverything
 
   override def launch(): Unit = {
+    if ( ! With.blackboard.darkTemplarSquad()) return
     bases.clear()
     bases ++= With.geography.bases
       .filterNot(_.zone.island)

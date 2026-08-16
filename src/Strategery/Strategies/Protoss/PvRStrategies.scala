@@ -1,5 +1,8 @@
 package Strategery.Strategies.Protoss
 
+import Gameplans.Protoss.PvR.PvQQ
+import Lifecycle.With
+import Planning.Plans.Plan
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -9,33 +12,38 @@ abstract class PvRStrategy extends Strategy {
 }
 
 object PvR2Gate4Gate extends PvRStrategy {
-  addChoice(PvT4Gate)
-  addChoice(PvP4GateGoon)
-  addChoice(PvZ2Gate4Gate)
+  addChoiceVs(Race.Terran)(PvT4Gate)
+  addChoiceVs(Race.Protoss)(PvP4GateGoon)
+  addChoiceVs(Race.Zerg)(PvZ2Gate4Gate)
 }
 object PvRDT extends PvRStrategy {
-  addChoice(PvTDT)
-  addChoice(PvPDT)
-  addChoice(PvZ1BaseReactive, PvZ1GateCoreYoloSpeedlot)
+  addChoiceVs(Race.Terran)(PvTDT)
+  addChoiceVs(Race.Protoss)(PvPDT)
+  addChoiceVs(Race.Zerg)(PvZ1BaseReactive, PvZ1GateCoreYoloSpeedlot)
 }
 object PvR2Gate1012 extends PvRStrategy {
-  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
-  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
-  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_2Gate: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_2Gate: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_2Gate: _*)
 }
 object PvRZZCoreZ extends PvRStrategy {
-  addChoice(ProtossChoices.vsTerran_From_GateCore: _*)
-  addChoice(ProtossChoices.vsProtoss_From_GateCore: _*)
-  addChoice(ProtossChoices.vsZerg_From_GateCore: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_GateCore: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_GateCore: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_GateCore: _*)
 }
 object PvRFFE extends PvRStrategy {
-  addChoice(ProtossChoices.vsTerran_From_FFE: _*)
-  addChoice(ProtossChoices.vsProtoss_From_FFE: _*)
-  addChoice(ProtossChoices.vsZerg_From_FFE: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_FFE: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)
 }
 object PvRGFE extends PvRStrategy {
-  addChoice(ProtossChoices.vsTerran_From_GFE: _*)
-  addChoice(ProtossChoices.vsProtoss_From_GFE: _*)
-  addChoice(ProtossChoices.vsZerg_From_GFE: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_GFE: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_GFE: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_GFE: _*)
 }
 
+object PvQQ extends PvRStrategy {
+  addSelectionRequirement(() => With.enemies.exists(_.name == "Pluto"))
+
+  override def gameplan: Option[Plan] = Some(new PvQQ)
+}

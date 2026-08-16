@@ -1,9 +1,13 @@
 package Strategery.Selection
 
+import Lifecycle.With
 import Strategery.Strategies.{Strategy, StrategyBranch}
+import bwapi.Race
 
 object ExpandStrategy {
-  def apply(root: Strategy): Seq[StrategyBranch] = {
+  def apply(root: Strategy): Seq[StrategyBranch] = apply(root, With.enemy.raceCurrent)
+
+  private def apply(root: Strategy, enemyRace: Race): Seq[StrategyBranch] = {
     if (root == null) {
       throw new NullPointerException()
     }
@@ -13,13 +17,15 @@ object ExpandStrategy {
     if (root.choices.contains(null)) {
       throw new NullPointerException()
     }
-    val choices = root.choices.filter(_.nonEmpty)
+    val choices = root.choices
+      .filter(choice => choice.strategies.nonEmpty)
+      .filter(choice => enemyRace == Race.Unknown || choice.enemyRace.isEmpty || choice.enemyRace.contains(enemyRace))
 
     if (choices.isEmpty) {
       return Seq(StrategyBranch(Seq(root)))
     }
 
-    val choicesChain = choices.map(_.flatMap(apply))
+    val choicesChain = choices.map(_.strategies.flatMap(apply(_, enemyRace)))
 
     var output = Seq(StrategyBranch(Seq(root)))
     choicesChain.foreach(nextChoiceChain =>

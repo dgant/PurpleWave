@@ -18,19 +18,19 @@ object PvEProxy2Gate extends PvEStrategy {
     With.fingerprints.proxyGateway,
     With.fingerprints.fourPool,
     With.fingerprints.ninePool)
-  addChoice(ProtossChoices.vsTerran_From_2Gate: _*)
-  addChoice(ProtossChoices.vsProtoss_From_2Gate: _*)
-  addChoice(ProtossChoices.vsZerg_From_2Gate: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_2Gate: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_2Gate: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_2Gate: _*)
 }
 
 object PvECannonRushFE extends PvEStrategy {
-  addChoice(ProtossChoices.vsTerran_From_FFE: _*)
-  addChoice(ProtossChoices.vsProtoss_From_FFE: _*)
-  addChoice(ProtossChoices.vsZerg_From_FFE: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_FFE: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)
 
 }
 object PvECannonRushMaximum extends PvEStrategy {
-  addChoice(ProtossChoices.vsTerran_From_FFE: _*)
-  addChoice(ProtossChoices.vsProtoss_From_FFE: _*)
-  addChoice(ProtossChoices.vsZerg_From_FFE: _*)
+  addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
+  addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_FFE: _*)
+  addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)
 }

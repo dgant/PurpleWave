@@ -42,7 +42,7 @@ object PvRGFE extends PvRStrategy {
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_GFE: _*)
 }
 
-object PvQQ extends PvRStrategy {
+object PvQQ extends PvEStrategy {
   addSelectionRequirement(() => With.enemies.exists(_.name == "Pluto"))
 
   override def gameplan: Option[Plan] = Some(new PvQQ)

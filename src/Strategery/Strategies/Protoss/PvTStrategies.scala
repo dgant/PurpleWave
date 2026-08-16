@@ -1,9 +1,7 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvT.PvTSpeedlotDT
 import Lifecycle.With
 import Macro.Facts.MacroFacts
-import Planning.Plans.Plan
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -33,8 +31,8 @@ abstract class PvTStrategyNoZealotNoRange extends PvTStrategyNoZealot {
 
 object PvT13Nexus extends PvTStrategyNoZealotNoRange {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
-  setStartLocationsMin(4)
-  setRushTilesMinimum(180)
+  //setStartLocationsMin(4)
+  //setRushTilesMinimum(180)
 }
 object PvTRangeless     extends PvTStrategyNoZealotNoRange {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)

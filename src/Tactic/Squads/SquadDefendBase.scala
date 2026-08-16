@@ -44,7 +44,8 @@ class SquadDefendBase(base: Base) extends Squad {
 
   val zoneAndChoke: Cache[(Zone, Option[Edge])] = new Cache(() => {
     if (plugWall().isDefined) {
-      (plugWall().get.zone, Maff.minBy(plugWall().get.zone.edges)(_.pixelCenter.groundPixels(plugWall().get.center)))
+      val wallZone = With.geography.ourFoyer.zone
+      (wallZone, wallZone.exitOriginal)
     } else if (plugEdge().isDefined) {
       plugEdge().get
     } else {
@@ -145,6 +146,7 @@ class SquadDefendBase(base: Base) extends Squad {
       lastAction = "Plug"
       formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
       units.foreach(_.intend(this)
+        .setCanFlee(false)
         .setRedoubt(plugPixel)
         .setTerminus(plugPixel)
         .setAction(Plug(plugPixel)))
@@ -171,6 +173,7 @@ class SquadDefendBase(base: Base) extends Squad {
       lastAction = "Hold"
       formations += formationBastion
       SquadAutomation.send(this)
+      units.foreach(_.intent.setCanFlee(false))
     }
   }
 

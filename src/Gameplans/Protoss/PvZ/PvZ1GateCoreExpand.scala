@@ -6,10 +6,13 @@ import Macro.Actions.BuildDefense
 import Mathematics.Maff
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import ProxyBwapi.Races.{Protoss, Zerg}
+import Strategery.Strategies.Protoss.PvZ1GateCoreExpand
 import Utilities.?
 import Utilities.UnitFilters.IsWarrior
 
 class PvZ1GateCoreExpand extends GameplanImperative {
+
+  override def activated: Boolean = PvZ1GateCoreExpand()
 
   override def executeBuild(): Unit = {
     once(8, Protoss.Probe)

@@ -12,6 +12,12 @@ class PvQQ extends GameplanImperative {
   object FFE
   var plan: Option[Any] = None
 
+  private def fillWall(): Unit = {
+    if (enemyIsZerg || ! safeDefending) {
+      buildInWall(10, Protoss.PhotonCannon)
+    }
+  }
+
   override def executeBuild(): Unit = {
     scoutOn(Protoss.Pylon)
     once(8, Protoss.Probe)
@@ -22,7 +28,7 @@ class PvQQ extends GameplanImperative {
       if (enemyIsTerran) {
         plan = Some(NF)
       } else if (enemyIsProtoss) {
-        plan = Some(GFE)
+        plan = Some(FFE)
       } else if (enemyIsZerg) {
         plan = Some(FFE)
       } else if (have(Protoss.Forge)) {
@@ -44,6 +50,7 @@ class PvQQ extends GameplanImperative {
         tryBuildInWall(1, Protoss.Gateway)
         once(17, Protoss.Probe)
         tryBuildInWall(2, Protoss.PhotonCannon)
+        fillWall()
         get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain))
         once(Protoss.Zealot)
         get(Protoss.Assimilator)
@@ -57,6 +64,7 @@ class PvQQ extends GameplanImperative {
         once(14, Protoss.Probe)
         tryBuildInWall(1, Protoss.Gateway)
         once(17, Protoss.Probe)
+        fillWall()
         get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain))
         once(18, Protoss.Probe)
         get(Protoss.Assimilator)
@@ -86,10 +94,9 @@ class PvQQ extends GameplanImperative {
 
   def executeMain(): Unit = {
     With.blackboard.darkTemplarSquad.set(false)
-    attack(false)
 
-    if ( ! safeDefending) {
-      buildInWall(6, Protoss.PhotonCannon)
+    if (enemyIsTerran && With.scouting.enemyProximity > 0.5) {
+      attack()
     }
 
     get(Protoss.ArbiterEnergy)
@@ -105,14 +112,14 @@ class PvQQ extends GameplanImperative {
     get(Protoss.Assimilator)
     get(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
-    get(3, Protoss.Gateway)
+    pumpGasPumps()
     get(Protoss.CitadelOfAdun)
     get(Protoss.TemplarArchives)
+    get(3, Protoss.Gateway)
     upgradeContinuously(Protoss.GroundDamage) && upgradeContinuously(Protoss.GroundArmor)
     get(Protoss.ZealotSpeed)
     get(Protoss.RoboticsFacility)
     get(Protoss.RoboticsSupportBay)
-    pumpGasPumps()
     get(Protoss.Stargate)
     get(Protoss.ArbiterTribunal)
     get(6, Protoss.Gateway)

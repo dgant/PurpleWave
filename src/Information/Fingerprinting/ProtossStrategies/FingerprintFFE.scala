@@ -18,6 +18,10 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private val expectedGFEForge    = GameTime(2, 26)()
   private val expectedFFEGateway  = GameTime(3, 20)()
   private val expectedGFEGateway  = GameTime(2,  3)()
+  // BOSS lower bound with continuous Probes through Pylon, Gate, Gate, Zealot,
+  // Pylon, Zealot, Zealot, Nexus.
+  private val earliestTwoGateNexusCompletion  = GameTime(4, 2)()
+  private val fastExpandNexusCompletionCutoff = earliestTwoGateNexusCompletion - Seconds(5)()
 
   trait Conclusion
   object Undecided    extends Conclusion
@@ -45,7 +49,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
     val wallUnits = With.units.enemy.filter(couldBeWall)
 
     val noProxies         = ! With.units.enemy.exists(_.proxied)
-    val expanded          = With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isMain))
+    val expanded          = With.units.enemy.exists(u => Protoss.Nexus(u) && ! u.base.exists(_.isMain) && u.completionFrame < fastExpandNexusCompletionCutoff)
     val forge             = Maff.minBy(wallUnits.filter(Protoss.Forge))       (_.completionFrame)
     val gateway           = Maff.minBy(wallUnits.filter(Protoss.Gateway))     (_.completionFrame)
     val cannon            = Maff.minBy(wallUnits.filter(Protoss.PhotonCannon))(_.completionFrame)

@@ -12,11 +12,13 @@
 .idea/modules.xml
 .idea/scala_settings.xml
 /.codex/
+/.codex-tmp/
 /.gradle/
 /agent-notes/
 /artifacts/
 /images/
 /out/
+/outputs/
 /target/
 dependency-reduced-pom.xml
 

@@ -6,4 +6,4 @@ import Utilities.Time.GameTime
 
 // Sample Core-on-14 Core completion time: 2:45
 // Sample ZCore Core completion time: 3:08
-class FingerprintCoreBeforeZealot extends FingerprintCompleteBy(Protoss.CyberneticsCore, GameTime(2, 57))
+class FingerprintCoreBeforeZealot extends FingerprintCompleteBy(Protoss.CyberneticsCore, GameTime(2, 53))

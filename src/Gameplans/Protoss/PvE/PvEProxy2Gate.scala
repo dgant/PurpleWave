@@ -27,12 +27,14 @@ class PvEProxy2Gate extends GameplanImperative {
 
   override def doWorkers(): Unit = {}
 
-  doAutosupply = false
+
 
   override def executeMain(): Unit = {
     if (unitsEver(Protoss.Gateway) < 2) {
+      doAutosupply = false
       return
     }
+    doAutosupply = true
     attack()
     if (armySupply200 >= 20) {
       allIn()

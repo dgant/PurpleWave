@@ -4,6 +4,7 @@ import Debugging.SimpleString
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
+import Mathematics.Maff
 import Placement.Access.PlaceLabels
 import Placement.Access.PlaceLabels.ProxyForwardRobo
 import PvPIdeas._
@@ -81,8 +82,11 @@ class PvPLateGame extends GameplanImperative {
     shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
     shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
-    shouldExpand ||= unitsComplete(IsWarrior) + unitsComplete(Protoss.Reaver) >= miningBases * 18
     shouldExpand ||= miningBases < 2 && frame > Minutes(10)()
+    shouldExpand ||= (unitsComplete(IsWarrior) + unitsComplete(Protoss.Reaver)
+    >= 18 * miningBases
+    - 8 * Maff.fromBoolean(With.battles.globalAttack.judgement.exists(_.confidence01Total > 0.55))
+    - 8 * Maff.fromBoolean(With.geography.preferredExpansionsOurs.headOption.exists(_.entranceNow.forall(_.pixelCenter.proximity > With.scouting.ourProximity))))
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath

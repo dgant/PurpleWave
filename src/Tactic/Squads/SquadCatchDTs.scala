@@ -24,6 +24,7 @@ class SquadCatchDTs extends Squad {
     if (bases.isEmpty)                        return
     if (With.units.existsOurs(u => u.isAny(Protoss.RoboticsFacility, Protoss.Gateway) && u.proxied)) return
     if (With.scouting.earliestArrival(Protoss.DarkTemplar) > With.frame + Seconds(15)()) return
+    if (MacroFacts.haveComplete(Protoss.PhotonCannon)) return
 
     setEnemies(With.units.enemy.view.filter(Protoss.DarkTemplar))
     setTargets(enemies)

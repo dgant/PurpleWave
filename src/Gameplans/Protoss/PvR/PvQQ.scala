@@ -83,7 +83,7 @@ class PvQQ extends GameplanImperative {
       once(2, Protoss.Zealot)
       get(Protoss.Assimilator)
       once(16, Protoss.Probe)
-      get(Protoss.CyberneticsCore)
+      tryBuildInWall(1, Protoss.CyberneticsCore)
       once(17, Protoss.Probe)
       once(3, Protoss.Zealot)
     } else {
@@ -122,8 +122,7 @@ class PvQQ extends GameplanImperative {
     get(Protoss.RoboticsSupportBay)
     get(Protoss.Stargate)
     get(Protoss.ArbiterTribunal)
-    get(6, Protoss.Gateway)
-    pumpGasPumps()
+    get(5, Protoss.Gateway)
     get(8, Protoss.Gateway)
   }
 }

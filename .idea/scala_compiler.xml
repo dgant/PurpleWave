@@ -4,27 +4,6 @@
     <option name="compileOrder" value="JavaThenScala" />
     <option name="postfixOps" value="true" />
     <option name="explainTypeErrors" value="true" />
-    <profile name="Maven" modules="PurpleWave">
-      <option name="postfixOps" value="true" />
-      <option name="deprecationWarnings" value="true" />
-      <option name="uncheckedWarnings" value="true" />
-      <option name="featureWarnings" value="true" />
-      <parameters>
-        <parameter value="-opt:unreachable-code" />
-        <parameter value="-opt:simplify-jumps" />
-        <parameter value="-opt:compact-locals" />
-        <parameter value="-opt:copy-propagation" />
-        <parameter value="-opt:redundant-casts" />
-        <parameter value="-opt:box-unbox" />
-        <parameter value="-opt:nullness-tracking" />
-        <parameter value="-opt:closure-invocations" />
-        <parameter value="-opt:inline" />
-        <parameter value="-opt:l:default,inline" />
-        <parameter value="-opt-inline-from:Micro.Targeting.**" />
-        <parameter value="-Ymacro-classpath" />
-        <parameter value="C:\p\pw\target\PurpleWave-macros.jar" />
-        <parameter value="-opt-warnings" />
-      </parameters>
-    </profile>
+    <profile name="Maven 1" modules="PurpleWave" />
   </component>
 </project>

@@ -110,7 +110,7 @@ trait EconomicModel {
   def enemySecretGas          : Double = _enemySecretGas
 
   private def isWar(unit: UnitInfo): Boolean = (
-    unit.unitClass.supplyProvided == 0
+    unit.unitClass.supplyProvided400 == 0
       && unit.unitClass.attacksOrCastsOrDetectsOrTransports
       && ! unit.unitClass.isWorker
       && ( ! unit.unitClass.isBuilding || unit.proxied))

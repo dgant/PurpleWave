@@ -85,7 +85,10 @@ trait Fitter extends Fits {
     val requirement = templatePoint.requirement
     val pointTile = origin.add(templatePoint.point)
     if (requirement.isTownHall) {
-      return pointTile.base.exists(_.townHallTile == pointTile)
+      return pointTile.base.exists(_.townHallTile == pointTile) &&
+        (0 until requirement.width).forall(dx =>
+          (0 until requirement.height).forall(dy =>
+            accept(requirement, Point(dx, dy), pointTile.add(dx, dy))))
     } else if (requirement.isGas) {
       return pointTile.base.exists(_.gas.exists(_.tileTopLeft == pointTile))
     } else {

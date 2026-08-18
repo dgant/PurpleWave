@@ -13,7 +13,7 @@ class Yolo extends TimedTask with MacroActions {
   var desperationTriggered: Boolean = false
   var maxoutTriggered: Boolean = false
 
-  def maxed: Boolean = With.units.ours.filter(_.complete).filterNot(u => Protoss.Carrier(u) && u.interceptorCount < 7).map(_.unitClass.supplyRequired).sum / 2 >= 192
+  def maxed: Boolean = With.units.ours.filter(_.complete).filterNot(u => Protoss.Carrier(u) && u.interceptorCount < 7).map(_.unitClass.supplyRequired400).sum / 2 >= 192
   def active: Boolean = desperationTriggered || maxoutTriggered || With.blackboard.yoloing()
 
   override protected def onRun(budgetMs: Long): Unit = {

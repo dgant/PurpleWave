@@ -77,8 +77,8 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
   val sightPixels             = bwapiType.sightRange
   val spaceProvided           = bwapiType.spaceProvided
   val spaceRequired           = bwapiType.spaceRequired
-  val supplyProvided          = bwapiType.supplyProvided
-  val supplyRequired          = bwapiType.supplyRequired
+  val supplyProvided400       = bwapiType.supplyProvided
+  val supplyRequired400       = bwapiType.supplyRequired
   val tileHeight              = bwapiType.tileHeight
   val tileSize                = new Tile(bwapiType.tileSize)
   val tileWidth               = bwapiType.tileWidth

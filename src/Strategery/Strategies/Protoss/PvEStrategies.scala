@@ -1,7 +1,7 @@
 package Strategery.Strategies.Protoss
 
 import Lifecycle.With
-import Placement.Access.PlaceLabels.Proxy2Gate
+import Placement.Access.PlaceLabels
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -11,7 +11,7 @@ class PvEStrategy extends Strategy {
 }
 
 object PvEProxy2Gate extends PvEStrategy {
-  addSelectionRequirement(() => With.placement.get(Proxy2Gate).nonEmpty)
+  addSelectionRequirement(() => With.placement.get(PlaceLabels.Proxy2Gate).nonEmpty)
   blacklistOn(MapGroups.badForProxying: _*)
   blacklistVs(
     With.fingerprints.twoGate,
@@ -24,6 +24,7 @@ object PvEProxy2Gate extends PvEStrategy {
 }
 
 object PvECannonRushFE extends PvEStrategy {
+  addSelectionRequirement(() => With.geography.mains.filterNot(_.isOurs).forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.base.contains(b))))
   addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
   addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_FFE: _*)
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)

@@ -15,11 +15,11 @@ class Efficiency {
   def update(): Unit = {
     if ( ! With.configuration.debugging) return
     val supplyAvailable = With.self.supplyTotal400 - With.self.supplyUsed400
-    val producers       = With.units.ours.filter(u => u.complete && u.framesIdleConsecutive > 0 && u.unitClass.unitsTrained.exists(_.supplyRequired > 0))
+    val producers       = With.units.ours.filter(u => u.complete && u.framesIdleConsecutive > 0 && u.unitClass.unitsTrained.exists(_.supplyRequired400 > 0))
     val supplyBlocked   = producers.find(p => p.unitClass.unitsTrained.iterator
-      .filter(_.supplyRequired > 0)
+      .filter(_.supplyRequired400 > 0)
       .exists(t =>
-            t.supplyRequired  > supplyAvailable
+            t.supplyRequired400  > supplyAvailable
           && t.mineralPrice   < With.self.minerals
           && t.gasPrice       < With.self.gas))
     if (supplyBlocked.isDefined && With.self.supplyTotal400 < 400) {

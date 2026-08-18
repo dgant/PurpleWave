@@ -21,7 +21,7 @@ object PvRDT extends PvRStrategy {
   addChoiceVs(Race.Protoss)(PvPDT)
   addChoiceVs(Race.Zerg)(PvZ1BaseReactive, PvZ1GateCoreYoloSpeedlot)
 }
-object PvR2Gate1012 extends PvRStrategy {
+object PvR1012 extends PvRStrategy {
   addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_2Gate: _*)
   addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_2Gate: _*)
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_2Gate: _*)

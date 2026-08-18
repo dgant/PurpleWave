@@ -2,6 +2,7 @@
 package Micro.Actions.Combat.Decisionmaking
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -54,7 +55,7 @@ object FightOrFlee extends Action {
     decide(false, "CarrierVuln",() => Protoss.Carrier(u) && u.matchups.threats.exists(t => ! t.flying && t.pixelsToGetInRange(u) < 32))
     decide(true,  "Raze",       () => ((IsTank(u) && Terran.SiegeMode()) || u.isAny(Protoss.Reaver, Zerg.Guardian)) && u.matchups.threats.forall(t => t.unitClass.isWorker || t.unitClass.isBuilding))
     decide(true,  "Miners",     () => ! u.isAny(IsWorker, Protoss.Carrier) && u.canAttack && u.battle.exists(_.us.minersThreatened) && u.presumptiveTarget.exists(t => t.isEnemyOf(u) && t.matchups.threateningMiners))
-    decide(true,  Reave,        () => Protoss.Reaver(u) && Protoss.ShuttleSpeed() && u.scarabs > 0 && u.agent.ride.isDefined && u.confidence01 > ?(u.loaded, 0.35, .3) && u.matchups.threatNearest.exists(t => u.canAttack(t) && t.speedApproaching(u) > Protoss.Reaver.topSpeed) && (u.matchups.framesOfSafety >= ?(u.loaded, 30, 0) && (u.loaded || u.cooldownLeft <= 31)))
+    decide(true,  Reave,        () => Protoss.Reaver(u) && u.scarabs > 0 && u.agent.ride.isDefined && u.confidence01 > 0.45 - Maff.or0(0.05, u.loaded) - Maff.or0(0.1, Protoss.ShuttleSpeed()) && u.matchups.threatNearest.exists(t => u.canAttack(t) && t.speedApproaching(u) > Protoss.Reaver.topSpeed) && (u.matchups.framesOfSafety >= ?(u.loaded, 30, 0) && (u.loaded || u.cooldownLeft <= 31)))
 
     decide(true,  "Energized",  () =>
       u.unitClass.maxShields > 20

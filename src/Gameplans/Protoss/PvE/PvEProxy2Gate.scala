@@ -6,6 +6,7 @@ import Placement.Access.PlaceLabels.{Proxy2Gate, Proxy4Gate}
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvEProxy2Gate
+import Utilities.?
 import Utilities.Time.Minutes
 
 class PvEProxy2Gate extends GameplanImperative {
@@ -14,6 +15,8 @@ class PvEProxy2Gate extends GameplanImperative {
   override def completed: Boolean = With.frame > Minutes(8)()
 
   override def executeBuild(): Unit = {
+    scoutOn(Protoss.Gateway, quantity = 2)
+
     once(8, Protoss.Probe)
     val enemyMains = With.geography.mains.filterNot(_.isOurMain)
     get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
@@ -23,40 +26,51 @@ class PvEProxy2Gate extends GameplanImperative {
       .preferZone(With.geography.mains.filterNot(_.isOurMain).map(_.zone): _*))
     once(9, Protoss.Probe)
     get(2, Protoss.Gateway)
+    once(12, Protoss.Probe)
+
+    if (unitsEver(Protoss.Gateway) < 2) {
+      return
+    }
+    once(1, Protoss.Zealot)
+    get(2, Protoss.Pylon)
+    once(3, Protoss.Zealot)
   }
+
+  doAutosupply = false
 
   override def doWorkers(): Unit = {}
 
-
-
   override def executeMain(): Unit = {
-    if (unitsEver(Protoss.Gateway) < 2) {
-      doAutosupply = false
-      return
-    }
-    doAutosupply = true
     attack()
-    if (armySupply200 >= 20) {
-      allIn()
-    }
-    if (have(Protoss.CyberneticsCore)) {
+    if (With.units.existsEverOurs(u => Protoss.Assimilator(u) && u.base.exists(_.isOurs))) {
+      gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
       gasLimitCeiling(200)
-      pumpWorkers()
       requireMiningBases(1)
+      slushOrPylons()
+      pumpWorkers()
+      get(Protoss.CyberneticsCore)
       get(Protoss.DragoonRange)
       pump(Protoss.Dragoon)
+      get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
       pump(Protoss.Zealot)
+      doAutosupply = true
     } else {
-      gasWorkerCeiling(1)
-      pump(Protoss.Zealot)
-      autosupply()
+      once(7, Protoss.Zealot)
       pumpWorkers()
+      slushOrPylons()
     }
-    if ( ! With.tactics.workerScout.scoutingAbandoned) {
-      //microSlush(100)
-    }
-    get(Protoss.Assimilator)
+
+    get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
     get(Protoss.CyberneticsCore)
-    get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
+  }
+
+  def slushOrPylons(): Unit = {
+    if ((enemyIsTerran || enemyIsProtoss)
+      && ! With.tactics.workerScout.scoutingAbandoned
+      && With.tactics.workerScout.scouts.exists(_.base.exists(_.isEnemy)) && units(Protoss.Gateway) >= 2) {
+      microSlush(100)
+    } else {
+      autosupply()
+    }
   }
 }

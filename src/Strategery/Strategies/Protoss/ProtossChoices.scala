@@ -16,7 +16,7 @@ object ProtossChoices {
     PvRDT,
     PvRFFE,
     PvRGFE,
-    PvR2Gate1012,
+    PvR1012,
     PvRZZCoreZ
   )
 
@@ -90,18 +90,11 @@ object ProtossChoices {
   )
 
   val vsProtoss_From_2Gate = Vector(
-    PvPRobo,
-    PvPDT,
-    PvP3GateGoon,
-    PvP4GateGoon
+    PvP1012
   )
 
   val vsProtoss_From_GateCore = Vector(
-    PvPRobo,
-    PvPDT,
-    PvPCoreExpand,
-    PvP3GateGoon,
-    PvP4GateGoon
+    PvPGateCore
   )
 
   val vsProtoss: Vector[Strategy] = (

@@ -2,11 +2,11 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvR2Gate1012
+import Strategery.Strategies.Protoss.PvR1012
 
 class PvR2Gate1012 extends GameplanImperative {
 
-  override def activated: Boolean = PvR2Gate1012()
+  override def activated: Boolean = PvR1012()
 
   override def executeBuild():  Unit = {
     scoutOn(Protoss.Pylon)

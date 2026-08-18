@@ -10,6 +10,7 @@ object Scout extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     CannonRush(unit)
+    PylonTrap(unit)
     DroneWarfare(unit)
     Harass4PoolWorkers(unit)
     SabotageProxy(unit)

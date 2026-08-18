@@ -437,7 +437,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(classes, this == ifThisClass, thenAddThatClass)
   }
 
-  lazy val supplyNet    : Int = supplyProvided - supplyRequired
+  override def supplyProvided: Int = supplyProvided400
+  override def supplyRequired: Int = supplyRequired400
+  lazy val supplyNet    : Int = supplyProvided400 - supplyRequired400
   lazy val mineralValue : Int = if (this == Zerg.Larva) 0 else if (this == Terran.SpiderMine) 5 else mineralPrice + buildUnitsSpent.map(_.mineralValue).sum
   lazy val gasValue     : Int = if (this == Zerg.Larva) 0                                       else gasPrice     + buildUnitsSpent.map(_.gasValue).sum
   lazy val copiesProduced: Int = ?(isTwoUnitsInOneEgg, 2, 1)
@@ -448,7 +450,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else (
       (mineralValue
           + 1.5 * gasValue
-          + 6.25 * supplyRequired // 100 minerals buys 16 supply; 100 / 16 = 6.25
+          + 6.25 * supplyRequired400 // 100 minerals buys 16 supply; 100 / 16 = 6.25
           + ?(isZerg && ! With.self.isZerg, 25.0 / copiesProduced, 0.0)) // Larva value
         * ?(isWorker,                         1.3,  1.0)
         * ?(whatBuilds._1 == Terran.Factory,  1.2 , 1.0)
@@ -557,7 +559,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
   lazy val budgetCategory: Budgets.Value = {
     if (isWorker)                                                                 Budgets.Worker
     else if (isTownHall || isGas)                                                 Budgets.Base
-    else if (supplyProvided > 0)                                                  Budgets.Supply
+    else if (supplyProvided400 > 0)                                                  Budgets.Supply
     else if (isBuilding && attacksOrCastsOrDetectsOrTransports)                   Budgets.Defense
     else if (this == Protoss.ShieldBattery)                                       Budgets.Defense
     else if (attacksOrCastsOrDetectsOrTransports)                                 Budgets.War

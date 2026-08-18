@@ -131,6 +131,7 @@ trait CombatUnit {
   @inline final def pixelDistanceEdgeFrom         (other: CombatUnit, usAt: Pixel)                    : Double  = other.pixelDistanceEdge(this, usAt)
   @inline final def pixelDistanceSquared          (other: CombatUnit)                                 : Double  = pixelDistanceSquared(other.pixel)
   @inline final def pixelDistanceSquared          (to: Pixel)                                         : Double  = pixel.pixelDistanceSquared(to)
+  @inline final def pixelDistanceSquared          (to: Tile)                                          : Double  = pixel.tile.pixelDistanceSquared(to)
   @inline final def pixelDistanceTravelling       (to: Pixel)                                         : Double  = pixelDistanceTravelling(pixel, to)
   @inline final def pixelDistanceTravelling       (to: Tile)                                          : Double  = pixelDistanceTravelling(pixel, to.center)
   @inline final def pixelDistanceTravelling       (from: Pixel, to: Pixel)                            : Double  = ?(flying, from.pixelDistance(to),               from.walkableTile.groundPixels(to.walkableTile))

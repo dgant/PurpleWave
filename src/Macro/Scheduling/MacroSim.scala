@@ -61,8 +61,8 @@ final class MacroSim {
     val initialState = initialStep.state
     initialState.minerals           = With.self.minerals
     initialState.gas                = With.self.gas
-    initialState.supplyAvailable    = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided).sum)
-    initialState.supplyUsed         = With.units.ours.map(_.unitClass.supplyRequired).sum
+    initialState.supplyAvailable    = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided400).sum)
+    initialState.supplyUsed         = With.units.ours.map(_.unitClass.supplyRequired400).sum
     initialState.mineralPatches     = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
     initialState.geysers            = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
     initialState.unitsExtant        = new CloneyCountMap(With.macroCounts.oursExtant)
@@ -105,7 +105,7 @@ final class MacroSim {
           event.dProducer1          = finalClass
           event.dProducer1N         = finalClass.copiesProduced
           if (u.isNone(Zerg.Lair, Zerg.Hive)) {
-            event.dSupplyAvailable += finalClass.supplyProvided
+            event.dSupplyAvailable += finalClass.supplyProvided400
           }
         }
         if (u.upgrading) {
@@ -333,7 +333,7 @@ final class MacroSim {
       val state = futureStep.state
       if (request.producerRequired != UnitClasses.None && state.producers(request.producerRequired) < request.producersRequired && futureStep.event.dFrames < atFrame + request.buildFrames) {
         return StealsProducer
-      } else if (request.mineralCost > Math.max(0, state.minerals) && ! (justInTimeSupply && futureStep.request.exists(_.unit.exists(_.supplyRequired > 0)))) {
+      } else if (request.mineralCost > Math.max(0, state.minerals) && ! (justInTimeSupply && futureStep.request.exists(_.unit.exists(_.supplyRequired400 > 0)))) {
         return StealsMinerals
       } else if (request.gasCost > Math.max(0, state.gas)) {
         return StealsGas
@@ -430,7 +430,7 @@ final class MacroSim {
       eventFinish.dProducer2N         = 1
       eventFinish.dAddon              = request.addonRequired.map(AddonSubstitution.fromReal).getOrElse(?(AddonSubstitution(u), AddonSubstitution.fromReal(u), UnitClasses.None))
       eventFinish.dAddonN             = ?(AddonSubstitution(u), 1, request.addonRequired.size)
-      eventFinish.dSupplyAvailable    = u.supplyProvided
+      eventFinish.dSupplyAvailable    = u.supplyProvided400
       eventFinish.dGeysers            = Maff.fromBoolean(u.isGas)
     })
     if (Seq(Protoss.HighTemplar, Protoss.DarkTemplar, Zerg.Larva, Zerg.Drone, Zerg.Hatchery, Zerg.Lair, Zerg.CreepColony, Zerg.Spire, Zerg.Hydralisk, Zerg.Mutalisk).contains(request.producerRequired)) {
@@ -463,7 +463,7 @@ final class MacroSim {
     })
   }
 
-  lazy val suppliers: Vector[UnitClass] = UnitClasses.all.filter(_.supplyProvided > 0)
+  lazy val suppliers: Vector[UnitClass] = UnitClasses.all.filter(_.supplyProvided400 > 0)
   def ourSuppliers: Seq[UnitClass]  = suppliers.view.filter(_.race == With.self.raceCurrent) // Exclude the town halls for now due to how long they take to finish
   private def updateStatesFrom(index: Int): Unit = {
     var i = index

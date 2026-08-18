@@ -7,7 +7,7 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.Time.{GameTime, Minutes, Seconds}
 
-abstract class FingerprintFFE extends FingerprintAnd(
+abstract class FingerprintProtossFE extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.proxyGateway),
   new FingerprintNot(With.fingerprints.cannonRush),
   new FingerprintNot(With.fingerprints.twoGate),
@@ -18,8 +18,7 @@ abstract class FingerprintFFE extends FingerprintAnd(
   private val expectedGFEForge    = GameTime(2, 26)()
   private val expectedFFEGateway  = GameTime(3, 20)()
   private val expectedGFEGateway  = GameTime(2,  3)()
-  // BOSS lower bound with continuous Probes through Pylon, Gate, Gate, Zealot,
-  // Pylon, Zealot, Zealot, Nexus.
+  // BOSS lower bound with continuous Probes through Pylon, Gate, Gate, Zealot, Pylon, Zealot, Zealot, Nexus.
   private val earliestTwoGateNexusCompletion  = GameTime(4, 2)()
   private val fastExpandNexusCompletionCutoff = earliestTwoGateNexusCompletion - Seconds(5)()
 
@@ -79,13 +78,13 @@ abstract class FingerprintFFE extends FingerprintAnd(
   
   val requiredConclusion: Conclusion
   
-  override def sticky: Boolean = With.frame > GameTime(4, 45)()
+  override def lockAfter: Int = GameTime(4, 45)()
 }
 
-class FingerprintForgeFE extends FingerprintFFE {
+class FingerprintForgeFE extends FingerprintProtossFE {
   override val requiredConclusion: Conclusion = ConcludeFFE
 }
 
-class FingerprintGatewayFE extends FingerprintFFE {
+class FingerprintGatewayFE extends FingerprintProtossFE {
   override val requiredConclusion: Conclusion = ConcludeGFE
 }

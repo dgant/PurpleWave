@@ -23,10 +23,12 @@ object CanGateCoreOnThisMap {
 
 object PvPGateCore extends PvPStrategy {
   addSelectionRequirement(() => CanGateCoreOnThisMap())
+  addChoice(PvPRobo, PvPDT, PvPCoreExpand, PvP3GateGoon, PvP4GateGoon)
 }
 
 object PvP1012 extends PvPStrategy {
   addChoice(PvP3Zealot, PvP5Zealot)
+  addChoice(PvPDT, PvP3GateGoon, PvP4GateGoon)
 }
 
 object PvPNexusFirst extends PvPStrategy {
@@ -48,7 +50,6 @@ object PvP5Zealot extends PvPStrategy
 ////////////////////////
 
 object PvPRobo extends PvPStrategy {
-  addChoice(PvPGateCore)
   addChoice(PvPObs, PvPReaver)
   // No restrictions; Preserve this as our "Always valid" choice
   addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
@@ -61,13 +62,11 @@ object PvPObs extends PvPStrategy {
   addActivationRequirement(() => haveEver(Protoss.Observatory))
 }
 object PvPDT extends PvPStrategy {
-  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.robo)
   addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
 }
 object PvPCoreExpand extends PvPStrategy {
   setMinimumGamesVsOpponent(3)
-  addChoice(PvPGateCore)
   addSelectionRequirement(() =>
     rushTilesMinimum >= 200
     || MapGroups.strongNatural.exists(_())
@@ -77,14 +76,12 @@ object PvPCoreExpand extends PvPStrategy {
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
-  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 3)
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
-  addChoice(PvP1012, PvPGateCore)
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addSelectionRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)

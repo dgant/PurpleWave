@@ -145,7 +145,7 @@ trait UnitGroup {
   private val _combatValueAir             = new Cache(() => warriorsCasters.filter(_.flying).map(_.subjectiveValue).sum)
   private val _combatValueGround          = new Cache(() => warriorsCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
-  private val _airToAirStrength           = new Cache(() => attackers.filterNot(Protoss.Interceptor).filterNot(Zerg.Guardian).map(u => u.friendly.filter(Protoss.Carrier).map(_.interceptorCount).getOrElse(u.unitClass.supplyRequired)).sum)
+  private val _airToAirStrength           = new Cache(() => attackers.filterNot(Protoss.Interceptor).filterNot(Zerg.Guardian).map(u => u.friendly.filter(Protoss.Carrier).map(_.interceptorCount).getOrElse(u.unitClass.supplyRequired400)).sum)
   private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.warriorsCastersCount * 4 >= With.units.groupVs(u).warriorsCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker

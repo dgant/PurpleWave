@@ -22,12 +22,19 @@ class MicroSlush {
   }
 
   def trySpend(minerals: Int): Boolean = {
-    val cost = Math.max(0, minerals)
-    val output = cost <= available && cost <= With.self.minerals
+    val output = have(minerals)
     if (output) {
-      _spent += cost
+      spend(minerals)
     }
     output
+  }
+
+  def have(minerals: Int): Boolean = {
+    minerals <= 0 || _available - _spent > minerals
+  }
+
+  def spend(minerals: Int): Unit = {
+    _spent += minerals
   }
 
   def trySpend(unitClass: UnitClass): Boolean = trySpend(unitClass.mineralPrice)

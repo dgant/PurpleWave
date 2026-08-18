@@ -264,8 +264,8 @@ class PvPLateGame extends GameplanImperative {
         pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
       }
       if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
-        // TODO: This is a last minute tournament panic addition. Maybe we can come up with somthing more principled
         get(Protoss.ShuttleSpeed)
+        get(Protoss.ScarabDamage)
       }
     }
 

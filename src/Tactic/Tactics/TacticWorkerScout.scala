@@ -6,6 +6,7 @@ import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.UnorderedBuffer
+import Strategery.Strategies.Protoss.PvEProxy2Gate
 import Strategery.Strategies.Zerg.ZvE4Pool
 import Utilities.?
 import Utilities.Time.Seconds
@@ -33,7 +34,7 @@ class TacticWorkerScout extends Tactic {
     scoutingAbandoned ||= scouts.exists( ! _.alive)
     scoutingAbandoned ||= basesToScout.isEmpty
 
-    if ( ! ZvE4Pool()) {
+    if ( ! ZvE4Pool() && ! PvEProxy2Gate()) {
       // Abandon scouting when we have a closer unit approaching
       scoutingAbandoned ||= (
         With.blackboard.wantToAttack()

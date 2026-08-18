@@ -14,7 +14,8 @@ import Utilities.Time.{Minutes, Seconds}
 class MissionReaverDrop extends MissionDrop {
 
   override protected def additionalFormationConditions: Boolean = (
-    With.recruiter.available.exists(reaverLock.matcher)
+    false // Until we can make these more effective and less suicidal
+    && With.recruiter.available.exists(reaverLock.matcher)
     && (
       With.enemies.forall(_.isTerran)
         || With.geography.enemyBases.exists(_.zone.island)

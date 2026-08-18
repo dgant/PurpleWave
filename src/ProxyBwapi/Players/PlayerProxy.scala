@@ -69,7 +69,7 @@ abstract class PlayerProxy(bwapiPlayer: bwapi.Player) {
     With.units.ours
       .view
       .withFilter(u => u.unitClass.race == raceInitial)
-      .map(u => if (u.morphing) u.buildType.supplyRequired * (if (u.buildType.isTwoUnitsInOneEgg) 2 else 1) else u.unitClass.supplyRequired)
+      .map(u => if (u.morphing) u.buildType.supplyRequired400 * (if (u.buildType.isTwoUnitsInOneEgg) 2 else 1) else u.unitClass.supplyRequired400)
       .sum)
 
   private val supplyTotalCache = new Cache(() => if (!isUs) 0 else
@@ -78,6 +78,6 @@ abstract class PlayerProxy(bwapiPlayer: bwapi.Player) {
       With.units.ours
         .view
         .withFilter(u => u.complete && u.unitClass.race == raceInitial)
-        .map(_.unitClass.supplyProvided)
+        .map(_.unitClass.supplyProvided400)
         .sum))
 }

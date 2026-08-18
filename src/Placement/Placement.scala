@@ -57,7 +57,10 @@ class Placement extends Fitter {
       if (b.tiles.contains(Points.tileMiddle)) {
         fitProxyGate(b.zone)
       }
-      index(Fit(b.townHallTile, TemplatesGeneric.townhall))
+      val townHallFit = Fit(b.townHallTile, TemplatesGeneric.townhall)
+      if (fitsAt(townHallFit.template, townHallFit.origin)) {
+        index(townHallFit)
+      }
     })
     forwardProxyNaturals --= forwardProxyNaturals.filter(fitProxyForwardRobo)
     protoss {

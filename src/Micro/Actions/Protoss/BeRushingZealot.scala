@@ -40,12 +40,14 @@ object BeRushingZealot extends Action {
   )
 
   private def scoreUnit(zealot: FriendlyUnitInfo, u: UnitInfo): Double = {
+    val target      = ?(u.isFriendly, u.matchups.targetNearest.getOrElse(u), u)
     val sign        = ?(u.isFriendly, 1, ?(u.isEnemy, -1, 0))
-    val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(zealot)) / 196.0)
+    val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(target) - zealot.matchups.pixelsToTargetRange.getOrElse(0)) / 196.0)
     val health      = u.totalHealth / u.unitClass.maxTotalHealth.toDouble
     val strength    = typeStrength.getOrElse(u.unitClass, u.unitClass.subjectiveValue / Protoss.Zealot.subjectiveValue)
     val hysteresis  = ?(u.isOurs, ?(u.matchups.threatsInRange.nonEmpty, 1.1, 0.9), 1.0)
-    sign * proximity * health * strength * hysteresis
+    val busyness    = ?(u.gathering || u.constructing, 0.5, 1.0)
+    sign * proximity * health * strength * hysteresis * busyness
   }
 
   override protected def perform(zealot: FriendlyUnitInfo): Unit = {

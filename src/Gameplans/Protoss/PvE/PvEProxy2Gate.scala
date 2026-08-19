@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvE
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, Defensive, Proxy2Gate, Proxy4Gate}
+import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvEProxy2Gate
@@ -19,11 +19,13 @@ class PvEProxy2Gate extends GameplanImperative {
 
     once(8, Protoss.Probe)
     val enemyMains = With.geography.mains.filterNot(_.isOurMain)
-    get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
-      .requireLabelYes(Proxy2Gate)
-      .requireZone(With.geography.zones.filter(_.heart.groundTiles(With.geography.home) > 40): _*)
-      .preferBase(enemyMains: _*)
-      .preferZone(With.geography.mains.filterNot(_.isOurMain).map(_.zone): _*))
+    if ( ! haveEver(Protoss.Pylon)) {
+      get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
+        .requireLabelYes(Proxy2Gate)
+        .requireZone(With.geography.zones.filter(_.heart.groundTiles(With.geography.home) > 40): _*)
+        .preferBase(enemyMains: _*)
+        .preferZone(With.geography.mains.filterNot(_.isOurMain).map(_.zone): _*))
+    }
     once(9, Protoss.Probe)
     get(2, Protoss.Gateway)
     once(11, Protoss.Probe)
@@ -39,40 +41,47 @@ class PvEProxy2Gate extends GameplanImperative {
   override def doWorkers(): Unit = {}
 
   override def executeMain(): Unit = {
-    attack()
+    if (confidenceAttacking01 > 0.45) {
+      attack()
+    }
     gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
     gasLimitCeiling(200)
     requireMiningBases(1)
     if (have(Protoss.CyberneticsCore)) {
-      slushOrPylons()
+      autosupply()
       pumpWorkers()
       get(Protoss.DragoonRange)
       pump(Protoss.Dragoon)
+      get(4 + With.units.ours.count(u => Protoss.Gateway(u) && ! u.powered), Protoss.Gateway)
       pump(Protoss.Zealot)
-      get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
     } else {
-      pump(Protoss.Zealot)
+      if (With.enemy.isZerg) {
+        pump(Protoss.Zealot)
+      } else {
+        once(7, Protoss.Zealot)
+      }
       pumpWorkers()
       slushOrPylons()
     }
     if (enemyIsZerg) {
-      get(5, Protoss.Gateway)
-    } else {
-      get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
-      get(Protoss.CyberneticsCore)
+      get(4, Protoss.Gateway)
+      get(2, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).preferLabelYes(GroundProduction))
+      get(6, Protoss.Gateway)
     }
+    get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
+    get(Protoss.CyberneticsCore)
   }
 
   def slushOrPylons(): Unit = {
-    if (With.tactics.workerScout.scoutingAbandoned || ( ! enemyIsProtoss && ! enemyIsTerran)) {
+    if (With.tactics.workerScout.scoutingAbandoned || ! enemyIsProtoss) {
       autosupply()
       return
     }
     if (foundEnemyBase && ! With.tactics.workerScout.scoutingAbandoned) {
       val bases = With.tactics.workerScout.units.flatMap(_.base)
       (1 to 2).foreach(n => {
-        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(Defensive, DefendGround, DefendEntrance))
-        get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(Defensive, DefendGround, DefendEntrance))
+        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
+        get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
       })
     }
     if (With.tactics.workerScout.scouts.exists(_.base.exists(_.isEnemy))) {

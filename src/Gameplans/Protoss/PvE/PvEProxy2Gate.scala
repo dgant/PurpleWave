@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvE
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Placement.Access.PlaceLabels.{Proxy2Gate, Proxy4Gate}
+import Placement.Access.PlaceLabels.{DefendEntrance, DefendGround, Defensive, Proxy2Gate, Proxy4Gate}
 import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.PvEProxy2Gate
@@ -26,14 +26,12 @@ class PvEProxy2Gate extends GameplanImperative {
       .preferZone(With.geography.mains.filterNot(_.isOurMain).map(_.zone): _*))
     once(9, Protoss.Probe)
     get(2, Protoss.Gateway)
-    once(12, Protoss.Probe)
-
-    if (unitsEver(Protoss.Gateway) < 2) {
-      return
-    }
+    once(11, Protoss.Probe)
     once(1, Protoss.Zealot)
+    once(2, Protoss.Zealot)
     get(2, Protoss.Pylon)
     once(3, Protoss.Zealot)
+    once(12, Protoss.Probe)
   }
 
   doAutosupply = false
@@ -42,32 +40,42 @@ class PvEProxy2Gate extends GameplanImperative {
 
   override def executeMain(): Unit = {
     attack()
-    if (With.units.existsEverOurs(u => Protoss.Assimilator(u) && u.base.exists(_.isOurs))) {
-      gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
-      gasLimitCeiling(200)
-      requireMiningBases(1)
+    gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
+    gasLimitCeiling(200)
+    requireMiningBases(1)
+    if (have(Protoss.CyberneticsCore)) {
       slushOrPylons()
       pumpWorkers()
-      get(Protoss.CyberneticsCore)
       get(Protoss.DragoonRange)
       pump(Protoss.Dragoon)
-      get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
       pump(Protoss.Zealot)
-      doAutosupply = true
+      get(4, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).preferLabelYes(Proxy4Gate))
     } else {
-      once(7, Protoss.Zealot)
+      pump(Protoss.Zealot)
       pumpWorkers()
       slushOrPylons()
     }
-
-    get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
-    get(Protoss.CyberneticsCore)
+    if (enemyIsZerg) {
+      get(5, Protoss.Gateway)
+    } else {
+      get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
+      get(Protoss.CyberneticsCore)
+    }
   }
 
   def slushOrPylons(): Unit = {
-    if ((enemyIsTerran || enemyIsProtoss)
-      && ! With.tactics.workerScout.scoutingAbandoned
-      && With.tactics.workerScout.scouts.exists(_.base.exists(_.isEnemy)) && units(Protoss.Gateway) >= 2) {
+    if (With.tactics.workerScout.scoutingAbandoned || ( ! enemyIsProtoss && ! enemyIsTerran)) {
+      autosupply()
+      return
+    }
+    if (foundEnemyBase && ! With.tactics.workerScout.scoutingAbandoned) {
+      val bases = With.tactics.workerScout.units.flatMap(_.base)
+      (1 to 2).foreach(n => {
+        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(Defensive, DefendGround, DefendEntrance))
+        get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(Defensive, DefendGround, DefendEntrance))
+      })
+    }
+    if (With.tactics.workerScout.scouts.exists(_.base.exists(_.isEnemy))) {
       microSlush(100)
     } else {
       autosupply()

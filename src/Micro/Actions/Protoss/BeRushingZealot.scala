@@ -4,6 +4,7 @@ import Debugging.Visualizations.Rendering.DrawMap
 import Lifecycle.With
 import Mathematics.Maff
 import Micro.Actions.Action
+import Micro.Actions.Combat.Tactics.Recharge
 import Micro.Agency.Commander
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
@@ -57,19 +58,29 @@ object BeRushingZealot extends Action {
     val canPotshot            = zealot.readyForAttackOrder && zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && (Zerg.Zergling(t) || zealot.hitPoints > 20))
     val hugging               = zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && t.pixelRangeAgainst(zealot) > 32)
     val shouldFight           = score > 0 || canPotshot || hugging
-    zealot.agent.shouldFight  = shouldFight
-    zealot.agent.destinationNext.set(zealot.agent.destinationFinal)
+    val batteries             = With.units.ours.filter(Protoss.ShieldBattery).toVector
+    val battery               = Maff.minBy(batteries.filter(b =>
+      b.complete
+        && b.energy * 2 > zealot.unitClass.maxShields - zealot.shieldPoints
+        && (zealot.shieldPoints < 10 || zealot.pixelDistanceEdge(b) < 64)))(_.pixelDistanceEdge(zealot))
 
+    zealot.agent.shouldFight  = shouldFight
+    zealot.agent.destinationNext.set(With.scouting.enemyMain.map(_.heart.center).getOrElse(With.scouting.enemyHome.center))
     DrawMap.label(f"$score%.2f", zealot.pixel.add(0, 24))
-    if (shouldFight) {
+
+    if (zealot.matchups.targetsInRange.forall( ! _.unitClass.attacksGround)
+      && zealot.matchups.threatsInRange.isEmpty
+      && battery.isDefined) {
+      Commander.rightClick(zealot, battery.get)
+    } else if (shouldFight) {
       if (canPotshot) {
         attack(zealot, zealot.matchups.targetsInRange.minBy(_.totalHealth))
       } else {
-        val targets = With.units.enemy.filter(_.unitClass.attacksGround)
+        val targets = With.units.enemy.filter(t => t.unitClass.attacksGround && t.visible)
         if (targets.isEmpty) {
           Commander.move(zealot)
         } else {
-          val trappedDragoons = zealot.matchups.targets.filter(t => Protoss.Dragoon(t) && t.tile.adjacent4.count(_.walkable) < 2 && t.inRangeToAttack(zealot) && t.matchups.targetsInRange.exists(b => b.unitClass.isBuilding && t.pixelDistanceEdge(b) < 16))
+          val trappedDragoons = targets.filter(t => Protoss.Dragoon(t) && t.tile.adjacent4.count(_.walkable) < 2 && t.inRangeToAttack(zealot) && t.matchups.targetsInRange.exists(b => b.unitClass.isBuilding && t.pixelDistanceEdge(b) < 16))
           if (trappedDragoons.nonEmpty) {
             Maff.minBy(trappedDragoons)(_.pixelDistanceEdge(zealot)).foreach(attack(zealot, _))
           } else {
@@ -106,6 +117,8 @@ object BeRushingZealot extends Action {
 
   def retreat(zealot: FriendlyUnitInfo): Unit = {
     if (zealot.matchups.pixelsToThreatRange.isEmpty) return
+
+    Recharge(zealot)
 
     val allies  = zealot.matchups.allies.filter(IsWarrior).filter(_.matchups.pixelsToThreatRange.exists(_ > zealot.matchups.pixelsToThreatRange.get + 64))
     val home    = Maff.minBy(allies)(_.matchups.pixelsToThreatRange)

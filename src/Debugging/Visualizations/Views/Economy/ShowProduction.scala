@@ -63,7 +63,8 @@ object ShowProduction extends DebugView {
           paid = production.hasSpent
         )})
 
-    val produciblesSorted = producibles.sortBy(p => p.framesLeft - p.framesTotal).sortBy( ! _.started)
+    val (produciblesStarted, produciblesPending) = producibles.partition(_.started)
+    val produciblesSorted = produciblesStarted.sortBy(p => p.framesLeft - p.framesTotal) ++ produciblesPending
     produciblesSorted.indices.take(18).foreach(i => {
       val p = produciblesSorted(i)
       val y0 = 45 + 14 * i

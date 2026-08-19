@@ -42,6 +42,7 @@ object Opponents {
   add("InfestedArtosis", .9,   defaultPvZ)
 
   // R
+  //add("Pluto",           .5,   StrategySelectionFixed(PvEProxy2Gate))
   add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
   add("C0mputer",        .9,   defaultPvR)
   add("Steamhammer",     .9,   defaultPvR, "Randomhammer")

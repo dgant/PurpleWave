@@ -41,9 +41,14 @@ class PvEProxy2Gate extends GameplanImperative {
   override def doWorkers(): Unit = {}
 
   override def executeMain(): Unit = {
-    if (confidenceAttacking01 > 0.45) {
+    val strength = With.units.playerOwned
+      .filter(u => u.complete && u.unitClass.isWarrior)
+      .map(u => u.unitClass.mineralPrice * u.totalHealth / u.unitClass.maxTotalHealth.toDouble * ?(u.isFriendly, 1.5, -1))
+      .sum
+    if (strength > 0) {
       attack()
     }
+
     gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
     gasLimitCeiling(200)
     requireMiningBases(1)
@@ -56,12 +61,21 @@ class PvEProxy2Gate extends GameplanImperative {
       pump(Protoss.Zealot)
     } else {
       if (With.enemy.isZerg) {
+        autosupply()
         pump(Protoss.Zealot)
+        pumpWorkers()
       } else {
+        autosupply()
         once(7, Protoss.Zealot)
+        pumpWorkers()
+        if (foundEnemyBase && ! With.tactics.workerScout.scoutingAbandoned) {
+          val bases = With.tactics.workerScout.units.flatMap(_.base)
+          (1 to 2).foreach(n => {
+            get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
+            get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
+          })
+        }
       }
-      pumpWorkers()
-      slushOrPylons()
     }
     if (enemyIsZerg) {
       get(4, Protoss.Gateway)
@@ -76,13 +90,6 @@ class PvEProxy2Gate extends GameplanImperative {
     if (With.tactics.workerScout.scoutingAbandoned || ! enemyIsProtoss) {
       autosupply()
       return
-    }
-    if (foundEnemyBase && ! With.tactics.workerScout.scoutingAbandoned) {
-      val bases = With.tactics.workerScout.units.flatMap(_.base)
-      (1 to 2).foreach(n => {
-        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
-        get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
-      })
     }
     if (With.tactics.workerScout.scouts.exists(_.base.exists(_.isEnemy))) {
       microSlush(100)

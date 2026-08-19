@@ -600,4 +600,15 @@ object TemplatesProtoss {
         "xxx-",
         "----"))
     .map(_.addLabels(ProxyForwardRobo))
+
+  val proxyForwardBatteries: Seq[Template] = Seq(
+    new Template()
+      .from(
+        "--------",
+        "-BxxBxx-",
+        "-xxxxxx-",
+        "-BxxPxx-",
+        "-xxxxxx-",
+        "-------"))
+    .map(_.addLabels(Defensive, DefendGround))
 }

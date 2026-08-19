@@ -57,6 +57,11 @@ class Placement extends Fitter {
       if (b.tiles.contains(Points.tileMiddle)) {
         fitProxyGate(b.zone)
       }
+      if (b.isNatural && ! b.naturalOf.exists(_.isOurs)) {
+        // Incompatible with caching
+        // fitAndIndexProximity(0, 1, TemplatesProtoss.proxyForwardBatteries, b.exitNow, b.zone)
+      }
+
       val townHallFit = Fit(b.townHallTile, TemplatesGeneric.townhall)
       if (fitsAt(townHallFit.template, townHallFit.origin)) {
         index(townHallFit)

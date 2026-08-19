@@ -11,6 +11,7 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
+import sun.management.resources.agent
 
 object BeRushingZealot extends Action {
 
@@ -40,13 +41,12 @@ object BeRushingZealot extends Action {
   )
 
   private def scoreUnit(zealot: FriendlyUnitInfo, u: UnitInfo): Double = {
-    val target      = ?(u.isFriendly, u.matchups.targetNearest.getOrElse(u), u)
     val sign        = ?(u.isFriendly, 1, ?(u.isEnemy, -1, 0))
-    val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(target) - zealot.matchups.pixelsToTargetRange.getOrElse(0)) / 196.0)
+    val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(zealot) - zealot.matchups.pixelsToTargetRange.getOrElse(0d)) / 196.0)
     val health      = u.totalHealth / u.unitClass.maxTotalHealth.toDouble
     val strength    = typeStrength.getOrElse(u.unitClass, u.unitClass.subjectiveValue / Protoss.Zealot.subjectiveValue)
     val hysteresis  = ?(u.isOurs, ?(u.matchups.threatsInRange.nonEmpty, 1.1, 0.9), 1.0)
-    val busyness    = ?(u.gathering || u.constructing, 0.5, 1.0)
+    val busyness    = ?(u.gathering || u.constructing, 0.25, 1.0)
     sign * proximity * health * strength * hysteresis * busyness
   }
 
@@ -60,12 +60,14 @@ object BeRushingZealot extends Action {
     val canPotshot            = zealot.readyForAttackOrder && zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && (Zerg.Zergling(t) || zealot.hitPoints > 20))
     val hugging               = zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && t.pixelRangeAgainst(zealot) > 32)
     val shouldFight           = score > 0 || canPotshot || hugging
-    val batteries             = With.units.ours.filter(Protoss.ShieldBattery).toVector
-    val battery               = Maff.minBy(batteries.filter(b =>
-      b.complete
+    val batteries = With.units.ours
+      .filter(b =>
+        Protoss.ShieldBattery(b)
+        && b.complete
         && b.energy * 2 > zealot.unitClass.maxShields - zealot.shieldPoints
-        && (zealot.shieldPoints < 10 || zealot.pixelDistanceEdge(b) < 64)))(_.pixelDistanceEdge(zealot))
-
+        && (zealot.shieldPoints < ?(zealot.pixelDistanceEdge(b) < 64, zealot.unitClass.maxShields, 10)))
+      .toVector
+    val battery               = Maff.minBy(batteries)(_.pixelDistanceEdge(zealot))
     zealot.agent.shouldFight  = shouldFight
     zealot.agent.destinationNext.set(With.scouting.enemyMain.map(_.heart.center).getOrElse(With.scouting.enemyHome.center))
     DrawMap.label(f"$score%.2f", zealot.pixel.add(0, 24))

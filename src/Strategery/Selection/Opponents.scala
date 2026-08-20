@@ -25,21 +25,21 @@ object Opponents {
   // COG 2026
 
   // P
-  add("BananaBrain",     .53, new StrategySelectionRecommended(StrategySelectionGreedy()))
-  add("Stardust",        .53, new StrategySelectionRecommended(StrategySelectionGreedy(), 3,  PvPGateCore, PvPDT))
+  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy()))
+  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 3,  PvPGateCore, PvPDT))
   add("Venator",         .9,  new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPRobo))
 
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
   //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("McRave",           .7,   new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvZ1GateCoreYoloSpeedlot), "McRaveZ")
+  add("McRave",           .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvZ1GateCoreYoloSpeedlot), "McRaveZ")
   add("Microwave",        .7,   defaultPvZ)
   add("InfestedArtosis",  .8,   defaultPvZ)
   add("WATTBOT",          .8,   defaultPvZ)
 
   // R
-  add("Pluto",           .5,   StrategySelectionFixed(PvEProxy2Gate))
-  add("Steamhammer",     .9,   defaultPvR, "Randomhammer")
+  add("Pluto",           .4,   defaultPvR)
+  add("Steamhammer",     .8,   defaultPvR, "Randomhammer")
   add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
 
   val all: Vector[Opponent] = allKnown

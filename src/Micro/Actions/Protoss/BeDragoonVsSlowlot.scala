@@ -18,7 +18,7 @@ import Utilities.Time.Minutes
 
 object BeDragoonVsSlowlot extends Action {
 
-  override protected def allowed(unit: FriendlyUnitInfo): Boolean = (
+  override def allowed(unit: FriendlyUnitInfo): Boolean = (
     Protoss.Dragoon(unit)
     && With.frame < Minutes(7)()
     && unit.matchups.threats.forall(_.isAny(Protoss.Probe, Protoss.Zealot))
@@ -45,12 +45,18 @@ object BeDragoonVsSlowlot extends Action {
 
     if (marginDelta >= 0) {
       Target.choose(unit)
-      if (unit.readyForAttackOrder) {
-        Commander.attack(unit)
-      } else if (unit.target.isDefined && marginDelta > 32 && ! unit.matchups.threatsInPixels(160).exists(_.presumptiveTarget.contains(unit))) {
-        unit.agent.forces.put(Forces.target, Potential.towards(unit, unit.pixelToFireAtExhaustive(unit.target.get)))
-        unit.agent.forced.set(MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians).orElse(unit.agent.destinationNext.pixel))
-        Commander.move(unit)
+      if (unit.agent.toAttack.isDefined) {
+        if (unit.readyForAttackOrder) {
+          Commander.attack(unit)
+        } else if (marginDelta > 32 && ! unit.matchups.threatsInPixels(160).exists(_.presumptiveTarget.contains(unit))) {
+          unit.agent.forces.put(Forces.target, Potential.towards(unit, unit.pixelToFireAtExhaustive(unit.agent.toAttack.get)))
+          unit.agent.forced.set(MicroPathing.getWaypointInDirection(unit, unit.agent.forces.sum.radians).orElse(unit.agent.destinationNext.pixel))
+          Commander.move(unit)
+        } else if (unit.pixelsToGetInRange(unit.agent.toAttack.get) < -32) {
+          Retreat(unit)
+        } else {
+          Commander.attack(unit)
+        }
       }
       // Allow default movement to take over
     } else {

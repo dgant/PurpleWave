@@ -83,8 +83,12 @@ object BeRushingZealot extends Action {
         if (targets.isEmpty) {
           Commander.move(zealot)
         } else {
-          val trappedDragoons = targets.filter(t => Protoss.Dragoon(t) && t.tile.adjacent4.count(_.walkable) < 2 && t.inRangeToAttack(zealot) && t.matchups.targetsInRange.exists(b => b.unitClass.isBuilding && t.pixelDistanceEdge(b) < 16))
-          if (trappedDragoons.nonEmpty) {
+          val trappedDragoons = targets.filter(t =>
+            Protoss.Dragoon(t)
+              && t.tile.adjacent4.count(_.walkable) < 2
+              && t.inRangeToAttack(zealot)
+              && t.matchups.targetsInRange.exists(b => b.unitClass.isBuilding && t.pixelDistanceEdge(b) < 16))
+          if (trappedDragoons.nonEmpty && false) { // Disabled since we aren't doing Pylon traps
             Maff.minBy(trappedDragoons)(_.pixelDistanceEdge(zealot)).foreach(attack(zealot, _))
           } else {
             val targets = zealot.matchups.targets
@@ -92,7 +96,7 @@ object BeRushingZealot extends Action {
               .filter(_.visible)
               .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || zealot.pixelsToGetInRange(t) < 16)
             if (targets.nonEmpty) {
-              val target = targets.minBy(t => t.totalHealth + 3 * zealot.pixelsToGetInRange(t))
+              val target = targets.minBy(t => t.totalHealth + 2 * zealot.pixelsToGetInRange(t))
               if (zealot.readyForAttackOrder || ! target.canMove) {
                 attack(zealot, target)
               } else if (target.isAny(Protoss.Zealot, Zerg.Zergling, IsWorker) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {

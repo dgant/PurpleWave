@@ -25,7 +25,7 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
       if (With.enemy.raceInitial == Race.Terran)        default = Opponents.defaultPvT
       else if (With.enemy.raceInitial == Race.Protoss)  default = Opponents.defaultPvP
       else if (With.enemy.raceInitial == Race.Zerg)     default = Opponents.defaultPvZ
-      else if (With.enemy.raceInitial == Race.Unknown)  default = Opponents.simplePvR
+      else if (With.enemy.raceInitial == Race.Unknown)  default = Opponents.defaultPvR
     }
 
     val policy = opponent.map(_.policy).getOrElse(default)

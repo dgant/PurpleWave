@@ -316,6 +316,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def framesToFace(target: UnitInfo): Int = framesToFace(target.pixel)
   @inline final def framesToFace(target: Pixel): Int = framesToFace(pixel.radiansTo(target))
   @inline final def framesToFace(faceRadians: Double): Int = unitClass.framesToTurn(Maff.radiansTo(angleRadians, faceRadians))
+  @inline final def dot(target: Pixel): Double = Maff.dot(pixel, target, angleRadians)
   @inline final def pixelsOfEntanglement(threat: UnitInfo): Double = {
     val speedTowardsThreat    = speedApproaching(threat)
     val framesToStopMe        = ?(speedTowardsThreat <= 0, 0.0, framesToStopRightNow)

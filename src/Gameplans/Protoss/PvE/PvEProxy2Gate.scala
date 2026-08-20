@@ -49,7 +49,9 @@ class PvEProxy2Gate extends GameplanImperative {
       attack()
     }
 
-    //gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
+    val unpoweredGateways = With.units.ours.count(u => Protoss.Gateway(u) && ! u.powered)
+
+    gasWorkerCeiling(?(gas >= 100 && With.self.gatheredGas > 250, 2, 3))
     gasLimitCeiling(250)
     requireMiningBases(1)
     if (have(Protoss.CyberneticsCore)) {
@@ -57,13 +59,14 @@ class PvEProxy2Gate extends GameplanImperative {
       pumpWorkers()
       get(Protoss.DragoonRange)
       pump(Protoss.Dragoon)
-      get(3 + With.units.ours.count(u => Protoss.Gateway(u) && ! u.powered), Protoss.Gateway)
+      get(3 + unpoweredGateways, Protoss.Gateway)
       pump(Protoss.Zealot)
     } else {
       if (With.enemy.isZerg) {
         autosupply()
         pump(Protoss.Zealot)
         pumpWorkers()
+        get(6, Protoss.Gateway)
       } else {
         once(5, Protoss.Zealot)
         /*

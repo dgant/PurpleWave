@@ -54,9 +54,8 @@ class Agency extends TimedTask {
       val agent       =   agents(agentIndex)
       val unit        =   agent.unit
       agentIndex      +=  1
-      unit.sleepUntil =   Math.max(unit.sleepUntil, AttackDelay.nextSafeOrderFrame(unit))
 
-      if (unit.alive && unit.ready) {
+      if (unit.alive && unit.ready && AttackDelay.safeToIssueOrder(unit)) {
         val timeBefore = With.performance.frameElapsedMs
         agent.execute()
         agent.toAttack.foreach(_.addTargeter(unit))

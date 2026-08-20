@@ -6,7 +6,7 @@ import bwapi.Race
 
 class StrategyLegality(strategy: Strategy) {
    private def allowedGivenOpponentHistory(strategy: Strategy): Boolean = {
-    if (strategy.responsesBlacklisted.exists(With.strategy.enemyRecentFingerprints.contains)) return false
+    if (strategy.responsesBlacklisted.exists(With.strategy.enemyRecentFingerprints.contains) && ! With.enemies.exists(_.isUnknown)) return false
     if (strategy.responsesWhitelisted.nonEmpty && ! strategy.responsesWhitelisted.exists(With.strategy.enemyRecentFingerprints.contains)) return false
     true
   }

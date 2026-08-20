@@ -140,7 +140,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   // Potential //
   ///////////////
 
-  protected def applyForce(label: ForceLabel, force: Force): Unit = {
+  def applyForce(label: ForceLabel, force: Force): Unit = {
     if (force.lengthFast > 0) {
       unit.agent.forces.put(label, force)
     }

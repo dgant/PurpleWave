@@ -1,11 +1,12 @@
 package Micro.Actions.Scouting
 
 import Lifecycle.With
+import Mathematics.Maff
 import Micro.Actions.Action
-import Micro.Targeting.Target
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Terran
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
+import Utilities.?
 import bwapi.Race
 
 object AttackBuilder extends Action {
@@ -23,7 +24,7 @@ object AttackBuilder extends Action {
   }
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    unit.agent.toAttack = Target.bestUnfiltered(unit, disruptableBuilders(unit))
+    unit.agent.toAttack = Maff.maxBy(disruptableBuilders(unit))(t => unit.targetScore(t) * ?(t.orderTarget.exists(_.unitClass.isGas), 0.1, 1.0))
     Commander.attack(unit)
   }
 

@@ -35,4 +35,11 @@ trait Angles {
   @inline final def isTowards(from: Pixel, to: Pixel, direction: Double): Boolean = {
     Math.abs(Maff.radiansTo(from.radiansTo(to), direction)) < Maff.halfPi
   }
+
+  @inline final def dot(from: Pixel, to: Pixel, radians: Double): Double = {
+    val dx = to.x.toDouble - from.x
+    val dy = to.y.toDouble - from.y
+    val distance = Math.sqrt(dx * dx + dy * dy)
+    if (distance == 0) 0.0 else (dx * Math.cos(radians) + dy * Math.sin(radians)) / distance
+  }
 }

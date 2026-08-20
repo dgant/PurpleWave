@@ -31,8 +31,8 @@ abstract class PvTStrategyNoZealotNoRange extends PvTStrategyNoZealot {
 
 object PvT13Nexus extends PvTStrategyNoZealotNoRange {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
-  //setStartLocationsMin(4)
-  //setRushTilesMinimum(180)
+  setStartLocationsMin(4)
+  setRushTilesMinimum(180)
 }
 object PvTRangeless     extends PvTStrategyNoZealotNoRange {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)

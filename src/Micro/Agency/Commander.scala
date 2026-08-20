@@ -549,7 +549,7 @@ object Commander {
     if (unit.flying) return
     if (unit.intent.toScoutTiles.nonEmpty)                      unit.agent.escalatePriority(TrafficPriorities.Pardon)
     if (unit.intent.toFinish.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
-    if (unit.intent.toHeal.isDefined)                         unit.agent.escalatePriority(TrafficPriorities.Bump)
+    if (unit.intent.toHeal.isDefined)                           unit.agent.escalatePriority(TrafficPriorities.Bump)
     if (unit.intent.toBuild.nonEmpty)                           unit.agent.escalatePriority(?(buildDistance < 128, TrafficPriorities.Shove, TrafficPriorities.Bump))
     if (unit.agent.toAttack.exists( ! unit.inRangeToAttack(_))) unit.agent.escalatePriority(TrafficPriorities.Nudge)
     if (unit.battle.isDefined && ! unit.agent.shouldFight) {    unit.agent.escalatePriority(TrafficPriorities.Pardon)

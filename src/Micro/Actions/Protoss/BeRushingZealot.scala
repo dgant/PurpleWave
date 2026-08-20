@@ -11,20 +11,19 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
 import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsWarrior, IsWorker}
-import sun.management.resources.agent
 
 object BeRushingZealot extends Action {
 
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     Protoss.Zealot(unit)
     && With.frame < Minutes(8)()
-    && unit.agent.destinationFinal.pixel.exists( ! _.metro.exists(_.isOurs))
+    && unit.agent.destinationFinal.pixel.exists(p => ! p.metro.exists(_.isOurs) && p.proximity < 0.5)
     && unit.team.forall(u => u.warriorsCasters.forall(u => u.isAny(Protoss.Probe, Protoss.Zealot, Protoss.ShieldBattery) || u.pixelDistanceCenter(unit) > 320))
   )
 
   private val typeStrength = Map(
     (Terran.SCV,            0.25),
-    (Terran.Marine,         0.45),
+    (Terran.Marine,         0.4),
     (Terran.Vulture,        1.0),
     (Terran.Firebat,        0.6),
     (Terran.Bunker,         2.0),
@@ -34,8 +33,8 @@ object BeRushingZealot extends Action {
     (Protoss.Dragoon,       0.75),
     (Protoss.PhotonCannon,  1.75),
 
-    (Zerg.Drone,            0.2),
-    (Zerg.Zergling,         0.4),
+    (Zerg.Drone,            0.3),
+    (Zerg.Zergling,         0.35),
     (Zerg.Hydralisk,        0.65),
     (Zerg.SunkenColony,     3.5)
   )
@@ -45,8 +44,8 @@ object BeRushingZealot extends Action {
     val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(zealot) - zealot.matchups.pixelsToTargetRange.getOrElse(0d)) / 196.0)
     val health      = u.totalHealth / u.unitClass.maxTotalHealth.toDouble
     val strength    = typeStrength.getOrElse(u.unitClass, u.unitClass.subjectiveValue / Protoss.Zealot.subjectiveValue)
-    val hysteresis  = ?(u.isOurs, ?(u.matchups.threatsInRange.nonEmpty, 1.1, 0.9), 1.0)
-    val busyness    = ?(u.gathering || u.constructing, 0.25, 1.0)
+    val hysteresis  = ?(u.isOurs, ?(u.matchups.threatsInRange.nonEmpty, 1.2, 0.9), 1.0)
+    val busyness    = ?(u.gathering || u.constructing, 0.5, 1.0)
     sign * proximity * health * strength * hysteresis * busyness
   }
 
@@ -57,7 +56,7 @@ object BeRushingZealot extends Action {
       .map(scoreUnit(zealot, _))
       .toVector
     val score                 = scores.sum
-    val canPotshot            = zealot.readyForAttackOrder && zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && (Zerg.Zergling(t) || zealot.hitPoints > 20))
+    val canPotshot            = zealot.readyForAttackOrder && zealot.matchups.targetsInRange.exists(_.canAttack(zealot))
     val hugging               = zealot.matchups.targetsInRange.exists(t => t.canAttack(zealot) && t.pixelRangeAgainst(zealot) > 32)
     val shouldFight           = score > 0 || canPotshot || hugging
     val batteries = With.units.ours
@@ -96,7 +95,7 @@ object BeRushingZealot extends Action {
               val target = targets.minBy(t => t.totalHealth + 2 * zealot.pixelsToGetInRange(t))
               if (zealot.readyForAttackOrder || ! target.canMove) {
                 attack(zealot, target)
-              } else if (target.isAny(Protoss.Zealot, Zerg.Zergling) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {
+              } else if (target.isAny(Protoss.Zealot, Zerg.Zergling, IsWorker) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {
                 retreat(zealot)
               } else if (target.speedApproaching(zealot) < 0) {
                 zealot.agent.destinationNext.set(target.projectFrames(zealot.cooldownLeft))

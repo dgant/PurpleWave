@@ -57,25 +57,45 @@ object AttackDelay {
     if (Protoss.Carrier(unit)) {
       // Need a better answer than this
       return 24
-    } else if (unit.flying && unit.isAny(Terran.Wraith, Terran.Battlecruiser, Protoss.Corsair, Protoss.Scout, Zerg.Mutalisk, Zerg.Guardian)) {
-      return 1
     }
-    Math.max(2, unit.unitClass.stopFrames)
+    // Sleep through command delivery so the next frame can observe and protect an attack that started.
+    With.latency.remainingFrames + 1
   }
   
-  def nextSafeOrderFrame(unit: FriendlyUnitInfo): Int = {
+  // OpenBW applies commands before running iscripts. After nobrkcodestart has run, follow-up orders queue until
+  // nobrkcodeend instead of interrupting the attack. These offsets are the first safe command-arrival frames,
+  // relative to the frame on which the attack cooldown starts. Lurkers and Hydralisks use the end of their
+  // interruptible repeat animation because cooldown alone does not distinguish an initial attack from a repeat.
+  private lazy val safeOrderArrivalFramesByUnit = Map(
+    Protoss.Corsair     -> 1,
+    Zerg.SunkenColony   -> 1,
+    Protoss.Arbiter     -> 2,
+    Protoss.Archon      -> 2,
+    Protoss.DarkTemplar -> 2,
+    Terran.Valkyrie     -> 2,
+    Zerg.Broodling      -> 2,
+    Zerg.Ultralisk      -> 2,
+    Zerg.Zergling       -> 2,
+    Protoss.Zealot      -> 3,
+    Zerg.Lurker         -> 3,
+    Terran.Ghost        -> 4,
+    Terran.Marine       -> 4,
+    Zerg.Hydralisk      -> 4)
+
+  def safeToIssueOrder(unit: FriendlyUnitInfo): Boolean = {
     // The +2 is to make units stick less after an attack
     // I tested this prior to COG 2021.
     // +0 lead to a lot of sticking.
     // +1 lead to some sticking, enough to lose games because of it.
     // +2 appeared to prevent all sticking
-    unit.lastFrameStartingAttack + unit.unitClass.stopFrames - With.latency.latencyFrames + 2
+    val safeArrivalFrame = unit.lastFrameStartingAttack + safeOrderArrivalFramesByUnit.getOrElse(unit.unitClass, unit.unitClass.stopFrames + 2)
+    With.frame + With.latency.remainingFrames >= safeArrivalFrame
   }
   
   /*
-  Here's the math justifying the above calculations.
-  This math assumes turn size 1. Turn sizes in most cases are 1 (Local PC) or 2 (LAN).
-  For some turn size T > 1 you could be a bit more precise and save N - 1 frames.
+  Here's the math justifying the fallback calculation.
+  These examples assume turn size 1. The implementation uses remainingFrames to account for the current command phase.
+  The scenarios show the unsafe +0 boundary; the fallback adds the empirically-tested two-frame margin.
   
   ---
 
@@ -108,9 +128,8 @@ object AttackDelay {
   ---
   
   Conclusion:
-  If you issue an attack order on frame N,
-  The next safe time to issue a move order to the unit is 1 + Max(Latency frames, stop frames)
-  And once you see a unit starting to attack, withhold orders until (Attack start frame + stop frames - latency frames)
+  Once you see a unit starting to attack, issue a follow-up order only when its projected arrival is at least
+  (Attack start frame + stop frames + 2).
    */
   
   /*
@@ -161,9 +180,8 @@ object AttackDelay {
   // JohnJ: yeah in theory. actually in practice. I did test that.
   //
   // JohnJ's research says (now + 9 - frames before execution) is the exact timing
-  // That formula causes Dragoons to miss some shots, especially on consecutive attacks without moving.
-  // So I've added one more frame of delay. Consecutive attacks are still sometimes missing.
+  // The fallback above retains the additional empirical margin because consecutive attacks can otherwise miss.
   //
-  // WARNING: This requires micro to run on *every frame*!
+  // Reaching the earliest safe frame requires micro to run on *every frame*.
   //
 }

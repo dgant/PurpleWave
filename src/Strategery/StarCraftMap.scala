@@ -65,9 +65,10 @@ object StarCraftMaps {
 }
 
 object MapGroups {
-  val badForProxying: Vector[StarCraftMap] = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
-  val badForMassGoon: Vector[StarCraftMap] = Vector(Destination) // We've allowed some maps like Aztec, Match Point, Circuit Breaker and Roadrunner because we now we *should* know how to flank on those
-  val narrowRamp    : Vector[StarCraftMap] = Vector(Plasma, ThirdWorld)
-  val strongNatural : Vector[StarCraftMap] = Vector(Aztec, MatchPoint, Roadrunner, Destination, Roadkill)
+  val badForProxying    : Vector[StarCraftMap] = Vector(Alchemist, BlueStorm, ChupungRyeong, Eddy, EmpireOfTheSun, GreatBarrierReef, LaMancha, Roadrunner, TauCross, Arcadia, Luna)
+  val badForCannonRush  : Vector[StarCraftMap] = Vector(Gladiator)
+  val badForMassGoon    : Vector[StarCraftMap] = Vector(Destination) // We've allowed some maps like Aztec, Match Point, Circuit Breaker and Roadrunner because we now we *should* know how to flank on those
+  val narrowRamp        : Vector[StarCraftMap] = Vector(Plasma, ThirdWorld)
+  val strongNatural     : Vector[StarCraftMap] = Vector(Aztec, MatchPoint, Roadrunner, Destination, Roadkill)
 }
 

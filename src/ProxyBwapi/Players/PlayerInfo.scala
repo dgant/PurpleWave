@@ -24,9 +24,10 @@ case class PlayerInfo(bwapiPlayer: Player) extends PlayerProxy(bwapiPlayer) {
   def isTerran            : Boolean = raceCurrent == Race.Terran
   def isProtoss           : Boolean = raceCurrent == Race.Protoss
   def isZerg              : Boolean = raceCurrent == Race.Zerg
-  def isUnknownOrTerran   : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Terran
-  def isUnknownOrProtoss  : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Protoss
-  def isUnknownOrZerg     : Boolean = raceCurrent == Race.Unknown || raceCurrent == Race.Zerg
+  def isUnknown           : Boolean = raceCurrent == Race.Unknown
+  def isUnknownOrTerran   : Boolean = isUnknown || isTerran
+  def isUnknownOrProtoss  : Boolean = isUnknown || isProtoss
+  def isUnknownOrZerg     : Boolean = isUnknown || isZerg
 
   def isFriendly : Boolean = isUs || isAlly
 

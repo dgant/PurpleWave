@@ -3,7 +3,6 @@ package Micro.Agency
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
-import bwapi.UnitCommandType
 
 object AttackDelay {
 
@@ -83,19 +82,7 @@ object AttackDelay {
     Terran.Marine       -> 4,
     Zerg.Hydralisk      -> 4)
 
-  private def awaitingAttackStart(unit: FriendlyUnitInfo): Boolean = {
-    val lastCommand = unit.bwapiUnit.getLastCommand
-    lastCommand != null &&
-      lastCommand.getType == UnitCommandType.Attack_Unit &&
-      unit.bwapiUnit.getLastCommandFrame > unit.lastFrameStartingAttack &&
-      unit.orderTarget.exists(_.bwapiUnit == lastCommand.getTarget) &&
-      unit.cooldownLeft <= With.latency.remainingFrames
-  }
-
   def safeToIssueOrder(unit: FriendlyUnitInfo): Boolean = {
-    // A delivered attack order can start after its sleep expires. Do not put a follow-up command in flight
-    // unless cooldown guarantees that it will arrive before the pending attack can start.
-    if (awaitingAttackStart(unit)) return false
     // The +2 is to make units stick less after an attack
     // I tested this prior to COG 2021.
     // +0 lead to a lot of sticking.

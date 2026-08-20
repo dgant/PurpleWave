@@ -36,11 +36,11 @@ final case class Force(x: Double, y: Double) {
   }
 
   @inline def clipAtLeast(scale: Double): Force = {
-    if (scale * scale >= lengthSquared) this else normalize(scale)
+    if (scale * scale <= lengthSquared) this else normalize(scale)
   }
 
   @inline def clipAtMost(scale: Double): Force = {
-    if (scale * scale <= lengthSquared) this else normalize(scale)
+    if (scale * scale >= lengthSquared) this else normalize(scale)
   }
 
   @inline def rotate(degrees: Double): Force = {

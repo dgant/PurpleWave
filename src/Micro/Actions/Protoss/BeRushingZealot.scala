@@ -22,13 +22,13 @@ object BeRushingZealot extends Action {
   )
 
   private val typeStrength = Map(
-    (Terran.SCV,            0.25),
+    (Terran.SCV,            0.4),
     (Terran.Marine,         0.4),
     (Terran.Vulture,        1.0),
     (Terran.Firebat,        0.6),
     (Terran.Bunker,         2.0),
 
-    (Protoss.Probe,         0.2),
+    (Protoss.Probe,         0.3),
     (Protoss.Zealot,        1.0),
     (Protoss.Dragoon,       0.75),
     (Protoss.PhotonCannon,  1.75),
@@ -90,9 +90,9 @@ object BeRushingZealot extends Action {
             val targets = zealot.matchups.targets
               .filter(_.canAttack(zealot))
               .filter(_.visible)
-              .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering)
+              .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || zealot.pixelsToGetInRange(t) < 16)
             if (targets.nonEmpty) {
-              val target = targets.minBy(t => t.totalHealth + 2 * zealot.pixelsToGetInRange(t))
+              val target = targets.minBy(t => t.totalHealth + 3 * zealot.pixelsToGetInRange(t))
               if (zealot.readyForAttackOrder || ! target.canMove) {
                 attack(zealot, target)
               } else if (target.isAny(Protoss.Zealot, Zerg.Zergling, IsWorker) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {

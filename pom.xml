@@ -178,6 +178,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
+                    <forceCreation>true</forceCreation>
                     <archive>
                         <manifestFile>${project.basedir}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>

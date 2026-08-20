@@ -17,35 +17,30 @@ object Opponents {
     add(new Opponent(name, other))
   }
 
-  val ecoPvZ    : StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvZFFE) { duration = 10 }
-
-  val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvTZZCoreZ, PvTDoubleRobo)
+  val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
   val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), PvR2Gate4Gate)
+  val defaultPvR: StrategySelectionPolicy = StrategySelectionGreedy()
 
-  // AIIDE 2025
-
-  // T
-  add("InsanityBot",     .9,   defaultPvT)
-  add("Void",            .95,  defaultPvT)
+  // COG 2026
 
   // P
-  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy()))
-  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), PvPGateCore, PvPDT) { duration = 10 })
+  add("BananaBrain",     .53, new StrategySelectionRecommended(StrategySelectionGreedy()))
+  add("Stardust",        .53, new StrategySelectionRecommended(StrategySelectionGreedy(), 3,  PvPGateCore, PvPDT))
+  add("Venator",         .9,  new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPRobo))
 
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
   //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("McRave",          .7,   defaultPvZ, "McRaveZ", "McRaveZB", "McRaveZC")
-  add("Microwave",       .7,   defaultPvZ)
-  add("InfestedArtosis", .9,   defaultPvZ)
+  add("McRave",           .7,   defaultPvZ, "McRaveZ")
+  add("Microwave",        .7,   defaultPvZ)
+  add("InfestedArtosis",  .8,   defaultPvZ)
+  add("WATTBOT",          .8,   defaultPvZ)
 
   // R
-  //add("Pluto",           .5,   StrategySelectionFixed(PvEProxy2Gate))
-  add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
-  add("C0mputer",        .9,   defaultPvR)
+  add("Pluto",           .5,   defaultPvR)
   add("Steamhammer",     .9,   defaultPvR, "Randomhammer")
+  add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
 
   val all: Vector[Opponent] = allKnown
 }

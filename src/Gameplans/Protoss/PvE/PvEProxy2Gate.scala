@@ -49,15 +49,15 @@ class PvEProxy2Gate extends GameplanImperative {
       attack()
     }
 
-    gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
-    gasLimitCeiling(200)
+    //gasWorkerCeiling(?(units(Protoss.Gateway) >= 4, 3, 2))
+    gasLimitCeiling(250)
     requireMiningBases(1)
     if (have(Protoss.CyberneticsCore)) {
       autosupply()
       pumpWorkers()
       get(Protoss.DragoonRange)
       pump(Protoss.Dragoon)
-      get(4 + With.units.ours.count(u => Protoss.Gateway(u) && ! u.powered), Protoss.Gateway)
+      get(3 + With.units.ours.count(u => Protoss.Gateway(u) && ! u.powered), Protoss.Gateway)
       pump(Protoss.Zealot)
     } else {
       if (With.enemy.isZerg) {
@@ -65,25 +65,41 @@ class PvEProxy2Gate extends GameplanImperative {
         pump(Protoss.Zealot)
         pumpWorkers()
       } else {
-        autosupply()
+        once(5, Protoss.Zealot)
+        /*
+        val batteryBases = With.scouting.enemyMain.flatMap(_.natural).toSeq
+        ?(
+          enemyIsProtoss,
+          get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon)
+            .requireBase(batteryBases: _*)
+            .preferLabelYes(DefendGround, DefendEntrance, GroundProduction)
+            .preferTile(batteryBases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*)),
+          get(3, Protoss.Pylon))
+          *
+         */
+        once(6, Protoss.Zealot)
+        once(13, Protoss.Probe)
         once(7, Protoss.Zealot)
+        get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
+        once(14, Protoss.Probe)
+        get(Protoss.CyberneticsCore)
+        once(15, Protoss.Probe)
+        get(3, Protoss.Gateway)
+        once(16, Protoss.Probe)
+        pump(Protoss.Zealot)
         pumpWorkers()
-        if (foundEnemyBase && ! With.tactics.workerScout.scoutingAbandoned) {
-          val bases = With.tactics.workerScout.units.flatMap(_.base)
-          (1 to 2).foreach(n => {
-            get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)         .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
-            get(n, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery) .requireBase(bases: _*) .preferLabelYes(DefendGround, DefendEntrance, GroundProduction).preferTile(bases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*))
-          })
-        }
+          /*
+          get(2, Protoss.ShieldBattery, new PlacementQuery(Protoss.ShieldBattery)
+            .requireBase(batteryBases: _*)
+            .preferLabelYes(DefendGround, DefendEntrance, GroundProduction)
+            .preferTile(batteryBases.flatMap(_.entranceNow).map(_.pixelCenter.tile): _*)),
+          */
       }
     }
-    if (enemyIsZerg) {
-      get(4, Protoss.Gateway)
-      get(2, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).preferLabelYes(GroundProduction))
-      get(6, Protoss.Gateway)
-    }
-    get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourMain))
-    get(Protoss.CyberneticsCore)
+    tryBuildInWall(1, Protoss.Pylon)
+    tryBuildInWall(1, Protoss.Forge)
+    tryBuildInWall(2, Protoss.PhotonCannon)
+    requireMiningBases(2)
   }
 
   def slushOrPylons(): Unit = {

@@ -32,7 +32,7 @@ object Opponents {
   // Z
   //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
   //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("McRave",           .7,   defaultPvZ, "McRaveZ")
+  add("McRave",           .7,   new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvZ1GateCoreYoloSpeedlot), "McRaveZ")
   add("Microwave",        .7,   defaultPvZ)
   add("InfestedArtosis",  .8,   defaultPvZ)
   add("WATTBOT",          .8,   defaultPvZ)

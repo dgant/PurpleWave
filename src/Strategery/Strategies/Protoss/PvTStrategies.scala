@@ -2,8 +2,10 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
+import ProxyBwapi.Races.Protoss
 import Strategery.MapGroups
 import Strategery.Strategies.Strategy
+import Utilities.Time.Minutes
 import bwapi.Race
 
 abstract class PvTStrategy extends Strategy {
@@ -81,6 +83,7 @@ object PvT1BaseReaver extends PvTStrategyNoZealot {
     With.fingerprints.threeFacVultures,
     With.fingerprints.bio,
     With.fingerprints.twoRaxAcad)
+  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
 }
 object PvTDT extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTArbiter)
@@ -89,9 +92,11 @@ object PvTDT extends PvTStrategyNoZealot {
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFacVultures)
+  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
 }
 object PvT29Arbiter extends PvTStrategyNoZealot {
   addChoice(PvTArbiter)
+  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
 }
 object PvT4Gate extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTArbiter)
@@ -105,6 +110,7 @@ object PvT4Gate extends PvTStrategyNoZealot {
   blacklistVs(
     With.fingerprints.wallIn
   )
+  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 4)
 }
 object PvTGasSteal extends PvTStrategy {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
@@ -112,6 +118,7 @@ object PvTGasSteal extends PvTStrategy {
     With.fingerprints.workerRush,
     With.fingerprints.bbs)
   setStartLocationsMax(3)
+  addActivationRequirement(() => haveEver(u => Protoss.Assimilator(u) && u.base.exists(b => b.isEnemy && b.isMain) && u.frameDiscovered < Minutes(5)()))
 }
 
 //////////////////

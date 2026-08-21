@@ -25,8 +25,8 @@ object Opponents {
   // COG 2026
 
   // P
-  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy()))
-  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 3,  PvPGateCore, PvPDT))
+  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 8,  PvPGateCore, PvPDT))
+  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 4,  PvPGateCore, PvPDT))
   add("Venator",         .9,  new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPRobo))
 
   // Z
@@ -38,7 +38,7 @@ object Opponents {
   add("WATTBOT",          .8,   defaultPvZ)
 
   // R
-  add("Pluto",           .4,   defaultPvR)
+  add("Pluto",           .1,   defaultPvR)
   add("Steamhammer",     .8,   defaultPvR, "Randomhammer")
   add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
 

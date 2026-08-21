@@ -22,7 +22,7 @@ object BeRushingZealot extends Action {
   )
 
   private val typeStrength = Map(
-    (Terran.SCV,            0.4),
+    (Terran.SCV,            0.3),
     (Terran.Marine,         0.4),
     (Terran.Vulture,        1.0),
     (Terran.Firebat,        0.6),
@@ -44,9 +44,24 @@ object BeRushingZealot extends Action {
     val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(zealot) - zealot.matchups.pixelsToTargetRange.getOrElse(0d)) / 196.0)
     val health      = u.totalHealth / u.unitClass.maxTotalHealth.toDouble
     val strength    = typeStrength.getOrElse(u.unitClass, u.unitClass.subjectiveValue / Protoss.Zealot.subjectiveValue)
-    val hysteresis  = ?(u.isOurs, ?(u.matchups.threatsInRange.nonEmpty, 1.2, 0.9), 1.0)
+    val marine      = u.matchups.threats.exists(_.isAny(Terran.Marine, Terran.Vulture))
+    val zergling    = u.matchups.threats.exists(Zerg.Zergling)
+    val dragoon     = u.matchups.threats.exists(Protoss.Dragoon)
+    val fighting    = u.matchups.threatsInRange.nonEmpty
+    val lowAllyHP   = Maff.min(zealot.matchups.allies.filter(Protoss.Zealot).filter(_.matchups.threatsInPixels(8).nonEmpty).map(_.totalHealth.toDouble)).getOrElse(1000.0)
+    val assisting   = Maff.clamp(zealot.totalHealth / Math.max(1.0, lowAllyHP), 1.0, 2.0)
+    val hysteresis  =
+      ?(u.isOurs,
+        ?(marine,
+          ?(fighting, 1.5, 0.8),
+        ?(zergling,
+          ?(fighting, 1.2, 0.8),
+        ?(dragoon,
+          ?(fighting, 2.0, 0.7),
+          ?(fighting, 1.1, 0.9)))),
+      1.0)
     val busyness    = ?(u.gathering || u.constructing, 0.5, 1.0)
-    sign * proximity * health * strength * hysteresis * busyness
+    sign * proximity * health * strength * hysteresis * busyness * assisting
   }
 
   override protected def perform(zealot: FriendlyUnitInfo): Unit = {
@@ -130,7 +145,6 @@ object BeRushingZealot extends Action {
     val allies  = zealot.matchups.allies.filter(IsWarrior).filter(_.matchups.pixelsToThreatRange.exists(_ > zealot.matchups.pixelsToThreatRange.get + 64))
     val home    = Maff.minBy(allies)(_.matchups.pixelsToThreatRange)
       .map(_.pixel)
-      .orElse(Maff.minBy(With.units.ours.filter(Protoss.Gateway).map(_.pixel))(zealot.pixelDistanceTravelling))
       .getOrElse(With.geography.home.center)
 
     zealot.agent.destinationNext.set(home)

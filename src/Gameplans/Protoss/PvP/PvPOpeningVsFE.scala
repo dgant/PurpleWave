@@ -6,8 +6,9 @@ import Mathematics.Maff
 import Placement.Access.{Foundation, PlaceLabels, PlacementQuery}
 import Placement.Access.PlaceLabels.{Proxy4Gate, ProxyForwardRobo}
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.PvPNexusFirst
+import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst}
 import Utilities.?
+import Utilities.Time.Seconds
 
 class PvPOpeningVsFE extends GameplanImperative {
 
@@ -23,6 +24,8 @@ class PvPOpeningVsFE extends GameplanImperative {
   def getProxyGatePlace : Option[Foundation] = Maff.minBy(With.placement.get(PlaceLabels.Proxy4Gate))(_.tile.groundTiles(With.scouting.enemyHome))
 
   override def activated: Boolean = {
+    if (PvPNexusFirst()) return false
+    if (PvPCoreExpand()) return false
 
     lazy val proxyRoboPlace = getProxyRoboPlace
     lazy val proxyGatePlace = getProxyGatePlace
@@ -34,7 +37,7 @@ class PvPOpeningVsFE extends GameplanImperative {
         if (unitsComplete(Protoss.Gateway) > 1) {
           response = Some(?(canProxyGate, FourGateProxy, FourGateHome))
         } else if (unitsComplete(Protoss.Gateway) > 0) {
-          response = Some(?(canProxyRobo, RoboProxy, ?(canProxyGate, FourGateProxy, FourGateHome)))
+          response = Some(?(canProxyRobo && framesUntilUnit(Protoss.CyberneticsCore) < Seconds(30)(), RoboProxy, ?(canProxyGate, FourGateProxy, FourGateHome)))
         } else {
           response = Some(NexusFirst)
         }
@@ -118,8 +121,12 @@ class PvPOpeningVsFE extends GameplanImperative {
     }
   }
 
+  var attackTrigger: Boolean = false
   override def executeMain(): Unit = {
-    attack()
+    attackTrigger ||= response.contains(RoboProxy) && haveEverComplete(Protoss.Reaver)
+    attackTrigger ||= response.contains(FourGateProxy) && unitsComplete(Protoss.Dragoon) >= 5
+    attackTrigger ||= response.contains(FourGateHome) && unitsComplete(Protoss.Dragoon) >= 5
+    attack(attackTrigger)
 
     if (PvPIdeas.enemyDarkTemplarLikely && ! response.contains(RoboProxy)) {
       get(Protoss.Forge)

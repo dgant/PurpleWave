@@ -1,10 +1,13 @@
 import argparse
 import contextlib
+import hashlib
 import subprocess
 import shutil
 import sys
 import textwrap
 import os
+import zipfile
+from datetime import datetime
 
 def main():
   parser = argparse.ArgumentParser(description="Compile, stage, and package PurpleWave and its JREs.")
@@ -14,6 +17,7 @@ def main():
   parser.add_argument('--schnail',        action='store_true', default=False, help='Step 3: Compile SCHNAIL launcher')
   parser.add_argument('--stage',          action='store_true', default=False, help='Step 4: Record deployment information, construct EXE via launch4j, then copy bot binaries and deployment information')
   parser.add_argument('--package',        action='store_true', default=False, help='Step 5: Re-zip directories')
+  parser.add_argument('--cog2026',        action='store_true', default=False, help='Build and verify the COG 2026 submission from the current ladder artifact')
   parser.add_argument('--t',              action='store_true', default=False, help='Deploy Terran (PurpleSpirit) to BASIL')
   parser.add_argument('--p',              action='store_true', default=False, help='Deploy Protoss (PurpleSpirit) to BASIL')
   parser.add_argument('--z',              action='store_true', default=False, help='Deploy Zerg (PurpleSpirit) to BASIL')
@@ -50,6 +54,9 @@ def main():
   if args.all or args.package:
     did_anything = True
     package()
+  if args.cog2026:
+    did_anything = True
+    package_cog2026()
   if do_basil:
     copy_basil(args.t, args.p, args.z)
   if args.play:
@@ -251,6 +258,69 @@ def package():
       logf(os.remove,         path_staging(f"{package_name}.zip"))
     logf(shutil.make_archive, path_staging(package_name), 'zip', path_staging(package_name))
     logf(rmtree,              path_staging(package_name))
+
+def sha256_file(path):
+  digest = hashlib.sha256()
+  with open(path, 'rb') as source:
+    for chunk in iter(lambda: source.read(1024 * 1024), b''):
+      digest.update(chunk)
+  return digest.hexdigest()
+
+def verify_cog2026_package(package_path, expected_jar):
+  required_files = {
+    "bwapi.dll",
+    "PurpleWave.dll",
+    "PurpleWave.jar",
+    "PurpleWaveAIIDE.config.json",
+    "revision.txt",
+    "run_proxy.bat",
+    "run32.bat",
+    "run64.bat",
+    "timestamp.txt"}
+  with zipfile.ZipFile(package_path, 'r') as archive:
+    corrupt_file = archive.testzip()
+    if corrupt_file is not None:
+      raise RuntimeError(f"Corrupt file in {package_path}: {corrupt_file}")
+    archived_files = set(archive.namelist())
+    if archived_files != required_files:
+      missing = sorted(required_files - archived_files)
+      unexpected = sorted(archived_files - required_files)
+      raise RuntimeError(f"Unexpected COG 2026 package contents; missing={missing}, unexpected={unexpected}")
+    archived_jar_hash = hashlib.sha256(archive.read("PurpleWave.jar")).hexdigest()
+  expected_jar_hash = sha256_file(expected_jar)
+  if archived_jar_hash != expected_jar_hash:
+    raise RuntimeError(f"Packaged JAR does not match ladder artifact: {archived_jar_hash} != {expected_jar_hash}")
+  log(f"Verified {package_path}: PurpleWave.jar SHA-256 {archived_jar_hash}")
+
+def package_cog2026():
+  log()
+  log("PACKAGING COG 2026")
+  package_name = "PurpleWaveCOG2026"
+  package_dir = path_staging(package_name)
+  package_path = path_staging(f"{package_name}.zip")
+  ladder_jar = pathjoin(dir_jar, "PurpleWave.jar")
+  ladder_revision = pathjoin(dir_jar, "revision.txt")
+  dropbox_package = path_basiluploads(f"{package_name}.zip")
+
+  logf(rmtree, package_dir)
+  logf(os.makedirs, package_dir)
+  logf(shutil.copy2, path_configs("bwapi.dll"), package_dir)
+  open(pathjoin(package_dir, "PurpleWave.dll"), 'w').close()
+  logf(shutil.copy2, ladder_jar, pathjoin(package_dir, "PurpleWave.jar"))
+  logf(shutil.copy2, path_configs("PurpleWaveAIIDE.config.json"), package_dir)
+  logf(shutil.copy2, ladder_revision, package_dir)
+  logf(shutil.copy2, path_configs("run_proxy.bat"), package_dir)
+  logf(shutil.copy2, path_configs("run32.bat"), package_dir)
+  logf(shutil.copy2, path_configs("run64.bat"), package_dir)
+  with open(pathjoin(package_dir, "timestamp.txt"), 'w') as timestamp_file:
+    timestamp_file.write(datetime.now().astimezone().isoformat() + "\n")
+
+  with contextlib.suppress(FileNotFoundError):
+    logf(os.remove, package_path)
+  logf(shutil.make_archive, path_staging(package_name), 'zip', package_dir)
+  verify_cog2026_package(package_path, ladder_jar)
+  logf(shutil.copy2, package_path, dropbox_package)
+  verify_cog2026_package(dropbox_package, ladder_jar)
   
 def copy_basil(t, p, z):
   if t:

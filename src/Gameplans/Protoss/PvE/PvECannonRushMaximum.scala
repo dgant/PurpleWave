@@ -6,13 +6,12 @@ import Placement.Access.PlacementQuery
 import ProxyBwapi.Races.{Protoss, Terran}
 import Strategery.Strategies.Protoss.PvECannonRushMaximum
 import Utilities.?
-import Utilities.Time.Minutes
 import Utilities.UnitFilters.{IsBuilding, IsWarrior}
 
 class PvECannonRushMaximum extends GameplanImperative {
 
   override def activated: Boolean = PvECannonRushMaximum()
-  override def completed: Boolean = With.frame > Minutes(?(canRush, 10, 4))()
+  override def completed: Boolean = bases > 1
 
   var canRush: Boolean = false
 
@@ -70,10 +69,7 @@ class PvECannonRushMaximum extends GameplanImperative {
     get(Protoss.Assimilator)
     get(Protoss.CyberneticsCore)
     get(Protoss.DragoonRange)
-    get(3 * miningBases, Protoss.Gateway, gatewayPlacement)
+    get(3, Protoss.Gateway, gatewayPlacement)
     expandOnce()
-    get(2, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourBases.filter(_.isMain): _*))
-    expandOnce()
-    pumpGasPumps()
   }
 }

@@ -25,14 +25,12 @@ object Opponents {
   // COG 2026
 
   // P
-  add("BananaBrain",     .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 8,  PvPGateCore, PvPDT))
-  add("Stardust",        .55, new StrategySelectionRecommended(StrategySelectionGreedy(), 4,  PvPGateCore, PvPDT))
+  add("BananaBrain",     .65, new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPDT))
+  add("Stardust",        .65, new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPDT))
   add("Venator",         .9,  new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPRobo))
 
   // Z
-  //add("McRave",          .6,   StrategySelectionFixed(PvZ1BaseReactive, PvZTech, PvZSpeedlot), "McRaveZ")
-  //add("McRave",          .7,   StrategySelectionGreedy(), "McRaveZ")
-  add("McRave",           .6,   new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvZ1GateCoreYoloSpeedlot), "McRaveZ")
+  add("McRave",           .65,  new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvZ1GateCoreYoloSpeedlot), "McRaveZ")
   add("Microwave",        .7,   defaultPvZ)
   add("InfestedArtosis",  .8,   defaultPvZ)
   add("WATTBOT",          .8,   defaultPvZ)

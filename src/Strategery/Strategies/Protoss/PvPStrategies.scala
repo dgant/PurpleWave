@@ -34,7 +34,7 @@ object PvP1012 extends PvPStrategy {
 object PvPNexusFirst extends PvPStrategy {
   whitelistVs(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)
   blacklistVs(With.fingerprints.gatewayFirst)
-  setMinimumGamesVsOpponent(3)
+  setMinimumGamesVsOpponent(5)
   addActivationRequirement(() => unitsEver(Protoss.Nexus) >= 2)
 }
 

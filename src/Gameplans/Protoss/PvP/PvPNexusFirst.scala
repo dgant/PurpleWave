@@ -14,7 +14,7 @@ class PvPNexusFirst extends GameplanImperative {
   override def completed: Boolean = {
     _complete ||= have(Protoss.RoboticsFacility)
     _complete ||= units(Protoss.Gateway) >= 5
-      _complete
+    _complete
   }
   private var _complete: Boolean = false
 
@@ -23,7 +23,6 @@ class PvPNexusFirst extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     scoutOn(Protoss.Gateway)
-
     once(8, Protoss.Probe)
     get(Protoss.Pylon)
     once(13, Protoss.Probe)

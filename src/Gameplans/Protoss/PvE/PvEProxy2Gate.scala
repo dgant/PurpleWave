@@ -56,9 +56,9 @@ class PvEProxy2Gate extends GameplanImperative {
       get(Protoss.DragoonRange)
       pump(Protoss.DarkTemplar)
       pump(Protoss.Dragoon)
+      get(3 + unpoweredGateways, Protoss.Gateway)
       get(Protoss.CitadelOfAdun)
       get(Protoss.TemplarArchives)
-      get(3 + unpoweredGateways, Protoss.Gateway)
       pump(Protoss.Zealot)
     } else {
       if (With.enemy.isZerg) {

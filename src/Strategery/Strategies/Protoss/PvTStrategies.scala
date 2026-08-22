@@ -102,6 +102,7 @@ object PvT4Gate extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTArbiter)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
+
   blacklistOn(MapGroups.badForMassGoon: _*)
   whitelistVs(
     With.fingerprints.fourteenCC,

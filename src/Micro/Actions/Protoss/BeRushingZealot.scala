@@ -47,7 +47,7 @@ object BeRushingZealot extends Action {
     val marine      = u.matchups.threats.exists(_.isAny(Terran.Marine, Terran.Vulture))
     val zergling    = u.matchups.threats.exists(Zerg.Zergling)
     val dragoon     = u.matchups.threats.exists(Protoss.Dragoon)
-    val fighting    = u.matchups.threatsInRange.nonEmpty
+    val fighting    = u.matchups.allies.filter(IsWarrior).exists(_.matchups.threatsInRange.nonEmpty)
     val lowAllyHP   = Maff.min(zealot.matchups.allies.filter(Protoss.Zealot).filter(_.matchups.threatsInPixels(8).nonEmpty).map(_.totalHealth.toDouble)).getOrElse(1000.0)
     val assisting   = Maff.clamp(zealot.totalHealth / Math.max(1.0, lowAllyHP), 1.0, 2.0)
     val hysteresis  =
@@ -57,7 +57,7 @@ object BeRushingZealot extends Action {
         ?(zergling,
           ?(fighting, 1.2, 0.8),
         ?(dragoon,
-          ?(fighting, 2.0, 0.7),
+          ?(fighting, 3.0, 0.7),
           ?(fighting, 1.1, 0.9)))),
       1.0)
     val busyness    = ?(u.gathering || u.constructing, 0.5, 1.0)
@@ -111,7 +111,7 @@ object BeRushingZealot extends Action {
               .filter(_.visible)
               .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || zealot.pixelsToGetInRange(t) < 16)
             if (targets.nonEmpty) {
-              val target = targets.minBy(t => t.totalHealth + 2 * zealot.pixelsToGetInRange(t))
+              val target = targets.minBy(t => t.totalHealth + 1.0 * zealot.pixelsToGetInRange(t))
               if (zealot.readyForAttackOrder || ! target.canMove) {
                 attack(zealot, target)
               } else if (target.isAny(Protoss.Zealot, Zerg.Zergling, IsWorker) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {

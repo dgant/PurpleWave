@@ -73,12 +73,8 @@ class PvECannonRushFE extends GameplanImperative {
     once(2, Protoss.Dragoon)
     once(2, Protoss.DarkTemplar)
     get(Protoss.DragoonRange)
-    tryBuildInWall(4, Protoss.PhotonCannon)
-    once(38, Protoss.Probe)
-    pump(Protoss.Dragoon)
-    get(5, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).requireBase(With.geography.ourMain))
-    get(3, Protoss.Pylon,   new PlacementQuery(Protoss.Pylon).requireBase(With.geography.ourMain))
-    pumpGasPumps()
-    get(8, Protoss.Gateway, new PlacementQuery(Protoss.Gateway).requireBase(With.geography.ourMain))
+    pumpWorkers()
+    get(3, Protoss.Gateway)
+
   }
 }

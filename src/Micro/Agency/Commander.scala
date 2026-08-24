@@ -605,8 +605,12 @@ object Commander {
   }
   
   private def sleepReturnCargo(unit:FriendlyUnitInfo): Unit = {
-    // Based on https://github.com/tscmoo/tsc-bwai/blame/master/src/unit_controls.h#L1442
-    sleep(unit, 8)
+    // ReturnMinerals/ReturnGas are processed by Brood War's slow-order loop,
+    // which runs once every nine frames. A retry after eight frames can reset
+    // the order after it selects a depot but before it processes the deposit.
+    // Wait one full processing interval plus one frame while retaining the
+    // pathing and recovery benefits of periodically reissuing the order.
+    sleep(unit, 10)
   }
   
   def sleep(unit: FriendlyUnitInfo, requiredDelay: Int = 2): Unit = {

@@ -80,7 +80,8 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
     _rideGoal = None
     ride.filterNot(_.alive).foreach(_.agent.removePassenger(unit))
     passengers.view.filter(u => ! u.alive || ! u.isOurs || u.unitClass.isBuilding).foreach(removePassenger)
-    unit.loadedUnits.filterNot(_passengers.contains).foreach(addPassenger)
+    val passengersReserved = reservedPassengers
+    unit.loadedUnits.filterNot(passengersReserved.contains).foreach(addPassenger)
 
     toAttack  = unit.intent.toAttack
     toGather  = unit.intent.toGather
@@ -120,7 +121,9 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
   private var _ride       : Option[FriendlyUnitInfo]      = None
   private var _rideGoal   : Option[Pixel]                 = None
 
-  def passengers            : Seq[FriendlyUnitInfo]     = (_passengers ++ unit.loadedUnits).distinct
+  private def reservedPassengers: Vector[FriendlyUnitInfo] = _passengers.synchronized(_passengers.toVector)
+
+  def passengers            : Seq[FriendlyUnitInfo]     = (reservedPassengers ++ unit.loadedUnits).distinct
   def passengersPrioritized : Seq[FriendlyUnitInfo]     = passengers.sortBy(p => - p.unitClass.subjectiveValue - p.energy / 250.0 + p.frameDiscovered / 1e6)
   def hailers               : Seq[FriendlyUnitInfo]     = passengers            .filter(p => ! p.loaded && p.agent.wantsPickup)
   def hailersPrioritized    : Seq[FriendlyUnitInfo]     = passengersPrioritized .filter(p => ! p.loaded && p.agent.wantsPickup)
@@ -133,12 +136,16 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
     if (passengerSize + passenger.unitClass.spaceRequired > 8 && ! passenger.transport.contains(unit)) return
     passenger.agent.ride.foreach(_.agent.removePassenger(passenger))
     passenger.agent._ride = Some(unit)
-    _passengers -= passenger
-    _passengers += passenger
+    _passengers.synchronized {
+      _passengers -= passenger
+      _passengers += passenger
+    }
   }
   def removePassenger(passenger: FriendlyUnitInfo): Unit = {
     passenger.agent._ride = passenger.agent._ride.filter(_ != unit)
-    _passengers -= passenger
+    _passengers.synchronized {
+      _passengers -= passenger
+    }
   }
   def removeAllPassengers(): Unit = {
     val all = passengers.toVector

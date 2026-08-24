@@ -214,7 +214,8 @@ trait CombatUnit {
     override def toString: String = f"$damageTotal from $source in ${With.framesUntil(onFrame)} frames ${if(guaranteed) "(Guaranteed)" else if (committed) "(Committed)" else ""}"
   }
   val damageQueue = new mutable.ArrayBuffer[DamageSource]()
-  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean, automaticallyGuaranteed: Boolean, fixedDamage: Option[Int] = None): Unit = {
+  private def damageQueueSnapshot: Vector[DamageSource] = damageQueue.synchronized(damageQueue.toVector)
+  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean, automaticallyGuaranteed: Boolean, fixedDamage: Option[Int] = None): Unit = damageQueue.synchronized {
     val damagePrevious = damageQueue.find(_.source == source)
     val damageNew = DamageSource(
       source      = source,
@@ -248,22 +249,23 @@ trait CombatUnit {
     // At no point have I attempted to figure out bullet duration as a function of target distance
     unitClass.expectedProjectileFrames
   }
-  def removeDamage(source: CombatUnit): Unit = {
+  def removeDamage(source: CombatUnit): Unit = damageQueue.synchronized {
     val toRemove = damageQueue.view.filter(_.source == source).toVector
     damageQueue --= toRemove
   }
-  def clearDamage(): Unit = {
+  def clearDamage(): Unit = damageQueue.synchronized {
     damageQueue.clear()
   }
   // Measure whether a unit is doomed, counting only guaranteed sources of damage
   def doomed            : Boolean = doomFrameAbsolute < Forever()
   def doomedInFrames    : Int     = doomFrameAbsolute - With.frame
   def doomFrameAbsolute : Int     = {
+    val queuedDamage = damageQueueSnapshot
     var damageRequired = totalHealth
     var i = 0
     var frame = 0
-    while (damageRequired > 0 && i < damageQueue.size) {
-      val next: DamageSource = damageQueue(i)
+    while (damageRequired > 0 && i < queuedDamage.size) {
+      val next: DamageSource = queuedDamage(i)
       if (next.guaranteed) {
         damageRequired -= next.damageTotal
         frame = next.onFrame
@@ -277,11 +279,12 @@ trait CombatUnit {
   def likelyDoomed            : Boolean = likelyDoomFrameAbsolute < Forever()
   def likelyDoomedInFrames    : Int     = likelyDoomFrameAbsolute - With.frame
   def likelyDoomFrameAbsolute : Int     = {
+    val queuedDamage = damageQueueSnapshot
     var damageRequired = totalHealth
     var i = 0
     var frame = 0
-    while (damageRequired > 0 && i < damageQueue.size) {
-      val next: DamageSource = damageQueue(i)
+    while (damageRequired > 0 && i < queuedDamage.size) {
+      val next: DamageSource = queuedDamage(i)
       damageRequired -= next.damageTotal
       frame = next.onFrame
       if (damageRequired <= 0) return frame

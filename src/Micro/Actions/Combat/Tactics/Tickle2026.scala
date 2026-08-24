@@ -40,7 +40,7 @@ object Tickle2026 extends Action {
           tickler.matchups.threats.filter(Terran.Marine),
           tickler.matchups.threats.filter(Protoss.Dragoon),
           tickler.matchups.threats.filter(Protoss.PhotonCannon),
-          tickler.matchups.threats.filter(Protoss.Zealot).filter(x => tickler.totalHealth > 16),
+          tickler.matchups.threats.filter(Protoss.Zealot).filter(x => tickler.totalHealth > ?(x.presumptiveTarget.contains(tickler), 32, 16)),
           tickler.matchups.threats.filter(Zerg.Zergling).filter(x => tickler.totalHealth > 10)))(_.totalHealth)
     Commander.attack(tickler)
 
@@ -51,7 +51,7 @@ object Tickle2026 extends Action {
 
     if (strength > 0 && tickler.totalHealth > 10) {
       fight(tickler)
-    } else if (tickler.matchups.threatsInPixels(128 - tickler.totalHealth).nonEmpty) {
+    } else if (tickler.tile.enemyRangeGround > 0) {
       flee(tickler)
     }
     arson(tickler)
@@ -79,9 +79,9 @@ object Tickle2026 extends Action {
   def fight(tickler: FriendlyUnitInfo): Unit = {
     val targets = With.units.enemy.filter(t =>
       t.unitClass.attacksGround
-      && t.visible
-      && (t.zone == tickler.zone || tickler.pixelsToGetInRange(t) < 256)
-      && ( ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || tickler.pixelsToGetInRange(t) < 16))
+        && t.visible
+        && (t.zone == tickler.zone || tickler.pixelsToGetInRange(t) < 256)
+        && ( ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || tickler.pixelsToGetInRange(t) < 16))
     val target = Maff.minBy(targets)(t => t.totalHealth + 1.0 * tickler.pixelsToGetInRange(t))
     tickler.agent.toAttack = target
     if (target.isDefined
@@ -102,13 +102,12 @@ object Tickle2026 extends Action {
       .map(b => (b._1, b._2.get.center))
       .toVector
     if (targets.isEmpty) {
-      if (tickler.matchups.threatsInPixels(256 - 128 * tickler.totalHealth / tickler.unitClass.maxTotalHealth).nonEmpty) {
-        flee(tickler)
-      } else {
-        Scout(tickler)
-      }
+      Scout(tickler)
     } else {
-      val target    = targets.minBy(t => t._1.totalHealth - 0.5 * Maff.or0(t._1.unitClass.maxTotalHealth, t._1.complete) - Maff.or0(1000, t._1.isAny(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.PhotonCannon, Zerg.SunkenColony, Zerg.CreepColony, Zerg.SpawningPool)))
+      val target = targets.minBy(t =>
+        t._1.totalHealth
+          - 0.5 * Maff.or0(t._1.unitClass.maxTotalHealth, t._1.complete)
+          - Maff.or0(1000, t._1.isAny(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.PhotonCannon, Zerg.SunkenColony, Zerg.CreepColony, Zerg.SpawningPool)))
       val pixel     = target._2
       val distance  = tickler.pixelDistanceTravelling(pixel)
       if (distance > 80) {

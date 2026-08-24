@@ -1,6 +1,7 @@
 package Gameplans.All
 
 import Lifecycle.With
+import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Strategery.Strategies.AllRaces.WorkerRushContinuousProduction
 import Utilities.?
@@ -24,21 +25,12 @@ class WorkerRush extends GameplanImperative {
       With.blackboard.maxBuilderTravelFrames.set(0)
 
       seenFiveWorkers ||= unitsComplete(IsWorker) >= 5
-      timeToAttack ||= With.self.gatheredMinerals >= 300
+      timeToAttack ||= unitsComplete(IsWorker) >= 9
 
       val completeWorkers = unitsEver(u => IsWorker(u) && u.complete)
 
       if (timeToAttack) {
-        val workersToKeep =
-          if (WorkerRushContinuousProduction()) completeWorkers match {
-            case 9  => 0
-            case 10 => 1
-            case 11 => 2
-            case _  => 3
-          }
-          else if (seenFiveWorkers)             1
-          else                                  0
-
+        val workersToKeep = Maff.clamp(completeWorkers - 9, 0, 3)
         With.blackboard.workerRushers.set(unitsComplete(IsWorker) - workersToKeep)
         if (workersToKeep >= 3 && supplyBlocked && minerals >= 150) {
           autosupply()

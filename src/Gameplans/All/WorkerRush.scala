@@ -24,12 +24,18 @@ class WorkerRush extends GameplanImperative {
       With.blackboard.maxBuilderTravelFrames.set(0)
 
       seenFiveWorkers ||= unitsComplete(IsWorker) >= 5
-      timeToAttack ||= foundEnemyBase && unitsComplete(IsWorker) >= 9
+      timeToAttack ||= With.self.gatheredMinerals >= 300
 
+      val completeWorkers = unitsEver(u => IsWorker(u) && u.complete)
 
       if (timeToAttack) {
         val workersToKeep =
-          if (WorkerRushContinuousProduction()) 3
+          if (WorkerRushContinuousProduction()) completeWorkers match {
+            case 9  => 0
+            case 10 => 1
+            case 11 => 2
+            case _  => 3
+          }
           else if (seenFiveWorkers)             1
           else                                  0
 

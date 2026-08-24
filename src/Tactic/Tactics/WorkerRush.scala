@@ -23,7 +23,6 @@ class WorkerRush extends Tactic {
       .setMatcher(IsWorker)
       .setCounter(CountUpTo(attackers))
       .setPreference(PreferClose(With.scouting.enemyHome.center))
-      //.setPreference(unit => 1.0 / (1.0 + PreferClose(With.geography.home.center)(unit)))
       .setInterruptible(false)
       .acquire()
 

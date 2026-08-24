@@ -69,9 +69,10 @@ object Tickle2026 extends Action {
     val fighting    = u.matchups.allies.filter(IsWarrior).exists(_.matchups.threatsInRange.nonEmpty)
     val lowAllyHP   = Maff.min(tickler.matchups.allies.filter(Protoss.Zealot).filter(_.matchups.threatsInPixels(8).nonEmpty).map(_.totalHealth.toDouble)).getOrElse(1000.0)
     val assisting   = Maff.clamp(tickler.totalHealth / Math.max(1.0, lowAllyHP), 1.0, 2.0)
-    val hysteresis  = ?(fighting, 1.2, 0.8)
+    val hysteresis  = ?(fighting, 1.2, 0.7)
     val busyness    = ?(u.gathering || u.constructing, 1.0, 1.0)
-    val output      = sign * proximity * health * hysteresis * busyness * assisting
+    val strength    = ?(Terran.SCV(tickler), 1.35, 1.0)
+    val output      = sign * proximity * health * hysteresis * busyness * assisting * strength
     output
   }
 

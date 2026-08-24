@@ -7,15 +7,16 @@ class Cache[T](getValue: () => T, refreshPeriod: Int = 1) {
   private var lastValue: T = _
   private val defaultValue: T = lastValue
 
-  @inline final def apply(): T = {
-    if (With.frame >= nextUpdateFrame) {
-      nextUpdateFrame = With.frame + refreshPeriod
+  @inline final def apply(): T = synchronized {
+    val frame = With.frame
+    if (frame >= nextUpdateFrame) {
+      nextUpdateFrame = frame + refreshPeriod
       lastValue = getValue()
     }
     lastValue
   }
   
-  @inline final def invalidate(): Unit = {
+  @inline final def invalidate(): Unit = synchronized {
     nextUpdateFrame = With.frame
     lastValue = defaultValue
   }

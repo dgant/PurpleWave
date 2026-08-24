@@ -45,7 +45,8 @@ class Blackboard {
   val toCancel                : Property[Vector[Buildable]] = add(new Property(Vector.empty))
   val basesToHold             : Property[Vector[Base]]      = add(new Property(Vector.empty))
   val cannonRushBase          : Property[Option[Base]]      = add(new Property(None))
-  val cannonRushMaximum       : Property[Boolean]           = add(new Property(false))
+  val cannonRushMaximum: Property[Boolean] = add(new Property(false))
+  val workerRushers           : Property[Int]               = add(new Property[Int](0))
 
   var lastStatus: Seq[String] = Seq.empty
 }

@@ -38,10 +38,10 @@ object MicroPathing {
     pathfindProfile.find
   }
 
-  def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true): TilePath = {
+  def getThreatAwarePath(unit: FriendlyUnitInfo, preferHome: Boolean = true, to: Option[Tile] = None): TilePath = {
     val pathLengthMinimum             = 7
     val pathfindProfile               = new PathfindProfile(unit.tile)
-    pathfindProfile.end               = SomeIf(preferHome, unit.agent.safety.tile)
+    pathfindProfile.end               = to.orElse(SomeIf(preferHome, unit.agent.safety.tile))
     pathfindProfile.lengthMinimum     = Some(pathLengthMinimum)
     pathfindProfile.lengthMaximum     = Some(Maff.clamp((unit.matchups.pixelsEntangled + unit.effectiveRangePixels).toInt / 32, pathLengthMinimum, 15))
     pathfindProfile.threatMaximum     = Some(0)

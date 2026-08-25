@@ -3,7 +3,7 @@ package Tactic.Tactics
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
-import Micro.Actions.Combat.Tactics.Tickle2026
+import Micro.Actions.Combat.Tactics.Tickle
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.UnitCounters.CountUpTo
 import Utilities.UnitFilters.IsWorker
@@ -106,6 +106,6 @@ class WorkerRush extends Tactic {
   private def tickle(unit: FriendlyUnitInfo, target: Pixel): Unit = {
     unit.intend(this)
       .setTerminus(target)
-      .setAction(Tickle2026)
+      .setAction(Tickle)
   }
 }

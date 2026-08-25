@@ -1,25 +1,24 @@
 package Micro.Actions.Combat.Tactics
 
+import Debugging.Visualizations.Forces
 import Information.Geography.Pathfinding.PathfindProfile
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Physics.Force
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Actions.Scouting.Scout
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
+import Micro.Heuristics.Potential
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import Strategery.Strategies.AllRaces.{WorkersKill, WorkersRaze, WorkersSpread, WorkersUnite}
-import Utilities.UnitFilters.{IsBuilding, IsWorker}
+import Utilities.?
+import Utilities.UnitFilters.{IsBuilding, IsWarrior, IsWorker}
 
 object Tickle extends Action {
 
   override def allowed(tickler: FriendlyUnitInfo): Boolean = IsWorker(tickler)
-
-  def workersSpread : Boolean = WorkersSpread.activate()
-  def workersUnite  : Boolean = WorkersUnite.activate()
-  def workersRaze   : Boolean = WorkersRaze.activate()
-  def workersKill   : Boolean = WorkersKill.activate()
 
   override protected def perform(tickler: FriendlyUnitInfo): Unit = {
 
@@ -29,246 +28,153 @@ object Tickle extends Action {
       return
     }
 
-    // Potential improvements:
-    // * Use convex hull to ensure we don't get trapped in the worker line
-    // * Fight when injured if everyone nearby is targeting someone else
-    // * Don't get pulled out of the base
+    tickler.agent.toAttack =
+      Maff.minBy(
+        Maff.orElse(
+          tickler.matchups.threats.filter(Terran.Vulture),
+          tickler.matchups.threats.filter(Terran.Marine),
+          tickler.matchups.threats.filter(Protoss.Dragoon),
+          tickler.matchups.threats.filter(Protoss.PhotonCannon),
+          tickler.matchups.threats.filter(Protoss.Zealot).filter(x => tickler.totalHealth > ?(x.presumptiveTarget.contains(tickler), 32, 16)),
+          tickler.matchups.threats.filter(Zerg.Zergling).filter(x => tickler.totalHealth > 10)))(_.totalHealth)
+    Commander.attack(tickler)
 
-    if (tickler.unready) return
+    val strengthGlobalUs    = With.units.ours   .filter(IsWorker).map(strengthGlobal).sum
+    val strengthGlobalFoe   = With.units.enemy  .filter(IsWorker).map(strengthGlobal).sum
+    val strengthGlobalRatio = strengthGlobalUs / Math.max(1.0, strengthGlobalFoe)
+    val strength            = tickler.matchups.allUnits.filter(_.unitClass.attacksGround).map(u => strengthLocal(tickler, u) * Maff.or1(strengthGlobalRatio, u.isFriendly)).sum
 
-    var attack = true
-
-    val zone                  = tickler.agent.terminus().zone
-    val exit                  = zone.edges.map(_.pixelCenter).sortBy(_.groundPixels(With.geography.home)).headOption.getOrElse(With.geography.home.center)
-    val hurtThreshold         = 30
-    val dyingThreshold        = 6
-    val hurt                  = tickler.totalHealth < hurtThreshold
-    val dying                 = tickler.totalHealth < dyingThreshold
-    val enemies               = tickler.matchups.threats
-    val enemyFighters         = tickler.matchups.threats.filter(isBeingViolent)
-    val enemiesAttackingUs    = enemies.filter(isBeingViolentTo(_, tickler))
-    val allyFighters          = tickler.matchups.allies
-    val strength              = (units: Iterable[UnitInfo]) => units.size * units.map(_.totalHealth).sum
-    val ourStrength           = strength(allyFighters :+ tickler)
-    val enemyStrength         = strength(enemies)
-    val enemyFighterStrength  = strength(enemyFighters)
-
-    // We want to avoid big drilling stacks
-    val centroidSoft = Maff.centroid(enemies.map(_.pixel))
-    val centroidHard = if (enemies.size > 3) Maff.centroid(enemies.sortBy(_.pixelDistanceCenter(centroidSoft)).take(enemies.size / 2).map(_.pixel)) else centroidSoft // Don't centroid an empty list
-
-    // Get in their base!
-    if ( ! tickler.zone.bases.exists(_.owner.isEnemy)
-      && ! enemies.exists(_.pixelDistanceEdge(tickler) < 48.0)
-      && enemiesAttackingUs.isEmpty) {
-      Commander.move(tickler)
-      return
+    if (strength > 0 || tickler.matchups.pixelsToThreatRange.forall(_ > 256)) {
+      //repair(tickler)
+    }
+    if (strength > 0 && tickler.totalHealth > 10) {
+      fight(tickler)
+    } else if (tickler.tile.enemyRangeGround > 0 && (tickler.matchups.threatsInRange.nonEmpty || tickler.matchups.threats.exists(_.orderTarget.contains(tickler)))) {
+      flee(tickler)
     }
 
-    // Don't get surrounded if we're trying to unite
-    if (
-      workersUnite
-      && zone.bases.exists(_.harvestingArea.contains(tickler.tile)
-      && enemies.exists(enemy =>
-        enemy.zone == zone
-        && enemy.pixelDistanceEdge(tickler) < 64.0
-        && enemy.pixelDistanceCenter(exit) < tickler.pixelDistanceCenter(exit)))) {
-      runAway(tickler)
-      return
-    }
-
-    // Try to avoid dying. Let our regeneration work for us.
-    if (dying && ! tickler.is(Terran.SCV)) {
-      attack = false
-    }
-
-    // Don't take losing fights
-    if (enemiesAttackingUs.map(_.totalHealth).sum > tickler.totalHealth) {
-      attack = false
-    }
-
-    // If violent enemies completely overpower us, let's back off
-    if (ourStrength < enemyFighterStrength && hurt) {
-      attack = false
-    }
-
-    // Wait for reinforcements
-    val workersTotal = With.units.countOurs(IsWorker)
-    val workersHere  = With.units.countOursP(u => u.unitClass.isWorker && u.zone == zone)
-    if (workersHere * 2 < workersTotal // Tomorrow, there'll be more of us.
-      && enemies.size > 4) {           // Versus 4-Pool we need to start dealing damage immediately
-      attack = false
-    }
-
-    // Stay close to the fight
-    if (tickler.matchups.threats.forall(_.pixelDistanceEdge(tickler) > 64)) {
-      attack = true
-    }
-
-    // Heal up before going back in
-    if (dying && tickler.matchups.threats.exists(_.pixelDistanceEdge(tickler) < 128)) {
-      attack = false
-    }
-
-    // If we completely overpower the enemy, let's go kill 'em.
-    val weOverpower = ourStrength > enemyStrength
-    if (weOverpower) {
-      attack = true
-    }
-
-    // Lastly, if they've started training combat units, we are ALL IN
-    if ( ! enemies.forall(IsWorker)) {
-      attack = true
-    }
-
-    if (attack) {
-      // No static defense allowed!
-      val staticDefense = tickler.matchups.targets.filter(u => u.unitClass.isBuilding && u.unitClass.rawCanAttack)
-      if (staticDefense.nonEmpty) {
-        tickler.agent.toAttack = staticDefense
-          .sortBy(_.remainingCompletionFrames)
-          .sortBy(_.totalHealth)
-          .headOption
-        Commander.attack(tickler)
-      }
-
-      val targets = tickler.matchups.targets.filter(target =>
-        // Ignore units outside their bases
-        (
-          target.zone == zone
-          // ...unless they're fighting us! Or building a building.
-          || target.constructing
-          || tickler.inRangeToAttack(target)
-          || (
-          isBeingViolent(target) &&
-            target.pixelDistanceTravelling(zone.centroid) <= tickler.pixelDistanceTravelling(zone.centroid)
-          )
-        )
-        // Kill combat units first unless we're trying to raze buildings
-        && (target.canAttack || workersRaze)
-        // Don't get distracted by workers leaving the base (eg. scouts)
-        && (
-          target.targetPixel.forall(_.zone == zone)
-          || tickler.inRangeToAttack(target)
-          || isBeingViolent(target)
-          || tickler.constructing
-        ))
-      if (targets.isEmpty) {
-        destroyBuildings(tickler)
-        return
-      }
-
-      // Let's pick the outermost target while avoiding drilling stacks
-      val nearestTargetDistance = targets.map(_.pixelDistanceCenter(exit)).min
-      val validTargets = targets.filter(_.pixelDistanceCenter(exit) - 16.0 <= nearestTargetDistance)
-      val razing = workersRaze
-      val bestTarget =
-        validTargets
-          // Prefer vulnerable workers
-          .sortBy(target => target.totalHealth * target.pixelDistanceEdge(tickler))
-          // If razing: Prefer the weakest building
-          .sortBy(target => if (razing && target.unitClass.isBuilding) razeCost(tickler, target) else 0)
-          // But definitely prefer enemy combat units in range to attack us
-          .sortBy(target => !(target.canAttack(tickler) && target.inRangeToAttack(tickler)))
-          .headOption
-          .getOrElse(targets.minBy(_.pixelDistanceCenter(exit)))
-
-      if (tickler.readyForAttackOrder
-        || (bestTarget.canAttack(tickler) && bestTarget.pixelRangeAgainst(tickler) > tickler.pixelRangeAgainst(bestTarget))
-        || tickler.matchups.threats.forall(t => t.constructing || t.framesToGetInRange(tickler) > 48)
-        || tickler.cooldownLeft - With.latency.remainingFrames <= targets.map(target => tickler.framesToTravelPixels(tickler.pixelDistanceEdge(target))).min) {
-        tickler.agent.toAttack = Some(bestTarget)
-        Commander.attack(tickler)
-        return
-      }
-
-      // SCVs shouldn't kite
-      if (tickler.is(Terran.SCV)) {
-        return
-      }
-    }
-
-    // We're not attacking, so let's hang out and wait for opportunities
-    if (enemiesAttackingUs.nonEmpty || enemies.exists(e => e.canAttack(tickler) && ! e.constructing && ! e.gathering && e.pixelDistanceEdge(tickler) < 64.0)) {
-      if ( ! weOverpower) {
-        runAway(tickler)
-      }
-    }
-    else {
-      val freebies = enemies.find(freebie =>
-        (freebie.unitClass.isBuilding || freebie.constructing)
-        && freebie.armorHealth < 5
-        && enemies.forall(defender =>
-          defender != freebie
-          && tickler.pixelDistanceEdge(defender) >
-          tickler.pixelDistanceEdge(freebie)))
-      tickler.agent.toAttack = freebies
-      Commander.attack(tickler)
-      Retreat.delegate(tickler)
-    }
-  }
-
-  private def razeCost(tickler: FriendlyUnitInfo, target: UnitInfo): Double = {
-    val importance =
-      if (target.isAny(Protoss.PhotonCannon, Zerg.SpawningPool))
-        500.0
-      else if (target.isAny(Terran.Barracks, Protoss.Gateway, Zerg.CreepColony))
-        50.0
-      else if (target.isAny(Terran.Factory, Terran.Bunker, Protoss.ShieldBattery, Protoss.Pylon))
-        5.0
-      else
-        1.0
-    val health = if (target.complete) target.totalHealth else target.unitClass.maxTotalHealth
-    health / importance
-  }
-
-  private def isBeingViolent(unit: UnitInfo): Boolean = {
-    unit.unitClass.isStaticDefense ||
-    unit.cooldownLeft > 0          ||
-    unit.orderTarget.exists(unit.isEnemyOf)
-  }
-
-  private def isBeingViolentTo(unit: UnitInfo, victim: UnitInfo): Boolean = {
-    isBeingViolent(unit) &&
-    unit.isEnemyOf(victim) &&
-    unit.canAttack(victim) &&
-    unit.target.forall(victim==) &&
-    unit.framesToGetInRange(victim) < 48
-  }
-
-  private def runAway(tickler: FriendlyUnitInfo): Unit = {
-
-    if (workersSpread) {
-      // Pathfind away
-      val pathLengthMinimum = 7
-      val maximumDistance = 10
-      val profile = new PathfindProfile(tickler.tile)
-      profile.end = None
-      profile.lengthMinimum = Some(pathLengthMinimum)
-      profile.lengthMaximum = Some(maximumDistance)
-      profile.threatMaximum = Some(0)
-      profile.employGroundDist = true
-      profile.costOccupancy = 1
-      profile.costRepulsion = 8
-      profile.repulsors = MicroPathing.getPathfindingRepulsors(tickler)
-      profile.unit = Some(tickler)
-      val path = profile.find
-      MicroPathing.tryMovingAlongTilePath(tickler, path)
-    }
-
-    // Mineral walk
-    tickler.agent.toGather = With.geography.ourBases.flatMap(_.minerals).headOption
-    tickler.agent.decision.set(tickler.agent.safety)
-    Commander.gather(tickler)
+    arson(tickler)
     Commander.move(tickler)
   }
 
-  private def destroyBuildings(unit: FriendlyUnitInfo): Unit = {
-    // Vs. 4-pool they will often be left with just an egg or two.
-    // We need to surround it and do as much damage to it as possible
-    val egg = With.units.enemy.view.filter(Zerg.Egg).toVector.sortBy(_.totalHealth).headOption
-    lazy val nonEgg = With.units.enemy.view.filter(IsBuilding).toVector.sortBy(_.totalHealth).headOption
-    unit.agent.toAttack = egg.orElse(nonEgg)
-    Commander.attack(unit)
+  private def strengthGlobal(unit: UnitInfo): Double = {
+    unit.totalHealth
+  }
+
+  private def strengthLocal(tickler: FriendlyUnitInfo, u: UnitInfo): Double = {
+    val sign        = ?(u.isFriendly, 1, ?(u.isEnemy, -1, 0))
+    val proximity   = Math.max(0, 1 - Math.max(0, u.pixelsToGetInRange(tickler) - tickler.matchups.pixelsToTargetRange.getOrElse(0d)) / 320.0)
+    val health      = u.totalHealth / u.unitClass.maxTotalHealth.toDouble
+    val fighting    = u.matchups.allies.filter(IsWarrior).exists(_.matchups.threatsInRange.nonEmpty)
+    val lowAllyHP   = Maff.min(tickler.matchups.allies.filter(Protoss.Zealot).filter(_.matchups.threatsInPixels(8).nonEmpty).map(_.totalHealth.toDouble)).getOrElse(1000.0)
+    val assisting   = Maff.clamp(tickler.totalHealth / Math.max(1.0, lowAllyHP), 1.0, 2.0)
+    val hysteresis  = ?(fighting, 1.1, 0.9)
+    val busyness    = ?(u.gathering || u.constructing, 1.0, 1.0)
+    val strength    = ?(Terran.SCV(tickler), 1.35, 1.0)
+    val output      = sign * proximity * health * hysteresis * busyness * assisting * strength
+    output
+  }
+
+  def fight(tickler: FriendlyUnitInfo): Unit = {
+    val targets = With.units.enemy.filter(t =>
+      t.unitClass.attacksGround
+        && t.visible
+        && (t.zone == tickler.zone || tickler.pixelsToGetInRange(t) < 320)
+        && ( ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || tickler.pixelsToGetInRange(t) < 16) || t.orderTarget.exists(_.isOurs))
+    val target = Maff.minBy(targets)(t => t.totalHealth + 1.0 * tickler.pixelsToGetInRange(t))
+    tickler.agent.toAttack = target
+    if (target.isDefined
+      && ! Terran.SCV(tickler)
+      && target.exists(Terran.SCV)
+      && ! tickler.readyForAttackOrder
+      && tickler.framesToConnectDamage(target.get) > tickler.framesToBeReadyForAttackOrder) {
+      flee(tickler)
+    }
+    Commander.attack(tickler)
+  }
+
+  def arson(tickler: FriendlyUnitInfo): Unit = {
+    val targets = With.units.enemy
+      .filter(IsBuilding)
+      .map(b => (b, Maff.minBy(b.tileArea.tilesSurrounding.filter(t => t.walkable && t.enemyRangeGround <= 0))(tickler.pixelDistanceSquared)))
+      .filter(_._2.isDefined)
+      .map(b => (b._1, b._2.get.center))
+      .toVector
+    if (targets.isEmpty) {
+      Scout(tickler)
+    } else {
+      val target = targets.minBy(t =>
+        t._1.totalHealth
+          - 0.5 * Maff.or0(t._1.unitClass.maxTotalHealth, t._1.complete)
+          - Maff.or0(1000, t._1.isAny(Terran.Barracks, Terran.Factory, Protoss.Gateway, Protoss.PhotonCannon, Zerg.SunkenColony, Zerg.CreepColony, Zerg.SpawningPool)))
+      val pixel     = target._2
+      val distance  = tickler.pixelDistanceTravelling(pixel)
+      if (distance > 80) {
+        tickler.agent.decision.set(pixel)
+        val pathLengthMinimum             = 7
+        val pathfindProfile               = new PathfindProfile(tickler.tile)
+        pathfindProfile.end               = Some(pixel.tile)
+        pathfindProfile.lengthMaximum     = Some(30)
+        pathfindProfile.threatMaximum     = Some(0)
+        pathfindProfile.employGroundDist  = true
+        pathfindProfile.costOccupancy     = 1
+        pathfindProfile.costRepulsion     = 1
+        pathfindProfile.costThreat        = 6
+        pathfindProfile.repulsors         = MicroPathing.getPathfindingRepulsors(tickler)
+        pathfindProfile.unit              = Some(tickler)
+        val path                          = pathfindProfile.find
+        MicroPathing.tryMovingAlongTilePath(tickler, path)
+        Commander.move(tickler)
+      } else {
+        tickler.agent.toAttack = Some(target._1)
+        Commander.attack(tickler)
+      }
+    }
+  }
+
+  def flee(tickler: FriendlyUnitInfo): Unit = {
+    tickler.agent.home.set(tickler.agent.destinationFinal.pixel)
+    Retreat(tickler)
+    val mineral = With.geography.ourMain.minerals.headOption.getOrElse(With.units.ours.filter(IsBuilding).head)
+    val away    = Potential.softAvoidThreatRange(tickler)
+    val out     = MicroPathing.getGroundWaypointToPixel(tickler.pixel, mineral.pixel)
+    val awayN   = away.normalize
+    val outN    = new Force(out.subtract(tickler.pixel)).normalize
+    if (awayN.dot(outN) > 0.7) {
+      Commander.rightClick(tickler, mineral)
+    } else {
+      tickler.agent.forces.put(Forces.threat, away)
+      tickler.agent.forces.put(Forces.travel, Potential.towards(tickler, tickler.agent.destinationFinal.pixel.get.zone.centroid.center))
+      tickler.agent.forces.put(Forces.spacing, Potential.preferSpacing(tickler))
+      MicroPathing.moveForcefully(tickler)
+    }
+  }
+
+  def repair(tickler: FriendlyUnitInfo): Unit = {
+    if (Terran.SCV(tickler)) {
+      val medics = tickler.matchups.allies.filter(_.orderTarget.contains(tickler))
+      if (medics.nonEmpty) {
+        val repairables = tickler.matchups.allies.filter(a => Terran.SCV(a) && a.totalHealth < 60 && tickler.inRangeToAttack(a))
+        val mostInjured = Maff.minBy(repairables)(_.totalHealth)
+        val attacker    = tickler.matchups.allies.exists(_.friendly.exists(_.agent.toAttack.isDefined))
+        if (attacker && mostInjured.exists(_.totalHealth < 35)) {
+          Commander.rightClick(tickler, mostInjured.get)
+        } else if (tickler.matchups.targetsInRange.nonEmpty) {
+          tickler.agent.toAttack = Maff.minBy(tickler.matchups.targetsInRange)(_.totalHealth)
+          Commander.attack(tickler)
+        } else {
+          val medic = medics.minBy(_.totalHealth)
+          if (medic.totalHealth < 60) {
+            Commander.rightClick(tickler, medics.minBy(_.totalHealth))
+          } else {
+            Commander.stop(tickler)
+          }
+        }
+      } else if (With.self.minerals > 10) {
+        val repairables = tickler.matchups.allies.filter(a => Terran.SCV(a) && a.totalHealth < 32 && (tickler.pixelsToGetInRange(a) < 12 || tickler.matchups.pixelsToThreatRange.forall(p => a.matchups.pixelsToThreatRange.forall(_ < p))) && a.totalHealth <= tickler.totalHealth)
+        val repairable = Maff.minBy(repairables)(_.pixelDistanceEdge(tickler))
+        repairable.foreach(Commander.rightClick(tickler, _))
+      }
+    }
   }
 }

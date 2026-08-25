@@ -1,7 +1,6 @@
 package Gameplans.All
 
 import Lifecycle.With
-import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.?
 import Utilities.UnitFilters.{IsFlyingBuilding, IsWorker}
@@ -24,17 +23,18 @@ class WorkerRush extends GameplanImperative {
       With.blackboard.maxBuilderTravelFrames.set(0)
 
       seenFiveWorkers ||= unitsComplete(IsWorker) >= 5
-      timeToAttack ||= unitsComplete(IsWorker) >= 9
+      timeToAttack ||= units(IsWorker) + minerals / 50 >= ?(With.self.isTerran, 10, 9)
 
       val completeWorkers = unitsEver(u => IsWorker(u) && u.complete)
 
       if (timeToAttack) {
-        val workersToKeep = Maff.clamp(completeWorkers - 9, 0, 3)
-        With.blackboard.workerRushers.set(unitsComplete(IsWorker) - workersToKeep)
-        if (workersToKeep >= 3 && supplyBlocked && minerals >= 150) {
-          autosupply()
-        }
-      } else {
+        //val workersToKeep = Maff.clamp(completeWorkers - 9, 0, 3)
+        With.blackboard.workerRushers.set(unitsComplete(IsWorker))
+        //With.blackboard.workerRushers.set(unitsComplete(IsWorker) - workersToKeep)
+        //if (workersToKeep >= 3 && supplyBlocked && minerals >= 150) {
+        //  autosupply()
+        //}
+      } else if (With.geography.startLocations.length > 2) {
         scoutAt(6, scouts = ?(With.geography.startLocations.length > 3, 2, 1))
       }
       pump(With.self.workerClass)

@@ -51,11 +51,11 @@ object Tickle2026 extends Action {
     val strength            = tickler.matchups.allUnits.filter(_.unitClass.attacksGround).map(u => strengthLocal(tickler, u) * Maff.or1(strengthGlobalRatio, u.isFriendly)).sum
 
     if (strength > 0 || tickler.matchups.pixelsToThreatRange.forall(_ > 256)) {
-      repair(tickler)
+      //repair(tickler)
     }
     if (strength > 0 && tickler.totalHealth > 10) {
       fight(tickler)
-    } else if (tickler.tile.enemyRangeGround > 0) {
+    } else if (tickler.tile.enemyRangeGround > 0 && (tickler.matchups.threatsInRange.nonEmpty || tickler.matchups.threats.exists(_.orderTarget.contains(tickler)))) {
       flee(tickler)
     }
 

@@ -3,7 +3,6 @@ package Gameplans.All
 import Lifecycle.With
 import Mathematics.Maff
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
-import Strategery.Strategies.AllRaces.WorkerRushContinuousProduction
 import Utilities.?
 import Utilities.UnitFilters.{IsFlyingBuilding, IsWorker}
 
@@ -15,7 +14,7 @@ class WorkerRush extends GameplanImperative {
   doAutosupply = false
 
   override def executeBuild(): Unit = {
-    rushEnded ||= enemies(IsWorker) <= 1 && enemiesHaveComplete(Protoss.PhotonCannon, Zerg.SunkenColony)
+    rushEnded ||= enemiesHaveComplete(Protoss.PhotonCannon, Zerg.SunkenColony)
     rushEnded ||= With.units.enemy.count(IsFlyingBuilding) > 0 && With.units.enemy.count( ! IsFlyingBuilding(_)) == 0
     doAutosupply = rushEnded
     doBasics     = rushEnded
@@ -36,7 +35,7 @@ class WorkerRush extends GameplanImperative {
           autosupply()
         }
       } else {
-        scoutAt(?(With.geography.startLocations.length > 3, 5, 6))
+        scoutAt(6, scouts = ?(With.geography.startLocations.length > 3, 2, 1))
       }
       pump(With.self.workerClass)
     }

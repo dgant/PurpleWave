@@ -6,6 +6,7 @@ import Gameplans.Zerg.ZvT.{ZvT13PoolMuta, ZvT3HatchCrazy, ZvTEffortBust, ZvTOneB
 import Gameplans.Zerg.ZvZ.{ZvZ10Hatch, ZvZ9Pool}
 import Lifecycle.With
 import Planning.Plans.Plan
+import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -14,17 +15,17 @@ abstract class ZvTStrategy extends ZvEStrategy  { setEnemyRace(Race.Terran)   }
 abstract class ZvPStrategy extends ZvEStrategy  { setEnemyRace(Race.Protoss)  }
 abstract class ZvZStrategy extends ZvEStrategy  { setEnemyRace(Race.Zerg)     }
 
-object ZvE4Pool           extends ZvEStrategy { override def gameplan: Option[Plan] = Some(new ZvE4Pool)        ; blacklistVs(With.fingerprints.bbs, With.fingerprints.twoGate99, With.fingerprints.ninePool, With.fingerprints.overpool) }
-object ZvTEffortBust      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTEffortBust)     }
-object ZvTOneHatchLurker  extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTOneBaseLurker)  }
-object ZvT13PoolMuta      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT13PoolMuta)   ; blacklistVs(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)  }
-object ZvT3HatchCrazy     extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT3HatchCrazy)    }
-object ZvPCrackling       extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPCrackling)      }
-object ZvPHydraLurker     extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPHydraLurker)    }
-object ZvP10HatchSpeed    extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvP10HatchSpeed)   }
-object ZvP11Hatch         extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvP11Hatch)        }
-object ZvZ10Hatch         extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ10Hatch)      ; blacklistVs(With.fingerprints.fourPool)  }
-object ZvZ9Pool           extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ9Pool)          }
+object ZvE4Pool           extends ZvEStrategy { override def gameplan: Option[Plan] = Some(new ZvE4Pool)        ;                                   blacklistVs(With.fingerprints.bbs, With.fingerprints.twoGate99, With.fingerprints.ninePool, With.fingerprints.overpool) }
+object ZvTEffortBust      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTEffortBust)   }
+object ZvTOneHatchLurker  extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvTOneBaseLurker)}
+object ZvT13PoolMuta      extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT13PoolMuta)   ;                                   blacklistVs(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad)  }
+object ZvT3HatchCrazy     extends ZvTStrategy { override def gameplan: Option[Plan] = Some(new ZvT3HatchCrazy)  ; banPersonality(PersonalityCheese) }
+object ZvPCrackling       extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPCrackling)    ; banPersonality(PersonalityCheese) }
+object ZvPHydraLurker     extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvPHydraLurker)  ; banPersonality(PersonalityCheese) }
+object ZvP10HatchSpeed    extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvP10HatchSpeed) }
+object ZvP11Hatch         extends ZvPStrategy { override def gameplan: Option[Plan] = Some(new ZvP11Hatch)      ; banPersonality(PersonalityCheese) }
+object ZvZ10Hatch         extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ10Hatch)      ;                                   blacklistVs(With.fingerprints.fourPool)  }
+object ZvZ9Pool           extends ZvZStrategy { override def gameplan: Option[Plan] = Some(new ZvZ9Pool)        }
 
 object ZergChoices {
 

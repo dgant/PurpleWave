@@ -3,6 +3,7 @@ package Strategery.Strategies.Protoss
 import Lifecycle.With
 import Macro.Facts.MacroFacts
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
 import Strategery._
 import bwapi.Race
@@ -43,6 +44,7 @@ object PvP3Zealot extends PvPStrategy {
   whitelistVs(With.fingerprints.coreBeforeZ)
   // This blacklist essentially bans it, at time of writing
   blacklistVs(With.fingerprints.twoGate)
+  banPersonality(PersonalityCheese)
 }
 object PvP5Zealot extends PvPStrategy
 
@@ -54,6 +56,7 @@ object PvPRobo extends PvPStrategy {
   addChoice(PvPObs, PvPReaver)
   // No restrictions; Preserve this as our "Always valid" choice
   addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
+  banPersonality(PersonalityCheese)
 }
 object PvPReaver extends PvPStrategy {
   addActivationRequirement(() => haveEver(Protoss.Reaver))
@@ -74,12 +77,14 @@ object PvPCoreExpand extends PvPStrategy {
     ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
   addActivationRequirement(() => unitsEver(Protoss.Nexus) >= 2)
+  banPersonality(PersonalityCheese)
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 3)
+  banPersonality(PersonalityCheese)
 }
 object PvP4GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)

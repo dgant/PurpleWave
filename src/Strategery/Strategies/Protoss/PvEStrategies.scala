@@ -23,6 +23,7 @@ object PvEProxy2Gate extends PvEStrategy {
 }
 
 object PvECannonRushFE extends PvEStrategy {
+  setEnemyRace(Race.Terran, Race.Protoss, Race.Unknown)
   addSelectionRequirement(() => With.geography.mains.filterNot(_.isOurs).forall(b => With.placement.get(PlaceLabels.CannonRush).exists(_.tile.base.contains(b))))
   addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)

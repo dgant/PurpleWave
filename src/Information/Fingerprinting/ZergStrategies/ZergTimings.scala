@@ -15,7 +15,7 @@ object ZergTimings {
 
   object FourPool_PoolCompleteBy                  extends GameTime(1, 32)
   object SevenPool_PoolCompleteBy                 extends GameTime(1, 42) // Estimated from one Crona replay
-  object NinePool_PoolCompleteBy                  extends GameTime(1, 58)
+  object NinePool_PoolCompleteBy                  extends GameTime(1, 55) // Observed: Microwave frame 2756; Crona frame 2758
   object NinePool9Gas_GasCompleteBy               extends GameTime(1, 43)
   object NinePool9Hatch_HatchCompleteBy           extends GameTime(3, 7) // Hatch before Overlord. I think it's an awful build but bots have done it
   object NinePool10Hatch_HatchCompleteBy          extends GameTime(3, 18)

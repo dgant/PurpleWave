@@ -1,8 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.PvQQ
-import Lifecycle.With
-import Planning.Plans.Plan
+import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -35,15 +33,11 @@ object PvRFFE extends PvRStrategy {
   addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_FFE: _*)
   addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_FFE: _*)
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_FFE: _*)
+  banPersonality(PersonalityCheese)
 }
 object PvRGFE extends PvRStrategy {
   addChoiceVs(Race.Terran)(ProtossChoices.vsTerran_From_GFE: _*)
   addChoiceVs(Race.Protoss)(ProtossChoices.vsProtoss_From_GFE: _*)
   addChoiceVs(Race.Zerg)(ProtossChoices.vsZerg_From_GFE: _*)
-}
-
-object PvQQ extends PvEStrategy {
-  addSelectionRequirement(() => With.enemies.exists(_.name == "Pluto"))
-
-  override def gameplan: Option[Plan] = Some(new PvQQ)
+  banPersonality(PersonalityCheese)
 }

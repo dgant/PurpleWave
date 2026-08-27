@@ -2,6 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
+import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
 import bwapi.Race
 
@@ -11,12 +12,16 @@ abstract class PvZStrategy extends Strategy {
 }
 
 object PvZ2Gate4Gate extends PvZStrategy
-object PvZ1GateCoreExpand extends PvZStrategy
 object PvZ1GateCoreYoloSpeedlot extends PvZStrategy
 object PvZ1GateCoreYoloDragoon extends PvZStrategy
+object PvZ1GateCoreExpand extends PvZStrategy {
+  banPersonality(PersonalityCheese)
+}
+
 object PvZ1BaseReactive extends PvZStrategy {
   addChoice(PvZGoon,    PvZReaver,  PvZSpeedlot)
   addChoice(PvZMuscle,  PvZExpand,  PvZTech)
+  banPersonality(PersonalityCheese)
 }
 object PvZMuscle extends PvZStrategy {
   addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 2)
@@ -41,9 +46,13 @@ abstract class PvZFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)
   addSelectionRequirement(() => With.placement.wall.exists(_.buildings.count(_._2 == Protoss.PhotonCannon) >= 6))
 }
-object PvZFFE extends PvZFEOpening
+
+object PvZFFE extends PvZFEOpening {
+  banPersonality(PersonalityCheese)
+}
 object PvZGFE extends PvZFEOpening {
   setMinimumGamesVsOpponent(2)
+  banPersonality(PersonalityCheese)
   whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
   blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)
 }

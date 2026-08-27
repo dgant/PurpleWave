@@ -10,5 +10,4 @@ class ProtossVsZerg extends ModalGameplan(
   new PvZ1GateCoreYoloDragoon,
   new PvZFE,
   new PvZ1BaseReactive,
-  new PvZ2022,
 )

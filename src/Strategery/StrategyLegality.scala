@@ -26,7 +26,7 @@ class StrategyLegality(strategy: Strategy) {
   val disabledOnMap           : Boolean   = strategy.mapsBlacklisted.exists(_()) || (strategy.mapsWhitelisted.nonEmpty && ! strategy.mapsWhitelisted.exists(_()))
   val appropriateForOurRace   : Boolean   = strategy.ourRaces.exists(ourRace==)
   val appropriateForEnemyRace : Boolean   = strategy.enemyRaces.exists(race => if (race == Race.Unknown) enemyRaceWasUnknown else (enemyRaceStillUnknown || enemyRacesCurrent.contains(race)))
-  val allowedGivenHumanity    : Boolean   = strategy.allowedVsHuman || ! With.configuration.humanMode
+  val allowedGivenPersonality : Boolean   = (strategy.personalitiesRequired.isEmpty || strategy.personalitiesRequired.exists(_.matches)) && ! strategy.personalitiesBanned.exists(_.matches)
   val allowedGivenHistory     : Boolean   = allowedGivenOpponentHistory(strategy)
   val allowedGivenRequirements: Boolean   = strategy.selectionRequirements.forall(_())
 
@@ -39,6 +39,7 @@ class StrategyLegality(strategy: Strategy) {
     &&  appropriateForOurRace
     &&  appropriateForEnemyRace
     &&  allowedGivenRequirements
+    &&  allowedGivenPersonality
     &&  ( ! With.configuration.playbook.respectMap      || ! disabledOnMap)
     &&  ( ! With.configuration.playbook.respectMap      || strategy.startLocationsMin <= startLocations)
     &&  ( ! With.configuration.playbook.respectMap      || strategy.startLocationsMax >= startLocations)

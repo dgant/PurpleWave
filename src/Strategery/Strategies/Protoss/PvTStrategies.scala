@@ -4,6 +4,7 @@ import Lifecycle.With
 import Macro.Facts.MacroFacts
 import ProxyBwapi.Races.Protoss
 import Strategery.MapGroups
+import Strategery.Strategies.Personalities.{PersonalityBase, PersonalityCheese}
 import Strategery.Strategies.Strategy
 import Utilities.Time.Minutes
 import bwapi.Race
@@ -38,18 +39,22 @@ object PvT13Nexus extends PvTStrategyNoZealotNoRange {
 }
 object PvTRangeless     extends PvTStrategyNoZealotNoRange {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
+  banPersonality(PersonalityCheese)
 }
 object PvT28Nexus       extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
+  banPersonality(PersonalityCheese)
 }
 object PvTZealotExpand  extends PvTStrategy {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
+  banPersonality(PersonalityCheese)
 }
 object PvTZZCoreZ       extends PvTStrategy {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
   addSelectionRequirement(() =>
     ! MacroFacts.enemyRecentStrategy(With.fingerprints.wallIn)
     || MacroFacts.enemyRecentStrategy(With.fingerprints.bbs))
+  banPersonality(PersonalityCheese)
 }
 object PvT910 extends PvTStrategy {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
@@ -97,12 +102,12 @@ object PvTDT extends PvTStrategyNoZealot {
 object PvT29Arbiter extends PvTStrategyNoZealot {
   addChoice(PvTArbiter)
   addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
+  banPersonality(PersonalityBase)
 }
 object PvT4Gate extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTArbiter)
   setRushTilesMaximum(200)
   setEntranceRamped(false)
-
   blacklistOn(MapGroups.badForMassGoon: _*)
   whitelistVs(
     With.fingerprints.fourteenCC,

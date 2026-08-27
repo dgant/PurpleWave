@@ -11,7 +11,6 @@ object ProtossChoices {
   )
   
   lazy val pvr = Vector(
-    PvQQ,
     PvR2Gate4Gate,
     PvRDT,
     PvRFFE,

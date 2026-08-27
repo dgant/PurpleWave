@@ -10,9 +10,11 @@ import Utilities.UnitFilters.{IsWarrior, IsWorker}
 
 class PvTDoubleRobo extends PvTOpeners {
 
-  override def activated: Boolean = PvTDoubleRobo()
+  // Don't set an activation requirement because
+  // this is our PvT late game fallback build in case of strategy snafu.
 
   override def executeMain(): Unit = {
+    PvTDoubleRobo.activate()
     val armyNormalPriority = new DoQueue(PvTArmy.normalPriority)
     val gasIfNeeded = new DoQueue(() => pumpGasPumps(miningBases - gas / 400))
 

@@ -22,7 +22,6 @@ abstract class Strategy extends MacroCounting {
   private var _entranceInverted       : Boolean             = true
   private var _ffa                    : Boolean             = false
   private var _moneyMap               : Boolean             = false
-  private var _allowedVsHuman         : Boolean             = true
   private var _rushTilesMinimum       : Int                 = - LightYear()
   private var _rushTilesMaximum       : Int                 =   LightYear()
   private var _startLocationsMin      : Int                 = 2
@@ -31,6 +30,8 @@ abstract class Strategy extends MacroCounting {
   private var _workerDelta            : Int                 = 0
   private var _ourRaces               : Seq[Race]           = Seq(Race.Terran, Race.Protoss, Race.Zerg)
   private var _enemyRaces             : Seq[Race]           = Seq(Race.Terran, Race.Protoss, Race.Zerg, Race.Unknown)
+  private var _personalityRequired    : Seq[Personality]    = Seq.empty
+  private var _personalityBanned      : Seq[Personality]    = Seq.empty
   private var _mapsBlacklisted        : Seq[StarCraftMap]   = Seq.empty
   private var _mapsWhitelisted        : Seq[StarCraftMap]   = Seq.empty
   private var _responsesBlacklisted   : Seq[Fingerprint]    = Seq.empty
@@ -47,7 +48,6 @@ abstract class Strategy extends MacroCounting {
   def entranceInverted        : Boolean             = _entranceInverted
   def ffa                     : Boolean             = _ffa
   def moneyMap                : Boolean             = _moneyMap
-  def allowedVsHuman          : Boolean             = _allowedVsHuman
   def rushTilesMinimum        : Int                 = _rushTilesMinimum
   def rushTilesMaximum        : Int                 = _rushTilesMaximum
   def startLocationsMin       : Int                 = _startLocationsMin
@@ -56,6 +56,8 @@ abstract class Strategy extends MacroCounting {
   def workerDelta             : Int                 = _workerDelta
   def ourRaces                : Seq[Race]           = _ourRaces
   def enemyRaces              : Seq[Race]           = _enemyRaces
+  def personalitiesRequired   : Seq[Personality]    = _personalityRequired
+  def personalitiesBanned     : Seq[Personality]    = _personalityBanned
   def mapsBlacklisted         : Seq[StarCraftMap]   = _mapsBlacklisted
   def mapsWhitelisted         : Seq[StarCraftMap]   = _mapsWhitelisted
   def responsesBlacklisted    : Seq[Fingerprint]    = _responsesBlacklisted
@@ -68,30 +70,31 @@ abstract class Strategy extends MacroCounting {
   // 2022 style of implementing strategies: Mutators //
   /////////////////////////////////////////////////////
 
-  def setIslandMaps             (value: Boolean)              : Unit = _islandMaps              = value
-  def setGroundMaps             (value: Boolean)              : Unit = _groundMaps              = value
-  def setEntranceRamped         (value: Boolean)              : Unit = _entranceRamped          = value
-  def setEntranceFlat           (value: Boolean)              : Unit = _entranceFlat            = value
-  def setEntranceInverted       (value: Boolean)              : Unit = _entranceInverted        = value
-  def setFFA                    (value: Boolean)              : Unit = _ffa                     = value
-  def setMoneyMap               (value: Boolean)              : Unit = _moneyMap                = value
-  def setAllowedVsHuman         (value: Boolean)              : Unit = _allowedVsHuman          = value
-  def setRushTilesMinimum       (value: Int)                  : Unit = _rushTilesMinimum        = value
-  def setRushTilesMaximum       (value: Int)                  : Unit = _rushTilesMaximum        = value
-  def setStartLocationsMin      (value: Int)                  : Unit = _startLocationsMin       = value
-  def setStartLocationsMax      (value: Int)                  : Unit = _startLocationsMax       = value
-  def setMinimumGamesVsOpponent (value: Int)                  : Unit = _minimumGamesVsOpponent  = value
-  def setWorkerDelta            (value: Int)                  : Unit = _workerDelta             = value
-  def setOurRace                (values: Race*)               : Unit = _ourRaces                = values
-  def setEnemyRace              (values: Race*)               : Unit = _enemyRaces              = values
-  def whitelistOn               (maps: StarCraftMap*)         : Unit = _mapsWhitelisted       ++= maps
-  def blacklistOn               (maps: StarCraftMap*)         : Unit = _mapsBlacklisted       ++= maps
-  def whitelistVs               (fingerprints: Fingerprint*)  : Unit = _responsesWhitelisted  ++= fingerprints
-  def blacklistVs               (fingerprints: Fingerprint*)  : Unit = _responsesBlacklisted  ++= fingerprints
-  def addChoice                 (strategies: Strategy*)       : Unit = _choices                 = _choices :+ StrategyChoice(strategies)
-  def addChoiceVs               (enemyRace: Race)(strategies: Strategy*): Unit = _choices        = _choices :+ StrategyChoice(strategies, Some(enemyRace))
-  def addSelectionRequirement   (predicate: () => Boolean)    : Unit = _selectionRequirements   = _selectionRequirements  :+ predicate
-  def addActivationRequirement  (predicate: () => Boolean)    : Unit = _activationRequirements  = _activationRequirements :+ predicate
+  def setIslandMaps             (value: Boolean)              : Unit = _islandMaps                = value
+  def setGroundMaps             (value: Boolean)              : Unit = _groundMaps                = value
+  def setEntranceRamped         (value: Boolean)              : Unit = _entranceRamped            = value
+  def setEntranceFlat           (value: Boolean)              : Unit = _entranceFlat              = value
+  def setEntranceInverted       (value: Boolean)              : Unit = _entranceInverted          = value
+  def setFFA                    (value: Boolean)              : Unit = _ffa                       = value
+  def setMoneyMap               (value: Boolean)              : Unit = _moneyMap                  = value
+  def setRushTilesMinimum       (value: Int)                  : Unit = _rushTilesMinimum          = value
+  def setRushTilesMaximum       (value: Int)                  : Unit = _rushTilesMaximum          = value
+  def setStartLocationsMin      (value: Int)                  : Unit = _startLocationsMin         = value
+  def setStartLocationsMax      (value: Int)                  : Unit = _startLocationsMax         = value
+  def setMinimumGamesVsOpponent (value: Int)                  : Unit = _minimumGamesVsOpponent    = value
+  def setWorkerDelta            (value: Int)                  : Unit = _workerDelta               = value
+  def setOurRace                (values: Race*)               : Unit = _ourRaces                  = values
+  def setEnemyRace              (values: Race*)               : Unit = _enemyRaces                = values
+  def requirePersonality        (personalities: Personality*) : Unit = _personalityRequired     ++= personalities
+  def banPersonality            (personalities: Personality*) : Unit = _personalityBanned       ++= personalities
+  def whitelistOn               (maps: StarCraftMap*)         : Unit = _mapsWhitelisted         ++= maps
+  def blacklistOn               (maps: StarCraftMap*)         : Unit = _mapsBlacklisted         ++= maps
+  def whitelistVs               (fingerprints: Fingerprint*)  : Unit = _responsesWhitelisted    ++= fingerprints
+  def blacklistVs               (fingerprints: Fingerprint*)  : Unit = _responsesBlacklisted    ++= fingerprints
+  def addChoice                 (strategies: Strategy*)       : Unit = _choices                   = _choices :+ StrategyChoice(strategies)
+  def addChoiceVs               (enemyRace: Race)(strategies: Strategy*): Unit = _choices         = _choices :+ StrategyChoice(strategies, Some(enemyRace))
+  def addSelectionRequirement   (predicate: () => Boolean)    : Unit = _selectionRequirements     = _selectionRequirements  :+ predicate
+  def addActivationRequirement  (predicate: () => Boolean)    : Unit = _activationRequirements    = _activationRequirements :+ predicate
 
   /**
     * Flag a strategy as being salient to the gameplay.

@@ -11,10 +11,12 @@ import Utilities.{?, SwapIf}
 
 class PvR2Gate4Gate extends GameplanImperative {
 
-  override def activated: Boolean = PvR2Gate4Gate()
+  // Don't require PvR2Gate4Gate to be activated; this is the fallback build order in case of strategy snafu.
+
   override def completed: Boolean = With.frame > Minutes(9)()
 
   override def executeBuild(): Unit = {
+    PvR2Gate4Gate.activate()
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(10, Protoss.Probe)

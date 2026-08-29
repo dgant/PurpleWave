@@ -23,8 +23,9 @@ class Intention {
   var toFinish          : Option[UnitInfo]              = None
   var toBoard           : Option[FriendlyUnitInfo]      = None
   var toTrain           : Option[UnitClass]             = None
-  var toTech            : Option[Tech]                  = None
   var toUpgrade         : Option[Upgrade]               = None
+  var toTech            : Option[Tech]                  = None
+  var toLand            : Option[Tile]                  = None
   var toBuild           : Seq[BuildIntent]              = Seq.empty
   var toScoutTiles      : Seq[Tile]                     = Seq.empty
   var action            : Action                        = Idle
@@ -48,6 +49,7 @@ class Intention {
   def setTrain            (value: UnitClass)                : Intention = { toTrain           = Some(value); this }
   def setUpgrade          (value: Upgrade)                  : Intention = { toUpgrade         = Some(value); this }
   def setTech             (value: Tech)                     : Intention = { toTech            = Some(value); this }
+  def setLand             (value: Tile)                     : Intention = { toLand            = Some(value); this }
   def setTerminus         (value: Option[Pixel])            : Intention = { terminus          = value; this }
   def setStation          (value: Option[Pixel])            : Intention = { station           = value; this }
   def setRedoubt          (value: Option[Pixel])            : Intention = { redoubt           = value; this }

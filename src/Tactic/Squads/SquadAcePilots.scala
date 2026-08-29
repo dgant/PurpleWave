@@ -21,12 +21,8 @@ class SquadAcePilots extends Squad {
   lock.matcher = acePilotMatcher
   lock.counter = CountEverything
   override def launch(): Unit = {
-    if ( ! With.blackboard.acePilots()) {
-      return
-    }
-    if (With.yolo.active) {
-      return
-    }
+    if ( ! With.blackboard.acePilots()) return
+    if (With.yolo.active) return
     lock.acquire()
   }
 
@@ -47,11 +43,23 @@ class SquadAcePilots extends Squad {
     val weSplash      = units.exists(splashPilotMatcher)
     val enemySplashes = With.units.enemy.exists(splashPilotMatcher)
     val requireFleet  = MacroFacts.enemyHasShown(acePilots: _*) || MacroFacts.enemiesCompleteFor(Zerg.Scourge.buildFrames, Zerg.Spire) > 0
+    hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
+
+    // Help other squads with anti-air
+    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
+    if (squadsToCover.nonEmpty) {
+      val squad = squadsToCover
+        .sortBy( ! _.isInstanceOf[SquadDefendBase])
+        .maxBy(_.targets.get.count(IsFlyingWarrior))
+      activity = "AceHelpSquad"
+      followSquad(squad)
+      return
+    }
 
     // If they have fast fliers,
     // and we don't have enough to contend against them,
     // seek shelter with the ground army
-    hasFleet = units.size >= Math.max(6, if (weSplash && ! enemySplashes) 0 else MacroFacts.enemies(acePilots: _*))
+
     if (requireFleet && ! hasFleet) {
       activity = "AceChill"
       chill()
@@ -90,17 +98,6 @@ class SquadAcePilots extends Squad {
       return
     }
 
-    // Help other squads with anti-air
-    val squadsToCover = otherSquads.filter(_.targets.exists(_.exists(IsFlyingWarrior))).toVector
-    if (squadsToCover.nonEmpty) {
-      val squad = squadsToCover
-        .sortBy( ! _.isInstanceOf[SquadDefendBase])
-        .maxBy(_.targets.get.count(IsFlyingWarrior))
-      activity = "AceHelpSquad"
-      followSquad(squad)
-      return
-    }
-
     // Unleash hell!
     if (units.exists(_.isAny(Zerg.Mutalisk, Protoss.Scout) && With.geography.enemyBases.nonEmpty)) {
       val bombingBases = With.geography.enemyBases.map(b => (
@@ -122,9 +119,10 @@ class SquadAcePilots extends Squad {
     // Don't look to target anything; just get scouting information first
     val unscoutedEnemy = getStaleBase(With.geography.enemyBases, 120)
     if (unscoutedEnemy.nonEmpty) {
-      activity = "AceMonitor"
-      val base = unscoutedEnemy.minBy(_.enemies.count(_.canAttackAir))
-      vicinity = base.townHallArea.center
+      activity  = "AceMonitor"
+      val base  = unscoutedEnemy.minBy(_.enemies.count(_.canAttackAir))
+      vicinity  = base.townHallArea.center
+      setTargets(Iterable.empty)
       SquadAutomation.send(this)
       return
     }
@@ -158,7 +156,7 @@ class SquadAcePilots extends Squad {
 
   private def getStaleBase(bases: Seq[Base], thresholdSeconds: Int): Seq[Base] = {
     bases.filter(b =>
-      With.framesSince(b.lastFrameScoutedByUs) > thresholdSeconds
+      With.framesSince(b.lastFrameScoutedByUs) > Seconds(thresholdSeconds)()
       && ! b.enemies.exists(_.canAttackAir))
   }
 

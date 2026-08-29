@@ -8,7 +8,7 @@ import Placement.Access.PlaceLabels.{Proxy4Gate, ProxyForwardRobo}
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst}
 import Utilities.?
-import Utilities.Time.Seconds
+import Utilities.Time.{GameTime, Seconds}
 
 class PvPOpeningVsFE extends GameplanImperative {
 
@@ -32,12 +32,14 @@ class PvPOpeningVsFE extends GameplanImperative {
     lazy val canProxyRobo   = proxyRoboPlace.isDefined
     lazy val canProxyGate   = proxyGatePlace.isDefined
 
-    if (response.isEmpty) {
-      if (With.fingerprints.forgeFe()) {
+    if (response.isEmpty && (enemiesHaveComplete(Protoss.PhotonCannon) || With.scouting.enemyNatural.exists(_.townHallTile.lastSeen > 0))) {
+      if (With.frame < GameTime(2, 0)() + Seconds(10)() * enemies(Protoss.PhotonCannon, Protoss.Forge)) {
+        response = Some(NexusFirst)
+      } else if (With.fingerprints.forgeFe()) {
         if (unitsComplete(Protoss.Gateway) > 1) {
           response = Some(?(canProxyGate, FourGateProxy, FourGateHome))
         } else if (unitsComplete(Protoss.Gateway) > 0) {
-          response = Some(?(canProxyRobo && framesUntilUnit(Protoss.CyberneticsCore) < Seconds(30)(), RoboProxy, ?(canProxyGate, FourGateProxy, FourGateHome)))
+          response = Some(?(canProxyRobo && framesUntilUnit(Protoss.CyberneticsCore) > Seconds(30)(), RoboProxy, ?(canProxyGate, FourGateProxy, FourGateHome)))
         } else {
           response = Some(NexusFirst)
         }

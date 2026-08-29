@@ -8,8 +8,6 @@ import Micro.Targeting.FiltersRequired.TargetFilterFocus
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Utilities.?
-import Utilities.Time.Minutes
-import Utilities.UnitFilters.IsWorker
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -108,10 +106,7 @@ object SquadAutomation {
     .getOrElse(squad.homeConsensus)
 
   def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel =
-    // Rush scenarios: Send army directly to vicinity
-    Some(squad.vicinity)
-      .filter(p => With.frame < Minutes(5)() && ! p.zone.metro.exists(_.bases.exists(_.isOurs)) && unit.matchups.threats.forall(IsWorker))
-      .orElse(?(squad.hasGround, None, Some(squad.vicinity)))
+    ?(squad.hasGround, None, Some(squad.vicinity))
       .orElse(
         squad
           .formations

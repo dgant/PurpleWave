@@ -544,6 +544,17 @@ object Commander {
     sleep(unit)
   }
 
+  def land(unit: FriendlyUnitInfo, tile: Tile): Unit = {
+    if (unit.unready) return
+    val destination = unit.unitClass.tileArea.add(tile).center
+    if (unit.pixelDistanceCenter(destination) > 2) {
+      unit.bwapiUnit.move(destination.bwapi)
+    } else {
+      unit.bwapiUnit.land(tile.bwapi)
+    }
+    sleep(unit)
+  }
+
   def defaultEscalation(unit: FriendlyUnitInfo): Unit = {
     lazy val buildDistance = unit.pixelDistanceCenter(unit.intent.toBuildActive.map(b => b.unitClass.tileArea.add(b.tile).center).get)
     if (unit.flying) return

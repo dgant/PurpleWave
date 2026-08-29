@@ -37,7 +37,7 @@ class Blackboard {
   val yoloing                 : Property[Boolean]           = add(new Property(false))
   val allowIslandBases        : Property[Boolean]           = add(new Property(false))
   val monitorBases            : Property[Boolean]           = add(new Property(false))
-  val acePilots               : Property[Boolean]           = add(new Property(false))
+  val acePilots               : Property[Boolean]           = add(new Property(true))
   val darkTemplarSquad        : Property[Boolean]           = add(new Property(true))
   val makeDarkArchons         : Property[Boolean]           = add(new Property(false))
   val maximumArchonEnergy     : Property[Int]               = add(new Property(50))

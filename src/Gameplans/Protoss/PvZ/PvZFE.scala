@@ -121,7 +121,7 @@ class PvZFE extends GameplanImperative {
 
   override def executeMain(): Unit = {
     // Disabling because it's bugged
-    //With.blackboard.acePilots.set(true)
+    With.blackboard.acePilots.set(true)
 
     if (wallOption.isEmpty) return
 

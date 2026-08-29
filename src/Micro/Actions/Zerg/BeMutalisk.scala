@@ -50,7 +50,7 @@ object BeMutalisk extends Action {
       }
     } else if (unit.confidence01 > 0.35 && ! unit.matchups.threatDeepest.exists(_.isAny(Terran.Goliath, Terran.MissileTurret, Protoss.Dragoon, Protoss.PhotonCannon, Zerg.Mutalisk, Zerg.SporeColony))) {
       val mutalisks = unit.tileArea.expand(5).tiles.flatMap(_.units.flatMap(_.friendly).filter(Zerg.Mutalisk))
-      if (mutalisks.forall(u => u.cooldownLeft == 0 || u.agent.contains(MutaliskVolley))) {
+      if (mutalisks.forall(u => u.readyForAttackOrder || u.agent.contains(MutaliskVolley))) {
         unit.agent.shouldFight = true
         unit.agent.fightReason = "MutaVolley"
         unit.agent.put(MutaliskVolley)

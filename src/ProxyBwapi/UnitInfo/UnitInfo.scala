@@ -224,7 +224,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && ?(isFriendly,
       proximity < 1 - _proxyThreshold
         || ! metro.exists(_.bases.exists(_.isOurs)),
-      proximity >     _proxyThreshold + ?(metro.exists(_.owner == player) || With.scouting.firstEnemyMain.isEmpty, 0.25, 0)
+      proximity >     _proxyThreshold + ?(metro.exists(m =>
+        m.owner == player ||
+        With.scouting.possibleEnemyMains.exists(_.metro == m)), 0.25, 0)
         || base.orElse(Maff.minBy(With.geography.bases)(_.groundPixels(tile))).exists(b => b.isOurs || (b.groundPixels(tile) > 32 * 30 && ! b.isMain))),
     240)
 

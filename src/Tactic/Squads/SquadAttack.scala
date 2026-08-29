@@ -11,7 +11,7 @@ import ProxyBwapi.UnitTracking.UnorderedBuffer
 import Tactic.Squads.AttackModes._
 import Utilities.In
 import Utilities.Time.Minutes
-import Utilities.UnitFilters.IsBuilding
+import Utilities.UnitFilters.{IsBuilding, IsWorker}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -145,7 +145,15 @@ class SquadAttack extends Squad {
 
     chooseMode()
 
-    SquadAutomation.formAndSend(this)
+    if (
+      With.frame < Minutes(5)()
+      && ! vicinity.zone.metro.exists(_.bases.exists(_.isOurs))
+      && units.forall(_.matchups.threats.forall(IsWorker))) {
+      SquadAutomation.send(this)
+    } else {
+      SquadAutomation.formAndSend(this)
+    }
+
 
     if (In(mode, ContainArmy, ClearMap) && MacroFacts.safeSkirmishing && units.size >= 12) {
 

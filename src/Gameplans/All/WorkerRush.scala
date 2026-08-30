@@ -45,12 +45,11 @@ class WorkerRush extends GameplanImperative {
     if (rushEnded) {
       attack(confidenceAttacking11 > 0)
       if (With.self.isTerran) {
+        get(Terran.SiegeMode)
         pump(Terran.SiegeTankUnsieged, 5)
         pump(Terran.Wraith, 5)
         pump(Terran.SiegeTankUnsieged)
-        get(Terran.Barracks, Terran.Refinery, Terran.Factory, Terran.MachineShop)
-        get(Terran.SiegeMode)
-        get(Terran.Starport)
+        get(Terran.Barracks, Terran.Refinery, Terran.Factory, Terran.MachineShop, Terran.Starport)
         pump(Terran.Marine)
         get(4, Terran.Barracks)
       } else if (With.self.isProtoss) {

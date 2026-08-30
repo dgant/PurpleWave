@@ -13,8 +13,6 @@ class PvR2Gate4Gate extends GameplanImperative {
 
   // Don't require PvR2Gate4Gate to be activated; this is the fallback build order in case of strategy snafu.
 
-  override def completed: Boolean = With.frame > Minutes(9)()
-
   override def executeBuild(): Unit = {
     PvR2Gate4Gate.activate()
     once(8, Protoss.Probe)

@@ -3,15 +3,14 @@ package Information.Battles.Prediction
 import Information.Battles.Prediction.Simulation.{Simulacrum, Simulation}
 import Lifecycle.With
 import Mathematics.Maff
+import Utilities.?
 
 class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCheckpoint]) {
 
   @inline final def valueMax            (simulacrum: Simulacrum)  : Double  = simulacrum.subjectiveValue
-  @inline final def valueLeft           (simulacrum: Simulacrum)  : Double  = if (simulacrum.dead) 0.0 else simulacrum.subjectiveValue
-  @inline final def unitHealthLeft      (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.hitPoints
-  @inline final def unitHealthMax       (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.hitPointsInitial
-  @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPoints + simulacrum.shieldPoints
-  @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = if ( ! simulacrum.measureHealth) 0.0 else simulacrum.subjectiveValue * simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial
+  @inline final def valueLeft           (simulacrum: Simulacrum)  : Double  = ?(simulacrum.dead, 0.0, simulacrum.subjectiveValue)
+  @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPoints + simulacrum.shieldPoints))
+  @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial))
 
   val weightLife    = 1.0
   val weightHealth  = 0.1

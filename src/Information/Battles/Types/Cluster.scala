@@ -12,7 +12,7 @@ final class Cluster(val units: UnorderedBuffer[UnitInfo] = new UnorderedBuffer[U
   var metrics: ClusterMetrics = new ClusterMetrics(this)
 
   def invalidateMetrics(): Unit = {
-    new ClusterMetrics(this)
+    metrics = new ClusterMetrics(this)
   }
 
   def absorb(other: Cluster): Unit = {

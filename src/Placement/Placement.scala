@@ -6,6 +6,7 @@ import Mathematics.Maff
 import Mathematics.Points.{Direction, Points, Tile}
 import Placement.Generation._
 import Placement.Walls.{FindWall, Wall, WallFinder}
+import Strategery.Strategies.Personalities.PersonalityCheese
 import Utilities.?
 
 import scala.collection.mutable.ArrayBuffer
@@ -69,10 +70,12 @@ class Placement extends Fitter {
     })
     forwardProxyNaturals --= forwardProxyNaturals.filter(fitProxyForwardRobo)
     protoss {
-      cannonRushes ++= basesSorted
-        .filter(base => (base.isMain || base.naturalOf.isDefined) && ! base.isOurMain && ! base.isOurNatural)
-        .flatMap(CannonRushFinder.find(_, this))
-      cannonRushes.foreach(rush => index(rush.fit))
+      if (PersonalityCheese.matches) {
+        cannonRushes ++= basesSorted
+          .filter(base => (base.isMain || base.naturalOf.isDefined) && ! base.isOurMain && ! base.isOurNatural)
+          .flatMap(CannonRushFinder.find(_, this))
+        cannonRushes.foreach(rush => index(rush.fit))
+      }
     }
     if (wallEverything) {
       With.geography.zones

@@ -22,20 +22,7 @@ object UpdateZones {
       With.geography
         .mains
         .foreach(startLocationBase => {
-          val enemyMains = With.geography.mains.filterNot(startLocationBase==)
-          val homeBases = With.geography.bases.view
-            .filterNot(_.gas.isEmpty)
-            .filterNot(_.isMain)
-            .filter(base => startLocationBase.groundPixels(base) <= enemyMains.map(_.groundPixels(base)).min)
-          val candidates = Maff.orElse(
-            homeBases.filter(_.entranceOriginal.exists(_.contains(startLocationBase.zone))),
-            homeBases.filter(base =>
-              base.exits.size == 1
-              && enemyMains.exists(enemyMain =>
-                With.paths.zonePath(base.exits.head.otherSideof(base.zone), enemyMain.zone)
-                  .exists(path => ! path.zones.contains(base.zone)))))
-
-          Maff.minBy(candidates)(base => enemyMains.map(_.groundPixels(base)).min)
+          FindNatural(startLocationBase)
             .foreach(natural => {
               natural.naturalOf = Some(startLocationBase)
               startLocationBase.natural = Some(natural)

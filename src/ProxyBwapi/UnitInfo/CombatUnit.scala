@@ -172,7 +172,7 @@ trait CombatUnit {
   @inline final def damageTypeAgainst             (enemy: CombatUnit)                                 : Damage.Type = ?(enemy.flying, unitClass.airDamageType, unitClass.groundDamageType)
 
   @inline final def guaranteedToHit(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Boolean = {
-    flying || enemy.flying || unitClass.affectedByDarkSwarm || from.getOrElse(pixel).tile.altitude >= to.getOrElse(enemy.pixel).tile.altitude
+    flying || enemy.flying || ! unitClass.affectedByDarkSwarm || from.getOrElse(pixel).tile.altitude >= to.getOrElse(enemy.pixel).tile.altitude
   }
   @inline final def hitChanceAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): Double = {
     ?(guaranteedToHit(enemy, from, to), 1.0, 0.47)

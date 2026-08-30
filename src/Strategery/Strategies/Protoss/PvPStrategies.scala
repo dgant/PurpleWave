@@ -44,7 +44,6 @@ object PvP3Zealot extends PvPStrategy {
   whitelistVs(With.fingerprints.coreBeforeZ)
   // This blacklist essentially bans it, at time of writing
   blacklistVs(With.fingerprints.twoGate)
-  banPersonality(PersonalityCheese)
 }
 object PvP5Zealot extends PvPStrategy
 
@@ -68,6 +67,7 @@ object PvPObs extends PvPStrategy {
 object PvPDT extends PvPStrategy {
   blacklistVs(With.fingerprints.robo)
   addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
+  banPersonality(PersonalityCheese)
 }
 object PvPCoreExpand extends PvPStrategy {
   setMinimumGamesVsOpponent(3)

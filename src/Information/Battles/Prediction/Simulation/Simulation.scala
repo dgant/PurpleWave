@@ -189,7 +189,7 @@ final class Simulation {
             SpinWait()
         })
       thread.setName("CombatSimulation")
-      thread.setPriority(Math.max(Thread.currentThread().getPriority - 1, Thread.MIN_PRIORITY))
+      thread.setPriority(Thread.currentThread().getPriority)
       thread.start()
     }
     simulatingAsynchronously = true

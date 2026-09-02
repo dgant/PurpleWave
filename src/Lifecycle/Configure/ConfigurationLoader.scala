@@ -1,7 +1,7 @@
 package Lifecycle.Configure
 
 import Lifecycle.With
-import Strategery.{HumanPlaybook, PretrainingPlaybook, TournamentPlaybook}
+import Strategery.{HumanPlaybook, PretrainingPlaybook, TestingPlaybook, TournamentPlaybook}
 import mjson.Json
 
 import java.io.File
@@ -55,6 +55,7 @@ object ConfigurationLoader {
       val simviz        = getOrDefault(config, "simviz",        false)
       val logstd        = getOrDefault(config, "logstd",        false)
       val multiCPU      = getOrDefault(config, "multiCPU",      true)
+      val randomStrategy = getOrDefault(config, "strategySelectionRandom", false)
       val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
       val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameLimitMs)
 
@@ -81,6 +82,7 @@ object ConfigurationLoader {
       if (debugging)            { setDebugMode() }
       if (debugginglive)        { setDebugLiveMode() }
       if (logstd)               { With.configuration.logstd = true }
+      if (randomStrategy)       { With.configuration.forcedPlaybook = Some(new TestingPlaybook) }
       With.configuration.simulationAsynchronous = multiCPU
 
       Seq(
@@ -95,6 +97,7 @@ object ConfigurationLoader {
         ("DebuggingLive",   debugginglive.toString),
         ("SimViz",          simviz.toString),
         ("Log stdout",      logstd.toString),
+        ("Random strategy", randomStrategy.toString),
         ("Frame MS target", frameMsTarget),
         ("Frame MS limit",  frameMsLimit),
         ("Fixed build",     With.configuration.fixedBuilds)

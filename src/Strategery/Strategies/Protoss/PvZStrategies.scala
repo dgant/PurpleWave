@@ -51,7 +51,6 @@ object PvZFFE extends PvZFEOpening {
   banPersonality(PersonalityCheese)
 }
 object PvZGFE extends PvZFEOpening {
-  setMinimumGamesVsOpponent(2)
   banPersonality(PersonalityCheese)
   whitelistVs(With.fingerprints.twelveHatch, With.fingerprints.tenHatch, With.fingerprints.overpool)
   blacklistVs(With.fingerprints.fourPool, With.fingerprints.ninePool)

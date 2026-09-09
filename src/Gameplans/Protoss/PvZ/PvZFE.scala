@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvZ
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import Macro.Actions.Enemy
+import Macro.Actions.{Enemy, Friendly}
 import Macro.Requests.RequestUnit
 import Mathematics.Maff
 import Placement.Access.PlaceLabels.{DefendAir, DefendHall}
@@ -10,14 +10,14 @@ import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.Walls.Wall
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Strategery.Python
-import Strategery.Strategies.Protoss.{PvZ1BaseReactive, PvZFFE, PvZGFE}
+import Strategery.Strategies.Protoss.{PvZFFE, PvZGFE}
 import Utilities.Time.GameTime
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, DoQueue}
 
 class PvZFE extends GameplanImperative {
 
-  override def activated: Boolean = PvZFFE() || PvZGFE()
+  override def activated: Boolean = wallOption.isDefined && (PvZFFE() || PvZGFE())
 
   lazy val wallOption: Option[Wall] = With.placement.wall
   private def wall = wallOption.get
@@ -27,12 +27,6 @@ class PvZFE extends GameplanImperative {
   }
 
   override def executeBuild(): Unit = {
-    if (wallOption.isEmpty) {
-      // We shouldn't even pick this strategy in the first place, but if we do here's an escape valve
-      once(5, Protoss.Probe)
-      With.strategy.swapEverything(Seq(PvZ1BaseReactive), Seq(PvZFFE, PvZGFE))
-      return
-    }
 
     // FFE: Scout on pylon
     // GFE: Scout with Zealot or just on gate
@@ -160,13 +154,11 @@ class PvZFE extends GameplanImperative {
         get(RequestUnit(Protoss.PhotonCannon, mutaliskCannons,  cannonTime, Some(new PlacementQuery(Protoss.PhotonCannon).requireBase(base).requireLabelYes(DefendAir))))
       })
       get(Maff.clamp(enemies(Zerg.Mutalisk) / 6, 1, 2), Protoss.Stargate)
-
-      // Disabling everything Dragoon-related because we're walling ourselves in
-      //pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
-      //once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
-      //get(Protoss.DragoonRange)
-      get(Protoss.AirArmor)
+      once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
+      get(Protoss.DragoonRange)
+      pumpRatio(Protoss.Dragoon, 6, 24, Seq(Enemy(Zerg.Mutalisk, 2.0), Enemy(Zerg.Scourge, 0.5), Enemy(Zerg.Lurker, 2.0), Friendly(Protoss.Corsair, -1.5)))
       get(Protoss.AirDamage)
+      get(Protoss.AirArmor)
       pumpGasPumps()
     }
 
@@ -177,7 +169,7 @@ class PvZFE extends GameplanImperative {
     }
     if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {
       once(Protoss.Gateway, Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Dragoon)
-      //get(Protoss.DragoonRange)
+      get(Protoss.DragoonRange)
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       pumpGasPumps()
     }
@@ -187,7 +179,7 @@ class PvZFE extends GameplanImperative {
     if (unitsComplete(IsWarrior) >= 16
       && unitsComplete(Protoss.Gateway) >= 6
       && safePushing
-      //&& upgradeComplete(Protoss.DragoonRange)
+      && upgradeComplete(Protoss.DragoonRange)
       && upgradeComplete(Protoss.ZealotSpeed)
       && haveComplete(Protoss.Observer)) {
       requireMiningBases(3)
@@ -203,7 +195,7 @@ class PvZFE extends GameplanImperative {
 
 
     if (upgradeStarted(Protoss.DragoonRange)) {
-      //pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
+      pumpRatio(Protoss.Dragoon, 1, 24, Seq(Friendly(Protoss.Zealot, 0.5), Enemy(Zerg.Lurker, 1.0), Enemy(Zerg.Mutalisk, 2.0), Friendly(Protoss.Corsair, -2.0)))
     }
     pumpRatio(Protoss.Observer, 1, 3, Seq(Enemy(Zerg.Lurker, 0.5)))
     pumpShuttleAndReavers()
@@ -258,7 +250,7 @@ class PvZFE extends GameplanImperative {
         get(Protoss.AirArmor)
       }
     }
-    //get(Protoss.DragoonRange)
+    get(Protoss.DragoonRange)
     get(Protoss.GroundArmor)
     once(Protoss.TemplarArchives, Protoss.RoboticsFacility, Protoss.Observatory, Protoss.RoboticsSupportBay)
     get(Protoss.ObserverSpeed)

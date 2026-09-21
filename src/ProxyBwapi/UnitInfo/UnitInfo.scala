@@ -298,7 +298,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && ! enemy.unitClass.isSpell
     && enemy.asInstanceOf[UnitInfo].canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
-    && ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked
+    && ( ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked || Terran.SpiderMine(this))
     && (enemy.unitClass.triggersSpiderMines || ! Terran.SpiderMine(this))
     && ( ! unitClass.affectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
 

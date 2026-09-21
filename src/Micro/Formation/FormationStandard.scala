@@ -47,8 +47,8 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   val targetPath          : TilePath              = findTargetPath
   val goalPathTiles       : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
   val targetPathTiles     : Seq[Tile]             = targetPath.tiles.getOrElse(Seq.empty).view
-  val goalPath5           : Tile                  = goalPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(goal.walkableTile)
-  val targetPath5         : Tile                  = targetPathTiles.zipWithIndex.reverseIterator.find(p => p._2 <= 5).map(_._1).getOrElse(threatOrigin.walkableTile)
+  val goalPath5           : Tile                  = FormationPathing.atOrBefore(goalPathTiles, 5).getOrElse(goal.walkableTile)
+  val targetPath5         : Tile                  = FormationPathing.atOrBefore(targetPathTiles, 5).getOrElse(threatOrigin.walkableTile)
   val goalTowardsTarget   : Boolean               = targetPath.pathExists && goalPath.pathExists && goalPath5.tileDistanceFast(targetPath5) < 6
   if (style == FormationStyleMarch && ! flanking && goalTowardsTarget && targetTowards.exists(t => units.exists(u => u.pixelsToGetInRange(t) < 32 * 6 && u.targetsAssigned.forall(_.contains(t))))) {
     style = FormationStyleEngage
@@ -163,7 +163,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
         vanguardCentroid,
         apexI
           .map(_ + 1 + Maff.div32(group.meanAttackerRange.toInt))
-          .flatMap(goalPathTiles.drop(_).lastOption).map(_.center)
+          .flatMap(i => FormationPathing.lastAfterDrop(goalPathTiles, i)).map(_.center)
           .getOrElse(?(style == FormationStyleDisengage, vanguardCentroid, goal))))
     }
   }

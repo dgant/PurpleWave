@@ -14,6 +14,13 @@ class PerformanceMonitor {
 
   private val frameTimes    : Array[Long] = Array.fill[Long](Seconds(3)())(1)
   private var frameStartMs  : Long  = 0
+  private val frameClockTrace = java.lang.Boolean.getBoolean("pwcombat.frameClockTrace")
+  private val threadBean = if (frameClockTrace) java.lang.management.ManagementFactory.getThreadMXBean else null
+  private val compilerBean = if (frameClockTrace) java.lang.management.ManagementFactory.getCompilationMXBean else null
+  private def currentThreadCpuNanos: Long = if (threadBean != null && threadBean.isCurrentThreadCpuTimeSupported && threadBean.isThreadCpuTimeEnabled) threadBean.getCurrentThreadCpuTime else -1L
+  private def compilationMillis: Long = if (compilerBean != null && compilerBean.isCompilationTimeMonitoringSupported) compilerBean.getTotalCompilationTime else -1L
+  private var frameStartCpuNanos: Long = -1L
+  private var frameStartCompilationMs: Long = -1L
   var framesOverShort       : Int   = 0
   var framesOver1000        : Int   = 0
   var framesOver10000       : Int   = 0
@@ -25,11 +32,25 @@ class PerformanceMonitor {
 
   def startFrame(): Unit = {
     frameStartMs = systemMillis
+    if (frameClockTrace) {
+      frameStartCpuNanos = currentThreadCpuNanos
+      frameStartCompilationMs = compilationMillis
+    }
     if (gameStartMs == 0) gameStartMs = frameStartMs
   }
 
   def endFrame(): Unit = {
-    val frameMs = ?(frameHitBreakpoint, frameMeanMs, frameElapsedMs)
+    val elapsedMs = frameElapsedMs
+    if (frameClockTrace) {
+      val cpuNanos = currentThreadCpuNanos
+      val compiledMs = compilationMillis
+      if (elapsedMs >= 100 || With.frame == 0) {
+        val cpuMs = if (frameStartCpuNanos >= 0 && cpuNanos >= frameStartCpuNanos) (cpuNanos - frameStartCpuNanos) / 1000000.0 else -1.0
+        val compilerMs = if (frameStartCompilationMs >= 0 && compiledMs >= frameStartCompilationMs) compiledMs - frameStartCompilationMs else -1L
+        With.logger.performance(f"Frame clock wall_ms=$elapsedMs thread_cpu_ms=$cpuMs%.3f compiler_ms=$compilerMs wall_end_ms=${System.currentTimeMillis}")
+      }
+    }
+    val frameMs = ?(frameHitBreakpoint, frameMeanMs, elapsedMs)
     frameTimes(With.frame % frameTimes.length) = frameMs
     if (With.frame > 0) {
       if (frameMs >= With.configuration.frameLimitMs) framesOverShort += 1

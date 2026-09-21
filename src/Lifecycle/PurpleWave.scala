@@ -21,11 +21,13 @@ class PurpleWave extends DefaultBWListener {
     timeFrameZero(() => {
       tryCatch(() => {
         With.onStart()
+        tryCatch(() => With.logger.debug(Performance.ClassPreloading()))
         Walls.logInfo = With.configuration.logstd
         JBWEBWrapper.onStart()
         With.history.onStart()
         With.units.onStart()
         With.geography.onStart()
+        With.learnedCombat.onStart()
       })})
   }
 
@@ -36,6 +38,7 @@ class PurpleWave extends DefaultBWListener {
         With.onFrame()
         With.latency.onFrame()
         With.units.onFrame()
+        With.learnedCombat.onFrame()
         With.gathering.updateAccelerantPixels()
         With.lambdas.onFrame()
         With.tasks.run(With.performance.msBeforeTarget)
@@ -73,6 +76,7 @@ class PurpleWave extends DefaultBWListener {
   override def onEnd(isWinner: Boolean): Unit = {
     tryCatch(() => {
       With.logger.debug(f"Game ended in ${?(isWinner, "victory", "defeat")}")
+      With.learnedCombat.onEnd(isWinner)
       With.history.onEnd(isWinner)
       With.gathering.onEnd()
       With.storyteller.onEnd()

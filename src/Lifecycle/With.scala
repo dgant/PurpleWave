@@ -18,6 +18,7 @@ import Macro.Gathering.Gathering
 import Macro.Scheduling.{MacroSim, Scheduler}
 import Mathematics.Points.Tile
 import Micro.Agency.Agency
+import Micro.LearnedCombat.LearnedCombatClient
 import Micro.Coordination.Coordinator
 import Micro.Matchups.MatchupGraph
 import Performance.TaskQueue.{TaskQueueGlobal, TaskQueueParallel}
@@ -84,6 +85,7 @@ object With {
   var history           : History             = _
   var lambdas           : LambdaQueue         = _
   var latency           : Latency             = _
+  var learnedCombat     : LearnedCombatClient = _
   var logger            : Logger              = _
   var macroCounts       : MacroCounts         = _
   var macroSim          : MacroSim            = _
@@ -227,6 +229,7 @@ object With {
     viewport          = new Viewport
     visualization     = new Visualization
     yolo              = new Yolo
+    learnedCombat     = new LearnedCombatClient
 
     // Order-dependent initialization:
     // TaskQueue comes last because it references other systems

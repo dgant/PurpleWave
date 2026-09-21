@@ -14,6 +14,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.resources.sourceEncoding>UTF-8</project.resources.sourceEncoding>
+        <pw.build.directory>${project.basedir}/target</pw.build.directory>
+        <pw.visualizer.output>${project.basedir}/out/artifacts/PurpleSimViz.exe</pw.visualizer.output>
     </properties>
 
     <dependencies>
@@ -48,6 +50,7 @@
     </dependencies>
 
     <build>
+        <directory>${pw.build.directory}</directory>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
@@ -144,6 +147,49 @@
                             </args>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>compile-formation-closures</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Emit formation closures before gameplay so startup can preload them. -->
+                            <sourceDir>${project.basedir}/src</sourceDir>
+                            <outputDir>${project.build.directory}/formation-classes</outputDir>
+                            <analysisCacheFile>${project.build.directory}/analysis/formation-closures</analysisCacheFile>
+                            <sendJavaToScalac>false</sendJavaToScalac>
+                            <includes>
+                                <include>Micro/Formation/FormationStandard.scala</include>
+                                <include>Micro/Formation/UnassignedFormation.scala</include>
+                            </includes>
+                            <classpath>
+                                <add>${project.build.directory}/${project.artifactId}-macros.jar</add>
+                                <add>${project.build.outputDirectory}</add>
+                            </classpath>
+                            <args>
+                                <arg>-Ydelambdafy:inline</arg>
+                                <arg>-unchecked</arg>
+                                <arg>-feature</arg>
+                                <arg>-deprecation</arg> <!-- To disable deprecation warnings -->
+                                <arg>-language:postfixOps</arg> <!-- To disable postfix operator warnings -->
+                                <arg>-opt:unreachable-code</arg>
+                                <arg>-opt:simplify-jumps</arg>
+                                <arg>-opt:compact-locals</arg>
+                                <arg>-opt:copy-propagation</arg>
+                                <arg>-opt:redundant-casts</arg>
+                                <arg>-opt:box-unbox</arg>
+                                <arg>-opt:nullness-tracking</arg>
+                                <arg>-opt:closure-invocations</arg>
+                                <arg>-opt:inline</arg>
+                                <arg>-opt:l:default,inline</arg>
+                                <arg>-opt-inline-from:Micro.Targeting.**</arg>
+                                <arg>-Ymacro-classpath</arg>
+                                <arg>${project.build.directory}/${project.artifactId}-macros.jar</arg>
+                                <arg>-opt-warnings</arg>
+                            </args>
+                        </configuration>
+                    </execution>
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
@@ -167,6 +213,23 @@
                                 <jar destfile="${project.build.directory}/${project.artifactId}-macros.jar"
                                      basedir="${project.build.directory}/macro-classes"
                                      update="true" />
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>install-formation-closures</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy todir="${project.build.outputDirectory}" overwrite="true">
+                                    <fileset dir="${project.build.directory}/formation-classes">
+                                        <include name="Micro/Formation/FormationStandard*.class" />
+                                        <include name="Micro/Formation/UnassignedFormation*.class" />
+                                    </fileset>
+                                </copy>
                             </target>
                         </configuration>
                     </execution>
@@ -227,7 +290,7 @@
                         </goals>
                         <configuration>
                             <!-- Use the shaded jar that includes all dependencies -->
-                            <outfile>${project.basedir}/out/artifacts/PurpleSimViz.exe</outfile>
+                            <outfile>${pw.visualizer.output}</outfile>
                             <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <headerType>gui</headerType>
                             <classPath>

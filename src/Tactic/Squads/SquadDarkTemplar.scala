@@ -33,7 +33,7 @@ class SquadDarkTemplar extends Squad {
         && u.unitClass.isDetector
         && u.zone.edges.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64))))
       .sortBy(_.heart.center.groundPixels(centroidGround))
-      .sortBy( - With.scouting.baseIntrigue(_))
+      .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy( ! _.owner.isEnemy)
       .sortBy(waitForBackstab && With.scouting.enemyProximity > 0.5 && ! _.naturalOf.exists(_.isEnemy))
     if (bases.isEmpty) return

@@ -175,9 +175,11 @@ final class Simulation {
       thread = new Thread(() =>
         while ( ! terminateThread) {
             if (simulatingAsynchronously) {
-              while ( ! battle.simulationComplete) {
+              while ( ! battle.simulationComplete && ! terminateThread) {
                 try {
                   step()
+                  // Enter the VM between steps so a long simulation cannot delay a safepoint.
+                  Thread.sleep(0)
                 } catch { case exception: Exception =>
                   simulatingAsynchronously = false
                   With.logger.onException(exception)

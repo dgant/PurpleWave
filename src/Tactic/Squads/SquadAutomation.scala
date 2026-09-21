@@ -97,23 +97,29 @@ object SquadAutomation {
     })
   }
 
-  def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel = squad
-    .formations
-    .find(f => f.style == FormationStyleGuard || f.style == FormationStyleDisengage)
-    .filter(_.placements.contains(unit))
-    .map(_.placements(unit))
-    .orElse(defaultReturn)
-    .getOrElse(squad.homeConsensus)
+  def getReturn(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel = {
+    // Avoid first-use lambda generation while issuing combat movement.
+    var index = 0
+    while (index < squad.formations.length) {
+      val formation = squad.formations(index)
+      if (formation.style == FormationStyleGuard || formation.style == FormationStyleDisengage) {
+        if (formation.placements.contains(unit)) return formation.placements(unit)
+        // Only the first eligible formation participates, even if it has no slot.
+        return if (defaultReturn.isDefined) defaultReturn.get else squad.homeConsensus
+      }
+      index += 1
+    }
+    if (defaultReturn.isDefined) defaultReturn.get else squad.homeConsensus
+  }
 
-  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel =
-    ?(squad.hasGround, None, Some(squad.vicinity))
-      .orElse(
-        squad
-          .formations
-          .headOption
-          .find(_.placements.contains(unit))
-          .map(_.placements(unit)))
-      .getOrElse(?(squad.fightConsensus, squad.vicinity, getReturn(unit, squad, defaultReturn)))
+  def getTravel(unit: FriendlyUnitInfo, squad: Squad, defaultReturn: Option[Pixel] = None): Pixel = {
+    if (!squad.hasGround) return squad.vicinity
+    if (squad.formations.nonEmpty) {
+      val formation = squad.formations.head
+      if (formation.placements.contains(unit)) return formation.placements(unit)
+    }
+    if (squad.fightConsensus) squad.vicinity else getReturn(unit, squad, defaultReturn)
+  }
 
   //////////////////////
   // Full automation! //

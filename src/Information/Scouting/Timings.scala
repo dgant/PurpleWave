@@ -58,7 +58,8 @@ trait Timings {
 
   def earliestCompletion(unitClass: UnitClass): Int = {
     var earliestCompletionFrame = enemyCompletions(unitClass)
-    lazy val scoutingVision = With.units.ours.map(_.proximity).min
+    // No surviving units provide no forward scouting information.
+    lazy val scoutingVision = Maff.min(With.units.ours.map(_.proximity)).getOrElse(1.0)
     lazy val earliestCompletionFrameScouted = (With.frame - scoutingVision * rushFrames(unitClass)).toInt
     if (unitClass == Protoss.DarkTemplar) {
       // Super-fast DT finishes 4:40. BetaStar and Locutus demonstrate this on replay.

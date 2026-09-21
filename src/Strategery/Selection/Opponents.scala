@@ -36,7 +36,7 @@ object Opponents {
   add("WATTBOT",          .8,   defaultPvZ)
 
   // R
-  add("Pluto",           .1,   StrategySelectionFixed(PvEProxy2Gate))
+  add("Pluto",           .55,  defaultPvR)
   add("Steamhammer",     .8,   defaultPvR, "Randomhammer")
   add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
 

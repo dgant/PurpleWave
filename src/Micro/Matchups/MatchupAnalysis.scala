@@ -69,13 +69,14 @@ case class MatchupAnalysis(me: UnitInfo) {
   def pixelsEntangled             : Double            = _pixelsEntangled()
   def pixelsToTargetRange         : Option[Double]    = targetNearest.map(me.pixelsToGetInRange)
   def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(_.pixelsToGetInRange(me))
+  def pixelsToDetectionRange      : Option[Double]    = enemyDetectorDeepest.map(d => me.tile.tileDistanceFast(d.tile) * 32 - d.sightPixels)
   private val _threatDeepest        = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
   private val _threatDeepestInRange = new Cache(() => _threatDeepest().filter(_.inRangeToAttack(me)))
   private val _threatSoonest        = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
   private val _threatNearest        = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
   private val _targetNearest        = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
   private val _targetNearestInRange = new Cache(() => _targetNearest().filter(me.inRangeToAttack))
-  private val _enemyDetectorDeepest = new Cache(() => Maff.minBy(groupVs.detectors.filter(_.remainingCompletionFrames < Seconds(5)()))(e => e.sightPixels - e.pixelDistanceCenter(me.pixel)))
+  private val _enemyDetectorDeepest = new Cache(() => Maff.minBy(groupVs.detectors.filter(_.remainingCompletionFrames < Seconds(5)()))(e => e.pixelDistanceCenter(me.pixel) - e.sightPixels))
   private val _pixelsEntangled      = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse( - With.mapPixelWidth.toDouble))
   private val _dpfReceiving         = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)
   private val _inTankRange          = new Cache(() => threatsInRange.exists(Terran.SiegeTankSieged))
@@ -109,9 +110,9 @@ case class MatchupAnalysis(me: UnitInfo) {
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
     || shooter.canAttack(victim)
-    || (shooter.unitClass.canAttack(victim)
-      && (shooter.remainingCompletionFrames < 72
-        || (victim.cloaked && shooter.matchups.groupOf.detectors.nonEmpty))))
+    || (shooter.unitClass.canAttack(victim) && (
+      ( ! shooter.complete && shooter.remainingCompletionFrames < 72) ||
+      (victim.cloaked && victim.matchups.pixelsToDetectionRange.exists(_ < 96)))))
 
   def healers: Seq[UnitInfo] = {
     allies.view.filter(a =>

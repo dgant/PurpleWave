@@ -16,8 +16,8 @@ object Damage {
     }
     val damageAgainstSmall: Double  = this match {
       case Concussive => 1.0
-      case Explosive  => 0.25
-      case _          => 0.5
+      case Explosive  => 0.5
+      case _          => 1.0
     }
 
     @inline final def apply(size: Size.Type): Double =

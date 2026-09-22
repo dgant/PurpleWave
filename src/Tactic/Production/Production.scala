@@ -34,7 +34,7 @@ trait Production extends Prioritized {
     if (request.upgrade   != requirement.upgrade)   return false
     if (request.unit      != requirement.unit)      return false
     if (request.placement != requirement.placement) return false
-    if ( ! request.specificTrainee.forall(trainee.contains)) return false
+    if ( ! requirement.specificTrainee.forall(trainee.contains)) return false
     if (request.upgrade.isDefined && request.quantity < requirement.quantity) return false
     if (request.minStartFrame > Math.max(requirement.minStartFrame, With.frame)) return false
     true

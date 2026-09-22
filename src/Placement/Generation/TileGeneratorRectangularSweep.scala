@@ -8,9 +8,9 @@ class TileGeneratorRectangularSweep(suggestedOrigin: Tile, val boundA: Tile, val
   private val xMax        = Math.max(boundA.x, boundB.x)
   private val yMin        = Math.min(boundA.y, boundB.y)
   private val yMax        = Math.max(boundA.y, boundB.y)
-  private val origin      = Tile(Maff.clamp(suggestedOrigin.x, xMin, xMax), Maff.clamp(suggestedOrigin.y, yMin, yMax))
-  private val dxMax       = Math.max(suggestedOrigin.x - xMin, xMax - suggestedOrigin.x)
-  private val dyMax       = Math.max(suggestedOrigin.y - yMin, yMax - suggestedOrigin.y)
+  private val origin      = Tile(Maff.clamp(suggestedOrigin.x, xMin, xMax - 1), Maff.clamp(suggestedOrigin.y, yMin, yMax - 1))
+  private val dxMax       = Math.max(origin.x - xMin, xMax - 1 - origin.x)
+  private val dyMax       = Math.max(origin.y - yMin, yMax - 1 - origin.y)
   private val breadthIsX  = direction.y != 0
   private val sideDepth   = if (breadthIsX) direction.y else direction.x
   private var sideBreadth = 1
@@ -19,7 +19,7 @@ class TileGeneratorRectangularSweep(suggestedOrigin: Tile, val boundA: Tile, val
   private val maxBreadth  = if (breadthIsX) dxMax else dyMax
   private val maxDepth    = if (breadthIsX) dyMax else dxMax
   private var nextOutput  = origin
-  private var _hasNext    = true
+  private var _hasNext    = xMin < xMax && yMin < yMax
 
   def next(): Tile = {
     val output = nextOutput
@@ -36,7 +36,7 @@ class TileGeneratorRectangularSweep(suggestedOrigin: Tile, val boundA: Tile, val
       }
 
       _hasNext = dDepth <= maxDepth
-      nextOutput = suggestedOrigin.add(
+      nextOutput = origin.add(
         if (breadthIsX) dBreadth * sideBreadth else dDepth * sideDepth,
         if (breadthIsX) dDepth * sideDepth else dBreadth * sideBreadth)
       foundNext = nextOutput.x >= xMin && nextOutput.x < xMax && nextOutput.y >= yMin && nextOutput.y < yMax

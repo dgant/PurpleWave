@@ -14,7 +14,7 @@ class ProduceAddon(buildableAddon: RequestBuildable, expectedFramesArg: Int) ext
   def addonClass    : UnitClass     = request.unit.get
   val currencyLock  : LockCurrency  = new LockCurrencyFor(this, addonClass)
   val builderLock   : LockUnits     = new LockUnits(this,
-    IsAll(addonClass.whatBuilds._1, _.addon.filter(addonClass).forall(_.producer.contains(this))),
+    IsAll(addonClass.whatBuilds._1, _.addon.forall(a => addonClass(a) && a.producer.contains(this))),
     PreferIdle,
     CountOne)
 

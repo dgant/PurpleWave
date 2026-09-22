@@ -6,6 +6,7 @@ import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.{Cache, TotalUnitCounter}
 import ProxyBwapi.UnitInfo._
+import ProxyBwapi.UnitClasses.UnitClasses
 import Tactic.Squads.{GenericFriendlyUnitGroup, GenericUnitGroup, UnitGroup}
 import Utilities.?
 import Utilities.UnitFilters.{IsAny, UnitFilter}
@@ -125,9 +126,15 @@ final class UnitTracker {
     Circle(tiles)
       .view
       .map(tile.add))
+  private lazy val radiusBuildingMargin: Pixel = {
+    val buildings = UnitClasses.all.filter(_.isBuilding)
+    Pixel(buildings.map(_.tileWidth).max * 16, buildings.map(_.tileHeight).max * 16)
+  }
   def inPixelRadius(pixel: Pixel, pixels: Int): Seq[UnitInfo] = {
+    if (pixels < 0) return Seq.empty
     val pixelsSquared = pixels * pixels
-    inTileRadius(pixel.tile, Maff.div32(pixels)).filter(_.pixel.pixelDistanceSquared(pixel) <= pixelsSquared)
+    val bounds = TileRectangle(pixel.subtract(pixels + radiusBuildingMargin.x, pixels + radiusBuildingMargin.y).tile, pixel.add(pixels, pixels).tile.add(1, 1))
+    inTileRectangle(bounds).filter(_.pixel.pixelDistanceSquared(pixel) <= pixelsSquared)
   }
 
   //////////////

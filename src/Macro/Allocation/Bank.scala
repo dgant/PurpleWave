@@ -36,7 +36,7 @@ class Bank {
     mineralsLeft  = With.self.minerals  + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameMinerals).toInt
     gasLeft       = With.self.gas       + (resourceLookaheadFrames * With.accounting.ourIncomePerFrameGas).toInt
     supplyLeft    = With.self.supplyTotal400 - With.self.supplyUsed400
-    requests.foreach(queueBuyer)
+    requests.clone().dequeueAll.foreach(queueBuyer)
   }
   
   private def queueBuyer(request: LockCurrency): Unit = {
@@ -52,7 +52,7 @@ class Bank {
   private def framesToEarn(value: Int, rate: Double): Int = {
     if (value <= 0) 0
     else if (rate <= 0.0) Forever()
-    else Math.ceil(value / With.accounting.ourIncomePerFrameMinerals).toInt
+    else Math.ceil(value / rate).toInt
   }
   
   private def framesToEarnMinerals(minerals: Int): Int = {

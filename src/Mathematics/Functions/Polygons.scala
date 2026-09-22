@@ -22,7 +22,7 @@ trait Polygons {
     val dy1           = y1 - y0
     val dotProduct    = dx0 * dx1 + dy0 * dy1
     val lengthSquared = dx1 * dx1 + dy1 * dy1
-    val param         = if (lengthSquared != 0.0) dotProduct / lengthSquared else -1.0
+    val param         = if (lengthSquared != 0.0) dotProduct.toDouble / lengthSquared else -1.0
 
     var xx = 0.0
     var yy = 0.0
@@ -193,7 +193,7 @@ trait Polygons {
     val indexMax        = Math.max(indexFrom, indexTo)
     val directLength    = indexMax - indexMin
     val directIsShorter = directLength * 2 <= rotation.length
-    val direct          = if (preserveRotation) (indexFrom > indexTo) else (directIsShorter == preferShort)
+    val direct          = if (preserveRotation) (indexFrom <= indexTo) else (directIsShorter == preferShort)
     val subsequence     = if (direct) rotation.view.slice(indexMin, indexMax + 1) else rotation.view.drop(indexMax) ++ rotation.view.take(indexMin + 1)
     if (subsequence.head == from) subsequence else subsequence.reverse
   }

@@ -62,7 +62,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
       (pixels * Math.sin(angleRadians)).toInt)
   }
   @inline def degreesTo(other: Pixel): Double = {
-    radiansTo(other) * Maff.x2PiInv360
+    radiansTo(other) * Maff.x360inv2Pi
   }
   @inline def radiansTo(other: Pixel): Double = {
     Maff.fastAtan2(other.y - y, other.x - x)
@@ -198,7 +198,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
         center.y - 16 + Math.min(16, unit.unitClass.dimensionUp),
         center.y + 16 - Math.min(16, unit.unitClass.dimensionDownInclusive)))
   }
-  @inline def offsetFromTileCenter: Pixel = Pixel(Maff.mod32(x) - 16, Maff.mod32(x) - 16)
+  @inline def offsetFromTileCenter: Pixel = Pixel(Maff.mod32(x) - 16, Maff.mod32(y) - 16)
   @inline def flowTo(to: Pixel): Force = {
     if (zone == to.zone) {
       return new Force(to.subtract(this)).normalize

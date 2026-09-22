@@ -20,8 +20,8 @@ trait Angles {
   }
 
   @inline final def normalizePiToPi(angleRadians: Double): Double = {
-    if      (angleRadians < -Math.PI) normalize0To2Pi(angleRadians + twoPi)
-    else if (angleRadians > Math.PI) normalize0To2Pi(angleRadians - twoPi)
+    if      (angleRadians < -Math.PI) normalizePiToPi(angleRadians + twoPi)
+    else if (angleRadians > Math.PI) normalizePiToPi(angleRadians - twoPi)
     else    angleRadians
   }
 

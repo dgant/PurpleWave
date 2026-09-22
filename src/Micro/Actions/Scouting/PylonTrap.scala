@@ -109,7 +109,7 @@ object PylonTrap extends Action {
       .find(legal)
 
     if (tile.isEmpty) {
-      With.logger.warn(f"{probe} needs to build a Pylon but found no location.")
+      With.logger.warn(f"${probe} needs to build a Pylon but found no location.")
       return
     }
 

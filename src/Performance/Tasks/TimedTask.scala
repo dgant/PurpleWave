@@ -41,7 +41,7 @@ abstract class TimedTask {
   final def runsCrossingLimit   : Int     = _runsCrossingLimit
   final def runMsTotal          : Long    = _runMsTotal
   final def runMsMax            : Long    = _runMsMax
-  final def runMsLast           : Long    = runMsPast.headOption.getOrElse(0L)
+  final def runMsLast           : Long    = runMsPast.lastOption.getOrElse(0L)
   final def runMsRecentSamples  : Int     = runMsPast.length
   final val runMsRecentMax      = new Cache[Long](() => Maff.max(runMsPast).getOrElse(0))
   final val runMsRecentMean     = new Cache(() => runMsPast.view.map(Math.min(_, 100)).sum / Math.max(1, runMsPast.size))

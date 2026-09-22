@@ -30,10 +30,10 @@ object BeArbiter extends Action {
     }
     val goal                              = arbiter.team.map(_.vanguardAll()).getOrElse(arbiter.agent.destinationNext())
     val goalDistanceSquared               = arbiter.pixelDistanceSquared(goal)
-    val seniorArbiters                    = arbiter.alliesSquad.filter(_.squadAge > arbiter.squadAge)
+    val seniorArbiters                    = arbiter.alliesSquad.filter(u => Protoss.Arbiter(u) && u.squadAge > arbiter.squadAge)
     val umbrellables                      = arbiter.alliesSquad.filter(needsUmbrella)
     val umbrellablesUncovered             = umbrellables.filterNot(u => seniorArbiters.exists(_.pixelDistanceCenter(u) < cloakRadiusPixels))
-    val umbrellable                       = Maff.minBy(umbrellables)(_.pixelDistanceSquared(goal))
+    val umbrellable                       = Maff.minBy(umbrellablesUncovered)(_.pixelDistanceSquared(goal))
     arbiter.agent.station.set(umbrellable.map(_.pixel).getOrElse(arbiter.agent.destinationNext()))
     arbiter.agent.forces(Forces.travel)   = Potential.towardsDestination(arbiter)
     arbiter.agent.forces(Forces.spacing)  = Potential.hardAvoidThreatRange(arbiter)

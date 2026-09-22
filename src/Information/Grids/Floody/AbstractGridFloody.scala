@@ -88,6 +88,7 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] with GridUpdate
         val floodyTile = tiles(x + y * width)
         floodyTile.depths.add(FloodyUnitDepth(floody, offset.value))
         floodyTile.maxDepth = Math.max(floodyTile.maxDepth, offset.value)
+        floodyTile.invalidateCaches()
       }
       i += 1
     }
@@ -104,6 +105,7 @@ abstract class AbstractGridFloody extends AbstractTypedGrid[Int] with GridUpdate
       if (x >= 0 && y >= 0 && x < width && y < height) {
         val floodyTile = tiles(x + y * width)
         floodyTile.depths.removeIf(_.unit.unit == floody.unit)
+        floodyTile.invalidateCaches()
         if (offset.value >= floodyTile.maxDepth) {
           var j = 0
           val size = floodyTile.depths.size

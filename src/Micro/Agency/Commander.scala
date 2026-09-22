@@ -180,8 +180,8 @@ object Commander {
 
     // Clip to map
     to = Pixel(
-      Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRightInclusive),
-      Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDownInclusive))
+      Maff.clamp(to.x, unit.unitClass.dimensionLeft, With.mapPixelWidth  - unit.unitClass.dimensionRightExclusive),
+      Maff.clamp(to.y, unit.unitClass.dimensionUp,   With.mapPixelHeight - unit.unitClass.dimensionDownExclusive))
 
     if (unit.airborne) return to
 
@@ -229,7 +229,7 @@ object Commander {
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = adjustDestination(unit, destination)
-    autoUnburrowUnlessLurkerInRangeOf(unit, to)
+    if (autoUnburrowUnlessLurkerInRangeOf(unit, to)) return
     val alreadyAttackMovingThere = unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
       unit.bwapiUnit.attack(to.bwapi)
@@ -244,7 +244,7 @@ object Commander {
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
     val to = adjustDestination(unit, destination)
-    autoUnburrowUnlessLurkerInRangeOf(unit, to)
+    if (autoUnburrowUnlessLurkerInRangeOf(unit, to)) return
     unit.bwapiUnit.patrol(to.bwapi)
     sleepAttack(unit)
   }
@@ -601,8 +601,8 @@ object Commander {
     true
   }
 
-  private def autoUnburrowUnlessLurkerInRangeOf(unit: FriendlyUnitInfo, to: Pixel): Unit = {
-    if ( ! Zerg.Lurker(unit) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) autoUnburrow(unit)
+  private def autoUnburrowUnlessLurkerInRangeOf(unit: FriendlyUnitInfo, to: Pixel): Boolean = {
+    ( ! Zerg.Lurker(unit) || unit.pixelDistanceCenter(to) > unit.pixelRangeGround) && autoUnburrow(unit)
   }
   
   private def sleepAttack(unit: FriendlyUnitInfo): Unit = {

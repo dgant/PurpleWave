@@ -11,13 +11,13 @@ abstract class AbstractGridVersioned extends AbstractGridArray[Int] {
   def updateVersion(): Unit = { version = Math.max(1 + version, With.frame) }
 
   @inline final def isSet           (i: Int)          : Boolean = get(i) >= version
-  @inline final def isSet           (tile: Tile)      : Boolean = isSet(tile.i)
+  @inline final def isSet           (tile: Tile)      : Boolean = get(tile) >= version
   @inline final def isSetUnchecked  (i: Int)          : Boolean = values(i) >= version
   @inline final def stamp           (i: Int)          : Unit    = set(i, version)
   @inline final def stampUnchecked  (i: Int)          : Unit    = values(i) = version
-  @inline final def stamp           (x: Int, y: Int)  : Unit    = set(x + y * With.mapTileWidth, version)
+  @inline final def stamp           (x: Int, y: Int)  : Unit    = set(x, y, version)
   @inline final def stampUnchecked  (x: Int, y: Int)  : Unit    = values(x + y * With.mapTileWidth) = version
-  @inline final def stamp           (tile: Tile)      : Unit    = stamp(tile.i)
+  @inline final def stamp           (tile: Tile)      : Unit    = set(tile, version)
   @inline final def stampUnchecked  (tile: Tile)      : Unit    = stampUnchecked(tile.i)
   @inline final def framesSince     (tile: Tile)      : Int     = version - get(tile)
   @inline final def ever            (tile: Tile)      : Boolean = get(tile) > 0

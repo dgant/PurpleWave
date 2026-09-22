@@ -14,7 +14,7 @@ object Qualities {
   }
   object SpiderMine extends Quality {
     override def apply(u: UnitInfo): Boolean = Terran.SpiderMine(u)
-    override val counteredBy: Array[Quality] = Array(AntiVulture)
+    override val counteredBy: Array[Quality] = Array(AntiSpiderMine)
   }
   object AntiSpiderMine extends Quality {
     override def apply(u: UnitInfo): Boolean = u.canAttackGround && (

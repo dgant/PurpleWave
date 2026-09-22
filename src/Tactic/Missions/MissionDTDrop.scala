@@ -13,7 +13,7 @@ class MissionDTDrop extends MissionDrop {
   override protected def additionalFormationConditions: Boolean = With.recruiter.available.exists(MatchDroppableDT)
 
   object MatchDroppableDT extends IsAll(Protoss.DarkTemplar, recruitablePassenger)
-  val dtLock: LockUnits = new LockUnits(this, Protoss.DarkTemplar).setCounter(CountUpTo(2))
+  val dtLock: LockUnits = new LockUnits(this, MatchDroppableDT).setCounter(CountUpTo(2))
 
   override def additionalItineraryConditions(base: Base): Boolean = ! base.enemies.exists(IsDetector)
 

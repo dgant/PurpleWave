@@ -60,7 +60,7 @@ final class MacroEvent(val state: MacroState) {
     if (dSupplyUsed       != 0)                 output += f"${sign(-dSupplyUsed)}s "
     if (dSupplyAvailable  != 0)                 output += f"${sign(dSupplyAvailable)}s "
     if (dMineralPatches   != 0)                 output += f"${sign(dMineralPatches)} patches "
-    if (dGeysers          != 0)                 output += f"${sign(dMineralPatches)} geysers "
+    if (dGeysers          != 0)                 output += f"${sign(dGeysers)} geysers "
     output += tileString
     output
   }

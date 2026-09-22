@@ -193,7 +193,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
     if (style == FormationStyleGuard && face.tile.enemiesAttackingGround.nonEmpty && arcSlotsProduced < arcSlotsDesired) {
       // We have failed to produce an acceptable guard formatio , likely because the choke has been breached.
       // Let's back up one choke and try again
-      val alternateFaces = goalPathTiles.takeWhile(_ != face.zone).lastOption
+      val alternateFaces = goalPathTiles.takeWhile(_.zone != face.zone).lastOption
       alternateFaces.map(_.center).foreach(alternateFace => {
         val alternateClassSlotsArc    = arcSlots(alternateFace, classCount, 32 + apex.pixelDistance(alternateFace))
         val alternateArcSlotsProduced = alternateClassSlotsArc.view.map(_._2.length).sum
@@ -241,12 +241,12 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   /**
     * Positions formation slots by tracing an arc around the goal, centered at the apex.
     */
-  private def arcSlots(toFace: Pixel, classSlots: Vector[ClassSlots], radius: Double): Map[UnitClass, Seq[Pixel]] = {
+  private def arcSlots(toFace: Pixel, classSlots: Vector[ClassSlots], radiusInitial: Double): Map[UnitClass, Seq[Pixel]] = {
     var unitClass       = Terran.Marine
     var angleIncrement  = 0d
     val angleCenter     = toFace.radiansToSlow(apex)
     val radiusIncrement = 4d
-    var radius          = toFace.pixelDistance(apex) - radiusIncrement
+    var radius          = radiusInitial - radiusIncrement
     var rowSlot         = -1
     var slotsEvaluated  = 0
     var haltNegative    = false

@@ -62,7 +62,7 @@ final class MacroSim {
     initialState.minerals           = With.self.minerals
     initialState.gas                = With.self.gas
     initialState.supplyAvailable    = Math.min(400, With.units.ours.filter(u => u.complete || u.isAny(Zerg.Lair, Zerg.Hive)).map(_.unitClass.supplyProvided400).sum)
-    initialState.supplyUsed         = With.units.ours.map(_.unitClass.supplyRequired400).sum
+    initialState.supplyUsed         = With.self.supplyUsed400
     initialState.mineralPatches     = With.self.bases.view.map(_.minerals.count(_.mineralsLeft >= 8)).sum
     initialState.geysers            = With.self.bases.view.map(_.gas.count(g => g.isOurs && g.complete && g.gasLeft > 0)).sum
     initialState.unitsExtant        = new CloneyCountMap(With.macroCounts.oursExtant)
@@ -121,8 +121,10 @@ final class MacroSim {
           val base = u.base.filter(_.townHall.contains(u))
           base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
         }
-        event.dProducer1  = finalClass
-        event.dProducer1N = Maff.fromBoolean(! u.morphing)
+        if ( ! u.morphing && u.complete) {
+          event.dProducer1  = finalClass
+          event.dProducer1N = 1
+        }
         insert(step)
       })
       if (With.self.isTerran) {
@@ -256,7 +258,7 @@ final class MacroSim {
         .max).toInt
       if (framesAfter < maximumFramesAhead) {
         val (stepStart, stepFinish, stepsExtra) = constructStepsForRequest(request, framesAfter)
-        lazy val indexAfterSupplyWouldFinish  = fit(stepStart.event.dFrames + Terran.SupplyDepot.buildFrames)
+        lazy val indexAfterSupplyWouldFinish  = fit(stepStart.event.dFrames + With.self.supplyClass.buildFrames)
         lazy val stepAfterSupplyWouldFinish   = steps(Math.min(indexAfterSupplyWouldFinish, steps.length - 1))
 
         if (_autosupply
@@ -266,7 +268,7 @@ final class MacroSim {
             400,
             stepBefore.state.supplyUsed
             + stepStart.event.dSupplyUsed
-            + stepBefore.state.supplyUsePerFrame * Terran.SupplyDepot.buildFrames / 2)) {
+            + stepBefore.state.supplyUsePerFrame * With.self.supplyClass.buildFrames / 2)) {
 
           val
           farm = With.self.supplyClass

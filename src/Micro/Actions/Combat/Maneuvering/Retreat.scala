@@ -38,7 +38,7 @@ object Retreat extends Action {
 
   def getRetreat(unit: FriendlyUnitInfo): RetreatPlan = {
     // Decide our goals in retreating
-    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToTravelTo(unit.agent.safety) - threat.pixelRangeAgainst(unit) * threat.topSpeed
+    def timeOriginOfThreat(threat: UnitInfo): Double = threat.framesToGetInRange(unit, unit.agent.safety)
     lazy val distanceOriginUs     = unit.pixelDistanceTravelling(unit.agent.safety)
     lazy val distanceOriginEnemy  = Maff.min(unit.matchups.threats.view.map(t => t.pixelDistanceTravelling(unit.agent.safety) - t.pixelRangeAgainst(unit))).getOrElse(2.0 * With.mapPixelWidth)
     lazy val enemyCloser          = distanceOriginUs + 160 >= distanceOriginEnemy

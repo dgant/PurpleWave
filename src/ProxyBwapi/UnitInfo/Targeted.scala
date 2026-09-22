@@ -22,7 +22,8 @@ trait Targeted {
     _targetersIndex = Maff.mod2(_targetersIndex + 1)
     _targetedByNow.clear()
     _targetedByRecently.clear()
-    _targetedByRecentlyMelee ++= _targetedByBefore
+    _targetedByRecentlyMelee.clear()
+    _targetedByRecently ++= _targetedByBefore
     _targetedByRecentlyMelee ++= _targetedByBefore.view.filter(_.unitClass.melee)
     _caught = _targetedByRecently.exists(caughtBy)
   }

@@ -163,8 +163,9 @@ class Storyteller extends MacroCounting {
   private var ourUnitsBefore: mutable.Set[UnitClass] = mutable.HashSet.empty
   private def logOurUnits(): Unit = {
     val ourUnitsAfter = With.units.ours.map(_.unitClass).toSet
-    val ourUnitsNew = ourUnitsAfter -- enemyUnitsBefore
-    ourUnitsNew.foreach(unit => "New unit")
+    val ourUnitsNew = ourUnitsAfter -- ourUnitsBefore
+    ourUnitsNew.foreach(unit => tell(f"New unit: $unit"))
+    ourUnitsBefore = mutable.HashSet.empty ++ ourUnitsAfter
   }
 
   private def logPerformance(): Unit = {

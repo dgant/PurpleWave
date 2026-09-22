@@ -30,6 +30,8 @@ class PlacementQueryParameters {
     if (building  != otherParameters.building)                  return false
     if ( ! labelYes.forall(otherParameters.labelYes.contains))  return false
     if ( ! otherParameters.labelYes.forall(labelYes.contains))  return false
+    if ( ! labelNo.forall(otherParameters.labelNo.contains))    return false
+    if ( ! otherParameters.labelNo.forall(labelNo.contains))    return false
     if ( ! zone.forall(otherParameters.zone.contains))          return false
     if ( ! otherParameters.zone.forall(zone.contains))          return false
     if ( ! base.forall(otherParameters.base.contains))          return false

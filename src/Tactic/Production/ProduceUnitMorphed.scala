@@ -41,7 +41,7 @@ class ProduceUnitMorphed(requestArg: RequestBuildable, expectedFramesArg: Int) e
 
     // Shared somewhat with TrainUnit
     if (hasSpent || currencyLock.acquire()) {
-      morpherLock.matcher = if (morpher.isDefined) morpher.contains else classInput
+      morpherLock.matcher = if (morpher.isDefined) morpher.contains else IsAny(classInput, _.friendly.exists(_.buildType == classOutput))
       morpherLock.acquire()
       morpher = morpherLock.units.headOption
       val shouldHide = Seq(Zerg.Lurker, Zerg.Guardian, Zerg.Devourer).contains(classOutput)

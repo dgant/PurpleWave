@@ -98,7 +98,7 @@ class DefendFFEWithProbes extends Tactic {
       }
       val nearestThreat = Maff.minBy(cannon.matchups.threats)(_.pixelDistanceEdge(cannon))
       nearestThreat.foreach(someNearestThreat => {
-        val threatDistanceToCannon = cannon.pixelDistanceEdge(threatSource)
+        val threatDistanceToCannon = cannon.pixelDistanceEdge(someNearestThreat)
         if (cannon.pixelDistanceEdge(toDefend) > threatDistanceToCannon) {
           toDefend = cannon.pixel.project(someNearestThreat.pixel, threatDistanceToCannon + 16)
         }

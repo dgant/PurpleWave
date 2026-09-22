@@ -94,7 +94,9 @@ final case class TileRectangle(
   }
 
   @inline def intersects(otherRectangle: TileRectangle): Boolean = {
-    containsRectangle(otherRectangle) || otherRectangle.containsRectangle(this)
+    Maff.rectanglesIntersect(
+      startInclusive.x, startInclusive.y, endExclusive.x, endExclusive.y,
+      otherRectangle.startInclusive.x, otherRectangle.startInclusive.y, otherRectangle.endExclusive.x, otherRectangle.endExclusive.y)
   }
 
   @inline private def containsRectangle(otherRectangle:TileRectangle):Boolean = {

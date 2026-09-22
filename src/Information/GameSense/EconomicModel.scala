@@ -182,7 +182,7 @@ trait EconomicModel {
     var enemyGasMiners        = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate / 6)
     val enemyMineralMiners    = Math.min(2 * enemyBasePatchesMins,  enemyWorkerEstimate - enemyGasMiners)
     enemyGasMiners            = Math.min(3 * enemyBasePatchesGas,   enemyWorkerEstimate - enemyMineralMiners)
-    val enemyBaseMineralsGone = With.geography.bases.view.filterNot(b => b.allTimeOwners.exists(_.isEnemy) && ! b.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum
+    val enemyBaseMineralsGone = With.geography.bases.view.filter(b => b.allTimeOwners.exists(_.isEnemy) && ! b.allTimeOwners.exists(_.isFriendly)).map(b => b.startingMinerals - b.mineralsLeft).sum
     _enemyMinedMinerals       += deltaFrames * enemyMineralMiners * With.accounting.workerIncomePerFrameMinerals
     _enemyMinedGas            += deltaFrames * enemyGasMiners     * With.accounting.workerIncomePerFrameGas
     _enemyMinedMinerals       = Math.max(_enemyMinedMinerals, enemyBaseMineralsGone)

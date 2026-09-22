@@ -112,7 +112,7 @@ trait MacroCounting {
   }
 
   def haveEverComplete(matchers: UnitFilter*): Boolean = {
-    matchers.exists(m => With.units.existsOurs(u => m(u) && u.complete))
+    matchers.exists(m => With.units.existsEverOurs(u => m(u) && u.complete))
   }
 
   def framesUntilUnit(unitClass: UnitClass): Int = {
@@ -136,11 +136,11 @@ trait MacroCounting {
   }
 
   def haveGasForUnit(unitClass: UnitClass, quantity: Int = 1): Boolean = {
-    gas >= quantity * unitClass.gasPrice - units(unitClass)
+    gas >= Math.max(0, quantity - units(unitClass)) * unitClass.gasPrice
   }
 
   def haveMineralsForUnit(unitClass: UnitClass, quantity: Int = 1): Boolean = {
-    minerals >= quantity * unitClass.mineralPrice - units(unitClass)
+    minerals >= Math.max(0, quantity - units(unitClass)) * unitClass.mineralPrice
   }
 
   def safeDefending: Boolean = {

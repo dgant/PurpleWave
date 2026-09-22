@@ -54,7 +54,7 @@ trait Zippers {
 
   private def unitNewlySpawned(unit: FriendlyUnitInfo): Boolean = With.framesSince(unit.frameDiscovered) < workerSpawnAgeThreshold
   def onAccelerant(unit: FriendlyUnitInfo, mineral: UnitInfo): Boolean = {
-    (if (unitNewlySpawned(unit)) getAccelerantPixelSpawn(unit) else getAccelerantPixelSteady(unit))
+    (if (unitNewlySpawned(unit)) getAccelerantPixelSpawn(mineral) else getAccelerantPixelSteady(mineral))
       .exists(accelerationPixel =>
         unit.pixelDistanceCenter(accelerationPixel) < zipperRadius
         && unit.pixelDistanceSquared(mineral.pixel) <= accelerationPixel.pixelDistanceSquared(mineral.pixel))
@@ -140,7 +140,7 @@ trait Zippers {
       val json = Json.read(jsonText)
       val mapInfo = new MapInfo(json)
       if (mapInfo.hash == With.game.mapHash) {
-        mapInfo.zippersSpawn.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSpawn.contains).foreach(add(_, p._2, 10)))
+        mapInfo.zippersSpawn.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSpawn.contains).foreach(mineral => zippersSpawn(mineral) = p._2))
         mapInfo.zippersSteady.foreach(p => With.units.neutral.find(_.tileTopLeft == p._1).filterNot(zippersSteady.contains).foreach(add(_, p._2, 10)))
       }
     })
@@ -159,7 +159,7 @@ trait Zippers {
     read()
     val cachedSpawn = With.units.neutral.view.count(zippersSpawn.contains)
     val cachedSteady = With.units.neutral.view.count(zippersSteady.contains)
-    if (cachedSpawn > 0) { With.logger.debug(f"$cachedSteady minerals have cached spawn zippers") }
+    if (cachedSpawn > 0) { With.logger.debug(f"$cachedSpawn minerals have cached spawn zippers") }
     if (cachedSteady > 0) { With.logger.debug(f"$cachedSteady minerals have cached steady zippers") }
   }
 

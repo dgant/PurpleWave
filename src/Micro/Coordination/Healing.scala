@@ -46,7 +46,7 @@ class Healing {
         val organicTarget = Terran.Medic(healer)
         val patient = healer.orderTarget.filter(patient =>
           patient.player == healer.player
-          && (if (organicTarget) patient.unitClass.isOrganic else patient.unitClass.isTerran && patient.unitClass.isMechanical)
+          && patient.unitClass.isOrganic == organicTarget
           && patient.hitPoints < patient.unitClass.maxHitPoints)
         patient.flatMap(_.friendly).foreach(p => healer.friendly.foreach(h => heal(h, p)))
       }

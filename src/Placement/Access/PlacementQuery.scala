@@ -22,7 +22,7 @@ class PlacementQuery {
   override def equals(other: Any): Boolean = {
     if ( ! other.isInstanceOf[PlacementQuery]) return false
     val otherQuery = other.asInstanceOf[PlacementQuery]
-    requirements == otherQuery.requirements && preferences == otherQuery.preferences && foundationSource == otherQuery.foundationSource
+    requirements == otherQuery.requirements && preferences == otherQuery.preferences
   }
 
   /**

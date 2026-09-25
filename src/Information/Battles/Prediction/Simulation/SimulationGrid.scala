@@ -33,7 +33,7 @@ final class SimulationGrid {
       return
     }
     if (unit.flying || true) { // Disabling collisions/pathfinding for now
-      relocateUnit(unit, unit.pixel.projectUpTo(toClamped, unit.topSpeed))
+      relocateUnit(unit, unit.pixel.projectUpTo(toClamped, unit.topSpeed), Some(tiles(toClamped.tile.i)))
       return
     }
     if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){

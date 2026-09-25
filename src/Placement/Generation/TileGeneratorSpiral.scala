@@ -10,11 +10,13 @@ class TileGeneratorSpiral(origin: Tile, zone: Zone) extends TileGenerator {
   private var atEnd: Boolean = false
 
   private def advance(): Unit = {
-    while (iterator.hasNext) {
-      nextNext = origin.add(iterator.next())
-      if (nextNext.zone == zone) return
-    }
-    atEnd = true
+    do {
+      if (iterator.hasNext) {
+        nextNext = origin.add(iterator.next())
+      } else {
+        atEnd = true
+      }
+    } while (nextNext.zone != zone && iterator.hasNext)
   }
 
   advance()

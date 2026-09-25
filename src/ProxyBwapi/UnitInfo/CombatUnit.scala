@@ -157,7 +157,7 @@ trait CombatUnit {
   @inline final def framesToGetInRange            (enemy: CombatUnit)                                 : Int     = ?(canAttack(enemy), framesToTravelPixels(pixelsToGetInRange(enemy)),          Forever())
   @inline final def framesToGetInRange            (enemy: CombatUnit, enemyAt: Pixel)                 : Int     = ?(canAttack(enemy), framesToTravelPixels(pixelsToGetInRange(enemy, enemyAt)), Forever())
   @inline final def framesBeforeAttacking         (enemy: CombatUnit)                                 : Int     = framesBeforeAttacking(enemy, enemy.pixel)
-  @inline final def framesBeforeAttacking         (enemy: CombatUnit, at: Pixel)                      : Int     = ?(canAttack(enemy),  Math.max(cooldownLeft, framesToGetInRange(enemy, at)), Forever())
+  @inline final def framesBeforeAttacking         (enemy: CombatUnit, at: Pixel)                      : Int     = ?(canAttack(enemy),  Math.max(cooldownLeft, framesToGetInRange(enemy)), Forever())
   @inline final def attacksAgainst                (enemy: CombatUnit)                                 : Int     = ?(enemy.flying, attacksAgainstAir, attacksAgainstGround)
   @inline final def cooldownMaxAgainst            (enemy: CombatUnit)                                 : Int     = ?(enemy.flying, cooldownMaxAir, cooldownMaxGround)
   @inline final def pixelRangeAgainst             (enemy: CombatUnit)                                 : Double  = ?(enemy.flying, pixelRangeAir,  pixelRangeGround)

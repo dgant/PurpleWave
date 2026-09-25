@@ -47,14 +47,23 @@ final class GridFormationSlots extends AbstractGridArray[UnorderedBuffer[(UnitCl
     false
   }
   def tryPlace(unitClass: UnitClass, pixel: Pixel): Boolean = {
-    val tile = pixel.tile
-    if ( ! tile.valid) return false
+    val i = this.i(Maff.div32(pixel.x), Maff.div32(pixel.y))
+    if (i < 0 || i > length) return false
     if (unitClass.isFlyer) return true
     val x0 = pixel.x - unitClass.dimensionLeft            - 2
     val x1 = pixel.x + unitClass.dimensionRightExclusive  + 2
     val y0 = pixel.y - unitClass.dimensionUp              - 2
     val y1 = pixel.y + unitClass.dimensionDownExclusive   + 2
-    val output = tile.adjacent9.filter(_.valid).forall(t => ! intersects(x0, y0, x1, y1, t.i))
+    val output = (
+         ! intersects(x0, y0, x1, y1, i - 1)
+      && ! intersects(x0, y0, x1, y1, i)
+      && ! intersects(x0, y0, x1, y1, i + 1)
+      && ! intersects(x0, y0, x1, y1, i - 1 - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i     - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i + 1 - With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i - 1 + With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i     + With.mapTileWidth)
+      && ! intersects(x0, y0, x1, y1, i + 1 + With.mapTileWidth))
     if (output) forcePlaceUnchecked(unitClass, pixel)
     output
   }

@@ -121,10 +121,8 @@ final class MacroSim {
           val base = u.base.filter(_.townHall.contains(u))
           base.foreach(b => event.dMineralPatches += b.minerals.count(_.mineralsLeft >= 8))
         }
-        if ( ! u.morphing && u.complete) {
-          event.dProducer1  = finalClass
-          event.dProducer1N = 1
-        }
+        event.dProducer1  = finalClass
+        event.dProducer1N = Maff.fromBoolean(! u.morphing)
         insert(step)
       })
       if (With.self.isTerran) {

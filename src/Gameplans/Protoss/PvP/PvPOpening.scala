@@ -226,9 +226,6 @@ class PvPOpening extends GameplanImperative {
       PvPDT.swapOut()
       if (With.fingerprints.dtRush() && ! PvPIdeas.preferObserverForDetection && roll("CannonExpand", 0.75)) {
         cannonExpand = true
-      } else if (earlyForge && roll("SwapDTIntoRobo", 0.6)) {
-        PvPRobo.swapIn()
-        PvPReaver.swapIn()
       } else if (roll("SwapDTIntoExpand", 0.6)) {
         PvPCoreExpand.swapIn()
       } else if (roll("SwapDTInto4Gate", 0.3)) {

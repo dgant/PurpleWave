@@ -33,7 +33,6 @@ class Agency extends TimedTask {
       lastQueueCompletion = With.frame
 
       With.coordinator.onAgentCycle()
-      With.learnedCombat.onCycle()
 
       agentIndex = 0
       agents.clear()
@@ -58,9 +57,7 @@ class Agency extends TimedTask {
 
       if (unit.alive && unit.ready && AttackDelay.safeToIssueOrder(unit)) {
         val timeBefore = With.performance.frameElapsedMs
-        With.learnedCombat.beforeAgent(unit)
         agent.execute()
-        With.learnedCombat.afterAgent(unit)
         agent.toAttack.foreach(_.addTargeter(unit))
 
         if (With.configuration.enablePerformancePauses && timer.redLight && With.performance.frameBrokeLimit) {

@@ -63,8 +63,6 @@ object ConfigurationLoader {
       With.configuration.frameTargetMs = frameMsTarget
       With.configuration.frameLimitMs = frameMsLimit
       With.configuration.simviz = simviz
-      With.configuration.experimentSeed = getOrDefault(config, "experimentSeed", -1)
-      if (With.configuration.experimentSeed >= 0) scala.util.Random.setSeed(With.configuration.experimentSeed.toLong)
 
       if (tournament    && ladder)      With.logger.warn("Both tournament and ladder modes are enabled")
       if (tournament    && livestream)  With.logger.warn("Both tournament and livestream modes are enabled")
@@ -86,19 +84,6 @@ object ConfigurationLoader {
       if (logstd)               { With.configuration.logstd = true }
       if (randomStrategy)       { With.configuration.forcedPlaybook = Some(new TestingPlaybook) }
       With.configuration.simulationAsynchronous = multiCPU
-      With.configuration.fightOrFleeEstimationOnly = getOrDefault(config, "fightOrFleeEstimationOnly", false)
-      With.configuration.learnedCombatMode = getOrDefault(config, "learnedCombatMode", "off")
-      With.configuration.learnedCombatHost = getOrDefault(config, "learnedCombatHost", "127.0.0.1")
-      With.configuration.learnedCombatPort = getOrDefault(config, "learnedCombatPort", 8765)
-      With.configuration.learnedCombatToken = getOrDefault(config, "learnedCombatToken", "")
-      With.configuration.learnedCombatGameId = getOrDefault(config, "learnedCombatGameId", "")
-      With.configuration.learnedCombatOraclePath = getOrDefault(config, "learnedCombatOraclePath", "")
-      With.configuration.learnedCombatDecisionFrames = getOrDefault(config, "learnedCombatDecisionFrames", With.configuration.learnedCombatDecisionFrames)
-      With.configuration.learnedCombatMaxAgeFrames = getOrDefault(config, "learnedCombatMaxAgeFrames", With.configuration.learnedCombatMaxAgeFrames)
-      With.configuration.learnedCombatMaxEntities = getOrDefault(config, "learnedCombatMaxEntities", 1024)
-      With.configuration.learnedCombatTimeoutMs = getOrDefault(config, "learnedCombatTimeoutMs", 5000)
-      With.configuration.learnedCombatSynchronous = getOrDefault(config, "learnedCombatSynchronous", false)
-      With.configuration.learnedCombatFullTeacherLabels = getOrDefault(config, "learnedCombatFullTeacherLabels", false)
 
       Seq(
         ("Human",           human.toString),
@@ -111,7 +96,6 @@ object ConfigurationLoader {
         ("Debugging",       debugging.toString),
         ("DebuggingLive",   debugginglive.toString),
         ("SimViz",          simviz.toString),
-        ("Fight/flee estimation only", With.configuration.fightOrFleeEstimationOnly),
         ("Log stdout",      logstd.toString),
         ("Random strategy", randomStrategy.toString),
         ("Frame MS target", frameMsTarget),

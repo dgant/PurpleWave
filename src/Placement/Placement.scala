@@ -71,10 +71,10 @@ class Placement extends Fitter {
     forwardProxyNaturals --= forwardProxyNaturals.filter(fitProxyForwardRobo)
     protoss {
       if (PersonalityCheese.matches) {
-        cannonRushes ++= basesSorted
-          .filter(base => (base.isMain || base.naturalOf.isDefined) && ! base.isOurMain && ! base.isOurNatural)
-          .flatMap(CannonRushFinder.find(_, this))
-        cannonRushes.foreach(rush => index(rush.fit))
+        // cannonRushes ++= basesSorted
+        //   .filter(base => (base.isMain || base.naturalOf.isDefined) && ! base.isOurMain && ! base.isOurNatural)
+        //   .flatMap(CannonRushFinder.find(_, this))
+        // cannonRushes.foreach(rush => index(rush.fit))
       }
     }
     if (wallEverything) {

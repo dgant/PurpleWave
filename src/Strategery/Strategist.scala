@@ -17,6 +17,7 @@ class Strategist extends StrategyDatabase with RecentFingerprints with GameFeatu
   val strategiesSelected      = new mutable.HashSet[Strategy]
   val strategiesDeselected    = new mutable.HashSet[Strategy]
   val strategiesActive        = new mutable.HashSet[Strategy]
+  private val _activationRequirementsSatisfied = new mutable.HashSet[Strategy]
 
   private var _lastEnemyRace  = With.enemy.raceInitial
   def update(): Unit = {
@@ -32,9 +33,18 @@ class Strategist extends StrategyDatabase with RecentFingerprints with GameFeatu
         .foreach(swapOut)
     }
     _lastEnemyRace = enemyRaceNow
+    strategiesSelected.foreach(activationRequirementsSatisfied)
   }
 
-  def isActive(strategy: Strategy): Boolean = isSelected(strategy) && strategiesActive.contains(strategy) && strategy.activationRequirements.forall(_())
+  private def activationRequirementsSatisfied(strategy: Strategy): Boolean = {
+    if ( ! _activationRequirementsSatisfied.contains(strategy)
+      && strategy.activationRequirements.forall(_())) {
+      _activationRequirementsSatisfied += strategy
+    }
+    _activationRequirementsSatisfied.contains(strategy)
+  }
+
+  def isActive(strategy: Strategy): Boolean = isSelected(strategy) && strategiesActive.contains(strategy) && activationRequirementsSatisfied(strategy)
   def isSelected(strategy: Strategy): Boolean = strategiesSelected.contains(strategy)
   def activate(strategy: Strategy): Boolean = {
     // Use public "selected" to force initialization

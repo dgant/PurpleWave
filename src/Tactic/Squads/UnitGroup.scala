@@ -79,7 +79,7 @@ trait UnitGroup {
   def keyDistanceTo       (pixel: Pixel)  : Double  = ?(hasGround, centroidKey       .groundPixels(pixel.walkablePixel), centroidKey       .pixelDistance(pixel))
   def attackKeyDistanceTo (pixel: Pixel)  : Double  = ?(hasGround, attackCentroidKey .groundPixels(pixel.walkablePixel), attackCentroidKey .pixelDistance(pixel))
   def canAttackIfVisible  (unit: UnitInfo): Boolean = ?(unit.flying, attacksAir, attacksGround)
-  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloaked || mobileDetectors.nonEmpty || With.units.existsOurs(Terran.Comsat))
+  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloaked || mobileDetectors.nonEmpty || ?(unit.isFriendly, With.units.existsEnemy(Terran.Comsat), With.units.existsOurs(Terran.Comsat)))
   def canBeAttackedBy     (unit: UnitInfo): Boolean = (unit.canAttackGround && hasGround) || (unit.canAttackAir && hasAir)
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()

@@ -19,11 +19,6 @@ object FightOrFlee extends Action {
   //noinspection NameBooleanParameters
   override def perform(u: FriendlyUnitInfo): Unit = {
 
-    if (With.configuration.fightOrFleeEstimationOnly && !With.configuration.learnedCombatFullTeacherLabels) {
-      applyEstimation(u)
-      return
-    }
-
     var decision: Option[Boolean] = None
 
     def decide(shouldEngage: Boolean, description: String, condition: () => Boolean): Unit = {
@@ -73,7 +68,6 @@ object FightOrFlee extends Action {
 
     if (decision.isDefined) {
       u.agent.shouldFight = decision.get
-      if (With.learnedCombat != null) With.learnedCombat.onEstimate(u)
     } else {
       applyEstimation(u)
     }
@@ -88,6 +82,5 @@ object FightOrFlee extends Action {
       unit.agent.shouldFight = unit.battle.get.judgement.get.unitShouldFight(unit)
       unit.agent.fightReason = ?(unit.agent.shouldFight, "Yes", "No")
     }
-    if (With.learnedCombat != null) With.learnedCombat.onEstimate(unit)
   }
 }

@@ -88,7 +88,7 @@ object PvT1BaseReaver extends PvTStrategyNoZealot {
     With.fingerprints.threeFacVultures,
     With.fingerprints.bio,
     With.fingerprints.twoRaxAcad)
-  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
+  addActivationRequirement(() => have(Protoss.RoboticsFacility) && unitsEver(Protoss.Nexus) < 2)
 }
 object PvTDT extends PvTStrategyNoZealot {
   addChoice(PvTDoubleRobo, PvTArbiter)
@@ -97,11 +97,11 @@ object PvTDT extends PvTStrategyNoZealot {
     With.fingerprints.twoRaxAcad,
     With.fingerprints.twoFacVultures,
     With.fingerprints.threeFacVultures)
-  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
+  addActivationRequirement(() => have(Protoss.CitadelOfAdun) && unitsEver(Protoss.Nexus) < 2)
 }
 object PvT29Arbiter extends PvTStrategyNoZealot {
   addChoice(PvTArbiter)
-  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
+  addActivationRequirement(() => have(Protoss.CitadelOfAdun) && unitsEver(Protoss.Nexus) < 2)
   banPersonality(PersonalityBase)
 }
 object PvT4Gate extends PvTStrategyNoZealot {
@@ -116,7 +116,7 @@ object PvT4Gate extends PvTStrategyNoZealot {
   blacklistVs(
     With.fingerprints.wallIn
   )
-  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 4)
+  addActivationRequirement(() => units(Protoss.Gateway) >= 4 && unitsEver(Protoss.Nexus) < 2)
 }
 object PvTGasSteal extends PvTStrategy {
   addChoice(PvTDoubleRobo, PvTFastCarrier, PvTArbiter)
@@ -124,7 +124,7 @@ object PvTGasSteal extends PvTStrategy {
     With.fingerprints.workerRush,
     With.fingerprints.bbs)
   setStartLocationsMax(3)
-  addActivationRequirement(() => haveEver(u => Protoss.Assimilator(u) && u.base.exists(b => b.isEnemy && b.isMain) && u.frameDiscovered < Minutes(5)()))
+  addActivationRequirement(() => have(u => Protoss.Assimilator(u) && u.base.exists(b => b.isEnemy && b.isMain) && u.frameDiscovered < Minutes(5)()))
 }
 
 //////////////////

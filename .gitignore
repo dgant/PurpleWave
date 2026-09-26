@@ -13,9 +13,6 @@
 .idea/scala_settings.xml
 /.codex/
 /.codex-tmp/
-__pycache__/
-*.egg-info/
-.pytest_cache/
 /.env
 /.gradle/
 /agent-notes/

@@ -4,6 +4,7 @@ import hashlib
 import http.cookiejar
 import io
 import json
+import re
 import subprocess
 import shutil
 import sys
@@ -37,6 +38,7 @@ def main():
   parser.add_argument('--ticklesscait',   action='store_true', default=False, help='Deploy PurpleTickles to SSCAIT')
   parser.add_argument('--csscait',        action='store_true', default=False, help='Deploy Random cheese (PurpleCheese) to SSCAIT')
   parser.add_argument('--pschnail',       action='store_true', default=False, help='Deploy Protoss (PurpleWave) to SCHNAIL')
+  parser.add_argument('--schnail-caches', action='store_true', default=False, help='Generate and validate all SCHNAIL placement caches without deploying')
   parser.add_argument('--play',           action='store_true', default=False, help='Play ladder games')
   parser.add_argument('--viz',            action='store_true', default=False, help='Construct PurpleSimViz.exe')
   args = parser.parse_args()
@@ -50,6 +52,8 @@ def main():
   if do_basil or selected_sscait or args.pschnail:
     args.stage = True
     args.package = True
+  if args.schnail_caches:
+    args.stage = True
   
   did_anything = False
   if args.all or args.jre:
@@ -64,9 +68,14 @@ def main():
   if args.all or args.stage:
     did_anything = True
     stage()
+  schnail_context = None
+  if args.pschnail or args.schnail_caches:
+    did_anything = True
+    schnail_context = load_schnail_context()
+    generate_schnail_caches(schnail_context)
   if args.all or args.package:
     did_anything = True
-    package()
+    package(include_schnail_caches=schnail_context is not None)
   if do_basil:
     copy_basil(args.t, args.p, args.z)
   for bot_name, email_key, password_key in selected_sscait:
@@ -97,13 +106,17 @@ dir_jre           = "c:/p/graalvm-jdk/"
 dir_bwapidata     = "c:/p/bw/bwapi-data/"
 java_version      = "21"
 dir_pw            = "c:/p/pw/"
+dir_purplebench   = "c:/p/PurpleBench/"
 dir_maven_target  = "c:/p/pw/target/"
 dir_scbwbots      = "c:/Users/d/AppData/Roaming/scbw/bots/"
 dir_localschnail  = "c:/Program Files (x86)/SCHNAIL Client/bots/PurpleWave/"
+dir_schnailmaps   = "c:/Program Files (x86)/SCHNAIL Client/maps/"
 dir_basiluploads  = "d:/Dropbox/StarcraftBots/"
 dir_out           = pathjoin(dir_pw,  "out/")
 dir_configs       = pathjoin(dir_pw,  "configs/")
 dir_staging       = pathjoin(dir_out, "staging/")
+dir_schnailcaches = pathjoin(dir_out, "schnail-caches/")
+dir_cacheartifact = pathjoin(dir_staging, "PurpleWaveCacheArtifact/")
 dir_jar           = pathjoin(dir_out, "artifacts", "PurpleWave")
 file_jar          = pathjoin(dir_jar, "PurpleWave.jar")
 
@@ -144,8 +157,14 @@ def maven_build():
   log("RUNNING MAVEN BUILD")
   environment = os.environ.copy()
   # Maven's default heap space is 512mb. We must increase it or compiler inlining will fail due to "Error while emitting"/"Java heap space"
-  environment["MAVEN_OPTS"] = "\"-Xmx1024m\"" 
-  logf(subprocess.run, ["mvn", "clean", "install"], cwd=dir_pw, env=environment, shell=True)
+  environment["MAVEN_OPTS"] = "-Xmx1024m"
+  maven = shutil.which("mvn.cmd") or shutil.which("mvn")
+  if maven is None:
+    local_maven = "c:/p/youtube/mvn/bin/mvn.cmd"
+    maven = local_maven if os.path.isfile(local_maven) else None
+  if maven is None:
+    raise RuntimeError("Could not find Maven on PATH or at c:/p/youtube/mvn/bin/mvn.cmd")
+  logf(subprocess.run, [maven, "clean", "install"], cwd=dir_pw, env=environment, check=True)
   dir_jar  = dir_maven_target
   global file_jar
   file_jar = pathjoin(dir_maven_target, "PurpleWave.jar")  
@@ -199,6 +218,10 @@ def stage():
   with open(path_staging("timestamp.txt"), 'w') as timestamp_file:
     subprocess.run(["date"], stdout=timestamp_file, text=True)
   logf(shutil.copy2, file_jar, path_staging("PurpleWave.jar"))
+  logf(rmtree, dir_cacheartifact)
+  logf(os.makedirs, dir_cacheartifact)
+  for cache_artifact in ["PurpleWave.jar", "revision.txt", "timestamp.txt"]:
+    logf(shutil.copy2, path_staging(cache_artifact), dir_cacheartifact)
 
   log("Building EXE with Launch4J")
   subprocess.run(file_launch4j + " "+  path_configs("launch4j.xml"))
@@ -251,7 +274,7 @@ def populate_bwapidata(dir_bwapidata, dir_ai=None):
   logf(shutil.copy2, path_configs("run64.bat"),       dir_ai)
   logf(shutil.copy2, path_configs("run32.bat"),       dir_ai)
 
-def package():
+def package(include_schnail_caches=False):
   log()
   log("PACKAGING")
   for package in ["AIIDE", "BASIL", "SSCAIT", "SCHNAIL"]:
@@ -269,6 +292,11 @@ def package():
     # TODO: AIIDE does not want the bwapi.dll
     if package in ["SCHNAIL"]:
       logf(shutil.copy2, path_staging(schnail_exe_source), pathjoin(package_dir, "PurpleWaveSCHNAIL.exe"))
+      if include_schnail_caches:
+        manifest = validate_schnail_caches()
+        for cache_name in schnail_cache_names(manifest):
+          logf(shutil.copy2, pathjoin(dir_schnailcaches, cache_name), package_dir)
+        logf(shutil.copy2, pathjoin(dir_schnailcaches, "manifest.json"), pathjoin(package_dir, "placement-cache-manifest.json"))
   
   log()
   log("Replacing zips")
@@ -404,11 +432,8 @@ def deploy_sscait(bot_name, email_key, password_key):
   downloaded_zip = request_bytes(urllib.request.Request(download_url, headers={"User-Agent": "PurpleWave deployment tool"}))
   verify_downloaded_zip(package_path, downloaded_zip, {"bwapi.dll"})
 
-def deploy_schnail():
+def load_schnail_context():
   bot_name, email_key, password_key = schnail_deployment
-  log()
-  log(f"DEPLOYING {bot_name} TO SCHNAIL")
-  package_path = path_staging("PurpleWaveSCHNAIL.zip")
   email = require_env(email_key)
   password = require_env(password_key)
   base_url = "https://app.schnail.com:8181/schnail-serv/rest"
@@ -430,6 +455,161 @@ def deploy_schnail():
   if len(matching_bots) != 1:
     raise RuntimeError(f"Expected one SCHNAIL bot named {bot_name}; found {len(matching_bots)}")
   bot = matching_bots[0]
+
+  maps_request = urllib.request.Request(
+    f"{base_url}/maps/mapInfos",
+    headers={"User-Agent": "PurpleWave deployment tool"})
+  maps = request_json(maps_request)
+  maps_by_guid = {map_info.get("guid"): map_info for map_info in maps}
+  missing_guids = [guid for guid in bot.get("mapGuids", []) if guid not in maps_by_guid]
+  if missing_guids:
+    raise RuntimeError(f"SCHNAIL returned no metadata for map GUIDs: {', '.join(missing_guids)}")
+  return {
+    "authorization": authorization,
+    "base_url": base_url,
+    "bot": bot,
+    "maps": [maps_by_guid[guid] for guid in bot.get("mapGuids", [])]}
+
+def schnail_cache_plan_path():
+  return path_staging("SCHNAIL-cache-plan.json")
+
+def schnail_map_starts(map_info):
+  match = re.match(r"^\s*\((\d+)\)", map_info.get("name", ""))
+  if match is None:
+    raise RuntimeError(f"Could not determine starting-position count for SCHNAIL map: {map_info}")
+  starts = int(match.group(1))
+  if starts < 2 or starts > 8:
+    raise RuntimeError(f"Invalid starting-position count for SCHNAIL map {map_info.get('name')}: {starts}")
+  return starts
+
+def write_schnail_cache_plan(context):
+  revision_path = path_staging("revision.txt")
+  if not os.path.isfile(revision_path):
+    raise RuntimeError(f"Missing staged cache invalidation signature: {revision_path}")
+  with open(revision_path, 'r', encoding='utf-8') as revision_file:
+    signature = revision_file.read().strip()
+  if not signature:
+    raise RuntimeError(f"Empty staged cache invalidation signature: {revision_path}")
+  plan = {
+    "signature": signature,
+    "botGuid": context["bot"]["guid"],
+    "mapGuids": context["bot"].get("mapGuids", []),
+    "maps": [
+      {"file": map_info["mapFileName"], "starts": schnail_map_starts(map_info)}
+      for map_info in context["maps"]]}
+  plan_path = schnail_cache_plan_path()
+  with open(plan_path, 'w', encoding='utf-8') as plan_file:
+    json.dump(plan, plan_file, indent=2)
+    plan_file.write('\n')
+  return plan
+
+def scbw_root():
+  try:
+    from scbw.defaults import SCBW_BASE_DIR
+    return SCBW_BASE_DIR
+  except ImportError:
+    candidates = ["e:/scbw", os.path.dirname(dir_scbwbots.rstrip('/'))]
+    return next((candidate for candidate in candidates if os.path.isdir(candidate)), candidates[0])
+
+def purplebench_cache_command(validate_only=False):
+  root = scbw_root()
+  command = [
+    sys.executable,
+    "-m",
+    "purplebench",
+    "placement-caches",
+    "--plan",
+    schnail_cache_plan_path(),
+    "--maps-dir",
+    dir_schnailmaps,
+    "--output-dir",
+    dir_schnailcaches]
+  if validate_only:
+    command.append("--validate-only")
+  else:
+    command.extend([
+      "--artifact-dir",
+      dir_cacheartifact,
+      "--scbw-root",
+      root,
+      "--bot-dir",
+      pathjoin(root, "bots"),
+      "--game-dir",
+      pathjoin(dir_schnailcaches, "games")])
+  return command
+
+def generate_schnail_caches(context):
+  log()
+  log("GENERATING SCHNAIL PLACEMENT CACHES")
+  write_schnail_cache_plan(context)
+  command = purplebench_cache_command()
+  log(subprocess.list2cmdline(command))
+  subprocess.run(command, cwd=dir_purplebench, check=True)
+  validate_schnail_caches(context)
+
+def validate_schnail_caches(context=None):
+  plan_path = schnail_cache_plan_path()
+  if not os.path.isfile(plan_path):
+    raise RuntimeError(f"Missing SCHNAIL cache plan: {plan_path}")
+  with open(plan_path, 'r', encoding='utf-8') as plan_file:
+    plan = json.load(plan_file)
+  if context is not None:
+    expected_guids = context["bot"].get("mapGuids", [])
+    if plan.get("botGuid") != context["bot"].get("guid") or plan.get("mapGuids") != expected_guids:
+      raise RuntimeError("SCHNAIL cache plan does not match the bot's current map selection")
+  command = purplebench_cache_command(validate_only=True)
+  completed = subprocess.run(command, cwd=dir_purplebench, capture_output=True, text=True)
+  if completed.returncode != 0:
+    details = (completed.stderr or completed.stdout).strip()
+    raise RuntimeError(f"PurpleBench rejected the SCHNAIL caches: {details[-4000:]}")
+  try:
+    manifest = json.loads(completed.stdout)
+  except json.JSONDecodeError as error:
+    raise RuntimeError(f"PurpleBench returned an invalid cache manifest: {completed.stdout[:500]!r}") from error
+  os.makedirs(dir_schnailcaches, exist_ok=True)
+  with open(pathjoin(dir_schnailcaches, "manifest.json"), 'w', encoding='utf-8') as manifest_file:
+    json.dump(manifest, manifest_file, indent=2)
+    manifest_file.write('\n')
+  return manifest
+
+def schnail_cache_names(manifest):
+  names = []
+  for map_info in manifest.get("maps", []):
+    for race in ["Zerg", "Terran", "Protoss", "Unknown"]:
+      names.extend(map_info.get("caches", {}).get(race, []))
+  if not names or len(names) != len(set(names)):
+    raise RuntimeError("PurpleBench returned an empty or duplicate SCHNAIL cache manifest")
+  return names
+
+def validate_schnail_package_caches(package_path, context):
+  manifest = validate_schnail_caches(context)
+  expected_names = set(schnail_cache_names(manifest))
+  with zipfile.ZipFile(package_path, 'r') as package_zip:
+    corrupt = package_zip.testzip()
+    if corrupt is not None:
+      raise RuntimeError(f"SCHNAIL package contains a corrupt file: {corrupt}")
+    packaged_names = {name for name in package_zip.namelist() if name.startswith("placement-") and name.endswith(".bin.gz")}
+    if packaged_names != expected_names:
+      missing = sorted(expected_names - packaged_names)
+      extra = sorted(packaged_names - expected_names)
+      raise RuntimeError(f"SCHNAIL package cache set does not match validated caches; missing={missing}, extra={extra}")
+    packaged_manifest = json.loads(package_zip.read("placement-cache-manifest.json").decode('utf-8'))
+    if packaged_manifest.get("signature") != manifest.get("signature"):
+      raise RuntimeError("SCHNAIL package cache signature does not match the staged revision")
+
+def deploy_schnail(context=None, *, require_caches=True):
+  bot_name, _, _ = schnail_deployment
+  log()
+  log(f"DEPLOYING {bot_name} TO SCHNAIL")
+  package_path = path_staging("PurpleWaveSCHNAIL.zip")
+  context = load_schnail_context() if context is None else context
+  if require_caches:
+    validate_schnail_package_caches(package_path, context)
+  else:
+    log("Skipping SCHNAIL placement-cache validation for this deployment")
+  base_url = context["base_url"]
+  authorization = context["authorization"]
+  bot = context["bot"]
   bot_guid = bot["guid"]
 
   upload_body, content_type = multipart_form(

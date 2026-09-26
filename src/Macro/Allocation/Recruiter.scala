@@ -103,7 +103,11 @@ class Recruiter {
     unitsByLock(lock) = unitsByLock.getOrElse(lock, mutable.Set.empty)
   }
 
-  private def recruitable(unit: FriendlyUnitInfo): Boolean = unit.alive && unit.unitClass.orderable && unit.remainingCompletionFrames < With.latency.remainingFrames
+  private def recruitable(unit: FriendlyUnitInfo): Boolean = (
+    unit.alive
+    && unit.unitClass.orderable
+    && unit.remainingCompletionFrames < With.latency.remainingFrames
+    && (unit.powered || ! unit.unitClass.requiresPsi))
   
   private def lockTo(unit: FriendlyUnitInfo, lock: LockUnits): Unit = {
     unitsByLock(lock).add(unit)

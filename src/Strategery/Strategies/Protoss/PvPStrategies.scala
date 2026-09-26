@@ -36,7 +36,7 @@ object PvPNexusFirst extends PvPStrategy {
   whitelistVs(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)
   blacklistVs(With.fingerprints.gatewayFirst)
   setMinimumGamesVsOpponent(5)
-  addActivationRequirement(() => unitsEver(Protoss.Nexus) >= 2)
+  addActivationRequirement(() => units(Protoss.Nexus) >= 2 && ! haveEver(Protoss.Gateway, Protoss.Forge))
 }
 
 object PvP3Zealot extends PvPStrategy {
@@ -54,19 +54,19 @@ object PvP5Zealot extends PvPStrategy
 object PvPRobo extends PvPStrategy {
   addChoice(PvPObs, PvPReaver)
   // No restrictions; Preserve this as our "Always valid" choice
-  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
+  addActivationRequirement(() => have(Protoss.RoboticsFacility) && unitsEver(Protoss.Nexus) < 2)
   banPersonality(PersonalityCheese)
 }
 object PvPReaver extends PvPStrategy {
-  addActivationRequirement(() => haveEver(Protoss.Reaver))
+  addActivationRequirement(() => have(Protoss.Reaver) && unitsEver(Protoss.Nexus) < 2)
 }
 object PvPObs extends PvPStrategy {
   whitelistVs(With.fingerprints.dtRush) // Until we make better use of the Obs
-  addActivationRequirement(() => haveEver(Protoss.Observatory))
+  addActivationRequirement(() => have(Protoss.Observatory) && unitsEver(Protoss.Nexus) < 2)
 }
 object PvPDT extends PvPStrategy {
   blacklistVs(With.fingerprints.robo)
-  addActivationRequirement(() => haveEver(Protoss.CitadelOfAdun))
+  addActivationRequirement(() => have(Protoss.CitadelOfAdun) && unitsEver(Protoss.Nexus) < 2)
   banPersonality(PersonalityCheese)
 }
 object PvPCoreExpand extends PvPStrategy {
@@ -76,14 +76,14 @@ object PvPCoreExpand extends PvPStrategy {
     || MapGroups.strongNatural.exists(_())
     ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
-  addActivationRequirement(() => unitsEver(Protoss.Nexus) >= 2)
+  addActivationRequirement(() => units(Protoss.Nexus) >= 2 && unitsEver(Protoss.Gateway) < 2 && ! haveEver(Protoss.CitadelOfAdun, Protoss.RoboticsFacility))
   banPersonality(PersonalityCheese)
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
-  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 3)
+  addActivationRequirement(() => units(Protoss.Gateway) >= 3 && unitsEver(Protoss.Nexus) < 2)
   banPersonality(PersonalityCheese)
 }
 object PvP4GateGoon extends PvPStrategy {
@@ -91,5 +91,5 @@ object PvP4GateGoon extends PvPStrategy {
   blacklistVs(With.fingerprints.dtRush)
   addSelectionRequirement(() => entranceInverted || ! (MapGroups.badForMassGoon ++ MapGroups.strongNatural).exists(_()))
   addSelectionRequirement(() => entranceInverted || ! With.fingerprints.fourGateGoon.recently)
-  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 4)
+  addActivationRequirement(() => units(Protoss.Gateway) >= 4 && unitsEver(Protoss.Nexus) < 2)
 }

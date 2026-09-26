@@ -24,7 +24,6 @@ class Configuration {
   var visualizeDebug    = false
   var debugging         = false
   var simviz            = false
-  var experimentSeed    = -1
   var detectBreakpoints = false
   var camera            = false
 
@@ -44,19 +43,6 @@ class Configuration {
   // Battles //
   /////////////
 
-  var fightOrFleeEstimationOnly      = false
-  var learnedCombatMode             = "off"
-  var learnedCombatHost             = "127.0.0.1"
-  var learnedCombatPort             = 8765
-  var learnedCombatToken            = ""
-  var learnedCombatGameId           = ""
-  var learnedCombatOraclePath       = ""
-  var learnedCombatDecisionFrames   = 2
-  var learnedCombatMaxAgeFrames     = 4
-  var learnedCombatMaxEntities      = 1024
-  var learnedCombatTimeoutMs        = 5000
-  var learnedCombatSynchronous      = false
-  var learnedCombatFullTeacherLabels = false
   var simulationAsynchronous        = true
   var simulationFrames              = Seconds(15)()
   var simulationResolution          = 8

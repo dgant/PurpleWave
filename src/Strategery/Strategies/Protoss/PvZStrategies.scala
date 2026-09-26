@@ -24,23 +24,23 @@ object PvZ1BaseReactive extends PvZStrategy {
   banPersonality(PersonalityCheese)
 }
 object PvZMuscle extends PvZStrategy {
-  addActivationRequirement(() => unitsEver(Protoss.Gateway) >= 2)
+  addActivationRequirement(() => units(Protoss.Gateway) >= 2 && unitsEver(Protoss.Nexus) < 2)
 }
 object PvZExpand extends PvZStrategy {
-  addActivationRequirement(() => With.geography.maxMiningBasesOurs >= 2)
+  addActivationRequirement(() => miningBases >= 2)
 }
 object PvZTech extends PvZStrategy {
-  addActivationRequirement(() => haveEver(Protoss.Assimilator))
+  addActivationRequirement(() => have(Protoss.Assimilator))
 }
 object PvZGoon extends PvZStrategy {
-  addActivationRequirement(() => haveEver(Protoss.Dragoon) && upgradeStarted(Protoss.DragoonRange))
+  addActivationRequirement(() => have(Protoss.Dragoon) && upgradeStarted(Protoss.DragoonRange))
 }
 object PvZReaver extends PvZStrategy {
   blacklistVs(With.fingerprints.twoHatchMuta, With.fingerprints.threeHatchMuta)
-  addActivationRequirement(() => haveEver(Protoss.RoboticsFacility))
+  addActivationRequirement(() => have(Protoss.RoboticsFacility))
 }
 object PvZSpeedlot extends PvZStrategy {
-  addActivationRequirement(() => haveEver(Protoss.Forge))
+  addActivationRequirement(() => have(Protoss.Forge))
 }
 abstract class PvZFEOpening extends PvZStrategy {
   setRushTilesMinimum(160)

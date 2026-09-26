@@ -2,10 +2,8 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPIdeas
-import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Terran}
-import Strategery.Strategies.Protoss.PvR2Gate4Gate
-import Utilities.Time.Minutes
+import Strategery.Strategies.Protoss.{PvR2Gate4Gate, PvZ2Gate4Gate}
 import Utilities.UnitFilters.IsWarrior
 import Utilities.{?, SwapIf}
 
@@ -15,6 +13,7 @@ class PvR2Gate4Gate extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     PvR2Gate4Gate.activate()
+    PvZ2Gate4Gate.activate()
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(10, Protoss.Probe)

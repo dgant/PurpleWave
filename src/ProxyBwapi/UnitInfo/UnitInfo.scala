@@ -293,12 +293,14 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     && (flying || ! underDisruptionWeb)
     && canDoAnything)
 
-  @inline final def canAttack(enemy: CombatUnit): Boolean = (
+  @inline final def canAttack(enemy: CombatUnit): Boolean = canAttack(enemy, assumeDetection = false)
+
+  @inline final def canAttack(enemy: CombatUnit, assumeDetection: Boolean): Boolean = (
     canAttack
     && ! enemy.unitClass.isSpell
     && enemy.asInstanceOf[UnitInfo].canBeAttacked
     && (if (enemy.flying) unitClass.attacksAir else unitClass.attacksGround)
-    && ( ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked || Terran.SpiderMine(this))
+    && ( ! enemy.asInstanceOf[UnitInfo].effectivelyCloaked || Terran.SpiderMine(this) || assumeDetection)
     && (enemy.unitClass.triggersSpiderMines || ! Terran.SpiderMine(this))
     && ( ! unitClass.affectedByDarkSwarm || ! enemy.asInstanceOf[UnitInfo].underDarkSwarm))
 

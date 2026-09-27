@@ -4,7 +4,7 @@ import Lifecycle.With
 import Micro.Targeting.TargetFilter
 import ProxyBwapi.Orders
 import Utilities.UnitFilters.IsTank
-import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterVsTank extends TargetFilter {
@@ -27,7 +27,7 @@ object TargetFilterVsTank extends TargetFilter {
       // Do target anything that's in the way
       || (actor.readyForAttackOrder && ! target.flying && actor.pixelDistanceEdge(target) < 12)
       // If we're cloaked it doesn't matter
-      || (actor.effectivelyCloaked && ! firingPixel.tile.enemyDetected)
+      || (actor.effectivelyCloaked && Protoss.DarkTemplar(actor) && ! firingPixel.tile.enemyDetected)
       // Do target things we can hit without eating tank fire
       || ! With.grids.enemyRangeGround.unitsOn(firingPixel.tile).exists(t =>
         IsTank(t)

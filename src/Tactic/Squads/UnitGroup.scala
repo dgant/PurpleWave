@@ -3,6 +3,7 @@ package Tactic.Squads
 import Debugging.EnumerateUnits
 import Information.Battles.Types.{Battle, GroupCentroid}
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Performance.Cache
@@ -46,6 +47,7 @@ trait UnitGroup {
   def engagedUpon               : Boolean   = _engagedUpon()
   def volleyConsensus           : Boolean   = _volleyConsensus()
   def minersThreatened          : Boolean   = _minersThreatened()
+  def detectionAvailable        : Boolean   = _detectionAvailable()
   def centroidKey               : Pixel     = _centroidKey()
   def centroidAir               : Pixel     = _centroidAir()
   def centroidGround            : Pixel     = _centroidGround()
@@ -79,7 +81,7 @@ trait UnitGroup {
   def keyDistanceTo       (pixel: Pixel)  : Double  = ?(hasGround, centroidKey       .groundPixels(pixel.walkablePixel), centroidKey       .pixelDistance(pixel))
   def attackKeyDistanceTo (pixel: Pixel)  : Double  = ?(hasGround, attackCentroidKey .groundPixels(pixel.walkablePixel), attackCentroidKey .pixelDistance(pixel))
   def canAttackIfVisible  (unit: UnitInfo): Boolean = ?(unit.flying, attacksAir, attacksGround)
-  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloaked || mobileDetectors.nonEmpty || ?(unit.isFriendly, With.units.existsEnemy(Terran.Comsat), With.units.existsOurs(Terran.Comsat)))
+  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloaked || detectionAvailable)
   def canBeAttackedBy     (unit: UnitInfo): Boolean = (unit.canAttackGround && hasGround) || (unit.canAttackAir && hasAir)
 
   private val _count = new mutable.HashMap[UnitFilter, Int]()
@@ -114,6 +116,7 @@ trait UnitGroup {
   private val _engagedUpon                = new Cache(() => groupOrderable.exists(_.matchups.engagedUpon))
   private val _volleyConsensus            = new Cache(() => Maff.modeOpt(attackers.flatMap(_.matchups.wantsToVolley)).getOrElse(false))
   private val _minersThreatened           = new Cache(() => consensusPrimaryFoes.attackers.exists(_.matchups.threateningMiners))
+  private val _detectionAvailable         = new Cache(() => detectors.nonEmpty || ?(groupUnits.headOption.exists(_.isOurs), With.units.existsOurs(u => Terran.Comsat(u) && u.complete && u.energy >= 50), MacroFacts.enemyHasShown(Terran.Comsat, Terran.SpellScannerSweep)))
   private val _widthPixels                = new Cache(() => warriorsCasters.view.filterNot(_.flying).filter(_.canMove).map(_.unitClass.radialHypotenuse * 2).sum)
   private val _centroidKey                = new Cache(() => ?(_hasGround(), centroidGround, centroidAir))
   private val _centroidAir                = new Cache(() => GroupCentroid.air   (centroidUnits(Maff.orElse(           groupOrderable, groupUnits)), _.pixel))

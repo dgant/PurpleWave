@@ -109,10 +109,8 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
-    || shooter.canAttack(victim)
-    || (shooter.unitClass.canAttack(victim) && (
-      ( ! shooter.complete && shooter.remainingCompletionFrames < 72) ||
-      (victim.cloaked && victim.matchups.pixelsToDetectionRange.exists(_ < 96)))))
+    || shooter.canAttack(victim, assumeDetection = ?(shooter == me, groupOf, groupVs).detectionAvailable)
+    || (shooter.unitClass.canAttack(victim) && ( ! shooter.complete && shooter.remainingCompletionFrames < 72)))
 
   def healers: Seq[UnitInfo] = {
     allies.view.filter(a =>

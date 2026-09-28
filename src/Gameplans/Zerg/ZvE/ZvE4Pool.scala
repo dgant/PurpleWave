@@ -17,7 +17,7 @@ class ZvE4Pool extends GameplanImperative {
     cancelExtractor ||= supplyUsed200 >= supplyTotal200
     cancelExtractor ||= supplyUsed200 < supplyTotal200 - 1
     cancelExtractor ||= With.units.ours.exists(u => Zerg.Extractor(u) && u.remainingCompletionFrames < 72)
-    if (cancelExtractor) {
+    if (have(Zerg.Extractor) && cancelExtractor) {
       cancel(Zerg.Extractor)
     } else if (supplyUsed200 == supplyTotal200 && have(Zerg.Larva) && minerals >= 100) {
       get(Zerg.Extractor)

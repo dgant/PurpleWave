@@ -66,8 +66,9 @@ object BlockConstruction extends Action {
   )
 
   def blockableBuilders(unit: FriendlyUnitInfo): Iterable[UnitInfo] = {
-    unit.matchups.targets.filter(builder => {
-      lazy val previouslyBuilder    = unit.agent.get[Iterable[UnitInfo]](this).exists(builder==) && ! unit.base.exists(_.harvestingTrafficTiles.contains(builder.tile))
+    val previousBuilders = unit.agent.get[Iterable[UnitInfo]](this).getOrElse(Iterable.empty)
+    val builders = unit.matchups.targets.filter(builder => {
+      lazy val previouslyBuilder    = previousBuilders.exists(builder==) && ! unit.base.exists(_.harvestingTrafficTiles.contains(builder.tile))
       lazy val hasBuildOrder        = constructionOrders.contains(builder.order)
       lazy val hasMoveOrder         = moveOrders.contains(builder.order)
       lazy val hasRelevantOrder     = hasBuildOrder  || hasMoveOrder || previouslyBuilder
@@ -84,9 +85,9 @@ object BlockConstruction extends Action {
 
       val output = IsWorker(builder) && (hasBuildOrder || movingToRelevantBase || sittingOnExpansion)
 
-      unit.agent.put(this, output)
-
       output
-    })
+    }).toVector
+    unit.agent.put(this, builders)
+    builders
   }
 }

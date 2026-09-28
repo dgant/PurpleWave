@@ -38,7 +38,7 @@ class SquadAttack extends Squad {
   def chooseMode(): AttackMode = {
     val legalTargets = With.units.enemy
       .filter(u => attacksAir     || ! u.unitClass.canFly || ( u.visible && ! u.flying) || u.tile.walkable)
-      .filter(u => attacksGround  || ! u.flying)
+      .filter(u => attacksGround  || u.flying)
     val proxies             = legalTargets.filter(_.proxied).toVector
     val enemyBasesOccupied  = units.view.flatMap(_.base).filter(_.isEnemy).toSet
 

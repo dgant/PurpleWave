@@ -83,7 +83,7 @@ abstract class MissionDrop extends Mission {
 
   final private def skipBase(base: Base): Boolean = {
     if (ignore(base)) return true
-    if (state == Evacuating || state == Escaping && units.exists(_.base.contains(base))) return true
+    if ((state == Evacuating || state == Escaping) && units.exists(_.base.contains(base))) return true
     if (base.isNeutral && itinerary.size > 1 && With.frame < Minutes(10)()) return true
     if (base.isNeutral) {
       val maxCost = if (itinerary.size > 1 && With.frame < Minutes(10)()) 0
@@ -135,7 +135,7 @@ abstract class MissionDrop extends Mission {
     if (duration > Seconds(90)()) { terminate("Expired"); return }
     if (passengers.isEmpty) { terminate("No passengers left"); return }
     lazy val interruptedPassengers = passengers.filterNot(recruitablePassenger)
-    if (state == Assembling && interruptedPassengers.nonEmpty) { terminate(f"Assembly interrupted: $interruptedPassengers") }
+    if (state == Assembling && interruptedPassengers.nonEmpty) { terminate(f"Assembly interrupted: $interruptedPassengers"); return }
     if (transports.isEmpty) {
       if (Seq(Raiding, Evacuating).contains(state)) { passengers.filter(_.base.exists(_.owner.isEnemy)).foreach(_.agent.commit = true) } // Godspeed you poor souls
       terminate("No transports left"); return

@@ -41,7 +41,7 @@ final class ForeignUnitInfo(bwapiUnit: bwapi.Unit, id: Int) extends BWAPICachedU
               if (Zerg.LurkerEgg(this)) Zerg.Lurker
         else  if (Zerg.Cocoon(this))    Zerg.Guardian
         else                            unitClass).buildFrames
-      return Math.max(1, buildFrames + lastClassChange - With.frame)
+      return Math.max(if (visible) 1 else 0, buildFrames + lastClassChange - With.frame)
     }
     // Use both the initial projection and the up-to-date projection
     // We can't always trust the most up-to-date projection in case the unit has taken damage

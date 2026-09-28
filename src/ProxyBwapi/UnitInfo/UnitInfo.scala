@@ -137,10 +137,11 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def tiles     : Seq[Tile]     = cacheTiles() // TODO: Set this on type/pixel change
   @inline final def tileArea  : TileRectangle = cacheTileArea() // TODO: Set this on type/pixel change
   private def tileCacheDuration: Int = { if (unitClass.isBuilding) (if (unitClass.canFly) 24 * 5 else 24 * 60) else 1 }
-  private lazy val cacheTileArea = new Cache(
+  private lazy val cacheTileArea = new KeyedCache(
     () => if (unitClass.isBuilding) unitClass.tileArea.add(tileTopLeft) else PixelRectangle(pixelStart, pixelEndExclusive).tiles,
+    () => (unitClass, tileTopLeft),
     refreshPeriod = tileCacheDuration)
-  private lazy val cacheTiles = new Cache(() => cacheTileArea().tiles.toVector, refreshPeriod = tileCacheDuration)
+  private lazy val cacheTiles = new KeyedCache(() => cacheTileArea().tiles.toVector, () => (unitClass, tileTopLeft), refreshPeriod = tileCacheDuration)
 
   @inline final def zone: Zone = ?(unitClass.isBuilding, tileTopLeft, tile).zone // Hack to get buildings categorized in zone they were intended to be constructed in
   @inline final def base: Option[Base] = tile.base

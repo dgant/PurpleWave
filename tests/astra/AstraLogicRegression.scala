@@ -3,7 +3,8 @@ package Regression
 import Debugging.Logger
 import Information.Battles.Battles
 import Information.Battles.Prediction.Simulation.{BehaviorFight, Simulacrum, Simulation}
-import Information.Battles.Types.{Battle, JudgmentModifiers}
+import Information.Battles.Prediction.Skimulation.Skimulator
+import Information.Battles.Types.{Battle, EnemyTeam, JudgmentModifiers}
 import Information.Fingerprinting.{Fingerprint, Fingerprints}
 import Information.Fingerprinting.Generic._
 import Information.Fingerprinting.ProtossStrategies._
@@ -327,6 +328,347 @@ object AstraLogicRegression extends App {
     fighter.lastFrameTakingDamage = With.frame - Seconds(5)() / 2
     fighter.damageQueue += fighter.DamageSource(fighter, With.frame + 1, committed = true, guaranteed = true, 1)
     assert(math.abs(JudgmentModifiers.hysteresis(fighter)._1 + 0.075) < 0.000001)
+  }
+  check("armor upgrades increase skim durability, including low-damage opponents") {
+    for (damage <- Seq(6.0, 1.0, 0.0); kind <- Seq(Protoss.Dragoon, Terran.Goliath)) {
+      def strength(armor: Int, shields: Int): Double = {
+        val fighter = unit(kind, Pixel(160, 160), friendly = true)
+        set(fighter, "_player", new PlayerInfo(HeadlessBWAPI.player(0, Race.Protoss)) {
+          override def getUpgradeLevel(upgrade: ProxyBwapi.Upgrades.Upgrade): Int =
+            if (upgrade == Protoss.Shields) shields else if (kind.armorUpgrade.contains(upgrade)) armor else 0
+        })
+        val battle = new Battle(Seq(fighter), isGlobal = true) {
+          override lazy val enemy: EnemyTeam = new EnemyTeam(this, Seq.empty) {
+            override def meanDamageOnHit: Double = damage
+          }
+        }
+        fighter.skimPresence = 1.0
+        Skimulator.measureUnitStrength(fighter, battle.us, battle)
+        fighter.skimStrength
+      }
+      val base = strength(0, 0)
+      val upgraded = strength(3, 0)
+      val shielded = strength(0, 3)
+      assert(base > 0 && upgraded >= base && shielded >= base)
+      assert(!upgraded.isInfinity && !shielded.isInfinity)
+      if (damage == 6.0) {
+        assert(upgraded > base)
+        if (kind.maxShields > 0) assert(shielded > base)
+      }
+    }
+  }
+  check("Medic engagement distance excludes the Medic itself") {
+    val medic = unit(Terran.Medic, Pixel(160, 160), friendly = true)
+    val marine = unit(Terran.Marine, Pixel(480, 160), friendly = true)
+    val method = Skimulator.getClass.getDeclaredMethods.find(_.getName.endsWith("distanceToEngage")).get
+    method.setAccessible(true)
+    val battle = new Battle(Seq(medic, marine), isGlobal = true)
+    val distance = method.invoke(Skimulator, medic, battle.us).asInstanceOf[Double]
+    assert(medic.skimTarget.contains(marine) && distance == medic.pixelDistanceEdge(marine))
+    val alone = new Battle(Seq(medic), isGlobal = true)
+    method.invoke(Skimulator, medic, alone.us)
+    assert(medic.skimTarget.isEmpty)
+  }
+  check("group counts refresh after membership and unit-type changes") {
+    val marine = unit(Terran.Marine, Pixel(160, 160), friendly = true)
+    var members = Seq.empty[UnitInfo]
+    val group = new Tactic.Squads.UnitGroup { override def groupUnits: Seq[UnitInfo] = members }
+    assert(group.count(Terran.Marine) == 0)
+    members = Seq(marine)
+    With.frame += 1
+    assert(group.count(Terran.Marine) == 1 && group.has(Terran.Marine))
+    set(marine, "_unitClass", Terran.Firebat)
+    With.frame += 1
+    assert(group.count(Terran.Marine) == 0 && group.count(Terran.Firebat) == 1)
+    members = Seq.empty
+    With.frame += 1
+    assert(!group.has(Terran.Marine, Terran.Firebat))
+  }
+  check("Zerg building families recognize higher tiers, never lower tiers") {
+    for (kind <- Seq(Zerg.Hatchery, Zerg.Lair, Zerg.Hive, Zerg.Spire, Zerg.GreaterSpire, Protoss.Nexus)) {
+      assert(kind.isHatchlike == Seq(Zerg.Hatchery, Zerg.Lair, Zerg.Hive).contains(kind))
+      assert(kind.isLairlike == Seq(Zerg.Lair, Zerg.Hive).contains(kind))
+      assert(kind.isSpirelike == Seq(Zerg.Spire, Zerg.GreaterSpire).contains(kind))
+    }
+    assert(Macro.Scheduling.MacroProducer(Zerg.Lair, Zerg.Mutalisk).supplyUsePerFrame == Zerg.Mutalisk.supplyRequired400 / 342.0f)
+    assert(Macro.Scheduling.MacroProducer(Zerg.Hive, Zerg.Ultralisk).supplyUsePerFrame == Zerg.Ultralisk.supplyRequired400 / 342.0f)
+  }
+  check("air-only attack squads retain flying targets and reject ground targets") {
+    With.frame += 1
+    With.yolo = new Planning.Yolo { override def active: Boolean = true }
+    set(With.scouting, "enemyHomeCache", new Performance.Cache(() => Tile(1, 1)))
+    val airborne = unit(Terran.CommandCenter, Pixel(480, 480)).asInstanceOf[ForeignUnitInfo]
+    set(airborne, "_flying", true)
+    val ground = unit(Terran.Marine, Pixel(180, 180)).asInstanceOf[ForeignUnitInfo]
+    ground.matchups = new MatchupAnalysis(ground) { override def pixelsToThreatRange: Option[Double] = None }
+    val buffer = get[UnorderedBuffer[ForeignUnitInfo]](With.units, "bufferEnemy")
+    buffer.add(airborne)
+    buffer.add(ground)
+    val squad = new Tactic.Squads.SquadAttack {
+      override def attacksAir: Boolean = true
+      override def attacksGround: Boolean = false
+      override def attackKeyDistanceTo(pixel: Pixel): Double = pixel.pixelDistance(Pixel(160, 160))
+      override def centroidKey: Pixel = Pixel(160, 160)
+      override def engagedUpon: Boolean = false
+    }
+    try {
+      squad.chooseMode()
+      assert(squad.vicinity == airborne.pixel)
+      assert(squad.targets.exists(t => t.contains(airborne) && !t.contains(ground)))
+    } finally { buffer.clear() }
+  }
+  check("supply-block diagnostics recognize exact-price and zero-gas affordability") {
+    With.frame += 1
+    With.configuration.debugging = true
+    With.self = new PlayerInfo(HeadlessBWAPI.player(0, Race.Protoss)) {
+      override def minerals: Int = Protoss.Zealot.mineralPrice
+      override def gas: Int = 0
+      override def supplyUsed400: Int = 18
+      override def supplyTotal400: Int = 18
+    }
+    val gateway = unit(Protoss.Gateway, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    set(gateway, "_framesIdleConsecutive", 1)
+    val buffer = get[UnorderedBuffer[FriendlyUnitInfo]](With.units, "bufferFriendly")
+    buffer.add(gateway)
+    val efficiency = new Information.Counting.Efficiency
+    try {
+      assert(gateway.framesIdleConsecutive > 0)
+      efficiency.update()
+      assert(efficiency.framesSupplyBlocked == 1 && efficiency.framesSupplyBlockedConsecutively == 1)
+    } finally { buffer.clear(); With.self = us }
+  }
+  check("building clearance checks every tile in the footprint") {
+    val terrain = Array.fill(With.mapTileWidth, With.mapTileHeight)(true)
+    set(With.game, "mapWidth", With.mapTileWidth)
+    set(With.game, "mapHeight", With.mapTileHeight)
+    set(With.game, "buildable", terrain)
+    terrain(5)(5) = false
+    terrain(14)(17) = false
+    terrain(24)(22) = false
+    for ((w, h) <- Seq((1, 1), (2, 2), (3, 2), (4, 3), (6, 3))) {
+      val grid = new Information.Grids.Construction.GridBuildableWH(w, h)
+      grid.initialize()
+      for (x <- 0 until With.mapTileWidth; y <- 0 until With.mapTileHeight) {
+        val expected = x + w <= With.mapTileWidth && y + h <= With.mapTileHeight &&
+          (x until x + w).forall(tx => (y until y + h).forall(ty => terrain(tx)(ty)))
+        assert(grid.get(Tile(x, y)) == expected, s"$w x $h at ($x, $y)")
+      }
+    }
+  }
+  check("groups require detection against both cloaked and burrowed targets") {
+    var detection = false
+    val group = new Tactic.Squads.UnitGroup {
+      override def groupUnits: Seq[UnitInfo] = Seq.empty
+      override def attacksGround: Boolean = true
+      override def detectionAvailable: Boolean = detection
+    }
+    val lurker = unit(Zerg.Lurker, Pixel(160, 160))
+    set(lurker, "_burrowed", true)
+    assert(group.canAttackIfVisible(lurker) && !group.canAttack(lurker))
+    detection = true
+    assert(group.canAttack(lurker))
+    detection = false
+    set(lurker, "_burrowed", false)
+    assert(group.canAttack(lurker))
+  }
+  check("in-range combat targets take priority even when the closest target is passive") {
+    With.frame += 1
+    val attacker = unit(Protoss.Dragoon, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val passive = unit(Protoss.Pylon, Pixel(180, 160))
+    val marine = unit(Terran.Marine, Pixel(220, 160))
+    val distant = unit(Terran.Marine, Pixel(700, 160))
+    attacker.intent.setTargets(Seq(distant))
+    attacker.matchups = new MatchupAnalysis(attacker) {
+      override def targets: Seq[UnitInfo] = Seq(passive, marine, distant)
+    }
+    assert(attacker.matchups.targetNearest.contains(passive))
+    assert(Micro.Targeting.Target.defaultTargets(attacker)._2 == Seq(marine))
+  }
+  check("unseen Zerg building morphs can reach their inferred completion") {
+    for (kind <- Seq(Zerg.Lair, Zerg.Hive, Zerg.SunkenColony, Zerg.SporeColony, Zerg.GreaterSpire)) {
+      val morph = unit(kind, Pixel(160, 160))
+      set(morph, "_complete", false)
+      set(morph, "_morphing", true)
+      set(morph, "_lastClassChange", With.frame)
+      With.frame += kind.buildFrames + 1
+      assert(morph.remainingCompletionFrames == 1) // Visible evidence wins over the estimate.
+      set(morph, "_visibility", Visibility.InvisibleNearby)
+      assert(morph.remainingCompletionFrames == 0)
+    }
+  }
+  check("building footprint caches follow relocation without waiting five seconds") {
+    val building = unit(Terran.Barracks, Pixel(160, 160), friendly = true)
+    val before = building.tileArea
+    val tilesBefore = building.tiles.toVector
+    With.frame += 1
+    val newTopLeft = Tile(15, 15)
+    set(building, "_tileTopLeft", newTopLeft)
+    assert(building.tileArea.startInclusive == newTopLeft)
+    assert(building.tiles.toVector == building.unitClass.tileArea.add(newTopLeft).tiles.toVector)
+    assert(building.tiles.toVector != tilesBefore && building.tileArea != before)
+  }
+  check("Scourge production consumes Larva and uses the morph lifecycle") {
+    assert(Zerg.Scourge.buildUnitsSpent == Vector(Zerg.Larva))
+    assert(Macro.Requests.RequestUnit(Zerg.Scourge).makeProduction(0).isInstanceOf[Tactic.Production.ProduceUnitMorphed])
+  }
+  check("Greater Spire production consumes its Spire and uses the morph lifecycle") {
+    assert(Zerg.GreaterSpire.buildUnitsSpent == Vector(Zerg.Spire))
+    assert(Macro.Requests.RequestUnit(Zerg.GreaterSpire).makeProduction(0).isInstanceOf[Tactic.Production.ProduceUnitMorphed])
+    assert(Zerg.GreaterSpire.mineralValue == Zerg.GreaterSpire.mineralPrice + Zerg.Spire.mineralValue)
+    assert(Zerg.GreaterSpire.gasValue == Zerg.GreaterSpire.gasPrice + Zerg.Spire.gasValue)
+  }
+  check("a distant threat cannot make a Carrier ignore a nearby threat") {
+    With.frame += 1
+    With.reaction = new Performance.ReactionTimes {
+      override def sluggishness: Int = 1
+      override def agencyMax: Int = 10
+    }
+    val carrier = unit(Protoss.Carrier, Pixel(200, 200), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val target = unit(Terran.Marine, Pixel(510, 200))
+    set(target, "_orderTargetPixel", Some(target.pixel))
+    val near = unit(Terran.Marine, Pixel(400, 200))
+    val far = unit(Terran.Marine, Pixel(1000, 200))
+    val interceptor = unit(Protoss.Interceptor, Pixel(400, 200), friendly = true)
+    set(interceptor, "_order", ProxyBwapi.Orders.InterceptorAttack)
+    set(carrier, "_interceptors", Vector(interceptor))
+    set(carrier, "_orderTarget", Some(target))
+    carrier.agent.shouldFight = true
+    carrier.sleepUntil = With.frame + 1 // Inspect the decision without sending a BWAPI command.
+    carrier.matchups = new MatchupAnalysis(carrier) {
+      override def threats: Seq[UnitInfo] = Seq(near, far)
+      override def pixelsEntangled: Double = 0
+    }
+    assert(carrier.pixelDistanceEdge(target) > 32 * 8 && carrier.pixelDistanceEdge(target) <= 32 * 9)
+    val action = Micro.Actions.Protoss.BeCarrier
+    val perform = action.getClass.getDeclaredMethod("perform", classOf[FriendlyUnitInfo])
+    perform.setAccessible(true)
+    perform.invoke(action, carrier)
+    assert(!carrier.agent.actions.contains("CarrierChase") && !carrier.agent.actions.contains("CarrierAttack"))
+    assert(carrier.agent.decision.pixel.contains(target.pixel.project(carrier.agent.defaultHome, 7.5 * 32)))
+  }
+  check("recovering Mutalisks clear stale targets when no safe target remains") {
+    With.frame += 1
+    set(With.geography, "_zoneByTile", new Array[Information.Geography.Types.Zone](With.mapTileArea))
+    val base = new Information.Geography.Types.Base("Recovery", Tile(3, 3), Set(Tile(3, 3)))
+    set(With.geography, "_bases", Vector(base))
+    val mutalisk = unit(Zerg.Mutalisk, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val stale = unit(Terran.Marine, Pixel(180, 160))
+    set(mutalisk, "_hitPoints", 50)
+    mutalisk.agent.put(Micro.Actions.Zerg.BeMutalisk.MutaliskRecovering)
+    mutalisk.agent.toAttack = Some(stale)
+    mutalisk.matchups = new MatchupAnalysis(mutalisk) {
+      override def framesOfSafety: Double = 100
+      override def targets: Seq[UnitInfo] = Seq.empty
+    }
+    val action = Micro.Actions.Zerg.BeMutalisk
+    val perform = action.getClass.getDeclaredMethod("perform", classOf[FriendlyUnitInfo])
+    perform.setAccessible(true)
+    try {
+      perform.invoke(action, mutalisk)
+      assert(mutalisk.agent.toAttack.isEmpty && !mutalisk.agent.shouldFight)
+    } finally { set(With.geography, "_bases", Vector.empty) }
+  }
+  check("construction blockers remember the workers they previously identified") {
+    val action = Micro.Actions.Scouting.BlockConstruction
+    val scout = unit(Protoss.Probe, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val builder = unit(Terran.SCV, Pixel(220, 160))
+    val destination = Tile(18, 18)
+    val base = new Information.Geography.Types.Base("Expansion", destination, Set(destination))
+    base.owner = foe
+    val bases = Array.fill[Option[Information.Geography.Types.Base]](With.mapTileArea)(None)
+    bases(destination.i) = Some(base)
+    set(With.geography, "_baseByTile", bases)
+    set(builder, "_order", ProxyBwapi.Orders.PlaceBuilding)
+    set(builder, "_orderTargetPixel", Some(destination.center))
+    scout.matchups = new MatchupAnalysis(scout) { override def targets: Seq[UnitInfo] = Seq(builder) }
+    assert(action.blockableBuilders(scout).toVector == Vector(builder))
+    assert(scout.agent.get[Iterable[UnitInfo]](action).exists(_.toVector == Vector(builder)))
+    set(builder, "_order", ProxyBwapi.Orders.AttackUnit)
+    assert(action.blockableBuilders(scout).toVector == Vector(builder))
+    scout.matchups = new MatchupAnalysis(scout) { override def targets: Seq[UnitInfo] = Seq.empty }
+    assert(action.blockableBuilders(scout).isEmpty)
+    assert(scout.agent.get[Iterable[UnitInfo]](action).exists(_.isEmpty))
+  }
+  check("the four-Pool Extractor trick can start before it needs to cancel") {
+    var used = 18
+    var extractor = false
+    val requested = ArrayBuffer.empty[ProxyBwapi.Buildable]
+    val cancelled = ArrayBuffer.empty[ProxyBwapi.Buildable]
+    val plan = new Gameplans.Zerg.ZvE.ZvE4Pool {
+      override def supplyUsed400: Int = used
+      override def supplyTotal400: Int = 18
+      override def minerals: Int = 100
+      override def have(filters: Utilities.UnitFilters.UnitFilter*): Boolean = filters.contains(Zerg.Larva) || (extractor && filters.contains(Zerg.Extractor))
+      override def get(request: Macro.Requests.RequestBuildable): Unit = { requested += request.buildable }
+      override def once(quantity: Int, kind: UnitClass): Unit = {}
+      override def pump(kind: UnitClass, maximumTotal: Int, maximumConcurrently: Int): Unit = {}
+      override def cancel(buildables: ProxyBwapi.Buildable*): Unit = { cancelled ++= buildables }
+    }
+    def run(): Unit = { requested.clear(); cancelled.clear(); plan.executeBuild() }
+    run()
+    assert(requested.contains(Zerg.Extractor) && cancelled.isEmpty)
+    extractor = true
+    used = 16 // Building the Extractor frees one supply; wait for that supply to be spent.
+    run()
+    assert(!requested.contains(Zerg.Extractor) && cancelled.isEmpty)
+    used = 18
+    run()
+    assert(cancelled.contains(Zerg.Extractor) && !requested.contains(Zerg.Extractor))
+    used = 14 // No trick needed after losing units.
+    run()
+    assert(cancelled.contains(Zerg.Extractor))
+  }
+  check("a placement query with no indexed foundations returns no candidates") {
+    With.placement = new Placement.Placement
+    assert(new Placement.Access.PlacementQuery().defaultFoundations.isEmpty)
+  }
+  check("interrupted drop assembly terminates once and stops processing") {
+    var releases = 0
+    With.recruiter = new Macro.Allocation.Recruiter {
+      override def release(owner: Macro.Allocation.Prioritized): Unit = { releases += 1 }
+    }
+    val mission = new Tactic.Missions.MissionDrop {
+      override protected def additionalFormationConditions: Boolean = true
+      override protected def additionalItineraryConditions(base: Information.Geography.Types.Base): Boolean = false
+      override protected def recruitablePassenger(unit: UnitInfo): Boolean = false
+      override protected def recruit(): Unit = {}
+    }
+    val transport = unit(Protoss.Shuttle, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val passenger = unit(Protoss.Zealot, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    transport.setSquad(Some(mission))
+    passenger.setSquad(Some(mission))
+    mission.transports += transport
+    mission.passengers += passenger
+    mission.run()
+    assert(releases == 1) // Continuing would terminate again for the empty itinerary.
+    assert(transport.client == None && passenger.client == None)
+  }
+  check("evacuating drops skip their current base, not every remaining destination") {
+    val previousHeight = With.mapTileHeight
+    val previousPixelHeight = With.mapPixelHeight
+    With.mapTileHeight = 128 // Put this base on the map perimeter, outside the central-base exclusion.
+    With.mapPixelHeight = 4096
+    try {
+      val mission = new Tactic.Missions.MissionDrop {
+        override protected def additionalFormationConditions: Boolean = true
+        override protected def recruit(): Unit = {}
+      }
+      val destination = new Information.Geography.Types.Base("Next drop", Tile(3, 3), Set(Tile(3, 3)))
+      destination.owner = foe
+      mission.state = mission.Evacuating
+      val method = classOf[Tactic.Missions.MissionDrop].getDeclaredMethods.find(_.getName.endsWith("skipBase")).get
+      method.setAccessible(true)
+      assert(!method.invoke(mission, destination).asInstanceOf[Boolean])
+      val passenger = unit(Protoss.Zealot, Tile(3, 3).center, friendly = true).asInstanceOf[FriendlyUnitInfo]
+      val bases = Array.fill[Option[Information.Geography.Types.Base]](With.mapTileArea)(None)
+      bases(passenger.tile.i) = Some(destination)
+      set(With.geography, "_baseByTile", bases)
+      get[ArrayBuffer[FriendlyUnitInfo]](mission, "_unitsNow") += passenger
+      assert(method.invoke(mission, destination).asInstanceOf[Boolean])
+    } finally {
+      With.mapTileHeight = previousHeight
+      With.mapPixelHeight = previousPixelHeight
+    }
   }
   println(s"$passed passed; ${failed.size} failed")
   assert(failed.isEmpty, failed.mkString(", "))

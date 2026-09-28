@@ -16,7 +16,7 @@ object Spiral {
     var segment_passed = 0
 
     val pointsToSearch = (2 * radius + 1) * (2 * radius + 1)
-    IndexedSeq(Point(0, 0)).view ++ (0 to pointsToSearch).view.map(i => {
+    (Iterator.single(Point(0, 0)) ++ (1 until pointsToSearch).iterator.map(i => {
       x += dx
       y += dy
       segment_passed += 1
@@ -30,6 +30,6 @@ object Spiral {
         }
       }
       Point(x, y)
-    })
+    })).toStream
   }
 }

@@ -18,5 +18,5 @@ class Fingerprint2Gate extends FingerprintAnd(
 
     new FingerprintCompleteBy(Protoss.Gateway,  GameTime(2, 55), 2))) {
 
-  override val sticky: Boolean = With.frame > GameTime(4, 30)()
+  override def sticky: Boolean = With.frame > GameTime(4, 30)()
 }

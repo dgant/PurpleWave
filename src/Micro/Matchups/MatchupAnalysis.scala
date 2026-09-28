@@ -14,7 +14,7 @@ import Utilities.UnitFilters.IsWorker
 case class MatchupAnalysis(me: UnitInfo) {
   // Default units allow identification of targets when destroying an empty base, because no Battle is happening
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
-  private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemy && BattleFilters.local(u)) else Seq.empty.view
+  private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemyOf(me) && BattleFilters.local(u)) else Seq.empty.view
 
   def groupOf: UnitGroup = _groupOf()
   def groupVs: UnitGroup = _groupVs()
@@ -34,14 +34,14 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   private def withEntrants(source: Seq[UnitInfo], filter: (UnitInfo) => Boolean = (unit) => true): Seq[UnitInfo] = source ++ entrants.filter(filter).filterNot(source.contains)
 
-  def alliesInclSelf              : Seq[UnitInfo]     = battleUs.map(withEntrants(_, _.isFriendly)).getOrElse(groupOf.groupUnits.view)
+  def alliesInclSelf              : Seq[UnitInfo]     = battleUs.map(withEntrants(_, _.isAllyOf(me))).getOrElse(groupOf.groupUnits.view)
   def allies                      : Seq[UnitInfo]     = alliesInclSelf.filterNot(_.id == me.id)
-  def enemies                     : Seq[UnitInfo]     = battleEnemies.map(withEntrants(_, _.isEnemy)).getOrElse(groupVs.groupUnits.view)
+  def enemies                     : Seq[UnitInfo]     = battleEnemies.map(withEntrants(_, _.isEnemyOf(me))).getOrElse(groupVs.groupUnits.view)
   def others                      : Seq[UnitInfo]     = enemies ++ allies
   def allUnits                    : Seq[UnitInfo]     = others :+ me
   def threats                     : Seq[UnitInfo]     = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                     : Seq[UnitInfo]     = ?(me.unitClass.canAttack || me.unitClass.isTransport, enemies.filter(threatens(me, _)), Seq.empty)
-  def threatsInRange              : Seq[UnitInfo]     = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
+  def threatsInRange              : Seq[UnitInfo]     = threats.filter(_.inRangeToAttack(me))
   def threatsInPixels(p: Double)  : Seq[UnitInfo]     = threats.filter(_.pixelsToGetInRange(me) <= p)
   def threatsInFrames(f: Int)     : Seq[UnitInfo]     = threats.filter(_.framesToGetInRange(me) <= f)
   def threatDeepest               : Option[UnitInfo]  = _threatDeepest()
@@ -75,7 +75,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   private val _threatSoonest        = new Cache(() => Maff.minBy(threats)(_.framesToLaunchAttack(me)))
   private val _threatNearest        = new Cache(() => Maff.minBy(threats)(_.pixelDistanceEdge(me)))
   private val _targetNearest        = new Cache(() => Maff.minBy(targets)(_.pixelDistanceEdge(me)))
-  private val _targetNearestInRange = new Cache(() => _targetNearest().filter(me.inRangeToAttack))
+  private val _targetNearestInRange = new Cache(() => Maff.minBy(targets.filter(me.inRangeToAttack))(_.pixelDistanceEdge(me)))
   private val _enemyDetectorDeepest = new Cache(() => Maff.minBy(groupVs.detectors.filter(_.remainingCompletionFrames < Seconds(5)()))(e => e.pixelDistanceCenter(me.pixel) - e.sightPixels))
   private val _pixelsEntangled      = new Cache(() => Maff.max(threats.map(me.pixelsOfEntanglement)).getOrElse( - With.mapPixelWidth.toDouble))
   private val _dpfReceiving         = new Cache(() => threatsInRange.view.map(t => t.dpfOnNextHitAgainst(me) / t.matchups.targetsInRange.size).sum)

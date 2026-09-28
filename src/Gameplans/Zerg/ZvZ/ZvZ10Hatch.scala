@@ -74,7 +74,7 @@ class ZvZ10Hatch extends ZergGameplan {
     val mutaliskArrival = With.scouting.earliestArrival(Zerg.Mutalisk)
     if (enemyMutalisksLikely
       && ! haveComplete(Zerg.Spire)
-      && mutaliskArrival + Seconds(10)() < framesUntilUnit(Zerg.Mutalisk)) {
+      && mutaliskArrival + Seconds(10)() < With.frame + framesUntilUnit(Zerg.Mutalisk)) {
       get(Zerg.EvolutionChamber)
       buildDefenseAtBases(2, Zerg.CreepColony, Seq(PlaceLabels.Defensive, PlaceLabels.DefendHall, PlaceLabels.DefendAir))
     }

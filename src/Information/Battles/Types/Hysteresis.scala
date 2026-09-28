@@ -14,6 +14,7 @@ class Hysteresis(val unit: FriendlyUnitInfo) {
     val shouldFight = unit.agent.shouldFight
     if (shouldFight != lastShouldFight) {
       lastChangeFrame = With.frame
+      lastShouldFight = shouldFight
     }
     val shouldBloodlust = unit.battle.exists(_.judgement.exists(j => j.scoreTotal > 0 && ! j.unitShouldFight(unit)))
     if (shouldBloodlust != bloodlust) {

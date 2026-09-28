@@ -16,7 +16,7 @@ class TvZ111 extends TerranGameplan {
     once(9, Terran.SCV)
     get(Terran.SupplyDepot, new PlacementQuery(Terran.SupplyDepot).preferLabelYes(PlaceLabels.Wall))
     once(11, Terran.SCV)
-    get(Terran.Barracks, new PlacementQuery(Terran.SupplyDepot).preferLabelYes(PlaceLabels.Wall))
+    get(Terran.Barracks, new PlacementQuery(Terran.Barracks).preferLabelYes(PlaceLabels.Wall))
     once(12, Terran.SCV)
     get(Terran.Refinery)
     once(14, Terran.SCV)

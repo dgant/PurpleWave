@@ -30,7 +30,7 @@ class TacticEjectScout extends Tactic {
 
     lock.setMatcher(unit => (
         unit.canMove
-        && unit.unitClass.attacksGround
+        && unit.canAttack(targetScout().get)
         && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
         && (With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)))
       .setCounter(CountOne)

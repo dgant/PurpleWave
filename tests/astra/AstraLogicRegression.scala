@@ -670,6 +670,32 @@ object AstraLogicRegression extends App {
       With.mapPixelHeight = previousPixelHeight
     }
   }
+  check("scout-ejector eligibility remains safe after its target disappears") {
+    With.frame = 1000
+    With.geography = new Geography
+    set(With.geography, "_zoneByTile", new Array[Information.Geography.Types.Zone](With.mapTileArea))
+    With.scouting = new Information.Scouting.Scouting
+    With.priorities = new Macro.Allocation.Priorities
+    With.recruiter = new Macro.Allocation.Recruiter {
+      override def satisfy(lock: Planning.ResourceLocks.LockUnits): Unit = {} // Inspect the installed predicate without acquiring units.
+    }
+    val scout = unit(Zerg.Overlord, Pixel(176, 160)).asInstanceOf[ForeignUnitInfo]
+    val dragoon = unit(Protoss.Dragoon, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    val zealot = unit(Protoss.Zealot, Pixel(160, 160), friendly = true).asInstanceOf[FriendlyUnitInfo]
+    var present = true
+    set(With.scouting, "enemyScouts", new Performance.Cache(() => if (present) Vector(scout) else Vector.empty))
+    set(With.scouting, "zonesToLookForEnemyScouts", new Performance.Cache(() => Vector.empty[Information.Geography.Types.Zone]))
+    val tactic = new Tactic.Tactics.TacticEjectScout
+    set(tactic, "targetScout", new Performance.Cache(() => if (present) Some(scout) else None))
+    tactic.launch()
+    assert(tactic.lock.matcher(dragoon))
+    assert(!tactic.lock.matcher(zealot))
+    present = false
+    With.frame += 1
+    assert(!tactic.lock.matcher(dragoon)) // Recruiter can re-check the old predicate before the next launch.
+    tactic.launch()
+    assert(!tactic.lock.matcher(dragoon))
+  }
   println(s"$passed passed; ${failed.size} failed")
   assert(failed.isEmpty, failed.mkString(", "))
 }

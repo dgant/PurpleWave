@@ -28,11 +28,11 @@ class TacticEjectScout extends Tactic {
     if (targetScout().isEmpty)                                        return
     if (With.geography.ourBases.exists(_.enemies.exists(IsWarrior)))  return
 
-    lock.setMatcher(unit => (
+    lock.setMatcher(unit => targetScout().exists(scout =>
         unit.canMove
-        && unit.canAttack(targetScout().get)
+        && unit.canAttack(scout)
         && (unit.topSpeed > Terran.SCV.topSpeed || unit.pixelRangeGround >= 32.0 * 4.0)
-        && (With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(targetScout().get) < 32)))
+        && (With.scouting.zonesToLookForEnemyScouts().exists(unit.zone==) || unit.pixelsToGetInRange(scout) < 32)))
       .setCounter(CountOne)
       .setPreference(PreferClose(targetScout().get.pixel))
       .acquire()

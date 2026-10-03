@@ -2,6 +2,26 @@ package bwapi;
 
 /** In-memory BWAPI data for regression tests; never connects to a game. */
 public final class HeadlessBWAPI {
+    private static final java.util.Map<Integer, UnitCommand> commands = new java.util.HashMap<>();
+
+    public static UnitCommand command(Unit unit) { return commands.get(unit.getID()); }
+
+    public static void storm(Game game, int x, int y) {
+        ClientData data = memory(ClientData.BulletData.SIZE);
+        ClientData.BulletData state = data.new BulletData(0);
+        state.setExists(true);
+        state.setType(BulletType.Psionic_Storm.id);
+        state.setPositionX(x);
+        state.setPositionY(y);
+        try {
+            java.lang.reflect.Field field = Game.class.getDeclaredField("bullets");
+            field.setAccessible(true);
+            field.set(game, new Bullet[] {new Bullet(state, 0, game)});
+        } catch (ReflectiveOperationException error) {
+            throw new AssertionError(error);
+        }
+    }
+
     private static ClientData memory(int size) {
         ClientData data = new ClientData();
         data.setBuffer(new WrappedBuffer(size));
@@ -48,6 +68,11 @@ public final class HeadlessBWAPI {
         state.setPositionY(y);
         state.setHitPoints(type.maxHitPoints());
         state.setShields(type.maxShields());
-        return new Unit(state, id, game);
+        return new Unit(state, id, game) {
+            @Override public boolean issueCommand(UnitCommand command) {
+                commands.put(getID(), command);
+                return true;
+            }
+        };
     }
 }

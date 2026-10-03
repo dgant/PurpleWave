@@ -18,7 +18,9 @@ foreach ($dependency in $compiler) {
 }
 & (Join-Path $JavaHome 'bin\javac.exe') -encoding UTF-8 -cp $Jar -d $classes (Join-Path $repo 'tests\astra\bwapi\HeadlessBWAPI.java')
 if ($LASTEXITCODE) { throw 'Headless BWAPI fixture compilation failed.' }
-& (Join-Path $JavaHome 'bin\java.exe') -Xmx512m -cp ($compiler -join ';') scala.tools.nsc.Main -classpath "$Jar;$classes" -d $classes (Join-Path $repo 'tests\astra\AstraLogicRegression.scala')
+& (Join-Path $JavaHome 'bin\java.exe') -Xmx512m -cp ($compiler -join ';') scala.tools.nsc.Main -classpath "$Jar;$classes" -d $classes (Join-Path $repo 'tests\astra\AstraLogicRegression.scala') (Join-Path $repo 'tests\astra\StormRegression.scala')
 if ($LASTEXITCODE) { throw 'Regression test compilation failed.' }
 & (Join-Path $JavaHome 'bin\java.exe') -Xmx512m -cp "$classes;$Jar" Regression.AstraLogicRegression
 if ($LASTEXITCODE) { throw 'Regression tests failed.' }
+& (Join-Path $JavaHome 'bin\java.exe') -Xmx512m -cp "$classes;$Jar" Regression.StormRegression
+if ($LASTEXITCODE) { throw 'Storm regression tests failed.' }

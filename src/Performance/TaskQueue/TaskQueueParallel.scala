@@ -31,7 +31,7 @@ class TaskQueueParallel(val tasks: TimedTask*) extends TimedTask {
 
     val taskWeightTotal = tasks.view.map(_.weight).sum
     val tasksSorted = tasks
-      .sortBy(task => task.runMsRecentTotal() / Math.max(1, task.weight))
+      .sortBy(task => task.runMsRecentTotal().toDouble / Math.max(1, task.weight))
       .sortBy( ! _.due) // Ensure we run any due tasks
       .sortBy(_.cosmetic) // Don't let a cosmetic task overtake a due task
 

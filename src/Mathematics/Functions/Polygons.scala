@@ -22,7 +22,7 @@ trait Polygons {
     val dy1           = y1 - y0
     val dotProduct    = dx0 * dx1 + dy0 * dy1
     val lengthSquared = dx1 * dx1 + dy1 * dy1
-    val param         = if (lengthSquared != 0.0) dotProduct / lengthSquared else -1.0
+    val param         = if (lengthSquared != 0.0) dotProduct.toDouble / lengthSquared else -1.0
 
     var xx = 0.0
     var yy = 0.0

@@ -166,7 +166,7 @@ object TargetScoring {
       val otherAttackers  = Math.max(0, target.targetedByRecentlyMelee.size - 1)
       val surfaceArea     = target.unitClass.perimeter
       val surfaceTaken    = attacker.unitClass.dimensionMax * otherAttackers
-      val surfaceRatio    = surfaceTaken / surfaceArea
+      val surfaceRatio    = surfaceTaken.toDouble / surfaceArea
       if (otherAttackers > 1 && surfaceRatio >= 0.25) {
         meleeSpreadBonus = Math.max(0, meleeSpreadBonus - 1.0 * otherAttackers)
       }

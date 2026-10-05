@@ -35,7 +35,7 @@ object ShowHappyUnits extends DebugView {
     
     val verticalBonus =
       if (unit.flying) 24
-      else if (isActiveBuilding) (Math.sin(animationFrame/8) * 6).toInt
+      else if (isActiveBuilding) (Math.sin(animationFrame/8.0) * 6).toInt
       else 0
 
     val horizontalBonus = 0

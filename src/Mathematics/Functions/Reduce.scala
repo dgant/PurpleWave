@@ -88,7 +88,7 @@ trait Reduce {
     if (values.isEmpty) 0L else {
       var numerator, denominator = 0L
       values.foreach(value => { numerator += value;  denominator += 1L })
-      numerator / denominator
+      numerator.toDouble / denominator
     }
   }
   @inline final def meanOpt(values: TraversableOnce[Double]): Option[Double] = {

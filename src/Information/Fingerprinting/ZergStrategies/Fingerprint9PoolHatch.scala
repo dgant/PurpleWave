@@ -11,4 +11,5 @@ class Fingerprint9PoolHatch extends FingerprintAnd(
   new FingerprintNot(With.fingerprints.ninePoolGas),
   new FingerprintOr(
     new FingerprintCompleteBy(IsHatchlike, NinePool13Hatch_HatchCompleteBy + Seconds(5), 2),
+    new FingerprintCompleteBy(u => IsHatchlike(u) && ! With.geography.startLocations.contains(u.tileTopLeft), NinePool13Hatch_HatchCompleteBy + Seconds(5)),
     new FingerprintGasEmptyUntil(GameTime(1, 56))))

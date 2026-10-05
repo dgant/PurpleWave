@@ -13,7 +13,7 @@ object Skimulator {
 
   @inline private def distanceToEngage(unit: UnitInfo, team: Team): Double = {
     val targets = ?(Terran.Medic(unit),
-      team.units.view.filter(u => u != unit && u.unitClass.isOrganic),
+      team.units.view.filter(_.isAny(Terran.Marine, Terran.Firebat, Terran.Ghost)),
       Maff.orElse(unit.presumptiveTarget, team.opponent.units))
 
     unit.skimTarget = None
@@ -119,8 +119,8 @@ object Skimulator {
     // Count basic upgrades
     // We do mean(1, multiplier) to acknowledge that half of a unit's contribution to the fight is just tanking.
     unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(
-      Math.max(1.0, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.unitClass.armor) + unit.unitClass.shieldsHealthRatio * opponent.meanDamageOnHit) /
-        Math.max(1.0, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.armorHealth) + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit - unit.armorShield))))
+      Math.max(0.5, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.unitClass.armor) + unit.unitClass.shieldsHealthRatio * opponent.meanDamageOnHit) /
+        Math.max(0.5, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.armorHealth) + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit - unit.armorShield))))
 
     // Units with different anti-air and anti-group attacks are primarily anti-air
     unit.skimTarget.foreach(t => unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(
@@ -155,7 +155,7 @@ object Skimulator {
     if (Terran.Vulture(unit)  && Terran.VultureSpeed(player))           unit.skimStrength *= 1.2
     if (Protoss.Archon(unit)  && unit.matchups.targetsInRange.nonEmpty) unit.skimStrength *= 1.5
     if (Protoss.Carrier(unit) && unit.isFriendly)                       unit.skimStrength *= unit.interceptors.size * Maff.inv8
-    if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(IsGroundWarrior) / 12, 1.0, 2.5)
+    if (Protoss.Reaver(unit))                                           unit.skimStrength *= Maff.clamp(team.opponent.count(IsGroundWarrior) / 12.0, 1.0, 2.5)
     if (Protoss.Reaver(unit))                                           unit.skimStrength *= ?(unit.friendly.map(_.agent.ride.isDefined).getOrElse(team.units.exists(u => Protoss.Shuttle(u) && u.pixelDistanceEdge(u) < 160)), ?(Protoss.ShuttleSpeed(unit.player), 2.0, 1.5), 1.0)
     if (Protoss.Zealot(unit)  && Protoss.ZealotSpeed(player))           unit.skimStrength *= 1.2
     if (Protoss.Dragoon(unit) && Protoss.DragoonRange(player))          unit.skimStrength *= 1.5
@@ -173,12 +173,12 @@ object Skimulator {
     unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.ScienceVessel(unit))                                  * casts100  * 1.5)
     unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Battlecruiser(unit))                                  * casts150  * 2.5)
     unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Terran.Ghost(unit)         && Terran.Lockdown(player))       * casts100  * Maff.clamp(team.opponent.count(IsMechWarrior)   / 1,  1.0, 1.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.HighTemplar(unit)  && Protoss.PsionicStorm(player))  * casts75   * Maff.clamp(team.opponent.count(IsWarrior)       / 8,  1.0, 2.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.DarkArchon(unit)   && Protoss.Maelstrom(player))     * casts100  * Maff.clamp(team.opponent.count(IsBioWarrior)    / 4,  1.0, 4.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 8.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Corsair(unit)      && Protoss.DisruptionWeb(player)) * casts125  * Maff.clamp(team.opponent.count(IsGroundWarrior) / 4,  1.0, 3.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Queen(unit)           && Zerg.Ensnare(player))          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 12, 1.0, 2.0))
-    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4,  1.0, 4.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.HighTemplar(unit)  && Protoss.PsionicStorm(player))  * casts75   * Maff.clamp(team.opponent.count(IsWarrior)       / 8.0,  1.0, 2.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.DarkArchon(unit)   && Protoss.Maelstrom(player))     * casts100  * Maff.clamp(team.opponent.count(IsBioWarrior)    / 4.0,  1.0, 4.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Arbiter(unit)      && Protoss.Stasis(player))        * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4.0,  1.0, 8.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Protoss.Corsair(unit)      && Protoss.DisruptionWeb(player)) * casts125  * Maff.clamp(team.opponent.count(IsGroundWarrior) / 4.0,  1.0, 3.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Queen(unit)           && Zerg.Ensnare(player))          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 12.0, 1.0, 2.0))
+    unit.skimMagic = Math.max(unit.skimMagic, Maff.fromBoolean(Zerg.Defiler(unit))                                          * casts100  * Maff.clamp(team.opponent.count(IsWarrior)       / 4.0,  1.0, 4.0))
     unit.skimStrength += unit.skimMagic
 
     // Count presence

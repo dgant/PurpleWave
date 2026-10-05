@@ -28,7 +28,7 @@ object Maelstrom extends TargetedSpell {
     val multiplierConfidence  = Math.max(1.0, Maff.nanToOne(1 / (1 + caster.confidence11)))
     val multiplierPlayer      = ?(target.isEnemy, 1.0, ?(target.isFriendly, -1.0, 0.0))
     val multiplierUnit        = target.unitClass.maelstromValue
-    val multiplierDanger      = 1.0 + 0.5 * ?(caster.matchups.threatsInRange.nonEmpty, caster.unitClass.maxTotalHealth / caster.totalHealth, 0)
+    val multiplierDanger      = 1.0 + 0.5 * ?(caster.matchups.threatsInRange.nonEmpty, caster.unitClass.maxTotalHealth.toDouble / caster.totalHealth, 0)
     val multiplierRich        = 0.5 + 0.5 * caster.team.map(_.maelstromCount).getOrElse(1)
     val output                = multiplierConfidence * multiplierPlayer * multiplierUnit * multiplierDanger * multiplierRich
     output

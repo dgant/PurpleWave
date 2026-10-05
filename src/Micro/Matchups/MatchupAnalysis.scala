@@ -41,7 +41,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def allUnits                    : Seq[UnitInfo]     = others :+ me
   def threats                     : Seq[UnitInfo]     = enemies.filter(threatens(_, me)).filterNot(Protoss.Interceptor)
   def targets                     : Seq[UnitInfo]     = ?(me.unitClass.canAttack || me.unitClass.isTransport, enemies.filter(threatens(me, _)), Seq.empty)
-  def threatsInRange              : Seq[UnitInfo]     = threats.filter(_.inRangeToAttack(me))
+  def threatsInRange              : Seq[UnitInfo]     = threats.filter(threat => threat.pixelRangeAgainst(me) >= threat.pixelDistanceEdge(me))
   def threatsInPixels(p: Double)  : Seq[UnitInfo]     = threats.filter(_.pixelsToGetInRange(me) <= p)
   def threatsInFrames(f: Int)     : Seq[UnitInfo]     = threats.filter(_.framesToGetInRange(me) <= f)
   def threatDeepest               : Option[UnitInfo]  = _threatDeepest()

@@ -63,7 +63,7 @@ object BehaviorFight extends SimulacrumBehavior {
     }
 
     // Fire!
-    if (distance <= range && (simulacrum.pixelRangeMin <= 0.0 || distance > simulacrum.pixelRangeMin)) {
+    if (distance <= range) {
       simulacrum.simulation.engaged = true
       simulacrum.moveGoal           = None
       if (simulacrum.cooldownLeft <= 0) {

@@ -27,9 +27,8 @@ class BattleJudgment(battle: Battle) {
 
   private def calculateSimulationScore11: Double = {
     if ( ! battle.simulated) return 0.0
-    if (battle.simulationCheckpoints.lastOption.forall(_.healthValueLostUs <= 0)) return 1.0 // This can happen when all simulated enemies run away and nobody does any damage
 
-    Maff.weightedMean(battle.simulationCheckpoints.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness)))
+    Maff.nanToZero(Maff.weightedMean(battle.simulationCheckpoints.view.map(m => (m.totalScore, m.cumulativeTotalDecisiveness))))
   }
 
   private def calculateTarget: Double = {

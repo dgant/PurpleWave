@@ -49,10 +49,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var maelstrommed            : Boolean = _
   var stasised                : Boolean = _
   var stimmed                 : Boolean = _
-  var hitPointsExact          : Double = _
-  var shieldPointsExact       : Double = _
-  def hitPoints               : Int = Math.ceil(hitPointsExact).toInt
-  def shieldPoints            : Int = Math.ceil(shieldPointsExact).toInt
+  var hitPoints               : Int = _
+  var shieldPoints            : Int = _
   var matrixPoints            : Int = _
   var armorHealth             : Int = _
   var armorShield             : Int = _
@@ -122,8 +120,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     maelstrommed            = realUnit.maelstrommed
     stasised                = realUnit.stasised
     stimmed                 = realUnit.stimmed
-    hitPointsExact          = realUnit.hitPoints
-    shieldPointsExact       = realUnit.shieldPoints
+    hitPoints               = realUnit.hitPoints
+    shieldPoints            = realUnit.shieldPoints
     matrixPoints            = realUnit.matrixPoints
     armorHealth             = realUnit.armorHealth
     armorShield             = realUnit.armorShield
@@ -235,7 +233,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def recalculateInjury(): Unit = {
-    injury = Maff.nanToZero((unitClass.maxTotalHealth - hitPointsExact - shieldPointsExact - matrixPoints) / unitClass.maxTotalHealth)
+    injury = _calculateInjury
   }
 
   @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
@@ -246,7 +244,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline def dealDamageTo(victim: Simulacrum): Unit = {
     val victimWasAlive    = victim.hitPoints > 0
-    val damage            = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))(victim.shieldPointsExact)
+    val damage            = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))(victim.shieldPoints)
     val damageTotal       = victim.receiveDamage(damage)
     val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
     cooldownLeft          = cooldownMaxAgainst(victim)
@@ -267,11 +265,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       victim.hitPoints <= 0))
   }
 
-  def receiveDamage(damage: DamageDealt): Double = {
-    val toHealth = Math.min(hitPointsExact, damage.health)
-    val toShields = Math.min(shieldPointsExact, damage.shields)
-    hitPointsExact -= toHealth
-    shieldPointsExact -= toShields
+  @inline def receiveDamage(damage: DamageDealt): Int = {
+    val toHealth = Math.min(hitPoints, Math.round(damage.health).toInt)
+    val toShields = Math.min(shieldPoints, Math.round(damage.shields).toInt)
+    hitPoints -= toHealth
+    shieldPoints -= toShields
     val total = toHealth + toShields
     damageReceived += total
     valueReceived += total * valuePerDamage * With.configuration.simulationDamageValueRatio

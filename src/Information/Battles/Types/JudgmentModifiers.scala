@@ -151,26 +151,13 @@ object JudgmentModifiers {
   //     because surprise is on the enemy's side
   //     and because patience will tend to let us gather more force to fight
   //
-  // We apply a floor to any commitment to avoid systematically underweighing commitment and bleeding out
-  private def commitmentFloor(value: Double): Double = if (value > 0) Math.max(0.25, value) else value
-  def hysteresisOld(battle: Battle): Option[JudgmentModifier] = {
-    val commitmentRaw             = Maff.weightedMean(battle.us.attackers.map(u => (Maff.clamp01(commitmentFloor((8 + u.matchups.pixelsEntangled) / 96d)), u.subjectiveValue)))
-    val commitment                = commitmentFloor(commitmentRaw)
-    lazy val groundRatio          = valueRatio(battle.us.attackers, ! _.flying)
-    lazy val invisibleRatio       = valueRatio(battle.enemy.attackers, !_.visible)
-    lazy val siegeRatio           = ?(With.enemies.exists(_.isTerran), valueRatio(battle.enemy.attackers, t => Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)), 0)
-    lazy val hesitanceVisibility  = 0.08 * invisibleRatio
-    lazy val hesitanceTanks       = 0.12 * siegeRatio * groundRatio
-    modifyTarget(?(commitment > 0, -commitment * 0.2, hesitanceVisibility + hesitanceTanks))
-  }
-
   def hysteresis(battle: Battle): Option[JudgmentModifier] = {
     modifyTarget(Maff.weightedMean(battle.us.warriorsCasters.flatMap(_.friendly.map(hysteresis))))
   }
   private case class Motivation(var amount: Double = 0, var weight: Double = 0)
   def hysteresis(unit: FriendlyUnitInfo): (Double, Double) = {
     var amount       =   0.0
-    val fighting     =   unit.matchups.engagedUpon || unit.matchups.engagingOn
+    val fighting     =   unit.matchups.engaged
     val speed        =   Math.max(unit.topSpeed, 0.1)
     val entanglement =   Maff.clamp01(unit.matchups.pixelsEntangled / speed / Math.min(unit.matchups.framesToLive, Seconds(5)()))
     val recentEngage =   Math.max(0, 1 - unit.hysteresis.decisionFrames.toDouble / Seconds(10)())

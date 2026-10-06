@@ -28,7 +28,7 @@ final class Simulation {
   private var pendingDamage = Vector.empty[PendingDamage]
   private var nextPendingDamage = 0
 
-  private[Prediction] def resetPendingDamage(snapshotFrame: Int): Unit = {
+  private def resetPendingDamage(snapshotFrame: Int): Unit = {
     pendingDamage = realUnits.toVector.flatMap(unit => unit.damageQueueSnapshot.filter(_.committed).map(d =>
       PendingDamage(Math.max(0, d.onFrame - snapshotFrame - 1), unit.simulacrum, d.volley))).sortBy(_.frame)
     nextPendingDamage = 0
@@ -66,7 +66,7 @@ final class Simulation {
     // Resolve incoming shots after actions and before end-of-frame deaths, just like other damage.
     while (nextPendingDamage < pendingDamage.size && pendingDamage(nextPendingDamage).frame <= battle.simulationFrames) {
       val damage = pendingDamage(nextPendingDamage)
-      if (damage.target.alive) damage.target.receiveDamage(damage.volley(damage.target.shieldPointsExact))
+      if (damage.target.alive) damage.target.receiveDamage(damage.volley(damage.target.shieldPoints))
       nextPendingDamage += 1
     }
     simulacrumIndex = 0

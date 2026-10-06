@@ -9,7 +9,7 @@ final case class DamageVolley(
   healthMultiplier: Double,
   hitChance: Double = 1.0) {
 
-  def apply(shields: Double): DamageDealt = {
+  @inline def apply(shields: Double): DamageDealt = {
     var shieldsLeft = Math.max(0.0, shields)
     var healthDamage = 0.0
     var shieldDamage = 0.0

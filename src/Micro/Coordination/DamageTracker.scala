@@ -55,9 +55,12 @@ final class DamageTracker {
     sourcesWithBullets += source
     if ( ! bullet.moving) return
     val bulletType = bullet.bulletType
+    // Parasite or Spawn Broodling (Ensnare has its own type)
     // Queen_Spell_Carrier is shared by Parasite and Broodlings; it cannot justify a guaranteed kill.
     if ( ! hangtime.contains(bulletType) && bulletType != BulletType.Yamato_Gun) return
-    // Tracking bullets whose target position differs have missed. Units update before bullets.
+    // Ankmairdor hypothesizes that you can predict missed bullets before arrival: target position != target's position
+    // Ank: Bullets update after units. If a moving bullet is not a miss, then it updates its target position every frame. Not all bullets move, so you would likely need to compare on the first frame of the bullet's life. Note, Valkyrie don't aim at their targets and that is not technically a miss.
+    // Apply this test only to the tracking bullets above.
     if (bullet.targetPixel.exists(_ != target.pixel)) return
     val inFrames = if (bullet.speed > 0.0) {
       Math.max(1, Math.ceil(bullet.distanceToTarget / bullet.speed).toInt)
@@ -72,12 +75,17 @@ final class DamageTracker {
   }
 
   @inline def countDamage(attacker: UnitInfo): Unit = {
+    // Count damage that the unit is likely about to deal
+    // Goal is to count whenever possible but being careful to not double-count damage that has already been dealt
+    // Better to undercount damage than overcount it
     // A cooldown rise records the target at attack start, so retargeting cannot move this shot.
     // Once a projectile is visible, use that observation instead of counting the animation too.
     val attackFrameEnd = attacker.lastFrameStartingAttack + attacker.unitClass.stopFrames
     if (With.frame < attackFrameEnd && ! sourcesWithBullets.contains(attacker)) {
       attacker.lastAttackTarget.filter(attacker.isEnemyOf).foreach(target => {
         if (attacker.expectedProjectileFrames(target) > 0) {
+          // Add frames for unit types with long projectile travel times.
+          // The duration varies based on projectile travel time.
           val damageFrame = Math.max(1, attacker.lastFrameStartingAttack - With.frame + attacker.expectedProjectileFrames(target))
           target.addDamage(attacker, damageFrame, committed = true, automaticallyGuaranteed = false)
         }

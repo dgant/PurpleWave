@@ -6,7 +6,7 @@ import Mathematics.Points.Pixel
 final case class SimulationEventAttack(
   shooter : Simulacrum,
   victim  : Simulacrum,
-  damage  : Double,
+  damage  : Int,
   fatal   : Boolean)
     extends SimulationEvent(shooter) {
   

@@ -62,6 +62,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def withinSafetyMargin          : Boolean           = _withinSafetyMargin()
   def threateningMiners           : Boolean           = _threateningMiners()
   def ignorant                    : Boolean           = me.battle.isEmpty || withinSafetyMargin
+  @inline def engaged             : Boolean           = engagedUpon || engagingOn
   def engagingOn                  : Boolean           = targetNearest.exists(t => t.visible && me.inRangeToAttack(t))
   def engagedUpon                 : Boolean           = me.visibleToOpponents && threatDeepest.exists(_.inRangeToAttack(me))
   def framesToLive                : Double            = _framesToLive()

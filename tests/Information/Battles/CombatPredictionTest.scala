@@ -2,7 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
 import Information.Battles.Prediction.SimulationCheckpoint
-import Information.Battles.Types.{Battle, Hysteresis}
+import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis}
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
 import Mathematics.Points.Pixel
@@ -11,6 +11,7 @@ import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
 import ProxyBwapi.Bullets.BulletInfo
 import Micro.Coordination.DamageTracker
+import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import ProxyBwapi.Upgrades.{Upgrade, UpgradeTypes}
 import bwapi.BulletType
@@ -48,7 +49,7 @@ object CombatPredictionTest extends App {
   With.battles = allocate(classOf[Battles])
   With.battles.byUnit = Map.empty
 
-  def unit(hp: Double = 10.0, shields: Double = 0.0): FriendlyUnitInfo = {
+  def unit(hp: Int = 10, shields: Int = 0): FriendlyUnitInfo = {
     val u = allocate(classOf[FriendlyUnitInfo])
     set(u, "_pixel", Pixel(64, 64))
     set(u, "_player", With.self)
@@ -57,15 +58,19 @@ object CombatPredictionTest extends App {
     set(u, "simulacrum", s)
     s.player = With.self
     s.unitClass = Protoss.Dragoon
-    s.hitPointsExact = hp
-    s.shieldPointsExact = shields
-    s.hitPointsInitial = Math.ceil(hp).toInt
-    s.shieldPointsInitial = Math.ceil(shields).toInt
+    s.hitPoints = hp
+    s.shieldPoints = shields
+    s.hitPointsInitial = hp
+    s.shieldPointsInitial = shields
     s.subjectiveValue = 100
     s.measureHealth = true
     s.shouldScoreIfOurs = true
     s.alive = true
     s.behavior = BehaviorIdle
+    u.matchups = new MatchupAnalysis(u) {
+      override def engagedUpon: Boolean = false
+      override def engagingOn: Boolean = false
+    }
     u
   }
   def simulation(units: FriendlyUnitInfo*): Simulation = {
@@ -98,13 +103,12 @@ object CombatPredictionTest extends App {
     near(fractionalShield.shields, 0)
     near(fractionalShield.health, 7)
   }
-  check("simulated health retains halves through lethal damage") {
+  check("simulated health uses integer pools and rounds applied damage") {
     val u = unit(10).simulacrum
-    (1 to 3).foreach(_ => u.receiveDamage(shot(u.shieldPointsExact)))
-    near(u.hitPointsExact, 2.5)
-    assert(u.hitPoints == 3)
+    (1 to 3).foreach(_ => u.receiveDamage(shot(u.shieldPoints)))
+    assert(u.hitPoints == 1)
     u.receiveDamage(shot(0))
-    near(u.hitPointsExact, 0)
+    near(u.hitPoints, 0)
   }
   check("retargeting preserves multiple projectiles and removes only the forecast") {
     With.frame = 100
@@ -122,8 +126,8 @@ object CombatPredictionTest extends App {
   }
   check("doom prediction consumes shields before evaluating later projectiles") {
     val target = unit().simulacrum
-    target.hitPointsExact = 10
-    target.shieldPointsExact = 10
+    target.hitPoints = 10
+    target.shieldPoints = 10
     val source = unit().simulacrum
     val explosive = DamageVolley(10, 1, 0, 0, 0.5)
     target.addDamage(source, 1, true, false, Some(explosive), Some(1))
@@ -149,16 +153,18 @@ object CombatPredictionTest extends App {
     target.addDamage(source, 3, true, false, Some(shot), Some(2))
     target.addDamage(source, 1, false, false, Some(DamageVolley(100, 1, 0, 0, 1)))
     val sim = simulation(target)
-    sim.resetPendingDamage(With.frame)
+    val resetPendingDamage = classOf[Simulation].getDeclaredMethods.find(_.getName.endsWith("resetPendingDamage")).get
+    resetPendingDamage.setAccessible(true)
+    resetPendingDamage.invoke(sim, Int.box(With.frame))
     target.clearDamage() // The game thread can refresh its queue after the snapshot.
     sim.step()
-    near(target.simulacrum.hitPointsExact, 5)
+    near(target.simulacrum.hitPoints, 5)
     assert(!sim.battle.simulationComplete)
     sim.step()
-    near(target.simulacrum.hitPointsExact, 2.5)
+    near(target.simulacrum.hitPoints, 2)
     assert(!sim.battle.simulationComplete)
     sim.step()
-    near(target.simulacrum.hitPointsExact, 0)
+    near(target.simulacrum.hitPoints, 0)
     assert(!target.simulacrum.alive && sim.battle.simulationComplete)
   }
   check("end-of-frame deaths retain both units' actions") {
@@ -186,7 +192,7 @@ object CombatPredictionTest extends App {
     near(checkpoint.unitHealthValueMax(marine.simulacrum), 50)
     near(checkpoint.unitHealthValueMax(dragoon.simulacrum), 50)
     marine.simulacrum.receiveDamage(DamageDealt(2.5, 0))
-    near(checkpoint.unitHealthValueLeft(marine.simulacrum), 43.75)
+    near(checkpoint.unitHealthValueLeft(marine.simulacrum), 42.5)
   }
   check("hysteresis timer resets on both decision transitions, not repeated decisions") {
     val u = unit()
@@ -206,6 +212,104 @@ object CombatPredictionTest extends App {
     With.frame = 200
     h.update()
     assert(h.decisionFrames == 60)
+  }
+  check("bloodlust survives fight permission and decays for 24 frames after actual engagement") {
+    With.frame = 0
+    val u = unit()
+    var engaging = false
+    var attacked = false
+    u.matchups = new MatchupAnalysis(u) {
+      override def engagingOn: Boolean = engaging
+      override def engagedUpon: Boolean = attacked
+    }
+    val battle = simulation(u).battle
+    val judgment = allocate(classOf[BattleJudgment])
+    set(judgment, "scoreTotal", 0.05)
+    set(judgment, "shouldFightGround", false)
+    battle.judgement = Some(judgment)
+    With.battles.byUnit = Map(u -> battle)
+    val h = new Hysteresis(u)
+    h.update()
+    With.frame = 180
+    h.update()
+    near(h.bloodlustFrames, 180)
+    set(judgment, "shouldFightGround", true)
+    u.agent.shouldFight = true
+    With.frame = 181
+    h.update()
+    near(h.bloodlustFrames, 180)
+    With.frame = 200
+    h.update()
+    near(h.bloodlustFrames, 180)
+    attacked = true
+    assert(u.matchups.engaged)
+    h.update()
+    near(h.bloodlustFrames, 180)
+    With.frame = 206
+    attacked = false
+    h.update()
+    near(h.bloodlustFrames, 135)
+    With.frame = 212
+    engaging = true
+    assert(u.matchups.engaged)
+    h.update()
+    near(h.bloodlustFrames, 90) // Re-entry must not restart decay.
+    With.frame = 224
+    h.update()
+    near(h.bloodlustFrames, 0)
+    With.frame = 230
+    engaging = false
+    set(judgment, "shouldFightGround", false)
+    h.update()
+    With.frame = 240
+    h.update()
+    near(h.bloodlustFrames, 10)
+  }
+  def scoreLosses(ourDamage: Int, enemyDamage: Int, enemyDead: Boolean = false): SimulationCheckpoint = {
+    val us = unit(500)
+    val enemy = unit(500)
+    us.simulacrum.unitClass = Terran.Battlecruiser
+    enemy.simulacrum.unitClass = Terran.Battlecruiser
+    val sim = simulation(us, enemy)
+    sim.realUnitsOurs -= enemy
+    sim.realUnitsEnemy += enemy
+    us.simulacrum.receiveDamage(DamageDealt(ourDamage, 0))
+    enemy.simulacrum.receiveDamage(DamageDealt(enemyDamage, 0))
+    enemy.simulacrum.alive = !enemyDead
+    new SimulationCheckpoint(sim, None)
+  }
+  check("score combines 25 percent survival with 75 percent damage before comparing losses") {
+    val damaged = scoreLosses(0, 250)
+    near(damaged.lossEnemy, 37.5)
+    near(damaged.totalScore, 37.5 / 47.5)
+    val killed = scoreLosses(0, 500, enemyDead = true)
+    near(killed.lossEnemy, 100)
+    near(killed.totalScore, 100.0 / 110)
+  }
+  check("scores vary smoothly across zero own damage and zero total damage") {
+    near(scoreLosses(0, 0).totalScore, 0)
+    val noLoss = scoreLosses(0, 250).totalScore
+    val smallLoss = scoreLosses(5, 250).totalScore
+    near(smallLoss, 36.75 / 48.25)
+    assert(noLoss > smallLoss && noLoss - smallLoss < 0.03)
+    val tinyDamage = scoreLosses(0, 1).totalScore
+    assert(tinyDamage > 0 && tinyDamage < 0.02)
+    near(scoreLosses(100, 100).totalScore, 0)
+    near(scoreLosses(5, 250).totalScore, -scoreLosses(250, 5).totalScore)
+  }
+  check("battle judgment has no automatic plus-one score for harmless simulations") {
+    val sim = simulation()
+    def judgmentScore: Double = {
+      val judgment = allocate(classOf[BattleJudgment])
+      set(judgment, "battle", sim.battle)
+      judgment.scoreSim11
+    }
+    near(judgmentScore, 0)
+    sim.battle.simulationCheckpoints += scoreLosses(0, 0)
+    near(judgmentScore, 0)
+    val damage = scoreLosses(0, 250)
+    sim.battle.simulationCheckpoints += damage
+    near(judgmentScore, damage.totalScore)
   }
   def player(enemy: Boolean): PlayerInfo = {
     val p = allocate(classOf[PlayerInfo])

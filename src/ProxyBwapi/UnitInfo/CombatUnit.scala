@@ -188,8 +188,8 @@ trait CombatUnit {
       damageOnHitBeforeShieldsArmorAndDamageType(enemy), attacksAgainst(enemy),
       enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to))
 
-  @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Double =
-    damageVolleyAgainst(enemy, from, to)(shields.getOrElse(enemy.shieldPoints).toDouble).total
+  @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Int =
+    Math.round(damageVolleyAgainst(enemy, from, to)(shields.getOrElse(enemy.shieldPoints).toDouble).total).toInt
 
   @inline final def isOurs     : Boolean = player.isUs
   @inline final def isNeutral  : Boolean = player.isNeutral

@@ -34,18 +34,22 @@ final class GridMobilityTerrain extends AbstractGridArray[Int] {
     while (horizonSize > 0) {
       i = 0
       horizonSize = 0
-      while (i < length) {
-        if (horizon(i)) {
-          horizonSize += 1
-          values(i)   = mobility
-          explored(i) = true
-          val x = i % width
-          if (x > 0) explore(i - 1)
-          if (x < width - 1) explore(i + 1)
-          explore(i - With.mapTileWidth)
-          explore(i + With.mapTileWidth)
+      var rowStart = 0
+      while (rowStart < length) {
+        val rowEnd = rowStart + width
+        while (i < rowEnd) {
+          if (horizon(i)) {
+            horizonSize += 1
+            values(i)   = mobility
+            explored(i) = true
+            if (i > rowStart) explore(i - 1)
+            if (i + 1 < rowEnd) explore(i + 1)
+            explore(i - width)
+            explore(i + width)
+          }
+          i += 1
         }
-        i += 1
+        rowStart = rowEnd
       }
 
       i = 0

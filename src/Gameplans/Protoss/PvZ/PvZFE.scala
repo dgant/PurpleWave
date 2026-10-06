@@ -97,7 +97,8 @@ class PvZFE extends GameplanImperative {
     }
 
     once(13, Protoss.Probe)
-    if (With.frame < GameTime(6, 30)()) {
+    if (With.frame < GameTime(6, 30)() || ! haveComplete(Protoss.DarkTemplar)) {
+      val zerglings = enemies(Zerg.Zergling)
       buildInWall(
         Math.min(
           6,
@@ -105,9 +106,10 @@ class PvZFE extends GameplanImperative {
             1 + Seq(
               With.fingerprints.ninePool(),
               With.tactics.workerScout.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
-              With.fingerprints.twoHatchMain).count(_ == true),
-            (3 + enemies(Zerg.Zergling)) / 3)
-          - units(IsWarrior)),
+              With.fingerprints.twoHatchMain()).count(_ == true),
+            // Keep two cannons for six lings; add a reserve against committed ling pressure.
+            (2 + zerglings) / 3 + ?(zerglings > 6, 1, 0)
+              - unitsComplete(Protoss.Zealot, Protoss.Dragoon) / 2)),
         Protoss.PhotonCannon)
     }
     naturalNexus()
@@ -163,8 +165,8 @@ class PvZFE extends GameplanImperative {
     }
 
     if (enemyHydralisksLikely || enemyLurkersLikely) {
-      if (With.frame < GameTime(7, 10)()) {
-        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 9 - unitsComplete(Protoss.Gateway)), Protoss.PhotonCannon)
+      if (With.frame < GameTime(7, 10)() || ! haveComplete(Protoss.DarkTemplar)) {
+        buildInWall(Maff.clamp(enemies(Zerg.Hydralisk, Zerg.Lurker, Zerg.LurkerEgg), 1, 6), Protoss.PhotonCannon)
       }
     }
     if (enemyLurkersLikely || enemyHasTech(Zerg.Burrow)) {

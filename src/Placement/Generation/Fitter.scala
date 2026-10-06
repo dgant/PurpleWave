@@ -120,10 +120,11 @@ trait Fitter extends Fits {
       return false
     } else {
       val previous = at(tile)
+      lazy val reusesReservation = previous.point == relative && requirement.sameOccupancyAs(previous.requirement)
       if (requirement.walkableBefore) {
         if ( ! tile.walkableUnchecked) {
           return false
-        } else if ( ! previous.requirement.walkableAfter) {
+        } else if ( ! previous.requirement.walkableAfter && ! reusesReservation) {
           return false
         }
       }
@@ -131,19 +132,8 @@ trait Fitter extends Fits {
         if ( ! With.grids.buildable.get(tile)) {
           return false
         }
-        if ( ! previous.requirement.buildableAfter) {
-          if (previous.point != relative) {
-            return false
-          }
-          if (previous.requirement.width != requirement.width) {
-            return false
-          }
-          if (previous.requirement.height != requirement.height) {
-            return false
-          }
-          if (requirement.buildings.nonEmpty && ! previous.requirement.buildings.forall(requirement.buildings.contains)) {
-            return false
-          }
+        if ( ! previous.requirement.buildableAfter && ! reusesReservation) {
+          return false
         }
       }
     }

@@ -3,7 +3,7 @@ package Placement.Access
 import Information.Geography.Types.{Base, Zone}
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Tile
+import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels.PlaceLabel
 import Placement.Generation.Fit
 import Placement.Templating._
@@ -38,15 +38,20 @@ trait Fits {
     _fits += fit
     fit.template.points.view.map(p => Foundation(fit.origin.add(p.point), p, fit.order)).foreach(index)
   }
-  protected def index(foundation: Foundation): Unit = {
-    if ( ! foundation.tile.valid) return
+  protected def index(incoming: Foundation): Unit = {
+    if ( ! incoming.tile.valid) return
+    val foundation: Foundation = get(incoming.tile)
+      .filter(_.point.requirement.sameOccupancyAs(incoming.point.requirement))
+      .map(previous => incoming.copy(point = incoming.point.copy(
+        requirement = incoming.point.requirement.mergeLabelsFrom(previous.point.requirement))))
+      .getOrElse(incoming)
     val point = foundation.point
     val requirement = point.requirement
-    (0 until requirement.width).view.flatMap(dx =>
-        (0 until requirement.height).view.map(foundation.tile.add(dx, _)))
-          .filter(_.valid)
-          .map(_.i)
-          .foreach(points(_) = point)
+    // Cell-local offsets identify the occupied footprint independently of the template origin.
+    for (dx <- 0 until requirement.width; dy <- 0 until requirement.height) {
+      val tile = foundation.tile.add(dx, dy)
+      if (tile.valid) points(tile.i) = TemplatePoint(Point(dx, dy), requirement)
+    }
     byTile(foundation.tile.i) = Some(foundation)
     if ( ! requirement.buildableBefore) return
     if (   requirement.buildableAfter)  return

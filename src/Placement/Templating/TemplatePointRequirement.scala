@@ -34,6 +34,30 @@ class TemplatePointRequirement(val buildings: UnitClass*) {
   def isGas       : Boolean = labels.contains(Gas)
   def powers      : Boolean = buildings.contains(Protoss.Pylon)
 
+  // Purpose labels may accumulate, but a reservation's physical meaning must not change.
+  def sameOccupancyAs(other: TemplatePointRequirement): Boolean = {
+    width == other.width && height == other.height &&
+      buildableBefore == other.buildableBefore && walkableBefore == other.walkableBefore &&
+      buildableAfter == other.buildableAfter && walkableAfter == other.walkableAfter &&
+      isTownHall == other.isTownHall && isGas == other.isGas && isMacroHatch == other.isMacroHatch &&
+      buildings.forall(other.buildings.contains) && other.buildings.forall(buildings.contains)
+  }
+
+  def mergeLabelsFrom(other: TemplatePointRequirement): TemplatePointRequirement = {
+    if (other.labels.forall(labels.contains)) return this
+    val source = this
+    val merged = new TemplatePointRequirement(buildings: _*) {
+      override val buildableBefore: Boolean = source.buildableBefore
+      override val walkableBefore : Boolean = source.walkableBefore
+      override val buildableAfter : Boolean = source.buildableAfter
+      override val walkableAfter  : Boolean = source.walkableAfter
+    }
+    merged.width = width
+    merged.height = height
+    merged.labels ++= (labels ++ other.labels).distinct
+    merged
+  }
+
   override def toString: String = {
     if (buildableAfter) return "Unused"
     if (walkableAfter)  return "Hallway"

@@ -48,7 +48,7 @@ class Wall {
       return Fit(Tile(0, 0), new Template())
     }
 
-    val origin  = Tile(buildings.view.map(_._1.x).min, buildings.view.map(_._1.x).max)
+    val origin  = Tile(buildings.view.map(_._1.x).min, buildings.view.map(_._1.y).min)
     val fit     = Fit(origin, new Template)
 
     buildings.foreach(b => fit.template.add(

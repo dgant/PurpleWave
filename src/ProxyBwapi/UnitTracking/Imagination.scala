@@ -55,7 +55,7 @@ object Imagination {
     // - In free-for-all settings, it's probable someone else killed them
     val expectedSurvivalFrames =
       if (unit.isAny(Zerg.Broodling, Zerg.SpelLDarkSwarm, Protoss.SpellDisruptionWeb, Terran.SpellScannerSweep))
-        unit.removalFrames - With.framesSince(unit.lastSeen)
+        unit.removalFrames
       else if (unit.painfullyIrradiated)  unit.totalHealth * Seconds(37)() / 250 // https://liquipedia.net/starcraft/Irradiate
       else if (IsWarrior(unit))           ?(With.strategy.isFfa, Minutes(4), Minutes(8))()
       else                                Forever()

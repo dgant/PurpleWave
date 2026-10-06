@@ -287,7 +287,7 @@ abstract class UnitClassProxy(val bwapiType: UnitType) {
       Protoss.Interceptor,
       Protoss.Arbiter
     ).contains(this))
-      Some(Protoss.AirArmor)
+      Some(Protoss.AirDamage)
     else if(Vector(
       Protoss.Reaver,
       Protoss.Scarab

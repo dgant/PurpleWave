@@ -9,14 +9,15 @@ final class CloneyCountMap[T](var parent: mutable.Map[T, Int] = null) extends Ba
   // OpenHashMap looks to be the best implementation for our use cases, based on:
   // https://github.com/dvmlls/scala-map-benchmarking/blob/master/src/R/plot.png
   private val _map = new mutable.OpenHashMap[T, Int]()
-  private val _parent = Option(parent)
+  private var _parent = Option(parent)
 
   // Reparent after some depth to avoid stack overflow and cap access cost
   val depth: Int = {
-    val initialDepth = _parent.map(p => ?(p.isInstanceOf[CloneyCountMap[T]], p.asInstanceOf[CloneyCountMap[T]].depth, 1)).getOrElse(0)
+    val initialDepth = _parent.map(p => ?(p.isInstanceOf[CloneyCountMap[T]], p.asInstanceOf[CloneyCountMap[T]].depth + 1, 1)).getOrElse(0)
     if (initialDepth > 30) {
       parent.iterator.foreach(pair => this(pair._1) = pair._2)
       parent = null
+      _parent = None
       0
     } else initialDepth
   }

@@ -19,6 +19,7 @@ class FingerprintCompleteBy(
         val frameProven = if (u.unitClass.isBuilding) With.frame else With.frame - u.unitClass.buildFrames
         frameProven <= endFrame
       })
+      if (proof.isDefined) return true
     }
     if (With.frame > endFrame) return false
 

@@ -22,8 +22,7 @@ class Recruiter {
   def update(): Unit = {
     // Remove ineligible units
     unitsByLock.foreach { case (lock, units) => units.view
-      .filterNot(recruitable)
-      .filterNot(lock.matcher)
+      .filter(u => ! recruitable(u) || ! lock.matcher(u))
       .foreach(unlock)
     }
 

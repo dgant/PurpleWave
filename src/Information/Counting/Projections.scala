@@ -94,13 +94,13 @@ class Projections {
     if (With.self.getUpgradeLevel(upgrade) >= level) return 0
 
     // Are we not even at the previous level?
-    if (With.self.getUpgradeLevel(upgrade) < level - 1) {
-      framesToUpgrade(upgrade, level - 1) + upgrade.upgradeFrames(level)
-    }
+    val framesToPreviousLevel = if (With.self.getUpgradeLevel(upgrade) < level - 1) {
+      framesToUpgrade(upgrade, level - 1)
+    } else 0
 
     // How much longer before the upgrade finishes?
     val upgrader = With.units.ours.find(unit => unit.upgrading && unit.upgradingType == upgrade)
-    if (upgrader.isDefined) return upgrader.get.remainingUpgradeFrames
+    if (upgrader.isDefined && With.self.getUpgradeLevel(upgrade) == level - 1) return upgrader.get.remainingUpgradeFrames
 
     // Do we need to build the thing that upgrades this?
     // or the thing that lets us get advanced levels of this?
@@ -112,6 +112,6 @@ class Projections {
       case _ => 0
     }
     val framesToUpgrader = framesToUnits(upgrade.whatUpgrades)
-    Math.max(framesToHighLevels, framesToUpgrader) + upgrade.upgradeFrames(level)
+    Math.max(framesToPreviousLevel, Math.max(framesToHighLevels, framesToUpgrader)) + upgrade.upgradeFrames(level)
   }
 }

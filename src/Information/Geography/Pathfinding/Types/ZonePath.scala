@@ -14,7 +14,7 @@ case class ZonePath(
     var here = from.centroid.walkableTile
     while (i < steps.length) {
       val edge = steps(i).edge
-      distance += edge.distanceGrid.get(here)
+      distance += 32.0 * edge.distanceGrid.get(here)
       here = edge.tiles.minBy(_.tileDistanceSquared(here)).walkableTile
       i += 1
     }

@@ -55,8 +55,7 @@ class SquadDefendBase(base: Base) extends Squad {
       if ( ! muscleZone.bases.exists(_.owner.isUs)) {
         val possiblePath = With.paths.zonePath(zone, muscleZone)
         possiblePath.foreach(path => {
-          val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).indices.map(i => {
-            val step          = path.steps(i)
+          val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72).map(step => {
             val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
             val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 6
             val altitudeDiff  = Maff.signum101(step.to.centroid.altitude - step.from.centroid.altitude)

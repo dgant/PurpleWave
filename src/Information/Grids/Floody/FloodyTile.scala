@@ -18,7 +18,7 @@ final class FloodyTile(val i: Int, margin: Int) {
   @inline def dpfGround     : Double = _dpfGround()
   @inline def dpfAir        : Double = _dpfAir()
   @inline def damageGround  : Double = _damageGround()
-  @inline def damageAir     : Double = _damageGround()
+  @inline def damageAir     : Double = _damageAir()
 
   private val caches = new ArrayBuffer[Cache[Double]]
   private def addCache(cache: Cache[Double]): Cache[Double] = {

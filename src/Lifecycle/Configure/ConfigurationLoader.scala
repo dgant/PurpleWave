@@ -33,7 +33,7 @@ object ConfigurationLoader {
       return
     }
     if (configFilesMatching.length > 1) {
-      With.logger.warn("Found multiple matching configurations; using newest: " + configFilesMatching.map(f => f"{f.getName} (${f.lastModified()})").mkString(", "))
+      With.logger.warn("Found multiple matching configurations; using newest: " + configFilesMatching.map(f => f"${f.getName} (${f.lastModified()})").mkString(", "))
     }
 
     val configFile = configFilesMatching.maxBy(_.lastModified())

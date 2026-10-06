@@ -57,10 +57,10 @@ class Architecture {
     val exclusion = Exclusion(unit.toString, area, Some(BuildingPlacement(tile, unit)))
 
     area.tiles.filter(_.valid).foreach(t => {
-      With.architecture.unbuildable.set(tile, Some(exclusion))
-      With.architecture.unwalkable.set(tile, Some(exclusion))
-      With.architecture.untownhallable.set(tile, Some(exclusion))
-      With.architecture.ungassable.set(tile, Some(exclusion))
+      With.architecture.unbuildable.set(t, Some(exclusion))
+      With.architecture.unwalkable.set(t, Some(exclusion))
+      With.architecture.untownhallable.set(t, Some(exclusion))
+      With.architecture.ungassable.set(t, Some(exclusion))
     })
 
     if (unit.powers) {

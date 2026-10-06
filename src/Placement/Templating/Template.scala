@@ -15,8 +15,8 @@ class Template extends TemplateFilter {
   val right   : Cache[Int]                  = new CacheForever(() => Maff.max(points.view.map(p => p.point.x + p.requirement.width)).getOrElse(0))
   val top     : Cache[Int]                  = new CacheForever(() => Maff.min(points.view.map(_.point.y)).getOrElse(0))
   val bottom  : Cache[Int]                  = new CacheForever(() => Maff.max(points.view.map(p => p.point.y + p.requirement.height)).getOrElse(0))
-  val start   : Cache[Tile]                 = new CacheForever(() => Tile(top(), left()))
-  val end     : Cache[Tile]                 = new CacheForever(() => Tile(bottom(), right()))
+  val start   : Cache[Tile]                 = new CacheForever(() => Tile(left(), top()))
+  val end     : Cache[Tile]                 = new CacheForever(() => Tile(right(), bottom()))
   val area    : Cache[TileRectangle]        = new CacheForever[TileRectangle](() => TileRectangle(start(), end()))
   var ascii   : Option[String]              = None
   def width   : Int                         = right() - left()

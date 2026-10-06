@@ -20,6 +20,8 @@ class MissionSpeedlotDrop extends MissionDrop {
   val zealotLock: LockUnits = new LockUnits(this, MatchDroppableSpeedlot).setCounter(CountExactly(4))
 
   override protected def recruit(): Unit = {
+    populateItinerary()
+    vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
     transportLock.setPreference(PreferClose(With.geography.home.center)).acquire()
     if (transportLock.units.isEmpty) { terminate("No transports available"); return }
     zealotLock.setPreference(PreferClose(transportLock.units.head.pixel)).acquire()

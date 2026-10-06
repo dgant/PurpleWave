@@ -39,8 +39,9 @@ final class GridMobilityTerrain extends AbstractGridArray[Int] {
           horizonSize += 1
           values(i)   = mobility
           explored(i) = true
-          explore(i - 1)
-          explore(i + 1)
+          val x = i % width
+          if (x > 0) explore(i - 1)
+          if (x < width - 1) explore(i + 1)
           explore(i - With.mapTileWidth)
           explore(i + With.mapTileWidth)
         }

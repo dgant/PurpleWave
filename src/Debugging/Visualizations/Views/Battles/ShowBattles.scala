@@ -113,7 +113,7 @@ object ShowBattles extends DebugView {
       val sim = unit.simulacrum
       val color = if (sim.player.isUs == shouldFight) sim.player.colorNeon else sim.player.colorDark
       val distanceTotal = sim.events.view.map(e => e.from.pixelDistance(e.to)).sum
-      val distanceToTraverse = distanceTotal / (With.frame % 8)
+      val distanceToTraverse = distanceTotal * (With.frame % 8) / 7.0
       var pixelAnimation = sim.realUnit.pixel
       var distanceTraveled = 0.0
       sim.events.foreach(event => {

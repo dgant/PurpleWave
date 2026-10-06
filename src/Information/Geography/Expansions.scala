@@ -42,12 +42,11 @@ trait Expansions {
           val profile = new PathfindProfile(bh._2, Some(bh._1.heart))
           profile.threatMaximum       = Some(0)
           profile.employGroundDist    = true
-          profile.endDistanceMaximum  = 32 + bh._2.groundTiles(bh._1.heart)
           profile.lengthMaximum       = Some(64)
           profile.find
         }))
       .toVector
-    _safeExpansions = _safeExpansionPaths.filter(_._3.pathExists).map(_._1)
+    _safeExpansions = _safeExpansionPaths.filter(p => p._3.pathExists && p._3.end == p._1.heart).map(_._1)
     _preferredOurs  = rankForPlayer(With.self)
     _preferredEnemy = Maff.maxBy(With.enemies)(_.supplyUsed400).map(rankForPlayer).getOrElse(Vector.empty)
     _safeExpansions = _preferredOurs.filter(_safeExpansions.contains)
@@ -58,9 +57,9 @@ trait Expansions {
     val totalBases      = With.geography.bases.count(b => b.owner == player)
     val gasBases        = With.geography.bases.count(b => b.owner == player && adequateGas(b))
     val tileHome        = ?(player.isFriendly,  With.geography.home,     With.scouting.enemyHome)
-    val tileEnemy       = ?(player.isEnemy,     With.scouting.enemyHome, With.geography.home)
+    val tileEnemy       = ?(player.isFriendly,  With.scouting.enemyHome, With.geography.home)
     val friendlyPlayers = ?(player.isFriendly,  Vector(player),          With.enemies)
-    val opposingPlayers = ?(player.isEnemy,     Vector(player),          With.enemies)
+    val opposingPlayers = player.enemies.toVector
     val friendlyBases   = With.geography.bases.filter(b => friendlyPlayers.contains(b.owner))
     val opposingBases   = With.geography.bases.filter(b => opposingPlayers.contains(b.owner))
     val friendlyTiles   = Maff.orElse(friendlyBases.map(_.heart), Seq(tileHome))

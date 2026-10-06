@@ -224,7 +224,7 @@ abstract class MissionDrop extends Mission {
     profile.costThreat          = 10.0 //125
     profile.canCrossUnwalkable  = Some(true)
     profile.canEndUnwalkable    = Some(true)
-    profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)).toFloat
+    profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)) / 32.0
     profile.repulsors           = Vector(PathfindRepulsor(Points.middle, 1.0, 32 * mapEdgeMarginTiles))
     profile.debug               = true
     path = Some(profile.find)
@@ -315,7 +315,7 @@ abstract class MissionDrop extends Mission {
       val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
       val droppables = transport.loadedUnits
         .filter(passenger =>
-          transport.doomFrameAbsolute < transport.topSpeed * transport.pixelDistanceCenter(runway) + Seconds(3)()
+          transport.doomedInFrames < transport.framesToTravelTo(runway) + Seconds(3)()
           || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96)
           || (passenger.pixelDistanceCenter(runway) < passenger.effectiveRangePixels
             && passenger.matchups.threats.exists(t => t.inRangeToAttack(passenger, runway) && ! t.inRangeToAttack(passenger))))

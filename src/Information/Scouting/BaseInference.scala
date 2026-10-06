@@ -89,10 +89,10 @@ trait BaseInference {
         .filter(_.buildable)
         .filter(t =>
           ! main.owner.isZerg
-          || main.townHallTile.x - t.x < 7 // Extends 8 to the left; seeing this far implies absence of building on the 8th tile
-          || main.townHallTile.x - t.x > -10 // Extends 11 to the right; ditto
-          || main.townHallTile.y - t.y < 4 // Extends 5 up; ditto
-          || main.townHallTile.y - t.y > -6) // Extends 7 down; ditto
+          || (main.townHallTile.x - t.x < 7 // Extends 8 to the left; seeing this far implies absence of building on the 8th tile
+          && main.townHallTile.x - t.x > -10 // Extends 11 to the right; ditto
+          && main.townHallTile.y - t.y < 4 // Extends 5 up; ditto
+          && main.townHallTile.y - t.y > -6)) // Extends 7 down; ditto
       val tilesSeen = scoutableTiles.count(_.explored)
       _enemyMainScouted = tilesSeen >= scoutableTiles.size * 0.85
     }

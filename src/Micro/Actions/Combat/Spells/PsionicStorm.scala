@@ -44,7 +44,7 @@ object PsionicStorm extends TargetedSpell {
     val multiplierConfidence  = Math.max(1.0, Maff.nanToOne(1 / (1 + caster.confidence11)))
     val multiplierPlayer      = if (target.isEnemy) 1.0 else if (target.isFriendly) -2.0 else 0.0
     val multiplierUnit        = target.unitClass.stormValue
-    val multiplierDanger      = 1.0 + 0.5 * (if (caster.matchups.threatsInRange.nonEmpty) caster.unitClass.maxTotalHealth / caster.totalHealth else 0.0)
+    val multiplierDanger      = 1.0 + 0.5 * (if (caster.matchups.threatsInRange.nonEmpty) caster.unitClass.maxTotalHealth.toDouble / caster.totalHealth else 0.0)
     val multiplierRich        = Math.max(1.0, 0.25 * caster.team.map(_.stormCount).getOrElse(1))
     val output                = multiplierConfidence * multiplierPlayer * multiplierUnit * multiplierDanger * multiplierRich
     output

@@ -18,7 +18,7 @@ object PurpleEventListener extends BWEventListener {
     }
     catch { case exception: Exception =>
       lastException = Some(exception)
-      lastStackTrace = Some(exception.getStackTrace.toString)
+      lastStackTrace = Some(exception.getStackTrace.mkString(System.lineSeparator()))
     }
   }
 

@@ -38,7 +38,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def isPrerequisite(unitMatcher: UnitFilter): Boolean = (
     unitMatcher(this)
       || unitMatcher == Zerg.Hatchery && isAny(Zerg.Lair, Zerg.Hive)
-      || unitMatcher == Zerg.Lair && is(Zerg.Hatchery)
+      || unitMatcher == Zerg.Lair && is(Zerg.Hive)
       || unitMatcher == Zerg.Spire && is(Zerg.GreaterSpire))
   @inline final def isNone(unitMatchers: UnitFilter*): Boolean = ! unitMatchers.exists(_(this))
   @inline final def isAny(unitMatchers: UnitFilter*): Boolean = unitMatchers.exists(_(this))
@@ -445,6 +445,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lazy val pixelParadrop = {
       val origin = formationPixel.getOrElse(pixel)
       Arc(enemy.pixel, origin, effectiveRangePixels, 32)
+        .map(enemy.pixel.add)
         .map(_.asPixel)
         .find(spot => {
           val spotTile  = spot.tile

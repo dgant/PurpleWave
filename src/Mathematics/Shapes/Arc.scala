@@ -19,7 +19,7 @@ object Arc {
       val arcRadius = innerRadius + arcIndex * stepDistance
       (0 until (2 * maxDeltaRadius * arcRadius / stepDistance).toInt).view.map(stepIndex => {
         val slot = (stepIndex + 1) / 2 * ((stepIndex & 1) * 2 - 1)
-        val radians = centerRadians + stepDistance * slot
+        val radians = centerRadians + stepDistance / arcRadius * slot
         Point(
           (arcRadius * Math.cos(radians)).toInt,
           (arcRadius * Math.sin(radians)).toInt)

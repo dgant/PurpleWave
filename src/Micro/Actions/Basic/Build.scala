@@ -72,7 +72,7 @@ object Build extends Action {
     Commander.defaultEscalation(unit)
     val priority = ?(unit.pixelDistanceCenter(pushPixel) < 128, TrafficPriorities.Shove, TrafficPriorities.Bump)
 
-    With.coordinator.pushes.put(new CircularPush(unit.agent.priority, pushPixel, 32 + building.radialHypotenuse, unit))
+    With.coordinator.pushes.put(new CircularPush(priority, pushPixel, 32 + building.radialHypotenuse, unit))
 
     var movePixel = tile.topLeftPixel.add(building.tileWidth * 16, building.tileHeight * 16)
 

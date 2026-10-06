@@ -88,7 +88,7 @@ trait Reduce {
     if (values.isEmpty) 0L else {
       var numerator, denominator = 0L
       values.foreach(value => { numerator += value;  denominator += 1L })
-      numerator / denominator
+      numerator.toDouble / denominator
     }
   }
   @inline final def meanOpt(values: TraversableOnce[Double]): Option[Double] = {
@@ -126,7 +126,7 @@ trait Reduce {
       values.foreach(value => { numerator += value * value; denominator += 1.0 })
       val sumOfSquares  = numerator / denominator
       val output        = Math.sqrt(sumOfSquares)
-      Some(sumOfSquares)
+      Some(output)
     }
   }
 

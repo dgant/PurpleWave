@@ -17,7 +17,7 @@ import Utilities.UnitPreferences.PreferClose
 
 import scala.collection.mutable.ArrayBuffer
 
-class DefendFFEWithProbes extends Tactic {
+class DefendFFEWithProbesLate extends Tactic {
   
   val defenders = new LockUnits(this, IsWorker)
   
@@ -34,8 +34,8 @@ class DefendFFEWithProbes extends Tactic {
   var haveMinedEnoughForTwoCannons: Boolean = false
   
   def launch(): Unit = {
-    if (With.frame > Minutes(6)()) return
-    if (With.enemies.size > 1) return
+    if (With.frame < Minutes(4)())  return
+    if (With.frame > Minutes(8)()) return
     if ( ! With.geography.ourMain.units.exists(Zerg.Zergling)) return
     if (With.units.countOurs(Protoss.PhotonCannon) == 0) return
     if (With.units.countOurs(IsAll(Protoss.PhotonCannon, IsComplete)) > 3) return

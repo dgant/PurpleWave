@@ -9,8 +9,8 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
 
   @inline final def valueMax            (simulacrum: Simulacrum)  : Double  = simulacrum.subjectiveValue
   @inline final def valueLeft           (simulacrum: Simulacrum)  : Double  = ?(simulacrum.dead, 0.0, simulacrum.subjectiveValue)
-  @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPoints + simulacrum.shieldPoints))
-  @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial))
+  @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth || simulacrum.dead, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPointsExact + simulacrum.shieldPointsExact) / Math.max(1, simulacrum.unitClass.maxTotalHealth))
+  @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial) / Math.max(1, simulacrum.unitClass.maxTotalHealth))
 
   val weightLife    = 1.0
   val weightHealth  = 0.1

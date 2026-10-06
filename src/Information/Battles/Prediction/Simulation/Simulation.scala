@@ -6,7 +6,7 @@ import Information.Battles.Types.Battle
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
-import ProxyBwapi.UnitInfo.UnitInfo
+import ProxyBwapi.UnitInfo.{DamageVolley, UnitInfo}
 import Utilities.SpinWait
 
 import scala.collection.mutable.ArrayBuffer
@@ -24,6 +24,15 @@ final class Simulation {
   // Frames log for visualizer (only when SimViz is enabled)
   private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
   private var simulationStartGameFrame: Int = 0
+  private case class PendingDamage(frame: Int, target: Simulacrum, volley: DamageVolley)
+  private var pendingDamage = Vector.empty[PendingDamage]
+  private var nextPendingDamage = 0
+
+  private[Prediction] def resetPendingDamage(snapshotFrame: Int): Unit = {
+    pendingDamage = realUnits.toVector.flatMap(unit => unit.damageQueueSnapshot.filter(_.committed).map(d =>
+      PendingDamage(Math.max(0, d.onFrame - snapshotFrame - 1), unit.simulacrum, d.volley))).sortBy(_.frame)
+    nextPendingDamage = 0
+  }
 
   @inline def step(): Unit = {
     if (shouldReset) {
@@ -39,6 +48,7 @@ final class Simulation {
         engaged           = false
         With.simulation.grid.reset()
         simulacra.foreach(_.reset(this))
+        resetPendingDamage(With.coordinator.damageTracker.updatedFrame)
         if (battle.logSimulation) {
           framesLog.clear()
           simulationStartGameFrame = With.frame
@@ -52,6 +62,12 @@ final class Simulation {
     while (simulacrumIndex < realUnits.length) {
       realUnits(simulacrumIndex).simulacrum.act()
       simulacrumIndex += 1
+    }
+    // Resolve incoming shots after actions and before end-of-frame deaths, just like other damage.
+    while (nextPendingDamage < pendingDamage.size && pendingDamage(nextPendingDamage).frame <= battle.simulationFrames) {
+      val damage = pendingDamage(nextPendingDamage)
+      if (damage.target.alive) damage.target.receiveDamage(damage.volley(damage.target.shieldPointsExact))
+      nextPendingDamage += 1
     }
     simulacrumIndex = 0
     while (simulacrumIndex < realUnits.length) {
@@ -117,9 +133,11 @@ final class Simulation {
       framesLog += sb.toString()
     }
     battle.simulationComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
-    battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
-    battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
-    battle.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    if (nextPendingDamage >= pendingDamage.size) {
+      battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
+      battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
+      battle.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+    }
     if (battle.simulationComplete) {
       cleanup()
     } else if (battle.simulationFrames - battle.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {

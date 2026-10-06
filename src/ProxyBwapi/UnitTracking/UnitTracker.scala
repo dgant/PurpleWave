@@ -66,6 +66,8 @@ final class UnitTracker {
       updateForeign(bufferEnemy)
       updateForeign(bufferNeutral)
       killDeadForeign()
+      // Publish health and pending damage together for asynchronous simulation snapshots.
+      With.coordinator.damageTracker.update()
     } finally {
       mutex.unlock()
     }

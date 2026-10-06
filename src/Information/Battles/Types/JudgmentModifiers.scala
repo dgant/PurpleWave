@@ -111,7 +111,7 @@ object JudgmentModifiers {
     val badness   = edge.get.badness(battle.us, pixelUs.zone)
     if (badness <= 1)                                                                                     return None
 
-    val speedMultiplier = battle.us.combatGroundFraction * Maff.nanToOne(1.0 / badness)
+    val speedMultiplier = 1 - battle.us.combatGroundFraction + battle.us.combatGroundFraction * Maff.nanToOne(1.0 / badness)
     val targetDelta     = battle.us.combatGroundFraction * Maff.clamp((badness - 1) * 0.0175, 0.0, 0.3)
     Some(JudgmentModifier(speedMultiplier = speedMultiplier, targetDelta = targetDelta))
   }
@@ -174,7 +174,7 @@ object JudgmentModifiers {
     val speed        =   Math.max(unit.topSpeed, 0.1)
     val entanglement =   Maff.clamp01(unit.matchups.pixelsEntangled / speed / Math.min(unit.matchups.framesToLive, Seconds(5)()))
     val recentEngage =   Math.max(0, 1 - unit.hysteresis.decisionFrames.toDouble / Seconds(10)())
-    val incomingShot =   Maff.fromBoolean(unit.damageQueue.view.exists(_.committed))
+    val incomingShot =   Maff.fromBoolean(unit.damageQueueSnapshot.exists(_.committed))
     val paidPrice    =   Math.max(0, 1 - incomingShot * Math.max(0, With.framesSince(unit.lastFrameTakingDamage).toDouble / Seconds(5)()))
     val stickiness   =   recentEngage * paidPrice
     val staticThreat =   Maff.fromBoolean(unit.matchups.threatDeepest.exists(t => t.unitClass.isBuilding || Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)))

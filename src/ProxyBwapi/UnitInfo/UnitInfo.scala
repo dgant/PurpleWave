@@ -53,6 +53,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   var lastCooldown                : Int = _
   var lastFrameTakingDamage       : Int = - Forever()
   var lastFrameStartingAttack     : Int = - Forever()
+  var lastAttackTarget            : Option[UnitInfo] = None
   var lastFrameHarvested          : Int = - Forever()
   var lastFrameMiningGas          : Int = - Forever()
   var lastFrameCarrying           : Int = - Forever()
@@ -65,8 +66,9 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   def update(): Unit = {
     if (visibleToOpponents) _frameKnownToOpponents = Math.min(_frameKnownToOpponents, With.frame)
     // We use cooldownGround/Air because for incomplete units cooldown is equal to remaining completion frames
-    if (Math.max(cooldownGround, cooldownAir) > lastCooldown) {
+    if (frameDiscovered < With.frame && visible && Math.max(cooldownGround, cooldownAir) > lastCooldown) {
       lastFrameStartingAttack = With.frame
+      lastAttackTarget = orderTarget
     }
     if (totalHealth < lastHitPoints + lastShieldPoints + lastMatrixPoints) {
       lastFrameTakingDamage = With.frame
@@ -92,7 +94,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     lastHitPoints     = hitPoints
     lastShieldPoints  = shieldPoints
     lastMatrixPoints  = matrixPoints
-    lastCooldown      = cooldownLeft
+    lastCooldown      = Math.max(cooldownGround, cooldownAir)
     previousPixels(With.frame % previousPixels.length) = pixel
   }
 

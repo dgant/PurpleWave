@@ -12,7 +12,6 @@ class Coordinator {
   val healing       = new Healing
 
   def onAgentCycle(): Unit = {
-    damageTracker.update()
     occupancy.update()
     pushes.update()
     With.units.playerOwned.foreach(_.resetTargeting())

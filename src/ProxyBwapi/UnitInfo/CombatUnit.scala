@@ -183,21 +183,13 @@ trait CombatUnit {
   private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: CombatUnit): Int = ?(enemy.flying, damageOnHitAir, damageOnHitGround)
-  @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Int = {
-    val enemyShieldPoints       = shields.getOrElse(enemy.shieldPoints)
-    val hits                    = attacksAgainst(enemy)
-    val damagePerHit            = damageOnHitBeforeShieldsArmorAndDamageType(enemy)
-    val damageAssignedTotal     = hits * damagePerHit
-    val damageAssignedToShields = Math.min(damageAssignedTotal, enemyShieldPoints + enemy.armorShield * hits)
-    val damageToShields         = damageAssignedToShields - enemy.armorShield * hits
-    val damageAssignedToHealth  = damageAssignedTotal - damageAssignedToShields
-    val damageToHealthScale     = damageMultiplierAgainst(enemy)
-    val damageToHealth          = Math.max(0.0, (damageAssignedToHealth - enemy.armorHealth * hits) * damageToHealthScale)
-    val damageDealtTotal        = damageToHealth + damageToShields
-    val hitChance               = hitChanceAgainst(enemy, from, to)
-    val output                  = (hitChance * Math.max(1.0, damageDealtTotal)).toInt
-    output
-  }
+  @inline final def damageVolleyAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): DamageVolley =
+    DamageVolley(
+      damageOnHitBeforeShieldsArmorAndDamageType(enemy), attacksAgainst(enemy),
+      enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to))
+
+  @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Double =
+    damageVolleyAgainst(enemy, from, to)(shields.getOrElse(enemy.shieldPoints).toDouble).total
 
   @inline final def isOurs     : Boolean = player.isUs
   @inline final def isNeutral  : Boolean = player.isNeutral
@@ -210,19 +202,23 @@ trait CombatUnit {
   // Damage //
   ////////////
 
-  case class DamageSource(source: CombatUnit, onFrame: Int, committed: Boolean, guaranteed: Boolean, damageTotal: Int) {
+  case class DamageSource(source: CombatUnit, onFrame: Int, committed: Boolean, guaranteed: Boolean, volley: DamageVolley, bulletId: Option[Int]) {
+    def damageTotal: Double = volley(shieldPoints).total
     override def toString: String = f"$damageTotal from $source in ${With.framesUntil(onFrame)} frames ${if(guaranteed) "(Guaranteed)" else if (committed) "(Committed)" else ""}"
   }
   val damageQueue = new mutable.ArrayBuffer[DamageSource]()
-  private def damageQueueSnapshot: Vector[DamageSource] = damageQueue.synchronized(damageQueue.toVector)
-  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean, automaticallyGuaranteed: Boolean, fixedDamage: Option[Int] = None): Unit = damageQueue.synchronized {
-    val damagePrevious = damageQueue.find(_.source == source)
+  def damageQueueSnapshot: Vector[DamageSource] = damageQueue.synchronized(damageQueue.toVector)
+  def addDamage(source: CombatUnit, inFrames: Int, committed: Boolean, automaticallyGuaranteed: Boolean, volley: Option[DamageVolley] = None, bulletId: Option[Int] = None): Unit = damageQueue.synchronized {
+    // Separate projectiles, the current attack animation, and the next predicted attack.
+    val damagePrevious = damageQueue.find(d => d.source == source && d.bulletId == bulletId && d.committed == committed)
+    val damageVolley = volley.getOrElse(source.damageVolleyAgainst(this))
     val damageNew = DamageSource(
       source      = source,
-      onFrame     = Math.min(damagePrevious.map(_.onFrame).getOrElse(Forever()), With.frame + inFrames),
-      committed   = automaticallyGuaranteed || damagePrevious.exists(_.committed)   || committed,
-      guaranteed  = automaticallyGuaranteed || damagePrevious.exists(_.guaranteed)  || (committed && source.hitChanceAgainst(this) > .9),
-      damageTotal = fixedDamage.getOrElse(source.damageOnNextHitAgainst(this)))
+      onFrame     = With.frame + Math.max(0, inFrames),
+      committed   = committed,
+      guaranteed  = automaticallyGuaranteed || (committed && damageVolley.hitChance > .9),
+      volley      = damageVolley,
+      bulletId    = bulletId)
     damagePrevious.foreach(damageQueue.-=)
     val insertIndex = damageQueue.indexWhere(_.onFrame > damageNew.onFrame)
     ?(insertIndex >= 0, damageQueue.insert(insertIndex, damageNew), damageQueue += damageNew)
@@ -231,7 +227,7 @@ trait CombatUnit {
     addDamage(
       source,
       source.framesToConnectDamage(this),
-      committed = source.isOurs && source.inRangeToAttack(this),
+      committed = false,
       automaticallyGuaranteed = false)
   }
   def framesToLaunchAttack(target: CombatUnit): Int = {
@@ -250,7 +246,7 @@ trait CombatUnit {
     unitClass.expectedProjectileFrames
   }
   def removeDamage(source: CombatUnit): Unit = damageQueue.synchronized {
-    val toRemove = damageQueue.view.filter(_.source == source).toVector
+    val toRemove = damageQueue.view.filter(d => d.source == source && ! d.committed).toVector
     damageQueue --= toRemove
   }
   def clearDamage(): Unit = damageQueue.synchronized {
@@ -261,13 +257,16 @@ trait CombatUnit {
   def doomedInFrames    : Int     = doomFrameAbsolute - With.frame
   def doomFrameAbsolute : Int     = {
     val queuedDamage = damageQueueSnapshot
-    var damageRequired = totalHealth
+    var damageRequired = hitPoints.toDouble + matrixPoints
+    var shieldsRemaining = shieldPoints.toDouble
     var i = 0
     var frame = 0
     while (damageRequired > 0 && i < queuedDamage.size) {
       val next: DamageSource = queuedDamage(i)
       if (next.guaranteed) {
-        damageRequired -= next.damageTotal
+        val damage = next.volley(shieldsRemaining)
+        shieldsRemaining -= damage.shields
+        damageRequired -= damage.health
         frame = next.onFrame
         if (damageRequired <= 0) return frame
       }
@@ -280,12 +279,15 @@ trait CombatUnit {
   def likelyDoomedInFrames    : Int     = likelyDoomFrameAbsolute - With.frame
   def likelyDoomFrameAbsolute : Int     = {
     val queuedDamage = damageQueueSnapshot
-    var damageRequired = totalHealth
+    var damageRequired = hitPoints.toDouble + matrixPoints
+    var shieldsRemaining = shieldPoints.toDouble
     var i = 0
     var frame = 0
     while (damageRequired > 0 && i < queuedDamage.size) {
       val next: DamageSource = queuedDamage(i)
-      damageRequired -= next.damageTotal
+      val damage = next.volley(shieldsRemaining)
+      shieldsRemaining -= damage.shields
+      damageRequired -= damage.health
       frame = next.onFrame
       if (damageRequired <= 0) return frame
       i += 1

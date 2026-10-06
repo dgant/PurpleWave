@@ -15,6 +15,7 @@ class WorkerRush extends GameplanImperative {
   override def executeBuild(): Unit = {
     rushEnded ||= enemiesHaveComplete(Protoss.PhotonCannon, Zerg.SunkenColony)
     rushEnded ||= With.units.enemy.count(IsFlyingBuilding) > 0 && With.units.enemy.count( ! IsFlyingBuilding(_)) == 0
+    rushEnded ||= With.geography.enemyBases.forall(_.zone.walledIn)
     doAutosupply = rushEnded
     doBasics     = rushEnded
     once(10, With.self.workerClass)

@@ -166,9 +166,7 @@ class PlacementQuery {
       requirements.width.flatMap(w => requirements.height.map(h => With.placement.get(w, h))).getOrElse(IndexedSeq.empty),
       With.placement.foundations)
 
-    val foundationSourceSmallest = foundationSources
-      .filter(_.nonEmpty)
-      .minBy(_.size)
+    val foundationSourceSmallest = Maff.minBy(foundationSources.filter(_.nonEmpty))(_.size).getOrElse(Seq.empty)
 
     foundationSourceSmallest
       .view

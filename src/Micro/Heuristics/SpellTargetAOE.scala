@@ -4,6 +4,8 @@ import Mathematics.Maff
 import Mathematics.Points.Pixel
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
+import scala.collection.mutable
+
 class SpellTargetAOE {
 
   def chooseTargetPixel(
@@ -17,13 +19,14 @@ class SpellTargetAOE {
       : Option[Pixel] = {
 
     val candidates = SpellTargets(caster).filter(_.pixelDistanceCenter(caster) <= searchRadiusPixels)
-    candidates.foreach(t => t.spellTargetValue = evaluate(t, caster))
-    val targets = candidates.filter(_.spellTargetValue > 0)
+    val values = new mutable.HashMap[UnitInfo, Double]
+    def valueUnit(unit: UnitInfo): Double = values.getOrElseUpdate(unit, evaluate(unit, caster))
+    val targets = candidates.filter(valueUnit(_) > 0)
     val boxes = targets.flatMap(target => Seq(
-      new AOETarget(target, caster,  1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames),
-      new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames),
-      new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames),
-      new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames)))
+      new AOETarget(target, caster,  1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, valueUnit = valueUnit),
+      new AOETarget(target, caster, -1,  1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, valueUnit = valueUnit),
+      new AOETarget(target, caster,  1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, valueUnit = valueUnit),
+      new AOETarget(target, caster, -1, -1, pixelWidth = pixelWidth, pixelHeight = pixelHeight, lookaheadPixels = projectionFrames, valueUnit = valueUnit)))
     val bestBox = Maff.maxBy(boxes)(_.netValue).filter(_.netValue >= minimumValue)
     val output = bestBox.map(_.finalTarget)
     output

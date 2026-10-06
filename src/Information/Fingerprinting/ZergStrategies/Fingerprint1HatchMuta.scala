@@ -18,7 +18,7 @@ class Fingerprint1HatchMuta extends FingerprintAnd(
 
   new FingerprintOr(
 
-    new FingerprintCompleteBy(Zerg.Spire,             TwoHatchMuta_MutaCompleteBy - Seconds(5) - Frames(Zerg.Spire.buildFrames)),
+    new FingerprintCompleteBy(Zerg.Spire,             TwoHatchMuta_MutaCompleteBy - Seconds(5) - Frames(Zerg.Mutalisk.buildFrames)),
     new FingerprintCompleteByArrivesBy(Zerg.Mutalisk, TwoHatchMuta_MutaCompleteBy - Seconds(5)),
 
     new FingerprintAnd(

@@ -49,7 +49,7 @@ object BeCarrier extends Action {
         .orElse(Target.choose(unit))
 
       val interceptorsActive      = unit.interceptors.count(isInterceptorActive) >= 1 + unit.interceptors.count(_.complete) / 2
-      val interceptorSafetyMargin = Maff.max(unit.matchups.threats.filterNot(Protoss.Carrier).map(threat => threat.pixelsToGetInRange(unit) - 8 * 32)).getOrElse(LightYear().toDouble)
+      val interceptorSafetyMargin = Maff.min(unit.matchups.threats.filterNot(Protoss.Carrier).map(threat => threat.pixelsToGetInRange(unit) - 8 * 32)).getOrElse(LightYear().toDouble)
       val carrierSafetyMargin     = unit.matchups.pixelsEntangled
 
       if (target.isDefined) {

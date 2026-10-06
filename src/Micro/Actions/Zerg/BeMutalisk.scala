@@ -34,7 +34,7 @@ object BeMutalisk extends Action {
       if (unit.matchups.framesOfSafety <= 0) {
         Retreat.perform(unit)
       } else {
-        Target.best(unit, With.units.enemy.filter(_.tile.enemyRangeAir <= 0))
+        unit.agent.toAttack = Target.best(unit, With.units.enemy.filter(_.tile.enemyRangeAir <= 0))
         val target = unit.agent.toAttack
         if (target.isDefined) {
           if (unit.framesToGetInRange(target.get) < With.reaction.agencyMax) {

@@ -126,8 +126,8 @@ trait EconomicModel {
     }
     _ourUpgradeMinerals       = Upgrades.all.view.filter(_()).flatMap(u => (1 to With.self.getUpgradeLevel(u)).map(u.mineralPrice(_))).sum
     _ourUpgradeGas            = Upgrades.all.view.filter(_()).flatMap(u => (1 to With.self.getUpgradeLevel(u)).map(u.gasPrice(_))).sum
-    _enemyUpgradeMinerals     = Upgrades.all.view.filter(_()).flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.mineralPrice(_))).sum
-    _enemyUpgradeGas          = Upgrades.all.view.filter(_()).flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.gasPrice(_))).sum
+    _enemyUpgradeMinerals     = Upgrades.all.view.flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.mineralPrice(_))).sum
+    _enemyUpgradeGas          = Upgrades.all.view.flatMap(u => With.enemies.flatMap(e => (1 to e.getUpgradeLevel(u))).map(u.gasPrice(_))).sum
     _ourTechMinerals          = Techs.nonFree.view.filter(_()).map(_.mineralPrice).sum
     _ourTechGas               = Techs.nonFree.view.filter(_()).map(_.gasPrice).sum
     _enemyTechMinerals        = With.enemies.flatMap(e => Techs.nonFree.view.filter(_(e))).map(_.mineralPrice).sum

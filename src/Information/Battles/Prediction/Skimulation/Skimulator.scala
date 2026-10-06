@@ -13,7 +13,7 @@ object Skimulator {
 
   @inline private def distanceToEngage(unit: UnitInfo, team: Team): Double = {
     val targets = ?(Terran.Medic(unit),
-      team.units.view.filter(_.unitClass.isOrganic),
+      team.units.view.filter(_.isAny(Terran.Marine, Terran.Firebat, Terran.Ghost)),
       Maff.orElse(unit.presumptiveTarget, team.opponent.units))
 
     unit.skimTarget = None
@@ -119,8 +119,8 @@ object Skimulator {
     // Count basic upgrades
     // We do mean(1, multiplier) to acknowledge that half of a unit's contribution to the fight is just tanking.
     unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(
-      (unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.armorHealth)      + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit - unit.armorShield)) /
-        (unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.unitClass.armor)  + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit))))
+      Math.max(0.5, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.unitClass.armor) + unit.unitClass.shieldsHealthRatio * opponent.meanDamageOnHit) /
+        Math.max(0.5, unit.unitClass.hitPointsHealthRatio * (opponent.meanDamageOnHit - unit.armorHealth) + unit.unitClass.shieldsHealthRatio * (opponent.meanDamageOnHit - unit.armorShield))))
 
     // Units with different anti-air and anti-group attacks are primarily anti-air
     unit.skimTarget.foreach(t => unit.skimStrength *= Maff.vmean(1.0, Maff.nanToOne(

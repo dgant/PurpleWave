@@ -87,7 +87,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
     toGather  = unit.intent.toGather
     toBoard   = unit.intent.toBoard.orElse(toBoard)
     toNuke    = unit.intent.toNuke
-    unit.intent.action(unit)
+    if ( ! combat.tryDodge()) unit.intent.action(unit)
   }
 
   /////////////

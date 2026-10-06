@@ -199,7 +199,7 @@ class Storyteller extends MacroCounting {
             p._1,
             p._2.invocations.toString,
             formatterMs.format(p._2.meanMs),
-            formatterMs.format(p._2.totalMs.toInt / 1000))))))
+            formatterMs.format(p._2.totalMs / 1000.0))))))
     tell(
       "Pathfinding:\n"
       + DrawScreen.tableToString(
@@ -213,7 +213,7 @@ class Storyteller extends MacroCounting {
             Vector("Path length, max:",     With.paths.aStarPathLengthMax),
             Vector("Path length, mean:",    formatterMs.format(With.paths.aStarPathLengthTotal.toDouble / With.paths.aStarPathfinds)),
             Vector("Tiles explored, max:",  With.paths.aStarTilesExploredMax),
-            Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal / With.paths.aStarPathfinds)))
+            Vector("Tiles explored, mean:", (With.paths.aStarTilesExploredTotal.toDouble / With.paths.aStarPathfinds)))
         .map(_.map(_.toString)))))
   }
 

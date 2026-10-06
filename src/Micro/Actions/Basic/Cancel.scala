@@ -19,7 +19,7 @@ object Cancel extends Action {
       if ( ! unit.complete && With.blackboard.toCancel().contains(unit.unitClass)) {
         return true
       }
-      if (unit.trainee.exists(With.blackboard.toCancel().contains)) {
+      if (unit.trainee.exists(t => With.blackboard.toCancel().contains(t.unitClass))) {
         return true
       }
       if (unit.upgradeProducing.exists(With.blackboard.toCancel().contains)) {

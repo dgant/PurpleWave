@@ -20,8 +20,8 @@ class Efficiency {
       .filter(_.supplyRequired400 > 0)
       .exists(t =>
             t.supplyRequired400  > supplyAvailable
-          && t.mineralPrice   < With.self.minerals
-          && t.gasPrice       < With.self.gas))
+          && t.mineralPrice   <= With.self.minerals
+          && t.gasPrice       <= With.self.gas))
     if (supplyBlocked.isDefined && With.self.supplyTotal400 < 400) {
       _framesSupplyBlocked += 1
       _framesSupplyBlockedConsecutively += 1

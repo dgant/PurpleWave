@@ -235,9 +235,9 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     else  if (this == Zerg.Lair)      Seq(Zerg.Hive)
     else                              Seq.empty
   lazy val withMacroSubstitutes: Seq[UnitClass] = Seq(this) ++ macroSubstitutes
-  lazy val isHatchlike    : Boolean = withMacroSubstitutes.contains(Zerg.Hatchery)
-  lazy val isLairlike     : Boolean = withMacroSubstitutes.contains(Zerg.Lair)
-  lazy val isSpirelike    : Boolean = withMacroSubstitutes.contains(Zerg.Spire)
+  lazy val isHatchlike    : Boolean = Zerg.Hatchery.withMacroSubstitutes.contains(this)
+  lazy val isLairlike     : Boolean = Zerg.Lair.withMacroSubstitutes.contains(this)
+  lazy val isSpirelike    : Boolean = Zerg.Spire.withMacroSubstitutes.contains(this)
   lazy val isTank         : Boolean = this == Terran.SiegeTankUnsieged || this == Terran.SiegeTankSieged
 
   lazy val baseClass: UnitClass = ?(isTank, Terran.SiegeTankUnsieged, this)
@@ -385,6 +385,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(output, Zerg.Zergling, Zerg.Larva)
     addBuildUnitIf(output, Zerg.Hydralisk, Zerg.Larva)
     addBuildUnitIf(output, Zerg.Mutalisk, Zerg.Larva)
+    addBuildUnitIf(output, Zerg.Scourge, Zerg.Larva)
     addBuildUnitIf(output, Zerg.Ultralisk, Zerg.Larva)
     addBuildUnitIf(output, Zerg.Queen, Zerg.Larva)
     addBuildUnitIf(output, Zerg.Defiler, Zerg.Larva)
@@ -410,6 +411,7 @@ final case class UnitClass(base: UnitType) extends UnitClassProxy(base) with Uni
     addBuildUnitIf(output, Zerg.Devourer,     Zerg.Mutalisk)
     addBuildUnitIf(output, Zerg.Lair,         Zerg.Hatchery)
     addBuildUnitIf(output, Zerg.Hive,         Zerg.Lair)
+    addBuildUnitIf(output, Zerg.GreaterSpire, Zerg.Spire)
     addBuildUnitIf(output, Zerg.SunkenColony, Zerg.CreepColony)
     addBuildUnitIf(output, Zerg.SporeColony,  Zerg.CreepColony)
 

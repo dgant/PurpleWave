@@ -39,7 +39,7 @@ object Target {
     val assigned      = attacker.targetsAssigned.getOrElse(Seq.empty)
     val matchups      = attacker.matchups.targets
     val engaged       = attacker.team.exists(_.engagedUpon)
-    val targetInRange = attacker.matchups.targetNearest.exists(t => hasCombatPriority(t) && attacker.inRangeToAttack(t))
+    val targetInRange = attacker.matchups.targetsInRange.exists(hasCombatPriority)
     val allFilters    = filtersRequired(attacker) ++ filters
     val strataUnfilteredInRange = ?(
       targetInRange,
@@ -68,7 +68,7 @@ object Target {
     val matchups      = attacker.matchups.targets
     val engaged       = attacker.team.exists(_.engagedUpon)
     val allFilters    = (filtersRequired(attacker) ++ filters).toVector
-    val targetInRange = attacker.matchups.targetNearest.exists(t => hasCombatPriority(t) && attacker.inRangeToAttack(t))
+    val targetInRange = attacker.matchups.targetsInRange.exists(hasCombatPriority)
     var output: Option[UnitInfo] = None
     if (targetInRange) {
       output = bestInStratum(attacker, assigned, allFilters, rankByScore = true,  requireCombatPriority = true,  requireInRange = true,  requireAcceleratesDemise = true)

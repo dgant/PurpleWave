@@ -31,7 +31,7 @@ final class GridBuildableWH(w: Int, h: Int) extends AbstractGridArrayBoolean {
     while (x >= 0) {
       y = With.mapTileHeight - 1
       while (y >= 0) {
-        if (With.game.isBuildable(x, y)) clearance += 1 else clearance = 0
+        if (getUnchecked(x, y)) clearance += 1 else clearance = 0
         if (clearance < h) {
           set(x, y, false)
         }

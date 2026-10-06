@@ -81,11 +81,11 @@ trait UnitGroup {
   def keyDistanceTo       (pixel: Pixel)  : Double  = ?(hasGround, centroidKey       .groundPixels(pixel.walkablePixel), centroidKey       .pixelDistance(pixel))
   def attackKeyDistanceTo (pixel: Pixel)  : Double  = ?(hasGround, attackCentroidKey .groundPixels(pixel.walkablePixel), attackCentroidKey .pixelDistance(pixel))
   def canAttackIfVisible  (unit: UnitInfo): Boolean = ?(unit.flying, attacksAir, attacksGround)
-  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloaked || detectionAvailable)
+  def canAttack           (unit: UnitInfo): Boolean = canAttackIfVisible(unit) && ( ! unit.cloakedOrBurrowed || detectionAvailable)
   def canBeAttackedBy     (unit: UnitInfo): Boolean = (unit.canAttackGround && hasGround) || (unit.canAttackAir && hasAir)
 
-  private val _count = new mutable.HashMap[UnitFilter, Int]()
-  def count(matcher: UnitFilter): Int = _count.getOrElseUpdate(matcher, groupUnits.count(matcher))
+  private val _count = new Cache(() => new mutable.HashMap[UnitFilter, Int]())
+  def count(matcher: UnitFilter): Int = _count().getOrElseUpdate(matcher, groupUnits.count(matcher))
   def has(matchers: UnitFilter*): Boolean = matchers.exists(count(_) > 0)
 
   private val _paceAge = 24

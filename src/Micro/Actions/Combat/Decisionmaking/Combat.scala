@@ -253,8 +253,17 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     unit.unready
   }
 
+  def tryDodge(): Boolean = {
+    if ( ! unit.ready || ! unit.canMove || unit.loaded || unit.agent.receivedPushPriority() < TrafficPriorities.Dodge) return false
+    technique = Dodge
+    unit.agent.act(technique.toString)
+    dodge()
+  }
+
   protected def dodge(): Boolean = {
     if (unit.ready) {
+      unit.agent.shouldFight = false // Emergency movement must not become an attack-move when sluggish.
+      unit.agent.fightReason = "Dodging"
       unit.agent.escalatePriority(TrafficPriorities.Shove) // Just lower than the dodge itself
       unit.agent.forces(Forces.threat) = Potential.followPushes(unit)
       MicroPathing.moveForcefully(unit)

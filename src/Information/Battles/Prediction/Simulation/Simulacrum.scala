@@ -6,7 +6,7 @@ import Mathematics.Points.{Pixel, Tile}
 import ProxyBwapi.Size
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.UnitClasses.UnitClass
-import ProxyBwapi.UnitInfo.{CombatUnit, UnitInfo}
+import ProxyBwapi.UnitInfo.{CombatUnit, DamageDealt, UnitInfo}
 import ProxyBwapi.UnitTracking.{UnorderedBuffer, Visibility}
 import Utilities.{?, LightYear}
 
@@ -159,6 +159,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     With.simulation.grid.populate(this)
   }
 
+  @inline def occupancy: Int = ?(flying, 0, unitClass.occupancy)
   @inline def canMove: Boolean = topSpeedPossible > 0
   @inline def setPixel(newPixel: Pixel): Unit = {
     pixel = newPixel
@@ -186,9 +187,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline def update(): Unit = {
     threat = threat.filter(t => t.alive && t.target.contains(this))
+    if ( ! alive && gridTile.isDefined) simulation.grid.remove(this)
     if (alive) {
       if (hitPoints <= 0) {
         alive = false
+        simulation.grid.remove(this)
         addEvent(SimulationEventDeath(this))
       } else {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)
@@ -244,20 +247,13 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline def dealDamageTo(victim: Simulacrum): Unit = {
     val victimWasAlive    = victim.hitPoints > 0
-    val damage            = damageOnNextHitAgainst(victim, Some(victim.shieldPoints), from = Some(pixel), to = Some(victim.pixel))
-    val damageTotal       = Math.min(victim.shieldPoints + victim.hitPoints, damage)
-    val damageToShields   = Math.min(victim.shieldPoints, damageTotal)
-    val damageToHitPoints = damageTotal - damageToShields
+    val damage            = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))(victim.shieldPoints)
+    val damageTotal       = victim.receiveDamage(damage)
     val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
     cooldownLeft          = cooldownMaxAgainst(victim)
     cooldownMoving        = Math.max(cooldownMoving, unitClass.stopFrames)
     valueDealt            += valueDamage
     damageDealt           += damageTotal
-    victim.valueReceived  += valueDamage
-    victim.damageReceived += damageTotal
-    victim.shieldPoints   -= damageToShields
-    victim.hitPoints      -= damageToHitPoints
-    victim.recalculateInjury()
     alive                 = alive && ! unitClass.suicides
     if (victimWasAlive && victim.hitPoints <= 0) {
       val valueKill = victim.subjectiveValue * (1.0 - With.configuration.simulationDamageValueRatio)
@@ -268,8 +264,20 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     addEvent(SimulationEventAttack(
       this,
       victim,
-      damageToHitPoints + damageToShields,
+      damageTotal,
       victim.hitPoints <= 0))
+  }
+
+  @inline def receiveDamage(damage: DamageDealt): Int = {
+    val toHealth = Math.min(hitPoints, Math.round(damage.health).toInt)
+    val toShields = Math.min(shieldPoints, Math.round(damage.shields).toInt)
+    hitPoints -= toHealth
+    shieldPoints -= toShields
+    val total = toHealth + toShields
+    damageReceived += total
+    valueReceived += total * valuePerDamage * With.configuration.simulationDamageValueRatio
+    recalculateInjury()
+    total
   }
 
   @inline private def addEvent(event: => SimulationEvent): Unit = {

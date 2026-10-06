@@ -16,11 +16,11 @@ final class SimulationGridTile(val i: Int) {
 
   @inline def +=(unit: Simulacrum): Unit = {
     units.add(unit)
-    occupancy += unit.unitClass.occupancy
+    occupancy += unit.occupancy
   }
   @inline def -=(unit: Simulacrum): Unit = {
     units.remove(unit)
-    occupancy -= unit.unitClass.occupancy
+    occupancy -= unit.occupancy
   }
   @inline def fits(unit: Simulacrum): Boolean = {
     if (unit.flying) {
@@ -33,7 +33,7 @@ final class SimulationGridTile(val i: Int) {
       return false
     }
 
-    val occupancyCost = ?(unit.target.exists(_.gridTile.contains(this)), 0, unit.unitClass.occupancy)
+    val occupancyCost = ?(unit.target.exists(_.gridTile.contains(this)), 0, unit.occupancy)
     if (occupancy + occupancyCost > Occupancy.Resolution) {
       return false
     }

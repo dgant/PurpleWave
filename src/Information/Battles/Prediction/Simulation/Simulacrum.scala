@@ -159,6 +159,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     With.simulation.grid.populate(this)
   }
 
+  @inline def occupancy: Int = ?(flying, 0, unitClass.occupancy)
   @inline def canMove: Boolean = topSpeedPossible > 0
   @inline def setPixel(newPixel: Pixel): Unit = {
     pixel = newPixel
@@ -186,9 +187,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline def update(): Unit = {
     threat = threat.filter(t => t.alive && t.target.contains(this))
+    if ( ! alive && gridTile.isDefined) simulation.grid.remove(this)
     if (alive) {
       if (hitPoints <= 0) {
         alive = false
+        simulation.grid.remove(this)
         addEvent(SimulationEventDeath(this))
       } else {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)

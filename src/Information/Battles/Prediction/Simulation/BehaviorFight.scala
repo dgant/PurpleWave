@@ -51,7 +51,7 @@ object BehaviorFight extends SimulacrumBehavior {
       && simulacrum.cooldownLeft > 0
       && (simulacrum.unitClass.abuseAllowed || simulacrum.unitClass == Protoss.Reaver)
       && ( ! target.canAttack(simulacrum) || simulacrum.pixelRangeAgainst(target) > target.pixelRangeAgainst(simulacrum))) {
-      val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - distance
+      val freeDistance = simulacrum.cooldownLeft * simulacrum.topSpeed - (distance - range)
       if (freeDistance > 0) {
         simulacrum.move(
           threat.get.pixel.project(

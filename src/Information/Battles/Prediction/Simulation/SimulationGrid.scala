@@ -26,15 +26,22 @@ final class SimulationGrid {
     populatedTiles += gridTile
   }
 
+  @inline def remove(unit: Simulacrum): Unit = {
+    unit.gridTile.foreach(tile => {
+      tile -= unit
+      if (tile.units.isEmpty) populatedTiles.remove(tile)
+    })
+    unit.gridTile = None
+  }
+
   @inline def tryMove(unit: Simulacrum, to: Pixel): Unit = {
     val toClamped = to.clamp()
-    if (unit.pixel.tile == toClamped.tile) {
-      unit.setPixel(unit.pixel.projectUpTo(toClamped, unit.topSpeed))
-      return
-    }
-    if (unit.flying || true) { // Disabling collisions/pathfinding for now
-      relocateUnit(unit, unit.pixel.projectUpTo(toClamped, unit.topSpeed), Some(tiles(toClamped.tile.i)))
-      return
+    if (unit.flying || unit.pixel.pixelDistanceSquared(toClamped) <= unit.topSpeed * unit.topSpeed || unit.pixel.tile == toClamped.tile) {
+      val step = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
+      if (tiles(step.tile.i).fits(unit)) {
+        relocateUnit(unit, step)
+        return
+      }
     }
     if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){
       return
@@ -50,10 +57,10 @@ final class SimulationGrid {
     val fromTile = from.tile
     val path = fromTile
       .adjacent4
-      .filter(t => t.walkable && ! unit.lastTile.contains(t))
-      .sortBy(t => t.groundTiles(to) +  t.pixelDistanceSquared(to))
+      .filter(_.walkable)
+      .sortBy(t => (unit.lastTile.contains(t), t.groundTiles(to) + t.pixelDistanceSquared(to)))
       .map(toTile => from.add(32 * (toTile.x - fromTile.x), 32 * (toTile.y - fromTile.y)))
-      .find(to => tryForceV2(unit, from.flowTo(to)))
+      .find(to => tryForceV2(unit, new Force(to.subtract(from))))
 
     if (path.isDefined) {
       true
@@ -113,6 +120,7 @@ final class SimulationGrid {
         populatedTiles.add(tileTo)
       }
       tileTo += unit
+      unit.lastTile = tileFrom.map(_.tile)
       unit.gridTile = Some(tileTo)
     }
     unit.setPixel(to)
@@ -120,13 +128,10 @@ final class SimulationGrid {
 
   @inline def tryForceV2(unit: Simulacrum, force: Force): Boolean = {
           val from      = unit.pixel
-          val forceJump = force.normalize(32)
-    lazy  val forceStep = force.normalize(unit.topSpeed)
-          val toJump    = from.add(forceJump.x.toInt, forceJump.y.toInt)
-    lazy  val toStep    = from.add(forceStep.x.toInt, forceStep.y.toInt)
-          val tileJump  = tiles(toJump.tile.clip.i)
-    lazy  val tileStep  = tiles(toStep.tile.clip.i)
-          val accept    = tileJump.fits(unit) && tileStep.fits(unit)
+          val forceStep = force.normalize(unit.topSpeed)
+          val toStep    = from.add(forceStep.x.toInt, forceStep.y.toInt).clamp()
+          val tileStep  = tiles(toStep.tile.i)
+          val accept    = toStep != from && tileStep.fits(unit)
 
     if (accept) {
       relocateUnit(unit, toStep, Some(tileStep))

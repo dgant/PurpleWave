@@ -12,8 +12,8 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   @inline final def unitHealthValueLeft (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth || simulacrum.dead, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPoints + simulacrum.shieldPoints) / Math.max(1, simulacrum.unitClass.maxTotalHealth))
   @inline final def unitHealthValueMax  (simulacrum: Simulacrum)  : Double  = ?( ! simulacrum.measureHealth, 0.0, simulacrum.subjectiveValue * (simulacrum.hitPointsInitial + simulacrum.shieldPointsInitial) / Math.max(1, simulacrum.unitClass.maxTotalHealth))
 
-  val weightLife    = 0.25
-  val weightHealth  = 0.75
+  val weightSurvival = 0.25
+  val weightHealth   = 1.0 - weightSurvival
 
   private val us  = simulation.realUnitsOurs
   private val foe = simulation.realUnitsEnemy
@@ -34,13 +34,13 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val healthValueLostUs         : Double =  healthValueMaxUs    - healthValueLeftUs
   val healthValueLostEnemy      : Double = (healthValueMaxEnemy - healthValueLeftEnemy) * aggression
   val healthValueLostRatio      : Double = Maff.nanToZero(2 * healthValueLostEnemy / (healthValueLostUs + healthValueLostEnemy) - 1)
-  val lossUs                    : Double = valueLostUs * weightLife + healthValueLostUs * weightHealth
-  val lossEnemy                 : Double = valueLostEnemy * weightLife + healthValueLostEnemy * weightHealth
+  val lossUs                    : Double = valueLostUs * weightSurvival + healthValueLostUs * weightHealth
+  val lossEnemy                 : Double = valueLostEnemy * weightSurvival + healthValueLostEnemy * weightHealth
   // Five percent of initial combined value keeps tiny exchanges from producing extreme scores.
-  private val lossPrior         : Double = 0.05 * (
-    (valueTotalUs + valueTotalEnemy * aggression) * weightLife +
+  private val lossFloor         : Double = 0.05 * (
+    (valueTotalUs + valueTotalEnemy * aggression) * weightSurvival +
     (healthValueMaxUs + healthValueMaxEnemy * aggression) * weightHealth)
-  val totalScore                : Double = Maff.nanToZero((lossEnemy - lossUs) / (lossUs + lossEnemy + lossPrior))
+  val totalScore                : Double = Maff.nanToZero((lossEnemy - lossUs) / Math.max(lossUs + lossEnemy, lossFloor))
 
   val cumulativeTotalDecisiveness: Double = lossUs + lossEnemy
 }

@@ -5,7 +5,13 @@ import Information.Battles.Prediction.SimulationCheckpoint
 import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis}
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
-import Mathematics.Points.Pixel
+import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Physics.Force
+import Information.Geography.Geography
+import Information.Geography.Pathfinding.Paths
+import Information.Geography.Types.Zone
+import Information.Grids.Grids
+import Information.Grids.Movement.{GridWalkable, GridWalkableTerrain, GridUnwalkableUnits, GridFlowField}
 import Planning.Blackboard
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
@@ -281,17 +287,17 @@ object CombatPredictionTest extends App {
   check("score combines 25 percent survival with 75 percent damage before comparing losses") {
     val damaged = scoreLosses(0, 250)
     near(damaged.lossEnemy, 37.5)
-    near(damaged.totalScore, 37.5 / 47.5)
+    near(damaged.totalScore, 1.0)
     val killed = scoreLosses(0, 500, enemyDead = true)
     near(killed.lossEnemy, 100)
-    near(killed.totalScore, 100.0 / 110)
+    near(killed.totalScore, 1.0)
   }
   check("scores vary smoothly across zero own damage and zero total damage") {
     near(scoreLosses(0, 0).totalScore, 0)
     val noLoss = scoreLosses(0, 250).totalScore
     val smallLoss = scoreLosses(5, 250).totalScore
-    near(smallLoss, 36.75 / 48.25)
-    assert(noLoss > smallLoss && noLoss - smallLoss < 0.03)
+    near(smallLoss, 36.75 / 38.25)
+    assert(noLoss > smallLoss && noLoss - smallLoss < 0.04)
     val tinyDamage = scoreLosses(0, 1).totalScore
     assert(tinyDamage > 0 && tinyDamage < 0.02)
     near(scoreLosses(100, 100).totalScore, 0)
@@ -373,6 +379,206 @@ object CombatPredictionTest extends App {
     target.addDamage(bulletSource, 20, false, false, Some(shot))
     near(target.damageQueueSnapshot.head.volley(0).total, 130) // Explosive vs small.
     assert(target.damageQueueSnapshot.size == 2)
+  }
+  check("score keeps both endpoints and is continuous where the denominator floor stops applying") {
+    near(scoreLosses(0, 250).totalScore, 1)
+    near(scoreLosses(250, 0).totalScore, -1)
+    val below = scoreLosses(0, 66).totalScore // 9.9 loss against a floor of 10.
+    val above = scoreLosses(0, 67).totalScore
+    near(below, 0.99)
+    near(above, 1.0)
+    for (ours <- 0 to 500 by 25; theirs <- 0 to 500 by 25) {
+      val score = scoreLosses(ours, theirs).totalScore
+      assert(score >= -1 && score <= 1)
+    }
+  }
+
+  With.mapTileWidth = 32
+  With.mapTileHeight = 32
+  With.mapTileArea = With.mapTileWidth * With.mapTileHeight
+  With.mapPixelWidth = With.mapTileWidth * 32
+  With.mapPixelHeight = With.mapTileHeight * 32
+  With.game = allocate(classOf[bwapi.Game])
+  set(With.game, "mapWidth", With.mapTileWidth)
+  set(With.game, "mapHeight", With.mapTileHeight)
+  set(With.game, "groundHeight", Array.ofDim[Int](With.mapTileWidth, With.mapTileHeight))
+  With.grids = allocate(classOf[Grids])
+  set(With.grids, "walkable", new GridWalkable)
+  set(With.grids, "walkableTerrain", new GridWalkableTerrain)
+  set(With.grids, "unwalkableUnits", new GridUnwalkableUnits)
+  java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  With.geography = allocate(classOf[Geography])
+  val zone = allocate(classOf[Zone])
+  set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+  With.paths = allocate(classOf[Paths])
+
+  def mover(sim: Simulation, at: Pixel, kind: UnitClass = Protoss.Dragoon, flying: Boolean = false): Simulacrum = {
+    val s = unit(100).simulacrum
+    s.unitClass = kind
+    s.flying = flying
+    s.topSpeed = 4
+    s.topSpeedPossible = 4
+    s.simulation = sim
+    s.setPixel(at)
+    sim.grid.populate(s)
+    s
+  }
+  def gridConsistent(sim: Simulation): Unit = {
+    sim.grid.populatedTiles.foreach { tile =>
+      assert(tile.units.nonEmpty)
+      assert(tile.occupancy == tile.units.map(s => if (s.flying) 0 else s.unitClass.occupancy).sum)
+      tile.units.foreach(s => assert(s.gridTile.contains(tile) && s.pixel.tile == tile.tile && s.alive))
+    }
+  }
+  check("flying movement tracks its actual cell and flying buildings consume no ground space") {
+    val sim = simulation()
+    val flyer = mover(sim, Pixel(48, 48), Terran.Barracks, flying = true)
+    sim.grid.tryMove(flyer, Pixel(176, 48))
+    assert(flyer.pixel == Pixel(52, 48))
+    assert(flyer.gridTile.get.tile == Tile(1, 1))
+    assert(flyer.gridTile.get.occupancy == 0)
+    (1 to 4).foreach(_ => sim.grid.tryMove(flyer, Pixel(176, 48)))
+    assert(flyer.lastTile.contains(Tile(1, 1)))
+    gridConsistent(sim)
+  }
+  check("ground movement advances within a legal cell even when the next tile is full") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(48, 48))
+    mover(sim, Pixel(80, 48))
+    assert(sim.grid.tryForceV2(moving, Force(1, 0)))
+    assert(moving.pixel == Pixel(52, 48))
+    (1 to 2).foreach(_ => assert(sim.grid.tryForceV2(moving, Force(1, 0))))
+    assert(moving.pixel == Pixel(60, 48))
+    assert(!sim.grid.tryForceV2(moving, Force(1, 0)))
+    assert(moving.pixel == Pixel(60, 48))
+    gridConsistent(sim)
+  }
+  check("movement obeys ground occupancy and terrain while aircraft cross both") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(60, 48))
+    mover(sim, Pixel(80, 48))
+    With.grids.walkableTerrain.set(Tile(1, 0), false)
+    With.grids.walkableTerrain.set(Tile(1, 2), false)
+    With.grids.walkableTerrain.set(Tile(0, 1), false)
+    try {
+      sim.grid.tryMove(moving, Pixel(176, 48))
+      assert(moving.pixel == Pixel(60, 48))
+      val flyer = mover(sim, Pixel(60, 48), Protoss.Scout, flying = true)
+      sim.grid.tryMove(flyer, Pixel(176, 48))
+      assert(flyer.pixel == Pixel(64, 48))
+      val terrainMover = mover(sim, Pixel(48, 32))
+      assert(!sim.grid.tryForceV2(terrainMover, Force(0, -1)))
+      assert(terrainMover.pixel == Pixel(48, 32))
+      gridConsistent(sim)
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("lethal damage and suicide both release grid occupancy") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(60, 48))
+    val blocker = mover(sim, Pixel(80, 48))
+    assert(!sim.grid.tryForceV2(moving, Force(1, 0)))
+    blocker.hitPoints = 0
+    blocker.update()
+    assert(blocker.gridTile.isEmpty)
+    assert(sim.grid.tryForceV2(moving, Force(1, 0)))
+    assert(moving.lastTile.contains(Tile(1, 1)))
+    moving.alive = false
+    moving.update()
+    assert(sim.grid.populatedTiles.isEmpty)
+    assert(sim.grid.tiles.forall(_.occupancy == 0))
+  }
+  check("movement clamps pixel positions at all four map edges") {
+    val sim = simulation()
+    for ((at, force) <- Seq(
+      (Pixel(0, 48), Force(-1, 0)),
+      (Pixel(With.mapPixelWidth - 1, 48), Force(1, 0)),
+      (Pixel(48, 0), Force(0, -1)),
+      (Pixel(48, With.mapPixelHeight - 1), Force(0, 1)))) {
+      val moving = mover(sim, at)
+      assert(!sim.grid.tryForceV2(moving, force))
+      assert(moving.pixel == at)
+    }
+    gridConsistent(sim)
+  }
+  check("nearby goals across a tile edge do not overshoot") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(63, 48))
+    sim.grid.tryMove(moving, Pixel(64, 48))
+    assert(moving.pixel == Pixel(64, 48))
+    assert(moving.lastTile.contains(Tile(1, 1)))
+    gridConsistent(sim)
+  }
+  check("fallback can backtrack when every other adjacent tile is blocked") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(80, 48))
+    moving.lastTile = Some(Tile(1, 1))
+    mover(sim, Pixel(112, 48))
+    sim.grid.relocateUnit(moving, Pixel(92, 48))
+    With.grids.walkableTerrain.set(Tile(2, 0), false)
+    With.grids.walkableTerrain.set(Tile(2, 2), false)
+    try {
+      sim.grid.tryMove(moving, Pixel(176, 48))
+      assert(moving.pixel == Pixel(88, 48))
+      gridConsistent(sim)
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("fallback takes the chosen adjacent step instead of repeating a blocked zone flow") {
+    val destinationZone = allocate(classOf[Zone])
+    val flow = new GridFlowField(Tile(5, 1))
+    flow.set(Tile(1, 1), Force(0, -1))
+    set(destinationZone, "flowField", flow)
+    set(destinationZone, "bitmap$0", -1L)
+    val zones = Array.fill(With.mapTileArea)(destinationZone)
+    zones(Tile(1, 1).i) = zone
+    set(With.geography, "_zoneByTile", zones)
+    With.grids.walkableTerrain.set(Tile(1, 0), false)
+    With.grids.walkableTerrain.set(Tile(1, 2), false)
+    With.grids.walkableTerrain.set(Tile(0, 1), false)
+    try {
+      val sim = simulation()
+      val moving = mover(sim, Pixel(48, 32))
+      sim.grid.tryMove(moving, Pixel(176, 32))
+      assert(moving.pixel == Pixel(52, 32), s"Clear sideways step was not taken: ${moving.pixel}")
+      gridConsistent(sim)
+    } finally {
+      java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+      set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+    }
+  }
+  check("grid reset clears every occupied cell before repopulation") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(60, 48))
+    sim.grid.tryMove(moving, Pixel(176, 48))
+    sim.grid.reset()
+    assert(sim.grid.populatedTiles.isEmpty)
+    assert(sim.grid.tiles.forall(t => t.occupancy == 0 && t.units.isEmpty))
+    sim.grid.populate(moving)
+    gridConsistent(sim)
+  }
+  check("kiting uses distance beyond weapon range and still fires when cooldown expires") {
+    val sim = simulation()
+    val kiter = mover(sim, Pixel(480, 240))
+    val target = mover(sim, Pixel(280, 240), Protoss.Zealot)
+    kiter.player = player(false)
+    target.player = player(true)
+    kiter.cooldownLeft = 20
+    kiter.topSpeed = 5
+    kiter.cooldownTargeting = 72
+    kiter.target = Some(target)
+    kiter.targets.add(target)
+    kiter.threat = Some(target)
+    target.target = Some(kiter)
+    set(kiter, "pixelRangeGroundCache", new Cache(() => 192.0))
+    set(kiter, "pixelRangeAirCache", new Cache(() => 192.0))
+    set(kiter, "damageOnHitGroundCache", new Cache(() => 20))
+    set(target, "pixelRangeGroundCache", new Cache(() => 32.0))
+    kiter.behavior = BehaviorFight
+    val start = kiter.pixel
+    kiter.act()
+    assert(kiter.moveGoal.exists(_.x > start.x))
+    (1 to 20).foreach { _ => kiter.update(); kiter.act() }
+    assert(target.hitPoints < 100, s"Next shot was delayed at distance ${kiter.pixelDistanceEdgeSimulation(target)}")
+    gridConsistent(sim)
   }
   println(s"$passed combat prediction checks passed")
 }

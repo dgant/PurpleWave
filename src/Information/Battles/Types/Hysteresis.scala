@@ -5,13 +5,13 @@ import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.Time.Seconds
 
 class Hysteresis(val unit: FriendlyUnitInfo) {
-  var lastChangeFrame           = 0
-  var lastShouldFight           = true
-  private var lastUpdateFrame = With.frame
-  private var bloodlust = 0.0
-  private var bloodlustAtEngage = 0.0
-  private var bloodlustEngagedFrame = 0
-  private var bloodlustDecaying = false
+  var lastChangeFrame                = 0
+  var lastShouldFight                = true
+  private var lastUpdateFrame        = With.frame
+  private var bloodlust              = 0.0
+  private var bloodlustAtEngage      = 0.0
+  private var bloodlustEngagedFrame  = 0
+  private var bloodlustDecaying      = false
 
   def update(): Unit = {
     val shouldFight = unit.agent.shouldFight
@@ -21,9 +21,9 @@ class Hysteresis(val unit: FriendlyUnitInfo) {
     }
     val engaged = unit.matchups.engaged
     if (engaged && ! bloodlustDecaying) {
-      bloodlustAtEngage = bloodlust
-      bloodlustEngagedFrame = With.frame
-      bloodlustDecaying = true
+      bloodlustAtEngage      = bloodlust
+      bloodlustEngagedFrame  = With.frame
+      bloodlustDecaying      = true
     }
     if (bloodlustDecaying) {
       bloodlust = bloodlustFrames
@@ -35,8 +35,8 @@ class Hysteresis(val unit: FriendlyUnitInfo) {
     lastUpdateFrame = With.frame
   }
 
-  def decisionFrames  : Int = With.framesSince(lastChangeFrame)
-  def bloodlustFrames: Double = if (bloodlustDecaying) {
+  def decisionFrames  : Int    = With.framesSince(lastChangeFrame)
+  def bloodlustFrames : Double = if (bloodlustDecaying) {
     bloodlustAtEngage * Math.max(0, 1 - With.framesSince(bloodlustEngagedFrame) / 24.0)
   } else bloodlust
 }

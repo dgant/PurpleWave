@@ -32,7 +32,7 @@ class ProduceBuilding(requestArg: RequestBuildable, expectedFramesArg: Int) exte
 
   private var _trainee: Option[FriendlyUnitInfo] = None
   private val recycledBuilder = new Cache(() => ?(
-    builderMatcher == Protoss.Probe,
+    builderMatcher == Protoss.Probe && ! foundation.flatMap(_.tile.metro).exists(_.bases.exists(b => b.isOurs && b.workerCount >= 6)),
     Maff.minBy(With.units.ours.filter(u =>
       Protoss.Probe(u)
         && (  u.intent.toScoutTiles .exists(t =>  foundation.exists(_.tile.groundTiles(t)       < 40))

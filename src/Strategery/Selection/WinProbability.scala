@@ -1,36 +1,38 @@
 package Strategery.Selection
 
 import Lifecycle.With
-import Mathematics.Maff
 import Strategery.Strategies.StrategyBranch
+import bwapi.Race
 
 import scala.util.Random
 
 object WinProbability {
 
-  // Naive Bayes probability of winning with multiple strategies
-  // Explanation at http://cs.wellesley.edu/~anderson/writing/naive-bayes.pdf
-  // Bayes: P(A|B) = P(B|A) * P(A) / P(B)
-  // Bayes: P(Win|Build) = P(Build|Win) * P(Win) / P(Build)
-  // P(Win|A & B) = P(A & B|Win) * P(Win) / P(A & B)
-  // P(Win|A & B & C) = P(A & B & C|Win) * P(Win) / P(A & B & C)
-  // We can try introducing priors for P(A & B & C)
-  // Conditional independence assumption used in Naive Bayes: P(A & B|Win) = P(A|win)P(B|win)
-  // Naive Bayes: P(Win|A & B) = P(win)P(A|win)P(B|win) / ( P(win)P(A|win)P(B|win) + P(loss)P(A|loss)P(B|loss) )
-  // Naive Bayes assumes independence of A/B in each class, which for us is not very true but makes better use of limited game information
-  // When we have an untested strategy, we can be optimistic in the face of uncertainty: P(A|win) == goal_wr and P(B|win) == 1 - goal_wr
-  //
-  // Apply a small random factor to shuffle strategies with nearly-equal values
+  private var cachedKey: Option[(Long, Double, Double, Int)] = None
+  private var cachedModel: StrategyScore.Model = _
+
+  private def model: StrategyScore.Model = {
+    val config = With.configuration
+    val key = (With.id, config.targetWinrate, config.historyHalfLife, config.recentFingerprints)
+    if (!cachedKey.contains(key)) {
+      val names = With.strategy.strategiesAll.map(_.toString).toSet
+      val games = With.strategy.gamesVsOpponent.map(game =>
+        StrategyScore.Game(game.won, game.tags.filter(names.contains)))
+      cachedModel = StrategyScore.fit(games, config.targetWinrate, config.historyHalfLife, config.recentFingerprints)
+      cachedKey = Some(key)
+    }
+    cachedModel
+  }
 
   def apply(strategyBranch: StrategyBranch): Double = {
-    val explorationGames = strategyBranch.explorationGames
-    val meanWinProbability =
-      Maff.geometricMean(strategyBranch.strategies.map(_.evaluation).map(eval =>
-        Math.max(
-          Maff.nanToZero(eval.gamesWeightedWon / eval.gamesWeighted),
-          (eval.gamesWeightedWon + explorationGames * With.configuration.targetWinrate)
-        / (eval.gamesWeighted    + explorationGames))))
-    noise(meanWinProbability)
+    val fitted = model
+    // Random-opponent branches contain mutually exclusive continuations for all three races.
+    // Average their predictions instead of adding effects which cannot occur together.
+    val races = if (With.enemy.raceCurrent == Race.Unknown)
+      Seq(Race.Protoss, Race.Terran, Race.Zerg) else Seq(With.enemy.raceCurrent)
+    val scores = races.map(race => fitted(strategyBranch.strategies
+      .filter(strategy => strategy.enemyRaces.contains(race) || strategy.enemyRaces.contains(Race.Unknown)).map(_.toString)))
+    noise(scores.sum / scores.size)
   }
 
   private def noise(input: Double): Double = {

@@ -2,16 +2,16 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
 import Information.Battles.Prediction.SimulationCheckpoint
-import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis}
+import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis, JudgmentModifiers}
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Physics.Force
 import Information.Geography.Geography
-import Information.Geography.Pathfinding.Paths
-import Information.Geography.Types.Zone
+import Information.Geography.Pathfinding.{GroundDistance, Paths}
+import Information.Geography.Types.{Edge, Zone}
 import Information.Grids.Grids
-import Information.Grids.Movement.{GridWalkable, GridWalkableTerrain, GridUnwalkableUnits, GridFlowField}
+import Information.Grids.Movement.{GridWalkable, GridWalkableTerrain, GridUnwalkableUnits, GridFlowField, GridGroundDistance}
 import Planning.Blackboard
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
@@ -20,8 +20,8 @@ import Micro.Coordination.DamageTracker
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import ProxyBwapi.Upgrades.{Upgrade, UpgradeTypes}
-import bwapi.BulletType
-import ProxyBwapi.Races.{Protoss, Terran}
+import bwapi.{BulletType, WeaponType}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
 import ProxyBwapi.UnitInfo.{DamageDealt, DamageVolley, FriendlyUnitInfo}
 import Utilities.Property
@@ -55,6 +55,12 @@ object CombatPredictionTest extends App {
   With.battles = allocate(classOf[Battles])
   With.battles.byUnit = Map.empty
 
+  def setWeapons(s: Simulacrum): Unit = {
+    s.attacksAgainstAirCached    = s.unitClass.airDamageFactorRaw * s.unitClass.maxAirHitsRaw
+    s.attacksAgainstGroundCached = if (s.unitClass == Protoss.Reaver) 1 else s.unitClass.groundDamageFactorRaw * s.unitClass.maxGroundHitsRaw
+    s.pixelRangeAirCached        = s.unitClass.pixelRangeAir
+    s.pixelRangeGroundCached     = s.unitClass.pixelRangeGround
+  }
   def unit(hp: Int = 10, shields: Int = 0): FriendlyUnitInfo = {
     val u = allocate(classOf[FriendlyUnitInfo])
     set(u, "_pixel", Pixel(64, 64))
@@ -64,6 +70,7 @@ object CombatPredictionTest extends App {
     set(u, "simulacrum", s)
     s.player = With.self
     s.unitClass = Protoss.Dragoon
+    setWeapons(s)
     s.hitPoints = hp
     s.shieldPoints = shields
     s.hitPointsInitial = hp
@@ -415,6 +422,7 @@ object CombatPredictionTest extends App {
   def mover(sim: Simulation, at: Pixel, kind: UnitClass = Protoss.Dragoon, flying: Boolean = false): Simulacrum = {
     val s = unit(100).simulacrum
     s.unitClass = kind
+    setWeapons(s)
     s.flying = flying
     s.topSpeed = 4
     s.topSpeedPossible = 4
@@ -568,10 +576,10 @@ object CombatPredictionTest extends App {
     kiter.targets.add(target)
     kiter.threat = Some(target)
     target.target = Some(kiter)
-    set(kiter, "pixelRangeGroundCache", new Cache(() => 192.0))
-    set(kiter, "pixelRangeAirCache", new Cache(() => 192.0))
+    kiter.pixelRangeGroundCached = 192.0
+    kiter.pixelRangeAirCached = 192.0
     set(kiter, "damageOnHitGroundCache", new Cache(() => 20))
-    set(target, "pixelRangeGroundCache", new Cache(() => 32.0))
+    target.pixelRangeGroundCached = 32.0
     kiter.behavior = BehaviorFight
     val start = kiter.pixel
     kiter.act()
@@ -579,6 +587,371 @@ object CombatPredictionTest extends App {
     (1 to 20).foreach { _ => kiter.update(); kiter.act() }
     assert(target.hitPoints < 100, s"Next shot was delayed at distance ${kiter.pixelDistanceEdgeSimulation(target)}")
     gridConsistent(sim)
+  }
+  check("fallback retains stable tie order and only deprioritizes the previous tile") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(60, 47))
+    mover(sim, Pixel(80, 47))
+    sim.grid.tryMove(moving, Pixel(176, 47))
+    assert(moving.pixel == Pixel(60, 43), s"Expected up, got ${moving.pixel}") // Up wins the up/down tie.
+    sim.grid.relocateUnit(moving, Pixel(60, 47))
+    moving.lastTile = Some(Tile(1, 0))
+    sim.grid.tryMove(moving, Pixel(176, 47))
+    assert(moving.pixel == Pixel(60, 51), s"Expected down, got ${moving.pixel}")
+    gridConsistent(sim)
+  }
+  def congestion(): (Simulation, Simulacrum, Simulacrum, Simulacrum) = {
+    val sim = simulation()
+    val rear = mover(sim, Pixel(60, 48))
+    val front = mover(sim, Pixel(80, 48))
+    mover(sim, Pixel(112, 48))
+    val target = mover(sim, Pixel(400, 48))
+    rear.isFriendlyCached = true
+    front.isFriendlyCached = true
+    front.behavior = BehaviorFight
+    front.target = Some(target)
+    front.pixelRangeGroundCached = 192.0
+    (sim, rear, front, target)
+  }
+  check("blocked entry makes an allied blocker yield laterally on the next frame") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    assert(!sim.grid.tryYield(front)) // No dependence on same-frame update order.
+    sim.grid.advanceFrame()
+    assert(sim.grid.tryYield(front))
+    assert(front.pixel.x == 80 && front.pixel.y != 48)
+    (1 to 6).foreach { _ =>
+      sim.grid.tryForceV2(rear, Force(1, 0))
+      sim.grid.advanceFrame()
+      sim.grid.tryYield(front)
+    }
+    assert(front.pixel.x == 80 && front.pixel.y < 32)
+    assert(rear.pixel.x >= 64, s"Rear unit did not enter the vacated cell: ${rear.pixel}")
+    gridConsistent(sim)
+  }
+  check("new requests do not overwrite pressure from the previous frame") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    assert(sim.grid.tryYield(front))
+  }
+  check("congestion requests expire and reset cannot revive requests on empty cells") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.remove(front)
+    sim.grid.reset()
+    sim.grid.populate(front)
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+  }
+  check("opponents and blocked terrain do not ask allied occupants to yield") {
+    val (sim, rear, front, _) = congestion()
+    rear.isFriendlyCached = false
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+    rear.isFriendlyCached = true
+    With.grids.walkableTerrain.set(Tile(2, 1), false)
+    try {
+      assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+      sim.grid.advanceFrame()
+      assert(!sim.grid.tryYield(front))
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("congestion cannot push a unit backwards when forward and lateral cells are blocked") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.remove(rear) // The cell behind is now the only free alternative.
+    With.grids.walkableTerrain.set(Tile(2, 0), false)
+    With.grids.walkableTerrain.set(Tile(2, 2), false)
+    try {
+      sim.grid.advanceFrame()
+      assert(!sim.grid.tryYield(front))
+      assert(front.pixel == Pixel(80, 48))
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("movement update applies yielding even without an existing movement goal") {
+    val (sim, rear, front, _) = congestion()
+    front.cooldownMoving = 0
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    front.update()
+    assert(front.pixel.x == 80 && front.pixel.y != 48)
+    gridConsistent(sim)
+  }
+  check("yielding respects attack wind-up and preserves the next firing opportunity") {
+    val (sim, rear, front, target) = congestion()
+    sim.grid.relocateUnit(target, Pixel(256, 48))
+    front.player = player(false)
+    target.player = player(true)
+    front.cooldownTargeting = 72
+    front.targets.add(target)
+    set(front, "damageOnHitGroundCache", new Cache(() => 20))
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    front.act()
+    val afterFirstShot = target.hitPoints
+    assert(afterFirstShot < 100)
+    front.update()
+    assert(front.pixel == Pixel(80, 48))
+    (1 to 32).foreach { _ =>
+      sim.grid.tryForceV2(rear, Force(1, 0))
+      sim.grid.advanceFrame()
+      front.act()
+      front.update()
+      assert(front.inRangeToAttackSimulation(target))
+    }
+    assert(front.pixel.y != 48)
+    assert(target.hitPoints < afterFirstShot, "Lateral yielding delayed the next shot")
+    gridConsistent(sim)
+  }
+  check("weapon snapshots retain capabilities until refreshed, including loaded-unit counts and range upgrades") {
+    val u = unit()
+    var hits = 4
+    var range = 192.0
+    set(u, "attacksAgainstAirCache", new Cache(() => hits))
+    set(u, "attacksAgainstGroundCache", new Cache(() => hits))
+    set(u, "pixelRangeAirCache", new Cache(() => range))
+    set(u, "pixelRangeGroundCache", new Cache(() => range))
+    u.simulacrum.snapshotWeapons()
+    hits = 8
+    range = 256.0
+    With.frame += 1
+    assert(u.attacksAgainstGround == 8 && u.pixelRangeGround == 256.0)
+    assert(u.simulacrum.attacksAgainstAir == 4 && u.simulacrum.attacksAgainstGround == 4)
+    near(u.simulacrum.pixelRangeAir, 192.0)
+    near(u.simulacrum.pixelRangeGround, 192.0)
+    u.simulacrum.snapshotWeapons()
+    assert(u.simulacrum.attacksAgainstAir == 8 && u.simulacrum.attacksAgainstGround == 8)
+    near(u.simulacrum.pixelRangeAir, 256.0)
+    near(u.simulacrum.pixelRangeGround, 256.0)
+  }
+  check("movement evaluates its by-name goal once and skips it when immobile with recording disabled") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(48, 48))
+    var evaluations = 0
+    moving.move({ evaluations += 1; Pixel(176, 48) }, None)
+    assert(evaluations == 1 && moving.moveGoal.contains(Pixel(176, 48)))
+    moving.cooldownMoving = 0
+    moving.topSpeed = 0
+    moving.move({ evaluations += 1; Pixel(176, 48) }, None)
+    assert(evaluations == 1)
+  }
+  check("ground distance preserves cross-zone edge minima, empty edges and unreachable distances") {
+    class Distances extends GroundDistance { def exact(a: Tile, b: Tile): Int = groundTiles(a, b) }
+    val distances = new Distances
+    val destinationZone = allocate(classOf[Zone])
+    set(destinationZone, "bitmap$0", -1L)
+    set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(destinationZone))
+    val a = Tile(1, 1)
+    val b = Tile(5, 1)
+    val edges = (0 until 3).map { _ =>
+      val edge = allocate(classOf[Edge])
+      set(edge, "distanceGrid", new GridGroundDistance())
+      edge
+    }.toVector
+    try {
+      set(destinationZone, "edges", Vector.empty[Edge])
+      assert(distances.exact(a, b) == distances.impossiblyLargeDistanceTiles)
+      set(destinationZone, "edges", edges)
+      assert(distances.exact(a, b) == 2 * distances.impossiblyLargeDistanceTiles)
+      for (i <- 0 until 50) {
+        edges.zipWithIndex.foreach { case (edge, j) =>
+          edge.distanceGrid.set(a, (i * 17 + j * 23) % 113)
+          edge.distanceGrid.set(b, (i * 31 + j * 7) % 127)
+        }
+        val expected = edges.map(e => e.distanceGrid.getUnchecked(a) + e.distanceGrid.getUnchecked(b)).min
+        assert(distances.exact(a, b) == expected)
+      }
+      assert(distances.exact(Tile(-1, 0), b) == distances.impossiblyLargeDistanceTiles)
+      assert(distances.exact(a, Tile(With.mapTileWidth, 0)) == distances.impossiblyLargeDistanceTiles)
+    } finally set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+  }
+  def armed(sim: Simulation, kind: UnitClass, at: Pixel, damage: Int): Simulacrum = {
+    val s = mover(sim, at, kind, kind.isFlyer)
+    s.isFriendlyCached = true
+    s.player = player(false)
+    set(s, "damageOnHitGroundCache", new Cache(() => damage))
+    set(s, "damageOnHitAirCache", new Cache(() => damage))
+    s
+  }
+  def splashVictim(sim: Simulation, x: Int, y: Int = 256, kind: UnitClass = Protoss.Dragoon): Simulacrum = {
+    val s = mover(sim, Pixel(x, y), kind, kind.isFlyer)
+    s.hitPoints = 500
+    s.hitPointsInitial = 500
+    s.player = player(true)
+    s.valuePerDamage = 1
+    s
+  }
+  check("collision off permits overlap and terrain crossing while retaining grid membership") {
+    val sim = new Simulation(collisionEnabled = false)
+    val moving = mover(sim, Pixel(60, 48))
+    mover(sim, Pixel(80, 48))
+    With.grids.walkableTerrain.set(Tile(2, 1), false)
+    try {
+      sim.grid.tryMove(moving, Pixel(176, 48))
+      assert(moving.pixel == Pixel(64, 48))
+      assert(sim.grid.tryForceV2(moving, Force(1, 0)))
+      assert(!sim.grid.tryYield(moving))
+      gridConsistent(sim)
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("collision mode disables the choke modifier before inspecting choke geometry") {
+    val previous = With.simulation
+    With.simulation = new Simulation(collisionEnabled = true)
+    try assert(JudgmentModifiers.choke(null).isEmpty) finally With.simulation = previous
+  }
+  check("siege splash uses inclusive footprint radii and hits primary exactly once") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val distances = Seq(10, 11, 25, 26, 40, 41)
+    val victims = distances.map(d => splashVictim(sim, 256 + Protoss.Dragoon.dimensionLeft + d))
+    tank.dealDamageTo(primary)
+    assert(primary.hitPoints == 430)
+    assert(victims.map(_.hitPoints) == Seq(430, 465, 465, 482, 482, 500))
+    assert(tank.cooldownLeft == tank.cooldownMaxAgainst(primary))
+  }
+  check("splash applies falloff before each victim's shields, armor and damage type") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val marine = splashVictim(sim, 256 + Terran.Marine.dimensionLeft + 20, kind = Terran.Marine)
+    marine.shieldPoints = 10
+    marine.armorShield = 3
+    marine.armorHealth = 2
+    tank.dealDamageTo(primary)
+    assert(marine.shieldPoints == 0 && marine.hitPoints == 490) // (70/2 - 3 - 10 - 2) * 0.5
+  }
+  check("radial splash damages allies without awarding kills, excludes shooter and respects target layers") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(256, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 258)
+    ally.isFriendlyCached = true
+    ally.hitPoints = 1
+    val flyer = splashVictim(sim, 256, kind = Protoss.Scout)
+    tank.dealDamageTo(primary)
+    assert(tank.hitPoints == 100 && ally.hitPoints == 0 && tank.kills == 0)
+    assert(flyer.hitPoints == 500 && tank.damageDealt == 69)
+    ally.update()
+    assert(ally.gridTile.isEmpty)
+  }
+  check("Archon enemy splash can cross air and ground layers but cannot hurt allies") {
+    val sim = simulation()
+    val archon = armed(sim, Protoss.Archon, Pixel(128, 256), 30)
+    val primary = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 258)
+    ally.isFriendlyCached = true
+    val flyer = splashVictim(sim, 256, kind = Protoss.Scout)
+    archon.dealDamageTo(primary)
+    assert(ally.hitPoints == 500 && flyer.hitPoints == 470 && primary.hitPoints == 470)
+  }
+  check("air splash caps secondary inner damage at half and excludes ground and allied units") {
+    val sim = simulation()
+    val corsair = armed(sim, Protoss.Corsair, Pixel(128, 256), 8)
+    val primary = splashVictim(sim, 256, kind = Protoss.Scout)
+    val inner = splashVictim(sim, 256, kind = Protoss.Scout)
+    val outer = splashVictim(sim, 256 + Protoss.Scout.dimensionLeft + 75, kind = Protoss.Scout)
+    val ground = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 256, kind = Protoss.Scout)
+    ally.isFriendlyCached = true
+    corsair.dealDamageTo(primary)
+    assert(primary.hitPoints == 492 && inner.hitPoints == 496 && outer.hitPoints == 498)
+    assert(ground.hitPoints == 500 && ally.hitPoints == 500)
+  }
+  check("splash reaches large footprints beyond the center search radius and follows relocation") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val building = splashVictim(sim, 256 + Terran.CommandCenter.dimensionLeft + 39, kind = Terran.CommandCenter)
+    val moved = splashVictim(sim, 700)
+    sim.grid.relocateUnit(moved, Pixel(260, 256))
+    tank.dealDamageTo(primary)
+    assert(building.hitPoints == 482 && moved.hitPoints == 430)
+  }
+  check("splash hits undetected units, ignores protected units, and limits burrowed hits to the inner radius") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val hidden = splashVictim(sim, 256)
+    hidden.cloaked = true
+    hidden.detected = false
+    val protectedUnit = splashVictim(sim, 256)
+    protectedUnit.invincible = true
+    val stasised = splashVictim(sim, 256)
+    stasised.stasised = true
+    val inner = splashVictim(sim, 256)
+    inner.burrowed = true
+    val outer = splashVictim(sim, 256 + Protoss.Dragoon.dimensionLeft + 20)
+    outer.burrowed = true
+    tank.dealDamageTo(primary)
+    assert(hidden.hitPoints == 430 && inner.hitPoints == 430)
+    assert(protectedUnit.hitPoints == 500 && stasised.hitPoints == 500 && outer.hitPoints == 500)
+  }
+  check("Reaver uses the Scarab weapon and upgraded primary damage") {
+    val sim = simulation()
+    val reaver = armed(sim, Protoss.Reaver, Pixel(64, 256), 125)
+    val primary = splashVictim(sim, 256)
+    val nearby = splashVictim(sim, 260)
+    assert(reaver.damageVolleyAgainst(primary).weapon == WeaponType.Scarab)
+    reaver.dealDamageTo(primary)
+    assert(primary.hitPoints == 375 && nearby.hitPoints == 375)
+    val upgraded = mover(sim, Pixel(64, 64), Protoss.Reaver)
+    val upgrades = new HashMap[Upgrade, Cache[Int]]
+    upgrades.put(Protoss.ScarabDamage, new Cache(() => 1))
+    upgraded.player = player(false)
+    set(upgraded.player, "upgradeLevelCaches", upgrades)
+    assert(upgraded.damageOnHitGround == 125)
+  }
+  check("collision off and non-splash weapons retain single-target damage") {
+    val disabled = new Simulation(collisionEnabled = false)
+    disabled.battle = simulation().battle
+    val tank = armed(disabled, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(disabled, 256)
+    val nearby = splashVictim(disabled, 260)
+    tank.dealDamageTo(primary)
+    assert(primary.hitPoints == 430 && nearby.hitPoints == 500)
+    val sim = simulation()
+    val devourer = armed(sim, Zerg.Devourer, Pixel(128, 256), 25)
+    val airPrimary = splashVictim(sim, 256, kind = Protoss.Scout)
+    val airNearby = splashVictim(sim, 260, kind = Protoss.Scout)
+    devourer.dealDamageTo(airPrimary)
+    assert(airPrimary.hitPoints == 475 && airNearby.hitPoints == 500)
+  }
+  check("Lurker splash follows the firing line, hits once, and excludes units beside or behind it") {
+    val sim = simulation()
+    val lurker = armed(sim, Zerg.Lurker, Pixel(128, 256), 20)
+    val primary = splashVictim(sim, 220)
+    val before = splashVictim(sim, 175)
+    val beyond = splashVictim(sim, 290)
+    val beside = splashVictim(sim, 220, 330)
+    val behind = splashVictim(sim, 64)
+    lurker.dealDamageTo(primary)
+    assert(Seq(primary, before, beyond).forall(_.hitPoints == 480))
+    assert(beside.hitPoints == 500 && behind.hitPoints == 500)
+  }
+  check("committed splash survives source death and strikes current neighbors at impact time") {
+    val sim = simulation()
+    val reaver = armed(sim, Protoss.Reaver, Pixel(64, 256), 100)
+    val primary = splashVictim(sim, 256)
+    val nearby = splashVictim(sim, 260)
+    sim.realUnits ++= Seq(primary.realUnit, nearby.realUnit)
+    With.frame = 1000
+    primary.realUnit.addDamage(reaver, 2, true, false, Some(reaver.damageVolleyAgainst(primary)), Some(900))
+    val reset = classOf[Simulation].getDeclaredMethods.find(_.getName.endsWith("resetPendingDamage")).get
+    reset.setAccessible(true)
+    reset.invoke(sim, Int.box(With.frame))
+    reaver.alive = false
+    sim.step()
+    assert(primary.hitPoints == 500 && nearby.hitPoints == 500)
+    sim.step()
+    assert(primary.hitPoints == 400 && nearby.hitPoints == 400)
   }
   println(s"$passed combat prediction checks passed")
 }

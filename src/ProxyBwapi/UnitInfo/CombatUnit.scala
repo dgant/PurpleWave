@@ -58,14 +58,14 @@ trait CombatUnit {
   def canAttack(other: CombatUnit): Boolean
 
   @inline final def dead: Boolean = ! alive
-  @inline final def attacksAgainstAir: Int = attacksAgainstAirCache()
+  @inline def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
     if (output == 0  && unitClass == Terran.Bunker)   output = loadedUnitCount
     if (output == 0  && unitClass == Protoss.Carrier) output = loadedUnitCount
     output
   })
-  @inline final def attacksAgainstGround: Int = attacksAgainstGroundCache()
+  @inline def attacksAgainstGround: Int = attacksAgainstGroundCache()
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
     if (output == 0  && unitClass == Terran.Bunker)   output = loadedUnitCount
@@ -74,7 +74,7 @@ trait CombatUnit {
     output
   })
   @inline final def stimAttackSpeedBonus: Int = ?(stimmed, 2, 1)
-  @inline final def pixelRangeAir: Double = pixelRangeAirCache()
+  @inline def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
     unitClass.pixelRangeAir +
       ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),     32.0, 0.0) +
@@ -82,7 +82,7 @@ trait CombatUnit {
       ?(unitClass == Terran.Goliath  && player.hasUpgrade(Terran.GoliathAirRange), 96.0, 0.0) +
       ?(unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange),   64.0, 0.0) +
       ?(unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange),    32.0, 0.0))
-  @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
+  @inline def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.pixelRangeGround +
       ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),   32.0, 0.0) +
@@ -180,13 +180,14 @@ trait CombatUnit {
   @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
   @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
-  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
+  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + (if (unitClass == Protoss.Reaver) bwapi.WeaponType.Scarab.damageBonus else unitClass.groundDamageBonusRaw) * damageUpgradeLevel)
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: CombatUnit): Int = ?(enemy.flying, damageOnHitAir, damageOnHitGround)
   @inline final def damageVolleyAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): DamageVolley =
     DamageVolley(
       damageOnHitBeforeShieldsArmorAndDamageType(enemy), attacksAgainst(enemy),
-      enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to))
+      enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to),
+      if (enemy.flying) unitClass.airWeaponRaw else if (unitClass == Protoss.Reaver) bwapi.WeaponType.Scarab else unitClass.groundWeaponRaw)
 
   @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Int =
     Math.round(damageVolleyAgainst(enemy, from, to)(shields.getOrElse(enemy.shieldPoints).toDouble).total).toInt

@@ -11,26 +11,36 @@ import Utilities.SpinWait
 
 import scala.collection.mutable.ArrayBuffer
 
-final class Simulation {
+final class Simulation(val collisionEnabled: Boolean = true) {
   val resolution      : Int                   = With.configuration.simulationResolution
   var battle          : Battle                = _
   val realUnits       : ArrayBuffer[UnitInfo] = new ArrayBuffer(200)
   val realUnitsOurs   : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy  : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
-  val grid            : SimulationGrid        = new SimulationGrid
+  val grid            : SimulationGrid        = new SimulationGrid(collisionEnabled)
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
   var shouldReset     : Boolean               = true
   // Frames log for visualizer (only when SimViz is enabled)
   private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
   private var simulationStartGameFrame: Int = 0
-  private case class PendingDamage(frame: Int, target: Simulacrum, volley: DamageVolley)
+  private case class PendingDamage(frame: Int, target: Simulacrum, volley: DamageVolley,
+    sourceIsFriendly: Boolean, source: UnitInfo, origin: Pixel)
   private var pendingDamage = Vector.empty[PendingDamage]
   private var nextPendingDamage = 0
 
   private def resetPendingDamage(snapshotFrame: Int): Unit = {
-    pendingDamage = realUnits.toVector.flatMap(unit => unit.damageQueueSnapshot.filter(_.committed).map(d =>
-      PendingDamage(Math.max(0, d.onFrame - snapshotFrame - 1), unit.simulacrum, d.volley))).sortBy(_.frame)
+    pendingDamage = realUnits.toVector.flatMap(unit => unit.damageQueueSnapshot.filter(_.committed).map { d =>
+      val source = d.source match {
+        case s: Simulacrum => s.realUnit
+        case u: UnitInfo => u
+      }
+      val friendly = d.source match {
+        case s: Simulacrum => s.isFriendlyCached
+        case u: UnitInfo => u.isFriendly
+      }
+      PendingDamage(Math.max(0, d.onFrame - snapshotFrame - 1), unit.simulacrum, d.volley, friendly, source, d.source.pixel)
+    }).sortBy(_.frame)
     nextPendingDamage = 0
   }
 
@@ -46,7 +56,7 @@ final class Simulation {
         realUnitsEnemy  ++= realUnits.view.filter(_.isEnemy)
         enemyVanguard     = battle.enemy.vanguardKey()
         engaged           = false
-        With.simulation.grid.reset()
+        grid.reset()
         simulacra.foreach(_.reset(this))
         resetPendingDamage(With.coordinator.damageTracker.updatedFrame)
         if (battle.logSimulation) {
@@ -58,6 +68,7 @@ final class Simulation {
         With.units.mutex.unlock()
       }
     }
+    grid.advanceFrame()
     var simulacrumIndex = 0
     while (simulacrumIndex < realUnits.length) {
       realUnits(simulacrumIndex).simulacrum.act()
@@ -67,6 +78,7 @@ final class Simulation {
     while (nextPendingDamage < pendingDamage.size && pendingDamage(nextPendingDamage).frame <= battle.simulationFrames) {
       val damage = pendingDamage(nextPendingDamage)
       if (damage.target.alive) damage.target.receiveDamage(damage.volley(damage.target.shieldPoints))
+      grid.applySplash(damage.target, damage.volley, damage.sourceIsFriendly, damage.source, damage.origin)
       nextPendingDamage += 1
     }
     simulacrumIndex = 0

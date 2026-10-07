@@ -64,6 +64,10 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var _targetValue            : Double = _
   var injury                  : Double = _
   var isFriendlyCached        : Boolean = _
+  var attacksAgainstAirCached    : Int    = _
+  var attacksAgainstGroundCached : Int    = _
+  var pixelRangeAirCached        : Double = _
+  var pixelRangeGroundCached     : Double = _
   // Simulacrum properties
   var simulation              : Simulation = _
   var behavior                : SimulacrumBehavior = BehaviorInitial
@@ -135,6 +139,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     _targetValue            = realUnit.targetValue
     recalculateInjury()
     isFriendlyCached        = realUnit.isFriendly
+    snapshotWeapons()
     // Simulacrum properties
     simulation              = newSimulation
     behavior                = BehaviorInitial
@@ -156,9 +161,21 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     damageReceived          = 0
     valueReceived           = 0
     events.clear()
-    With.simulation.grid.populate(this)
+    simulation.grid.populate(this)
   }
 
+  // Weapon capabilities and upgrades stay consistent with the rest of this simulation snapshot.
+  private[Simulation] def snapshotWeapons(): Unit = {
+    attacksAgainstAirCached    = realUnit.attacksAgainstAir
+    attacksAgainstGroundCached = realUnit.attacksAgainstGround
+    pixelRangeAirCached        = realUnit.pixelRangeAir
+    pixelRangeGroundCached     = realUnit.pixelRangeGround
+  }
+
+  @inline override def attacksAgainstAir    : Int    = attacksAgainstAirCached
+  @inline override def attacksAgainstGround : Int    = attacksAgainstGroundCached
+  @inline override def pixelRangeAir        : Double = pixelRangeAirCached
+  @inline override def pixelRangeGround     : Double = pixelRangeGroundCached
   @inline def occupancy: Int = ?(flying, 0, unitClass.occupancy)
   @inline def canMove: Boolean = topSpeedPossible > 0
   @inline def setPixel(newPixel: Pixel): Unit = {
@@ -167,7 +184,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     pixelTop = newPixel.y - unitClass.dimensionUp
     pixelRightExclusive = newPixel.x + unitClass.dimensionRightExclusive
     pixelBottomExclusive = newPixel.y + unitClass.dimensionDownExclusive
-    altitude = newPixel.tile.altitude
+    altitude = With.game.getGroundHeight(Maff.div32(newPixel.x), Maff.div32(newPixel.y))
   }
   @inline def pixelDistanceEdgeSimulation(other: Simulacrum): Double = {
     Maff.broodWarDistanceBox(
@@ -197,7 +214,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)
         cooldownMoving    = Math.max(0, cooldownMoving    - 1)
         cooldownTargeting = Math.max(0, cooldownTargeting - 1)
-        if (moveGoal.isDefined) {
+        val yielded = (moveGoal.isDefined || cooldownMoving == 0) && simulation.grid.tryYield(this)
+        if (moveGoal.isDefined && ! yielded) {
           val goal = moveGoal.get
           if (pixel.pixelDistanceSquared(goal) > moveGoalDistanceSquared) {
             simulation.grid.tryMove(this, goal)
@@ -225,14 +243,15 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   @inline def move(goal: => Pixel, reason: Option[String], goalDistance: Double = 0): Unit = {
     if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
+    val destination = if (ableToMove || simulation.battle.logSimulation) goal else null
     if (ableToMove) {
-      var goalAdjusted        = goal.clamp(unitClass.dimensionMax)
+      var goalAdjusted        = destination.clamp(unitClass.dimensionMax)
       goalAdjusted            = ?(flying, goalAdjusted, goalAdjusted.walkablePixel)
       moveGoal                = Some(goalAdjusted)
       moveGoalDistanceSquared = goalDistance * goalDistance
-      cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(goal) - goalDistance) / topSpeed).toInt)
+      cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(destination) - goalDistance) / topSpeed).toInt)
     }
-    addEvent(SimulationEventMove(this, goal, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
+    addEvent(SimulationEventMove(this, destination, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
 
   @inline def recalculateInjury(): Unit = {
@@ -246,19 +265,24 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def dealDamageTo(victim: Simulacrum): Unit = {
-    val victimWasAlive    = victim.hitPoints > 0
-    val damage            = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))(victim.shieldPoints)
-    val damageTotal       = victim.receiveDamage(damage)
-    val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
-    cooldownLeft          = cooldownMaxAgainst(victim)
-    cooldownMoving        = Math.max(cooldownMoving, unitClass.stopFrames)
-    valueDealt            += valueDamage
-    damageDealt           += damageTotal
-    alive                 = alive && ! unitClass.suicides
+    val volley = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))
+    applyAttackDamage(victim, volley(victim.shieldPoints))
+    simulation.grid.applySplash(victim, volley, isFriendlyCached, realUnit, pixel, this)
+    cooldownLeft = cooldownMaxAgainst(victim)
+    cooldownMoving = Math.max(cooldownMoving, unitClass.stopFrames)
+    alive = alive && ! unitClass.suicides
+  }
+
+  private[Simulation] def applyAttackDamage(victim: Simulacrum, damage: DamageDealt): Unit = {
+    val victimWasAlive = victim.hitPoints > 0
+    val damageTotal = victim.receiveDamage(damage)
+    val credit = if (isFriendlyCached == victim.isFriendlyCached) -1 else 1
+    valueDealt += credit * damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
+    damageDealt += credit * damageTotal
     if (victimWasAlive && victim.hitPoints <= 0) {
       val valueKill = victim.subjectiveValue * (1.0 - With.configuration.simulationDamageValueRatio)
-      kills += 1
-      valueDealt += valueKill
+      if (credit > 0) kills += 1
+      valueDealt += credit * valueKill
       victim.valueReceived += valueKill
     }
     addEvent(SimulationEventAttack(

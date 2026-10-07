@@ -58,6 +58,7 @@ final class Simulation {
         With.units.mutex.unlock()
       }
     }
+    grid.advanceFrame()
     var simulacrumIndex = 0
     while (simulacrumIndex < realUnits.length) {
       realUnits(simulacrumIndex).simulacrum.act()

@@ -197,7 +197,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)
         cooldownMoving    = Math.max(0, cooldownMoving    - 1)
         cooldownTargeting = Math.max(0, cooldownTargeting - 1)
-        if (moveGoal.isDefined) {
+        val yielded = (moveGoal.isDefined || cooldownMoving == 0) && simulation.grid.tryYield(this)
+        if (moveGoal.isDefined && ! yielded) {
           val goal = moveGoal.get
           if (pixel.pixelDistanceSquared(goal) > moveGoalDistanceSquared) {
             simulation.grid.tryMove(this, goal)

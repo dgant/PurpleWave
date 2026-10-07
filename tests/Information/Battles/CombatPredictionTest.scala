@@ -580,5 +580,115 @@ object CombatPredictionTest extends App {
     assert(target.hitPoints < 100, s"Next shot was delayed at distance ${kiter.pixelDistanceEdgeSimulation(target)}")
     gridConsistent(sim)
   }
+  def congestion(): (Simulation, Simulacrum, Simulacrum, Simulacrum) = {
+    val sim = simulation()
+    val rear = mover(sim, Pixel(60, 48))
+    val front = mover(sim, Pixel(80, 48))
+    mover(sim, Pixel(112, 48))
+    val target = mover(sim, Pixel(400, 48))
+    rear.isFriendlyCached = true
+    front.isFriendlyCached = true
+    front.behavior = BehaviorFight
+    front.target = Some(target)
+    set(front, "pixelRangeGroundCache", new Cache(() => 192.0))
+    (sim, rear, front, target)
+  }
+  check("blocked entry makes an allied blocker yield laterally on the next frame") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    assert(!sim.grid.tryYield(front)) // No dependence on same-frame update order.
+    sim.grid.advanceFrame()
+    assert(sim.grid.tryYield(front))
+    assert(front.pixel.x == 80 && front.pixel.y != 48)
+    (1 to 6).foreach { _ =>
+      sim.grid.tryForceV2(rear, Force(1, 0))
+      sim.grid.advanceFrame()
+      sim.grid.tryYield(front)
+    }
+    assert(front.pixel.x == 80 && front.pixel.y < 32)
+    assert(rear.pixel.x >= 64, s"Rear unit did not enter the vacated cell: ${rear.pixel}")
+    gridConsistent(sim)
+  }
+  check("new requests do not overwrite pressure from the previous frame") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    assert(sim.grid.tryYield(front))
+  }
+  check("congestion requests expire and reset cannot revive requests on empty cells") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.remove(front)
+    sim.grid.reset()
+    sim.grid.populate(front)
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+  }
+  check("opponents and blocked terrain do not ask allied occupants to yield") {
+    val (sim, rear, front, _) = congestion()
+    rear.isFriendlyCached = false
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    assert(!sim.grid.tryYield(front))
+    rear.isFriendlyCached = true
+    With.grids.walkableTerrain.set(Tile(2, 1), false)
+    try {
+      assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+      sim.grid.advanceFrame()
+      assert(!sim.grid.tryYield(front))
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("congestion cannot push a unit backwards when forward and lateral cells are blocked") {
+    val (sim, rear, front, _) = congestion()
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.remove(rear) // The cell behind is now the only free alternative.
+    With.grids.walkableTerrain.set(Tile(2, 0), false)
+    With.grids.walkableTerrain.set(Tile(2, 2), false)
+    try {
+      sim.grid.advanceFrame()
+      assert(!sim.grid.tryYield(front))
+      assert(front.pixel == Pixel(80, 48))
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("movement update applies yielding even without an existing movement goal") {
+    val (sim, rear, front, _) = congestion()
+    front.cooldownMoving = 0
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    front.update()
+    assert(front.pixel.x == 80 && front.pixel.y != 48)
+    gridConsistent(sim)
+  }
+  check("yielding respects attack wind-up and preserves the next firing opportunity") {
+    val (sim, rear, front, target) = congestion()
+    sim.grid.relocateUnit(target, Pixel(256, 48))
+    front.player = player(false)
+    target.player = player(true)
+    front.cooldownTargeting = 72
+    front.targets.add(target)
+    set(front, "damageOnHitGroundCache", new Cache(() => 20))
+    assert(!sim.grid.tryForceV2(rear, Force(1, 0)))
+    sim.grid.advanceFrame()
+    front.act()
+    val afterFirstShot = target.hitPoints
+    assert(afterFirstShot < 100)
+    front.update()
+    assert(front.pixel == Pixel(80, 48))
+    (1 to 32).foreach { _ =>
+      sim.grid.tryForceV2(rear, Force(1, 0))
+      sim.grid.advanceFrame()
+      front.act()
+      front.update()
+      assert(front.inRangeToAttackSimulation(target))
+    }
+    assert(front.pixel.y != 48)
+    assert(target.hitPoints < afterFirstShot, "Lateral yielding delayed the next shot")
+    gridConsistent(sim)
+  }
   println(s"$passed combat prediction checks passed")
 }

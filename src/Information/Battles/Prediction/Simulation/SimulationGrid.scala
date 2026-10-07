@@ -13,10 +13,14 @@ final class SimulationGrid {
   val tiles: Array[SimulationGridTile] = (0 until With.mapTileArea).map(new SimulationGridTile(_)).toArray
 
   val populatedTiles: mutable.Set[SimulationGridTile] = new mutable.HashSet[SimulationGridTile]
+  private var frame = 0
+
+  @inline def advanceFrame(): Unit = { frame += 1 }
 
   def reset(): Unit = {
     populatedTiles.foreach(_.reset())
     populatedTiles.clear()
+    frame += 2 // Expire requests even on cells that became empty before reset.
   }
 
   def populate(unit: Simulacrum): Unit = {
@@ -42,6 +46,7 @@ final class SimulationGrid {
         relocateUnit(unit, step)
         return
       }
+      tiles(step.tile.i).requestEntry(unit, frame)
     }
     if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){
       return
@@ -60,13 +65,63 @@ final class SimulationGrid {
       .filter(_.walkable)
       .sortBy(t => (unit.lastTile.contains(t), t.groundTiles(to) + t.pixelDistanceSquared(to)))
       .map(toTile => from.add(32 * (toTile.x - fromTile.x), 32 * (toTile.y - fromTile.y)))
-      .find(to => tryForceV2(unit, new Force(to.subtract(from))))
+      .find(to => tryForceV2(unit, new Force(to.subtract(from)), requestSpace = false))
 
     if (path.isDefined) {
       true
     } else {
       false
     }
+  }
+
+  @inline def tryYield(unit: Simulacrum): Boolean = {
+    if (unit.flying || ! unit.canMove || unit.topSpeed <= 0 || ! unit.behavior.fighting || unit.target.isEmpty || unit.gridTile.isEmpty) return false
+    val current = unit.gridTile.get
+    if ( ! current.requestedLastFrame(unit, frame)) return false
+    val target = unit.target.get
+    if ( ! target.alive) return false
+    val from = unit.pixel
+    val goal = unit.moveGoal.getOrElse(target.pixel)
+    val forwardX = goal.x - from.x
+    val forwardY = goal.y - from.y
+    if (forwardX == 0 && forwardY == 0) return false
+    val horizontal = Math.abs(forwardX) >= Math.abs(forwardY)
+    val preserveRange = unit.inRangeToAttackSimulation(target)
+    val range = unit.pixelRangeAgainst(target)
+    var bestDirection = -1
+    var bestDistance = Double.PositiveInfinity
+    var direction = 0
+    while (direction < 4) {
+      val dx = if (direction == 2) -1 else if (direction == 3) 1 else 0
+      val dy = if (direction == 0) -1 else if (direction == 1) 1 else 0
+      val x = current.tile.x + dx
+      val y = current.tile.y + dy
+      val backwards = if (horizontal) dx * forwardX < 0 else dy * forwardY < 0
+      if ( ! backwards && x >= 0 && y >= 0 && x < With.mapTileWidth && y < With.mapTileHeight) {
+        val destination = tiles(x + y * With.mapTileWidth)
+        // Staying in a requested cell costs more than moving toward an unrequested neighbor.
+        if ( ! destination.requestedLastFrame(unit, frame) && destination.fits(unit)) {
+          val stepX = Maff.clamp(from.x + (dx * unit.topSpeed).toInt, 0, With.mapPixelWidth - 1)
+          val stepY = Maff.clamp(from.y + (dy * unit.topSpeed).toInt, 0, With.mapPixelHeight - 1)
+          val distance = Maff.broodWarDistanceBox(
+            stepX - unit.unitClass.dimensionLeft, stepY - unit.unitClass.dimensionUp,
+            stepX + unit.unitClass.dimensionRightExclusive, stepY + unit.unitClass.dimensionDownExclusive,
+            target.pixelLeft, target.pixelTop, target.pixelRightExclusive, target.pixelBottomExclusive)
+          if ( ! preserveRange || (distance <= range && (unit.pixelRangeMin <= 0 || distance > unit.pixelRangeMin))) {
+            val goalDistance = Maff.squared(32 * x + 16 - goal.x) + Maff.squared(32 * y + 16 - goal.y)
+            if (goalDistance < bestDistance) {
+              bestDistance = goalDistance
+              bestDirection = direction
+            }
+          }
+        }
+      }
+      direction += 1
+    }
+    if (bestDirection < 0) return false
+    val dx = if (bestDirection == 2) -1 else if (bestDirection == 3) 1 else 0
+    val dy = if (bestDirection == 0) -1 else if (bestDirection == 1) 1 else 0
+    tryForceV2(unit, Force(dx, dy), requestSpace = false)
   }
 
   @inline private def moveFlow(unit: Simulacrum, to: Pixel): Unit = {
@@ -126,7 +181,7 @@ final class SimulationGrid {
     unit.setPixel(to)
   }
 
-  @inline def tryForceV2(unit: Simulacrum, force: Force): Boolean = {
+  @inline def tryForceV2(unit: Simulacrum, force: Force, requestSpace: Boolean = true): Boolean = {
           val from      = unit.pixel
           val forceStep = force.normalize(unit.topSpeed)
           val toStep    = from.add(forceStep.x.toInt, forceStep.y.toInt).clamp()
@@ -135,8 +190,8 @@ final class SimulationGrid {
 
     if (accept) {
       relocateUnit(unit, toStep, Some(tileStep))
-    } else {
-      unit.setPixel(unit.pixel)
+    } else if (requestSpace && toStep != from) {
+      tileStep.requestEntry(unit, frame)
     }
     accept
   }

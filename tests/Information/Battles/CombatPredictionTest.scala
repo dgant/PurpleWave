@@ -8,10 +8,10 @@ import Lifecycle.Configure.Configuration
 import Mathematics.Points.{Pixel, Tile}
 import Mathematics.Physics.Force
 import Information.Geography.Geography
-import Information.Geography.Pathfinding.Paths
-import Information.Geography.Types.Zone
+import Information.Geography.Pathfinding.{GroundDistance, Paths}
+import Information.Geography.Types.{Edge, Zone}
 import Information.Grids.Grids
-import Information.Grids.Movement.{GridWalkable, GridWalkableTerrain, GridUnwalkableUnits, GridFlowField}
+import Information.Grids.Movement.{GridWalkable, GridWalkableTerrain, GridUnwalkableUnits, GridFlowField, GridGroundDistance}
 import Planning.Blackboard
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
@@ -55,6 +55,12 @@ object CombatPredictionTest extends App {
   With.battles = allocate(classOf[Battles])
   With.battles.byUnit = Map.empty
 
+  def setWeapons(s: Simulacrum): Unit = {
+    s.attacksAgainstAirCached    = s.unitClass.airDamageFactorRaw * s.unitClass.maxAirHitsRaw
+    s.attacksAgainstGroundCached = if (s.unitClass == Protoss.Reaver) 1 else s.unitClass.groundDamageFactorRaw * s.unitClass.maxGroundHitsRaw
+    s.pixelRangeAirCached        = s.unitClass.pixelRangeAir
+    s.pixelRangeGroundCached     = s.unitClass.pixelRangeGround
+  }
   def unit(hp: Int = 10, shields: Int = 0): FriendlyUnitInfo = {
     val u = allocate(classOf[FriendlyUnitInfo])
     set(u, "_pixel", Pixel(64, 64))
@@ -64,6 +70,7 @@ object CombatPredictionTest extends App {
     set(u, "simulacrum", s)
     s.player = With.self
     s.unitClass = Protoss.Dragoon
+    setWeapons(s)
     s.hitPoints = hp
     s.shieldPoints = shields
     s.hitPointsInitial = hp
@@ -415,6 +422,7 @@ object CombatPredictionTest extends App {
   def mover(sim: Simulation, at: Pixel, kind: UnitClass = Protoss.Dragoon, flying: Boolean = false): Simulacrum = {
     val s = unit(100).simulacrum
     s.unitClass = kind
+    setWeapons(s)
     s.flying = flying
     s.topSpeed = 4
     s.topSpeedPossible = 4
@@ -568,10 +576,10 @@ object CombatPredictionTest extends App {
     kiter.targets.add(target)
     kiter.threat = Some(target)
     target.target = Some(kiter)
-    set(kiter, "pixelRangeGroundCache", new Cache(() => 192.0))
-    set(kiter, "pixelRangeAirCache", new Cache(() => 192.0))
+    kiter.pixelRangeGroundCached = 192.0
+    kiter.pixelRangeAirCached = 192.0
     set(kiter, "damageOnHitGroundCache", new Cache(() => 20))
-    set(target, "pixelRangeGroundCache", new Cache(() => 32.0))
+    target.pixelRangeGroundCached = 32.0
     kiter.behavior = BehaviorFight
     val start = kiter.pixel
     kiter.act()
@@ -602,7 +610,7 @@ object CombatPredictionTest extends App {
     front.isFriendlyCached = true
     front.behavior = BehaviorFight
     front.target = Some(target)
-    set(front, "pixelRangeGroundCache", new Cache(() => 192.0))
+    front.pixelRangeGroundCached = 192.0
     (sim, rear, front, target)
   }
   check("blocked entry makes an allied blocker yield laterally on the next frame") {
@@ -701,6 +709,68 @@ object CombatPredictionTest extends App {
     assert(front.pixel.y != 48)
     assert(target.hitPoints < afterFirstShot, "Lateral yielding delayed the next shot")
     gridConsistent(sim)
+  }
+  check("weapon snapshots retain capabilities until refreshed, including loaded-unit counts and range upgrades") {
+    val u = unit()
+    var hits = 4
+    var range = 192.0
+    set(u, "attacksAgainstAirCache", new Cache(() => hits))
+    set(u, "attacksAgainstGroundCache", new Cache(() => hits))
+    set(u, "pixelRangeAirCache", new Cache(() => range))
+    set(u, "pixelRangeGroundCache", new Cache(() => range))
+    u.simulacrum.snapshotWeapons()
+    hits = 8
+    range = 256.0
+    With.frame += 1
+    assert(u.attacksAgainstGround == 8 && u.pixelRangeGround == 256.0)
+    assert(u.simulacrum.attacksAgainstAir == 4 && u.simulacrum.attacksAgainstGround == 4)
+    near(u.simulacrum.pixelRangeAir, 192.0)
+    near(u.simulacrum.pixelRangeGround, 192.0)
+    u.simulacrum.snapshotWeapons()
+    assert(u.simulacrum.attacksAgainstAir == 8 && u.simulacrum.attacksAgainstGround == 8)
+    near(u.simulacrum.pixelRangeAir, 256.0)
+    near(u.simulacrum.pixelRangeGround, 256.0)
+  }
+  check("movement evaluates its by-name goal once and skips it when immobile with recording disabled") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(48, 48))
+    var evaluations = 0
+    moving.move({ evaluations += 1; Pixel(176, 48) }, None)
+    assert(evaluations == 1 && moving.moveGoal.contains(Pixel(176, 48)))
+    moving.cooldownMoving = 0
+    moving.topSpeed = 0
+    moving.move({ evaluations += 1; Pixel(176, 48) }, None)
+    assert(evaluations == 1)
+  }
+  check("ground distance preserves cross-zone edge minima, empty edges and unreachable distances") {
+    class Distances extends GroundDistance { def exact(a: Tile, b: Tile): Int = groundTiles(a, b) }
+    val distances = new Distances
+    val destinationZone = allocate(classOf[Zone])
+    set(destinationZone, "bitmap$0", -1L)
+    set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(destinationZone))
+    val a = Tile(1, 1)
+    val b = Tile(5, 1)
+    val edges = (0 until 3).map { _ =>
+      val edge = allocate(classOf[Edge])
+      set(edge, "distanceGrid", new GridGroundDistance())
+      edge
+    }.toVector
+    try {
+      set(destinationZone, "edges", Vector.empty[Edge])
+      assert(distances.exact(a, b) == distances.impossiblyLargeDistanceTiles)
+      set(destinationZone, "edges", edges)
+      assert(distances.exact(a, b) == 2 * distances.impossiblyLargeDistanceTiles)
+      for (i <- 0 until 50) {
+        edges.zipWithIndex.foreach { case (edge, j) =>
+          edge.distanceGrid.set(a, (i * 17 + j * 23) % 113)
+          edge.distanceGrid.set(b, (i * 31 + j * 7) % 127)
+        }
+        val expected = edges.map(e => e.distanceGrid.getUnchecked(a) + e.distanceGrid.getUnchecked(b)).min
+        assert(distances.exact(a, b) == expected)
+      }
+      assert(distances.exact(Tile(-1, 0), b) == distances.impossiblyLargeDistanceTiles)
+      assert(distances.exact(a, Tile(With.mapTileWidth, 0)) == distances.impossiblyLargeDistanceTiles)
+    } finally set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
   }
   println(s"$passed combat prediction checks passed")
 }

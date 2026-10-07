@@ -58,14 +58,14 @@ trait CombatUnit {
   def canAttack(other: CombatUnit): Boolean
 
   @inline final def dead: Boolean = ! alive
-  @inline final def attacksAgainstAir: Int = attacksAgainstAirCache()
+  @inline def attacksAgainstAir: Int = attacksAgainstAirCache()
   private val attacksAgainstAirCache = new Cache(() => {
     var output = unitClass.airDamageFactorRaw * unitClass.maxAirHitsRaw
     if (output == 0  && unitClass == Terran.Bunker)   output = loadedUnitCount
     if (output == 0  && unitClass == Protoss.Carrier) output = loadedUnitCount
     output
   })
-  @inline final def attacksAgainstGround: Int = attacksAgainstGroundCache()
+  @inline def attacksAgainstGround: Int = attacksAgainstGroundCache()
   private val attacksAgainstGroundCache = new Cache(() => {
     var output = unitClass.groundDamageFactorRaw * unitClass.maxGroundHitsRaw
     if (output == 0  && unitClass == Terran.Bunker)   output = loadedUnitCount
@@ -74,7 +74,7 @@ trait CombatUnit {
     output
   })
   @inline final def stimAttackSpeedBonus: Int = ?(stimmed, 2, 1)
-  @inline final def pixelRangeAir: Double = pixelRangeAirCache()
+  @inline def pixelRangeAir: Double = pixelRangeAirCache()
   private val pixelRangeAirCache = new Cache(() =>
     unitClass.pixelRangeAir +
       ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),     32.0, 0.0) +
@@ -82,7 +82,7 @@ trait CombatUnit {
       ?(unitClass == Terran.Goliath  && player.hasUpgrade(Terran.GoliathAirRange), 96.0, 0.0) +
       ?(unitClass == Protoss.Dragoon && player.hasUpgrade(Protoss.DragoonRange),   64.0, 0.0) +
       ?(unitClass == Zerg.Hydralisk  && player.hasUpgrade(Zerg.HydraliskRange),    32.0, 0.0))
-  @inline final def pixelRangeGround: Double = pixelRangeGroundCache()
+  @inline def pixelRangeGround: Double = pixelRangeGroundCache()
   private val pixelRangeGroundCache = new Cache(() =>
     unitClass.pixelRangeGround +
       ?(unitClass == Terran.Bunker   && player.hasUpgrade(Terran.MarineRange),   32.0, 0.0) +

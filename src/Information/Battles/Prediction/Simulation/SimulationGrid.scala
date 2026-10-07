@@ -27,7 +27,7 @@ final class SimulationGrid {
   }
 
   def populate(unit: Simulacrum): Unit = {
-    val gridTile = tiles(unit.pixel.tile.clip.i)
+    val gridTile = tileAt(unit.pixel)
     gridTile += unit
     unit.gridTile = Some(gridTile)
     populatedTiles += gridTile
@@ -42,14 +42,16 @@ final class SimulationGrid {
   }
 
   @inline def tryMove(unit: Simulacrum, to: Pixel): Unit = {
-    val toClamped = to.clamp()
-    if (unit.flying || unit.pixel.pixelDistanceSquared(toClamped) <= unit.topSpeed * unit.topSpeed || unit.pixel.tile == toClamped.tile) {
+    val toClamped = if (to.valid) to else to.clamp()
+    if (unit.flying || unit.pixel.pixelDistanceSquared(toClamped) <= unit.topSpeed * unit.topSpeed
+      || (Maff.div32(unit.pixel.x) == Maff.div32(toClamped.x) && Maff.div32(unit.pixel.y) == Maff.div32(toClamped.y))) {
       val step = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
-      if (tiles(step.tile.i).fits(unit)) {
-        relocateUnit(unit, step)
+      val destination = tileAt(step)
+      if (destination.fits(unit)) {
+        relocateUnit(unit, step, destination)
         return
       }
-      tiles(step.tile.i).requestEntry(unit, frame)
+      destination.requestEntry(unit, frame)
     }
     if (tryForceV2(unit, unit.pixel.flowTo(toClamped))){
       return
@@ -61,8 +63,7 @@ final class SimulationGrid {
   }
 
   @inline private def moveGrid(unit: Simulacrum, to: Pixel): Boolean = {
-    val from  = unit.pixel
-    val fromTile = from.tile
+    val fromTile = unit.gridTile.get.tile
     var count = 0
     var direction = 0
     while (direction < 4) {
@@ -93,8 +94,7 @@ final class SimulationGrid {
     var index = 0
     while (index < count) {
       val tile = fallbackTiles(index).tile
-      val force = Force(32 * (tile.x - fromTile.x), 32 * (tile.y - fromTile.y))
-      if (tryForceV2(unit, force, requestSpace = false)) return true
+      if (tryForceStep(unit, 32 * (tile.x - fromTile.x), 32 * (tile.y - fromTile.y), requestSpace = false)) return true
       index += 1
     }
     false
@@ -147,7 +147,7 @@ final class SimulationGrid {
     if (bestDirection < 0) return false
     val dx = if (bestDirection == 2) -1 else if (bestDirection == 3) 1 else 0
     val dy = if (bestDirection == 0) -1 else if (bestDirection == 1) 1 else 0
-    tryForceV2(unit, Force(dx, dy), requestSpace = false)
+    tryForceStep(unit, dx, dy, requestSpace = false)
   }
 
   @inline private def moveFlow(unit: Simulacrum, to: Pixel): Unit = {
@@ -186,9 +186,13 @@ final class SimulationGrid {
     */
   }
 
-  @inline def relocateUnit(unit: Simulacrum, to: Pixel, knownTile: Option[SimulationGridTile] = None): Unit = {
+  @inline private def tileAt(pixel: Pixel): SimulationGridTile = tiles(
+    Maff.clamp(Maff.div32(pixel.x), 0, With.mapTileWidth - 1)
+      + With.mapTileWidth * Maff.clamp(Maff.div32(pixel.y), 0, With.mapTileHeight - 1))
+
+  @inline def relocateUnit(unit: Simulacrum, to: Pixel, knownTile: SimulationGridTile = null): Unit = {
     val tileFrom  = unit.gridTile
-    val tileTo    = knownTile.getOrElse(tiles(to.tile.clip.i))
+    val tileTo    = if (knownTile == null) tileAt(to) else knownTile
 
     if ( ! unit.gridTile.contains(tileTo)) {
       unit.gridTile.foreach(tileLast => {
@@ -207,19 +211,24 @@ final class SimulationGrid {
     unit.setPixel(to)
   }
 
-  @inline def tryForceV2(unit: Simulacrum, force: Force, requestSpace: Boolean = true): Boolean = {
-          val from      = unit.pixel
-          val forceStep = force.normalize(unit.topSpeed)
-          val toStep    = from.add(forceStep.x.toInt, forceStep.y.toInt).clamp()
-          val tileStep  = tiles(toStep.tile.i)
-          val accept    = toStep != from && tileStep.fits(unit)
+  @inline def tryForceV2(unit: Simulacrum, force: Force, requestSpace: Boolean = true): Boolean =
+    tryForceStep(unit, force.x, force.y, requestSpace)
 
-    if (accept) {
-      relocateUnit(unit, toStep, Some(tileStep))
-    } else if (requestSpace && toStep != from) {
-      tileStep.requestEntry(unit, frame)
+  @inline private def tryForceStep(unit: Simulacrum, forceX: Double, forceY: Double, requestSpace: Boolean): Boolean = {
+    val length = Math.sqrt(forceX * forceX + forceY * forceY)
+    if (length == 0) return false
+    val from = unit.pixel
+    val x = Maff.clamp(from.x + (unit.topSpeed * forceX / length).toInt, 0, With.mapPixelWidth - 1)
+    val y = Maff.clamp(from.y + (unit.topSpeed * forceY / length).toInt, 0, With.mapPixelHeight - 1)
+    if (x == from.x && y == from.y) return false
+    val tileStep = tiles(Maff.div32(x) + With.mapTileWidth * Maff.div32(y))
+    if (tileStep.fits(unit)) {
+      relocateUnit(unit, Pixel(x, y), tileStep)
+      true
+    } else {
+      if (requestSpace) tileStep.requestEntry(unit, frame)
+      false
     }
-    accept
   }
 
   @inline def tryForce(unit: Simulacrum, force: Force): Boolean = {

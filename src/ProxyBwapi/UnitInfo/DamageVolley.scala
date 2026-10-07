@@ -7,7 +7,8 @@ final case class DamageVolley(
   armorHealth: Double,
   armorShield: Double,
   healthMultiplier: Double,
-  hitChance: Double = 1.0) {
+  hitChance: Double = 1.0,
+  weapon: bwapi.WeaponType = bwapi.WeaponType.None) {
 
   @inline def apply(shields: Double): DamageDealt = {
     var shieldsLeft = Math.max(0.0, shields)

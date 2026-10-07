@@ -180,13 +180,14 @@ trait CombatUnit {
   @inline final def damageUpgradeLevel  : Int = unitClass.damageUpgradeType.map(player.getUpgradeLevel).getOrElse(0)
   @inline final def damageOnHitGround   : Int = damageOnHitGroundCache()
   @inline final def damageOnHitAir      : Int = damageOnHitAirCache()
-  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + unitClass.groundDamageBonusRaw  * damageUpgradeLevel)
+  private val damageOnHitGroundCache  = new Cache(() => unitClass.effectiveGroundDamage  + (if (unitClass == Protoss.Reaver) bwapi.WeaponType.Scarab.damageBonus else unitClass.groundDamageBonusRaw) * damageUpgradeLevel)
   private val damageOnHitAirCache     = new Cache(() => unitClass.effectiveAirDamage     + unitClass.airDamageBonusRaw     * damageUpgradeLevel)
   @inline final def damageOnHitBeforeShieldsArmorAndDamageType(enemy: CombatUnit): Int = ?(enemy.flying, damageOnHitAir, damageOnHitGround)
   @inline final def damageVolleyAgainst(enemy: CombatUnit, from: Option[Pixel] = None, to: Option[Pixel] = None): DamageVolley =
     DamageVolley(
       damageOnHitBeforeShieldsArmorAndDamageType(enemy), attacksAgainst(enemy),
-      enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to))
+      enemy.armorHealth, enemy.armorShield, damageMultiplierAgainst(enemy), hitChanceAgainst(enemy, from, to),
+      if (enemy.flying) unitClass.airWeaponRaw else if (unitClass == Protoss.Reaver) bwapi.WeaponType.Scarab else unitClass.groundWeaponRaw)
 
   @inline final def damageOnNextHitAgainst(enemy: CombatUnit, shields: Option[Int] = None, from: Option[Pixel] = None, to: Option[Pixel] = None): Int =
     Math.round(damageVolleyAgainst(enemy, from, to)(shields.getOrElse(enemy.shieldPoints).toDouble).total).toInt

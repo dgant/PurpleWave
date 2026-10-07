@@ -101,6 +101,7 @@ object JudgmentModifiers {
 
   // Avoid fighting across chokes/bridges
   def choke(battle: Battle): Option[JudgmentModifier] = {
+    if (With.simulation.collisionEnabled) return None
     val pixelUs   = battle.us.attackCentroidGround
     val pixelFoe  = battle.enemy.vanguardGround()
     val edge      = battle.choke

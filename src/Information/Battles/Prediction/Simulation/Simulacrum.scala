@@ -161,7 +161,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     damageReceived          = 0
     valueReceived           = 0
     events.clear()
-    With.simulation.grid.populate(this)
+    simulation.grid.populate(this)
   }
 
   // Weapon capabilities and upgrades stay consistent with the rest of this simulation snapshot.
@@ -265,19 +265,24 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def dealDamageTo(victim: Simulacrum): Unit = {
-    val victimWasAlive    = victim.hitPoints > 0
-    val damage            = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))(victim.shieldPoints)
-    val damageTotal       = victim.receiveDamage(damage)
-    val valueDamage       = damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
-    cooldownLeft          = cooldownMaxAgainst(victim)
-    cooldownMoving        = Math.max(cooldownMoving, unitClass.stopFrames)
-    valueDealt            += valueDamage
-    damageDealt           += damageTotal
-    alive                 = alive && ! unitClass.suicides
+    val volley = damageVolleyAgainst(victim, from = Some(pixel), to = Some(victim.pixel))
+    applyAttackDamage(victim, volley(victim.shieldPoints))
+    simulation.grid.applySplash(victim, volley, isFriendlyCached, realUnit, pixel, this)
+    cooldownLeft = cooldownMaxAgainst(victim)
+    cooldownMoving = Math.max(cooldownMoving, unitClass.stopFrames)
+    alive = alive && ! unitClass.suicides
+  }
+
+  private[Simulation] def applyAttackDamage(victim: Simulacrum, damage: DamageDealt): Unit = {
+    val victimWasAlive = victim.hitPoints > 0
+    val damageTotal = victim.receiveDamage(damage)
+    val credit = if (isFriendlyCached == victim.isFriendlyCached) -1 else 1
+    valueDealt += credit * damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
+    damageDealt += credit * damageTotal
     if (victimWasAlive && victim.hitPoints <= 0) {
       val valueKill = victim.subjectiveValue * (1.0 - With.configuration.simulationDamageValueRatio)
-      kills += 1
-      valueDealt += valueKill
+      if (credit > 0) kills += 1
+      valueDealt += credit * valueKill
       victim.valueReceived += valueKill
     }
     addEvent(SimulationEventAttack(

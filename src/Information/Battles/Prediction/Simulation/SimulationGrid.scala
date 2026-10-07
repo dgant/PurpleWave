@@ -5,15 +5,18 @@ import Mathematics.Physics.Force
 import Mathematics.Points.Pixel
 import ProxyBwapi.Races.Protoss
 import Mathematics.Maff
+import ProxyBwapi.UnitInfo.{DamageVolley, UnitInfo}
+import bwapi.{ExplosionType, WeaponType}
 
 import scala.collection.mutable
 
-final class SimulationGrid {
+final class SimulationGrid(val collisionEnabled: Boolean = true) {
   val occupancyMax: Int = Protoss.Dragoon.area
   val tiles: Array[SimulationGridTile] = (0 until With.mapTileArea).map(new SimulationGridTile(_)).toArray
 
   val populatedTiles: mutable.Set[SimulationGridTile] = new mutable.HashSet[SimulationGridTile]
   private var frame = 0
+  private var maxUnitExtent = 0
   private val fallbackTiles = new Array[SimulationGridTile](4)
   private val fallbackCosts = new Array[Double](4)
   private val fallbackBacktracks = new Array[Boolean](4)
@@ -23,14 +26,79 @@ final class SimulationGrid {
   def reset(): Unit = {
     populatedTiles.foreach(_.reset())
     populatedTiles.clear()
+    maxUnitExtent = 0
     frame += 2 // Expire requests even on cells that became empty before reset.
   }
 
   def populate(unit: Simulacrum): Unit = {
+    maxUnitExtent = Math.max(maxUnitExtent, unit.unitClass.dimensionMax)
     val gridTile = tileAt(unit.pixel)
     gridTile += unit
     unit.gridTile = Some(gridTile)
     populatedTiles += gridTile
+  }
+
+  // Cells store centers, so expand the search for large footprints before testing exact splash distance.
+  def applySplash(primary: Simulacrum, volley: DamageVolley, sourceIsFriendly: Boolean,
+    source: UnitInfo, origin: Pixel, attacker: Simulacrum = null): Unit = {
+    val weapon = volley.weapon
+    val explosion = weapon.explosionType
+    if ( ! collisionEnabled || weapon.outerSplashRadius <= 0
+      || (explosion != ExplosionType.Radial_Splash && explosion != ExplosionType.Enemy_Splash && explosion != ExplosionType.Air_Splash)) return
+    val airSplash = explosion == ExplosionType.Air_Splash
+    val friendlyFire = explosion == ExplosionType.Radial_Splash
+    val lineSplash = weapon == WeaponType.Subterranean_Spines && origin != null
+    val impact = primary.pixel
+    val startX = if (lineSplash) origin.x else impact.x
+    val startY = if (lineSplash) origin.y else impact.y
+    val length = if (lineSplash) Math.hypot(impact.x - startX, impact.y - startY) else 0.0
+    val endX = if (length > 0) startX + (impact.x - startX) * weapon.maxRange / length else impact.x.toDouble
+    val endY = if (length > 0) startY + (impact.y - startY) * weapon.maxRange / length else impact.y.toDouble
+    val radius = weapon.outerSplashRadius + maxUnitExtent
+    val xMin = Maff.clamp(Maff.div32(Math.floor(Math.min(startX, endX)).toInt - radius), 0, With.mapTileWidth - 1)
+    val xMax = Maff.clamp(Maff.div32(Math.ceil(Math.max(startX, endX)).toInt + radius), 0, With.mapTileWidth - 1)
+    val yMin = Maff.clamp(Maff.div32(Math.floor(Math.min(startY, endY)).toInt - radius), 0, With.mapTileHeight - 1)
+    val yMax = Maff.clamp(Maff.div32(Math.ceil(Math.max(startY, endY)).toInt + radius), 0, With.mapTileHeight - 1)
+    var y = yMin
+    while (y <= yMax) {
+      var x = xMin
+      while (x <= xMax) {
+        val units = tiles(x + y * With.mapTileWidth).units
+        var i = 0
+        while (i < units.size) {
+          val victim = units(i)
+          if ((victim ne primary) && (victim.realUnit ne source) && victim.alive && victim.hitPoints > 0
+            && ! victim.invincible && ! victim.stasised
+            && (friendlyFire || victim.isFriendlyCached != sourceIsFriendly)
+            && (if (victim.flying) weapon.targetsAir else weapon.targetsGround)
+            && ( ! weapon.targetsMechanical || victim.unitClass.isMechanical)
+            && ( ! weapon.targetsOrganic || victim.unitClass.isOrganic)
+            && ( ! weapon.targetsNonBuilding || ! victim.unitClass.isBuilding)
+            && ( ! weapon.targetsNonRobotic || ! victim.unitClass.isRobotic)
+            && ( ! weapon.targetsOrgOrMech || victim.unitClass.isOrganic || victim.unitClass.isMechanical)
+            && ( ! airSplash || victim.unitClass != Protoss.Interceptor)) {
+            val distance = if (lineSplash) SimulationSplash.lineDistance(victim, startX, startY, endX, endY)
+              else SimulationSplash.pointDistance(victim, impact.x, impact.y)
+            val divisor = if (distance > weapon.outerSplashRadius) 0
+              else if (lineSplash) { if (distance <= weapon.innerSplashRadius) 1 else 0 }
+              else if ( ! airSplash && distance <= weapon.innerSplashRadius) 1
+              else if (victim.burrowed) 0
+              else if (distance <= weapon.medianSplashRadius) 2
+              else 4
+            if (divisor > 0) {
+              val splash = volley.copy(damagePerHit = volley.damagePerHit / divisor,
+                armorHealth = victim.armorHealth, armorShield = victim.armorShield,
+                healthMultiplier = SimulationSplash.healthMultiplier(weapon, victim.unitClass.size))
+              val damage = splash(victim.shieldPoints)
+              if (attacker == null) victim.receiveDamage(damage) else attacker.applyAttackDamage(victim, damage)
+            }
+          }
+          i += 1
+        }
+        x += 1
+      }
+      y += 1
+    }
   }
 
   @inline def remove(unit: Simulacrum): Unit = {
@@ -43,11 +111,11 @@ final class SimulationGrid {
 
   @inline def tryMove(unit: Simulacrum, to: Pixel): Unit = {
     val toClamped = if (to.valid) to else to.clamp()
-    if (unit.flying || unit.pixel.pixelDistanceSquared(toClamped) <= unit.topSpeed * unit.topSpeed
+    if ( ! collisionEnabled || unit.flying || unit.pixel.pixelDistanceSquared(toClamped) <= unit.topSpeed * unit.topSpeed
       || (Maff.div32(unit.pixel.x) == Maff.div32(toClamped.x) && Maff.div32(unit.pixel.y) == Maff.div32(toClamped.y))) {
       val step = unit.pixel.projectUpTo(toClamped, unit.topSpeed)
       val destination = tileAt(step)
-      if (destination.fits(unit)) {
+      if ( ! collisionEnabled || destination.fits(unit)) {
         relocateUnit(unit, step, destination)
         return
       }
@@ -101,7 +169,7 @@ final class SimulationGrid {
   }
 
   @inline def tryYield(unit: Simulacrum): Boolean = {
-    if (unit.flying || ! unit.canMove || unit.topSpeed <= 0 || ! unit.behavior.fighting || unit.target.isEmpty || unit.gridTile.isEmpty) return false
+    if ( ! collisionEnabled || unit.flying || ! unit.canMove || unit.topSpeed <= 0 || ! unit.behavior.fighting || unit.target.isEmpty || unit.gridTile.isEmpty) return false
     val current = unit.gridTile.get
     if ( ! current.requestedLastFrame(unit, frame)) return false
     val target = unit.target.get
@@ -222,7 +290,7 @@ final class SimulationGrid {
     val y = Maff.clamp(from.y + (unit.topSpeed * forceY / length).toInt, 0, With.mapPixelHeight - 1)
     if (x == from.x && y == from.y) return false
     val tileStep = tiles(Maff.div32(x) + With.mapTileWidth * Maff.div32(y))
-    if (tileStep.fits(unit)) {
+    if ( ! collisionEnabled || tileStep.fits(unit)) {
       relocateUnit(unit, Pixel(x, y), tileStep)
       true
     } else {
@@ -236,7 +304,7 @@ final class SimulationGrid {
           val to        = from.add((unit.topSpeed * force.x).toInt, (unit.topSpeed * force.y).toInt).clamp()
           val tile      = to.tile
     lazy  val gridTile  = tiles(tile.i)
-          val accept    = gridTile.fits(unit)
+          val accept    = ! collisionEnabled || gridTile.fits(unit)
     if (accept) {
       relocateUnit(unit, to)
     }

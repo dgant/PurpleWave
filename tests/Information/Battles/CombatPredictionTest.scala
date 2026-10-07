@@ -2,7 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
 import Information.Battles.Prediction.SimulationCheckpoint
-import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis}
+import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis, JudgmentModifiers}
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
 import Mathematics.Points.{Pixel, Tile}
@@ -20,8 +20,8 @@ import Micro.Coordination.DamageTracker
 import Micro.Matchups.MatchupAnalysis
 import Performance.Cache
 import ProxyBwapi.Upgrades.{Upgrade, UpgradeTypes}
-import bwapi.BulletType
-import ProxyBwapi.Races.{Protoss, Terran}
+import bwapi.{BulletType, WeaponType}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
 import ProxyBwapi.UnitInfo.{DamageDealt, DamageVolley, FriendlyUnitInfo}
 import Utilities.Property
@@ -771,6 +771,187 @@ object CombatPredictionTest extends App {
       assert(distances.exact(Tile(-1, 0), b) == distances.impossiblyLargeDistanceTiles)
       assert(distances.exact(a, Tile(With.mapTileWidth, 0)) == distances.impossiblyLargeDistanceTiles)
     } finally set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+  }
+  def armed(sim: Simulation, kind: UnitClass, at: Pixel, damage: Int): Simulacrum = {
+    val s = mover(sim, at, kind, kind.isFlyer)
+    s.isFriendlyCached = true
+    s.player = player(false)
+    set(s, "damageOnHitGroundCache", new Cache(() => damage))
+    set(s, "damageOnHitAirCache", new Cache(() => damage))
+    s
+  }
+  def splashVictim(sim: Simulation, x: Int, y: Int = 256, kind: UnitClass = Protoss.Dragoon): Simulacrum = {
+    val s = mover(sim, Pixel(x, y), kind, kind.isFlyer)
+    s.hitPoints = 500
+    s.hitPointsInitial = 500
+    s.player = player(true)
+    s.valuePerDamage = 1
+    s
+  }
+  check("collision off permits overlap and terrain crossing while retaining grid membership") {
+    val sim = new Simulation(collisionEnabled = false)
+    val moving = mover(sim, Pixel(60, 48))
+    mover(sim, Pixel(80, 48))
+    With.grids.walkableTerrain.set(Tile(2, 1), false)
+    try {
+      sim.grid.tryMove(moving, Pixel(176, 48))
+      assert(moving.pixel == Pixel(64, 48))
+      assert(sim.grid.tryForceV2(moving, Force(1, 0)))
+      assert(!sim.grid.tryYield(moving))
+      gridConsistent(sim)
+    } finally java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
+  }
+  check("collision mode disables the choke modifier before inspecting choke geometry") {
+    val previous = With.simulation
+    With.simulation = new Simulation(collisionEnabled = true)
+    try assert(JudgmentModifiers.choke(null).isEmpty) finally With.simulation = previous
+  }
+  check("siege splash uses inclusive footprint radii and hits primary exactly once") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val distances = Seq(10, 11, 25, 26, 40, 41)
+    val victims = distances.map(d => splashVictim(sim, 256 + Protoss.Dragoon.dimensionLeft + d))
+    tank.dealDamageTo(primary)
+    assert(primary.hitPoints == 430)
+    assert(victims.map(_.hitPoints) == Seq(430, 465, 465, 482, 482, 500))
+    assert(tank.cooldownLeft == tank.cooldownMaxAgainst(primary))
+  }
+  check("splash applies falloff before each victim's shields, armor and damage type") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val marine = splashVictim(sim, 256 + Terran.Marine.dimensionLeft + 20, kind = Terran.Marine)
+    marine.shieldPoints = 10
+    marine.armorShield = 3
+    marine.armorHealth = 2
+    tank.dealDamageTo(primary)
+    assert(marine.shieldPoints == 0 && marine.hitPoints == 490) // (70/2 - 3 - 10 - 2) * 0.5
+  }
+  check("radial splash damages allies without awarding kills, excludes shooter and respects target layers") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(256, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 258)
+    ally.isFriendlyCached = true
+    ally.hitPoints = 1
+    val flyer = splashVictim(sim, 256, kind = Protoss.Scout)
+    tank.dealDamageTo(primary)
+    assert(tank.hitPoints == 100 && ally.hitPoints == 0 && tank.kills == 0)
+    assert(flyer.hitPoints == 500 && tank.damageDealt == 69)
+    ally.update()
+    assert(ally.gridTile.isEmpty)
+  }
+  check("Archon enemy splash can cross air and ground layers but cannot hurt allies") {
+    val sim = simulation()
+    val archon = armed(sim, Protoss.Archon, Pixel(128, 256), 30)
+    val primary = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 258)
+    ally.isFriendlyCached = true
+    val flyer = splashVictim(sim, 256, kind = Protoss.Scout)
+    archon.dealDamageTo(primary)
+    assert(ally.hitPoints == 500 && flyer.hitPoints == 470 && primary.hitPoints == 470)
+  }
+  check("air splash caps secondary inner damage at half and excludes ground and allied units") {
+    val sim = simulation()
+    val corsair = armed(sim, Protoss.Corsair, Pixel(128, 256), 8)
+    val primary = splashVictim(sim, 256, kind = Protoss.Scout)
+    val inner = splashVictim(sim, 256, kind = Protoss.Scout)
+    val outer = splashVictim(sim, 256 + Protoss.Scout.dimensionLeft + 75, kind = Protoss.Scout)
+    val ground = splashVictim(sim, 256)
+    val ally = splashVictim(sim, 256, kind = Protoss.Scout)
+    ally.isFriendlyCached = true
+    corsair.dealDamageTo(primary)
+    assert(primary.hitPoints == 492 && inner.hitPoints == 496 && outer.hitPoints == 498)
+    assert(ground.hitPoints == 500 && ally.hitPoints == 500)
+  }
+  check("splash reaches large footprints beyond the center search radius and follows relocation") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val building = splashVictim(sim, 256 + Terran.CommandCenter.dimensionLeft + 39, kind = Terran.CommandCenter)
+    val moved = splashVictim(sim, 700)
+    sim.grid.relocateUnit(moved, Pixel(260, 256))
+    tank.dealDamageTo(primary)
+    assert(building.hitPoints == 482 && moved.hitPoints == 430)
+  }
+  check("splash hits undetected units, ignores protected units, and limits burrowed hits to the inner radius") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val hidden = splashVictim(sim, 256)
+    hidden.cloaked = true
+    hidden.detected = false
+    val protectedUnit = splashVictim(sim, 256)
+    protectedUnit.invincible = true
+    val stasised = splashVictim(sim, 256)
+    stasised.stasised = true
+    val inner = splashVictim(sim, 256)
+    inner.burrowed = true
+    val outer = splashVictim(sim, 256 + Protoss.Dragoon.dimensionLeft + 20)
+    outer.burrowed = true
+    tank.dealDamageTo(primary)
+    assert(hidden.hitPoints == 430 && inner.hitPoints == 430)
+    assert(protectedUnit.hitPoints == 500 && stasised.hitPoints == 500 && outer.hitPoints == 500)
+  }
+  check("Reaver uses the Scarab weapon and upgraded primary damage") {
+    val sim = simulation()
+    val reaver = armed(sim, Protoss.Reaver, Pixel(64, 256), 125)
+    val primary = splashVictim(sim, 256)
+    val nearby = splashVictim(sim, 260)
+    assert(reaver.damageVolleyAgainst(primary).weapon == WeaponType.Scarab)
+    reaver.dealDamageTo(primary)
+    assert(primary.hitPoints == 375 && nearby.hitPoints == 375)
+    val upgraded = mover(sim, Pixel(64, 64), Protoss.Reaver)
+    val upgrades = new HashMap[Upgrade, Cache[Int]]
+    upgrades.put(Protoss.ScarabDamage, new Cache(() => 1))
+    upgraded.player = player(false)
+    set(upgraded.player, "upgradeLevelCaches", upgrades)
+    assert(upgraded.damageOnHitGround == 125)
+  }
+  check("collision off and non-splash weapons retain single-target damage") {
+    val disabled = new Simulation(collisionEnabled = false)
+    disabled.battle = simulation().battle
+    val tank = armed(disabled, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(disabled, 256)
+    val nearby = splashVictim(disabled, 260)
+    tank.dealDamageTo(primary)
+    assert(primary.hitPoints == 430 && nearby.hitPoints == 500)
+    val sim = simulation()
+    val devourer = armed(sim, Zerg.Devourer, Pixel(128, 256), 25)
+    val airPrimary = splashVictim(sim, 256, kind = Protoss.Scout)
+    val airNearby = splashVictim(sim, 260, kind = Protoss.Scout)
+    devourer.dealDamageTo(airPrimary)
+    assert(airPrimary.hitPoints == 475 && airNearby.hitPoints == 500)
+  }
+  check("Lurker splash follows the firing line, hits once, and excludes units beside or behind it") {
+    val sim = simulation()
+    val lurker = armed(sim, Zerg.Lurker, Pixel(128, 256), 20)
+    val primary = splashVictim(sim, 220)
+    val before = splashVictim(sim, 175)
+    val beyond = splashVictim(sim, 290)
+    val beside = splashVictim(sim, 220, 330)
+    val behind = splashVictim(sim, 64)
+    lurker.dealDamageTo(primary)
+    assert(Seq(primary, before, beyond).forall(_.hitPoints == 480))
+    assert(beside.hitPoints == 500 && behind.hitPoints == 500)
+  }
+  check("committed splash survives source death and strikes current neighbors at impact time") {
+    val sim = simulation()
+    val reaver = armed(sim, Protoss.Reaver, Pixel(64, 256), 100)
+    val primary = splashVictim(sim, 256)
+    val nearby = splashVictim(sim, 260)
+    sim.realUnits ++= Seq(primary.realUnit, nearby.realUnit)
+    With.frame = 1000
+    primary.realUnit.addDamage(reaver, 2, true, false, Some(reaver.damageVolleyAgainst(primary)), Some(900))
+    val reset = classOf[Simulation].getDeclaredMethods.find(_.getName.endsWith("resetPendingDamage")).get
+    reset.setAccessible(true)
+    reset.invoke(sim, Int.box(With.frame))
+    reaver.alive = false
+    sim.step()
+    assert(primary.hitPoints == 500 && nearby.hitPoints == 500)
+    sim.step()
+    assert(primary.hitPoints == 400 && nearby.hitPoints == 400)
   }
   println(s"$passed combat prediction checks passed")
 }

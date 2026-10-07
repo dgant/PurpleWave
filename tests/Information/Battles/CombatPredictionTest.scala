@@ -580,6 +580,18 @@ object CombatPredictionTest extends App {
     assert(target.hitPoints < 100, s"Next shot was delayed at distance ${kiter.pixelDistanceEdgeSimulation(target)}")
     gridConsistent(sim)
   }
+  check("fallback retains stable tie order and only deprioritizes the previous tile") {
+    val sim = simulation()
+    val moving = mover(sim, Pixel(60, 47))
+    mover(sim, Pixel(80, 47))
+    sim.grid.tryMove(moving, Pixel(176, 47))
+    assert(moving.pixel == Pixel(60, 43), s"Expected up, got ${moving.pixel}") // Up wins the up/down tie.
+    sim.grid.relocateUnit(moving, Pixel(60, 47))
+    moving.lastTile = Some(Tile(1, 0))
+    sim.grid.tryMove(moving, Pixel(176, 47))
+    assert(moving.pixel == Pixel(60, 51), s"Expected down, got ${moving.pixel}")
+    gridConsistent(sim)
+  }
   def congestion(): (Simulation, Simulacrum, Simulacrum, Simulacrum) = {
     val sim = simulation()
     val rear = mover(sim, Pixel(60, 48))

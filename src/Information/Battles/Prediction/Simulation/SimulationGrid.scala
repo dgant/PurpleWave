@@ -14,6 +14,9 @@ final class SimulationGrid {
 
   val populatedTiles: mutable.Set[SimulationGridTile] = new mutable.HashSet[SimulationGridTile]
   private var frame = 0
+  private val fallbackTiles = new Array[SimulationGridTile](4)
+  private val fallbackCosts = new Array[Double](4)
+  private val fallbackBacktracks = new Array[Boolean](4)
 
   @inline def advanceFrame(): Unit = { frame += 1 }
 
@@ -60,18 +63,41 @@ final class SimulationGrid {
   @inline private def moveGrid(unit: Simulacrum, to: Pixel): Boolean = {
     val from  = unit.pixel
     val fromTile = from.tile
-    val path = fromTile
-      .adjacent4
-      .filter(_.walkable)
-      .sortBy(t => (unit.lastTile.contains(t), t.groundTiles(to) + t.pixelDistanceSquared(to)))
-      .map(toTile => from.add(32 * (toTile.x - fromTile.x), 32 * (toTile.y - fromTile.y)))
-      .find(to => tryForceV2(unit, new Force(to.subtract(from)), requestSpace = false))
-
-    if (path.isDefined) {
-      true
-    } else {
-      false
+    var count = 0
+    var direction = 0
+    while (direction < 4) {
+      val x = fromTile.x + (if (direction == 2) -1 else if (direction == 3) 1 else 0)
+      val y = fromTile.y + (if (direction == 0) -1 else if (direction == 1) 1 else 0)
+      if (x >= 0 && y >= 0 && x < With.mapTileWidth && y < With.mapTileHeight) {
+        val candidate = tiles(x + y * With.mapTileWidth)
+        if (candidate.tile.walkable) {
+          val cost = candidate.tile.groundTiles(to) + candidate.tile.pixelDistanceSquared(to)
+          val backtrack = unit.lastTile.contains(candidate.tile)
+          var index = count
+          // Stable insertion preserves adjacent4's up/down/left/right tie order.
+          while (index > 0 && ((fallbackBacktracks(index - 1) && ! backtrack)
+            || (fallbackBacktracks(index - 1) == backtrack && java.lang.Double.compare(cost, fallbackCosts(index - 1)) < 0))) {
+            fallbackTiles(index) = fallbackTiles(index - 1)
+            fallbackCosts(index) = fallbackCosts(index - 1)
+            fallbackBacktracks(index) = fallbackBacktracks(index - 1)
+            index -= 1
+          }
+          fallbackTiles(index) = candidate
+          fallbackCosts(index) = cost
+          fallbackBacktracks(index) = backtrack
+          count += 1
+        }
+      }
+      direction += 1
     }
+    var index = 0
+    while (index < count) {
+      val tile = fallbackTiles(index).tile
+      val force = Force(32 * (tile.x - fromTile.x), 32 * (tile.y - fromTile.y))
+      if (tryForceV2(unit, force, requestSpace = false)) return true
+      index += 1
+    }
+    false
   }
 
   @inline def tryYield(unit: Simulacrum): Boolean = {

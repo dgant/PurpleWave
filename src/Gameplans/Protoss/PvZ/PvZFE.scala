@@ -55,7 +55,7 @@ class PvZFE extends GameplanImperative {
       get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).requireLabelYes(PlaceLabels.DefendHall))
       get(3, Protoss.PhotonCannon,  new PlacementQuery(Protoss.PhotonCannon).requireBase(With.geography.ourMain).preferLabelYes(PlaceLabels.DefendHall, PlaceLabels.DefendAir))
       get(1, Protoss.Forge,         new PlacementQuery(Protoss.Forge)       .requireBase(With.geography.ourMain))
-      get(2, Protoss.Gateway,       new PlacementQuery(Protoss.Gateway)     .requireBase(With.geography.ourMain))
+      get(2, Protoss.Gateway,       new PlacementQuery(Protoss.Gateway)     .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes())
       get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes(PlaceLabels.GroundProduction))
       oneBase.executeBuild()
       oneBase.executeMain()

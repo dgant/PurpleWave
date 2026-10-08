@@ -34,6 +34,20 @@ object BeReaver extends Action {
     }
 
     if (unit.transport.isDefined) {
+      // Try to land next to lead passenger
+      if (
+        unit.agent.shouldFight
+          && (unit.scarabs > 0 || unit.trainee.exists(_.remainingCompletionFrames < cooldownOnLanding + With.latency.latencyFrames))
+          && unit.tile.walkable
+          && unit.agent.ride.exists(_.agent.passengersPrioritized.headOption.exists(r =>
+          Protoss.Reaver(r)
+            && r != unit
+            && r.agent.shouldFight
+            && ! r.loaded
+            && r.pixelDistanceEdge(unit) < 32))) {
+        Commander.requestUnload(unit)
+      }
+    } else {
       lazy val canShoot             = unit.scarabs > 0 && unit.matchups.targetsInRange.nonEmpty
       lazy val inRangeOfPlebian     = unit.matchups.threatsInRange.exists(t => ! t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))
       lazy val needRefresh          = unit.cooldownLeft > cooldownOnLanding + 2 * With.latency.latencyFrames // Reaver cooldown resets to 30 when dropped: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
@@ -49,19 +63,6 @@ object BeReaver extends Action {
       } else if (needRefresh) {
         unit.agent.act("Refresh")
         clickShuttle(unit)
-
-      // Try to land next to lead passenger
-      } else if (
-        unit.agent.shouldFight
-        && (unit.scarabs > 0 || unit.trainee.exists(_.remainingCompletionFrames < cooldownOnLanding + With.latency.latencyFrames))
-        && unit.tile.walkable
-        && unit.agent.ride.exists(_.agent.passengersPrioritized.headOption.exists(r =>
-          Protoss.Reaver(r)
-          && r != unit
-          && r.agent.shouldFight
-          && ! r.loaded
-          && r.pixelDistanceEdge(unit) < 32))) {
-          Commander.requestUnload(unit)
       }
     }
   }

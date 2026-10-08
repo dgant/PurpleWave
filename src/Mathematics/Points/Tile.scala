@@ -329,10 +329,10 @@ final case class Tile(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     With.grids.scoutingPathsStartLocations.get(this)
   }
   @inline def creep: Boolean = {
-    With.game.hasCreep(x, y)
+    With.grids.creep.get(this)
   }
   @inline def creepUnchecked: Boolean = {
-    With.game.hasCreepUnsafe(x, y)
+    With.grids.creep.getUnchecked(i)
   }
   @inline def enemiesVulnerableGround: Seq[UnitInfo] = {
     With.grids.enemyVulnerabilityGround.unitsOn(i)

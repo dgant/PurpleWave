@@ -68,12 +68,7 @@ object PvPIdeas extends MacroActions {
   def preferObserverForDetection  : Boolean = detectWithObserverOrCannon(auditing = true)
   def requireTimelyDetection()    : Boolean = detectWithObserverOrCannon(auditing = false)
 
-  def enemyDarkTemplarPossible: Boolean = (
-    enemyDarkTemplarLikely
-    || enemyContained
-    || ! With.scouting.enemyMainFullyScouted
-    || ( ! enemyRobo && ! With.fingerprints.threeGateGoon() && ! With.fingerprints.fourGateGoon())
-    || (With.frame > twoBaseDTFrame && safePushing))
+  def enemyDarkTemplarPossible: Boolean = enemyDarkTemplarLikely || ( ! enemyRobo && ! With.fingerprints.fourGateGoon())
 
   private def detectWithObserverOrCannon(auditing: Boolean): Boolean = {
     // Performance shortcut

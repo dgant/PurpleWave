@@ -77,8 +77,11 @@ object PvPCoreExpand extends PvPStrategy {
     || MapGroups.strongNatural.exists(_())
     ||   MacroFacts.enemyRecentStrategy(With.fingerprints.robo, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
     || ! MacroFacts.enemyRecentStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon))
-  addActivationRequirement(() => units(Protoss.Nexus) >= 2 && have(Protoss.CyberneticsCore) && unitsEver(Protoss.Gateway) < 2 && ! haveEver(Protoss.CitadelOfAdun, Protoss.RoboticsFacility))
+  addActivationRequirement(() => units(Protoss.Nexus) >= 2 && have(Protoss.CyberneticsCore) && unitsEver(Protoss.Gateway) < 3 && ! haveEver(Protoss.CitadelOfAdun, Protoss.RoboticsFacility))
   banPersonality(PersonalityCheese)
+}
+object PvPNexusFirst extends PvPStrategy {
+
 }
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)

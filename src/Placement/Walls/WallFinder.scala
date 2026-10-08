@@ -275,7 +275,7 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
     }
 
     // Tiles must be buildable (eg. not blocked by neutrals)
-    if (buildingTiles.exists( ! _.buildable)) {
+    if (buildingTiles.exists(t => ! t.buildable || (! With.self.isZerg && t.creep))) {
       return fail(wallInProgress, UnbuildableGranular)
     }
 

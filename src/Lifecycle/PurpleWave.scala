@@ -25,6 +25,7 @@ class PurpleWave extends DefaultBWListener {
         JBWEBWrapper.onStart()
         With.history.onStart()
         With.units.onStart()
+        With.grids.creep.update()
         With.geography.onStart()
       })})
   }

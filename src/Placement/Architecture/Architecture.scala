@@ -208,7 +208,7 @@ class Architecture {
         if ( ! buildable(nextTile, Some(request))) {
           return ArchitecturalAssessment.IsntBuildable
         }
-        if (building.requiresCreep != nextTile.creep) {
+        if ((building.requiresCreep && ! nextTile.creep) || (! building.isZerg && nextTile.creep)) {
           return ArchitecturalAssessment.CreepMismatch
         }
         if (building.isTownHall && ! With.grids.buildableTownHall.get(nextTile)) {

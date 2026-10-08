@@ -49,6 +49,7 @@ class Grids extends TimedTask {
   val scoutingPathsStartLocations = add("sps",  new GridScoutingPathsStartLocations)
 
   // Updated by tasks
+  val creep                       = add("c",    new GridCreep)
   val lastSeen                    = add("ls",   new GridLastSeen)
   val psi2Height                  = add("p2",   new GridPsi2Height)
   val psi3Height                  = add("p3",   new GridPsi3Height)

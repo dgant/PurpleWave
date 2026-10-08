@@ -84,18 +84,24 @@ trait Fitter extends Fits {
   private def accept(templatePoint: TemplatePoint, origin: Tile): Boolean = {
     val requirement = templatePoint.requirement
     val pointTile = origin.add(templatePoint.point)
+    // An existing building can satisfy its own slot in a larger layout.
+    val reusesBuilding = requirement.buildableBefore && ! requirement.buildableAfter && ! requirement.walkableAfter &&
+      pointTile.units.exists(u => u.isOurs && u.alive && ! u.flying && u.unitClass.isBuilding &&
+        u.tileTopLeft == pointTile && u.unitClass.tileWidth == requirement.width && u.unitClass.tileHeight == requirement.height &&
+        (requirement.buildings.isEmpty || requirement.buildings.contains(u.unitClass)) &&
+        (! requirement.isTownHall || u.unitClass.isTownHall))
     if (requirement.isTownHall) {
       return pointTile.base.exists(_.townHallTile == pointTile) &&
         (0 until requirement.width).forall(dx =>
           (0 until requirement.height).forall(dy =>
-            accept(requirement, Point(dx, dy), pointTile.add(dx, dy))))
+            accept(requirement, Point(dx, dy), pointTile.add(dx, dy), reusesBuilding)))
     } else if (requirement.isGas) {
       return pointTile.base.exists(_.gas.exists(_.tileTopLeft == pointTile))
     } else {
       if (requirement.isMacroHatch && ! With.grids.buildableTownHall.get(pointTile)) {
         return false
       }
-      if (requirement.buildableBefore && ! With.grids.buildableW(requirement.width).get(pointTile)) {
+      if (requirement.buildableBefore && ! reusesBuilding && ! With.grids.buildableW(requirement.width).get(pointTile)) {
         return false
       }
       var dx = 0
@@ -104,7 +110,7 @@ trait Fitter extends Fits {
         while(dy < requirement.height) {
           val relative = Point(dx, dy)
           val tile = pointTile.add(relative)
-          if ( ! accept(requirement, relative, tile)) {
+          if ( ! accept(requirement, relative, tile, reusesBuilding)) {
             return false
           }
           dy += 1
@@ -115,21 +121,25 @@ trait Fitter extends Fits {
     true
   }
 
-  private def accept(requirement: TemplatePointRequirement, relative: Point, tile: Tile): Boolean = {
+  private def accept(requirement: TemplatePointRequirement, relative: Point, tile: Tile, reusesBuilding: Boolean): Boolean = {
     if ( ! tile.valid) {
       return false
     } else {
       val previous = at(tile)
       lazy val reusesReservation = previous.point == relative && requirement.sameOccupancyAs(previous.requirement)
       if (requirement.walkableBefore) {
-        if ( ! tile.walkableUnchecked) {
+        if ( ! tile.walkableUnchecked && ! (reusesBuilding && tile.walkableTerrainUnchecked)) {
           return false
         } else if ( ! previous.requirement.walkableAfter && ! reusesReservation) {
           return false
         }
       }
       if (requirement.buildableBefore) {
-        if ( ! With.grids.buildable.get(tile)) {
+        if (tile.creep && ! reusesBuilding && ! requirement.buildings.exists(_.isZerg)
+          && (requirement.buildings.nonEmpty || ! With.self.isZerg)) {
+          return false
+        }
+        if ( ! With.grids.buildable.get(tile) && ! (reusesBuilding && With.grids.buildableTerrain.get(tile))) {
           return false
         }
         if ( ! previous.requirement.buildableAfter && ! reusesReservation) {

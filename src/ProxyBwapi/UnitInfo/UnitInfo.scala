@@ -335,8 +335,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     output
   }
   // Reavers require a ground route shorter than twice their acquisition range.
-  // Use our terrain-distance estimate to avoid choosing a firing spot across a cliff.
-  final def hasScarabPathTo(enemy: UnitInfo, from: Pixel): Boolean = from.groundPixels(enemy.pixel) < 2 * pixelRangeAgainst(enemy)
+  // Match BW's native region-path measurement rather than our tile-distance estimate.
+  final def hasScarabPathTo(enemy: UnitInfo, from: Pixel): Boolean = With.paths.broodWarGroundDistance.pixels(from, enemy.pixel) < 2 * pixelRangeAgainst(enemy)
 
   final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
   final def pixelToFireAtExhaustive(enemy: UnitInfo)  : Pixel = pixelToFireAt(enemy, exhaustive = true)

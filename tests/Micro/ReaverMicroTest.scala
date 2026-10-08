@@ -1,10 +1,6 @@
 package Micro
 
-import Information.Geography.Geography
-import Information.Geography.Pathfinding.Paths
-import Information.Geography.Types.{Edge, Zone}
-import Information.Grids.Grids
-import Information.Grids.Movement.{GridGroundDistance, GridUnwalkableUnits, GridWalkable, GridWalkableTerrain}
+import Information.Geography.Pathfinding.{BroodWarGroundDistance, Paths}
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Performance.{Cache, Latency, ReactionTimes}
@@ -13,6 +9,8 @@ import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitTracking.{ScarabTracker, UnitTracker}
+
+import scala.collection.JavaConverters._
 
 object ReaverMicroTest extends App {
   // Synthetic observations exercise the production tracker, readiness and terrain-distance checks.
@@ -111,45 +109,75 @@ object ReaverMicroTest extends App {
   With.mapTileArea = 1024
   With.mapPixelWidth = 1024
   With.mapPixelHeight = 1024
-  With.grids = allocate(classOf[Grids])
-  set(With.grids, "walkable", new GridWalkable)
-  set(With.grids, "walkableTerrain", new GridWalkableTerrain)
-  set(With.grids, "unwalkableUnits", new GridUnwalkableUnits)
-  java.util.Arrays.fill(With.grids.walkableTerrain.rawValues, true)
-  With.geography = allocate(classOf[Geography])
-  With.paths = allocate(classOf[Paths])
-  set(With.paths, "impossiblyLargeDistanceTiles", 256 * 256)
-  val originZone = allocate(classOf[Zone])
-  val targetZone = allocate(classOf[Zone])
-  set(targetZone, "bitmap$0", -1L)
-  val zones = Array.fill(With.mapTileArea)(originZone)
   val from = Tile(1, 1).center
   val target = unit(10, Protoss.Assimilator, 240)
   set(target, "_pixel", Tile(7, 1).center)
-  set(target, "_tile", Tile(7, 1))
-  zones(target.tile.i) = targetZone
-  set(With.geography, "_zoneByTile", zones)
-  val edge = allocate(classOf[Edge])
-  set(edge, "distanceGrid", new GridGroundDistance())
-  set(targetZone, "edges", Vector(edge))
   val reaver = unit(11, Protoss.Reaver, 48)
 
-  check("nearby targets across a long ground route cannot authorize a combat drop") {
-    edge.distanceGrid.set(from.tile, 12)
-    edge.distanceGrid.set(target.tile, 12)
+  // Feed the actual BWAPI adapter, including getRegionAt, with three native regions.
+  def nativeMap(centers: Vector[Pixel], groups: Vector[Int] = Vector(1, 1, 1)): Unit = {
+    val regions = centers.indices.map(i => {
+      val r = allocate(classOf[bwapi.Region])
+      set(r, "id", i)
+      set(r, "center", centers(i).bwapi)
+      set(r, "regionGroupID", groups(i))
+      set(r, "accessible", true)
+      r
+    }).toArray
+    regions.indices.foreach(i => set(regions(i), "neighbours", regions.indices.filter(j => Math.abs(i - j) == 1).map(regions).asJava))
+    With.game = allocate(classOf[bwapi.Game])
+    set(With.game, "mapWidth", 32)
+    set(With.game, "mapHeight", 32)
+    set(With.game, "mapPixelWidth", 1024)
+    set(With.game, "mapPixelHeight", 1024)
+    set(With.game, "regions", regions)
+    set(With.game, "regionSet", regions.toVector.asJava)
+    val tiles = Array.ofDim[Short](32, 32)
+    tiles(7)(1) = 2
+    set(With.game, "mapTileRegionID", tiles)
+    With.paths = new Paths
+  }
+  check("native regions reject a nearby target across a long ground route") {
+    nativeMap(Vector(Pixel(48, 48), Pixel(48, 432), Pixel(240, 48)))
     assert(from.pixelDistance(target.pixel) < 256)
     assert(!reaver.hasScarabPathTo(target, from))
   }
-  check("the firing-path limit is strict and reachable short routes remain legal") {
-    edge.distanceGrid.set(from.tile, 8)
-    edge.distanceGrid.set(target.tile, 8)
+  check("the native firing-path limit is strict and shorter routes stay legal") {
+    nativeMap(Vector(Pixel(48, 48), Pixel(304, 48), Pixel(560, 48)))
+    assert(With.paths.broodWarGroundDistance.pixels(from, target.pixel) == 512)
     assert(!reaver.hasScarabPathTo(target, from))
-    edge.distanceGrid.set(target.tile, 7)
+    nativeMap(Vector(Pixel(48, 48), Pixel(304, 48), Pixel(528, 48)))
     assert(reaver.hasScarabPathTo(target, from))
   }
-  check("an unreachable target cannot authorize a combat drop") {
-    set(targetZone, "edges", Vector.empty[Edge])
+  check("different native region groups cannot authorize a combat drop") {
+    nativeMap(Vector(Pixel(48, 48), Pixel(304, 48), Pixel(528, 48)), Vector(1, 1, 2))
     assert(!reaver.hasScarabPathTo(target, from))
+  }
+  import BroodWarGroundDistance.Region
+  check("one- and two-region routes measure endpoints, not region centers") {
+    val graph = Array(Region(Pixel(0, 0), 1, true, Vector(1)), Region(Pixel(1000, 0), 1, true, Vector(0)))
+    val distance = new BroodWarGroundDistance(graph, p => if (p.x < 200) 0 else 1)
+    assert(distance.pixels(Pixel(0, 0), Pixel(100, 25)) == 100) // BW's quarter-slope boundary.
+    assert(distance.pixels(Pixel(190, 0), Pixel(210, 0)) == 20)
+  }
+  check("endpoint changes within a region can choose a different route") {
+    val graph = Array(
+      Region(Pixel(0, 0), 1, true, Vector(1, 2)),
+      Region(Pixel(0, 100), 1, true, Vector(0, 3)),
+      Region(Pixel(800, 200), 1, true, Vector(0, 3)),
+      Region(Pixel(1000, 0), 1, true, Vector(1, 2)))
+    val to = Pixel(1000, 0)
+    val distance = new BroodWarGroundDistance(graph, p => if (p == to) 3 else 0)
+    assert(distance.pixels(Pixel(0, 90), to) == 1100)
+    assert(distance.pixels(Pixel(800, 190), to) == 1062)
+    assert(distance.pixels(Pixel(0, 90), to) == 1100)
+  }
+  check("missing regions fail closed and bounded searches match BW's 50-region prefix") {
+    val graph = (0 to 350).map(i => Region(Pixel(i * 2, 0), 1, true, Vector(i - 1, i + 1).filter(j => j >= 0 && j <= 350))).toArray
+    val distance = new BroodWarGroundDistance(graph, p => p.x / 2)
+    assert(distance.pixels(Pixel(0, 0), Pixel(700, 0)) == 98)
+    assert(distance.pixels(Pixel(0, 0), Pixel(702, 0)) == BroodWarGroundDistance.unreachable)
+    assert(distance.pixels(Pixel(-1, 0), Pixel(0, 0)) == BroodWarGroundDistance.unreachable)
   }
   println(s"$passed Reaver micro checks passed")
 }

@@ -1,3 +1,7 @@
 package Information.Geography.Pathfinding
 
-final class Paths extends TilePathfinder with ZonePathfinder with GroundDistance
+import Lifecycle.With
+
+final class Paths extends TilePathfinder with ZonePathfinder with GroundDistance {
+  lazy val broodWarGroundDistance: BroodWarGroundDistance = BroodWarGroundDistance(With.game)
+}

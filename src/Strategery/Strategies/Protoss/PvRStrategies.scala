@@ -45,6 +45,6 @@ object PvRGFE extends PvRStrategy {
 }
 
 object PvRGFEComplete extends PvRStrategy {
-  override def gameplan: Option[Plan] = new PvRGFEComplete()
+  override def gameplan: Option[Plan] = Some(new PvRGFEComplete())
   banPersonality(PersonalityCheese)
 }

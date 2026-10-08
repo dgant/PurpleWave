@@ -80,9 +80,6 @@ object PvPCoreExpand extends PvPStrategy {
   addActivationRequirement(() => units(Protoss.Nexus) >= 2 && have(Protoss.CyberneticsCore) && unitsEver(Protoss.Gateway) < 3 && ! haveEver(Protoss.CitadelOfAdun, Protoss.RoboticsFacility))
   banPersonality(PersonalityCheese)
 }
-object PvPNexusFirst extends PvPStrategy {
-
-}
 object PvP3GateGoon extends PvPStrategy {
   setMinimumGamesVsOpponent(1)
   blacklistVs(With.fingerprints.dtRush)

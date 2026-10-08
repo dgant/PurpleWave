@@ -26,6 +26,7 @@ final class UnitTracker {
   private val deadForeignIds  = new ArrayBuffer[Int]()
 
   val mutex: ReentrantLock = new ReentrantLock()
+  val scarabs: ScarabTracker = new ScarabTracker
 
   @inline def getId(id: Int): Option[UnitInfo] = units(id)
   @inline def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else units(unit.getID)
@@ -63,6 +64,7 @@ final class UnitTracker {
       mutex.lock()
       birthAll()
       updateFriendly(bufferFriendly)
+      scarabs.update(ours)
       updateForeign(bufferEnemy)
       updateForeign(bufferNeutral)
       killDeadForeign()

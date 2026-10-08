@@ -19,10 +19,18 @@ object BeReaver extends Action {
       return
     }
 
+    // A zero weapon cooldown cannot release another Scarab while the previous one is alive.
+    // Rescue before the special Reave behavior can issue a hold or attack-move order.
+    if ( ! unit.loaded && ! unit.agent.commit && unit.hasActiveScarab && unit.cooldownLeft <= With.latency.remainingFrames && unit.matchups.threatsInRange.nonEmpty) {
+      unit.agent.act("Hop")
+      clickShuttle(unit)
+      return
+    }
+
     // jonsnow.jpg
     if (unit.agent.fightReason == FightOrFlee.Reave) {
       if (unit.transport.isDefined) {
-        Commander.requestUnload(unit)
+        if (unit.matchups.targetNearest.exists(unit.hasScarabPathTo(_, unit.pixel))) Commander.requestUnload(unit)
       }
       else if (unit.matchups.targetNearest.exists(unit.framesToFace(_) > 1)) {
         val t =  unit.matchups.targetNearest.get
@@ -39,6 +47,7 @@ object BeReaver extends Action {
         unit.agent.shouldFight
           && (unit.scarabs > 0 || unit.trainee.exists(_.remainingCompletionFrames < cooldownOnLanding + With.latency.latencyFrames))
           && unit.tile.walkable
+          && unit.agent.toAttack.orElse(unit.matchups.targetNearest).exists(unit.hasScarabPathTo(_, unit.pixel))
           && unit.agent.ride.exists(_.agent.passengersPrioritized.headOption.exists(r =>
           Protoss.Reaver(r)
             && r != unit
@@ -48,7 +57,7 @@ object BeReaver extends Action {
         Commander.requestUnload(unit)
       }
     } else {
-      lazy val canShoot             = unit.scarabs > 0 && unit.matchups.targetsInRange.nonEmpty
+      lazy val canShoot             = unit.scarabs > 0 && ! unit.hasActiveScarab && unit.matchups.targetsInRange.exists(unit.hasScarabPathTo(_, unit.pixel))
       lazy val inRangeOfPlebian     = unit.matchups.threatsInRange.exists(t => ! t.flying && t.pixelRangeAgainst(unit) < unit.pixelRangeAgainst(t))
       lazy val needRefresh          = unit.cooldownLeft > cooldownOnLanding + 2 * With.latency.latencyFrames // Reaver cooldown resets to 30 when dropped: https://github.com/OpenBW/openbw/blob/master/bwgame.h#L3165
       lazy val needlesslyEndangered = needRefresh && (inRangeOfPlebian || ! canShoot)

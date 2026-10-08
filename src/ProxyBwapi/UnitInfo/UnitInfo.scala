@@ -319,7 +319,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
   @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.remainingFrames - With.reaction.agencyMin
-  @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0
+  @inline final def hasActiveScarab: Boolean = Protoss.Reaver(this) && With.units.scarabs.launchedBy(this).isDefined
+  @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0 && ! hasActiveScarab
   @inline final def framesToFace(target: UnitInfo): Int = framesToFace(target.pixel)
   @inline final def framesToFace(target: Pixel): Int = framesToFace(pixel.radiansTo(target))
   @inline final def framesToFace(faceRadians: Double): Int = unitClass.framesToTurn(Maff.radiansTo(angleRadians, faceRadians))
@@ -333,6 +334,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
     val output                = distanceClosedByMe + distanceClosedByEnemy + threat.pixelRangeAgainst(this) - threat.pixelDistanceEdge(this)
     output
   }
+  // Reavers require a ground route shorter than twice their acquisition range.
+  // Use our terrain-distance estimate to avoid choosing a firing spot across a cliff.
+  final def hasScarabPathTo(enemy: UnitInfo, from: Pixel): Boolean = from.groundPixels(enemy.pixel) < 2 * pixelRangeAgainst(enemy)
+
   final def pixelToFireAtSimple(enemy: UnitInfo)      : Pixel = pixelToFireAt(enemy, exhaustive = false)
   final def pixelToFireAtExhaustive(enemy: UnitInfo)  : Pixel = pixelToFireAt(enemy, exhaustive = true)
   private final def pixelToFireAt(enemy: UnitInfo, exhaustive: Boolean): Pixel = {
@@ -454,6 +459,7 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
           val spotTile  = spot.tile
           var output    = spotTile.valid
           output &&= spotTile.walkable
+          output &&= ! isReaver || hasScarabPathTo(enemy, spot.asPixel)
           output &&= (wide || spotTile.zone == enemyZone)
           output &&= spotTile.altitude >= enemyAltitude || enemy.visible
           output &&= spotTile.enemyRange < With.grids.enemyRangeAirGround.margin
@@ -488,11 +494,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
         pixelSight
       }
     } else if (isReaver) {
-      if (wide && (enemyVisible || ! uphill)) {
-        pixelRange
-      } else {
-        pixelHugParadrop
-      }
+      val landing = if (wide && (enemyVisible || ! uphill)) pixelRange else pixelHugParadrop
+      if (hasScarabPathTo(enemy, landing)) landing else pixelHug
     } else if (enemyVisible) {
       if (wide && ! uphill) {
         pixelRange

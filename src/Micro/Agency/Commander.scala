@@ -90,7 +90,10 @@ object Commander {
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.toAttack = Some(target)
-    lazy val attackFrom = unit.agent.perch.pixel.filter(acceptableAttackFrom(unit, target, _)).getOrElse(unit.agent.choosePerch()())
+    lazy val attackFrom = {
+      val perch = unit.agent.perch.pixel.filter(acceptableAttackFrom(unit, target, _)).getOrElse(unit.agent.choosePerch()())
+      if (Protoss.Reaver(unit) && ! unit.hasScarabPathTo(target, perch)) unit.pixelToFireAtExhaustive(target) else perch
+    }
 
     if (Protoss.Reaver(unit)) {
       if (unit.loaded)  pushAway    (unit, attackFrom, TrafficPriorities.Bump)
@@ -105,7 +108,7 @@ object Commander {
     if (unit.unready) return
 
     if (unit.airlifted && (unit.pixelDistanceCenter(attackFrom) < ?(unit.agent.isPrimaryPassenger, 32, 64) || unit.pixelsToGetInRange(target) <= ?(unit.agent.isPrimaryPassenger, 16, 48))) {
-      requestUnload(unit);
+      if ( ! Protoss.Reaver(unit) || unit.hasScarabPathTo(target, unit.pixel)) requestUnload(unit)
       sleep(unit) //  Although we're not doing anything, it's important to sleep here so we don't keep executing and change our ride goal
       return
     }

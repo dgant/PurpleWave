@@ -2,16 +2,19 @@ package Placement
 
 import Information.Geography.Geography
 import Information.Geography.Types.{Base, Zone}
-import Information.Grids.Grids
+import Information.Grids.{Grids, GridUnits}
 import Information.Grids.Construction._
 import Information.Grids.Movement._
 import Lifecycle.With
 import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels._
+import Placement.Access.PlacementQuery
 import Placement.Generation.{Fit, TemplatesGeneric, TemplatesProtoss, TemplatesTerran, TemplatesZerg}
 import Placement.Templating._
 import ProxyBwapi.ProxyBWAPI
-import ProxyBwapi.Races.Protoss
+import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
+import ProxyBwapi.Races.{Protoss, Terran}
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
 
 object PlacementReservationTest extends App {
@@ -34,6 +37,8 @@ object PlacementReservationTest extends App {
   With.proxy = allocate(classOf[ProxyBWAPI])
   set(With.proxy, "unitClasses", UnitTypes.all.map(UnitClass))
   With.grids = allocate(classOf[Grids])
+  set(With.grids, "creep", new GridCreep)
+  set(With.grids, "units", new GridUnits)
   set(With.grids, "buildable", new GridBuildable)
   set(With.grids, "walkable", new GridWalkable)
   set(With.grids, "unwalkableUnits", new GridUnwalkableUnits)
@@ -71,6 +76,93 @@ object PlacementReservationTest extends App {
     val placement = new Placement
     placement.index(Fit(hallTile, template(previous)))
     placement.fitsAt(template(next), hallTile.add(shift))
+  }
+
+  def withBuilding(unitClass: UnitClass, ours: Boolean = true, flying: Boolean = false)(test: => Unit): Unit = {
+    val owner = allocate(classOf[PlayerInfo])
+    set(owner, "isUs", ours)
+    val bitmap = classOf[PlayerProxy].getDeclaredField("bitmap$0")
+    bitmap.setAccessible(true)
+    bitmap.setInt(owner, -1)
+    val building = allocate(classOf[FriendlyUnitInfo])
+    set(building, "_player", owner)
+    set(building, "_unitClass", unitClass)
+    set(building, "_tileTopLeft", hallTile)
+    set(building, "_alive", true)
+    set(building, "_flying", flying)
+    With.grids.units.updateUnit(building)
+    for (dx <- 0 until unitClass.tileWidth; dy <- 0 until unitClass.tileHeight) {
+      With.grids.unwalkableUnits.stamp(hallTile.add(dx, dy))
+    }
+    try test finally {
+      set(With.grids, "units", new GridUnits)
+      With.grids.unwalkableUnits.reset()
+    }
+  }
+
+  check("occupied starting Nexus anchors a usable main defense layout") {
+    withBuilding(Protoss.Nexus) {
+      val placement = new Placement
+      assert(placement.fitsAt(TemplatesGeneric.townhall, hallTile))
+      placement.index(Fit(hallTile, TemplatesGeneric.townhall))
+      assert(placement.fitAndIndexConstrained(5, 1, Seq(TemplatesProtoss.expansions.last), base).nonEmpty)
+      With.placement = placement
+      val query = new PlacementQuery().requireBase(base).requireBuilding(Protoss.Pylon)
+        .requireWidth(2).requireHeight(2).requireLabelYes(DefendHall).requireLabelNo(TownHall)
+      assert(query.foundations.nonEmpty)
+      assert(placement.get(DefendHall).exists(_.point.requirement.buildings.contains(Protoss.PhotonCannon)))
+      val cannon = placement.get(DefendHall).find(_.point.requirement.buildings.contains(Protoss.PhotonCannon)).get
+      With.grids.unwalkableUnits.stamp(cannon.tile)
+      val blocked = new Placement
+      blocked.index(Fit(hallTile, TemplatesGeneric.townhall))
+      assert(blocked.fitAndIndexConstrained(5, 1, Seq(TemplatesProtoss.expansions.last), base).isEmpty)
+    }
+  }
+  check("matching owned Pylon satisfies typed and unrestricted footprints") {
+    withBuilding(Protoss.Pylon) {
+      assert(new Placement().fitsAt(template(pylon), hallTile))
+      assert(new Placement().fitsAt(template(new TemplatePointRequirement(Protoss.Pylon, Protoss.PhotonCannon)), hallTile))
+      assert(new Placement().fitsAt(template(new TemplatePointRequirement(2, 2)), hallTile))
+      assert(canReuse(pylon, pylon))
+    }
+  }
+  check("existing building must match the exact location and dimensions") {
+    withBuilding(Protoss.Pylon) {
+      assert(!new Placement().fitsAt(template(pylon), hallTile.add(1, 0)))
+      val wider = pylon
+      wider.width += 1
+      assert(!new Placement().fitsAt(template(wider), hallTile))
+      val taller = pylon
+      taller.height += 1
+      assert(!new Placement().fitsAt(template(taller), hallTile))
+    }
+  }
+  check("existing building must match the allowed type and town hall role") {
+    withBuilding(Protoss.Pylon) {
+      assert(!new Placement().fitsAt(template(new TemplatePointRequirement(Protoss.PhotonCannon)), hallTile))
+    }
+    withBuilding(Protoss.Gateway) { assert(!new Placement().fitsAt(template(hall), hallTile)) }
+  }
+  check("enemy buildings cannot satisfy a placement") {
+    withBuilding(Protoss.Nexus, ours = false) { assert(!new Placement().fitsAt(template(hall), hallTile)) }
+  }
+  check("flying buildings cannot excuse blocked ground") {
+    withBuilding(Terran.CommandCenter, flying = true) { assert(!new Placement().fitsAt(template(hall), hallTile)) }
+  }
+  check("existing building does not erase terrain or reservation conflicts") {
+    withBuilding(Protoss.Nexus) {
+      With.grids.buildableTerrain.set(hallTile.add(1, 1), false)
+      try { assert(!new Placement().fitsAt(template(hall), hallTile)) }
+      finally { With.grids.buildableTerrain.set(hallTile.add(1, 1), true) }
+      With.grids.walkableTerrain.set(hallTile.add(1, 1), false)
+      try { assert(!new Placement().fitsAt(template(hall), hallTile)) }
+      finally { With.grids.walkableTerrain.set(hallTile.add(1, 1), true) }
+      assert(!canReuse(new TemplatePointRequirement(Protoss.Gateway), hall))
+      val walkway = new RequireWalkable
+      walkway.width = 4
+      walkway.height = 3
+      assert(!new Placement().fitsAt(template(walkway), hallTile))
+    }
   }
 
   check("town hall reuses its existing reservation") { assert(canReuse(hall, hall)) }

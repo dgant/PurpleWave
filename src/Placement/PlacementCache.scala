@@ -21,7 +21,7 @@ import scala.io.Source
 object PlacementCache {
 
   private val Magic = 0x5057504c // PWPL
-  private val FormatVersion = 3
+  private val FormatVersion = 4
   private val MaximumCompressedBytes = 8L * 1024L * 1024L
   private val MaximumDecodedBytes = 32L * 1024L * 1024L
   private val MaximumRequirements = 4096

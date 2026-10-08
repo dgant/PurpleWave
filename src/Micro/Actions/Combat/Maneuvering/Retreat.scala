@@ -64,7 +64,7 @@ object Retreat extends Action {
     }
     lazy val force = forceVector.radians
 
-    if (unit.agent.ride.exists(_.pixelDistanceEdge(unit) <= Shuttling.pickupRadiusEdge + 32) && unit.matchups.targetsInRange.isEmpty) {
+    if ( ! unit.agent.shouldFight && unit.agent.ride.exists(_.pixelDistanceEdge(unit) <= Shuttling.pickupRadiusEdge + 32) && unit.matchups.targetsInRange.isEmpty) {
       Commander.rightClick(unit, unit.agent.ride.get)
       return RetreatPlan(unit, unit.agent.ride.get.pixel, "Hail")
     }

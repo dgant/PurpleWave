@@ -17,6 +17,7 @@ class PvPOpeningVsFE extends GameplanImperative {
   override def activated: Boolean = {
     if (PvPNexusFirst()) return false
     if (PvPCoreExpand()) return false
+    if ( ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)) return false
 
     if (response.isEmpty && (enemiesHaveComplete(Protoss.PhotonCannon) || With.scouting.enemyNatural.exists(_.townHallTile.lastSeen > 0))) {
       if (With.frame < GameTime(2, 0)() + Seconds(10)() * enemies(Protoss.PhotonCannon, Protoss.Forge)) {

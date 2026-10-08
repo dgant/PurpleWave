@@ -54,7 +54,7 @@ trait BaseInference {
       }
       // Infer main by creep
       else if (With.frame < Minutes(5)() && With.enemies.exists(_.isZerg)) {
-        val newlyCreepedBases = With.geography.mains.filter(b => b.owner.isNeutral && b.zone.tiles.exists(_.creep))
+        val newlyCreepedBases = With.geography.mains.filter(b => b.owner.isNeutral && b.zone.tiles.exists(t => t.creep && ! With.grids.creep.initiallyNeutral(t.i)))
         if (newlyCreepedBases.size == 1) {
           _firstEnemyMain = newlyCreepedBases.headOption
           With.logger.debug("Inferred enemy main from presence of creep: " + _firstEnemyMain.get.toString)

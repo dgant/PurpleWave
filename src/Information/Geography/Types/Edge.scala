@@ -10,12 +10,15 @@ import bwta.Chokepoint
 
 final class Edge(choke: Chokepoint) {
 
+  private val neutralPassage: Boolean = choke.getWidth == 0
+
   // On Pathfinder BWTA found an edge with the same zone on both sides
   def otherSideof(zone: Zone): Zone = zones.find(_ != zone).getOrElse(zones.head)
   lazy val pixelCenter  : Pixel         = new Pixel(choke.getCenter)
-  lazy val radiusPixels : Double        = choke.getWidth / 2
+  lazy val radiusPixels : Double        = if (choke.getWidth > 0) choke.getWidth / 2 else sidePixels.head.pixelDistance(sidePixels.last) / 2
   lazy val tiles        : Vector[Tile]  = Maff.orElse(Shapes.Ray(sidePixels.head, sidePixels.last).map(_.tile).toVector, Vector(pixelCenter.tile)).toVector
-  lazy val sidePixels   : Seq[Pixel]    = Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight))
+  lazy val sidePixels   : Seq[Pixel]    = if (choke.getWidth > 0) Vector(new Pixel(choke.getSides.getLeft), new Pixel(choke.getSides.getRight)) else
+    ChokeGeometry.sides(pixelCenter, p => p.valid && With.game.isWalkable(p.x / 8, p.y / 8))
   lazy val direction    : Direction     = new Direction(sidePixels.head, sidePixels.last)
   lazy val endPixels    : Vector[Pixel] = Vector(-1, 1)
     .map(m => pixelCenter
@@ -40,6 +43,7 @@ final class Edge(choke: Chokepoint) {
   def contains(tile: Tile): Boolean = contains(tile.center)
   def contains(zone: Zone): Boolean = zones.head == zone || zones.last == zone
   def diameterPixels: Double = 2 * radiusPixels
+  def isOpen: Boolean = ! neutralPassage || With.paths.groundWalkable(pixelCenter.tile.i)
 
   def badness2(group: UnitGroup, from: Zone): Double = Maff.squared(badness(group, from))
   def badness(group: UnitGroup, from: Zone): Double = {

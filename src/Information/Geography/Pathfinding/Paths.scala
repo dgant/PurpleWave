@@ -1,3 +1,3 @@
 package Information.Geography.Pathfinding
 
-final class Paths extends TilePathfinder with ZonePathfinder with GroundDistance
+final class Paths extends TilePathfinder with ZonePathfinder with GroundDistance with GroundTopology

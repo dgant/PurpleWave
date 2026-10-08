@@ -49,6 +49,9 @@ final class UnitTracker {
       unit.friendly.foreach(bufferFriendly.remove)
       unit.foreign.filter(_.isEnemy).foreach(bufferEnemy.remove)
       unit.foreign.filter(_.isNeutral).foreach(bufferNeutral.remove)
+      if (unit.isNeutral && unit.unitClass.isBuilding && ! unit.flying) {
+        With.paths.onNeutralRemoved(unit.tiles)
+      }
     })
     units(id) = None
   }

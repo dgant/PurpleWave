@@ -533,7 +533,7 @@ object CombatPredictionTest extends App {
   check("fallback takes the chosen adjacent step instead of repeating a blocked zone flow") {
     val destinationZone = allocate(classOf[Zone])
     val flow = new GridFlowField(Tile(5, 1))
-    flow.set(Tile(1, 1), Force(0, -1))
+    set(flow, "values", Array.tabulate(With.mapTileArea)(i => if (i == Tile(1, 1).i) Force(0, -1) else Force(0, 0)))
     set(destinationZone, "flowField", flow)
     set(destinationZone, "bitmap$0", -1L)
     val zones = Array.fill(With.mapTileArea)(destinationZone)

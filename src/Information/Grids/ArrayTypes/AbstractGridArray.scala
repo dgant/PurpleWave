@@ -20,6 +20,7 @@ abstract class AbstractGridArray[T] extends AbstractTypedGrid[T] {
   }
 
   final def isInitialized: Boolean = initialized
+  final def invalidate(): Unit = { reset(); initialized = false }
   final def initialize(): Unit = { if ( ! initialized) { onInitialization(); initialized = true } }
   override def update(): Unit = { initialize() }
   def onInitialization(): Unit = {}

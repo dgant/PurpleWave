@@ -194,5 +194,55 @@ object ReaverMicroTest extends App {
     assert(distance.pixels(Pixel(0, 0), Pixel(702, 0)) == BroodWarGroundDistance.unreachable)
     assert(distance.pixels(Pixel(-1, 0), Pixel(0, 0)) == BroodWarGroundDistance.unreachable)
   }
+  import Micro.Actions.Protoss.ReaverShot
+  check("shot preparation reserves delivery, agency, a full turn and native attack startup") {
+    assert(ReaverShot.preparationFrames(0, 1, 7) == 12)
+    assert(ReaverShot.preparationFrames(4, 3, 7) == 18)
+    assert(60 - ReaverShot.preparationFrames(0, 1, 7) == 48)
+  }
+  check("cooldown repositioning stops at firing range instead of overshooting a long waypoint") {
+    val from = Pixel(200, 100)
+    val enemy = Pixel(0, 100)
+    val to = ReaverShot.limitMove(from, Pixel(500, 100), 150)(_.pixelDistance(enemy) <= 256)
+    assert(to == Pixel(256, 100))
+  }
+  check("cooldown movement keeps all legal lateral movement and respects the time budget") {
+    val from = Pixel(100, 100)
+    assert(ReaverShot.limitMove(from, Pixel(100, 200), 80)(_ => true) == Pixel(100, 180))
+    assert(ReaverShot.limitMove(from, Pixel(100, 140), 80)(_ => true) == Pixel(100, 140))
+    assert(ReaverShot.limitMove(from, Pixel(100, 200), 0)(_ => true) == from)
+  }
+  check("a legal endpoint cannot hide an intervening path or terrain boundary") {
+    assert(ReaverShot.limitMove(Pixel(100, 100), Pixel(200, 100), 100)(p => p.x < 140 || p.x > 160) == Pixel(139, 100))
+  }
+  check("an in-range Reaver does not creep toward its target between shots") {
+    val from = Pixel(200, 100)
+    val enemy = Pixel(0, 100)
+    assert(ReaverShot.limitMove(from, enemy, 100)(_.pixelDistance(enemy) >= from.pixelDistance(enemy)) == from)
+  }
+  check("aiming uses a short accurate ray in every direction") {
+    val origin = Pixel(500, 500)
+    for (i <- 0 until 256) {
+      val angle = i * Math.PI / 128
+      val target = origin.add(Math.round(200 * Math.cos(angle)).toInt, Math.round(200 * Math.sin(angle)).toInt)
+      val aim = ReaverShot.aimPoint(origin, target)
+      assert(origin.pixelDistance(aim) <= ReaverShot.aimDistanceMax + 1)
+      val error = Math.abs(Mathematics.Maff.radiansTo(origin.radiansToSlow(target), origin.radiansToSlow(aim)))
+      assert(error <= Math.PI / 256, s"heading $i: $error")
+    }
+  }
+  check("repeated aim updates stay anchored even when the target moves") {
+    val origin = Pixel(500, 500)
+    var position = origin
+    var clipped = false
+    for (i <- 0 to 100) {
+      ReaverShot.aimPoint(position, Pixel(700, 450 + i), origin) match {
+        case Some(to) => position = to
+        case None => clipped = true
+      }
+      assert(position.pixelDistance(origin) <= ReaverShot.aimDistanceMax + 1)
+    }
+    assert(clipped)
+  }
   println(s"$passed Reaver micro checks passed")
 }

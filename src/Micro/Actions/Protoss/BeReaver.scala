@@ -20,25 +20,15 @@ object BeReaver extends Action {
     }
 
     // A zero weapon cooldown cannot release another Scarab while the previous one is alive.
-    // Rescue before the special Reave behavior can issue a hold or attack-move order.
+    // Rescue before combat starts preparing another shot.
     if ( ! unit.loaded && ! unit.agent.commit && unit.hasActiveScarab && unit.cooldownLeft <= With.latency.remainingFrames && unit.matchups.threatsInRange.nonEmpty) {
       unit.agent.act("Hop")
       clickShuttle(unit)
       return
     }
 
-    // jonsnow.jpg
-    if (unit.agent.fightReason == FightOrFlee.Reave) {
-      if (unit.transport.isDefined) {
-        if (unit.matchups.targetNearest.exists(unit.hasScarabPathTo(_, unit.pixel))) Commander.requestUnload(unit)
-      }
-      else if (unit.matchups.targetNearest.exists(unit.framesToFace(_) > 1)) {
-        val t =  unit.matchups.targetNearest.get
-        unit.agent.decision.set(unit.pixel.project(t.pixel, 6))
-        Commander.attackMove(unit)
-      } else {
-        Commander.hold(unit)
-      }
+    if (unit.agent.fightReason == FightOrFlee.Reave && unit.transport.isDefined) {
+      if (unit.matchups.targetNearest.exists(unit.hasScarabPathTo(_, unit.pixel))) Commander.requestUnload(unit)
     }
 
     if (unit.transport.isDefined) {

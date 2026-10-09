@@ -24,12 +24,24 @@ object BeShuttle extends Action {
     val finalCost: Double = baseCost * multiplier
   }
 
+  def supportedPassengers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = {
+    val passengers = shuttle.agent.passengersPrioritized
+    Maff.orElse(passengers.filter(Protoss.Reaver), passengers).toVector
+  }
+
+  def deliveryGoal(shuttle: FriendlyUnitInfo, goal: Pixel): Pixel = {
+    val exposed = supportedPassengers(shuttle).filter(p => Protoss.Reaver(p) && !p.loaded)
+    Maff.minBy(exposed)(_.pixelDistanceSquared(shuttle))
+      .map(p => p.pixel.projectUpTo(goal, 32)).getOrElse(goal)
+  }
+
   protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     if (ShuttleDitchPassengers(shuttle)) return
     if (ShuttleAdoptPassenger(shuttle)) return
 
     // Emergency pickups
-    val hailers = shuttle.agent.hailersPrioritized
+    val supported = supportedPassengers(shuttle)
+    val hailers = shuttle.agent.hailersPrioritized.filter(supported.contains)
     val hailersMostUrgent = Maff.orElse(
       hailers.filter(_.doomed),
       hailers.filter(_.likelyDoomed),
@@ -45,7 +57,7 @@ object BeShuttle extends Action {
 
     // Ordinary pickups/dropoffs/parking
     val fightRadius = 320
-    val passengersFighting =  shuttle.agent.passengers.filter(p =>
+    val passengersFighting = supported.filter(p =>
       p.agent.toAttack.isDefined
       || p.agent.perch.isDefined
       || p.matchups.pixelsToThreatRange.exists(_ < fightRadius)
@@ -53,8 +65,8 @@ object BeShuttle extends Action {
     val anyoneFighting = passengersFighting.nonEmpty
 
     val quests = new ArrayBuffer[ShuttleQuest]
-    shuttle.agent.passengersPrioritized.foreach(p => {
-      val goal = p.agent.rideGoal
+    supported.foreach(p => {
+      val goal = p.agent.rideGoal.map(g => if (p.loaded) deliveryGoal(shuttle, g) else g)
       val m = ?(passengersFighting.contains(p) || ! anyoneFighting, 1, 10)
 
       def add(transform: Pixel => ShuttleQuest): Unit = { quests ++= goal.map(transform) }
@@ -62,7 +74,7 @@ object BeShuttle extends Action {
       // Deliver passenger
       if (p.loaded) {
 
-        add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g), () => deliver(shuttle, p)))
+        add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g), () => deliver(shuttle, g)))
 
       // Pickup passenger
       } else if (goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
@@ -97,8 +109,8 @@ object BeShuttle extends Action {
 
   // Heed a passenger's ride goal
   //
-  private def deliver(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
-    shuttle.agent.decision.set(passenger.agent.rideGoal)
-    Commander.move(shuttle)
+  private def deliver(shuttle: FriendlyUnitInfo, goal: Pixel): Unit = {
+    shuttle.agent.decision.set(goal)
+    Commander.move(shuttle, allowOvershoot = false)
   }
 }

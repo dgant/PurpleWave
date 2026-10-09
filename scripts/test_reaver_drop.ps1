@@ -20,6 +20,11 @@ $classpath = (@($classes, $macros) + $compiler) -join ';'
 $sources = @(
     'src/ProxyBwapi/UnitInfo/UnitInfo.scala',
     'src/Planning/Blackboard.scala',
+    'src/Tactic/Squads/Squads.scala',
+    'src/Tactic/GetDefenseBase.scala',
+    'src/Tactic/Squads/SquadDefendBase.scala',
+    'src/Micro/Actions/Protoss/Shuttle/BeShuttle.scala',
+    'src/Micro/Actions/Protoss/Shuttle/ShuttlePark.scala',
     'src/Tactic/Missions/DropManifest.scala',
     'src/Tactic/Missions/DropRoute.scala',
     'src/Tactic/Missions/MissionDrop.scala',

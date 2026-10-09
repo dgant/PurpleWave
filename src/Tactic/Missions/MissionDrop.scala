@@ -12,7 +12,6 @@ import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
-import Micro.Coordination.Pathing.MicroPathing
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadAutomation
@@ -35,6 +34,7 @@ abstract class MissionDrop extends Mission {
   protected def additionalFormationConditions             : Boolean
   protected def additionalItineraryConditions(base: Base) : Boolean = true
   protected def requireWorkers                            : Boolean = false
+  protected def targetCleared(base: Base): Boolean = requireWorkers && base.heart.visible && base.units.forall(u => !u.isEnemy || !IsWorker(u))
   protected def shouldStopRaiding                         : Boolean = false
   protected def shouldGoHome                              : Boolean = false
   protected def recruited(unit: UnitInfo)                 : Boolean = With.recruiter.lockedBy(this).exists(_ == unit)
@@ -42,6 +42,8 @@ abstract class MissionDrop extends Mission {
   protected def recruitablePassenger(unit: UnitInfo)      : Boolean = recruitable(unit) && (recruited(unit) || Maff.orElse(transportLock.units, With.recruiter.available.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640))
   protected def raidTransportAction: Action = ActionRaidTransport
   protected def commitWhileRaiding: Boolean = true
+  protected def missionTimeout: Int = Seconds(90)()
+  protected def approachTimeout: Int = Seconds(45)()
   protected val transportLock: LockUnits = new LockUnits(this, u => u.isTransport && recruitable(u)).setCounter(CountOne).setInterruptible(false)
 
   val itinerary                             = new mutable.Queue[Base]
@@ -80,8 +82,8 @@ abstract class MissionDrop extends Mission {
 
   private def ignore(base: Base): Boolean = {
     if (base.owner.isFriendly) return true
-    if (base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
-    if (requireWorkers && base.heart.visible && base.units.forall(u => ! u.isEnemy || ! IsWorker(u))) return true
+    if (!base.isEnemy && base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
+    if (targetCleared(base)) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
     if ( ! additionalItineraryConditions(base)) return true
     With.framesSince(base.lastFrameScoutedByUs) < Seconds(90)() && ! base.owner.isEnemy
@@ -147,10 +149,10 @@ abstract class MissionDrop extends Mission {
     updateManifest()
     if (passengers.isEmpty) { terminate("No transportable passengers left"); return }
     while (itinerary.headOption.exists(skipBase)) {
-      With.logger.debug(f"$this: Removing ${itinerary.head} from itinerary. Next base: ${itinerary.drop(1).headOption}")
+      With.logger.debug(f"$this: Leaving target ${itinerary.head.heart}. Next target: ${itinerary.drop(1).headOption.map(_.heart)}")
       itinerary.dequeue()
     }
-    val expired = duration > Seconds(90)() || (duration > Seconds(45)() && state != Raiding && state != Evacuating)
+    val expired = duration > missionTimeout || (duration > approachTimeout && state != Raiding && state != Evacuating)
     updateState(shouldGoHome || expired)
     if (state == Escaping && allHome) { terminate("Escaped!"); return }
     transports.foreach(t => {
@@ -265,6 +267,7 @@ abstract class MissionDrop extends Mission {
   object ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengersFor(transport).filterNot(_.loaded)
+        .filter(p => !ProxyBwapi.Races.Protoss.Reaver(p) || p.scarabs + p.trainingQueue.size > 0)
       if (unloaded.isEmpty) {
         Commander.hold(transport)
       } else {
@@ -306,12 +309,8 @@ abstract class MissionDrop extends Mission {
     val route = routes.getOrElseUpdate(transport, new DropRoute)
     route.next(transport.tile, destination) match {
       case Some(path) =>
-        MicroPathing.getWaypointAlongTilePath(transport, path).foreach(waypoint => {
-          transport.agent.decision.set(waypoint)
-          // A loaded Shuttle normally overshoots short moves by nine tiles,
-          // which can cut straight through the threat the path goes around.
-          Commander.move(transport, allowOvershoot = false)
-        })
+        transport.agent.decision.set(route.waypoint(transport.pixel, path))
+        Commander.move(transport, allowOvershoot = false)
       case None =>
         if (route.stalled) returningHome = true
         transport.agent.redoubt.set(transport.agent.defaultHome)

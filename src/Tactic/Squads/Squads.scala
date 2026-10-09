@@ -26,8 +26,10 @@ class Squads extends TimedTask {
 
   @inline final def isCommissioned(squad: Squad): Boolean = squad.batchId == _batchNext.id
   @inline final def commission(squad: Squad): Unit = {
-    _batchNext.squads += squad
-    squad.batchId = _batchNext.id
+    if (!isCommissioned(squad)) {
+      _batchNext.squads += squad
+      squad.batchId = _batchNext.id
+    }
   }
 
   override protected def onRun(budgetMs: Long): Unit = {
@@ -44,7 +46,7 @@ class Squads extends TimedTask {
       i += 1
     }
     all.foreach(_.clearUnits())
-    all.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
+    next.toVector.foreach(squad => squad.addUnits(With.recruiter.lockedBy(squad)))
     val batchSwap = _batchActive
     _batchActive  = _batchNext
     _batchNext    = batchSwap

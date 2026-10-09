@@ -15,11 +15,11 @@ object ShuttlePark extends Action {
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && exposedPassengers(shuttle).nonEmpty
 
   def exposedPassengers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = {
-    shuttle.agent.passengersPrioritized.filterNot(_.airborne)
+    BeShuttle.supportedPassengers(shuttle).filterNot(_.airborne)
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
+    val exposed   = BeShuttle.supportedPassengers(shuttle).filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
     parkWithPassengers(shuttle, exposed)
   }
 
@@ -41,6 +41,6 @@ object ShuttlePark extends Action {
     if (shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
       Retreat.delegate(shuttle)
     }
-    Commander.move(shuttle)
+    Commander.move(shuttle, allowOvershoot = false)
   }
 }

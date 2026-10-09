@@ -1,11 +1,11 @@
 package Tactic.Missions
 
+import Information.Geography.Types.Base
 import Lifecycle.With
-import Macro.Facts.MacroFacts
 import Planning.ResourceLocks.LockUnits
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Protoss
 import Utilities.?
-import Utilities.Time.{Minutes, Seconds}
+import Utilities.Time.Minutes
 import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters._
 
@@ -13,23 +13,29 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
   override protected def commitWhileRaiding: Boolean = false
+  override protected def requireWorkers: Boolean = true
 
-  override protected def additionalFormationConditions: Boolean = (
-    With.blackboard.reaverDrop()
-    && With.recruiter.available.exists(reaverLock.matcher)
-    && (
-      With.enemies.forall(_.isTerran)
-        || With.geography.enemyBases.exists(_.zone.island)
-        || (MacroFacts.unitsComplete(Protoss.Reaver) >= 3 && MacroFacts.unitsComplete(Protoss.Shuttle) >= 2))
-    && (
-      (With.enemies.forall(_.isTerran)
-        && With.frame < Minutes(9)()
-        && ! MacroFacts.enemyStrategy(With.fingerprints.bbs, With.fingerprints.twoRax1113, With.fingerprints.twoRaxAcad, With.fingerprints.bio))
-      || (
-        // Will their base be empty?
-        (With.scouting.enemyProximity > 0.35 || MacroFacts.enemyBases > 2 || With.geography.enemyBases.exists(_.zone.island))
-        // Can we get there safely?
-        && (MacroFacts.upgradeComplete(Protoss.ShuttleSpeed, 1, Seconds(15)()) || With.unitsShown.allEnemies(Terran.Wraith, Terran.Goliath, Protoss.Dragoon, Zerg.Scourge, Zerg.Mutalisk) == 0))))
+  override protected def missionTimeout: Int = Minutes(3)()
+  override protected def approachTimeout: Int = Minutes(2)()
+  override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy
+
+  override protected def additionalFormationConditions: Boolean =
+    With.blackboard.reaverDrop() && reaverManifest.size >= 2
+
+  override protected def populateItinerary(): Unit = {
+    itinerary.clear()
+    // A combat drop needs an occupied target, including the main and natural.
+    // Empty expansion scouting must not consume the opening Reaver pair.
+    itinerary ++= MissionReaverDrop.targets(With.geography.bases)
+    With.logger.debug(s"$this target: ${itinerary.headOption.map(_.heart)}")
+  }
+
+  private def reaverManifest: DropManifest.Manifest = {
+    val available = With.recruiter.available.toVector
+    val shuttles = available.filter(u => Protoss.Shuttle(u) && transportLock.matcher(u))
+      .sortBy(u => (u.pixelDistanceSquared(vicinity), u.id))
+    DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
+  }
 
   override protected def shouldStopRaiding: Boolean = passengers.view
     .filter(Protoss.Reaver)
@@ -41,7 +47,7 @@ class MissionReaverDrop extends MissionDrop {
         >= passengers.view.map(_.subjectiveValue).sum))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
-  val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u) && recruitablePassenger(u) && (recruited(u) || u.scarabs + u.trainingQueue.size >= 3))
+  val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u) && recruitablePassenger(u))
   val smallLock   : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(u)).setCounter(CountUpTo(2))
   val bigLock     : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Archon, Protoss.Dragoon)     && recruitablePassenger(u)).setCounter(CountOne)
 
@@ -49,10 +55,9 @@ class MissionReaverDrop extends MissionDrop {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
     val available = With.recruiter.available.toVector
-    val shuttles = available.filter(u => Protoss.Shuttle(u) && transportLock.matcher(u)).sortBy(u => (u.pixelDistanceSquared(vicinity), u.id))
-    val reavers = DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
-    if (reavers.isEmpty) { terminate("No transportable reavers available"); return }
-    val selectedTransports = shuttles.filter(reavers.values.toSet)
+    val reavers = reaverManifest
+    if (reavers.size < 2) { terminate("Waiting for two transportable Reavers"); return }
+    val selectedTransports = reavers.values.toVector.distinct.sortBy(_.id)
     val filler = available.filter(smallLock.matcher) ++ available.filter(bigLock.matcher)
     manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)
 
@@ -67,4 +72,9 @@ class MissionReaverDrop extends MissionDrop {
     transports ++= selectedTransports
     passengers ++= manifest.keys.toVector.sortBy(_.id)
   }
+}
+
+private[Missions] object MissionReaverDrop {
+  def targets(bases: Seq[Base]): Vector[Base] = bases.filter(_.isEnemy).sortBy(b => (
+    b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
 }

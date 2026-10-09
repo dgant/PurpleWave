@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
-import ProxyBwapi.Races.{Protoss, Terran, Zerg}
+import ProxyBwapi.Races.Protoss
 import Utilities.UnitFilters.IsWarrior
 
 class PvRReaver extends GameplanImperative{
@@ -39,10 +39,10 @@ class PvRReaver extends GameplanImperative{
   }
   var shouldHarass: Boolean = false
   override def executeMain(): Unit = {
+    With.blackboard.takeUnownedBases.set(false)
     var shouldAttack: Boolean = unitsEverComplete(IsWarrior) >= 12 && unitsEverComplete(Protoss.Observer) > 0 && safePushing
     shouldHarass = unitsEverComplete(Protoss.Reaver) >= 2
-    shouldHarass &&= ! enemiesHaveComplete(Terran.Starport, Terran.Wraith, Terran.Valkyrie, Protoss.Corsair, Protoss.Scout, Zerg.Spire, Zerg.Mutalisk, Zerg.Scourge)
-    shouldHarass &&= unitsComplete(Protoss.Reaver) >= 4 || ! shouldAttack
+    shouldHarass &&= With.units.ours.count(u => (Protoss.Reaver(u) && u.scarabs + u.trainingQueue.length >= 3)) >= 2
     With.blackboard.reaverDrop.set(shouldHarass)
     With.blackboard.reaverDropMaxReavers.set(6)
     harass(shouldHarass)
@@ -50,21 +50,22 @@ class PvRReaver extends GameplanImperative{
     maintainMiningBases(unitsComplete(IsWarrior) / 6)
     pump(Protoss.Observer, 1)
     pumpShuttleAndReavers()
-    if (safePushing && shouldHarass) {
+    if (safePushing && shouldHarass && upgradeComplete(Protoss.DragoonRange)) {
       requireMiningBases(2)
     }
     upgradeContinuously(Protoss.GroundArmor) && upgradeContinuously(Protoss.GroundDamage)
     pump(Protoss.Dragoon)
     if (With.geography.ourNatural.isOurs) {
-      tryBuildInWall(1, Protoss.Pylon)
-      tryBuildInWall(1, Protoss.Gateway)
-      tryBuildInWall(1, Protoss.Forge)
-      tryBuildInWall(6, Protoss.PhotonCannon)
+      buildInWall(1, Protoss.Pylon)
+      buildInWall(1, Protoss.Gateway)
+      buildInWall(1, Protoss.Forge)
+      buildInWall(6, Protoss.PhotonCannon)
     }
     get(3, Protoss.Gateway)
     requireMiningBases(2)
     get(2, Protoss.RoboticsFacility)
     pumpGasPumps()
+    get(Protoss.Forge)
     get(Protoss.Observatory)
     get(Protoss.ScarabDamage)
     get(Protoss.GroundArmor)

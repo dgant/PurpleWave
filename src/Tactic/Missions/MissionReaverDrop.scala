@@ -3,8 +3,6 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Pixel
-import Mathematics.Shapes.Spiral
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
@@ -17,9 +15,8 @@ class MissionReaverDrop extends MissionDrop {
   private val plannedTargets = scala.collection.mutable.ArrayBuffer.empty[Base]
   private case class RaidProgress(var frame: Int, var distance: Double, var landed: Set[Int], var shot: Int)
   private val combatProgress = scala.collection.mutable.Map.empty[FriendlyUnitInfo, RaidProgress]
-  private val landingPoints = scala.collection.mutable.Map.empty[FriendlyUnitInfo, Pixel]
   override def reset(): Unit = { super.reset(); plannedTargets.clear(); onDestinationChanged() }
-  override protected def onDestinationChanged(): Unit = { combatProgress.clear(); landingPoints.clear() }
+  override protected def onDestinationChanged(): Unit = combatProgress.clear()
   override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
   private[Missions] def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
     plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
@@ -66,28 +63,12 @@ class MissionReaverDrop extends MissionDrop {
   override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
 
   private def workers = destinationBase.toVector.flatMap(_.enemies).filter(u => IsWorker(u) && u.visible)
-  private def firingPosition(reaver: FriendlyUnitInfo, at: Pixel): Boolean = at.valid && at.tile.walkable &&
-    workers.exists(w => reaver.inRangeToAttackFrom(w, at) && reaver.hasScarabPathTo(w, at))
-
-  override protected def landingGoal(transport: FriendlyUnitInfo): Pixel = landingPoints.synchronized {
-    val reavers = passengersFor(transport).filter(Protoss.Reaver)
-    val cached = landingPoints.get(transport).filter(p => reavers.exists(firingPosition(_, p)))
-    cached.getOrElse {
-      val candidates = workers.flatMap(w => reavers.flatMap(r => {
-        val near = w.pixel.projectUpTo(transport.pixel, Math.max(64, r.pixelRangeAgainst(w) - 48)).tile
-        Spiral(3).map(near.add).filter(_.valid).map(_.center).filter(firingPosition(r, _))
-      })).distinct
-      val goal = Maff.minBy(candidates)(p => (
-        With.grids.enemyRangeAir.get(p.tile), transport.pixelDistanceSquared(p))).getOrElse(vicinity)
-      if (candidates.nonEmpty) landingPoints(transport) = goal
-      goal
-    }
-  }
-
   override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
-    destinationBase.exists(_.isEnemy) && passengersFor(transport).filter(Protoss.Reaver).exists(r =>
-      (!r.loaded && r.pixelDistanceCenter(transport) <= 384 && destinationBase.exists(r.base.contains))
-        || firingPosition(r, transport.pixel))
+    destinationBase.exists(base => base.isEnemy && passengersFor(transport).exists(Protoss.Reaver) && (
+      transport.matchups.threatsInRange.nonEmpty
+      || transport.pixelDistanceCenter(vicinity) <= 64
+      || (base.minerals.nonEmpty && base.minerals.forall(m =>
+        m.tile.lastSeen > 0 && With.framesSince(m.tile.lastSeen) <= Seconds(5)()))))
 
   override protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {
     val reavers = passengersFor(transport).filter(Protoss.Reaver)

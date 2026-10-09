@@ -115,6 +115,7 @@ package Tactic.Missions {
       With.grids = allocate(classOf[Grids])
       set(With.grids, "enemyRangeAir", new GridEnemyRangeAir)
       set(With.grids, "enemyVision", new GridEnemyVision)
+      set(With.grids, "lastSeen", new Information.Grids.Vision.GridLastSeen)
       set(With.grids, "walkable", new GridWalkable)
       val terrain = new GridWalkableTerrain
       terrain.indices.foreach(terrain.set(_, true))
@@ -882,20 +883,23 @@ package Tactic.Missions {
       val unseen = new DropRoute().next(from, target.heart).get
       assert(defended.tiles == unseen.tiles, "Destination vision must not lengthen an anti-air detour")
     }
-    def combatMission(): (MissionProbe, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo) = {
+    def combatMission(approaching: Boolean = false): (MissionProbe, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo) = {
       world(128)
       val target = base(100, 100)
-      val worker = unit(ProxyBwapi.Races.Terran.SCV, 3264, 3280)
+      val at = target.heart.center.add(if (approaching) -320 else 0, 0)
+      val worker = unit(ProxyBwapi.Races.Terran.SCV, at.x + 144, at.y)
       set(worker, "_player", enemy); target.units = Vector(worker)
-      val t = unit(Protoss.Shuttle, 3120, 3280)
-      val r = unit(Protoss.Reaver, 3120, 3280)
-      val z = unit(Protoss.Zealot, 3120, 3280)
+      target.minerals = Vector(-64, 64).map(dy =>
+        unit(UnitClass(bwapi.UnitType.Resource_Mineral_Field), target.heart.center.x + 96, target.heart.center.y + dy))
+      val t = unit(Protoss.Shuttle, at.x, at.y)
+      val r = unit(Protoss.Reaver, at.x, at.y)
+      val z = unit(Protoss.Zealot, at.x, at.y)
       val m = new MissionProbe(target)
       m.autonomousLanding = true; m.assessDefense = true; m.launched = true
       m.configure(Vector(t), Vector(r, z)); load(r, Some(t)); load(z, Some(t))
       (m, t, r, z, worker)
     }
-    check("a loaded Reaver and its Shuttle enter default combat together before the first unload") {
+    check("reaching the target hands a loaded crew to default combat before the first unload") {
       val (m, t, r, z, _) = combatMission()
       m.run()
       assert(m.state == m.Raiding && m.controlsCombat(t))
@@ -904,6 +908,20 @@ package Tactic.Missions {
       load(r, None); m.run(); load(r, Some(t)); m.run()
       assert(m.state == m.Raiding && t.intent.action == Idle && z.loaded,
         "A recovered Reaver cannot restart initial landing to deploy filler")
+    }
+    check("an isolated worker cannot trigger an uncontested landing before the mineral line") {
+      val (m, t, r, z, worker) = combatMission(approaching = true)
+      assert(r.inRangeToAttackFrom(worker, t.pixel) && t.pixelDistanceCenter(m.target.heart.center) > 64)
+      m.run()
+      assert(m.state == m.Landing && !m.controlsCombat(t),
+        "Keep flying to the mineral line even when an isolated worker is already in firing range")
+      assert(t.intent.action == m.ActionLandTransport && Vector(r, z).forall(_.intent.action == Micro.Actions.Basic.DoNothing))
+      assert(m.approach(t) == m.vicinity, "The approach target must not move to the first visible worker")
+      t.matchups = new MatchupAnalysis(t) { override def threats = Vector.empty; override def threatsInRange = Vector.empty }
+      perform(m.ActionLandTransport, t)
+      val moved = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+      assert(moved != null && Pixel(moved.getX, moved.getY).pixelDistance(m.vicinity) < t.pixelDistanceCenter(m.vicinity))
+      assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null && r.loaded && z.loaded)
     }
     check("a second Shuttle keeps delivery control until its own loaded crew reaches combat") {
       val (m, t, r, _, _) = combatMission()
@@ -920,20 +938,39 @@ package Tactic.Missions {
       m.run()
       assert(m.state == m.Raiding && Vector(other, otherReaver).forall(_.intent.action == Idle))
     }
-    check("landing approaches a reachable worker firing position instead of requiring the base heart") {
-      val (m, t, r, _, worker) = combatMission()
-      set(t, "_pixel", Pixel(2400, 3280)); set(t, "_tile", t.pixel.tile)
-      set(r, "_pixel", t.pixel); set(r, "_tile", t.tile)
+    check("a Shuttle under anti-air threat may hand off before reaching the target") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      val marine = unit(ProxyBwapi.Races.Terran.Marine, t.pixel.x + 96, t.pixel.y)
+      set(marine, "_player", enemy)
+      t.matchups = new MatchupAnalysis(t) { override def threatsInRange = Vector(marine) }
       m.run()
-      assert(m.state == m.Landing && r.intent.action == Micro.Actions.Basic.DoNothing)
-      val goal = m.approach(t)
-      assert(goal != m.vicinity && goal.tile.walkable)
-      assert(r.inRangeToAttackFrom(worker, goal) && r.hasScarabPathTo(worker, goal))
-      assert(m.approach(t) == goal, "Keep a valid landing destination stable")
-      set(t, "_pixel", goal); set(t, "_tile", goal.tile)
-      set(r, "_pixel", goal); set(r, "_tile", goal.tile)
+      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle))
+      assert(r.loaded && z.loaded && t.pixelDistanceCenter(m.vicinity) > 64)
+    }
+    check("every mineral patch needs recent vision before vision alone permits a landing") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      val minerals = m.target.minerals
+      With.grids.lastSeen.set(minerals.head.tile, With.frame)
+      m.run(); assert(m.state == m.Landing && !m.controlsCombat(t), "Partial mineral-line vision is insufficient")
+      With.grids.lastSeen.set(minerals.last.tile, With.frame - Seconds(6)())
+      m.run(); assert(m.state == m.Landing && !m.controlsCombat(t), "Old mineral vision is insufficient")
+      With.grids.lastSeen.set(minerals.last.tile, With.frame - Seconds(5)())
       m.run()
-      assert(m.state == m.Raiding && t.intent.action == Idle && r.intent.action == Idle)
+      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle) && r.loaded)
+    }
+    check("an empty mineral list does not count as full mineral-line vision") {
+      val (m, t, r, _, _) = combatMission(approaching = true)
+      m.target.minerals = Vector.empty
+      m.run()
+      assert(m.state == m.Landing && !m.controlsCombat(t) && r.loaded)
+    }
+    check("the last approach stays loaded until the Shuttle comes within two tiles of its target") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-65, 0)); set(u, "_tile", u.pixel.tile) })
+      m.run(); assert(m.state == m.Landing && r.intent.action == Micro.Actions.Basic.DoNothing)
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.vicinity.add(-64, 0)); set(u, "_tile", u.pixel.tile) })
+      m.run()
+      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle) && r.loaded)
     }
     check("combat receives a bounded attempt despite a large defending army") {
       val (m, t, r, z, _) = combatMission()
@@ -965,7 +1002,7 @@ package Tactic.Missions {
       })
     }
     check("an unusable landing approach is abandoned without forcing a passenger to unload") {
-      val (m, t, r, _, worker) = combatMission()
+      val (m, t, r, _, worker) = combatMission(approaching = true)
       set(worker, "_visibility", ProxyBwapi.UnitTracking.Visibility.InvisibleMissing)
       m.run(); assert(m.state == m.Landing)
       With.frame += Seconds(9)(); m.run()

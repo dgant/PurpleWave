@@ -1021,6 +1021,55 @@ package Tactic.Missions {
       avoidsThreat(t, turret, movement(t))
       assert(movement(t).valid)
     }
+    check("a distant pickup cannot pull an empty Shuttle back across a turret after escaping") {
+      val (t, turret) = turretEscape()
+      set(t, "_pixel", Pixel(4020, 1240)); set(t, "_tile", t.pixel.tile)
+      set(t, "_angleRadians", 91 * 2 * Math.PI / 256 - Math.PI / 2)
+      val r = unit(Protoss.Reaver, 952, 512); t.agent.addPassenger(r)
+      With.grids.enemyRangeAir.tiles.foreach(tile => tile.maxDepth =
+        Math.max(0, 12 - Math.ceil(tile.tile.center.pixelDistance(turret.pixel) / 32).toInt))
+      Micro.Agency.Commander.rightClick(r, t)
+      assert(r.agent.wantsPickup && r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+      val follower = unit(Protoss.Zealot, r.pixel.x, r.pixel.y)
+      Micro.Agency.Commander.rightClick(follower, t)
+      assert(follower.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+      Micro.Agency.Commander.rightClick(t, r)
+      assert(Micro.Actions.Protoss.Shuttle.ShuttleEscape.active(t))
+      avoidsThreat(t, turret, movement(t))
+      set(t, "_pixel", movement(t)); set(t, "_tile", t.pixel.tile)
+      assert(!Micro.Actions.Protoss.Shuttle.ShuttleEscape.active(t))
+      r.sleepUntil = 0; set(r, "_order", ProxyBwapi.Orders.EnterTransport)
+      Micro.Agency.Commander.rightClick(r, t)
+      assert(r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].stopped,
+        "A distant EnterTransport order must stay blocked after the escape latch releases")
+      var steps = 0
+      while (t.pixelDistanceCenter(r) > 384 && steps < 64) {
+        t.sleepUntil = 0
+        Micro.Agency.Commander.rightClick(t, r)
+        assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+        val to = movement(t)
+        val length = t.pixelDistanceCenter(to)
+        assert(length > 32, "The routed pickup must make progress")
+        (0 to 32).foreach(i => assert(turret.pixelDistanceEdge(t, t.pixel.project(to, length * i / 32)) >
+          turret.pixelRangeAgainst(t), s"Pickup flight crosses the turret toward $to"))
+        set(t, "_angleRadians", t.pixel.radiansTo(to))
+        set(t, "_pixel", t.pixel.project(to, Math.min(128, length))); set(t, "_tile", t.pixel.tile)
+        With.frame += 24; steps += 1
+      }
+      assert(t.pixelDistanceCenter(r) <= 384, "The Shuttle must reach its distant passenger safely")
+      t.sleepUntil = 0
+      Micro.Agency.Commander.rightClick(t, r)
+      assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == r.bwapiUnit)
+    }
+    check("nearby combat pickups still issue boarding commands immediately") {
+      val (t, _) = turretEscape()
+      val r = unit(Protoss.Reaver, t.pixel.x - 100, t.pixel.y)
+      t.agent.addPassenger(r)
+      Micro.Agency.Commander.rightClick(r, t)
+      Micro.Agency.Commander.rightClick(t, r)
+      assert(r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == t.bwapiUnit)
+      assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == r.bwapiUnit)
+    }
     check("a motionless route fails closed and eventually reports a stall") {
       world(128)
       val route = new DropRoute

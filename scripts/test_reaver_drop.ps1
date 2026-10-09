@@ -27,6 +27,7 @@ $sources = @(
     'src/Micro/Actions/Protoss/Shuttle/BeShuttle.scala',
     'src/Micro/Actions/Protoss/Shuttle/ShuttlePark.scala',
     'src/Micro/Actions/Protoss/Shuttle/ShuttleEscape.scala',
+    'src/Micro/Actions/Protoss/Shuttle/ShuttlePickup.scala',
     'src/Micro/Actions/Combat/Maneuvering/Retreat.scala',
     'src/Micro/Actions/Transportation/Transport.scala',
     'src/Tactic/Missions/DropManifest.scala',

@@ -24,6 +24,8 @@ class MissionReaverDrop extends MissionDrop {
   override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
   override protected def commitWhileRaiding: Boolean = false
   override protected def requireWorkers: Boolean = true
+  override protected def targetCleared(base: Base): Boolean =
+    requireWorkers && state == Raiding && MissionReaverDrop.workersCleared(base, _.visible)
 
   override protected def missionTimeout: Int = Minutes(3)()
   override protected def approachTimeout: Int = Minutes(2)()
@@ -48,7 +50,7 @@ class MissionReaverDrop extends MissionDrop {
     DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
   }
 
-  override protected def shouldStopRaiding: Boolean = passengers.view
+  override protected def shouldStopRaiding: Boolean = state == Raiding && passengers.view
     .filter(Protoss.Reaver)
     .forall(reaver =>
       reaver.doomed
@@ -86,6 +88,9 @@ class MissionReaverDrop extends MissionDrop {
 }
 
 private[Missions] object MissionReaverDrop {
+  def workersCleared(base: Base, visible: Mathematics.Points.Tile => Boolean): Boolean =
+    visible(base.heart) && base.resources.forall(r => visible(r.tile)) && base.units.forall(u => !u.isEnemy || !IsWorker(u))
+
   def targets(bases: Seq[Base]): Vector[Base] = bases.filter(_.isEnemy).sortBy(b => (
     b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
 }

@@ -244,6 +244,16 @@ package Tactic.Missions {
       val empty = base(80); empty.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
       assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)) == Vector(main, natural))
     }
+    check("a visible base heart cannot clear workers hidden beyond the approach") {
+      val target = base(5)
+      val resource = unit(Protoss.Probe, 500, 300)
+      target.minerals = Vector(resource)
+      assert(!MissionReaverDrop.workersCleared(target, t => t == target.heart))
+      assert(MissionReaverDrop.workersCleared(target, _ => true))
+      val worker = unit(Protoss.Probe); set(worker, "_player", enemy)
+      target.units = Vector(worker)
+      assert(!MissionReaverDrop.workersCleared(target, _ => true))
+    }
     check("newly discovered enemy bases extend the raid without revisiting cleared targets") {
       val main = base(5); val expansion = base(16)
       val m = new MissionProbe(main)

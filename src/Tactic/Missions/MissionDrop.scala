@@ -334,8 +334,8 @@ abstract class MissionDrop extends Mission {
             && passenger.matchups.threats.exists(t => t.inRangeToAttack(passenger, runway) && ! t.inRangeToAttack(passenger))))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRange > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
-      transport.agent.decision.set(runway)
-      Commander.move(transport)
+      transport.agent.decision.set(Micro.Actions.Protoss.Shuttle.BeShuttle.deliveryGoal(transport, runway))
+      Commander.move(transport, allowOvershoot = false)
     }
   }
 

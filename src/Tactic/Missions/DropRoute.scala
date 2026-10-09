@@ -14,10 +14,13 @@ private[Missions] class DropRoute {
   private var progress: Option[Tile] = None
   private var progressFrame = With.frame
   private var failureFrame: Option[Int] = None
+  private var finalApproach = false
 
   def stalled: Boolean = failureFrame.exists(With.framesSince(_) >= Seconds(8)())
-  private def value(tile: Tile): (Int, Boolean) = (With.grids.enemyRangeAir.get(tile), tile.visibleToEnemy)
-  private def exposure(tile: Tile): Double = 64.0 * (With.grids.enemyRangeAir.get(tile) + (if (tile.visibleToEnemy) 1 else 0))
+  private def avoidVision(tile: Tile): Boolean = tile.visibleToEnemy &&
+    !destination.exists(t => t.base.exists(_.isEnemy) && tile.tileDistanceFast(t) <= 32)
+  private def value(tile: Tile): (Int, Boolean) = (With.grids.enemyRangeAir.get(tile), avoidVision(tile))
+  private def exposure(tile: Tile): Double = 64.0 * (With.grids.enemyRangeAir.get(tile) + (if (avoidVision(tile)) 1 else 0))
   private def centerCost(tile: Tile): Double = {
     val depth = Seq(tile.x, tile.y, With.mapTileWidth - 1 - tile.x, With.mapTileHeight - 1 - tile.y).min
     val relative = 2.0 * depth / Math.min(With.mapTileWidth, With.mapTileHeight)
@@ -33,6 +36,7 @@ private[Missions] class DropRoute {
   // Search the whole map on a four-tile air grid. A short greedy search cannot
   // compare the two perimeter approaches or see the far end of an enemy screen.
   private def find(from: Tile, to: Tile): TilePath = {
+    if (finalApproach) return TilePath(from, to, Math.sqrt(from.tileDistanceSquared(to)), Some(line(from, to)))
     val xs = (2 until With.mapTileWidth - 1 by 4).toVector
     val ys = (2 until With.mapTileHeight - 1 by 4).toVector
     val grid = (for (y <- ys; x <- xs) yield Tile(x, y)).toVector
@@ -95,9 +99,15 @@ private[Missions] class DropRoute {
       progress = Some(from)
       progressFrame = With.frame
     }
+    // Once at the target's outskirts, commit to the raid instead of circling its
+    // newly discovered vision. The perimeter leg and anti-air avoidance remain intact.
+    val approach = to.base.exists(_.isEnemy) && from.tileDistanceFast(to) <= 32 &&
+      line(from, to).forall(t => With.grids.enemyRangeAir.get(t) == 0)
+    val approachChanged = approach != finalApproach
+    finalApproach = approach
     val changed = path.exists(p => p.tiles.get.map(value).toVector != values)
     val offPath = path.exists(_.tiles.get.forall(_.tileDistanceFast(from) > 6))
-    if (path.isEmpty || changed || offPath) {
+    if (path.isEmpty || changed || offPath || approachChanged) {
       path = Some(find(from, to)).filter(_.pathExists)
       values = path.map(_.tiles.get.map(value).toVector).getOrElse(Vector.empty)
     }
@@ -113,6 +123,7 @@ private[Missions] class DropRoute {
   // Let a speed-upgraded Shuttle accelerate on clear legs. Short (three-tile)
   // orders keep it braking; blindly overshooting them cuts across route hazards.
   def waypoint(from: Pixel, route: TilePath): Pixel = {
+    if (finalApproach) return route.end.center
     val tiles = route.tiles.get
     val index = tiles.indices.minBy(i => tiles(i).center.pixelDistanceSquared(from))
     val end = Math.min(index + 16, tiles.size - 1)

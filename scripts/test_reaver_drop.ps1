@@ -23,6 +23,7 @@ $sources = @(
     'src/Tactic/Squads/Squads.scala',
     'src/Tactic/GetDefenseBase.scala',
     'src/Tactic/Squads/SquadDefendBase.scala',
+    'src/Micro/Actions/Protoss/ReloadScarabs.scala',
     'src/Micro/Actions/Protoss/Shuttle/BeShuttle.scala',
     'src/Micro/Actions/Protoss/Shuttle/ShuttlePark.scala',
     'src/Tactic/Missions/DropManifest.scala',

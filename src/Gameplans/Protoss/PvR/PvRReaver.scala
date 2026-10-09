@@ -41,20 +41,20 @@ class PvRReaver extends GameplanImperative{
   override def executeMain(): Unit = {
     With.blackboard.takeUnownedBases.set(false)
     var shouldAttack: Boolean = unitsEverComplete(IsWarrior) >= 12 && unitsEverComplete(Protoss.Observer) > 0 && safePushing
-    shouldHarass = unitsEverComplete(Protoss.Reaver) >= 2
-    shouldHarass &&= With.units.ours.count(u => (Protoss.Reaver(u) && u.scarabs + u.trainingQueue.length >= 3)) >= 2
+    shouldHarass = true
     With.blackboard.reaverDrop.set(shouldHarass)
-    With.blackboard.reaverDropMaxReavers.set(6)
+    With.blackboard.reaverDropMaxReavers.set(Math.max(2, unitsComplete(Protoss.Reaver) / 2))
     harass(shouldHarass)
     attack(shouldAttack)
     maintainMiningBases(unitsComplete(IsWarrior) / 6)
     pump(Protoss.Observer, 1)
     pumpShuttleAndReavers()
-    if (safePushing && shouldHarass && upgradeComplete(Protoss.DragoonRange)) {
+    if (safePushing && upgradeComplete(Protoss.DragoonRange)) {
       requireMiningBases(2)
     }
     upgradeContinuously(Protoss.GroundArmor) && upgradeContinuously(Protoss.GroundDamage)
     pump(Protoss.Dragoon)
+    pump(Protoss.Zealot)
     if (With.geography.ourNatural.isOurs) {
       buildInWall(1, Protoss.Pylon)
       buildInWall(1, Protoss.Gateway)

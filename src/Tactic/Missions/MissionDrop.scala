@@ -33,6 +33,9 @@ abstract class MissionDrop extends Mission {
   protected def additionalItineraryConditions(base: Base) : Boolean = true
   protected def requireWorkers                            : Boolean = false
   protected def refreshItinerary(): Unit = {}
+  protected def continueItinerary(from: Base): Boolean = false
+  protected def isScoutingTarget(base: Base): Boolean = false
+  protected def canLandAt(base: Base): Boolean = true
   protected def targetCleared(base: Base): Boolean = requireWorkers && base.heart.visible && base.units.forall(u => !u.isEnemy || !IsWorker(u))
   protected def shouldStopRaiding                         : Boolean = false
   protected def shouldGoHome                              : Boolean = false
@@ -54,6 +57,8 @@ abstract class MissionDrop extends Mission {
   private val initiallyLanded = mutable.Set.empty[FriendlyUnitInfo]
   private var destinationBase: Option[Base] = None
   private var returningHome = false
+  private var itineraryFrame = 0
+  private var destinationFrame = 0
 
   final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] = manifest.get(passenger)
   private def passengersFor(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = passengers.filter(p => manifest.get(p).contains(transport))
@@ -68,6 +73,8 @@ abstract class MissionDrop extends Mission {
     initiallyLanded.clear()
     destinationBase = None
     returningHome = false
+    itineraryFrame = With.frame
+    destinationFrame = With.frame
   }
 
   final override protected def shouldForm: Boolean = {
@@ -81,6 +88,7 @@ abstract class MissionDrop extends Mission {
 
   private def ignore(base: Base): Boolean = {
     if (base.owner.isFriendly) return true
+    if (isScoutingTarget(base)) return false
     if (!base.isEnemy && base.heart.tileDistanceFast(Points.tileMiddle) < 32 && ! base.zone.island) return true
     if (targetCleared(base)) return true
     if ( ! base.owner.isEnemy && base.units.exists(u => u.likelyStillThere && u.isEnemy && u.canAttack && u.canMove && ! u.unitClass.isWorker)) return true
@@ -92,6 +100,7 @@ abstract class MissionDrop extends Mission {
 
   final private def skipBase(base: Base): Boolean = {
     if (ignore(base)) return true
+    if (isScoutingTarget(base)) return false
     if ((state == Evacuating || state == Escaping) && units.exists(_.base.contains(base))) return true
     if (base.isNeutral && itinerary.size > 1 && With.frame < Minutes(10)()) return true
     if (base.isNeutral) {
@@ -152,8 +161,11 @@ abstract class MissionDrop extends Mission {
       With.logger.debug(f"$this: Leaving target ${itinerary.head.heart}. Next target: ${itinerary.drop(1).headOption.map(_.heart)}")
       itinerary.dequeue()
     }
-    val expired = duration > missionTimeout || (duration > approachTimeout && state != Raiding && state != Evacuating)
-    updateState(shouldGoHome || expired)
+    val expired = With.framesSince(Math.max(launchFrame, itineraryFrame)) > missionTimeout ||
+      (With.framesSince(Math.max(launchFrame, destinationFrame)) > approachTimeout && state != Raiding && state != Evacuating)
+    val renewed = !returningHome && !shouldGoHome && (itinerary.isEmpty || expired) && destinationBase.exists(continueItinerary)
+    if (renewed) itineraryFrame = With.frame
+    updateState(shouldGoHome || (expired && !renewed))
     if (state == Escaping && allHome) { terminate("Escaped!"); return }
     transports.foreach(t => {
       t.agent.passengers.filterNot(p => manifest.get(p).contains(t)).foreach(t.agent.removePassenger)
@@ -198,11 +210,12 @@ abstract class MissionDrop extends Mission {
 
   private def beginDestination(): Unit = {
     destinationBase = itinerary.headOption
+    destinationFrame = With.frame
     initiallyLanded.clear()
     routes.clear()
     destinationBase.foreach(base => {
       vicinity =
-        if (base.owner.isEnemy) base.heart.center
+        if (base.owner.isEnemy || isScoutingTarget(base)) base.heart.center
         else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, Maff.max(transports.view.map(_.sightPixels)).getOrElse(0).toDouble)
         else base.heart.center
     })
@@ -218,7 +231,7 @@ abstract class MissionDrop extends Mission {
     }
     if (state == Assembling && allAboard) transition(Travelling)
     if (state == Travelling && !allAboard) transition(Evacuating)
-    if (state == Travelling && transports.exists(_.base.exists(destinationBase.contains))) transition(Landing)
+    if (state == Travelling && transports.exists(_.base.exists(b => destinationBase.contains(b) && canLandAt(b)))) transition(Landing)
     if (state == Landing) {
       initiallyLanded ++= passengers.filterNot(_.loaded)
       if (allLanded) transition(Raiding)
@@ -267,7 +280,7 @@ abstract class MissionDrop extends Mission {
   object ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengersFor(transport).filterNot(_.loaded)
-        .filter(p => !ProxyBwapi.Races.Protoss.Reaver(p) || p.scarabs + p.trainingQueue.size > 0)
+        .filter(ReloadScarabs.readyForPickup)
       if (unloaded.isEmpty) {
         Commander.hold(transport)
       } else {
@@ -289,7 +302,9 @@ abstract class MissionDrop extends Mission {
       passenger.agent.redoubt.set(
         passenger.agent.decision.set(assignedTransport(passenger).map(_.pixel)))
       ReloadScarabs.delegate(passenger)
-      assignedTransport(passenger).foreach(Commander.rightClick(passenger, _))
+      if (ReloadScarabs.readyForPickup(passenger)) {
+        assignedTransport(passenger).foreach(Commander.rightClick(passenger, _))
+      }
     }
   }
 

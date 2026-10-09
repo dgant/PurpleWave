@@ -505,10 +505,11 @@ object Commander {
     sleep(unit)
   }
 
-  def buildScarab(unit: FriendlyUnitInfo): Unit = {
+  def buildScarab(unit: FriendlyUnitInfo, count: Int = 1): Unit = {
     if (unit.unready) return
-    unit.bwapiUnit.build(Protoss.Scarab.bwapiType)
-    sleep(unit)
+    var queued = 0
+    while (queued < count && unit.bwapiUnit.build(Protoss.Scarab.bwapiType)) queued += 1
+    if (queued > 0) sleep(unit)
   }
 
   def buildInterceptor(unit: FriendlyUnitInfo): Unit = {

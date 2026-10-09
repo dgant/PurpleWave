@@ -11,14 +11,29 @@ import Utilities.UnitFilters._
 
 class MissionReaverDrop extends MissionDrop {
 
-  private val plannedTargets = scala.collection.mutable.Set.empty[Base]
+  private val plannedTargets = scala.collection.mutable.ArrayBuffer.empty[Base]
   override def reset(): Unit = { super.reset(); plannedTargets.clear() }
-  override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases)
-  private[Missions] def appendTargets(bases: Seq[Base]): Unit = {
-    plannedTargets ++= itinerary
-    val discovered = MissionReaverDrop.targets(bases).filterNot(plannedTargets)
+  override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
+  private[Missions] def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
+    plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
+    val discovered = MissionReaverDrop.targets(bases, possibleMains).filterNot(plannedTargets.contains)
     itinerary ++= discovered
     plannedTargets ++= discovered
+  }
+
+  override protected def continueItinerary(from: Base): Boolean = {
+    val enemyBases = With.geography.bases.filter(_.isEnemy)
+    if (!With.blackboard.reaverDropContinuePressure() || enemyBases.size < 2 ||
+      transports.isEmpty || !passengers.exists(Protoss.Reaver)) return false
+    val known = (plannedTargets.toVector ++ MissionReaverDrop.targets(enemyBases)).distinct
+    val next = MissionReaverDrop.reverseTargets(known, from).filter(b => b.isEnemy && !targetCleared(b))
+    if (next.isEmpty) return false
+    itinerary.clear()
+    itinerary ++= next
+    plannedTargets.clear()
+    plannedTargets ++= from +: next
+    With.logger.debug(s"$this reversing itinerary from ${from.heart}: ${next.map(_.heart).mkString(" -> ")}")
+    true
   }
 
   override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
@@ -29,7 +44,10 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def missionTimeout: Int = Minutes(3)()
   override protected def approachTimeout: Int = Minutes(2)()
-  override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy
+  override protected def isScoutingTarget(base: Base): Boolean =
+    !base.owner.isFriendly && !base.scoutedByUs && With.scouting.possibleEnemyMains.contains(base)
+  override protected def canLandAt(base: Base): Boolean = base.isEnemy
+  override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy || isScoutingTarget(base)
 
   override protected def additionalFormationConditions: Boolean =
     With.blackboard.reaverDrop() && reaverManifest.size >= 2
@@ -37,9 +55,9 @@ class MissionReaverDrop extends MissionDrop {
   override protected def populateItinerary(): Unit = {
     itinerary.clear()
     plannedTargets.clear()
-    // A combat drop needs an occupied target, including the main and natural.
-    // Empty expansion scouting must not consume the opening Reaver pair.
-    appendTargets(With.geography.bases)
+    // If the ground scout died, locate an unscouted enemy start from the air.
+    // Passengers stay aboard until ownership is confirmed; empty expansions are not targets.
+    appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
     With.logger.debug(s"$this target: ${itinerary.headOption.map(_.heart)}")
   }
 
@@ -91,6 +109,16 @@ private[Missions] object MissionReaverDrop {
   def workersCleared(base: Base, visible: Mathematics.Points.Tile => Boolean): Boolean =
     visible(base.heart) && base.resources.forall(r => visible(r.tile)) && base.units.forall(u => !u.isEnemy || !IsWorker(u))
 
-  def targets(bases: Seq[Base]): Vector[Base] = bases.filter(_.isEnemy).sortBy(b => (
-    b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
+  def reverseTargets(planned: Seq[Base], from: Base): Vector[Base] = {
+    val ordered = (planned :+ from).distinct
+    val index = ordered.indexOf(from)
+    (ordered.take(index).reverse ++ ordered.drop(index + 1).reverse).toVector
+  }
+
+  def targets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Vector[Base] = {
+    val confirmed = bases.filter(_.isEnemy)
+    val candidates = if (confirmed.nonEmpty) confirmed else possibleMains.filter(b => !b.owner.isFriendly && !b.scoutedByUs)
+    candidates.sortBy(b => (
+      b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
+  }
 }

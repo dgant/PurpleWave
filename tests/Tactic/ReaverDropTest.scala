@@ -2,6 +2,11 @@ package bwapi {
   // Constructed with Unsafe: observations and commands needed by these tests only.
   class DropTestUnit extends Unit(null, 0, null) {
     var unloaded: Unit = _
+    var queuedScarabs: Int = 0
+    override def getTrainingQueueCount: Int = queuedScarabs
+    override def build(kind: UnitType): Boolean = {
+      if (queuedScarabs >= 5) false else { queuedScarabs += 1; true }
+    }
     override def getRemainingBuildTime: Int = 0
     override def getSpaceRemaining: Int = 8
     override def unload(passenger: Unit): Boolean = { unloaded = passenger; true }
@@ -65,9 +70,10 @@ package Tactic.Missions {
     With.recruiter = new Recruiter
     With.blackboard = allocate(classOf[Blackboard])
     set(With.blackboard, "reaverDropMaxReavers", new Utilities.Property(1))
+    set(With.blackboard, "reaverDropContinuePressure", new Utilities.Property(true))
     With.latency = allocate(classOf[Latency])
     set(With.latency, "_remainingFrames", 1)
-    With.reaction = new ReactionTimes { override def sluggishness: Int = 0 }
+    With.reaction = new ReactionTimes { override def sluggishness: Int = 0; override def agencyMax: Int = 1 }
     With.configuration = new Configuration
     With.logger = new Logger { override def debug(message: String): Unit = {}; override def micro(message: String): Unit = {} }
     With.battles = allocate(classOf[Battles])
@@ -76,7 +82,9 @@ package Tactic.Missions {
     set(With.matchups, "entrants", mutable.HashMap.empty[Information.Battles.Types.Battle, ArrayBuffer[UnitInfo]])
     With.agents = allocate(classOf[Agency])
     set(With.agents, "actionPerformance", mutable.HashMap.empty[String, ActionPerformance])
+    var availableMinerals = 300
     With.self = new PlayerInfo(null) {
+      override def minerals: Int = availableMinerals
       override lazy val isNeutral = false
       override lazy val isAlly = false
       override lazy val isUs = true
@@ -198,13 +206,18 @@ package Tactic.Missions {
     }
     class MissionProbe(val target: Base) extends MissionReaverDrop {
       override protected def requireWorkers: Boolean = false
+      override protected def isScoutingTarget(b: Base): Boolean = false
       override protected def refreshItinerary(): Unit = {}
+      var continuePressure = false
+      override protected def continueItinerary(from: Base): Boolean = continuePressure && super.continueItinerary(from)
+      def continueNow(from: Base): Boolean = continueItinerary(from)
       override protected def populateItinerary(): Unit = { itinerary.clear(); itinerary += target }
       override protected def shouldStopRaiding: Boolean = false
       def recruitNow(): Unit = recruit()
       def combatAction: Action = raidTransportAction
       def commits: Boolean = commitWhileRaiding
       def configure(ts: Seq[FriendlyUnitInfo], ps: Seq[FriendlyUnitInfo]): Unit = {
+        launchFrame = With.frame
         transports ++= ts; passengers ++= ps; itinerary += target
         (ts ++ ps).foreach(_.setSquad(Some(this)))
         set(this, "_unitsNow", ArrayBuffer((ts ++ ps): _*))
@@ -213,6 +226,45 @@ package Tactic.Missions {
     }
     val first = base(5)
     val second = base(110)
+    check("a fresh Reaver queues five Scarabs in one micro update") {
+      val r = unit(Protoss.Reaver)
+      set(r, "_scarabs", 0)
+      Micro.Actions.Protoss.ReloadScarabs(r)
+      assert(r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].queuedScarabs == 5)
+    }
+    check("Scarab queues respect minerals and count completed ammunition") {
+      val r = unit(Protoss.Reaver)
+      set(r, "_scarabs", 0)
+      availableMinerals = 30
+      Micro.Actions.Protoss.ReloadScarabs(r)
+      assert(r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].queuedScarabs == 2)
+      availableMinerals = 300
+      val stocked = unit(Protoss.Reaver)
+      Micro.Actions.Protoss.ReloadScarabs(stocked)
+      assert(stocked.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].queuedScarabs == 2)
+    }
+    check("assembly waits for two completed or queued Scarabs without waiting for completion") {
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(first); m.configure(Vector(t), Vector(r))
+      t.agent.addPassenger(r)
+      r.sleepUntil = With.frame + 10
+      set(r, "_scarabs", 0)
+      set(r, "_trainingQueue", Vector(Protoss.Scarab))
+      perform(m.ActionAssemblePassenger, r)
+      assert(!r.agent.wantsPickup)
+      set(r, "_trainingQueue", Vector(Protoss.Scarab, Protoss.Scarab))
+      perform(m.ActionAssemblePassenger, r)
+      assert(r.agent.wantsPickup)
+    }
+    check("a loaded Reaver with two queued Scarabs stays aboard to finish them in flight") {
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      set(r, "_scarabs", 0)
+      set(r, "_trainingQueue", Vector(Protoss.Scarab, Protoss.Scarab))
+      r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].queuedScarabs = 2
+      load(r, Some(t))
+      Micro.Actions.Protoss.ReloadScarabs(r)
+      assert(!r.agent.wantsUnload && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
+    }
     check("the newly completed second Reaver is recruited before it has Scarabs") {
       val t = unit(Protoss.Shuttle)
       val ready = unit(Protoss.Reaver)
@@ -243,6 +295,66 @@ package Tactic.Missions {
       val ours = base(110); ours.owner = With.self
       val empty = base(80); empty.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
       assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)) == Vector(main, natural))
+    }
+    check("missing scouting selects only unscouted candidate mains, then prefers confirmed bases") {
+      val unknown = base(80); val empty = base(60); val confirmed = base(20)
+      val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
+      unknown.owner = neutral; empty.owner = neutral; empty.lastFrameScoutedByUs = 50
+      assert(MissionReaverDrop.targets(Vector(unknown, empty), Vector(unknown, empty)) == Vector(unknown))
+      assert(MissionReaverDrop.targets(Vector(unknown, empty, confirmed), Vector(unknown)) == Vector(confirmed))
+      val t = unit(Protoss.Shuttle); val rs = Vector.fill(2)(unit(Protoss.Reaver))
+      val m = new MissionProbe(unknown); m.configure(Vector(t), rs); rs.foreach(load(_, Some(t)))
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(unknown)))
+      m.updateState(false)
+      assert(m.state == m.Travelling, "An unconfirmed start is scouted with both Reavers aboard")
+      unknown.owner = enemy
+      m.updateState(false)
+      assert(m.state == m.Landing, "Confirmed ownership releases the actual drop")
+    }
+    check("reverse pressure sweeps back through previous targets with one surviving Reaver") {
+      With.geography.home = Tile(0, 5)
+      val a = base(20); val b = base(50); val c = base(90)
+      assert(MissionReaverDrop.reverseTargets(Vector(a, b, c), c) == Vector(b, a))
+      assert(MissionReaverDrop.reverseTargets(Vector(a, b, c), b) == Vector(a, c))
+      set(With.geography, "_bases", Vector(a, b, c))
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(c) { override protected def targetCleared(base: Base): Boolean = base == c }
+      m.continuePressure = true; m.configure(Vector(t), Vector(r))
+      m.itinerary.clear(); m.appendTargets(Vector(a, b, c))
+      m.itinerary.clear(); m.itinerary += c
+      m.updateState(false); m.state = m.Raiding
+      val previousVicinity = m.vicinity
+      m.run()
+      assert(m.itinerary.toVector == Vector(b, a) && m.state == m.Evacuating)
+      assert(m.vicinity == previousVicinity, "Pickup keeps the current base as its goal")
+      load(r, Some(t)); m.run()
+      assert(m.state == m.Travelling && m.vicinity == b.heart.center)
+      With.blackboard.reaverDropContinuePressure.set(false)
+      assert(!m.continueNow(b))
+      With.blackboard.reaverDropContinuePressure.set(true)
+      set(With.geography, "_bases", Vector(b))
+      assert(!m.continueNow(b))
+      set(With.geography, "_bases", Vector(a, b, c))
+      m.transports.clear()
+      assert(!m.continueNow(b))
+    }
+    check("continued pressure renews the mission and gives the next approach its own clock") {
+      With.geography.home = Tile(0, 5)
+      val a = base(20); val b = base(90)
+      set(With.geography, "_bases", Vector(a, b))
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(b)
+      m.continuePressure = true; m.configure(Vector(t), Vector(r))
+      m.itinerary.clear(); m.appendTargets(Vector(a, b)); m.itinerary.clear(); m.itinerary += b
+      m.updateState(false); m.state = m.Raiding
+      With.frame += Seconds(181)()
+      m.run()
+      assert(m.itinerary.toVector == Vector(a) && m.state == m.Evacuating)
+      load(r, Some(t)); m.run()
+      assert(m.state == m.Travelling && m.vicinity == a.heart.center)
+      With.frame += Seconds(60)()
+      m.run()
+      assert(m.state == m.Travelling, "The original mission age cannot end the renewed approach")
     }
     check("a visible base heart cannot clear workers hidden beyond the approach") {
       val target = base(5)
@@ -347,7 +459,8 @@ package Tactic.Missions {
     check("expiration keeps the mission active through pickup and return") {
       val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
       val m = new MissionProbe(first); m.configure(Vector(t), Vector(r)); m.state = m.Raiding
-      m.launched = true; m.launchFrame = With.frame - Seconds(181)()
+      m.launched = true; m.launchFrame = With.frame
+      With.frame += Seconds(181)()
       m.run()
       assert(m.launched && m.state == m.Evacuating)
       assert(t.intent.action == m.ActionEvacuateTransport && r.intent.action == m.ActionEvacuatePassenger)
@@ -514,6 +627,26 @@ package Tactic.Missions {
           assert(!crossed.visibleToEnemy)
         }
       }
+    }
+    check("new vision at the destination cannot turn the final approach away from the base") {
+      world(128)
+      val target = new Base("enemy main", Tile(121, 8), Set(Tile(121, 8)))
+      target.owner = enemy
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(target)))
+      val route = new DropRoute
+      val from = Tile(94, 2)
+      route.next(from, target.heart)
+      With.grids.enemyVision.tiles.foreach(t => t.maxDepth =
+        if (t.tile.tileDistanceSquared(Tile(103, 6)) <= 100 || t.tile.tileDistanceSquared(target.heart) <= 144) 5 else 0)
+      val approach = route.next(from, target.heart).get
+      assert(approach.length <= 30, s"Unnecessary destination-vision detour: ${approach.length} tiles")
+      assert(route.waypoint(from.center, approach) == target.heart.center)
+      With.grids.enemyRangeAir.tiles.foreach(t => t.maxDepth = if (t.tile.tileDistanceSquared(Tile(107, 5)) <= 16) 5 else 0)
+      val defended = route.next(from, target.heart).get
+      assert(defended.tiles.get.forall(t => With.grids.enemyRangeAir.get(t) == 0), "Final approach must still avoid anti-air")
+      With.grids.enemyVision.tiles.foreach(_.maxDepth = 0)
+      val unseen = new DropRoute().next(from, target.heart).get
+      assert(defended.tiles == unseen.tiles, "Destination vision must not lengthen an anti-air detour")
     }
     check("a motionless route fails closed and eventually reports a stall") {
       world(128)

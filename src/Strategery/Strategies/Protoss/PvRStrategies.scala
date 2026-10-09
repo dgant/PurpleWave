@@ -48,3 +48,8 @@ object PvRGFEComplete extends PvRStrategy {
   override def gameplan: Option[Plan] = Some(new PvRGFEComplete())
   banPersonality(PersonalityCheese)
 }
+
+
+object PvRReaver extends PvRStrategy {
+  override def gameplan: Option[Plan] = Some(new Gameplans.Protoss.PvR.PvRReaver)
+}

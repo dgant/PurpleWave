@@ -34,6 +34,10 @@ object ShuttleAdoptPassenger extends Action {
   protected def shouldAdopt(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Boolean = (
     // Can we adopt this passenger?
     shuttle.canTransport(passenger)
+      && shuttle.squad.forall {
+        case drop: Tactic.Missions.MissionDrop => drop.assignedTransport(passenger).contains(shuttle)
+        case _ => true
+      }
       && passenger.transport.isEmpty
       && passenger.agent.ride.forall(shuttle==)
       && passenger.unitClass.spaceRequired + shuttle.agent.passengerSize <= shuttle.unitClass.spaceProvided

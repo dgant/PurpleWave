@@ -95,6 +95,10 @@ trait MacroCounting {
     With.units.countEverOurs(_.isAny(matchers: _*))
   }
 
+  def unitsEverComplete(matchers: UnitFilter*): Int = {
+    With.units.countEverOurs(u => u.isAny(matchers: _*) && u.complete)
+  }
+
   def existsEver(matchers: UnitFilter*): Boolean = {
     matchers.exists(unitsEver(_) > 0)
   }

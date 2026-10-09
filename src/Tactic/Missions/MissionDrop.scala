@@ -1,8 +1,6 @@
 package Tactic.Missions
 
 import Debugging.SimpleString
-import Information.Geography.Pathfinding.Types.TilePath
-import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
@@ -39,26 +37,36 @@ abstract class MissionDrop extends Mission {
   protected def requireWorkers                            : Boolean = false
   protected def shouldStopRaiding                         : Boolean = false
   protected def shouldGoHome                              : Boolean = false
-  protected def recruitable(unit: UnitInfo)               : Boolean = unit.complete && ! unit.team.exists(_.engagedUpon)
-  protected def recruitablePassenger(unit: UnitInfo)      : Boolean = recruitable(unit) && Maff.orElse(transportLock.units, With.units.ours.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640)
+  protected def recruited(unit: UnitInfo)                 : Boolean = With.recruiter.lockedBy(this).exists(_ == unit)
+  protected def recruitable(unit: UnitInfo)               : Boolean = unit.complete && (recruited(unit) || ! unit.team.exists(_.engagedUpon))
+  protected def recruitablePassenger(unit: UnitInfo)      : Boolean = recruitable(unit) && (recruited(unit) || Maff.orElse(transportLock.units, With.recruiter.available.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640))
+  protected def raidTransportAction: Action = ActionRaidTransport
+  protected def commitWhileRaiding: Boolean = true
   protected val transportLock: LockUnits = new LockUnits(this, u => u.isTransport && recruitable(u)).setCounter(CountOne).setInterruptible(false)
 
   val itinerary                             = new mutable.Queue[Base]
   val transports                            = new ArrayBuffer[FriendlyUnitInfo]
   val passengers                            = new ArrayBuffer[FriendlyUnitInfo]
   var state             : DropState         = Assembling
-  var path              : Option[TilePath]  = None
-  var pathItineraryBase : Base              = _
-  var pathValues        : Array[PathValues] = Array.fill(256)(PathValues())
+  protected var manifest: DropManifest.Manifest = Map.empty
+  private val routes = mutable.Map.empty[FriendlyUnitInfo, DropRoute]
+  private val initiallyLanded = mutable.Set.empty[FriendlyUnitInfo]
+  private var destinationBase: Option[Base] = None
+  private var returningHome = false
 
-  case class PathValues(enemyRange: Int = 0, enemyVision: Boolean = false)
+  final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] = manifest.get(passenger)
+  private def passengersFor(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = passengers.filter(p => manifest.get(p).contains(transport))
 
   override def reset(): Unit = {
     itinerary.clear()
     transports.clear()
     passengers.clear()
     state = Assembling
-    path = None
+    manifest = Map.empty
+    routes.clear()
+    initiallyLanded.clear()
+    destinationBase = None
+    returningHome = false
   }
 
   final override protected def shouldForm: Boolean = {
@@ -117,7 +125,7 @@ abstract class MissionDrop extends Mission {
       else Math.min(b.heart.groundTiles(With.scouting.enemyMuscleOrigin), 10 * b.heart.tileDistanceFast(With.scouting.enemyMuscleOrigin))).get
     val itineraries = Vector(
         With.geography.itineraryCounterwise(With.geography.ourMain, targetBase),
-        With.geography.itineraryClockwise(targetBase, With.geography.ourMain))
+        With.geography.itineraryClockwise(With.geography.ourMain, targetBase))
       .sortBy(_.size)
       .sortBy(_.count(_.owner.isEnemy))
     itinerary.clear()
@@ -126,48 +134,30 @@ abstract class MissionDrop extends Mission {
   }
 
   private def allAboard: Boolean = passengers.forall(_.transport.exists(transports.contains))
-  private def allLanded: Boolean = passengers.forall( ! _.loaded)
+  private def allLanded: Boolean = passengers.forall(initiallyLanded.contains)
   private def allHome: Boolean = units.forall(_.base.exists(_.owner.isUs))
   final override def run(): Unit = {
     transports --= transports.filterNot(u => u.alive && u.squad.contains(this))
     passengers --= passengers.filterNot(u => u.alive && u.squad.contains(this))
-    if (duration > Seconds(45)() && state != Raiding && state != Evacuating) { terminate("Expired (not raiding)"); return }
-    if (duration > Seconds(90)()) { terminate("Expired"); return }
     if (passengers.isEmpty) { terminate("No passengers left"); return }
-    lazy val interruptedPassengers = passengers.filterNot(recruitablePassenger)
-    if (state == Assembling && interruptedPassengers.nonEmpty) { terminate(f"Assembly interrupted: $interruptedPassengers"); return }
     if (transports.isEmpty) {
       if (Seq(Raiding, Evacuating).contains(state)) { passengers.filter(_.base.exists(_.owner.isEnemy)).foreach(_.agent.commit = true) } // Godspeed you poor souls
       terminate("No transports left"); return
     }
+    updateManifest()
+    if (passengers.isEmpty) { terminate("No transportable passengers left"); return }
     while (itinerary.headOption.exists(skipBase)) {
       With.logger.debug(f"$this: Removing ${itinerary.head} from itinerary. Next base: ${itinerary.drop(1).headOption}")
       itinerary.dequeue()
     }
-    if (itinerary.isEmpty) { terminate("Empty itinerary"); return }
-    val base = itinerary.head
-    vicinity =
-      if (base.owner.isEnemy) base.heart.center
-      else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, Maff.max(transports.view.map(_.sightPixels)).getOrElse(0).toDouble)
-      else base.heart.center
-
-    if (shouldGoHome) {
-      state match {
-        case Assembling | Travelling | Landing => transition(Escaping)
-        case Raiding => transition(Evacuating)
-        case _ =>
-      }
-    }
-    if (state == Assembling && allAboard)                                                                 { transition(Travelling)  }
-    if (state == Travelling && ! allAboard)                                                               { transition(Assembling)  } // Can happen if passenger is in process of dropping out
-    if (state == Travelling && transports.exists(_.base.exists(vicinity.base.contains)))                  { transition(Landing)     }
-    if (state == Landing    && allLanded)                                                                 { transition(Raiding)     }
-    if (Seq(Travelling, Landing, Raiding).contains(state) && ! vicinity.base.exists(itinerary.contains))  { transition(Evacuating)  }
-    if (state == Evacuating && allAboard)                                                                 { transition(if (itinerary.isEmpty) Escaping else Travelling) }
-    if (state == Escaping   && allHome)                                                                   { terminate("Escaped!"); return }
+    val expired = duration > Seconds(90)() || (duration > Seconds(45)() && state != Raiding && state != Evacuating)
+    updateState(shouldGoHome || expired)
+    if (state == Escaping && allHome) { terminate("Escaped!"); return }
     transports.foreach(t => {
-      t.agent.removeAllPassengers()
-      passengers.foreach(t.agent.addPassenger)
+      t.agent.passengers.filterNot(p => manifest.get(p).contains(t)).foreach(t.agent.removePassenger)
+    })
+    manifest.foreach { case (p, t) => if (!p.agent.ride.contains(t)) t.agent.addPassenger(p) }
+    transports.foreach(t => {
       t.loadedUnits.view.filterNot(passengers.contains).foreach(p => {
         With.logger.micro(f"Drop transport $t ditching rider $p")
         Commander.unload(t, p)
@@ -182,6 +172,64 @@ abstract class MissionDrop extends Mission {
       case Escaping   => escape()
     }
   }
+  private def updateManifest(): Unit = {
+    manifest = DropManifest.fill(transports, passengers, manifest)
+    val stranded = passengers.filterNot(manifest.contains).toSet
+    if (stranded.nonEmpty) {
+      // Losing capacity must not leave evacuation waiting forever for an impossible load.
+      With.recruiter.locksOf(this).toVector.foreach(lock => {
+        val retained = lock.units.filterNot(stranded).toVector
+        if (retained.size != lock.units.size) {
+          lock.release()
+          With.recruiter.lockTo(lock, retained)
+        }
+      })
+      stranded.foreach(p => {
+        p.agent.ride.foreach(_.agent.removePassenger(p))
+        p.agent.commit = false
+        p.intend(this).setAction(Idle)
+      })
+      passengers --= stranded
+    }
+    routes.keys.filterNot(transports.contains).toVector.foreach(routes.remove)
+  }
+
+  private def beginDestination(): Unit = {
+    destinationBase = itinerary.headOption
+    initiallyLanded.clear()
+    routes.clear()
+    destinationBase.foreach(base => {
+      vicinity =
+        if (base.owner.isEnemy) base.heart.center
+        else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, Maff.max(transports.view.map(_.sightPixels)).getOrElse(0).toDouble)
+        else base.heart.center
+    })
+  }
+
+  private[Missions] def updateState(goHome: Boolean): Unit = {
+    returningHome ||= goHome || itinerary.isEmpty
+    if (destinationBase.isEmpty && !returningHome) beginDestination()
+    // Keep the old vicinity throughout pickup; a new destination never orders
+    // grounded passengers to walk away from the Shuttle collecting them.
+    if (returningHome || destinationBase != itinerary.headOption) {
+      if (state != Evacuating && state != Escaping) transition(Evacuating)
+    }
+    if (state == Assembling && allAboard) transition(Travelling)
+    if (state == Travelling && !allAboard) transition(Evacuating)
+    if (state == Travelling && transports.exists(_.base.exists(destinationBase.contains))) transition(Landing)
+    if (state == Landing) {
+      initiallyLanded ++= passengers.filterNot(_.loaded)
+      if (allLanded) transition(Raiding)
+    }
+    if (state == Escaping && !allAboard) transition(Evacuating)
+    if (state == Evacuating && allAboard) {
+      if (returningHome) transition(Escaping) else {
+        beginDestination()
+        transition(Travelling)
+      }
+    }
+  }
+
   private def assemble(): Unit = {
     transports.foreach(_.intend(this).setAction(ActionAssembleTransport))
     passengers.foreach(_.intend(this).setAction(ActionAssemblePassenger))
@@ -191,14 +239,17 @@ abstract class MissionDrop extends Mission {
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
   private def land(): Unit = {
+    SquadAutomation.targetRaid(this)
+    passengers.foreach(_.agent.commit = commitWhileRaiding)
+    passengers.foreach(_.intend(this).setTerminus(vicinity))
     transports.foreach(_.intend(this).setAction(ActionLandTransport))
     passengers.foreach(_.intend(this).setAction(ActionLandPassenger))
   }
   protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
-    transports.foreach(_.intend(this).setAction(ActionRaidTransport))
-    passengers.foreach(_.intend(this).setTerminus(vicinity))
-    passengers.foreach(_.agent.commit = true)
+    transports.foreach(_.intend(this).setAction(raidTransportAction))
+    passengers.foreach(_.intend(this).setAction(Idle).setTerminus(vicinity))
+    passengers.foreach(_.agent.commit = commitWhileRaiding)
   }
   private def evacuate(): Unit = {
     passengers.foreach(_.agent.commit = false)
@@ -211,41 +262,11 @@ abstract class MissionDrop extends Mission {
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
 
-  private def createPath(transport: FriendlyUnitInfo): Unit = {
-    val mapEdgeMarginTiles = Math.min(With.mapPixelWidth, With.mapPixelHeight) - Math.max(3, Seq(
-      vicinity.tile.x,
-      vicinity.tile.y,
-      With.mapTileWidth - vicinity.tile.x,
-      With.mapTileHeight - vicinity.tile.y).min)
-    val profile = new PathfindProfile(transport.tile)
-    profile.end                 = Some(vicinity.tile)
-    profile.costEnemyVision     = 2.5 // Maybe ideally ~5 but this decreases likelihood of failing to find a path within maximum pathfind lengths
-    profile.costRepulsion       = 5.0 // 25
-    profile.costThreat          = 10.0 //125
-    profile.canCrossUnwalkable  = Some(true)
-    profile.canEndUnwalkable    = Some(true)
-    profile.endDistanceMaximum  = Math.max(0, 32 * 7 - 2 * transport.pixelDistanceCenter(vicinity)) / 32.0
-    profile.repulsors           = Vector(PathfindRepulsor(Points.middle, 1.0, 32 * mapEdgeMarginTiles))
-    profile.debug               = true
-    path = Some(profile.find)
-    pathItineraryBase = itinerary.headOption.orNull
-    if (path.get.pathExists) {
-      var i = 0
-      while (i < Math.min(pathValues.length, path.get.tiles.get.length)) {
-        val tile = path.get.tiles.get(i)
-        pathValues(i) = PathValues(enemyRange = tile.enemyRange, enemyVision = tile.visibleToEnemy)
-        i += 1
-      }
-    }
-  }
-
   object ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      passengers.foreach(transport.agent.addPassenger)
-      val unloaded = passengers.filterNot(_.loaded)
+      val unloaded = passengersFor(transport).filterNot(_.loaded)
       if (unloaded.isEmpty) {
-        transport.agent.decision.set(vicinity)
-        Idle.delegate(transport)
+        Commander.hold(transport)
       } else {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
         if (transport.matchups.withinSafetyMargin) {
@@ -266,9 +287,9 @@ abstract class MissionDrop extends Mission {
 
   object ActionAssemblePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
+      if (passenger.loaded) return
       passenger.agent.redoubt.set(
-        passenger.agent.decision.set(
-          Maff.minBy(transports.view.map(_.pixel))(passenger.pixelDistanceSquared)))
+        passenger.agent.decision.set(assignedTransport(passenger).map(_.pixel)))
       ReloadScarabs.delegate(passenger)
       Potshot.delegate(passenger)
       Retreat.delegate(passenger)
@@ -277,43 +298,40 @@ abstract class MissionDrop extends Mission {
 
   object ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      lazy val pathValueChanged = pathValues.indices.take(path.get.length).find(i =>
-            path.get.tiles.get(i).enemyRange != pathValues(i).enemyRange
-        ||  path.get.tiles.get(i).visibleToEnemy != pathValues(i).enemyVision)
-      var shouldCreatePath = false
-      if (path.forall( ! _.pathExists)) {
-        With.logger.debug(f"${this}: Calculating a path because none exists.")
-        shouldCreatePath = true
-      } else if (pathItineraryBase != itinerary.headOption.orNull) {
-        With.logger.debug(f"${this}: Calculating a path because we are going to ${itinerary.headOption.orNull} instead of $pathItineraryBase.")
-        shouldCreatePath = true
-      } else if (pathValueChanged.isDefined) {
-        val i = pathValueChanged.get
-        With.logger.debug(f"${this}: Calculating a path because step #$i changed from ${pathValues(i)} to (${pathValues(i).enemyRange}, ${pathValues(i).enemyVision})")
-        shouldCreatePath = true
-      }
-      if (shouldCreatePath) {
-        createPath(transport)
-      }
-      if (path.exists(_.pathExists)) {
-        With.logger.debug(f"$this: Following path from ${path.get.start} to ${path.get.end} via ${path.get.tiles.get.drop(1).headOption.getOrElse(path.get.end)}")
-        MicroPathing.tryMovingAlongTilePath(transport, path.get)
-      } else {
-        With.logger.debug(f"$this: No path available to $vicinity")
-        transport.agent.redoubt.set(vicinity)
-        transport.agent.decision.set(vicinity)
-        if (transport.matchups.pixelsEntangled > -64) {
-          Retreat.delegate(transport)
-        }
-        Commander.move(transport)
-      }
+      followRoute(transport, vicinity.tile)
+    }
+  }
+
+  private def followRoute(transport: FriendlyUnitInfo, destination: Mathematics.Points.Tile): Unit = {
+    val route = routes.getOrElseUpdate(transport, new DropRoute)
+    route.next(transport.tile, destination) match {
+      case Some(path) =>
+        MicroPathing.getWaypointAlongTilePath(transport, path).foreach(waypoint => {
+          transport.agent.decision.set(waypoint)
+          // A loaded Shuttle normally overshoots short moves by nine tiles,
+          // which can cut straight through the threat the path goes around.
+          Commander.move(transport, allowOvershoot = false)
+        })
+      case None =>
+        if (route.stalled) returningHome = true
+        transport.agent.redoubt.set(transport.agent.defaultHome)
+        Retreat.delegate(transport)
+        Commander.hold(transport)
     }
   }
 
   object ActionLandTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      val runway = itinerary.headOption.map(_.heart.center).getOrElse(vicinity)
-      val droppables = transport.loadedUnits
+      if (passengersFor(transport).forall(initiallyLanded.contains)) {
+        raidTransportAction.delegate(transport)
+        return
+      }
+      if (!transport.base.exists(destinationBase.contains)) {
+        ActionTravelTransport.delegate(transport)
+        return
+      }
+      val runway = destinationBase.map(_.heart.center).getOrElse(vicinity)
+      val droppables = transport.loadedUnits.filterNot(initiallyLanded.contains)
         .filter(passenger =>
           transport.doomedInFrames < transport.framesToTravelTo(runway) + Seconds(3)()
           || passenger.pixelDistanceCenter(runway) <= Math.max(64, passenger.effectiveRangePixels - 96)
@@ -328,14 +346,15 @@ abstract class MissionDrop extends Mission {
 
   object ActionLandPassenger extends Action {
     override protected def perform(unit: FriendlyUnitInfo): Unit = {
-      if ( ! unit.loaded) Idle.delegate(unit)
+      if (!unit.loaded || initiallyLanded(unit)) Idle.delegate(unit)
     }
   }
 
   object ActionRaidTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      if (passengers.isEmpty) ActionEscapeTransport.delegate(transport) else {
-        transport.agent.decision.set(Maff.centroid(Maff.orElse(passengers.view.filterNot(_.loaded), passengers.view).map(_.pixel)))
+      val crew = passengersFor(transport)
+      if (crew.isEmpty) Commander.hold(transport) else {
+        transport.agent.decision.set(Maff.centroid(Maff.orElse(crew.view.filterNot(_.loaded), crew.view).map(_.pixel)))
         Commander.move(transport)
       }
     }
@@ -343,8 +362,8 @@ abstract class MissionDrop extends Mission {
 
   object ActionEvacuateTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      val unloaded = passengers.filterNot(_.loaded)
-      if (unloaded.isEmpty) ActionEscapeTransport.delegate(transport) else {
+      val unloaded = passengersFor(transport).filterNot(_.loaded)
+      if (unloaded.isEmpty) Commander.hold(transport) else {
         Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(Maff.centroid(unloaded.view.map(_.pixel)))))
       }
     }
@@ -352,21 +371,14 @@ abstract class MissionDrop extends Mission {
 
   object ActionEvacuatePassenger extends Action {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
-      if (transports.isEmpty) {
-        passenger.agent.commit = true
-        Idle.delegate(passenger)
-      } else {
-        ReloadScarabs.delegate(passenger)
-        Commander.rightClick(passenger, transports.minBy(_.pixelDistanceSquared(passenger)))
-      }
+      if (passenger.loaded) return
+      assignedTransport(passenger).foreach(Commander.rightClick(passenger, _))
     }
   }
 
   object ActionEscapeTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      transport.agent.decision.set(transport.agent.defaultHome)
-      Retreat.delegate(transport)
-      Commander.move(transport)
+      followRoute(transport, transport.agent.defaultHome.tile)
     }
   }
 }

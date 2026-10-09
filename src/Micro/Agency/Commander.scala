@@ -166,11 +166,12 @@ object Commander {
   /**
     * Adjust the unit's destination to ensure successful execution of the move.
     */
-  def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
+  def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = adjustDestination(unit, argTo, allowOvershoot = true)
+  private def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel, allowOvershoot: Boolean): Pixel = {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
-    if (With.reaction.sluggishness == 0 && (unit.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen) || unit.loadedUnits.nonEmpty)) {
+    if (allowOvershoot && With.reaction.sluggishness == 0 && (unit.isAny(Terran.ScienceVessel, Protoss.Observer, Zerg.Mutalisk, Zerg.Overlord, Zerg.Queen) || unit.loadedUnits.nonEmpty)) {
       val overshootDistance = ?(unit.airborne, 288.0, 8)
       if (to == unit.pixel) {
         val signX = Maff.signum11(Points.middle.x - to.x)
@@ -253,10 +254,12 @@ object Commander {
   }
 
   def move(unit: FriendlyUnitInfo): Unit = move(unit, unit.agent.destinationNext())
-  private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
-    val to = adjustDestination(unit, destination)
+  def move(unit: FriendlyUnitInfo, allowOvershoot: Boolean): Unit = move(unit, unit.agent.destinationNext(), allowOvershoot)
+  private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = move(unit, destination, allowOvershoot = true)
+  private def move(unit: FriendlyUnitInfo, destination: Pixel, allowOvershoot: Boolean): Unit = {
+    val to = adjustDestination(unit, destination, allowOvershoot)
     unit.agent.setRideGoal(to)
-    leadFollower(unit, move(_, to))
+    leadFollower(unit, move(_, to, allowOvershoot))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(to) > tryingToMoveThreshold
     if (unit.unready) return
     if (autoUnburrow(unit)) return

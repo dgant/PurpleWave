@@ -2,19 +2,20 @@ package Tactic.Missions
 
 import Lifecycle.With
 import Macro.Facts.MacroFacts
-import Mathematics.Maff
 import Planning.ResourceLocks.LockUnits
-import Utilities.UnitCounters.{CountOne, CountUpTo}
-import Utilities.UnitFilters._
-import Utilities.UnitPreferences.PreferClose
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import Utilities.?
 import Utilities.Time.{Minutes, Seconds}
+import Utilities.UnitCounters.{CountOne, CountUpTo}
+import Utilities.UnitFilters._
 
 class MissionReaverDrop extends MissionDrop {
 
+  override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
+  override protected def commitWhileRaiding: Boolean = false
+
   override protected def additionalFormationConditions: Boolean = (
-    false // Until we can make these more effective and less suicidal
+    With.blackboard.reaverDrop()
     && With.recruiter.available.exists(reaverLock.matcher)
     && (
       With.enemies.forall(_.isTerran)
@@ -34,36 +35,36 @@ class MissionReaverDrop extends MissionDrop {
     .filter(Protoss.Reaver)
     .forall(reaver =>
       reaver.doomed
-      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.battle.exists(_.judgement.exists( ! _.shouldFightGround)))
+      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.battle.exists(_.judgement.exists(_.shouldFightGround)))
       || itinerary.headOption.exists(_.enemies.filter(IsWarrior).filter(_.canAttackGround).map(_.subjectiveValue).sum
         * ?(reaver.matchups.targetsInRange.count(IsWorker) > 2, 1, 2)
         >= passengers.view.map(_.subjectiveValue).sum))
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
-  val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u)                            && recruitablePassenger(u))
+  val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u) && recruitablePassenger(u) && (recruited(u) || u.scarabs + u.trainingQueue.size >= 3))
   val smallLock   : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(u)).setCounter(CountUpTo(2))
   val bigLock     : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Archon, Protoss.Dragoon)     && recruitablePassenger(u)).setCounter(CountOne)
 
   override protected def recruit(): Unit = {
     populateItinerary()
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
-    transportLock.setPreference(PreferClose(vicinity)).acquire()
-    if (transportLock.units.isEmpty) { terminate("No transports available"); return }
+    val available = With.recruiter.available.toVector
+    val shuttles = available.filter(u => Protoss.Shuttle(u) && transportLock.matcher(u)).sortBy(u => (u.pixelDistanceSquared(vicinity), u.id))
+    val reavers = DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
+    if (reavers.isEmpty) { terminate("No transportable reavers available"); return }
+    val selectedTransports = shuttles.filter(reavers.values.toSet)
+    val filler = available.filter(smallLock.matcher) ++ available.filter(bigLock.matcher)
+    manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)
 
-    val transportPixel = transportLock.units.head.pixel
-    reaverLock.setPreference(PreferClose(transportPixel))
-    smallLock .setPreference(PreferClose(transportPixel))
-    bigLock   .setPreference(PreferClose(transportPixel))
-
-    reaverLock.counter = CountUpTo(Maff.clamp(MacroFacts.unitsComplete(Protoss.Reaver) - 1, 1, 2))
-    reaverLock.acquire()
-    if (reaverLock.units.isEmpty) { terminate("No reavers available"); return }
-    if (reaverLock.units.size < 2 && smallLock.acquire().isEmpty) {
-      bigLock.acquire()
+    def reserve(lock: LockUnits, units: Iterable[ProxyBwapi.UnitInfo.FriendlyUnitInfo]): Unit = {
+      lock.setCounter(CountUpTo(units.size))
+      With.recruiter.lockTo(lock, units)
     }
-    transports ++= transportLock.units
-    passengers ++= reaverLock.units
-    passengers ++= smallLock.units
-    passengers ++= bigLock.units
+    reserve(transportLock, selectedTransports)
+    reserve(reaverLock, manifest.keys.filter(Protoss.Reaver))
+    reserve(smallLock, manifest.keys.filter(u => u.isAny(Protoss.Zealot, Protoss.DarkTemplar)))
+    reserve(bigLock, manifest.keys.filter(u => u.isAny(Protoss.Archon, Protoss.Dragoon)))
+    transports ++= selectedTransports
+    passengers ++= manifest.keys.toVector.sortBy(_.id)
   }
 }

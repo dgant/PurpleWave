@@ -198,6 +198,7 @@ package Tactic.Missions {
     }
     class MissionProbe(val target: Base) extends MissionReaverDrop {
       override protected def requireWorkers: Boolean = false
+      override protected def refreshItinerary(): Unit = {}
       override protected def populateItinerary(): Unit = { itinerary.clear(); itinerary += target }
       override protected def shouldStopRaiding: Boolean = false
       def recruitNow(): Unit = recruit()
@@ -242,6 +243,22 @@ package Tactic.Missions {
       val ours = base(110); ours.owner = With.self
       val empty = base(80); empty.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
       assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)) == Vector(main, natural))
+    }
+    check("newly discovered enemy bases extend the raid without revisiting cleared targets") {
+      val main = base(5); val expansion = base(16)
+      val m = new MissionProbe(main)
+      m.appendTargets(Vector(main))
+      m.appendTargets(Vector(main, expansion))
+      assert(m.itinerary.toVector == Vector(main, expansion))
+      m.itinerary.dequeue()
+      m.appendTargets(Vector(main, expansion))
+      assert(m.itinerary.toVector == Vector(expansion))
+      m.itinerary.dequeue()
+      m.appendTargets(Vector(main, expansion))
+      assert(m.itinerary.isEmpty)
+      m.reset()
+      m.appendTargets(Vector(main))
+      assert(m.itinerary.toVector == Vector(main))
     }
     check("the drop build can refuse an unowned natural until expansion is underway") {
       set(With.blackboard, "takeUnownedBases", new Utilities.Property(false))

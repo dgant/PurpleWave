@@ -11,6 +11,16 @@ import Utilities.UnitFilters._
 
 class MissionReaverDrop extends MissionDrop {
 
+  private val plannedTargets = scala.collection.mutable.Set.empty[Base]
+  override def reset(): Unit = { super.reset(); plannedTargets.clear() }
+  override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases)
+  private[Missions] def appendTargets(bases: Seq[Base]): Unit = {
+    plannedTargets ++= itinerary
+    val discovered = MissionReaverDrop.targets(bases).filterNot(plannedTargets)
+    itinerary ++= discovered
+    plannedTargets ++= discovered
+  }
+
   override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
   override protected def commitWhileRaiding: Boolean = false
   override protected def requireWorkers: Boolean = true
@@ -24,9 +34,10 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def populateItinerary(): Unit = {
     itinerary.clear()
+    plannedTargets.clear()
     // A combat drop needs an occupied target, including the main and natural.
     // Empty expansion scouting must not consume the opening Reaver pair.
-    itinerary ++= MissionReaverDrop.targets(With.geography.bases)
+    appendTargets(With.geography.bases)
     With.logger.debug(s"$this target: ${itinerary.headOption.map(_.heart)}")
   }
 

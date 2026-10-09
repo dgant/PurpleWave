@@ -9,7 +9,6 @@ import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Protoss.ReloadScarabs
-import Micro.Actions.Protoss.Shuttle.Shuttling
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Planning.ResourceLocks.LockUnits
@@ -34,6 +33,7 @@ abstract class MissionDrop extends Mission {
   protected def additionalFormationConditions             : Boolean
   protected def additionalItineraryConditions(base: Base) : Boolean = true
   protected def requireWorkers                            : Boolean = false
+  protected def refreshItinerary(): Unit = {}
   protected def targetCleared(base: Base): Boolean = requireWorkers && base.heart.visible && base.units.forall(u => !u.isEnemy || !IsWorker(u))
   protected def shouldStopRaiding                         : Boolean = false
   protected def shouldGoHome                              : Boolean = false
@@ -148,6 +148,7 @@ abstract class MissionDrop extends Mission {
     }
     updateManifest()
     if (passengers.isEmpty) { terminate("No transportable passengers left"); return }
+    refreshItinerary()
     while (itinerary.headOption.exists(skipBase)) {
       With.logger.debug(f"$this: Leaving target ${itinerary.head.heart}. Next target: ${itinerary.drop(1).headOption.map(_.heart)}")
       itinerary.dequeue()
@@ -274,13 +275,8 @@ abstract class MissionDrop extends Mission {
         val centroid = Maff.centroid(unloaded.view.map(_.pixel))
         if (transport.matchups.withinSafetyMargin) {
           val toPickup = unloaded.minBy(_.pixelDistanceSquared(centroid))
-          if (transport.pixelDistanceCenter(toPickup) < Shuttling.pickupRadiusEdge) {
-            Commander.rightClick(transport, toPickup)
-          } else {
-            // Let Commander overshoot the Shuttle to keep it moving
-            transport.agent.decision.set(toPickup.pixel)
-            Commander.move(transport)
-          }
+          transport.agent.decision.set(toPickup.pixel)
+          Commander.rightClick(transport, toPickup)
         } else {
           Retreat.delegate(transport)
         }

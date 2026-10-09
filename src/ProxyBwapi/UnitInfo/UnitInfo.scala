@@ -318,7 +318,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.
   // Frame X-1-L: Unit's cooldown is L+1. Send attack order.
-  @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.remainingFrames - With.reaction.agencyMin
+  // Allow time to face the target; this is command lead time, not a shorter weapon cooldown.
+  @inline final def framesToBeReadyForAttackOrder: Int = cooldownLeft - With.latency.remainingFrames - With.reaction.agencyMin - ?(unitClass.turnsToShoot, unitClass.framesToTurn180, 0)
   @inline final def hasActiveScarab: Boolean = Protoss.Reaver(this) && With.units.scarabs.launchedBy(this).isDefined
   @inline final def readyForAttackOrder: Boolean = canAttack && framesToBeReadyForAttackOrder <= 0 && ! hasActiveScarab
   @inline final def framesToFace(target: UnitInfo): Int = framesToFace(target.pixel)

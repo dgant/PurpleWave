@@ -68,6 +68,21 @@ object ReaverMicroTest extends App {
     assert(unit(2, Protoss.Dragoon, 100).readyForAttackOrder)
     assert(!unit(3, Protoss.Reaver, 100, 30).readyForAttackOrder)
   }
+  check("attack orders include latency, reaction and a conservative firing turn") {
+    set(With.latency, "_remainingFrames", 3)
+    With.reaction = new ReactionTimes { override def agencyMin: Int = 2 }
+    assert(Protoss.Reaver.framesToTurn180 == 7)
+    assert(unit(20, Protoss.Reaver, 100, 12).readyForAttackOrder)
+    assert(!unit(21, Protoss.Reaver, 100, 13).readyForAttackOrder)
+    assert(unit(22, Protoss.Dragoon, 100, 5).readyForAttackOrder)
+    assert(!unit(23, Protoss.Dragoon, 100, 6).readyForAttackOrder)
+    set(With.latency, "_remainingFrames", 0)
+    With.reaction = new ReactionTimes { override def agencyMin: Int = 0 }
+  }
+  check("units with independent turrets do not wait for a body turn") {
+    assert(ProxyBwapi.Races.Terran.Goliath.framesToTurn180 > 0)
+    assert(!unit(24, ProxyBwapi.Races.Terran.Goliath, 100, 1).readyForAttackOrder)
+  }
   check("a landing cooldown cannot claim a nearby Scarab") {
     val tracker = new ScarabTracker
     val reaver = unit(1, Protoss.Reaver, 100, 30)

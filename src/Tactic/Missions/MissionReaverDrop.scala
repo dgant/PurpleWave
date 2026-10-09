@@ -2,17 +2,24 @@ package Tactic.Missions
 
 import Information.Geography.Types.Base
 import Lifecycle.With
+import Mathematics.Maff
+import Mathematics.Points.Pixel
+import Mathematics.Shapes.Spiral
+import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
-import Utilities.?
-import Utilities.Time.Minutes
+import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters._
 
 class MissionReaverDrop extends MissionDrop {
 
   private val plannedTargets = scala.collection.mutable.ArrayBuffer.empty[Base]
-  override def reset(): Unit = { super.reset(); plannedTargets.clear() }
+  private case class RaidProgress(var frame: Int, var distance: Double, var landed: Set[Int], var shot: Int)
+  private val combatProgress = scala.collection.mutable.Map.empty[FriendlyUnitInfo, RaidProgress]
+  private val landingPoints = scala.collection.mutable.Map.empty[FriendlyUnitInfo, Pixel]
+  override def reset(): Unit = { super.reset(); plannedTargets.clear(); onDestinationChanged() }
+  override protected def onDestinationChanged(): Unit = { combatProgress.clear(); landingPoints.clear() }
   override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
   private[Missions] def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
     plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
@@ -55,6 +62,58 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
   override protected def commitWhileRaiding: Boolean = false
+  override protected def defaultCombatLanding: Boolean = true
+  override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
+
+  private def workers = destinationBase.toVector.flatMap(_.enemies).filter(u => IsWorker(u) && u.visible)
+  private def firingPosition(reaver: FriendlyUnitInfo, at: Pixel): Boolean = at.valid && at.tile.walkable &&
+    workers.exists(w => reaver.inRangeToAttackFrom(w, at) && reaver.hasScarabPathTo(w, at))
+
+  override protected def landingGoal(transport: FriendlyUnitInfo): Pixel = landingPoints.synchronized {
+    val reavers = passengersFor(transport).filter(Protoss.Reaver)
+    val cached = landingPoints.get(transport).filter(p => reavers.exists(firingPosition(_, p)))
+    cached.getOrElse {
+      val candidates = workers.flatMap(w => reavers.flatMap(r => {
+        val near = w.pixel.projectUpTo(transport.pixel, Math.max(64, r.pixelRangeAgainst(w) - 48)).tile
+        Spiral(3).map(near.add).filter(_.valid).map(_.center).filter(firingPosition(r, _))
+      })).distinct
+      val goal = Maff.minBy(candidates)(p => (
+        With.grids.enemyRangeAir.get(p.tile), transport.pixelDistanceSquared(p))).getOrElse(vicinity)
+      if (candidates.nonEmpty) landingPoints(transport) = goal
+      goal
+    }
+  }
+
+  override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
+    destinationBase.exists(_.isEnemy) && passengersFor(transport).filter(Protoss.Reaver).exists(r =>
+      (!r.loaded && r.pixelDistanceCenter(transport) <= 384 && destinationBase.exists(r.base.contains))
+        || firingPosition(r, transport.pixel))
+
+  override protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {
+    val reavers = passengersFor(transport).filter(Protoss.Reaver)
+    combatProgress(transport) = RaidProgress(With.frame, distanceToWorkers(transport),
+      reavers.filterNot(_.loaded).map(_.id).toSet, Maff.max(reavers.map(_.lastFrameStartingAttack)).getOrElse(0))
+  }
+
+  private def distanceToWorkers(transport: FriendlyUnitInfo): Double =
+    Maff.min(workers.map(_.pixelDistanceCenter(transport))).getOrElse(transport.pixelDistanceCenter(vicinity))
+
+  private def combatStalled: Boolean = {
+    combatProgress.foreach { case (transport, progress) =>
+      val reavers = passengersFor(transport).filter(Protoss.Reaver)
+      val landed = reavers.filterNot(_.loaded).map(_.id).toSet
+      val shot = Maff.max(reavers.map(_.lastFrameStartingAttack)).getOrElse(0)
+      val distance = distanceToWorkers(transport)
+      if (distance + 32 < progress.distance || !landed.subsetOf(progress.landed) ||
+        shot > progress.shot || reavers.exists(_.hasActiveScarab)) progress.frame = With.frame
+      if (distance + 32 < progress.distance) progress.distance = distance
+      progress.landed ++= landed
+      progress.shot = Math.max(progress.shot, shot)
+    }
+    val participating = transports.filter(t => passengersFor(t).exists(Protoss.Reaver))
+    participating.nonEmpty && participating.forall(t => combatProgress.get(t).exists(p =>
+      With.framesSince(p.frame) >= Seconds(6)()))
+  }
   override protected def requireWorkers: Boolean = true
   override protected def targetCleared(base: Base): Boolean =
     requireWorkers && MissionReaverDrop.workersCleared(base, _.visible)
@@ -86,14 +145,16 @@ class MissionReaverDrop extends MissionDrop {
     DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
   }
 
-  override protected def shouldStopRaiding: Boolean = (state == Travelling || state == Landing || state == Raiding) && passengers.view
-    .filter(Protoss.Reaver)
-    .forall(reaver =>
-      reaver.doomed
-      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.battle.exists(_.judgement.exists(_.shouldFightGround)))
-      || itinerary.headOption.exists(_.enemies.filter(IsWarrior).filter(_.canAttackGround).map(_.subjectiveValue).sum
-        * ?(reaver.matchups.targetsInRange.count(IsWorker) > 2, 1, 2)
-        >= passengers.view.map(_.subjectiveValue).sum))
+  override protected def shouldStopRaiding: Boolean = {
+    if (state != Travelling && state != Landing && state != Raiding) return false
+    val doomed = passengers.filter(Protoss.Reaver).forall(_.doomed)
+    val stalled = combatStalled
+    val unableToLand = state == Landing && raidingTransports.isEmpty && stateAge >= Seconds(8)()
+    if (doomed || stalled || unableToLand) {
+      With.logger.debug(s"$this recovering crew: doomed=$doomed combatStalled=$stalled landingTimedOut=$unableToLand")
+      true
+    } else false
+  }
   override protected def shouldGoHome: Boolean = ! passengers.exists(Protoss.Reaver)
 
   val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u) && recruitablePassenger(u))

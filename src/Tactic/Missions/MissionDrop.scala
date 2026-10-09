@@ -316,7 +316,7 @@ abstract class MissionDrop extends Mission {
 
   private def followRoute(transport: FriendlyUnitInfo, destination: Mathematics.Points.Tile): Unit = {
     val route = routes.getOrElseUpdate(transport, new DropRoute)
-    route.next(transport.tile, destination) match {
+    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
       case Some(path) =>
         transport.agent.decision.set(route.waypoint(transport.pixel, path))
         Commander.move(transport, allowOvershoot = false)

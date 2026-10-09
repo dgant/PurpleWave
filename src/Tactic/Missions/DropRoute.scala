@@ -1,6 +1,7 @@
 package Tactic.Missions
 
 import Information.Geography.Pathfinding.Types.TilePath
+import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Points.{Pixel, Tile}
 import Utilities.Time.Seconds
@@ -8,6 +9,7 @@ import Utilities.Time.Seconds
 import scala.collection.mutable
 
 private[Missions] class DropRoute {
+  private var raidBases = Set.empty[Base]
   private var destination: Option[Tile] = None
   private var path: Option[TilePath] = None
   private var values = Vector.empty[(Int, Boolean)]
@@ -18,7 +20,9 @@ private[Missions] class DropRoute {
 
   def stalled: Boolean = failureFrame.exists(With.framesSince(_) >= Seconds(8)())
   private def avoidVision(tile: Tile): Boolean = tile.visibleToEnemy &&
-    !destination.exists(t => t.base.exists(_.isEnemy) && tile.tileDistanceFast(t) <= 32)
+    !destination.exists(t => t.base.exists(_.isEnemy) && tile.tileDistanceFast(t) <= 32) &&
+    (raidBases.isEmpty || With.grids.enemyVision.floodiesNear(tile).exists(f =>
+      f.value > With.grids.enemyVision.margin && !f.unit.unit.base.exists(raidBases.contains)))
   private def value(tile: Tile): (Int, Boolean) = (With.grids.enemyRangeAir.get(tile), avoidVision(tile))
   private def exposure(tile: Tile): Double = 64.0 * (With.grids.enemyRangeAir.get(tile) + (if (avoidVision(tile)) 1 else 0))
   private def centerCost(tile: Tile): Double = {
@@ -88,7 +92,11 @@ private[Missions] class DropRoute {
     TilePath(from, to, distances(goal), Some(tiles))
   }
 
-  def next(from: Tile, to: Tile): Option[TilePath] = {
+  def next(from: Tile, to: Tile, targets: Set[Base] = Set.empty): Option[TilePath] = {
+    if (raidBases != targets) {
+      raidBases = targets
+      path = None
+    }
     if (!destination.contains(to)) {
       destination = Some(to)
       path = None
@@ -127,11 +135,21 @@ private[Missions] class DropRoute {
     val tiles = route.tiles.get
     val index = tiles.indices.minBy(i => tiles(i).center.pixelDistanceSquared(from))
     val end = Math.min(index + 16, tiles.size - 1)
-    (end to index by -1).find(i => {
-      val planned = tiles.slice(index, i + 1)
+    val waypoint = (end to Math.min(index + 1, end) by -1).find(i => {
+      val planned = line(from.tile, tiles(index)).dropRight(1) ++ tiles.slice(index, i + 1)
       val direct = line(from.tile, tiles(i))
       direct.map(exposure).sum <= planned.map(exposure).sum &&
         direct.map(centerCost).max <= planned.map(centerCost).max + 0.25
     }).map(tiles(_).center).getOrElse(tiles(Math.min(index + 1, end)).center)
+    if (waypoint == route.end.center || from.pixelDistanceSquared(waypoint) >= 288 * 288) return waypoint
+
+    // Keep accelerating out of a threat instead of braking at a nearby route bend.
+    // Extend only through non-increasing anti-air and vision; never through a new hazard.
+    val extended = from.project(waypoint, 288).clamp(32)
+    val direct = line(from.tile, extended.tile)
+    val safe = direct.sliding(2).forall(pair =>
+      With.grids.enemyRangeAir.get(pair.last) <= With.grids.enemyRangeAir.get(pair.head) &&
+        (!avoidVision(pair.last) || avoidVision(pair.head)))
+    if (safe && from.pixelDistanceSquared(extended) > from.pixelDistanceSquared(waypoint)) extended else waypoint
   }
 }

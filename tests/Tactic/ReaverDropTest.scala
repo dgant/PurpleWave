@@ -3,6 +3,8 @@ package bwapi {
   class DropTestUnit extends Unit(null, 0, null) {
     var unloaded: Unit = _
     var queuedScarabs: Int = 0
+    var movedTo: Position = _
+    override def move(to: Position): Boolean = { movedTo = to; true }
     override def getTrainingQueueCount: Int = queuedScarabs
     override def build(kind: UnitType): Boolean = {
       if (queuedScarabs >= 5) false else { queuedScarabs += 1; true }
@@ -133,6 +135,10 @@ package Tactic.Missions {
       set(u, "_loadedUnitsCache", new Cache(() => observations.filter(_.transport.contains(u)).toVector, refreshPeriod = 0))
       set(u, "_cooldownLeft", new Cache(() => 60))
       set(u, "canMoveCache", new Cache(() => true))
+      set(u, "canAttackCache", new Cache(() => kind.rawCanAttack))
+      set(u, "attacksAgainstAirCache", new Cache(() => kind.airDamageFactorRaw * kind.maxAirHitsRaw))
+      set(u, "pixelRangeAirCache", new Cache(() => kind.pixelRangeAir))
+      set(u, "pixelRangeGroundCache", new Cache(() => kind.pixelRangeGround))
       u.matchups = new MatchupAnalysis(u) {
         override def threatsInRange = Vector.empty
         override def targetsInRange = Vector.empty
@@ -447,6 +453,36 @@ package Tactic.Missions {
       m.appendTargets(Vector(main))
       assert(m.itinerary.toVector == Vector(main))
     }
+    check("a newly encountered worker base is raided before the distant main") {
+      val main = base(115); val expansion = base(46); val natural = base(82)
+      val t = unit(Protoss.Shuttle, expansion.heart.center.x - 300, expansion.heart.center.y)
+      val r = unit(Protoss.Reaver); load(r, Some(t))
+      val worker = unit(Protoss.Probe, expansion.heart.center.x, expansion.heart.center.y)
+      val naturalWorker = unit(Protoss.Probe, natural.heart.center.x, natural.heart.center.y)
+      Vector(worker, naturalWorker).foreach(set(_, "_player", enemy))
+      expansion.units = Vector(worker); natural.units = Vector(naturalWorker)
+      val m = new MissionProbe(main); m.configure(Vector(t), Vector(r))
+      m.updateState(false)
+      m.appendTargets(Vector(main, natural, expansion))
+      assert(m.itinerary.toVector == Vector(expansion, main, natural), "Do not fly past the workers just discovered")
+      m.updateState(false)
+      assert(m.vicinity == expansion.heart.center && m.state == m.Travelling)
+      m.state = m.Raiding
+      set(t, "_pixel", natural.heart.center)
+      m.appendTargets(Vector(main, natural, expansion))
+      assert(m.itinerary.head == expansion, "Finish the current raid before switching bases")
+      m.itinerary.dequeue(); m.state = m.Travelling
+      m.appendTargets(Vector(main, natural, expansion))
+      assert(m.itinerary.toVector == Vector(natural, main), "Stop at the natural on the following leg too")
+      m.appendTargets(Vector(main, natural, expansion))
+      assert(m.itinerary.head == natural, "Keep the closer current target")
+      val previousBases = With.geography.bases
+      set(With.geography, "_bases", Vector(main, natural, expansion))
+      m.itinerary.clear(); m.continuePressure = true
+      assert(m.continueNow(main) && m.itinerary.toVector == Vector(natural, expansion),
+        "The return sweep must reverse the actual visit order")
+      set(With.geography, "_bases", previousBases)
+    }
     check("the drop build can refuse an unowned natural until expansion is underway") {
       set(With.blackboard, "takeUnownedBases", new Utilities.Property(false))
       val main = base(5); main.owner = With.self
@@ -466,6 +502,34 @@ package Tactic.Missions {
       t.agent.addPassenger(z); t.agent.addPassenger(r)
       assert(Micro.Actions.Protoss.Shuttle.BeShuttle.supportedPassengers(t) == Vector(r))
       assert(Micro.Actions.Protoss.Shuttle.ShuttlePark.exposedPassengers(t) == Vector(r))
+    }
+    check("a threatened Shuttle stays with its nearby grounded Reaver") {
+      val previousMapping = With.geography.allTiles.map(_.base).toArray
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(None))
+      val t = unit(Protoss.Shuttle, 700, 960); val r = unit(Protoss.Reaver, 574, 1070)
+      val threat = unit(Protoss.Dragoon, 450, 1100); set(threat, "_player", enemy)
+      t.agent.addPassenger(r)
+      t.agent.home.set(Pixel(2000, 960))
+      t.agent.forces(Debugging.Visualizations.Forces.threat) = Mathematics.Physics.Force(1, -1)
+      t.matchups = new MatchupAnalysis(t) {
+        override def threats = Vector(threat)
+        override def enemies = Vector(threat)
+        override def pixelsEntangled = 1.0
+        override def framesOfSafety = -1.0
+        override def withinSafetyMargin = false
+      }
+      Micro.Actions.Protoss.Shuttle.ShuttlePark.parkWithPassengers(t, Vector(r))
+      val command = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+      assert(command != null)
+      val destination = Pixel(command.getX, command.getY)
+      assert(destination.pixelDistance(r.pixel) <= 12, s"Shuttle abandoned its Reaver for $destination")
+      t.sleepUntil = 0
+      set(t, "_pixel", Pixel(1200, 960)); set(t, "_tile", Pixel(1200, 960).tile)
+      Micro.Actions.Protoss.Shuttle.ShuttlePark.parkWithPassengers(t, Vector(r))
+      val distant = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+      assert(Pixel(distant.getX, distant.getY).pixelDistance(r.pixel) > t.pixelDistanceCenter(r),
+        "Keep retreating when still too far away to support the Reaver")
+      set(With.geography, "_baseByTile", previousMapping)
     }
     check("delivering a loaded Reaver cannot abandon its grounded partner") {
       val t = unit(Protoss.Shuttle); val ground = unit(Protoss.Reaver, 300); val rider = unit(Protoss.Reaver)
@@ -692,6 +756,55 @@ package Tactic.Missions {
           assert(!crossed.visibleToEnemy)
         }
       }
+    }
+    check("escaping air threats keeps the movement target beyond braking distance") {
+      world(128)
+      val threats = Vector(Tile(9, 31), Tile(11, 22), Tile(11, 18))
+      With.grids.enemyRangeAir.tiles.foreach(t => t.maxDepth = threats.map(threat =>
+        Math.max(0, 9 - Math.ceil(Math.sqrt(t.tile.tileDistanceSquared(threat))).toInt)).max)
+      for (from <- Vector(Pixel(381, 812), Pixel(387, 812), Pixel(394, 813), Pixel(430, 818))) {
+        val route = new DropRoute
+        val path = route.next(from.tile, Tile(6, 4)).get
+        val next = route.waypoint(from, path)
+        assert(from.pixelDistanceSquared(next) >= 280 * 280, s"Braking during escape: $from -> $next")
+        val n = Math.max(Math.abs(next.tile.x - from.tile.x), Math.abs(next.tile.y - from.tile.y))
+        val depths = (0 to n).map(i => With.grids.enemyRangeAir.get(Tile(
+          Math.round(from.tile.x + (next.tile.x - from.tile.x) * i.toDouble / n).toInt,
+          Math.round(from.tile.y + (next.tile.y - from.tile.y) * i.toDouble / n).toInt)))
+        assert(depths.sliding(2).forall(pair => pair.last <= pair.head), "Acceleration must lead out of anti-air")
+      }
+    }
+    check("vision from every itinerary base is ignored while other vision and anti-air remain hazards") {
+      world(128)
+      val expansion = new Base("expansion", Tile(46, 123), Set(Tile(46, 123)))
+      val main = new Base("main", Tile(115, 119), Set(Tile(115, 119)))
+      expansion.owner = enemy; main.owner = enemy
+      val mapping = Array.fill[Option[Base]](With.mapTileArea)(None)
+      mapping(expansion.heart.i) = Some(expansion); mapping(main.heart.i) = Some(main)
+      set(With.geography, "_baseByTile", mapping)
+      val source = unit(Protoss.Probe, expansion.heart.center.x, expansion.heart.center.y)
+      set(source, "_player", enemy)
+      val from = Tile(34, 119)
+      val clear = new DropRoute().next(from, main.heart, Set(main, expansion)).get
+      val vision = Information.Grids.Floody.FloodyUnit(source, 9, source.tile)
+      With.grids.enemyVision.tiles.foreach(t => {
+        val depth = Math.max(0, 11 - Math.ceil(Math.sqrt(t.tile.tileDistanceSquared(source.tile))).toInt)
+        t.maxDepth = depth
+        if (depth > 0) t.depths.add(Information.Grids.Floody.FloodyUnitDepth(vision, depth))
+      })
+      val route = new DropRoute
+      val dodging = route.next(from, main.heart, Set(main)).get
+      assert(dodging.tiles != clear.tiles, "The original route detours around the worker base")
+      val raiding = route.next(from, main.heart, Set(main, expansion)).get
+      assert(raiding.tiles == clear.tiles, "A later itinerary stop must not repel the Shuttle with its vision")
+      mapping(source.tile.i) = None
+      assert(route.next(from, main.heart, Set(main, expansion)).get.tiles == dodging.tiles,
+        "Vision outside the itinerary bases must still affect routing")
+      mapping(source.tile.i) = Some(expansion)
+      With.grids.enemyRangeAir.tiles.foreach(t => t.maxDepth =
+        Math.max(0, 7 - Math.ceil(Math.sqrt(t.tile.tileDistanceSquared(source.tile))).toInt))
+      val defended = route.next(from, main.heart, Set(main, expansion)).get
+      assert(defended.tiles.get.forall(t => With.grids.enemyRangeAir.get(t) == 0), "Keep avoiding actual anti-air")
     }
     check("new vision at the destination cannot turn the final approach away from the base") {
       world(128)

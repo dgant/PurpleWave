@@ -38,7 +38,8 @@ object ShuttlePark extends Action {
   def park(shuttle: FriendlyUnitInfo, goals: Seq[Pixel]): Unit = {
     val to = MicroPathing.pullTowards(12, goals: _*) // TODO: The leash length should ideally be the edge-to-edge pickup radius (32) minus the diameter of a spinning Shuttle (unclear) to ensure that the Shuttle doesn't get out of range
     shuttle.agent.decision.set(to)
-    if (shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
+    // Stay close enough to collect exposed passengers before retreating.
+    if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
       Retreat.delegate(shuttle)
     }
     Commander.move(shuttle, allowOvershoot = false)

@@ -19,6 +19,23 @@ class MissionReaverDrop extends MissionDrop {
     val discovered = MissionReaverDrop.targets(bases, possibleMains).filterNot(plannedTargets.contains)
     itinerary ++= discovered
     plannedTargets ++= discovered
+    // Take an undefended worker line encountered en route instead of flying past
+    // it to visit a more distant target first. Preserve the rest of the itinerary.
+    if (state == Travelling && passengers.forall(_.transport.exists(transports.contains))) {
+      def distance(base: Base): Double = transports.map(_.pixelDistanceSquared(base.heart.center)).min
+      val encountered = itinerary.drop(1).filter(b => b.isEnemy && b.enemies.exists(IsWorker) &&
+        !b.enemies.exists(_.canAttackAir) && transports.exists(_.pixelDistanceCenter(b.heart.center) <= 384))
+        .sortBy(distance).headOption.filter(b => itinerary.headOption.forall(distance(b) < distance(_)))
+      encountered.foreach(base => {
+        val visited = plannedTargets.filterNot(itinerary.contains).toVector
+        val remaining = itinerary.filterNot(_ == base).toVector
+        itinerary.clear()
+        itinerary ++= base +: remaining
+        plannedTargets.clear()
+        plannedTargets ++= visited ++ itinerary
+        With.logger.debug(s"$this stopping at encountered worker base ${base.heart}")
+      })
+    }
   }
 
   override protected def continueItinerary(from: Base): Boolean = {

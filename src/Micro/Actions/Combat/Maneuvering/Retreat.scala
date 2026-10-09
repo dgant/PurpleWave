@@ -5,7 +5,7 @@ import Lifecycle.With
 import Mathematics.Points.Pixel
 import Mathematics.{Maff, Shapes}
 import Micro.Actions.Action
-import Micro.Actions.Protoss.Shuttle.Shuttling
+import Micro.Actions.Protoss.Shuttle.{ShuttleEscape, Shuttling}
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -33,6 +33,7 @@ object Retreat extends Action {
   }
 
   override def perform(unit: FriendlyUnitInfo): Unit = {
+    if (ShuttleEscape.start(unit)) return
     getRetreat(unit)(unit)
   }
 

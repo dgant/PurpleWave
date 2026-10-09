@@ -3,6 +3,7 @@ package Micro.Agency
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
+import Micro.Actions.Protoss.Shuttle.ShuttleEscape
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing._
 import ProxyBwapi.Orders
@@ -296,6 +297,13 @@ object Commander {
       unit.agent.setRideGoal(target.pixel)
     }
     if (unit.unready) return
+    // EnterTransport also orders the Shuttle to fly to this passenger. Do not let
+    // a boarding request take control back from an escape in progress.
+    if (target.friendly.exists(ShuttleEscape.active)) {
+      if (unit.order == Orders.EnterTransport) stop(unit) else doNothing(unit)
+      return
+    }
+    if (ShuttleEscape.active(unit)) { ShuttleEscape.delegate(unit); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     unit.bwapiUnit.rightClick(target.bwapiUnit)
     sleepAttack(unit)

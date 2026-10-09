@@ -8,6 +8,8 @@ import Mathematics.Points.Points
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Protoss.ReloadScarabs
+import Micro.Actions.Protoss.Shuttle.ShuttleEscape
+import ProxyBwapi.Races.Protoss
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Planning.ResourceLocks.LockUnits
@@ -315,6 +317,7 @@ abstract class MissionDrop extends Mission {
   }
 
   private def followRoute(transport: FriendlyUnitInfo, destination: Mathematics.Points.Tile): Unit = {
+    if (ShuttleEscape(transport)) return
     val route = routes.getOrElseUpdate(transport, new DropRoute)
     route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
       case Some(path) =>
@@ -330,6 +333,10 @@ abstract class MissionDrop extends Mission {
 
   object ActionLandTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      // Once the Reavers have been recovered, surviving anti-air takes priority
+      // over finishing the initial landing of filler passengers.
+      if ((ShuttleEscape.active(transport) || passengersFor(transport).filter(Protoss.Reaver).exists(initiallyLanded.contains)) &&
+        ShuttleEscape(transport)) return
       if (passengersFor(transport).forall(initiallyLanded.contains)) {
         raidTransportAction.delegate(transport)
         return
@@ -371,7 +378,10 @@ abstract class MissionDrop extends Mission {
   object ActionEvacuateTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val unloaded = passengersFor(transport).filterNot(_.loaded)
-      if (unloaded.isEmpty) Commander.hold(transport) else {
+      if (ShuttleEscape.active(transport) && ShuttleEscape(transport)) return
+      if (unloaded.isEmpty) {
+        if (!ShuttleEscape(transport)) Commander.hold(transport)
+      } else {
         Commander.rightClick(transport, unloaded.minBy(_.pixelDistanceSquared(Maff.centroid(unloaded.view.map(_.pixel)))))
       }
     }

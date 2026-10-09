@@ -1,7 +1,7 @@
 package Micro.Actions.Transportation
 
 import Micro.Actions.Action
-import Micro.Actions.Protoss.Shuttle.BeShuttle
+import Micro.Actions.Protoss.Shuttle.{BeShuttle, ShuttleEscape}
 import Micro.Agency.Commander
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
@@ -10,6 +10,7 @@ object Transport extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport
   
   override protected def perform(transport: FriendlyUnitInfo): Unit = {
+    if (ShuttleEscape.allowed(transport) && ShuttleEscape(transport)) return
     val passengers = transport.agent.passengers
     passengers.indices.foreach(i => {
       // Don't get stuck trying to unload a passenger that fails to land

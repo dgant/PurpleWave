@@ -62,7 +62,8 @@ class MissionReaverDrop extends MissionDrop {
   override protected def missionTimeout: Int = Minutes(3)()
   override protected def approachTimeout: Int = Minutes(2)()
   override protected def isScoutingTarget(base: Base): Boolean =
-    !base.owner.isFriendly && !base.scoutedByUs && With.scouting.possibleEnemyMains.contains(base)
+    MissionReaverDrop.unscoutedNatural(base) ||
+      (!base.owner.isFriendly && !base.scoutedByUs && With.scouting.possibleEnemyMains.contains(base))
   override protected def canLandAt(base: Base): Boolean = base.isEnemy
   override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy || isScoutingTarget(base)
 
@@ -132,9 +133,15 @@ private[Missions] object MissionReaverDrop {
     (ordered.take(index).reverse ++ ordered.drop(index + 1).reverse).toVector
   }
 
+  def unscoutedNatural(base: Base): Boolean =
+    !base.owner.isFriendly && !base.scoutedByUs && base.naturalOf.exists(_.isEnemy)
+
   def targets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Vector[Base] = {
     val confirmed = bases.filter(_.isEnemy)
-    val candidates = if (confirmed.nonEmpty) confirmed else possibleMains.filter(b => !b.owner.isFriendly && !b.scoutedByUs)
+    // Workers can evacuate to a natural that the ground scout never reached.
+    // Visit it with the crew aboard before treating the itinerary as exhausted.
+    val candidates = if (confirmed.nonEmpty) (confirmed ++ bases.filter(unscoutedNatural)).distinct
+      else possibleMains.filter(b => !b.owner.isFriendly && !b.scoutedByUs)
     candidates.sortBy(b => (
       b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
   }

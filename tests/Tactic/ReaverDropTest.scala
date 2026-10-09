@@ -214,7 +214,8 @@ package Tactic.Missions {
     }
     class MissionProbe(val target: Base) extends MissionReaverDrop {
       override protected def requireWorkers: Boolean = false
-      override protected def isScoutingTarget(b: Base): Boolean = false
+      var scoutTargets = false
+      override protected def isScoutingTarget(b: Base): Boolean = scoutTargets && super.isScoutingTarget(b)
       override protected def refreshItinerary(): Unit = {}
       var continuePressure = false
       override protected def continueItinerary(from: Base): Boolean = continuePressure && super.continueItinerary(from)
@@ -366,6 +367,36 @@ package Tactic.Missions {
       val ours = base(110); ours.owner = With.self
       val empty = base(80); empty.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
       assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)) == Vector(main, natural))
+    }
+    check("the unseen enemy natural follows the main before the drop can go home") {
+      val main = base(5); main.workerCount = 12; main.lastFrameScoutedByUs = 1
+      val natural = base(36)
+      val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
+      natural.owner = neutral; main.natural = Some(natural); natural.naturalOf = Some(main)
+      With.scouting = allocate(classOf[Information.Scouting.Scouting])
+      set(With.scouting, "_firstEnemyMain", Some(main))
+      val targets = Vector(main, natural)
+      assert(MissionReaverDrop.targets(targets) == targets, "An unseen natural is a scouting stop, not an empty expansion")
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(main) { override protected def targetCleared(b: Base): Boolean = b == main && state == Raiding }
+      m.scoutTargets = true; m.configure(Vector(t), Vector(r)); m.appendTargets(targets)
+      set(With.geography, "_bases", targets)
+      m.updateState(false); m.state = m.Raiding
+      m.run()
+      assert(m.state == m.Evacuating && m.itinerary.toVector == Vector(natural))
+      load(r, Some(t)); m.run()
+      assert(m.state == m.Travelling && m.vicinity == natural.heart.center,
+        "Workers fleeing the main must lead the drop to the unseen natural instead of home")
+      m.run()
+      assert(m.state == m.Travelling, "Keep the crew loaded while natural ownership is unknown")
+      natural.owner = enemy; m.run()
+      assert(m.state == m.Landing, "Finding the enemy natural releases the drop")
+      natural.owner = neutral; natural.lastFrameScoutedByUs = With.frame
+      assert(MissionReaverDrop.targets(targets) == Vector(main), "A scouted empty natural is not a raid target")
+      m.state = m.Travelling; m.run()
+      assert(m.state == m.Escaping && r.loaded, "Seeing an empty natural must not strand or unload the crew")
+      natural.owner = With.self; natural.lastFrameScoutedByUs = 0
+      assert(MissionReaverDrop.targets(targets) == Vector(main), "Never scout a friendly natural as a raid target")
     }
     check("missing scouting selects only unscouted candidate mains, then prefers confirmed bases") {
       val unknown = base(80); val empty = base(60); val confirmed = base(20)

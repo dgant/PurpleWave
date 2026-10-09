@@ -50,7 +50,7 @@ class MissionReaverDrop extends MissionDrop {
   override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy || isScoutingTarget(base)
 
   override protected def additionalFormationConditions: Boolean =
-    With.blackboard.reaverDrop() && reaverManifest.size >= 2
+    With.blackboard.reaverDrop() && reaverManifest.nonEmpty
 
   override protected def populateItinerary(): Unit = {
     itinerary.clear()
@@ -87,7 +87,7 @@ class MissionReaverDrop extends MissionDrop {
     vicinity = itinerary.headOption.map(_.heart).getOrElse(With.scouting.enemyHome).center
     val available = With.recruiter.available.toVector
     val reavers = reaverManifest
-    if (reavers.size < 2) { terminate("Waiting for two transportable Reavers"); return }
+    if (reavers.isEmpty) { terminate("Waiting for a transportable Reaver"); return }
     val selectedTransports = reavers.values.toVector.distinct.sortBy(_.id)
     val filler = available.filter(smallLock.matcher) ++ available.filter(bigLock.matcher)
     manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)

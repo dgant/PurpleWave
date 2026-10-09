@@ -70,6 +70,8 @@ package Tactic.Missions {
     With.recruiter = new Recruiter
     With.blackboard = allocate(classOf[Blackboard])
     set(With.blackboard, "reaverDropMaxReavers", new Utilities.Property(1))
+    set(With.blackboard, "reaverDrop", new Utilities.Property(true))
+    set(With.blackboard, "wantToHarass", new Utilities.Property(true))
     set(With.blackboard, "reaverDropContinuePressure", new Utilities.Property(true))
     With.latency = allocate(classOf[Latency])
     set(With.latency, "_remainingFrames", 1)
@@ -213,6 +215,7 @@ package Tactic.Missions {
       def continueNow(from: Base): Boolean = continueItinerary(from)
       override protected def populateItinerary(): Unit = { itinerary.clear(); itinerary += target }
       override protected def shouldStopRaiding: Boolean = false
+      def canFormNow: Boolean = shouldForm
       def recruitNow(): Unit = recruit()
       def combatAction: Action = raidTransportAction
       def commits: Boolean = commitWhileRaiding
@@ -278,14 +281,76 @@ package Tactic.Missions {
       assert(m.passengers.toSet == Set(ready, fresh), "Both completed Reavers must occupy the Shuttle")
       assert(m.assignedTransport(fresh).contains(t))
     }
-    check("a lone Reaver cannot launch the pair drop") {
+    check("one Shuttle and one Reaver form immediately and depart as soon as loaded") {
+      for (alreadyLoaded <- Vector(false, true)) {
+        val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+        set(r, "_scarabs", 0)
+        if (alreadyLoaded) {
+          set(r, "_trainingQueue", Vector.fill(2)(Protoss.Scarab))
+          load(r, Some(t))
+        }
+        With.recruiter = new Recruiter
+        set(With.recruiter, "unlockedUnits", mutable.Set(t, r))
+        With.blackboard.reaverDropMaxReavers.set(1)
+        val m = new MissionProbe(first)
+        assert(m.canFormNow, "A second Reaver must not delay mission formation")
+        m.recruitNow()
+        assert(m.passengers.toVector == Vector(r) && m.transports.toVector == Vector(t))
+        assert(m.assignedTransport(r).contains(t))
+        (Vector(t, r)).foreach(_.setSquad(Some(m)))
+        set(m, "_unitsNow", ArrayBuffer(t, r))
+        m.launchFrame = With.frame
+        m.run()
+        if (!alreadyLoaded) {
+          assert(m.state == m.Assembling)
+          perform(m.ActionAssemblePassenger, r)
+          assert(!r.agent.wantsPickup)
+          set(r, "_trainingQueue", Vector.fill(2)(Protoss.Scarab))
+          perform(m.ActionAssemblePassenger, r)
+          assert(r.agent.wantsPickup)
+          load(r, Some(t))
+          m.run()
+        }
+        assert(m.state == m.Travelling)
+        assert(t.intent.action == m.ActionTravelTransport)
+      }
+    }
+    check("a drop still needs an enabled mission and a completed transportable Reaver") {
       val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
       With.recruiter = new Recruiter
-      set(With.recruiter, "unlockedUnits", mutable.Set(t, r))
-      With.blackboard.reaverDropMaxReavers.set(6)
+      With.blackboard.reaverDropMaxReavers.set(1)
       val m = new MissionProbe(first)
+      for (available <- Vector(mutable.Set(t), mutable.Set(r))) {
+        set(With.recruiter, "unlockedUnits", available)
+        assert(!m.canFormNow)
+      }
+      set(With.recruiter, "unlockedUnits", mutable.Set(t, r))
+      set(r, "_complete", false)
+      assert(!m.canFormNow)
+      set(r, "_complete", true)
+      With.blackboard.reaverDrop.set(false)
+      assert(!m.canFormNow)
+      With.blackboard.reaverDrop.set(true)
+      With.blackboard.wantToHarass.set(false)
+      assert(!m.canFormNow)
+      With.blackboard.wantToHarass.set(true)
+      assert(m.canFormNow)
+    }
+    check("a cap of one recruits only one of two completed Reavers on separate Shuttles") {
+      val ts = Vector.fill(2)(unit(Protoss.Shuttle))
+      val rs = Vector.fill(2)(unit(Protoss.Reaver))
+      val zs = Vector.fill(4)(unit(Protoss.Zealot))
+      rs.zip(ts).foreach { case (r, t) => load(r, Some(t)) }
+      With.recruiter = new Recruiter
+      set(With.recruiter, "unlockedUnits", mutable.Set((ts ++ rs ++ zs): _*))
+      With.blackboard.reaverDropMaxReavers.set(1)
+      val m = new MissionProbe(first)
+      assert(m.canFormNow)
       m.recruitNow()
-      assert(m.passengers.isEmpty && m.transports.isEmpty)
+      assert(m.passengers.count(Protoss.Reaver) == 1)
+      assert(m.reaverLock.units.size == 1 && m.transports.size == 1)
+      assert(With.recruiter.available.count(Protoss.Reaver) == 1)
+      assert(m.passengers.count(Protoss.Zealot) == 2 && fits(m.passengers.map(p => p -> m.assignedTransport(p).get).toMap))
     }
     check("drop targets include the enemy main and natural and exclude empty expansions") {
       With.geography.home = Tile(110, 5)

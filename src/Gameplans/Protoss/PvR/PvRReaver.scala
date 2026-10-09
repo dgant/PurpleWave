@@ -43,7 +43,7 @@ class PvRReaver extends GameplanImperative{
     var shouldAttack: Boolean = unitsEverComplete(IsWarrior) >= 12 && unitsEverComplete(Protoss.Observer) > 0 && safePushing
     shouldHarass = true
     With.blackboard.reaverDrop.set(shouldHarass)
-    With.blackboard.reaverDropMaxReavers.set(Math.max(2, unitsComplete(Protoss.Reaver) / 2))
+    With.blackboard.reaverDropMaxReavers.set(Math.max(1, unitsComplete(Protoss.Reaver) / 2))
     harass(shouldHarass)
     attack(shouldAttack)
     maintainMiningBases(unitsComplete(IsWarrior) / 6)

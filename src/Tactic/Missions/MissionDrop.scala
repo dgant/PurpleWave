@@ -7,7 +7,6 @@ import Mathematics.Maff
 import Mathematics.Points.Points
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
@@ -290,8 +289,7 @@ abstract class MissionDrop extends Mission {
       passenger.agent.redoubt.set(
         passenger.agent.decision.set(assignedTransport(passenger).map(_.pixel)))
       ReloadScarabs.delegate(passenger)
-      Potshot.delegate(passenger)
-      Retreat.delegate(passenger)
+      assignedTransport(passenger).foreach(Commander.rightClick(passenger, _))
     }
   }
 

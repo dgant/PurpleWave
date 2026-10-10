@@ -15,7 +15,8 @@ final class BattleForecasts(parent: Battle) {
     else groups.map(group => BattleForecast(group,
       new Battle(ownership.collect { case (u, g) if g == group => u }, parent.enemy.units, isGlobal = false)))
   }
-  private val byUnit = forecasts.flatMap(f => f.battle.us.units.map(_ -> f.battle)).toMap
+  private val byUnit = forecasts.flatMap(f =>
+    (if (forecasts.size == 1) f.battle.units else f.battle.us.units).map(_ -> f.battle)).toMap
 
   def forUnit(unit: UnitInfo): Option[Battle] = synchronized {
     // Check once per ownership change, not once per unit/frame. Invalidated jobs stay invalid.

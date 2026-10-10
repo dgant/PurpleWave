@@ -1066,6 +1066,8 @@ object CombatPredictionTest extends App {
     val score = predictForecast(alone).scoreTotal
     near(score, armyUnit.combatJudgment.get.scoreTotal)
     assert(alone.combatForecasts.forecasts.head.battle eq alone)
+    assert(alone.combatForecasts.forUnit(defender).contains(alone))
+    assert(physicalBattle.combatForecasts.forUnit(defender).isEmpty)
   }
   check("ordinary squads share one forecast and moving a drop back invalidates old jobs") {
     dropUnit.setSquad(Some(forecastSquad(CombatGroup.army)))

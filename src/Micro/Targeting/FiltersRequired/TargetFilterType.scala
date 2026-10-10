@@ -1,9 +1,11 @@
 package Micro.Targeting.FiltersRequired
 
 import Micro.Targeting.TargetFilter
-import ProxyBwapi.Races.{Protoss, Zerg}
+import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 
 object TargetFilterType extends TargetFilter {
-  def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = target.isNone(Protoss.Interceptor, Zerg.Larva, Zerg.Egg)
+  def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
+    (Protoss.Reaver(actor) || target.isNone(Zerg.Larva, Zerg.Egg)) &&
+    ( ! Protoss.Interceptor(target) || actor.isAny(Terran.Marine, Protoss.Archon, Protoss.Dragoon, Zerg.Hydralisk)))
 }

@@ -17,7 +17,8 @@ object ProtossChoices {
     PvRGFE,
     PvR1012,
     PvRZZCoreZ,
-    PvRReaver
+    PvRReaver,
+    PvRFFECarrier
   )
 
   val oddball = Vector(

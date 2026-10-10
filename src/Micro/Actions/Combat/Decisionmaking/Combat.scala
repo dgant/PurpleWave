@@ -47,7 +47,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def formationHelpsChase   : Boolean = targetDistanceThere <= targetDistanceHere
   protected def idealDistanceForward  : Double  = target.map(unit.pixelDistanceEdge(_) - idealTargetDistance).getOrElse(0d)
   protected def confidentEnoughToChase: Boolean = unit.confidence11 > confidenceChaseThreshold
-  protected def shouldChase           : Boolean = (idealDistanceForward > 0 && confidentEnoughToChase && targetFleeing) || (target.exists(_.isAny(Terran.SiegeTankSieged, Protoss.Reaver)) && ! unit.flying && ! Protoss.Reaver(unit))
+  protected def shouldChase           : Boolean = (idealDistanceForward > 0 && confidentEnoughToChase && targetFleeing) || (target.exists(_.isAny(Terran.SiegeTankSieged, Protoss.Reaver) && ! With.fingerprints.bio()) && ! unit.flying && ! Protoss.Reaver(unit))
   protected def allThreatsAbusable    : Boolean = unit.matchups.threats.forall(t => canAbuse(t) || t.pixelsToGetInRange(unit) > 24 * 5)
   protected def nudged                : Boolean = unit.agent.receivedPushPriority() > TrafficPriorities.Nudge
   protected def nudgedTowards         : Boolean = nudged && Maff.isTowards(unit.pixel, unit.agent.destinationNext(), unit.agent.receivedPushForce().radians)

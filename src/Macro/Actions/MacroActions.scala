@@ -6,7 +6,7 @@ import Macro.Actions.Rounding.Rounding
 import Macro.Facts.MacroCounting
 import Macro.Requests._
 import Mathematics.Maff
-import Placement.Access.PlaceLabels.{DefendAir, DefendEntrance, DefendGround, MacroHatch, PlaceLabel}
+import Placement.Access.PlaceLabels._
 import Placement.Access.{PlaceLabels, PlacementQuery}
 import Placement.FoundationSources
 import ProxyBwapi.Buildable
@@ -73,13 +73,28 @@ trait MacroActions extends MacroCounting {
     Pump(unitClass, maximumTotal, maximumConcurrently)
   }
   def pumpWorkers(oversaturate: Boolean = false, maximumTotal: Int = 75, maximumConcurrently: Int = 2): Unit = {
-    PumpWorkers(oversaturate, maximumTotal, maximumConcurrently)
+    val builderCount = ?(With.self.isTerran, 3, ?(With.self.isZerg, 2, 0))
+    var max = ?(oversaturate, 15, 0) // 6 less than 21; one town hall can produce 6 workers in the time it takes to finish a new town hall
+    With.geography.ourBases.foreach(base =>
+      max += builderCount + 2 * base.minerals.count(_.resourcesLeft > 200) + base.gas.view
+      .filter(_.resourcesLeft > 200)
+      .map(_.gasMinersRequired)
+      .sum)
+    max = Math.max(max, 21)
+    max = Math.min(max, maximumTotal)
+    pump(With.self.workerClass, max, maximumConcurrently)
   }
   def pumpRatio(unitClass: UnitClass, minimum: Int, maximum: Int, ratios: Seq[MatchingRatio], round: Rounding = Rounding.Up): Unit = {
     PumpRatio(unitClass, minimum, maximum, ratios, round)
   }
   def pumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true): Unit = {
-    PumpShuttleAndReavers(reavers, shuttleFirst)
+    if (shuttleFirst && ! haveComplete(Protoss.RoboticsSupportBay)) {
+      once(Protoss.Shuttle)
+    }
+    (0 to reavers).foreach(i => {
+      pump(Protoss.Reaver, i)
+      pump(Protoss.Shuttle, Math.min(units(Protoss.Reaver) + 1, (i + 1) / 2))
+    })
   }
   def makeDarkArchons(): Unit = {
     With.blackboard.makeDarkArchons.set(true)
@@ -97,7 +112,13 @@ trait MacroActions extends MacroCounting {
     With.blackboard.toCancel.set(With.blackboard.toCancel() ++ buildables)
   }
   def pumpGasPumps(quantity: Int = 400): Unit = {
-    PumpGasPumps(quantity)
+    val pumpType            = With.self.gasClass
+    val eligibleBases       = With.geography.ourBases.filter(base => base.townHall.exists(_.remainingCompletionFrames <= pumpType.buildFrames)).sortBy(-_.gasLeft).sortBy(_.townHall.exists(_.complete))
+    val eligibleGas         = eligibleBases.flatMap(_.gas)
+    val eligibleGasToTake   = eligibleGas.filter(_.player.isNeutral)
+    val eligibleBlueprints  = eligibleGasToTake.map(_.tileTopLeft)
+    val gasToRequest        = Math.min(quantity, eligibleGas.size)
+    get(gasToRequest, pumpType)
   }
   def microSlush(minerals: Int): Unit = {
     get(RequestMicroSlush(minerals))

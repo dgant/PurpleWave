@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.PvRGFEComplete
+import Gameplans.Protoss.PvR.{PvRFFECarrier, PvRFFEGateway, PvRGFEComplete, PvRReaver}
 import Planning.Plans.Plan
 import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
@@ -51,5 +51,13 @@ object PvRGFEComplete extends PvRStrategy {
 
 
 object PvRReaver extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new Gameplans.Protoss.PvR.PvRReaver)
+  override def gameplan: Option[Plan] = Some(new PvRReaver)
+}
+
+object PvRFFECarrier extends PvRStrategy {
+  override def gameplan: Option[Plan] = Some(new PvRFFECarrier)
+}
+
+object PvRFFEGateway extends PvRStrategy {
+  override def gameplan: Option[Plan] = Some(new PvRFFEGateway)
 }

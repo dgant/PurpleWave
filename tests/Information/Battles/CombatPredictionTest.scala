@@ -2,7 +2,8 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
 import Information.Battles.Prediction.SimulationCheckpoint
-import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis, JudgmentModifiers}
+import Information.Battles.Types.{Battle, BattleJudgment, CombatGroup, Hysteresis, JudgmentModifiers}
+import Tactic.Squads.Squad
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
 import Mathematics.Points.{Pixel, Tile}
@@ -63,6 +64,8 @@ object CombatPredictionTest extends App {
   }
   def unit(hp: Int = 10, shields: Int = 0): FriendlyUnitInfo = {
     val u = allocate(classOf[FriendlyUnitInfo])
+    set(u, "friendly", Some(u))
+    set(u, "_squad", None)
     set(u, "_pixel", Pixel(64, 64))
     set(u, "_player", With.self)
     set(u, "damageQueue", new ArrayBuffer[u.DamageSource])
@@ -89,7 +92,7 @@ object CombatPredictionTest extends App {
   def simulation(units: FriendlyUnitInfo*): Simulation = {
     val sim = new Simulation
     sim.shouldReset = false
-    sim.battle = new Battle(isGlobal = false) {
+    sim.battle = new Battle(unitsUs = units, isGlobal = false) {
       override lazy val simulated: Boolean = true
       override lazy val logSimulation: Boolean = false
     }
@@ -952,6 +955,158 @@ object CombatPredictionTest extends App {
     assert(primary.hitPoints == 500 && nearby.hitPoints == 500)
     sim.step()
     assert(primary.hitPoints == 400 && nearby.hitPoints == 400)
+  }
+  // Keep the physical battle fixed while independently changing combat ownership.
+  class ForecastSquad extends Squad {
+    var group: CombatGroup = CombatGroup.army
+    override def combatGroup: CombatGroup = group
+    override def run(): Unit = {}
+    override def launch(): Unit = {}
+  }
+  def forecastSquad(group: CombatGroup): ForecastSquad = {
+    val squad = allocate(classOf[ForecastSquad])
+    squad.group = group
+    squad
+  }
+  def forecastUnit(hp: Int, kind: UnitClass, enemy: Boolean = false): FriendlyUnitInfo = {
+    val u = unit(hp)
+    set(u, "friendly", Some(u))
+    set(u, "_squad", None)
+    set(u, "_unitClass", kind)
+    set(u, "_player", player(enemy))
+    u.simulacrum.unitClass = kind
+    u.simulacrum.player = u.player
+    u.simulacrum.isFriendlyCached = !enemy
+    setWeapons(u.simulacrum)
+    u
+  }
+  With.configuration.simulationAsynchronous = true
+  val armyUnit = forecastUnit(40, Protoss.Dragoon)
+  val dropUnit = forecastUnit(200, Protoss.Reaver)
+  val transport = forecastUnit(80, Protoss.Shuttle)
+  val defender = forecastUnit(100, Terran.Marine, enemy = true)
+  val dropGroup = new CombatGroup("Drop")
+  val dropSquad = forecastSquad(dropGroup)
+  dropUnit.setSquad(Some(dropSquad))
+  transport.setSquad(Some(dropSquad))
+  def physical(ours: Seq[FriendlyUnitInfo]): Battle = new Battle(ours, Vector(defender), isGlobal = false)
+  val physicalBattle = physical(Vector(armyUnit, dropUnit, transport))
+  val forecasts = physicalBattle.combatForecasts
+  With.battles.byUnit = physicalBattle.units.map(_ -> physicalBattle).toMap
+
+  // Use real prediction steps, damage, checkpoints, and judgment scoring with synthetic BWAPI state.
+  def predictForecast(battle: Battle): BattleJudgment = {
+    val sim = new Simulation
+    sim.battle = battle
+    sim.shouldReset = false
+    sim.realUnits ++= battle.units
+    sim.realUnitsOurs ++= battle.us.units
+    sim.realUnitsEnemy ++= battle.enemy.units
+    sim.realUnits.foreach { u =>
+      val s = u.simulacrum
+      s.simulation = sim
+      s.hitPoints = if (u == armyUnit) 40 else if (u == defender) 100 else 200
+      s.hitPointsInitial = s.hitPoints
+      s.alive = true
+      s.damageDealt = 0
+      s.damageReceived = 0
+      s.valueDealt = 0
+      s.valueReceived = 0
+      s.kills = 0
+      s.cooldownLeft = 0
+      s.target = None
+      s.threat = None
+      s.gridTile = None
+      s.events.clear()
+      s.setPixel(Pixel(64, 64))
+      sim.grid.populate(s)
+      s.behavior = new SimulacrumBehavior {
+        val fighting = true
+        def act(actor: Simulacrum): Unit = {
+          if (actor.alive && actor.unitClass != Protoss.Shuttle) {
+            sim.simulacraEnemiesOf(actor).find(_.alive).foreach { target =>
+              val damage = if (actor.unitClass == Protoss.Reaver) 100 else if (actor.isFriendlyCached) 5 else 20
+              target.receiveDamage(DamageDealt(damage, 0))
+            }
+          }
+        }
+      }
+    }
+    while (!battle.simulationComplete) sim.step()
+    val scoring = new Battle(isGlobal = false) {
+      override lazy val skimWeight = 0.0
+      override lazy val judgmentModifiers = Vector.empty
+    }
+    scoring.simulationCheckpoints ++= battle.simulationCheckpoints
+    val judgment = new BattleJudgment(scoring)
+    battle.judgement = Some(judgment)
+    judgment
+  }
+  check("one spatial battle gives army and drop disjoint forecasts against the same defenders") {
+    assert(armyUnit.battle.contains(physicalBattle) && dropUnit.battle.contains(physicalBattle))
+    assert(armyUnit.team.contains(physicalBattle.us) && dropUnit.team.contains(physicalBattle.us))
+    assert(forecasts.forecasts.size == 2)
+    assert(armyUnit.combatForecast.get.us.units == Vector(armyUnit))
+    assert(dropUnit.combatForecast == transport.combatForecast)
+    assert(dropUnit.combatForecast.get.us.units.toSet == Set(dropUnit, transport))
+    assert(forecasts.forecasts.forall(_.battle.enemy.units == Vector(defender)))
+    assert(armyUnit.combatAllies.isEmpty && !dropUnit.combatAllies.exists(_ == armyUnit))
+    assert(physicalBattle.judgement.isEmpty)
+  }
+  check("army can retreat while a drop in the same cluster wins its own forecast") {
+    val army = predictForecast(armyUnit.combatForecast.get)
+    val armyScore = army.scoreTotal
+    val drop = predictForecast(dropUnit.combatForecast.get)
+    assert(!army.shouldFightGround && drop.shouldFightGround)
+    assert(armyUnit.combatJudgment.contains(army) && dropUnit.combatJudgment.contains(drop))
+    near(army.scoreTotal, armyScore)
+  }
+  check("adding an independent drop does not improve the army prediction") {
+    val alone = physical(Vector(armyUnit))
+    val score = predictForecast(alone).scoreTotal
+    near(score, armyUnit.combatJudgment.get.scoreTotal)
+    assert(alone.combatForecasts.forecasts.head.battle eq alone)
+  }
+  check("ordinary squads share one forecast and moving a drop back invalidates old jobs") {
+    dropUnit.setSquad(Some(forecastSquad(CombatGroup.army)))
+    transport.setSquad(None)
+    assert(armyUnit.combatForecast.isEmpty && dropUnit.combatForecast.isEmpty)
+    assert(armyUnit.combatJudgment.isEmpty && armyUnit.combatAllies.isEmpty)
+    val together = physical(Vector(armyUnit, dropUnit, transport))
+    assert(together.combatForecasts.forecasts.size == 1)
+    assert(together.combatForecasts.forecasts.head.battle eq together)
+    assert(predictForecast(together).shouldFightGround)
+  }
+  check("recruiting a unit out of an army invalidates its previous combined prediction") {
+    val parent = physical(Vector(armyUnit, dropUnit))
+    assert(parent.combatForecasts.forUnit(armyUnit).contains(parent))
+    dropUnit.setSquad(Some(dropSquad))
+    assert(parent.combatForecasts.forUnit(armyUnit).isEmpty)
+    assert(parent.combatForecasts.forUnit(dropUnit).isEmpty)
+  }
+  check("mission reuse and termination invalidate frozen ownership without changing squads") {
+    val parent = physical(Vector(armyUnit, dropUnit))
+    val before = parent.combatForecasts.forUnit(dropUnit)
+    assert(before.isDefined)
+    dropSquad.group = new CombatGroup("Drop relaunched")
+    CombatGroup.invalidate()
+    assert(parent.combatForecasts.forUnit(dropUnit).isEmpty)
+    val relaunched = physical(Vector(armyUnit, dropUnit))
+    assert(relaunched.combatForecasts.forUnit(dropUnit).isDefined)
+    dropSquad.group = CombatGroup.army
+    CombatGroup.invalidate()
+    assert(relaunched.combatForecasts.forUnit(armyUnit).isEmpty)
+  }
+  check("report snapshots survive reuse of an enemy simulacrum by another forecast") {
+    val s = defender.simulacrum
+    s.alive = false
+    s.damageReceived = 77
+    s.setPixel(Pixel(128, 128))
+    val report = new ReportCard(s, physicalBattle)
+    s.alive = true
+    s.damageReceived = 0
+    s.setPixel(Pixel(256, 256))
+    assert(!report.alive && report.damageReceived == 77 && report.pixel == Pixel(128, 128))
   }
   println(s"$passed combat prediction checks passed")
 }

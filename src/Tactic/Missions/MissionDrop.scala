@@ -1,7 +1,6 @@
 package Tactic.Missions
 
 import Debugging.SimpleString
-import Information.Battles.Types.CombatGroup
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Pathfinding.{PathfindProfile, PathfindRepulsor}
 import Information.Geography.Types.Base
@@ -27,8 +26,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 abstract class MissionDrop extends Mission {
-  private var dropCombatGroup = new CombatGroup(toString)
-  override def combatGroup: CombatGroup = if (launched) dropCombatGroup else CombatGroup.army
+  override def fightsIndependently: Boolean = launched
   trait DropState   extends SimpleString
   object Assembling extends DropState
   object Travelling extends DropState
@@ -57,7 +55,6 @@ abstract class MissionDrop extends Mission {
   case class PathValues(enemyRange: Int = 0, enemyVision: Boolean = false)
 
   override def reset(): Unit = {
-    dropCombatGroup = new CombatGroup(f"$this@${With.frame}")
     itinerary.clear()
     transports.clear()
     passengers.clear()

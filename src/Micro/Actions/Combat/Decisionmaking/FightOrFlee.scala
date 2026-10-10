@@ -74,14 +74,13 @@ object FightOrFlee extends Action {
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo): Unit = {
-    if (unit.battle.isEmpty) {
+    if (unit.combatForecast.isEmpty) {
       // Important for things which care about unit willingness to trot around
       unit.agent.shouldFight = true
       unit.agent.fightReason = ""
     } else {
-      val judgment = unit.combatJudgment
-      unit.agent.shouldFight = judgment.exists(_.unitShouldFight(unit))
-      unit.agent.fightReason = if (judgment.isEmpty) "AwaitForecast" else ?(unit.agent.shouldFight, "Yes", "No")
+      unit.agent.shouldFight = unit.combatForecast.get.judgement.get.unitShouldFight(unit)
+      unit.agent.fightReason = ?(unit.agent.shouldFight, "Yes", "No")
     }
   }
 }

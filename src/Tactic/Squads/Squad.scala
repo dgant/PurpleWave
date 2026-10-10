@@ -1,7 +1,6 @@
 package Tactic.Squads
 
 import Debugging.ToString
-import Information.Battles.Types.CombatGroup
 import Lifecycle.With
 import Micro.Formation.Formation
 import Performance.Cache
@@ -17,7 +16,7 @@ import Utilities.?
 import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
-  def combatGroup: CombatGroup = CombatGroup.army
+  def fightsIndependently: Boolean = false
   var batchId           : Int                           = Int.MinValue
   var targets           : Option[IndexedSet[UnitInfo]]  = None
   var formations        : ArrayBuffer[Formation]        = ArrayBuffer.empty

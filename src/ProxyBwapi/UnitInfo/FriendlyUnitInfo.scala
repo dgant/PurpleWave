@@ -1,6 +1,6 @@
 package ProxyBwapi.UnitInfo
 
-import Information.Battles.Types.{CombatGroup, FriendlyTeam, Hysteresis}
+import Information.Battles.Types.{FriendlyTeam, Hysteresis}
 import Information.Grids.Floody.AbstractGridFloody
 import Lifecycle.With
 import Mathematics.Points.Pixel
@@ -82,9 +82,7 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   def squadAge      : Int                   = With.framesSince(_lastSquadChange)
   def setSquad(newSquad: Option[Squad]): Unit = {
     if (newSquad != _squad) {
-      val oldGroup = CombatGroup.of(this)
       _squad = newSquad
-      if (CombatGroup.of(this) != oldGroup) CombatGroup.invalidate()
       _lastSquadChange = With.frame
     }
   }

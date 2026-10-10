@@ -8,7 +8,7 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Decisionmaking.Techniques._
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Combat.Tactics.Brawl
-import Micro.Actions.Protoss.{BeReaver, ReaverShot}
+import Micro.Actions.Protoss.BeReaver
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing.TrafficPriorities
@@ -23,8 +23,6 @@ import Utilities.UnitFilters.{IsSpeedling, IsSpeedlot, IsWarrior}
 import Utilities.{?, SomeIf}
 
 final class Combat(unit: FriendlyUnitInfo) extends Action {
-
-  private lazy val reaverShot = new ReaverShot(unit)
 
   var restrained            : Boolean = false
   var restrainedFrames      : Double  = 0.0
@@ -118,7 +116,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     if (technique == Walk       && walk())        return
     if (technique == Aim        && aim())         return
     if (technique == Dodge      && dodge())       return
-    if (Protoss.Reaver(unit)    && reaverShot.perform(shouldRetreat)) return
     if (technique == Fallback   && potshot())     return
     if (shouldRetreat           && Retreat(unit)) return
     if (shouldEngage            && Brawl(unit))   return
@@ -265,7 +262,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
 
   protected def dodge(): Boolean = {
     if (unit.ready) {
-      if (Protoss.Reaver(unit)) reaverShot.reset()
       unit.agent.shouldFight = false // Emergency movement must not become an attack-move when sluggish.
       unit.agent.fightReason = "Dodging"
       unit.agent.escalatePriority(TrafficPriorities.Shove) // Just lower than the dodge itself

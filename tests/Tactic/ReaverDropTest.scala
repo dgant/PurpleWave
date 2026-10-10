@@ -419,9 +419,10 @@ package Tactic.Missions {
       main.natural = Some(natural); natural.naturalOf = Some(main)
       val ours = base(110); ours.owner = With.self
       val empty = base(80); empty.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
-      assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)) == Vector(main, natural))
+      assert(MissionReaverDrop.targets(Vector(empty, ours, natural, main)).toSet == Set(main, natural))
     }
     check("the unseen enemy natural follows the main before the drop can go home") {
+      With.geography.home = Tile(0, 5)
       val main = base(5); main.workerCount = 12; main.lastFrameScoutedByUs = 1
       val natural = base(36)
       val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
@@ -522,6 +523,7 @@ package Tactic.Missions {
       assert(!MissionReaverDrop.workersCleared(target, _ => true))
     }
     check("newly discovered enemy bases extend the raid without revisiting cleared targets") {
+      With.geography.home = Tile(0, 5)
       val main = base(5); val expansion = base(16)
       val m = new MissionProbe(main)
       m.appendTargets(Vector(main))
@@ -537,49 +539,36 @@ package Tactic.Missions {
       m.appendTargets(Vector(main))
       assert(m.itinerary.toVector == Vector(main))
     }
-    check("a newly encountered worker base is raided before the distant main") {
-      val main = base(115); val expansion = base(46); val natural = base(82)
-      val t = unit(Protoss.Shuttle, expansion.heart.center.x - 300, expansion.heart.center.y)
-      val r = unit(Protoss.Reaver); load(r, Some(t))
-      val worker = unit(Protoss.Probe, expansion.heart.center.x, expansion.heart.center.y)
-      val naturalWorker = unit(Protoss.Probe, natural.heart.center.x, natural.heart.center.y)
-      Vector(worker, naturalWorker).foreach(set(_, "_player", enemy))
-      expansion.units = Vector(worker); natural.units = Vector(naturalWorker)
-      val m = new MissionProbe(main); m.configure(Vector(t), Vector(r))
-      m.updateState(false)
-      m.appendTargets(Vector(main, natural, expansion))
-      assert(m.itinerary.toVector == Vector(expansion, main, natural), "Do not fly past the workers just discovered")
-      m.updateState(false)
-      assert(m.vicinity == expansion.heart.center && m.state == m.Travelling)
-      m.state = m.Raiding
-      set(t, "_pixel", natural.heart.center)
-      m.appendTargets(Vector(main, natural, expansion))
-      assert(m.itinerary.head == expansion, "Finish the current raid before switching bases")
-      m.itinerary.dequeue(); m.state = m.Travelling
-      m.appendTargets(Vector(main, natural, expansion))
-      assert(m.itinerary.toVector == Vector(natural, main), "Stop at the natural on the following leg too")
-      m.appendTargets(Vector(main, natural, expansion))
-      assert(m.itinerary.head == natural, "Keep the closer current target")
-      val previousBases = With.geography.bases
-      set(With.geography, "_bases", Vector(main, natural, expansion))
-      m.itinerary.clear(); m.continuePressure = true
-      assert(m.continueNow(main) && m.itinerary.toVector == Vector(natural, expansion),
-        "The return sweep must reverse the actual visit order")
-      set(With.geography, "_bases", previousBases)
+    check("both traversal directions keep every enemy base in perimeter order") {
+      val top = base(62, 5); val right = base(115, 62); val bottom = base(62, 115); val left = base(5, 62)
+      val candidates = Vector(bottom, top, left, right)
+      assert(MissionReaverDrop.orderedTargets(candidates, top.townHallArea.center, clockwise = true) == Vector(top, right, bottom, left))
+      assert(MissionReaverDrop.orderedTargets(candidates, top.townHallArea.center, clockwise = false) == Vector(top, left, bottom, right))
     }
-    check("the drop build can refuse an unowned natural until expansion is underway") {
-      set(With.blackboard, "takeUnownedBases", new Utilities.Property(false))
-      val main = base(5); main.owner = With.self
-      val natural = base(16)
-      natural.owner = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
-      assert(Tactic.GetDefenseBase.canSecure(Vector(main)))
-      assert(!Tactic.GetDefenseBase.canSecure(Vector(natural)))
-      assert(!Tactic.GetDefenseBase.canSecure(Vector.empty))
-      natural.lastPlannedExpo = With.frame
-      assert(Tactic.GetDefenseBase.canSecure(Vector(natural)))
-      natural.lastPlannedExpo = -100000
-      With.blackboard.takeUnownedBases.set(true)
-      assert(Tactic.GetDefenseBase.canSecure(Vector(natural)))
+    check("discoveries join the directional sweep without interrupting a raid") {
+      With.geography.home = Tile(0, 5)
+      val main = base(115); val expansion = base(46); val natural = base(82)
+      val t = unit(Protoss.Shuttle, Tile(0, 5).center.x, Tile(0, 5).center.y)
+      val r = unit(Protoss.Reaver); load(r, Some(t))
+      val m = new MissionProbe(main); m.configure(Vector(t), Vector(r))
+      m.appendTargets(Vector(main, natural))
+      assert(m.itinerary.toVector == Vector(natural, main), "The first sweep starts with the nearer base")
+      m.state = m.Travelling
+      m.appendTargets(Vector(main, natural, expansion))
+      assert(m.itinerary.toVector == Vector(expansion, natural, main), "New discoveries belong at their position in the sweep")
+      m.state = m.Raiding
+      val discovered = base(58)
+      m.appendTargets(Vector(main, natural, expansion, discovered))
+      assert(m.itinerary.toVector == Vector(expansion, discovered, natural, main), "Finish the active raid and insert the next base in order")
+      m.itinerary.dequeue(); m.state = m.Travelling
+      m.appendTargets(Vector(main, natural, expansion, discovered))
+      assert(m.itinerary.toVector == Vector(discovered, natural, main), "Cleared stops stay cleared")
+      val previousBases = With.geography.bases
+      set(With.geography, "_bases", Vector(main, natural, expansion, discovered))
+      m.itinerary.clear(); m.continuePressure = true
+      assert(m.continueNow(main) && m.itinerary.toVector == Vector(natural, discovered, expansion),
+        "The return sweep reverses the traversal")
+      set(With.geography, "_bases", previousBases)
     }
     check("parking protects only unloaded Reavers, Templar, and Archons") {
       for (kind <- Vector(Protoss.Reaver, Protoss.HighTemplar, Protoss.DarkTemplar, Protoss.Archon, Protoss.Zealot, Protoss.Dragoon, Protoss.DarkArchon)) {

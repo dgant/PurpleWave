@@ -3,7 +3,7 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.Tile
+import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Actions.{Action, Idle}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.ResourceLocks.LockUnits
@@ -17,33 +17,33 @@ import scala.collection.mutable
 class MissionReaverDrop extends MissionDrop {
 
   private val plannedTargets = mutable.ArrayBuffer.empty[Base]
+  private var clockwise: Option[Boolean] = None
   private case class RaidProgress(var frame: Int, var distance: Double, var landed: Set[Int], var shot: Int)
   private val combatProgress = mutable.Map.empty[FriendlyUnitInfo, RaidProgress]
-  override def reset(): Unit = { super.reset(); plannedTargets.clear(); onDestinationChanged() }
+  override def reset(): Unit = { super.reset(); plannedTargets.clear(); clockwise = None; onDestinationChanged() }
   override protected def onDestinationChanged(): Unit = combatProgress.clear()
   override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
   protected def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
     plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
     val discovered = MissionReaverDrop.targets(bases, possibleMains).filterNot(plannedTargets.contains)
-    itinerary ++= discovered
-    plannedTargets ++= discovered
-    // Take an undefended worker line encountered en route instead of flying past
-    // it to visit a more distant target first. Preserve the rest of the itinerary.
-    if (state == Travelling && passengers.forall(_.transport.exists(transports.contains))) {
-      def distance(base: Base): Double = transports.map(_.pixelDistanceSquared(base.heart.center)).min
-      val encountered = itinerary.drop(1).filter(b => b.isEnemy && b.enemies.exists(IsWorker) &&
-        !b.enemies.exists(_.canAttackAir) && transports.exists(_.pixelDistanceCenter(b.heart.center) <= 384))
-        .sortBy(distance).headOption.filter(b => itinerary.headOption.forall(distance(b) < distance(_)))
-      encountered.foreach(base => {
-        val visited = plannedTargets.filterNot(itinerary.contains).toVector
-        val remaining = itinerary.filterNot(_ == base).toVector
-        itinerary.clear()
-        itinerary ++= base +: remaining
-        plannedTargets.clear()
-        plannedTargets ++= visited ++ itinerary
-        With.logger.debug(s"$this stopping at encountered worker base ${base.heart}")
-      })
+    if (discovered.isEmpty) return
+    val origin = transports.headOption.map(_.pixel).getOrElse(With.geography.home.center)
+    val remaining = itinerary.toVector ++ discovered
+    if (clockwise.isEmpty) {
+      clockwise = Some(Vector(true, false).minBy(direction => {
+        val stops = origin +: MissionReaverDrop.orderedTargets(remaining, origin, direction).map(_.heart.center)
+        (stops.sliding(2).map(pair => pair.head.pixelDistance(pair.last)).sum,
+          Maff.normalize0To2Pi((Points.middle.radiansTo(stops.last) - Points.middle.radiansTo(origin)) * (if (direction) 1 else -1)))
+      }))
     }
+    val active = if (state == Landing || state == Raiding || state == Evacuating) itinerary.headOption else None
+    val ordered = active.toVector ++ MissionReaverDrop.orderedTargets(
+      remaining.filterNot(active.contains), active.map(_.townHallArea.center).getOrElse(origin), clockwise.get)
+    val visited = plannedTargets.filterNot(itinerary.contains).toVector
+    itinerary.clear()
+    itinerary ++= ordered
+    plannedTargets.clear()
+    plannedTargets ++= visited ++ ordered
   }
 
   override protected def continueItinerary(from: Base): Boolean = {
@@ -55,6 +55,7 @@ class MissionReaverDrop extends MissionDrop {
     if (next.isEmpty) return false
     itinerary.clear()
     itinerary ++= next
+    clockwise = clockwise.map(!_)
     plannedTargets.clear()
     plannedTargets ++= from +: next
     With.logger.debug(s"$this reversing itinerary from ${from.heart}: ${next.map(_.heart).mkString(" -> ")}")
@@ -115,6 +116,7 @@ class MissionReaverDrop extends MissionDrop {
   override protected def populateItinerary(): Unit = {
     itinerary.clear()
     plannedTargets.clear()
+    clockwise = None
     // If the ground scout died, locate an unscouted enemy start from the air.
     // Passengers stay aboard until ownership is confirmed; empty expansions are not targets.
     appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
@@ -172,6 +174,12 @@ private[Missions] object MissionReaverDrop {
   def workersCleared(base: Base, visible: Tile => Boolean): Boolean =
     visible(base.heart) && base.resources.forall(r => visible(r.tile)) && base.units.forall(u => !u.isEnemy || !IsWorker(u))
 
+  def orderedTargets(bases: Seq[Base], from: Pixel, clockwise: Boolean): Vector[Base] = {
+    val origin = Points.middle.radiansTo(from)
+    bases.sortBy(base => Maff.normalize0To2Pi(
+      (Points.middle.radiansTo(base.townHallArea.center) - origin) * (if (clockwise) 1 else -1))).toVector
+  }
+
   def reverseTargets(planned: Seq[Base], from: Base): Vector[Base] = {
     val ordered = (planned :+ from).distinct
     val index = ordered.indexOf(from)
@@ -187,7 +195,6 @@ private[Missions] object MissionReaverDrop {
     // Visit it with the crew aboard before treating the itinerary as exhausted.
     val candidates = if (confirmed.nonEmpty) (confirmed ++ bases.filter(unscoutedNatural)).distinct
       else possibleMains.filter(b => !b.owner.isFriendly && !b.scoutedByUs)
-    candidates.sortBy(b => (
-      b.enemies.count(_.canAttackAir), -b.workerCount, b.heart.pixelDistance(With.geography.home.center))).toVector
+    candidates.toVector
   }
 }

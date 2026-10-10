@@ -39,7 +39,6 @@ class PvRReaver extends GameplanImperative{
   }
   var shouldHarass: Boolean = false
   override def executeMain(): Unit = {
-    With.blackboard.takeUnownedBases.set(false)
     var shouldAttack: Boolean = unitsEverComplete(IsWarrior) >= 12 && unitsEverComplete(Protoss.Observer) > 0 && safePushing
     shouldHarass = true
     With.blackboard.reaverDrop.set(shouldHarass)

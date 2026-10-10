@@ -197,43 +197,5 @@ object ReaverMicroTest extends App {
     assert(distance.pixels(Pixel(0, 0), Pixel(702, 0)) == BroodWarGroundDistance.unreachable)
     assert(distance.pixels(Pixel(-1, 0), Pixel(0, 0)) == BroodWarGroundDistance.unreachable)
   }
-  import Micro.Actions.Protoss.ReaverShot
-  check("shot preparation yields to ordinary combat during the cooldown movement interval") {
-    val previousReaction = With.reaction
-    With.reaction = new ReactionTimes { override def agencyMax: Int = 1 }
-    val r = unit(40, Protoss.Reaver, 100, 60)
-    assert(!new ReaverShot(r).perform(retreating = false))
-    assert(!new ReaverShot(r).perform(retreating = true))
-    With.reaction = previousReaction
-  }
-  check("shot preparation reserves delivery, agency, a full turn and native attack startup") {
-    assert(ReaverShot.preparationFrames(0, 1, 7) == 12)
-    assert(ReaverShot.preparationFrames(4, 3, 7) == 18)
-    assert(60 - ReaverShot.preparationFrames(0, 1, 7) == 48)
-  }
-  check("aiming uses a short accurate ray in every direction") {
-    val origin = Pixel(500, 500)
-    for (i <- 0 until 256) {
-      val angle = i * Math.PI / 128
-      val target = origin.add(Math.round(200 * Math.cos(angle)).toInt, Math.round(200 * Math.sin(angle)).toInt)
-      val aim = ReaverShot.aimPoint(origin, target)
-      assert(origin.pixelDistance(aim) <= ReaverShot.aimDistanceMax + 1)
-      val error = Math.abs(Mathematics.Maff.radiansTo(origin.radiansToSlow(target), origin.radiansToSlow(aim)))
-      assert(error <= Math.PI / 256, s"heading $i: $error")
-    }
-  }
-  check("repeated aim updates stay anchored even when the target moves") {
-    val origin = Pixel(500, 500)
-    var position = origin
-    var clipped = false
-    for (i <- 0 to 100) {
-      ReaverShot.aimPoint(position, Pixel(700, 450 + i), origin) match {
-        case Some(to) => position = to
-        case None => clipped = true
-      }
-      assert(position.pixelDistance(origin) <= ReaverShot.aimDistanceMax + 1)
-    }
-    assert(clipped)
-  }
   println(s"$passed Reaver micro checks passed")
 }

@@ -14,7 +14,6 @@ import Micro.Formation._
 import Micro.Heuristics.Potential
 import Performance.Cache
 import Planning.ResourceLocks.LockUnits
-import Tactic.GetDefenseBase
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import ProxyBwapi.UnitTracking.UnorderedBuffer
@@ -57,7 +56,7 @@ class SquadDefendBase(base: Base) extends Squad {
         val possiblePath = With.paths.zonePath(zone, muscleZone)
         possiblePath.foreach(path => {
           val stepScores = path.steps.take(4).filter(_.from.centroid.tileDistanceManhattan(With.geography.home) < 72)
-            .filter(step => GetDefenseBase.canSecure(step.from.bases)).map(step => {
+            .map(step => {
             val turtlePenalty = if (step.to.units.exists(u => u.isOurs && u.unitClass.isBuilding)) 10 else 1
             val altitudeValue = if (With.enemies.forall(_.isZerg)) 1 else 6
             val altitudeDiff  = Maff.signum101(step.to.centroid.altitude - step.from.centroid.altitude)
@@ -98,7 +97,7 @@ class SquadDefendBase(base: Base) extends Squad {
     if (emergencyDTHugs()) return
 
     val canWander         = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
-    val scourables        = enemies.filter(isScourable).filter(e => GetDefenseBase.canSecure(e.zone.bases))
+    val scourables        = enemies.filter(isScourable)
     val breached          = scourables.exists(isBreaching)
     val canScour          = scourables.nonEmpty && (canWander || breached)
     val travelGoal        = ?(canScour, vicinity, guardChoke.map(_.pixelCenter).getOrElse(bastion()))

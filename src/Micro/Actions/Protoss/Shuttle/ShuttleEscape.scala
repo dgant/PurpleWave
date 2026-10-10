@@ -77,6 +77,6 @@ object ShuttleEscape extends Action {
     val to = waypoint(shuttle)
     shuttle.agent.put(this, to)
     shuttle.agent.decision.set(to)
-    Commander.move(shuttle, allowOvershoot = false)
+    Commander.move(shuttle)
   }
 }

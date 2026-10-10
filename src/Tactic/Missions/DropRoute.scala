@@ -128,28 +128,17 @@ class DropRoute {
     }
   }
 
-  // Let a speed-upgraded Shuttle accelerate on clear legs. Short (three-tile)
-  // orders keep it braking; blindly overshooting them cuts across route hazards.
+  // Choose a route heading; Commander handles acceleration overshoot.
   def waypoint(from: Pixel, route: TilePath): Pixel = {
     if (finalApproach) return route.end.center
     val tiles = route.tiles.get
     val index = tiles.indices.minBy(i => tiles(i).center.pixelDistanceSquared(from))
     val end = Math.min(index + 16, tiles.size - 1)
-    val waypoint = (end to Math.min(index + 1, end) by -1).find(i => {
+    (end to Math.min(index + 1, end) by -1).find(i => {
       val planned = line(from.tile, tiles(index)).dropRight(1) ++ tiles.slice(index, i + 1)
       val direct = line(from.tile, tiles(i))
       direct.map(exposure).sum <= planned.map(exposure).sum &&
         direct.map(centerCost).max <= planned.map(centerCost).max + 0.25
     }).map(tiles(_).center).getOrElse(tiles(Math.min(index + 1, end)).center)
-    if (waypoint == route.end.center || from.pixelDistanceSquared(waypoint) >= 288 * 288) return waypoint
-
-    // Keep accelerating out of a threat instead of braking at a nearby route bend.
-    // Extend only through non-increasing anti-air and vision; never through a new hazard.
-    val extended = from.project(waypoint, 288).clamp(32)
-    val direct = line(from.tile, extended.tile)
-    val safe = direct.sliding(2).forall(pair =>
-      With.grids.enemyRangeAir.get(pair.last) <= With.grids.enemyRangeAir.get(pair.head) &&
-        (!avoidVision(pair.last) || avoidVision(pair.head)))
-    if (safe && from.pixelDistanceSquared(extended) > from.pixelDistanceSquared(waypoint)) extended else waypoint
   }
 }

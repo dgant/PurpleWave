@@ -42,6 +42,6 @@ object ShuttlePark extends Action {
     if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
       Retreat.delegate(shuttle)
     }
-    Commander.move(shuttle, allowOvershoot = false)
+    Commander.move(shuttle)
   }
 }

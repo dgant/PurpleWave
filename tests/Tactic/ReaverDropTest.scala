@@ -588,7 +588,10 @@ package Tactic.Missions {
       val command = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
       assert(command != null)
       val destination = Pixel(command.getX, command.getY)
-      assert(destination.pixelDistance(r.pixel) <= 12, s"Shuttle abandoned its Reaver for $destination")
+      val pickup = t.agent.decision()
+      assert(pickup.pixelDistance(r.pixel) <= 12, s"Shuttle abandoned its Reaver for $pickup")
+      assert(destination.pixelDistance(t.pixel.project(pickup, 288)) <= 1,
+        "Parking must keep moving along the passenger's pickup heading without braking")
       t.sleepUntil = 0
       set(t, "_pixel", Pixel(1200, 960)); set(t, "_tile", Pixel(1200, 960).tile)
       Micro.Actions.Protoss.Shuttle.ShuttlePark.parkWithPassengers(t, Vector(r))
@@ -823,7 +826,12 @@ package Tactic.Missions {
       for (from <- Vector(Pixel(381, 812), Pixel(387, 812), Pixel(394, 813), Pixel(430, 818))) {
         val route = new DropRoute
         val path = route.next(from.tile, Tile(6, 4)).get
-        val next = route.waypoint(from, path)
+        val t = unit(Protoss.Shuttle, from.x, from.y)
+        t.agent.decision.set(route.waypoint(from, path))
+        Micro.Agency.Commander.move(t)
+        val command = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+        assert(command != null)
+        val next = Pixel(command.getX, command.getY)
         assert(from.pixelDistanceSquared(next) >= 280 * 280, s"Braking during escape: $from -> $next")
         val n = Math.max(Math.abs(next.tile.x - from.tile.x), Math.abs(next.tile.y - from.tile.y))
         val depths = (0 to n).map(i => With.grids.enemyRangeAir.get(Tile(
@@ -989,8 +997,15 @@ package Tactic.Missions {
     }
     check("the last approach stays loaded until the Shuttle comes within one tile of its target") {
       val (m, t, r, z, _) = combatMission(approaching = true)
-      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-33, 0)); set(u, "_tile", u.pixel.tile) })
-      m.run(); assert(m.state == m.Landing && r.intent.action == Micro.Actions.Basic.DoNothing)
+      t.matchups = new MatchupAnalysis(t) { override def threats = Vector.empty; override def threatsInRange = Vector.empty }
+      for (distance <- Vector(128, 96, 64, 33)) {
+        Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-distance, 0)); set(u, "_tile", u.pixel.tile) })
+        m.run(); assert(m.state == m.Landing && r.intent.action == Micro.Actions.Basic.DoNothing)
+        t.sleepUntil = 0; perform(m.ActionLandTransport, t)
+        val command = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+        assert(command != null && t.pixelDistanceCenter(Pixel(command.getX, command.getY)) >= 280,
+          "The mineral-line approach must retain overshoot until arrival")
+      }
       Vector(t, r, z).foreach(u => { set(u, "_pixel", m.vicinity.add(-32, 0)); set(u, "_tile", u.pixel.tile) })
       m.run()
       assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle) && r.loaded)

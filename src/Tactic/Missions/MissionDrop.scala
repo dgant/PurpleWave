@@ -380,7 +380,7 @@ abstract class MissionDrop extends Mission {
     route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
       case Some(path) =>
         transport.agent.decision.set(route.waypoint(transport.pixel, path))
-        Commander.move(transport, allowOvershoot = false)
+        Commander.move(transport)
       case None =>
         if (route.stalled) returningHome = true
         transport.agent.redoubt.set(transport.agent.defaultHome)
@@ -415,7 +415,7 @@ abstract class MissionDrop extends Mission {
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRange > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
       transport.agent.decision.set(runway)
-      Commander.move(transport, allowOvershoot = false)
+      Commander.move(transport)
     }
   }
 

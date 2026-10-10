@@ -21,7 +21,7 @@ object ShuttlePickup {
     route.next(shuttle.tile, passenger.tile) match {
       case Some(path) =>
         shuttle.agent.decision.set(route.waypoint(shuttle.pixel, path))
-        Commander.move(shuttle, allowOvershoot = false)
+        Commander.move(shuttle)
       case None => Commander.stop(shuttle)
     }
   }

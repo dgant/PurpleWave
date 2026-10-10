@@ -6,7 +6,7 @@ import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Actions.Combat.Tactics.Potshot
+import Micro.Actions.Combat.Tactics.{HoldWallGap, Potshot}
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
@@ -89,6 +89,7 @@ class SquadDefendBase(base: Base) extends Squad {
     .getOrElse(vicinity))
 
   private var formationReturn: Formation = FormationEmpty
+  private val wallGapPositions = new WallGapPositions(base)
 
   override def run(): Unit = {
     vicinity = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
@@ -140,7 +141,20 @@ class SquadDefendBase(base: Base) extends Squad {
       else                    enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker))
 
-    if (plugEdge().isDefined) {
+    val wallPlugs = wallGapPositions(units)
+    if (wallPlugs.nonEmpty) {
+      lastAction = "Wall"
+      formations += FormationSimple(FormationStylePlug, formationBastion.placements ++ wallPlugs)
+      formations += formationBastion
+      SquadAutomation.send(this)
+      wallPlugs.foreach { case (unit, pixel) =>
+        unit.intend(this)
+          .setCanFlee(false)
+          .setRedoubt(pixel)
+          .setTerminus(pixel)
+          .setAction(HoldWallGap(pixel))
+      }
+    } else if (plugEdge().isDefined) {
       val plugPixel = plugEdge().get._2.get.pixelCenter
       lastAction = "Plug"
       formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)

@@ -91,10 +91,7 @@ object Commander {
   def attack(unit: FriendlyUnitInfo): Unit = unit.agent.toAttack.foreach(attack(unit, _))
   private def attack(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
     unit.agent.toAttack = Some(target)
-    lazy val attackFrom = {
-      val perch = unit.agent.perch.pixel.filter(acceptableAttackFrom(unit, target, _)).getOrElse(unit.agent.choosePerch()())
-      if (Protoss.Reaver(unit) && ! unit.hasScarabPathTo(target, perch)) unit.pixelToFireAtExhaustive(target) else perch
-    }
+    lazy val attackFrom = unit.agent.perch.pixel.filter(acceptableAttackFrom(unit, target, _)).getOrElse(unit.agent.choosePerch()())
 
     if (Protoss.Reaver(unit)) {
       if (unit.loaded)  pushAway    (unit, attackFrom, TrafficPriorities.Bump)

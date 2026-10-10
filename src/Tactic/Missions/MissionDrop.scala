@@ -52,6 +52,8 @@ abstract class MissionDrop extends Mission {
   protected def landingGoal(transport: FriendlyUnitInfo): Pixel = vicinity
   protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = false
   protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {}
+  protected final def threatenedOnApproach(transport: FriendlyUnitInfo): Boolean =
+    transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin
   protected def onDestinationChanged(): Unit = {}
   protected def missionTimeout: Int = Seconds(90)()
   protected def approachTimeout: Int = Seconds(45)()
@@ -385,7 +387,7 @@ abstract class MissionDrop extends Mission {
 
   private def intendRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
     val intent = transport.intend(this).setTerminus(destination.center)
-    if (transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin) {
+    if (threatenedOnApproach(transport)) {
       intent.setAction(Retreat)
       return
     }

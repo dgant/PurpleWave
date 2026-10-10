@@ -70,7 +70,7 @@ class MissionReaverDrop extends MissionDrop {
   private def workers = destinationBase.toVector.flatMap(_.enemies).filter(u => IsWorker(u) && u.visible)
   override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
     destinationBase.exists(base => base.isEnemy && passengersFor(transport).exists(Protoss.Reaver) && (
-      transport.matchups.threatsInRange.nonEmpty
+      transport.matchups.threatsInRange.nonEmpty || threatenedOnApproach(transport)
       || transport.pixelDistanceCenter(vicinity) <= 32))
 
   override protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {

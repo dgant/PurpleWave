@@ -1007,6 +1007,20 @@ package Tactic.Missions {
       assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle))
       assert(r.loaded && z.loaded && t.pixelDistanceCenter(m.vicinity) > 64)
     }
+    check("threatened delivery hands combat control over before travel retreats from weapon range") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      val marine = unit(ProxyBwapi.Races.Terran.Marine, t.pixel.x + 500, t.pixel.y)
+      set(marine, "_player", enemy)
+      t.matchups = new MatchupAnalysis(t) {
+        override def threats = Vector(marine)
+        override def threatsInRange = Vector.empty
+        override def withinSafetyMargin = false
+      }
+      m.run()
+      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle),
+        "Mission travel must not keep retreating before the combat handoff can become reachable")
+      assert(t.intent.station.isEmpty && r.loaded && z.loaded)
+    }
     check("seeing the entire mineral line still requires approaching its center") {
       val (m, t, r, z, _) = combatMission(approaching = true)
       val minerals = m.target.minerals

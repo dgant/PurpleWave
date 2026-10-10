@@ -1140,5 +1140,22 @@ object CombatPredictionTest extends App {
     assert(actual > defender.pixelDistanceEdge(dropUnit))
     assert(defender.skimTarget.contains(armyUnit))
   }
+  check("squad consensus drops cached fight permission immediately after ownership changes") {
+    dropUnit.setSquad(None)
+    val parent = physical(Vector(armyUnit, dropUnit))
+    parent.combatForecasts
+    val judgment = allocate(classOf[BattleJudgment])
+    set(judgment, "shouldFightGround", true)
+    parent.judgement = Some(judgment)
+    With.battles.byUnit = parent.units.map(_ -> parent).toMap
+    armyUnit.agent.shouldFight = true
+    val squad = new Tactic.Squads.TFriendlyUnitGroup {
+      def groupFriendlyUnits = Vector(armyUnit)
+    }
+    assert(squad.fightConsensus)
+    dropUnit.setSquad(Some(dropSquad))
+    assert(!squad.fightConsensus)
+    near(squad.confidence11, -1)
+  }
   println(s"$passed combat prediction checks passed")
 }

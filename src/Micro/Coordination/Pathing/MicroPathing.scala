@@ -102,6 +102,13 @@ object MicroPathing {
   private val rayRadians32 = rayRadiansN(32)
   private val rayRadians16 = rayRadiansN(16)
   private val rayRadians12 = rayRadiansN(12)
+  def isSafeMove(unit: FriendlyUnitInfo, pixel: Pixel): Boolean = {
+    val destination = Commander.adjustDestination(unit, pixel)
+    val currentThreat = unit.tile.enemyRangeAgainst(unit)
+    destination.tile.enemyRangeAgainst(unit) < Math.max(1, currentThreat) &&
+      Ray(unit.pixel, destination).forall(_.tile.enemyRangeAgainst(unit) <= currentThreat)
+  }
+
   def getWaypointInDirection(
     unit          : FriendlyUnitInfo,
     radians       : Double,
@@ -110,12 +117,7 @@ object MicroPathing {
 
     lazy val unacceptableDistance = mustApproach.map(unit.pixelDistanceTravelling)
 
-    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || {
-      val destination = Commander.adjustDestination(unit, pixel)
-      val currentThreat = unit.tile.enemyRangeAgainst(unit)
-      destination.tile.enemyRangeAgainst(unit) < Math.max(1, currentThreat) &&
-        Ray(unit.pixel, destination).forall(_.tile.enemyRangeAgainst(unit) <= currentThreat)
-    }
+    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || isSafeMove(unit, pixel)
 
     if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) return mustApproach
 

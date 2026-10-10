@@ -11,6 +11,7 @@ import Micro.Actions.Commands.Travel
 import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Orders
 import ProxyBwapi.Races.Protoss
@@ -52,8 +53,9 @@ abstract class MissionDrop extends Mission {
   protected def landingGoal(transport: FriendlyUnitInfo): Pixel = vicinity
   protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = false
   protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {}
-  protected final def threatenedOnApproach(transport: FriendlyUnitInfo): Boolean =
-    transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin
+  protected final def threatenedOnApproach(transport: FriendlyUnitInfo, waypoint: => Option[Pixel]): Boolean =
+    transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin &&
+      !waypoint.exists(MicroPathing.isSafeMove(transport, _))
   protected def onDestinationChanged(): Unit = {}
   protected def missionTimeout: Int = Seconds(90)()
   protected def approachTimeout: Int = Seconds(45)()
@@ -385,15 +387,21 @@ abstract class MissionDrop extends Mission {
     }
   }
 
+  protected final def routeWaypoint(transport: FriendlyUnitInfo, destination: Tile): Option[Pixel] = {
+    val route = routes.getOrElseUpdate(transport, new DropRoute)
+    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet).map(route.waypoint(transport.pixel, _))
+  }
+
   private def intendRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
     val intent = transport.intend(this).setTerminus(destination.center)
-    if (threatenedOnApproach(transport)) {
+    val waypoint = routeWaypoint(transport, destination)
+    if (threatenedOnApproach(transport, waypoint)) {
       intent.setAction(Retreat)
       return
     }
-    val route = routes.getOrElseUpdate(transport, new DropRoute)
-    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
-      case Some(path) => intent.setStation(route.waypoint(transport.pixel, path)).setAction(Travel)
+    val route = routes(transport)
+    waypoint match {
+      case Some(pixel) => intent.setStation(pixel).setAction(Travel)
       case None =>
         if (route.stalled) returningHome = true
         intent.setRedoubt(transport.agent.defaultHome).setAction(ActionAwaitRoute)

@@ -1007,7 +1007,7 @@ package Tactic.Missions {
       assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle))
       assert(r.loaded && z.loaded && t.pixelDistanceCenter(m.vicinity) > 64)
     }
-    check("threatened delivery hands combat control over before travel retreats from weapon range") {
+    check("a distant threat cannot cancel a safe final approach or trigger an early handoff") {
       val (m, t, r, z, _) = combatMission(approaching = true)
       val marine = unit(ProxyBwapi.Races.Terran.Marine, t.pixel.x + 500, t.pixel.y)
       set(marine, "_player", enemy)
@@ -1017,9 +1017,46 @@ package Tactic.Missions {
         override def withinSafetyMargin = false
       }
       m.run()
-      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle),
-        "Mission travel must not keep retreating before the combat handoff can become reachable")
-      assert(t.intent.station.isEmpty && r.loaded && z.loaded)
+      assert(m.state == m.Landing && t.intent.action == Travel,
+        "A safe route must continue despite the conservative threat margin")
+      assert(t.intent.station.nonEmpty && r.loaded && z.loaded)
+    }
+    check("the replay's western approach reaches the main despite Marines at the natural") {
+      world(128)
+      val target = base(5, 8)
+      val t = unit(Protoss.Shuttle, 155, 1439)
+      val r = unit(Protoss.Reaver, 155, 1439)
+      val marines = Vector((386, 941), (487, 978), (405, 961)).map { case (x, y) =>
+        val marine = unit(ProxyBwapi.Races.Terran.Marine, x, y)
+        set(marine, "_player", enemy)
+        With.grids.enemyRangeAir.updateUnit(marine)
+        marine
+      }
+      t.matchups = new MatchupAnalysis(t) {
+        override def threats = marines
+        override def threatsInRange = Vector.empty
+        override def withinSafetyMargin = false
+      }
+      val m = new MissionProbe(target)
+      m.autonomousLanding = true; m.launched = true
+      m.configure(Vector(t), Vector(r)); load(r, Some(t))
+      var steps = 0
+      while (m.state != m.Raiding && steps < 64) {
+        m.run()
+        if (m.state != m.Raiding) {
+          assert(t.intent.action == Travel, "Distant Marines must not force a southbound retreat")
+          t.sleepUntil = 0; performIntent(t)
+          val to = movement(t)
+          assert(to.y < t.pixel.y, s"The western approach should head north: ${t.pixel} -> $to")
+          assert(Mathematics.Shapes.Ray(t.pixel, to).forall(_.tile.enemyRangeAgainst(t) == 0),
+            "The commanded approach, including acceleration, must avoid anti-air")
+          val next = t.pixel.project(to, Math.min(32, t.pixelDistanceCenter(m.vicinity)))
+          Vector(t, r).foreach(u => { set(u, "_pixel", next); set(u, "_tile", next.tile) })
+          With.frame += 4; steps += 1
+        }
+      }
+      assert(m.state == m.Raiding && t.pixelDistanceCenter(m.vicinity) <= 32 && r.loaded,
+        "The mission must reach the main before releasing its loaded crew to combat")
     }
     check("seeing the entire mineral line still requires approaching its center") {
       val (m, t, r, z, _) = combatMission(approaching = true)
@@ -1223,7 +1260,7 @@ package Tactic.Missions {
       m.run(); performIntent(t)
       avoidsThreat(t, turret, movement(t))
     }
-    check("post-pickup retreat reduces Marine threat depth and reacts to a new blocker") {
+    check("post-pickup movement reduces Marine threat depth and reacts to a new blocker") {
       world(128)
       val t = unit(Protoss.Shuttle, 1372, 155)
       set(t.agent, "_defaultHome", new Cache(() => Pixel(464, 448)))
@@ -1243,7 +1280,6 @@ package Tactic.Missions {
       set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(None))
       t.agent.addPassenger(r); load(r, Some(t)); m.updateState(false)
       m.run(); performIntent(t)
-      assert(t.intent.action == Retreat && t.intent.station.isEmpty)
       assert(movement(t).tile.enemyRangeAgainst(t) < t.tile.enemyRangeAgainst(t), s"Retreat ${t.pixel} -> ${movement(t)} must reduce threat depth")
       marines.foreach(marine => assert(marine.pixelDistanceEdge(t, movement(t)) > marine.pixelRangeAgainst(t)))
       // A newly revealed Marine blocks the original westbound flight path.
@@ -1258,7 +1294,6 @@ package Tactic.Missions {
         override def threatsInRange = threats.filter(_.inRangeToAttack(t))
       }
       m.run(); performIntent(t)
-      assert(t.intent.action == Retreat && t.intent.station.isEmpty)
       assert(movement(t).tile.enemyRangeAgainst(t) < t.tile.enemyRangeAgainst(t), s"Retreat ${t.pixel} -> ${movement(t)} must reduce threat depth")
       assert(Mathematics.Shapes.Ray(t.pixel, movement(t)).forall(_.tile.enemyRangeAgainst(t) <= t.tile.enemyRangeAgainst(t)),
         "The full retreat command, including overshoot, must not cross deeper anti-air")

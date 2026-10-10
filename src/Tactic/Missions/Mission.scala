@@ -1,6 +1,7 @@
 package Tactic.Missions
 
 import Lifecycle.With
+import Information.Battles.Types.CombatGroup
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Tactic.Squads.Squad
 
@@ -21,6 +22,7 @@ trait Mission extends Squad {
     } else if (shouldForm) {
       reset()
       launched = true
+      CombatGroup.invalidate()
       launchFrame = With.frame
       recruit()
       With.logger.debug(f"Launching $this to ${vicinity.base.getOrElse(vicinity.tile)} with ${With.recruiter.lockedBy(this).view.map(_.toString).mkString(", ")}")
@@ -35,7 +37,9 @@ trait Mission extends Squad {
     if (launched) {
       With.logger.debug(f"Terminating $this: $reason")
     }
+    val oldGroup = combatGroup
     launched = false
+    if (combatGroup != oldGroup) CombatGroup.invalidate()
     With.recruiter.release(this)
   }
 }

@@ -239,7 +239,10 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
 
   @inline final def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
   @inline final def team: Option[Team] = battle.map(b => ?(isFriendly, b.us, b.enemy))
-  @inline final def report: Option[ReportCard] = battle.flatMap(_.simulationReport.get(this))
+  @inline final def combatForecast: Option[Battle] = battle.flatMap(_.combatForecasts.forUnit(this))
+  @inline final def combatJudgment = combatForecast.flatMap(_.judgement)
+  @inline final def combatAllies: Iterable[UnitInfo] = combatForecast.toSeq.flatMap(_.us.units).filterNot(_ == this)
+  @inline final def report: Option[ReportCard] = combatForecast.flatMap(_.simulationReport.get(this))
   var matchups: MatchupAnalysis = MatchupAnalysis(this)
   val simulacrum: Simulacrum = new Simulacrum(this)
   var nextInCluster: Option[UnitInfo] = None
@@ -312,8 +315,8 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canBurrow       : Boolean = canDoAnything && (is(Zerg.Lurker) || (Zerg.Burrow(player) && unitClass.canBurrow))
 
   def confidence01: Double = (confidence11 + 1) / 2
-  def confidence11: Double = _confidence()
-  private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else battle.flatMap(_.judgement.map(j => if (flying) j.confidence11Air else j.confidence11Ground)).getOrElse(1.0))
+  def confidence11: Double = if (battle.isDefined && combatForecast.isEmpty) -1.0 else _confidence()
+  private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else combatJudgment.map(j => if (flying) j.confidence11Air else j.confidence11Ground).getOrElse(if (battle.isDefined) -1.0 else 1.0))
 
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

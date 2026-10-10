@@ -29,7 +29,7 @@ class Hysteresis(val unit: FriendlyUnitInfo) {
       bloodlust = bloodlustFrames
       // Finish the decay even if contact is briefly lost; don't restart it on re-entry.
       if (bloodlust == 0 && ! engaged) bloodlustDecaying = false
-    } else if (unit.battle.exists(_.judgement.exists(j => j.scoreTotal > 0 && ! j.unitShouldFight(unit)))) {
+    } else if (unit.combatJudgment.exists(j => j.scoreTotal > 0 && ! j.unitShouldFight(unit))) {
       bloodlust = Math.min(Seconds(15)(), bloodlust + With.framesSince(lastUpdateFrame))
     }
     lastUpdateFrame = With.frame

@@ -15,11 +15,11 @@ object ShuttlePark extends Action {
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && exposedPassengers(shuttle).nonEmpty
 
   def exposedPassengers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = {
-    BeShuttle.supportedPassengers(shuttle).filterNot(_.airborne)
+    shuttle.agent.passengersPrioritized.filterNot(_.airborne)
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = BeShuttle.supportedPassengers(shuttle).filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
+    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
     parkWithPassengers(shuttle, exposed)
   }
 

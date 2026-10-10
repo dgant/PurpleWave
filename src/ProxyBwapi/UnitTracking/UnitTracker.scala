@@ -5,6 +5,7 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Mathematics.Shapes.Circle
 import Performance.{Cache, TotalUnitCounter}
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo._
 import Tactic.Squads.{GenericFriendlyUnitGroup, GenericUnitGroup, UnitGroup}
 import Utilities.?
@@ -27,6 +28,7 @@ final class UnitTracker {
 
   val mutex: ReentrantLock = new ReentrantLock()
   val scarabs: ScarabTracker = new ScarabTracker
+  private val newScarabs = new ArrayBuffer[FriendlyUnitInfo]
 
   @inline def getId(id: Int): Option[UnitInfo] = units(id)
   @inline def get(unit: bwapi.Unit): Option[UnitInfo] = if (unit == null) None else units(unit.getID)
@@ -41,6 +43,7 @@ final class UnitTracker {
         else                                                              bufferNeutral   .add(new ForeignUnitInfo(bwapiUnit, id))
       units(id) = Some(newUnit)
       newUnit.readProxy()
+      newUnit.friendly.filter(Protoss.Scarab).foreach(newScarabs += _)
       With.scouting.onUnitBirthTimings(newUnit)
     }
   }
@@ -64,7 +67,9 @@ final class UnitTracker {
       mutex.lock()
       birthAll()
       updateFriendly(bufferFriendly)
-      scarabs.update(ours)
+      // Births arrive before Reaver cooldowns are refreshed. Match launches afterwards.
+      newScarabs.foreach(scarabs.onUnitCreate(_, ours))
+      newScarabs.clear()
       updateForeign(bufferEnemy)
       updateForeign(bufferNeutral)
       killDeadForeign()

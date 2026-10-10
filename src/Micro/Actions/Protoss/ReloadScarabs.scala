@@ -16,16 +16,12 @@ object ReloadScarabs extends Action {
     && With.self.minerals >= Protoss.Scarab.mineralPrice
   )
 
-  def readyForPickup(unit: FriendlyUnitInfo): Boolean =
-    !Protoss.Reaver(unit) || unit.scarabs + unit.trainingQueue.size >= 2
-
   override def perform(unit: FriendlyUnitInfo): Unit = {
     val queued = Math.max(unit.trainingQueue.size, unit.bwapiUnit.getTrainingQueueCount)
     val needed = maxScarabCount - unit.scarabs - queued
     if (needed <= 0) return
     if (unit.airlifted) {
-      // Queued Scarabs finish in flight; do not land just to top up a ready passenger.
-      if (!readyForPickup(unit) && unit.matchups.framesOfSafety > 24 + With.reaction.agencyMax) {
+      if (unit.matchups.framesOfSafety > 24 + With.reaction.agencyMax) {
         RequestSafeLanding(unit)
       }
     } else {

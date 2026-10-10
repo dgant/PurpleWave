@@ -3,6 +3,8 @@ package Tactic.Missions
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
+import Mathematics.Points.Tile
+import Micro.Actions.{Action, Idle}
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
@@ -10,15 +12,17 @@ import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitCounters.{CountOne, CountUpTo}
 import Utilities.UnitFilters._
 
+import scala.collection.mutable
+
 class MissionReaverDrop extends MissionDrop {
 
-  private val plannedTargets = scala.collection.mutable.ArrayBuffer.empty[Base]
+  private val plannedTargets = mutable.ArrayBuffer.empty[Base]
   private case class RaidProgress(var frame: Int, var distance: Double, var landed: Set[Int], var shot: Int)
-  private val combatProgress = scala.collection.mutable.Map.empty[FriendlyUnitInfo, RaidProgress]
+  private val combatProgress = mutable.Map.empty[FriendlyUnitInfo, RaidProgress]
   override def reset(): Unit = { super.reset(); plannedTargets.clear(); onDestinationChanged() }
   override protected def onDestinationChanged(): Unit = combatProgress.clear()
   override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
-  private[Missions] def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
+  protected def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
     plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
     val discovered = MissionReaverDrop.targets(bases, possibleMains).filterNot(plannedTargets.contains)
     itinerary ++= discovered
@@ -57,7 +61,7 @@ class MissionReaverDrop extends MissionDrop {
     true
   }
 
-  override protected def raidTransportAction: Micro.Actions.Action = Micro.Actions.Idle
+  override protected def raidTransportAction: Action = Idle
   override protected def commitWhileRaiding: Boolean = false
   override protected def defaultCombatLanding: Boolean = true
   override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
@@ -66,9 +70,7 @@ class MissionReaverDrop extends MissionDrop {
   override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
     destinationBase.exists(base => base.isEnemy && passengersFor(transport).exists(Protoss.Reaver) && (
       transport.matchups.threatsInRange.nonEmpty
-      || transport.pixelDistanceCenter(vicinity) <= 64
-      || (base.minerals.nonEmpty && base.minerals.forall(m =>
-        m.tile.lastSeen > 0 && With.framesSince(m.tile.lastSeen) <= Seconds(5)()))))
+      || transport.pixelDistanceCenter(vicinity) <= 32))
 
   override protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {
     val reavers = passengersFor(transport).filter(Protoss.Reaver)
@@ -150,9 +152,9 @@ class MissionReaverDrop extends MissionDrop {
     if (reavers.isEmpty) { terminate("Waiting for a transportable Reaver"); return }
     val selectedTransports = reavers.values.toVector.distinct.sortBy(_.id)
     val filler = available.filter(smallLock.matcher) ++ available.filter(bigLock.matcher)
-    manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)
+    val manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)
 
-    def reserve(lock: LockUnits, units: Iterable[ProxyBwapi.UnitInfo.FriendlyUnitInfo]): Unit = {
+    def reserve(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {
       lock.setCounter(CountUpTo(units.size))
       With.recruiter.lockTo(lock, units)
     }
@@ -162,11 +164,12 @@ class MissionReaverDrop extends MissionDrop {
     reserve(bigLock, manifest.keys.filter(u => u.isAny(Protoss.Archon, Protoss.Dragoon)))
     transports ++= selectedTransports
     passengers ++= manifest.keys.toVector.sortBy(_.id)
+    manifest.foreach { case (p, t) => t.agent.addPassenger(p) }
   }
 }
 
 private[Missions] object MissionReaverDrop {
-  def workersCleared(base: Base, visible: Mathematics.Points.Tile => Boolean): Boolean =
+  def workersCleared(base: Base, visible: Tile => Boolean): Boolean =
     visible(base.heart) && base.resources.forall(r => visible(r.tile)) && base.units.forall(u => !u.isEnemy || !IsWorker(u))
 
   def reverseTargets(planned: Seq[Base], from: Base): Vector[Base] = {

@@ -3,7 +3,6 @@ package Micro.Actions.Protoss
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.{Commander, ReaverCommander}
 import Micro.Targeting.FiltersSituational.{TargetFilterPotshot, TargetFilterVisibleInRange}
 import Micro.Targeting.Target
@@ -41,21 +40,6 @@ object ReaverShot {
 
   def preparationFrames(latency: Int, reaction: Int, turn: Int): Int =
     latency + Math.max(1, reaction) + turn + 2 + attackLeadFrames
-
-  // Keep the entire segment legal, not just its endpoint. In particular, don't let a
-  // cooldown move cross the firing range or a native Scarab-path boundary.
-  def limitMove(from: Pixel, to: Pixel, maxPixels: Double)(legal: Pixel => Boolean): Pixel = {
-    val distance = Math.min(from.pixelDistance(to), Math.max(0, maxPixels))
-    var result = from
-    var step = 1
-    while (step <= Math.ceil(distance).toInt) {
-      val candidate = from.projectUpTo(to, Math.min(step.toDouble, distance))
-      if ( ! legal(candidate)) return result
-      result = candidate
-      step += 1
-    }
-    result
-  }
 }
 
 // One plan per Reaver. Lock the target only during preparation, so target scoring
@@ -80,13 +64,18 @@ final class ReaverShot(unit: FriendlyUnitInfo) {
     if (unit.unready) return true
     if (unit.loaded) { reset(); return false }
 
+    val lead = ReaverShot.preparationFrames(With.latency.remainingFrames, With.reaction.agencyMax, Protoss.Reaver.framesToTurn180)
+    if (unit.cooldownLeft > lead || (retreating && unit.hasActiveScarab)) {
+      reset()
+      return false // Existing combat movement and retreat own the cooldown interval.
+    }
+
     def legal(target: UnitInfo): Boolean = (
       target.alive && target.visible && unit.canAttack(target) && unit.inRangeToAttack(target)
         && unit.hasScarabPathTo(target, unit.pixel)
         && ( ! retreating || TargetFilterPotshot.legal(unit, target)))
 
-    val lead = ReaverShot.preparationFrames(With.latency.remainingFrames, With.reaction.agencyMax, Protoss.Reaver.framesToTurn180)
-    if (With.framesSince(lastPlanningFrame) > lead || unit.cooldownLeft > lead || preparing.exists(t => ! legal(t))) reset()
+    if (With.framesSince(lastPlanningFrame) > lead || preparing.exists(t => ! legal(t))) reset()
     lastPlanningFrame = With.frame
     val selected = preparing.filter(legal)
       .orElse(unit.agent.toAttack.filter(legal))
@@ -94,28 +83,6 @@ final class ReaverShot(unit: FriendlyUnitInfo) {
     if (selected.isEmpty) { reset(); return false }
     val target = selected.get
     unit.agent.toAttack = selected
-
-    if (unit.cooldownLeft > lead || (retreating && unit.hasActiveScarab)) {
-      reset()
-      // A deliberate retreat may leave firing range. Engaged Reavers instead use
-      // the available movement window without sacrificing their next in-range shot.
-      if (retreating) return false
-      val desired = if (unit.matchups.threats.nonEmpty) Retreat.getRetreat(unit).to else unit.agent.destinationNext()
-      if (unit.unready) return true // The retreat planner may request a Shuttle pickup.
-      val projectedTarget = target.projectFrames(unit.cooldownLeft)
-      val canKeepProjectedRange = unit.inRangeToAttack(target, projectedTarget)
-      val distanceNow = unit.pixelDistanceEdge(target)
-      val moveFrames = unit.cooldownLeft - With.latency.remainingFrames - Protoss.Reaver.framesToTurn180 - 2 - ReaverShot.attackLeadFrames
-      val to = ReaverShot.limitMove(unit.pixel, desired, unit.topSpeed * Math.max(0, moveFrames))(p =>
-        p.traversableBy(unit)
-          && unit.pixelDistanceEdgeFrom(target, p) >= distanceNow
-          && unit.inRangeToAttackFrom(target, p)
-          && ( ! canKeepProjectedRange || unit.inRangeToAttack(target, p, projectedTarget))
-          && unit.hasScarabPathTo(target, p))
-      unit.agent.act("ReaverReposition")
-      if (to == unit.pixel) ReaverCommander.hold(unit) else ReaverCommander.move(unit, to)
-      return true
-    }
 
     if (preparing.isEmpty) {
       preparing = selected

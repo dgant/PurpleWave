@@ -4,7 +4,7 @@ import Debugging.SimpleString
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
-import Mathematics.Points.{Pixel, Points}
+import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Actions.Protoss.ReloadScarabs
@@ -12,6 +12,8 @@ import Micro.Actions.Protoss.Shuttle.ShuttleEscape
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Planning.ResourceLocks.LockUnits
+import ProxyBwapi.Orders
+import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Squads.SquadAutomation
 import Utilities.Time.{Minutes, Seconds}
@@ -61,19 +63,18 @@ abstract class MissionDrop extends Mission {
   var state             : DropState         = Assembling
   private var stateFrame = With.frame
   protected def stateAge: Int = With.framesSince(stateFrame)
-  protected var manifest: DropManifest.Manifest = Map.empty
   private val routes = mutable.Map.empty[FriendlyUnitInfo, DropRoute]
   private val initiallyLanded = mutable.Set.empty[FriendlyUnitInfo]
   protected val raidingTransports = mutable.Set.empty[FriendlyUnitInfo]
   private val pickupTargets = mutable.Map.empty[FriendlyUnitInfo, FriendlyUnitInfo]
-  private var optionalPickupFrame: Option[Int] = None
   protected var destinationBase: Option[Base] = None
   private var returningHome = false
   private var itineraryFrame = 0
   private var destinationFrame = 0
 
-  final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] = manifest.get(passenger)
-  protected final def passengersFor(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = passengers.filter(p => manifest.get(p).contains(transport))
+  final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] =
+    passenger.transport.filter(transports.contains).orElse(passenger.agent.ride.filter(transports.contains))
+  protected final def passengersFor(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = passengers.filter(p => assignedTransport(p).contains(transport))
 
   override def reset(): Unit = {
     itinerary.clear()
@@ -81,12 +82,10 @@ abstract class MissionDrop extends Mission {
     passengers.clear()
     state = Assembling
     stateFrame = With.frame
-    manifest = Map.empty
     routes.clear()
     initiallyLanded.clear()
     raidingTransports.clear()
     pickupTargets.clear()
-    optionalPickupFrame = None
     destinationBase = None
     returningHome = false
     itineraryFrame = With.frame
@@ -101,7 +100,6 @@ abstract class MissionDrop extends Mission {
     if (state != newState) {
       With.logger.debug(f"$this transitioning from $state to $newState")
       pickupTargets.clear()
-      optionalPickupFrame = None
       stateFrame = With.frame
     }
     state = newState
@@ -188,10 +186,6 @@ abstract class MissionDrop extends Mission {
     if (renewed) itineraryFrame = With.frame
     updateState(shouldGoHome || (expired && !renewed))
     if (state == Escaping && allHome) { terminate("Escaped!"); return }
-    transports.foreach(t => {
-      t.agent.passengers.filterNot(p => manifest.get(p).contains(t)).foreach(t.agent.removePassenger)
-    })
-    manifest.foreach { case (p, t) => if (!p.agent.ride.contains(t)) t.agent.addPassenger(p) }
     transports.filter(t => state == Assembling || (state == Escaping && t.base.exists(_.owner.isUs))).foreach(t => {
       t.loadedUnits.view.filterNot(passengers.contains).foreach(p => {
         With.logger.micro(f"Drop transport $t ditching rider $p")
@@ -208,8 +202,11 @@ abstract class MissionDrop extends Mission {
     }
   }
   private def updateManifest(): Unit = {
-    manifest = DropManifest.fill(transports, passengers, manifest)
-    releasePassengers(passengers.filterNot(manifest.contains).toSet)
+    val current = passengers.flatMap(p => assignedTransport(p).map(p -> _)).toMap
+    val assigned = DropManifest.fill(transports, passengers, current)
+    transports.foreach(t => t.agent.passengers.filterNot(p => assigned.get(p).contains(t)).foreach(t.agent.removePassenger))
+    assigned.foreach { case (p, t) => if (!p.agent.ride.contains(t)) t.agent.addPassenger(p) }
+    releasePassengers(passengers.filterNot(assigned.contains).toSet)
     routes.keys.filterNot(transports.contains).toVector.foreach(routes.remove)
     pickupTargets.keys.filterNot(transports.contains).toVector.foreach(pickupTargets.remove)
     raidingTransports.retain(transports.contains)
@@ -226,13 +223,12 @@ abstract class MissionDrop extends Mission {
         }
       })
       stranded.foreach(p => {
-        if (!p.loaded && p.order == ProxyBwapi.Orders.EnterTransport) Commander.stop(p)
+        if (!p.loaded && p.order == Orders.EnterTransport) Commander.stop(p)
         p.agent.ride.foreach(_.agent.removePassenger(p))
         p.agent.commit = false
         p.intend(this).setAction(Idle)
       })
       passengers --= stranded
-      manifest --= stranded
     }
   }
 
@@ -251,23 +247,13 @@ abstract class MissionDrop extends Mission {
     })
   }
 
-  private[Missions] def updateState(goHome: Boolean): Unit = {
+  private def updateState(goHome: Boolean): Unit = {
     returningHome ||= goHome || itinerary.isEmpty
     if (destinationBase.isEmpty && !returningHome) beginDestination()
     // Keep the old vicinity throughout pickup; a new destination never orders
     // grounded passengers to walk away from the Shuttle collecting them.
     if (returningHome || destinationBase != itinerary.headOption) {
       if (state != Evacuating && state != Escaping) transition(Evacuating)
-    }
-    if (state == Assembling || state == Evacuating) {
-      val required = passengers.filter(requiredPassenger)
-      if (required.forall(_.transport.exists(transports.contains))) {
-        optionalPickupFrame = optionalPickupFrame.orElse(Some(With.frame))
-        val allowance = if (state == Assembling) Seconds(3)() else Seconds(5)()
-        if (optionalPickupFrame.exists(With.framesSince(_) >= allowance)) {
-          releasePassengers(passengers.filter(p => !requiredPassenger(p) && !p.loaded).toSet)
-        }
-      } else optionalPickupFrame = None
     }
     if (state == Assembling && allAboard) transition(Travelling)
     if (state == Travelling && !allAboard) transition(Evacuating)
@@ -330,9 +316,12 @@ abstract class MissionDrop extends Mission {
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
 
+  private def readyForPickup(passenger: FriendlyUnitInfo): Boolean =
+    !Protoss.Reaver(passenger) || passenger.scarabs + passenger.trainingQueue.size >= 2
+
   private def pickupTarget(transport: FriendlyUnitInfo, assembling: Boolean): Option[FriendlyUnitInfo] = pickupTargets.synchronized {
     val unloaded = passengersFor(transport).filterNot(_.loaded)
-      .filter(p => !assembling || ReloadScarabs.readyForPickup(p))
+      .filter(p => !assembling || readyForPickup(p))
     val required = Maff.orElse(unloaded.filter(requiredPassenger), unloaded).toVector
     val candidates = if (assembling) required else
       Maff.orElse(required.filter(_.matchups.threatsInRange.nonEmpty), required).toVector
@@ -345,7 +334,7 @@ abstract class MissionDrop extends Mission {
   private def boardSelected(passenger: FriendlyUnitInfo, assembling: Boolean): Unit = {
     assignedTransport(passenger).foreach(t => {
       if (pickupTarget(t, assembling).contains(passenger)) Commander.rightClick(passenger, t)
-      else if (passenger.order == ProxyBwapi.Orders.EnterTransport) Commander.stop(passenger)
+      else if (passenger.order == Orders.EnterTransport) Commander.stop(passenger)
       else DoNothing.delegate(passenger)
     })
   }
@@ -373,7 +362,7 @@ abstract class MissionDrop extends Mission {
       passenger.agent.redoubt.set(
         passenger.agent.decision.set(assignedTransport(passenger).map(_.pixel)))
       ReloadScarabs.delegate(passenger)
-      if (ReloadScarabs.readyForPickup(passenger)) {
+      if (readyForPickup(passenger)) {
         boardSelected(passenger, assembling = true)
       }
     }
@@ -385,7 +374,7 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  private def followRoute(transport: FriendlyUnitInfo, destination: Mathematics.Points.Tile): Unit = {
+  private def followRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
     if (ShuttleEscape.start(transport)) return
     val route = routes.getOrElseUpdate(transport, new DropRoute)
     route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
@@ -425,7 +414,7 @@ abstract class MissionDrop extends Mission {
             && passenger.matchups.threats.exists(t => t.inRangeToAttack(passenger, runway) && ! t.inRangeToAttack(passenger))))
         .sortBy(_.subjectiveValue * (if (transport.tile.enemyRange > 0) -1 else 1))
       droppables.headOption.foreach(Commander.unload(transport, _))
-      transport.agent.decision.set(Micro.Actions.Protoss.Shuttle.BeShuttle.deliveryGoal(transport, runway))
+      transport.agent.decision.set(runway)
       Commander.move(transport, allowOvershoot = false)
     }
   }

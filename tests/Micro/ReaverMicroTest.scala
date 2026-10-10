@@ -49,18 +49,21 @@ object ReaverMicroTest extends App {
     u
   }
 
+  def discover(tracker: ScarabTracker, units: Vector[FriendlyUnitInfo]): Unit =
+    units.filter(u => Protoss.Scarab(u) && u.frameDiscovered == With.frame).foreach(tracker.onUnitCreate(_, units))
+
   check("an active Scarab blocks a zero-cooldown Reaver until the Scarab dies") {
     val reaver = unit(398, Protoss.Reaver, 100, 60)
     val scarab = unit(900, Protoss.Scarab, 125)
-    With.units.scarabs.update(Vector(reaver, scarab))
+    discover(With.units.scarabs, Vector(reaver, scarab))
     assert(reaver.hasActiveScarab)
     With.frame += 60
     set(reaver, "_cooldownRaw", 0)
     set(scarab, "_pixel", Pixel(600, 64))
-    With.units.scarabs.update(Vector(reaver, scarab))
+    discover(With.units.scarabs, Vector(reaver, scarab))
     assert(!reaver.readyForAttackOrder)
     set(scarab, "_alive", false)
-    With.units.scarabs.update(Vector(reaver))
+    discover(With.units.scarabs, Vector(reaver))
     assert(reaver.readyForAttackOrder)
   }
   check("other Reavers and non-Reavers retain normal readiness") {
@@ -86,7 +89,7 @@ object ReaverMicroTest extends App {
   check("a landing cooldown cannot claim a nearby Scarab") {
     val tracker = new ScarabTracker
     val reaver = unit(1, Protoss.Reaver, 100, 30)
-    tracker.update(Vector(reaver, unit(9, Protoss.Scarab, 125)))
+    discover(tracker, Vector(reaver, unit(9, Protoss.Scarab, 125)))
     assert(tracker.launchedBy(reaver).isEmpty)
   }
   check("loaded, distant and stale-firing Reavers cannot claim a launch") {
@@ -96,14 +99,14 @@ object ReaverMicroTest extends App {
     val distant = unit(2, Protoss.Reaver, 300, 60)
     val stale = unit(3, Protoss.Reaver, 100, 59)
     stale.lastFrameStartingAttack -= 1
-    tracker.update(Vector(loaded, distant, stale, unit(9, Protoss.Scarab, 125)))
+    discover(tracker, Vector(loaded, distant, stale, unit(9, Protoss.Scarab, 125)))
     assert(Vector(loaded, distant, stale).forall(tracker.launchedBy(_).isEmpty))
   }
   check("ambiguous simultaneous launches do not block either possible parent") {
     val tracker = new ScarabTracker
     val a = unit(1, Protoss.Reaver, 100, 60)
     val b = unit(2, Protoss.Reaver, 110, 60)
-    tracker.update(Vector(a, b, unit(9, Protoss.Scarab, 125)))
+    discover(tracker, Vector(a, b, unit(9, Protoss.Scarab, 125)))
     assert(tracker.launchedBy(a).isEmpty && tracker.launchedBy(b).isEmpty)
   }
   check("separated simultaneous launches retain independent identities") {
@@ -112,10 +115,10 @@ object ReaverMicroTest extends App {
     val b = unit(2, Protoss.Reaver, 300, 60)
     val sa = unit(8, Protoss.Scarab, 125)
     val sb = unit(9, Protoss.Scarab, 325)
-    tracker.update(Vector(a, b, sa, sb))
+    discover(tracker, Vector(a, b, sa, sb))
     assert(tracker.launchedBy(a).contains(sa) && tracker.launchedBy(b).contains(sb))
     set(sa, "_alive", false)
-    tracker.update(Vector(a, b, sb))
+    discover(tracker, Vector(a, b, sb))
     assert(tracker.launchedBy(a).isEmpty && tracker.launchedBy(b).contains(sb))
   }
 
@@ -195,30 +198,18 @@ object ReaverMicroTest extends App {
     assert(distance.pixels(Pixel(-1, 0), Pixel(0, 0)) == BroodWarGroundDistance.unreachable)
   }
   import Micro.Actions.Protoss.ReaverShot
+  check("shot preparation yields to ordinary combat during the cooldown movement interval") {
+    val previousReaction = With.reaction
+    With.reaction = new ReactionTimes { override def agencyMax: Int = 1 }
+    val r = unit(40, Protoss.Reaver, 100, 60)
+    assert(!new ReaverShot(r).perform(retreating = false))
+    assert(!new ReaverShot(r).perform(retreating = true))
+    With.reaction = previousReaction
+  }
   check("shot preparation reserves delivery, agency, a full turn and native attack startup") {
     assert(ReaverShot.preparationFrames(0, 1, 7) == 12)
     assert(ReaverShot.preparationFrames(4, 3, 7) == 18)
     assert(60 - ReaverShot.preparationFrames(0, 1, 7) == 48)
-  }
-  check("cooldown repositioning stops at firing range instead of overshooting a long waypoint") {
-    val from = Pixel(200, 100)
-    val enemy = Pixel(0, 100)
-    val to = ReaverShot.limitMove(from, Pixel(500, 100), 150)(_.pixelDistance(enemy) <= 256)
-    assert(to == Pixel(256, 100))
-  }
-  check("cooldown movement keeps all legal lateral movement and respects the time budget") {
-    val from = Pixel(100, 100)
-    assert(ReaverShot.limitMove(from, Pixel(100, 200), 80)(_ => true) == Pixel(100, 180))
-    assert(ReaverShot.limitMove(from, Pixel(100, 140), 80)(_ => true) == Pixel(100, 140))
-    assert(ReaverShot.limitMove(from, Pixel(100, 200), 0)(_ => true) == from)
-  }
-  check("a legal endpoint cannot hide an intervening path or terrain boundary") {
-    assert(ReaverShot.limitMove(Pixel(100, 100), Pixel(200, 100), 100)(p => p.x < 140 || p.x > 160) == Pixel(139, 100))
-  }
-  check("an in-range Reaver does not creep toward its target between shots") {
-    val from = Pixel(200, 100)
-    val enemy = Pixel(0, 100)
-    assert(ReaverShot.limitMove(from, enemy, 100)(_.pixelDistance(enemy) >= from.pixelDistance(enemy)) == from)
   }
   check("aiming uses a short accurate ray in every direction") {
     val origin = Pixel(500, 500)

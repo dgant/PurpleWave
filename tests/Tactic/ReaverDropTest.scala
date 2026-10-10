@@ -26,7 +26,7 @@ package Tactic.Missions {
   import Information.Geography.Pathfinding.Paths
   import Information.Geography.Types.{Base, Zone}
   import Information.Grids.Grids
-  import Information.Grids.Floody.{GridEnemyRangeAir, GridEnemyVision}
+  import Information.Grids.Floody.{GridEnemyRangeAir, GridEnemyRangeAirGround, GridEnemyRangeGround, GridEnemyVision}
   import Information.Grids.Movement.{GridUnwalkableUnits, GridWalkable, GridWalkableTerrain}
   import Lifecycle.With
   import Lifecycle.Configure.Configuration
@@ -114,6 +114,8 @@ package Tactic.Missions {
       set(With.geography, "_zoneByTile", Array.fill[Zone](size * size)(null))
       With.grids = allocate(classOf[Grids])
       set(With.grids, "enemyRangeAir", new GridEnemyRangeAir)
+      set(With.grids, "enemyRangeGround", new GridEnemyRangeGround)
+      set(With.grids, "enemyRangeAirGround", new GridEnemyRangeAirGround)
       set(With.grids, "enemyVision", new GridEnemyVision)
       set(With.grids, "lastSeen", new Information.Grids.Vision.GridLastSeen)
       set(With.grids, "walkable", new GridWalkable)
@@ -234,7 +236,13 @@ package Tactic.Missions {
     class MissionProbe(val target: Base) extends MissionReaverDrop {
       var autonomousLanding = false
       override protected def defaultCombatLanding: Boolean = autonomousLanding
+      def updateState(goHome: Boolean): Unit = {
+        val method = classOf[MissionDrop].getDeclaredMethod("updateState", java.lang.Boolean.TYPE)
+        method.setAccessible(true)
+        method.invoke(this, java.lang.Boolean.valueOf(goHome))
+      }
       def approach(t: FriendlyUnitInfo): Pixel = landingGoal(t)
+      override def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = super.appendTargets(bases, possibleMains)
       def controlsCombat(t: FriendlyUnitInfo): Boolean = raidingTransports(t)
 
       override protected def requireWorkers: Boolean = false
@@ -257,7 +265,7 @@ package Tactic.Missions {
         transports ++= ts; passengers ++= ps; itinerary += target
         (ts ++ ps).foreach(_.setSquad(Some(this)))
         set(this, "_unitsNow", ArrayBuffer((ts ++ ps): _*))
-        manifest = DropManifest.fill(ts, ps)
+        DropManifest.fill(ts, ps).foreach { case (p, t) => t.agent.addPassenger(p) }
       }
     }
     val first = base(5)
@@ -292,14 +300,16 @@ package Tactic.Missions {
       perform(m.ActionAssemblePassenger, r)
       assert(r.agent.wantsPickup)
     }
-    check("a loaded Reaver with two queued Scarabs stays aboard to finish them in flight") {
+    check("general micro lands safely to refill even with two Scarabs already queued") {
       val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
       set(r, "_scarabs", 0)
       set(r, "_trainingQueue", Vector(Protoss.Scarab, Protoss.Scarab))
       r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].queuedScarabs = 2
       load(r, Some(t))
+      r.agent.shouldFight = true; r.agent.decision.set(r.pixel)
+      r.matchups = new MatchupAnalysis(r) { override def framesOfSafety = 1000.0 }
       Micro.Actions.Protoss.ReloadScarabs(r)
-      assert(!r.agent.wantsUnload && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
+      assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == r.bwapiUnit)
     }
     check("the newly completed second Reaver is recruited before it has Scarabs") {
       val t = unit(Protoss.Shuttle)
@@ -554,11 +564,10 @@ package Tactic.Missions {
       With.blackboard.takeUnownedBases.set(true)
       assert(Tactic.GetDefenseBase.canSecure(Vector(natural)))
     }
-    check("Shuttle support follows its Reavers instead of a nearby filler Zealot") {
+    check("Shuttle support includes its Zealots alongside the Reaver") {
       val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver, 300); val z = unit(Protoss.Zealot)
       t.agent.addPassenger(z); t.agent.addPassenger(r)
-      assert(Micro.Actions.Protoss.Shuttle.BeShuttle.supportedPassengers(t) == Vector(r))
-      assert(Micro.Actions.Protoss.Shuttle.ShuttlePark.exposedPassengers(t) == Vector(r))
+      assert(Micro.Actions.Protoss.Shuttle.ShuttlePark.exposedPassengers(t).toSet == Set(r, z))
     }
     check("a threatened Shuttle stays with its nearby grounded Reaver") {
       val previousMapping = With.geography.allTiles.map(_.base).toArray
@@ -587,14 +596,6 @@ package Tactic.Missions {
       assert(Pixel(distant.getX, distant.getY).pixelDistance(r.pixel) > t.pixelDistanceCenter(r),
         "Keep retreating when still too far away to support the Reaver")
       set(With.geography, "_baseByTile", previousMapping)
-    }
-    check("delivering a loaded Reaver cannot abandon its grounded partner") {
-      val t = unit(Protoss.Shuttle); val ground = unit(Protoss.Reaver, 300); val rider = unit(Protoss.Reaver)
-      t.agent.addPassenger(ground); t.agent.addPassenger(rider); load(rider, Some(t))
-      val far = Pixel(3000, 3000)
-      assert(Micro.Actions.Protoss.Shuttle.BeShuttle.deliveryGoal(t, far).pixelDistance(ground.pixel) <= 33)
-      load(ground, Some(t))
-      assert(Micro.Actions.Protoss.Shuttle.BeShuttle.deliveryGoal(t, far) == far)
     }
     check("new squads receive their recruited crew on the first update and run once") {
       With.performance = new Performance.PerformanceMonitor
@@ -909,6 +910,24 @@ package Tactic.Missions {
       assert(m.state == m.Raiding && t.intent.action == Idle && z.loaded,
         "A recovered Reaver cannot restart initial landing to deploy filler")
     }
+    check("default Shuttle combat honors a loaded Zealot ride goal beside a grounded Reaver") {
+      val (m, t, r, z, worker) = combatMission(); m.run(); load(r, None)
+      val previousUnits = With.units.ours.toVector
+      set(With.units, "bufferFriendly", new ProxyBwapi.UnitTracking.UnorderedBuffer(Vector(t, r, z)))
+      Vector(t, r, z).foreach(u => u.matchups = new MatchupAnalysis(u) {
+        override def threats = Vector.empty
+        override def threatsInRange = Vector.empty
+        override def enemies = Vector.empty
+        override def pixelsToThreatRange = None
+      })
+      val goal = t.pixel.add(120, 0)
+      z.agent.toAttack = Some(worker); z.agent.setRideGoal(goal)
+      perform(Micro.Actions.Protoss.Shuttle.BeShuttle, t)
+      assert(t.agent.decision.pixel.contains(goal), "The Zealot's delivery request must remain eligible and unclamped")
+      val moved = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+      assert(moved != null && moved.getX > t.pixel.x + 120, "Ordinary delivery retains acceleration overshoot")
+      set(With.units, "bufferFriendly", new ProxyBwapi.UnitTracking.UnorderedBuffer(previousUnits))
+    }
     check("an isolated worker cannot trigger an uncontested landing before the mineral line") {
       val (m, t, r, z, worker) = combatMission(approaching = true)
       assert(r.inRangeToAttackFrom(worker, t.pixel) && t.pixelDistanceCenter(m.target.heart.center) > 64)
@@ -947,7 +966,7 @@ package Tactic.Missions {
       assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle))
       assert(r.loaded && z.loaded && t.pixelDistanceCenter(m.vicinity) > 64)
     }
-    check("every mineral patch needs recent vision before vision alone permits a landing") {
+    check("seeing the entire mineral line still requires approaching its center") {
       val (m, t, r, z, _) = combatMission(approaching = true)
       val minerals = m.target.minerals
       With.grids.lastSeen.set(minerals.head.tile, With.frame)
@@ -956,7 +975,11 @@ package Tactic.Missions {
       m.run(); assert(m.state == m.Landing && !m.controlsCombat(t), "Old mineral vision is insufficient")
       With.grids.lastSeen.set(minerals.last.tile, With.frame - Seconds(5)())
       m.run()
-      assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle) && r.loaded)
+      assert(m.state == m.Landing && !m.controlsCombat(t) && Vector(r, z).forall(_.loaded))
+      t.matchups = new MatchupAnalysis(t) { override def threats = Vector.empty; override def threatsInRange = Vector.empty }
+      perform(m.ActionLandTransport, t)
+      val moved = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
+      assert(moved != null && Pixel(moved.getX, moved.getY).pixelDistance(m.vicinity) < t.pixelDistanceCenter(m.vicinity))
     }
     check("an empty mineral list does not count as full mineral-line vision") {
       val (m, t, r, _, _) = combatMission(approaching = true)
@@ -964,11 +987,11 @@ package Tactic.Missions {
       m.run()
       assert(m.state == m.Landing && !m.controlsCombat(t) && r.loaded)
     }
-    check("the last approach stays loaded until the Shuttle comes within two tiles of its target") {
+    check("the last approach stays loaded until the Shuttle comes within one tile of its target") {
       val (m, t, r, z, _) = combatMission(approaching = true)
-      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-65, 0)); set(u, "_tile", u.pixel.tile) })
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-33, 0)); set(u, "_tile", u.pixel.tile) })
       m.run(); assert(m.state == m.Landing && r.intent.action == Micro.Actions.Basic.DoNothing)
-      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.vicinity.add(-64, 0)); set(u, "_tile", u.pixel.tile) })
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.vicinity.add(-32, 0)); set(u, "_tile", u.pixel.tile) })
       m.run()
       assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle) && r.loaded)
     }
@@ -1016,15 +1039,17 @@ package Tactic.Missions {
       assert(m.launched && m.passengers.isEmpty && m.state == m.Escaping)
       assert(t.intent.action == m.ActionEscapeTransport && m.transports.contains(t))
     }
-    check("optional filler cannot hold a prepared Reaver at assembly indefinitely") {
+    check("assembly keeps both Zealots until the entire crew has boarded") {
       val (m, t, r, z, _) = combatMission(); load(z, None)
+      val secondZealot = unit(Protoss.Zealot, t.pixel.x, t.pixel.y)
+      m.passengers += secondZealot; secondZealot.setSquad(Some(m))
       m.run(); assert(m.state == m.Assembling)
-      set(z, "_order", ProxyBwapi.Orders.EnterTransport)
+      With.frame += Seconds(4)(); load(z, Some(t)); m.run()
       With.frame += Seconds(4)(); m.run()
-      assert(!m.passengers.contains(z) && m.assignedTransport(z).isEmpty)
-      assert(z.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].stopped,
-        "Released filler must not retain an engine boarding order that redirects the Shuttle")
-      assert(m.state == m.Raiding && r.loaded && t.intent.action == Idle)
+      assert(m.state == m.Assembling && m.passengers.contains(secondZealot))
+      assert(m.assignedTransport(secondZealot).contains(t) && secondZealot.agent.ride.contains(t))
+      load(secondZealot, Some(t)); m.run()
+      assert(m.state == m.Raiding && Vector(r, z, secondZealot).forall(_.loaded))
     }
     check("recovery collects the Reaver first and cancels competing filler boarding orders") {
       val (m, t, r, z, _) = combatMission(); m.run()
@@ -1039,7 +1064,9 @@ package Tactic.Missions {
       With.frame += Seconds(10)(); m.run()
       assert(m.passengers.contains(r) && m.state == m.Evacuating, "Never expire collection of the required Reaver")
       load(r, Some(t)); m.run(); With.frame += Seconds(6)(); m.run()
-      assert(!m.passengers.contains(z) && m.state == m.Escaping)
+      assert(m.passengers.contains(z) && m.state == m.Evacuating)
+      load(z, Some(t)); m.run()
+      assert(m.state == m.Escaping)
     }
     def turretEscape(): (FriendlyUnitInfo, FriendlyUnitInfo) = {
       world(128)

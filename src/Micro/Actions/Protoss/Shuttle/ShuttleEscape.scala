@@ -23,7 +23,7 @@ object ShuttleEscape extends Action {
 
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = Protoss.Shuttle(shuttle) &&
     (active(shuttle) || (shuttle.loadedUnits.exists(Protoss.Reaver) &&
-      BeShuttle.supportedPassengers(shuttle).filter(Protoss.Reaver).forall(_.loaded) &&
+      shuttle.agent.passengersPrioritized.filter(Protoss.Reaver).forall(_.loaded) &&
       shuttle.matchups.threatsInRange.nonEmpty))
 
   // Explicit retreats also protect empty Shuttles from later pickup/parking orders.

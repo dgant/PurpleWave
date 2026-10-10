@@ -4,7 +4,6 @@ import Debugging.SimpleString
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
-import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
@@ -25,23 +24,12 @@ object BeShuttle extends Action {
     val finalCost: Double = baseCost * multiplier
   }
 
-  def supportedPassengers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = {
-    val passengers = shuttle.agent.passengersPrioritized
-    Maff.orElse(passengers.filter(Protoss.Reaver), passengers).toVector
-  }
-
-  def deliveryGoal(shuttle: FriendlyUnitInfo, goal: Pixel): Pixel = {
-    val exposed = supportedPassengers(shuttle).filter(p => Protoss.Reaver(p) && !p.loaded)
-    Maff.minBy(exposed)(_.pixelDistanceSquared(shuttle))
-      .map(p => p.pixel.projectUpTo(goal, 32)).getOrElse(goal)
-  }
-
   protected def perform(shuttle: FriendlyUnitInfo): Unit = {
     if (ShuttleDitchPassengers(shuttle)) return
     if (ShuttleAdoptPassenger(shuttle)) return
 
     // Emergency pickups
-    val supported = supportedPassengers(shuttle)
+    val supported = shuttle.agent.passengersPrioritized
     val hailers = shuttle.agent.hailersPrioritized.filter(supported.contains)
     val hailersMostUrgent = Maff.orElse(
       hailers.filter(_.doomed),
@@ -67,7 +55,7 @@ object BeShuttle extends Action {
 
     val quests = new ArrayBuffer[ShuttleQuest]
     supported.foreach(p => {
-      val goal = p.agent.rideGoal.map(g => if (p.loaded) deliveryGoal(shuttle, g) else g)
+      val goal = p.agent.rideGoal
       val m = ?(passengersFighting.contains(p) || ! anyoneFighting, 1, 10)
 
       def add(transform: Pixel => ShuttleQuest): Unit = { quests ++= goal.map(transform) }
@@ -78,7 +66,7 @@ object BeShuttle extends Action {
         add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g), () => deliver(shuttle, g)))
 
       // Pickup passenger
-      } else if (ReloadScarabs.readyForPickup(p) && goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
+      } else if (goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
 
         add(g => ShuttleQuest(p, Pickup, m, shuttle.pixelDistanceEdge(p), () => pickup(shuttle, p)))
 
@@ -112,6 +100,6 @@ object BeShuttle extends Action {
   //
   private def deliver(shuttle: FriendlyUnitInfo, goal: Pixel): Unit = {
     shuttle.agent.decision.set(goal)
-    Commander.move(shuttle, allowOvershoot = false)
+    Commander.move(shuttle)
   }
 }

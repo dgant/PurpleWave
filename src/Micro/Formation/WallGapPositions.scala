@@ -25,10 +25,12 @@ class WallGapPositions(base: Base) {
     if (! base.isNatural || ! With.enemies.exists(_.isZerg)) return Map.empty
     val defenders = units.filter(u => u.alive && u.complete && ! u.loaded && u.isAny(Protoss.Zealot, Protoss.Probe)).toVector
     if (defenders.isEmpty) return Map.empty
-    // A wall may straddle the edge of the base tile region or its zone.
+    // A wall may stand beyond the natural's zone; its hallway connects it to the base.
+    val baseWall = With.placement.wall.filter(_.hallway.exists(_.zone == base.zone))
     val foundations = With.placement.get(PlaceLabels.Wall).flatMap(f => With.placement.get(f.tile)).distinct.filter(f =>
       f.point.requirement.labels.contains(PlaceLabels.Wall) &&
-        new TileRectangle(f.tile, f.point.requirement.width, f.point.requirement.height).tiles.exists(_.zone == base.zone))
+        (baseWall.exists(_.buildings.exists(_._1 == f.tile)) ||
+          new TileRectangle(f.tile, f.point.requirement.width, f.point.requirement.height).tiles.exists(_.zone == base.zone)))
     val wall = With.units.ours.filter(u => u.alive && ! u.flying && u.unitClass.isBuilding && foundations.exists(f =>
       f.tile == u.tileTopLeft && f.point.requirement.dimensions == ((u.unitClass.tileWidth, u.unitClass.tileHeight)))).toVector
     if (! wall.exists(u => u.unitClass.tileWidth == 4 && u.unitClass.tileHeight == 3)
@@ -173,8 +175,13 @@ object WallGapPositions {
       val g = Gap(a, b, Pixel(ax, ay), Pixel(bx, by), nx, ny, depths.min, depths.max,
         door.exists(p => Math.abs((p.x - center.x) * nx + (p.y - center.y) * ny) <= Math.max(32, depths.max - depths.min) &&
           Math.abs((p.x - center.x) * (bx - ax) / width + (p.y - center.y) * (by - ay) / width) < width / 2) || reservedDoor)
-      // Reject closed pockets and channels obstructed by a third building.
-      if (! (g.outer.toInt - 8 to g.inner.toInt + 8 by 4).forall(d => fits(ling, g.at(0, d), 0))) None else Some(g)
+      // The Zergling origin is asymmetric; narrow passages may be traversable
+      // off-center even when their geometric center line collides with a building.
+      val crossLeft = -g.width / 2.0 + ling.extent(-g.tx, -g.ty)
+      val crossRight = g.width / 2.0 - ling.extent(g.tx, g.ty)
+      val crossings = if (diagonal) Vector(0.0) else
+        (Math.ceil(crossLeft).toInt to Math.floor(crossRight).toInt).map(_.toDouble)
+      if (crossings.exists(c => (g.outer.toInt - 8 to g.inner.toInt + 8 by 4).forall(d => fits(ling, g.at(c, d), 0)))) Some(g) else None
     }
 
     // Include pylons on the front line, but exclude aisles behind the large wall
@@ -310,7 +317,11 @@ object WallGapPositions {
       val crossRight = g.width / 2.0 - body.extent(g.tx, g.ty) - 1
       val through = crossLeft <= crossRight && ! diagonal &&
         g.inner - g.outer >= body.extent(-g.nx, -g.ny) + body.extent(g.nx, g.ny)
-      val frontLimit = if (through) g.inner - body.extent(g.nx, g.ny) - 1 else g.inner + body.extent(-g.nx, -g.ny) + 1 + (if (diagonal) 16 else 0)
+      // A body too wide for the corridor must clear both inner building edges,
+      // including an offset edge beyond the overlapping part of the passage.
+      val mouth = if (through || diagonal) g.inner else Vector(g.first, g.second).flatMap(b =>
+        Vector(Pixel(b.left, b.top), Pixel(b.right, b.top), Pixel(b.left, b.bottom), Pixel(b.right, b.bottom))).map(g.depth).max
+      val frontLimit = if (through) g.inner - body.extent(g.nx, g.ny) - 1 else mouth + body.extent(-g.nx, -g.ny) + 1 + (if (diagonal) 16 else 0)
       val first = if (diagonal) 0 else Math.ceil(Math.min(frontLimit, g.outer + body.extent(-g.nx, -g.ny) + 16)).toInt
       val last = Math.ceil(g.inner + 256).toInt
       val step = if (diagonal) 2 else 4
@@ -320,7 +331,7 @@ object WallGapPositions {
       // Include exact obstacle contacts as well as the search lattice: a legal
       // inner-mouth seal can have only one pixel of clearance.
       val depths = ((first to last by step).map(_.toDouble) ++ Vector(
-        Math.ceil(g.inner + body.extent(-g.nx, -g.ny) + 1), Math.floor(g.inner - body.extent(g.nx, g.ny) - 1)))
+        Math.ceil(mouth + body.extent(-g.nx, -g.ny) + 1), Math.floor(g.inner - body.extent(g.nx, g.ny) - 1)))
         .filter(d => d >= first && d <= last).distinct
       depths.flatMap(d => cross.map(c => g.at(c, d))).distinct.filter(p => fits(body, p) && navigationFor(body).reachable(p)).map { p =>
         val b = body.at(p)

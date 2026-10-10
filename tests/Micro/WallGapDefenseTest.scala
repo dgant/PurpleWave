@@ -167,7 +167,7 @@ package Micro.Formation {
       set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(base)))
       placement()
     }
-    check("a wall footprint may straddle the natural zone, but must overlap it") {
+    check("unlinked wall foundations may straddle the natural zone, but must overlap it") {
       val otherZone = allocate(classOf[Zone])
       val zones = Array.fill(With.mapTileArea)(zone)
       zones(gateway.tileTopLeft.i) = otherZone
@@ -175,6 +175,23 @@ package Micro.Formation {
       placement()
       assert(positions(defenders).size == 2)
       for (x <- 0 until 4; y <- 0 until 3) zones(gateway.tileTopLeft.add(x, y).i) = otherZone
+      assert(positions(defenders).isEmpty)
+      set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+      placement()
+    }
+    check("a wall outside the natural zone belongs to the base reached by its hallway") {
+      val otherZone = allocate(classOf[Zone])
+      val zones = Array.fill(With.mapTileArea)(zone)
+      Vector(gateway, forge).foreach(u =>
+        for (x <- 0 until u.unitClass.tileWidth; y <- 0 until u.unitClass.tileHeight) zones(u.tileTopLeft.add(x, y).i) = otherZone)
+      set(With.geography, "_zoneByTile", zones)
+      placement()
+      val wall = new _root_.Placement.Walls.Wall
+      wall.buildings ++= Vector(gateway.tileTopLeft -> Protoss.Gateway, forge.tileTopLeft -> Protoss.Forge)
+      wall.hallway = Vector(base.townHallTile)
+      With.placement.restoreCachedWall(Some(wall))
+      assert(positions(defenders).size == 2)
+      wall.hallway = Vector(gateway.tileTopLeft)
       assert(positions(defenders).isEmpty)
       set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
       placement()

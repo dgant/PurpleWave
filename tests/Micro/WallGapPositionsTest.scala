@@ -158,6 +158,16 @@ object WallGapPositionsTest extends App {
     assert(result.values.exists(p => p.x > 100 && p.x < 140), result)
     assert(result.values.exists(p => p.x > 180 && p.x < 220), result)
   }
+  check("Circuit Breaker's three-building wall includes its narrow Pylon-Forge gap") {
+    val front = Vector(Box(528, 2896, 625, 2969), Box(528, 3028, 561, 3061), Box(524, 3080, 597, 3125))
+    val g = geometry(front, Pixel(288, 2992), Some(Pixel(527, 2991)))
+    assert(g.gaps.map(_.width) == Vector(59, 19), g.gaps)
+    val result = g.assign(Vector(defender(1), defender(2)))
+    assert(result.size == 2, result)
+    assert(result.values.exists(p => p.y > 2969 && p.y < 3028), result)
+    assert(result.values.exists(p => p.y > 3061 && p.y < 3080), result)
+    assert(! crosses(front ++ result.values.map(zealot.at), Box(480, 3061, 600, 3080), _.x == 599, _.x == 480), result)
+  }
   check("spaces behind the wall between cannon rows are not wall entrances") {
     val front = Vector(Box(0, 100, 100, 220), Box(140, 100, 240, 220))
     val rear = Box(264, 244, 344, 324)

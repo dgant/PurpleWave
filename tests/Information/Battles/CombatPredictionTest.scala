@@ -2,7 +2,7 @@ package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
 import Information.Battles.Prediction.SimulationCheckpoint
-import Information.Battles.Types.{Battle, BattleJudgment, CombatGroup, Hysteresis, JudgmentModifiers}
+import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis, JudgmentModifiers}
 import Tactic.Squads.Squad
 import Lifecycle.With
 import Lifecycle.Configure.Configuration
@@ -956,16 +956,16 @@ object CombatPredictionTest extends App {
     sim.step()
     assert(primary.hitPoints == 400 && nearby.hitPoints == 400)
   }
-  // Keep the physical battle fixed while independently changing combat ownership.
+  // Combat ownership is sampled once per physical battle, during clustering.
   class ForecastSquad extends Squad {
-    var group: CombatGroup = CombatGroup.army
-    override def combatGroup: CombatGroup = group
+    var independent: Boolean = false
+    override def fightsIndependently: Boolean = independent
     override def run(): Unit = {}
     override def launch(): Unit = {}
   }
-  def forecastSquad(group: CombatGroup): ForecastSquad = {
+  def forecastSquad(independent: Boolean = false): ForecastSquad = {
     val squad = allocate(classOf[ForecastSquad])
-    squad.group = group
+    squad.independent = independent
     squad
   }
   def forecastUnit(hp: Int, kind: UnitClass, enemy: Boolean = false): FriendlyUnitInfo = {
@@ -985,8 +985,7 @@ object CombatPredictionTest extends App {
   val dropUnit = forecastUnit(200, Protoss.Reaver)
   val transport = forecastUnit(80, Protoss.Shuttle)
   val defender = forecastUnit(100, Terran.Marine, enemy = true)
-  val dropGroup = new CombatGroup("Drop")
-  val dropSquad = forecastSquad(dropGroup)
+  val dropSquad = forecastSquad(independent = true)
   dropUnit.setSquad(Some(dropSquad))
   transport.setSquad(Some(dropSquad))
   def physical(ours: Seq[FriendlyUnitInfo]): Battle = new Battle(ours, Vector(defender), isGlobal = false)
@@ -1045,11 +1044,11 @@ object CombatPredictionTest extends App {
   check("one spatial battle gives army and drop disjoint forecasts against the same defenders") {
     assert(armyUnit.battle.contains(physicalBattle) && dropUnit.battle.contains(physicalBattle))
     assert(armyUnit.team.contains(physicalBattle.us) && dropUnit.team.contains(physicalBattle.us))
-    assert(forecasts.forecasts.size == 2)
+    assert(forecasts.size == 2)
     assert(armyUnit.combatForecast.get.us.units == Vector(armyUnit))
     assert(dropUnit.combatForecast == transport.combatForecast)
     assert(dropUnit.combatForecast.get.us.units.toSet == Set(dropUnit, transport))
-    assert(forecasts.forecasts.forall(_.battle.enemy.units == Vector(defender)))
+    assert(forecasts.forall(_.enemy.units == Vector(defender)))
     assert(armyUnit.combatAllies.isEmpty && !dropUnit.combatAllies.exists(_ == armyUnit))
     assert(physicalBattle.judgement.isEmpty)
   }
@@ -1065,42 +1064,39 @@ object CombatPredictionTest extends App {
     val alone = physical(Vector(armyUnit))
     val score = predictForecast(alone).scoreTotal
     near(score, armyUnit.combatJudgment.get.scoreTotal)
-    assert(alone.combatForecasts.forecasts.head.battle eq alone)
+    assert(alone.combatForecasts.head eq alone)
+    assert(alone.combatForecastByUnit.get(defender).contains(alone))
+    assert(physicalBattle.combatForecastByUnit.get(defender).isEmpty)
   }
-  check("ordinary squads share one forecast and moving a drop back invalidates old jobs") {
-    dropUnit.setSquad(Some(forecastSquad(CombatGroup.army)))
+  check("squad membership changes affect only the next clustering cycle") {
+    val army = armyUnit.combatForecast
+    val drop = dropUnit.combatForecast
+    dropUnit.setSquad(Some(forecastSquad()))
     transport.setSquad(None)
-    assert(armyUnit.combatForecast.isEmpty && dropUnit.combatForecast.isEmpty)
-    assert(armyUnit.combatJudgment.isEmpty && armyUnit.combatAllies.isEmpty)
-    near(armyUnit.confidence11, -1)
-    val estimate = Micro.Actions.Combat.Decisionmaking.FightOrFlee.getClass.getDeclaredMethods.find(_.getName.endsWith("applyEstimation")).get
-    estimate.setAccessible(true)
-    estimate.invoke(Micro.Actions.Combat.Decisionmaking.FightOrFlee, armyUnit)
-    assert(!armyUnit.agent.shouldFight && armyUnit.agent.fightReason == "AwaitForecast")
+    assert(armyUnit.combatForecast == army && dropUnit.combatForecast == drop)
+    assert(!armyUnit.combatJudgment.get.shouldFightGround && dropUnit.combatJudgment.get.shouldFightGround)
     val together = physical(Vector(armyUnit, dropUnit, transport))
-    assert(together.combatForecasts.forecasts.size == 1)
-    assert(together.combatForecasts.forecasts.head.battle eq together)
+    assert(together.combatForecasts == Vector(together))
+    assert(together.combatForecastByUnit.get(dropUnit).contains(together))
     assert(predictForecast(together).shouldFightGround)
-  }
-  check("recruiting a unit out of an army invalidates its previous combined prediction") {
-    val parent = physical(Vector(armyUnit, dropUnit))
-    assert(parent.combatForecasts.forUnit(armyUnit).contains(parent))
     dropUnit.setSquad(Some(dropSquad))
-    assert(parent.combatForecasts.forUnit(armyUnit).isEmpty)
-    assert(parent.combatForecasts.forUnit(dropUnit).isEmpty)
+    assert(together.combatForecastByUnit.get(armyUnit).contains(together))
+    assert(together.combatForecastByUnit.get(dropUnit).contains(together))
+    val recruited = physical(Vector(armyUnit, dropUnit))
+    assert(recruited.combatForecasts.size == 2)
+    assert(recruited.combatForecastByUnit(armyUnit).us.units == Vector(armyUnit))
   }
-  check("mission reuse and termination invalidate frozen ownership without changing squads") {
+  check("mission stop and restart preserve the clustered forecasts until the next cycle") {
     val parent = physical(Vector(armyUnit, dropUnit))
-    val before = parent.combatForecasts.forUnit(dropUnit)
-    assert(before.isDefined)
-    dropSquad.group = new CombatGroup("Drop relaunched")
-    CombatGroup.invalidate()
-    assert(parent.combatForecasts.forUnit(dropUnit).isEmpty)
-    val relaunched = physical(Vector(armyUnit, dropUnit))
-    assert(relaunched.combatForecasts.forUnit(dropUnit).isDefined)
-    dropSquad.group = CombatGroup.army
-    CombatGroup.invalidate()
-    assert(relaunched.combatForecasts.forUnit(armyUnit).isEmpty)
+    val before = parent.combatForecastByUnit(dropUnit)
+    dropSquad.independent = false
+    assert(parent.combatForecastByUnit(dropUnit) eq before)
+    assert(parent.combatForecasts.size == 2)
+    val stopped = physical(Vector(armyUnit, dropUnit))
+    assert(stopped.combatForecasts == Vector(stopped))
+    dropSquad.independent = true
+    assert(stopped.combatForecasts == Vector(stopped))
+    assert(physical(Vector(armyUnit, dropUnit)).combatForecasts.size == 2)
   }
   check("report snapshots survive reuse of an enemy simulacrum by another forecast") {
     val s = defender.simulacrum
@@ -1115,12 +1111,10 @@ object CombatPredictionTest extends App {
   }
   check("prediction queue contains separate jobs while the spatial index retains their parent") {
     dropUnit.setSquad(Some(dropSquad))
-    dropSquad.group = new CombatGroup("Another drop")
-    CombatGroup.invalidate()
     val parent = physical(Vector(armyUnit, dropUnit))
     With.battles.nextBattlesLocal = Vector(parent)
     val jobs = With.battles.nextBattles.take(2)
-    assert(jobs.toSet == parent.combatForecasts.forecasts.map(_.battle).toSet)
+    assert(jobs.toSet == parent.combatForecasts.toSet)
     assert(!jobs.contains(parent) && With.battles.byUnit(armyUnit) == physicalBattle)
   }
   check("skim targets exclude another group's distraction even when it is the real enemy target") {
@@ -1132,30 +1126,13 @@ object CombatPredictionTest extends App {
     set(dropUnit, "_pixel", Pixel(368, 64))
     set(defender, "_presumptiveTargetCache", new KeyedCache[Option[UnitInfo], Int](() => Some(dropUnit), () => 0))
     val parent = physical(Vector(armyUnit, dropUnit))
-    val army = parent.combatForecasts.forUnit(armyUnit).get
+    val army = parent.combatForecastByUnit.get(armyUnit).get
     val distance = Skimulator.getClass.getDeclaredMethods.find(_.getName.endsWith("distanceToEngage")).get
     distance.setAccessible(true)
     val actual = distance.invoke(Skimulator, defender, army.enemy).asInstanceOf[Double]
     near(actual, defender.pixelDistanceEdge(armyUnit))
     assert(actual > defender.pixelDistanceEdge(dropUnit))
     assert(defender.skimTarget.contains(armyUnit))
-  }
-  check("squad consensus drops cached fight permission immediately after ownership changes") {
-    dropUnit.setSquad(None)
-    val parent = physical(Vector(armyUnit, dropUnit))
-    parent.combatForecasts
-    val judgment = allocate(classOf[BattleJudgment])
-    set(judgment, "shouldFightGround", true)
-    parent.judgement = Some(judgment)
-    With.battles.byUnit = parent.units.map(_ -> parent).toMap
-    armyUnit.agent.shouldFight = true
-    val squad = new Tactic.Squads.TFriendlyUnitGroup {
-      def groupFriendlyUnits = Vector(armyUnit)
-    }
-    assert(squad.fightConsensus)
-    dropUnit.setSquad(Some(dropSquad))
-    assert(!squad.fightConsensus)
-    near(squad.confidence11, -1)
   }
   println(s"$passed combat prediction checks passed")
 }

@@ -26,7 +26,7 @@ object ShowBattles extends DebugView {
 
   def localBattle: Option[Battle] = {
     val battlesSelected = With.units.ours.filter(_.selected).flatMap(_.combatForecast)
-    val battlesToShow = if (battlesSelected.isEmpty) With.battles.local.flatMap(_.combatForecasts.forecasts.map(_.battle)) else battlesSelected
+    val battlesToShow = if (battlesSelected.isEmpty) With.battles.local.flatMap(_.combatForecasts) else battlesSelected
     Maff.minBy(battlesToShow)(_.focus.pixelDistanceSquared(With.viewport.center))
   }
 

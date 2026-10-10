@@ -21,7 +21,14 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val teams        : Vector[Team]  = Vector(us, enemy)
   lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
-  lazy val combatForecasts: BattleForecasts = new BattleForecasts(this)
+  // Forced during clustering; squad changes take effect in the next battle cycle.
+  lazy val combatForecasts: Vector[Battle] = {
+    val groups = us.units.groupBy(_.friendly.flatMap(_.squad).filter(_.fightsIndependently)).values.toVector
+    if (groups.size <= 1) Vector(this)
+    else groups.map(units => new Battle(units, enemy.units, isGlobal = false))
+  }
+  lazy val combatForecastByUnit: Map[UnitInfo, Battle] = combatForecasts.flatMap(b =>
+    (if (combatForecasts.size == 1) b.units else b.us.units).map(_ -> b)).toMap
 
   def predictionComplete: Boolean = simulationComplete && skimulationComplete
 

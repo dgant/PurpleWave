@@ -315,8 +315,12 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   @inline final def canBurrow       : Boolean = canDoAnything && (is(Zerg.Lurker) || (Zerg.Burrow(player) && unitClass.canBurrow))
 
   def confidence01: Double = (confidence11 + 1) / 2
-  def confidence11: Double = if (battle.isDefined && combatForecast.isEmpty) -1.0 else _confidence()
-  private val _confidence = new Cache(() => if (matchups.threats.isEmpty) 1.0 else combatJudgment.map(j => if (flying) j.confidence11Air else j.confidence11Ground).getOrElse(if (battle.isDefined) -1.0 else 1.0))
+  def confidence11: Double = {
+    val forecast = combatForecast
+    if (battle.isDefined && forecast.isEmpty) -1.0
+    else if (matchups.threats.isEmpty) 1.0
+    else forecast.flatMap(_.judgement).map(j => if (flying) j.confidence11Air else j.confidence11Ground).getOrElse(if (battle.isDefined) -1.0 else 1.0)
+  }
 
   // Frame X:     Unit's cooldown is 0.   Unit starts attacking.
   // Frame X-1:   Unit's cooldown is 1.   Unit receives attack order.

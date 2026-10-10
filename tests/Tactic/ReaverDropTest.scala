@@ -1123,11 +1123,27 @@ package Tactic.Missions {
         assert(!m.mustLeave, "Do not expire an approach that steadily closes on workers")
       })
     }
+    check("a safe landing approach keeps its time allowance while the Shuttle makes progress") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      m.run()
+      for (_ <- 1 to 12) {
+        With.frame += Seconds(1)()
+        Vector(t, r, z).foreach(u => { set(u, "_pixel", u.pixel.add(16, 0)); set(u, "_tile", u.pixel.tile) })
+        m.run()
+        assert(m.state == m.Landing && t.intent.action == Travel && r.loaded,
+          "Entering the base region must not put a fixed deadline on a progressing flight")
+      }
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.vicinity); set(u, "_tile", u.pixel.tile) })
+      m.run()
+      assert(m.state == m.Raiding && r.loaded)
+    }
     check("an unusable landing approach is abandoned without forcing a passenger to unload") {
       val (m, t, r, _, worker) = combatMission(approaching = true)
       set(worker, "_visibility", ProxyBwapi.UnitTracking.Visibility.InvisibleMissing)
       m.run(); assert(m.state == m.Landing)
       With.frame += Seconds(9)(); m.run()
+      assert(m.state == m.Landing && r.loaded)
+      With.frame += Seconds(8)(); m.run()
       assert(m.state == m.Escaping && r.loaded)
       assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
     }

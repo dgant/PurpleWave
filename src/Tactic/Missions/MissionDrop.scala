@@ -65,8 +65,6 @@ abstract class MissionDrop extends Mission {
   val transports                            = new ArrayBuffer[FriendlyUnitInfo]
   val passengers                            = new ArrayBuffer[FriendlyUnitInfo]
   var state             : DropState         = Assembling
-  private var stateFrame = With.frame
-  protected def stateAge: Int = With.framesSince(stateFrame)
   private val routes = mutable.Map.empty[FriendlyUnitInfo, DropRoute]
   private val initiallyLanded = mutable.Set.empty[FriendlyUnitInfo]
   protected val raidingTransports = mutable.Set.empty[FriendlyUnitInfo]
@@ -85,7 +83,6 @@ abstract class MissionDrop extends Mission {
     transports.clear()
     passengers.clear()
     state = Assembling
-    stateFrame = With.frame
     routes.clear()
     initiallyLanded.clear()
     raidingTransports.clear()
@@ -104,7 +101,6 @@ abstract class MissionDrop extends Mission {
     if (state != newState) {
       With.logger.debug(f"$this transitioning from $state to $newState")
       pickupTargets.clear()
-      stateFrame = With.frame
     }
     state = newState
   }
@@ -386,6 +382,9 @@ abstract class MissionDrop extends Mission {
       }
     }
   }
+
+  protected final def approachStalled: Boolean =
+    transports.nonEmpty && transports.forall(t => routes.get(t).exists(_.stalled))
 
   protected final def routeWaypoint(transport: FriendlyUnitInfo, destination: Tile): Option[Pixel] = {
     val route = routes.getOrElseUpdate(transport, new DropRoute)

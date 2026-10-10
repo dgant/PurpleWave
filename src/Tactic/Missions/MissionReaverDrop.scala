@@ -134,7 +134,7 @@ class MissionReaverDrop extends MissionDrop {
     if (state != Travelling && state != Landing && state != Raiding) return false
     val doomed = passengers.filter(Protoss.Reaver).forall(_.doomed)
     val stalled = combatStalled
-    val unableToLand = state == Landing && raidingTransports.isEmpty && stateAge >= Seconds(8)()
+    val unableToLand = state == Landing && raidingTransports.isEmpty && approachStalled
     if (doomed || stalled || unableToLand) {
       With.logger.debug(s"$this recovering crew: doomed=$doomed combatStalled=$stalled landingTimedOut=$unableToLand")
       true

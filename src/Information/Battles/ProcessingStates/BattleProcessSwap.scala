@@ -15,6 +15,8 @@ class BattleProcessSwap extends BattleProcessState {
     With.battles.byUnit = With.battles.local.flatten(battle => battle.teams.flatMap(_.units).map(unit => (unit, battle))).toMap
     With.battles.divisions = With.battles.nextDivisions
 
+    Debugging.CombatForecastDiagnostics.cycle()
+
     // Replace global
     With.battles.globalDefend   = With.battles.nextBattleGlobalDefend
     With.battles.globalAttack   = With.battles.nextBattleGlobalAttack

@@ -1072,6 +1072,11 @@ object CombatPredictionTest extends App {
     transport.setSquad(None)
     assert(armyUnit.combatForecast.isEmpty && dropUnit.combatForecast.isEmpty)
     assert(armyUnit.combatJudgment.isEmpty && armyUnit.combatAllies.isEmpty)
+    near(armyUnit.confidence11, -1)
+    val estimate = Micro.Actions.Combat.Decisionmaking.FightOrFlee.getClass.getDeclaredMethods.find(_.getName.endsWith("applyEstimation")).get
+    estimate.setAccessible(true)
+    estimate.invoke(Micro.Actions.Combat.Decisionmaking.FightOrFlee, armyUnit)
+    assert(!armyUnit.agent.shouldFight && armyUnit.agent.fightReason == "AwaitForecast")
     val together = physical(Vector(armyUnit, dropUnit, transport))
     assert(together.combatForecasts.forecasts.size == 1)
     assert(together.combatForecasts.forecasts.head.battle eq together)
@@ -1107,6 +1112,33 @@ object CombatPredictionTest extends App {
     s.damageReceived = 0
     s.setPixel(Pixel(256, 256))
     assert(!report.alive && report.damageReceived == 77 && report.pixel == Pixel(128, 128))
+  }
+  check("prediction queue contains separate jobs while the spatial index retains their parent") {
+    dropUnit.setSquad(Some(dropSquad))
+    dropSquad.group = new CombatGroup("Another drop")
+    CombatGroup.invalidate()
+    val parent = physical(Vector(armyUnit, dropUnit))
+    With.battles.nextBattlesLocal = Vector(parent)
+    val jobs = With.battles.nextBattles.take(2)
+    assert(jobs.toSet == parent.combatForecasts.forecasts.map(_.battle).toSet)
+    assert(!jobs.contains(parent) && With.battles.byUnit(armyUnit) == physicalBattle)
+  }
+  check("skim targets exclude another group's distraction even when it is the real enemy target") {
+    import Information.Battles.Prediction.Skimulation.Skimulator
+    import Performance.KeyedCache
+    import ProxyBwapi.UnitInfo.UnitInfo
+    set(defender, "_pixel", Pixel(400, 64))
+    set(armyUnit, "_pixel", Pixel(64, 64))
+    set(dropUnit, "_pixel", Pixel(368, 64))
+    set(defender, "_presumptiveTargetCache", new KeyedCache[Option[UnitInfo], Int](() => Some(dropUnit), () => 0))
+    val parent = physical(Vector(armyUnit, dropUnit))
+    val army = parent.combatForecasts.forUnit(armyUnit).get
+    val distance = Skimulator.getClass.getDeclaredMethods.find(_.getName.endsWith("distanceToEngage")).get
+    distance.setAccessible(true)
+    val actual = distance.invoke(Skimulator, defender, army.enemy).asInstanceOf[Double]
+    near(actual, defender.pixelDistanceEdge(armyUnit))
+    assert(actual > defender.pixelDistanceEdge(dropUnit))
+    assert(defender.skimTarget.contains(armyUnit))
   }
   println(s"$passed combat prediction checks passed")
 }

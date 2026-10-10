@@ -4,7 +4,9 @@ import Debugging.SimpleString
 import Mathematics.Maff
 import Mathematics.Points.Pixel
 import Micro.Actions.Action
+import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
+import Micro.Coordination.Pathing.MicroPathing
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 import Utilities.?
@@ -94,7 +96,13 @@ object BeShuttle extends Action {
   //
   private def pickup(shuttle: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Unit = {
     shuttle.agent.decision.set(passenger.pixel)
-    Commander.rightClick(shuttle, passenger)
+    if (shuttle.pixelDistanceCenter(passenger) <= 384) {
+      Commander.rightClick(shuttle, passenger)
+    } else if (shuttle.matchups.threats.nonEmpty && !shuttle.matchups.withinSafetyMargin) {
+      Retreat.delegate(shuttle)
+    } else {
+      MicroPathing.tryMovingAlongTilePath(shuttle, MicroPathing.getThreatAwarePath(shuttle, preferHome = false, to = Some(passenger.tile)))
+    }
   }
 
   // Heed a passenger's ride goal

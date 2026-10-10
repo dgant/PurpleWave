@@ -3,7 +3,6 @@ package Micro.Agency
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
-import Micro.Actions.Protoss.Shuttle.ShuttlePickup
 import Micro.Coordination.Pathing.MicroPathing
 import Micro.Coordination.Pushing._
 import ProxyBwapi.Orders
@@ -293,11 +292,10 @@ object Commander {
     if (unit.unready) return
     // EnterTransport also orders the Shuttle to fly to this passenger. Keep long
     // approaches routed, while allowing nearby rescues to interrupt a retreat.
-    if (target.friendly.exists(t => ShuttlePickup.distant(t, unit))) {
+    if (target.friendly.exists(t => Protoss.Shuttle(t) && unit.isOurs && !unit.flying && unit.pixelDistanceCenter(t) > 384)) {
       if (unit.order == Orders.EnterTransport) stop(unit) else doNothing(unit)
       return
     }
-    if (ShuttlePickup.distant(unit, target)) { ShuttlePickup.approach(unit, target); return }
     if ( ! Zerg.Lurker(unit) && autoUnburrow(unit)) return
     unit.bwapiUnit.rightClick(target.bwapiUnit)
     sleepAttack(unit)

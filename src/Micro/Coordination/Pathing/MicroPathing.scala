@@ -110,7 +110,12 @@ object MicroPathing {
 
     lazy val unacceptableDistance = mustApproach.map(unit.pixelDistanceTravelling)
 
-    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || pixel.tile.enemyRangeAgainst(unit) < Math.max(1, unit.tile.enemyRangeAgainst(unit))
+    def acceptableForSafety(pixel: Pixel): Boolean = ! requireSafety || {
+      val destination = Commander.adjustDestination(unit, pixel)
+      val currentThreat = unit.tile.enemyRangeAgainst(unit)
+      destination.tile.enemyRangeAgainst(unit) < Math.max(1, currentThreat) &&
+        Ray(unit.pixel, destination).forall(_.tile.enemyRangeAgainst(unit) <= currentThreat)
+    }
 
     if (mustApproach.exists(a => unit.pixelDistanceCenter(a) < waypointDistancePixels && acceptableForSafety(a))) return mustApproach
 
@@ -128,7 +133,7 @@ object MicroPathing {
         val clamped = p.clamp(unit.unitClass.dimensionMax / 2)
         (unit.pixelDistanceCenter(clamped) >= 80
           && unacceptableDistance.forall(_ > clamped.travelPixelsFor(mustApproach.get, unit))
-          && acceptableForSafety(unit.pixel.project(clamped, 80)))
+          && acceptableForSafety(p))
       })
     terminus
   }

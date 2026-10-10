@@ -7,8 +7,8 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
+import Micro.Actions.Commands.Travel
 import Micro.Actions.Protoss.ReloadScarabs
-import Micro.Actions.Protoss.Shuttle.ShuttleEscape
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Planning.ResourceLocks.LockUnits
@@ -192,6 +192,7 @@ abstract class MissionDrop extends Mission {
         Commander.unload(t, p)
       })
     })
+    transports.foreach(_.intend(this).setStation(None))
     state match {
       case Assembling => assemble()
       case Travelling => travel()
@@ -281,38 +282,52 @@ abstract class MissionDrop extends Mission {
   }
 
   private def assemble(): Unit = {
-    transports.foreach(_.intend(this).setAction(ActionAssembleTransport))
+    transports.foreach(t => {
+      val pickup = pickupTarget(t, assembling = true)
+      if (pickup.exists(t.pixelDistanceCenter(_) > 384)) intendRoute(t, pickup.get.tile)
+      else t.intend(this).setAction(ActionAssembleTransport)
+    })
     passengers.foreach(_.intend(this).setAction(ActionAssemblePassenger))
   }
   private def travel(): Unit = {
-    transports.foreach(_.intend(this).setAction(ActionTravelTransport))
+    transports.foreach(t => intendRoute(t, vicinity.tile))
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
   private def land(): Unit = {
     SquadAutomation.targetRaid(this)
     passengers.foreach(_.agent.commit = commitWhileRaiding)
     passengers.foreach(_.intend(this).setTerminus(vicinity))
-    transports.foreach(t => t.intend(this).setAction(
-      if (defaultCombatLanding && raidingTransports(t)) raidTransportAction else ActionLandTransport))
+    transports.foreach(t => {
+      if (defaultCombatLanding && raidingTransports(t)) t.intend(this).setAction(raidTransportAction)
+      else if (defaultCombatLanding && !passengersFor(t).exists(requiredPassenger)) intendRoute(t, t.agent.defaultHome.tile)
+      else if (defaultCombatLanding || !t.base.exists(destinationBase.contains)) intendRoute(t, landingGoal(t).tile)
+      else t.intend(this).setAction(ActionLandTransport)
+    })
     passengers.foreach(p => p.intend(this).setAction(
       if (!defaultCombatLanding) ActionLandPassenger
       else if (assignedTransport(p).exists(raidingTransports)) Idle else DoNothing))
   }
   protected def raid(): Unit = {
     SquadAutomation.targetRaid(this)
-    transports.foreach(t => t.intend(this).setAction(
-      if (defaultCombatLanding && !passengersFor(t).exists(requiredPassenger)) ActionEscapeTransport else raidTransportAction))
+    transports.foreach(t => {
+      if (defaultCombatLanding && !passengersFor(t).exists(requiredPassenger)) intendRoute(t, t.agent.defaultHome.tile)
+      else t.intend(this).setAction(raidTransportAction)
+    })
     passengers.foreach(_.intend(this).setAction(Idle).setTerminus(vicinity))
     passengers.foreach(_.agent.commit = commitWhileRaiding)
   }
   private def evacuate(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this).setAction(ActionEvacuateTransport))
+    transports.foreach(t => {
+      val pickup = pickupTarget(t, assembling = false)
+      if (pickup.exists(t.pixelDistanceCenter(_) > 384)) intendRoute(t, pickup.get.tile)
+      else t.intend(this).setAction(ActionEvacuateTransport)
+    })
     passengers.foreach(_.intend(this).setAction(ActionEvacuatePassenger))
   }
   private def escape(): Unit = {
     passengers.foreach(_.agent.commit = false)
-    transports.foreach(_.intend(this).setAction(ActionEscapeTransport))
+    transports.foreach(t => intendRoute(t, t.agent.defaultHome.tile))
     passengers.foreach(_.intend(this).setAction(DoNothing))
   }
 
@@ -368,41 +383,32 @@ abstract class MissionDrop extends Mission {
     }
   }
 
-  object ActionTravelTransport extends Action {
-    override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      followRoute(transport, vicinity.tile)
+  private def intendRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
+    val intent = transport.intend(this).setTerminus(destination.center)
+    if (transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin) {
+      intent.setAction(Retreat)
+      return
+    }
+    val route = routes.getOrElseUpdate(transport, new DropRoute)
+    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
+      case Some(path) => intent.setStation(route.waypoint(transport.pixel, path)).setAction(Travel)
+      case None =>
+        if (route.stalled) returningHome = true
+        intent.setRedoubt(transport.agent.defaultHome).setAction(ActionAwaitRoute)
     }
   }
 
-  private def followRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
-    if (ShuttleEscape.start(transport)) return
-    val route = routes.getOrElseUpdate(transport, new DropRoute)
-    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet) match {
-      case Some(path) =>
-        transport.agent.decision.set(route.waypoint(transport.pixel, path))
-        Commander.move(transport)
-      case None =>
-        if (route.stalled) returningHome = true
-        transport.agent.redoubt.set(transport.agent.defaultHome)
-        Retreat.delegate(transport)
-        Commander.hold(transport)
+  private object ActionAwaitRoute extends Action {
+    override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      Retreat.delegate(transport)
+      Commander.hold(transport)
     }
   }
 
   object ActionLandTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      if (defaultCombatLanding) {
-        if (raidingTransports(transport)) raidTransportAction.delegate(transport)
-        else if (!passengersFor(transport).exists(requiredPassenger)) ActionEscapeTransport.delegate(transport)
-        else followRoute(transport, landingGoal(transport).tile)
-        return
-      }
       if (passengersFor(transport).forall(initiallyLanded.contains)) {
         raidTransportAction.delegate(transport)
-        return
-      }
-      if (!transport.base.exists(destinationBase.contains)) {
-        ActionTravelTransport.delegate(transport)
         return
       }
       val runway = destinationBase.map(_.heart.center).getOrElse(vicinity)
@@ -439,7 +445,8 @@ abstract class MissionDrop extends Mission {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
       val pickup = pickupTarget(transport, assembling = false)
       if (pickup.isEmpty) {
-        if (!ShuttleEscape(transport)) Commander.hold(transport)
+        if (transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin) Retreat.delegate(transport)
+        Commander.hold(transport)
       } else {
         Commander.rightClick(transport, pickup.get)
       }
@@ -450,12 +457,6 @@ abstract class MissionDrop extends Mission {
     override protected def perform(passenger: FriendlyUnitInfo): Unit = {
       if (passenger.loaded) return
       boardSelected(passenger, assembling = false)
-    }
-  }
-
-  object ActionEscapeTransport extends Action {
-    override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      followRoute(transport, transport.agent.defaultHome.tile)
     }
   }
 }

@@ -8,7 +8,7 @@ import Utilities.Time.Seconds
 
 import scala.collection.mutable
 
-class DropRoute {
+private[Missions] class DropRoute {
   private var raidBases = Set.empty[Base]
   private var destination: Option[Tile] = None
   private var path: Option[TilePath] = None

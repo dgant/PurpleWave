@@ -152,7 +152,7 @@ class SquadDefendBase(base: Base) extends Squad {
           .setCanFlee(false)
           .setRedoubt(pixel)
           .setTerminus(pixel)
-          .setAction(HoldWallGap(pixel))
+          .setAction(HoldWallGap(pixel, Some(wallGapPositions.waypoint(unit, pixel))))
       }
     } else if (plugEdge().isDefined) {
       val plugPixel = plugEdge().get._2.get.pixelCenter

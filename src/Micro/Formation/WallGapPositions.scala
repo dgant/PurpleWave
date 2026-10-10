@@ -2,7 +2,7 @@ package Micro.Formation
 
 import Information.Geography.Types.Base
 import Lifecycle.With
-import Mathematics.Points.{Pixel, Tile}
+import Mathematics.Points.{Pixel, Tile, TileRectangle}
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitClasses.UnitClass
@@ -18,11 +18,17 @@ class WallGapPositions(base: Base) {
   private var previousDoor: Option[Pixel] = None
   private var geometry: Option[Geometry] = None
 
+  def waypoint(unit: FriendlyUnitInfo, target: Pixel): Pixel = geometry
+    .map(_.waypoint(Defender(unit.id, body(unit.unitClass), Protoss.Probe(unit), unit.pixel), target)).getOrElse(target)
+
   def apply(units: Iterable[FriendlyUnitInfo]): Map[FriendlyUnitInfo, Pixel] = {
     if (! base.isNatural || ! With.enemies.exists(_.isZerg)) return Map.empty
     val defenders = units.filter(u => u.alive && u.complete && ! u.loaded && u.isAny(Protoss.Zealot, Protoss.Probe)).toVector
     if (defenders.isEmpty) return Map.empty
-    val foundations = With.placement.get(base).flatMap(f => With.placement.get(f.tile)).distinct.filter(_.point.requirement.labels.contains(PlaceLabels.Wall))
+    // A wall may straddle the edge of the base tile region or its zone.
+    val foundations = With.placement.get(PlaceLabels.Wall).flatMap(f => With.placement.get(f.tile)).distinct.filter(f =>
+      f.point.requirement.labels.contains(PlaceLabels.Wall) &&
+        new TileRectangle(f.tile, f.point.requirement.width, f.point.requirement.height).tiles.exists(_.zone == base.zone))
     val wall = With.units.ours.filter(u => u.alive && ! u.flying && u.unitClass.isBuilding && foundations.exists(f =>
       f.tile == u.tileTopLeft && f.point.requirement.dimensions == ((u.unitClass.tileWidth, u.unitClass.tileHeight)))).toVector
     if (! wall.exists(u => u.unitClass.tileWidth == 4 && u.unitClass.tileHeight == 3)
@@ -30,7 +36,7 @@ class WallGapPositions(base: Base) {
 
     val wallBoxes = wall.filterNot(_.unitClass.isStaticDefense).map(u => body(u.unitClass).at(u.pixel))
     val vicinity = Box(wallBoxes.map(_.left).min, wallBoxes.map(_.top).min,
-      wallBoxes.map(_.right).max, wallBoxes.map(_.bottom).max).expand(128)
+      wallBoxes.map(_.right).max, wallBoxes.map(_.bottom).max).expand(288)
     val buildings = With.units.all.filter(u => u.alive && ! u.flying && (u.unitClass.isBuilding || u.unitClass.isMinerals))
       .map(u => body(u.unitClass).at(u.pixel)).filter(_.intersects(vicinity)).toVector.distinct
       .sortBy(b => (b.left, b.top, b.right, b.bottom)).map(b => (b, wallBoxes.contains(b)))
@@ -101,8 +107,9 @@ object WallGapPositions {
     }
     private def terrainOpen(x: Int, y: Int): Boolean = terrain(x - minX + (y - minY) * width)
 
-    def fits(body: Body, p: Pixel): Boolean = {
-      val b = body.at(p)
+    def fits(body: Body, p: Pixel, clearance: Int = 1): Boolean = {
+      // Movement flush against buildings or terrain can stop short; leave one pixel.
+      val b = body.at(p).expand(clearance)
       if (boxes.exists(_.intersects(b))) return false
       val x0 = Math.floorDiv(b.left, 8) - minX
       val y0 = Math.floorDiv(b.top, 8) - minY
@@ -167,10 +174,21 @@ object WallGapPositions {
         door.exists(p => Math.abs((p.x - center.x) * nx + (p.y - center.y) * ny) <= Math.max(32, depths.max - depths.min) &&
           Math.abs((p.x - center.x) * (bx - ax) / width + (p.y - center.y) * (by - ay) / width) < width / 2) || reservedDoor)
       // Reject closed pockets and channels obstructed by a third building.
-      if (! (g.outer.toInt - 8 to g.inner.toInt + 8 by 4).forall(d => fits(ling, g.at(0, d)))) None else Some(g)
+      if (! (g.outer.toInt - 8 to g.inner.toInt + 8 by 4).forall(d => fits(ling, g.at(0, d), 0))) None else Some(g)
     }
 
-    private val rawGaps = walls.flatMap(a => (boxes ++ terrainBoxes).filterNot(_ == a).flatMap(b => between(a, b)))
+    // Include pylons on the front line, but exclude aisles behind the large wall
+    // buildings. Cannons remain collision obstacles, never entrance endpoints.
+    private val majorWalls = walls.filter(b => b.right - b.left >= 64 || b.bottom - b.top >= 48) match {
+      case large if large.nonEmpty => large
+      case _ => walls
+    }
+    private val wallCenter = Pixel(majorWalls.map(_.center.x).sum / majorWalls.size, majorWalls.map(_.center.y).sum / majorWalls.size)
+    private val inward = inside.subtract(wallCenter)
+    private def wallDepth(p: Pixel): Double = (p.x - wallCenter.x).toDouble * inward.x + (p.y - wallCenter.y).toDouble * inward.y
+    private val wallBack = majorWalls.flatMap(b => Vector(Pixel(b.left, b.top), Pixel(b.right, b.top), Pixel(b.left, b.bottom), Pixel(b.right, b.bottom))).map(wallDepth).max
+    private val rawGaps = walls.flatMap(a => (walls ++ terrainBoxes).filterNot(_ == a).flatMap(b => between(a, b)))
+      .filter(g => wallDepth(g.center) <= wallBack && (g.doorway || walls.contains(g.second)))
     val gaps: Vector[Gap] = {
       val distinct = mutable.ArrayBuffer.empty[Gap]
       // A jagged cliff can produce several rectangles bordering the same passage.
@@ -186,30 +204,132 @@ object WallGapPositions {
       distinct.toVector.sortBy(g => (if (g.doorway) 0 else 1, -g.width, g.center.x, g.center.y))
     }
 
-    private case class Slot(pixel: Pixel, box: Box, blocked: Box, exposure: Int, depth: Double, across: Double)
+    // A fitting pixel can still be trapped behind a neck narrower than the defender.
+    // Match the game's walk grid for approach paths; exact pixels are the final step.
+    private class Navigation(body: Body) {
+      private val step = 8
+      private val columns = width * 8 / step
+      private val rows = height * 8 / step
+      private val count = columns * rows
+      private def pixel(i: Int): Pixel = Pixel(minX * 8 + i % columns * step, minY * 8 + i / columns * step)
+      private val open = Array.tabulate(count)(i => fits(body, pixel(i)))
+      private val reached = Array.fill(count)(false)
+      private val queue = new Array[Int](count)
+      private def neighbors(i: Int)(visit: Int => Unit): Unit = {
+        if (i % columns > 0) visit(i - 1)
+        if (i % columns + 1 < columns) visit(i + 1)
+        if (i >= columns) visit(i - columns)
+        if (i + columns < count) visit(i + columns)
+      }
+      private val seed = {
+        val seeds = open.indices.filter(open)
+        if (seeds.isEmpty) None else Some(seeds.minBy(i => pixel(i).pixelDistanceSquared(inside)))
+      }
+      seed.foreach { start =>
+        var head = 0
+        var tail = 1
+        queue(0) = start
+        reached(start) = true
+        while (head < tail) {
+          val i = queue(head)
+          head += 1
+          neighbors(i) { j => if (open(j) && ! reached(j)) {
+            reached(j) = true
+            queue(tail) = j
+            tail += 1
+          }}
+        }
+      }
+      private def clear(from: Pixel, to: Pixel): Boolean = {
+        val length = Math.max(1, Math.ceil(from.pixelDistance(to)).toInt)
+        (0 to length).forall(i => fits(body, Pixel(
+          Math.round(from.x + (to.x - from.x).toDouble * i / length).toInt,
+          Math.round(from.y + (to.y - from.y).toDouble * i / length).toInt)))
+      }
+      private def node(p: Pixel): Option[Int] = {
+        val x = Math.floorDiv(p.x - minX * 8, step)
+        val y = Math.floorDiv(p.y - minY * 8, step)
+        (for (dy <- 0 to 1; dx <- 0 to 1 if x + dx >= 0 && y + dy >= 0 && x + dx < columns && y + dy < rows)
+          yield x + dx + (y + dy) * columns)
+          .filter(i => reached(i) && clear(p, pixel(i))).sortBy(i => pixel(i).pixelDistanceSquared(p)).headOption
+      }
+      def reachable(p: Pixel): Boolean = node(p).isDefined
+      private val routes = mutable.Map.empty[(Int, Pixel), Vector[Pixel]]
+      private def route(from: Pixel, to: Pixel): Vector[Pixel] = {
+        val start = node(from)
+        val end = node(to)
+        if (start.isEmpty || end.isEmpty) return Vector.empty
+        val parent = Array.fill(count)(-1)
+        var head = 0
+        var tail = 1
+        queue(0) = start.get
+        parent(start.get) = start.get
+        while (head < tail && parent(end.get) < 0) {
+          val i = queue(head)
+          head += 1
+          neighbors(i) { j => if (reached(j) && parent(j) < 0) {
+            parent(j) = i
+            queue(tail) = j
+            tail += 1
+          }}
+        }
+        if (parent(end.get) < 0) return Vector.empty
+        val reverse = mutable.ArrayBuffer(pixel(end.get))
+        var i = end.get
+        while (i != start.get) { i = parent(i); reverse += pixel(i) }
+        val path = reverse.reverse.toVector
+        // Keep corners only; the final segment retains the exact sub-tile goal.
+        path.indices.filter(i => i == 0 || i + 1 == path.size ||
+          path(i).subtract(path(i - 1)) != path(i + 1).subtract(path(i))).map(path).toVector :+ to
+      }
+      def waypoint(id: Int, from: Pixel, to: Pixel): Pixel = {
+        if (! reachable(from)) return to
+        def visible(path: Vector[Pixel]): Option[Pixel] = path.reverseIterator
+          .find(p => p.pixelDistanceSquared(from) > 4 && clear(from, p))
+        val next = if (clear(from, to)) to else {
+          val key = (id, to)
+          visible(routes.getOrElseUpdate(key, route(from, to))).orElse {
+            // A spawning unit may initially overlap a building or be outside the grid.
+            routes(key) = route(from, to)
+            visible(routes(key))
+          }.getOrElse(to)
+        }
+        // Short moves keep the game from replanning around a building's tile bounds.
+        from.projectUpTo(next, 64)
+      }
+    }
+    private val navigation = mutable.Map.empty[Body, Navigation]
+    private def navigationFor(body: Body): Navigation = navigation.getOrElseUpdate(body, new Navigation(body))
+    private case class Slot(pixel: Pixel, box: Box, blocked: Box, exposure: Int, depth: Double, across: Double, front: Boolean)
     private val slots = mutable.Map.empty[(Gap, Body), Vector[Slot]]
     private def candidates(g: Gap, body: Body): Vector[Slot] = slots.getOrElseUpdate((g, body), {
       val diagonal = g.tx != 0 && g.ty != 0
       // Cardinal corridors can shelter the whole front plus melee reach. At an offset
       // corner there may be no such recess; search the inner mouth for the best seal.
-      val first = if (diagonal) 0 else Math.ceil(g.outer + body.extent(-g.nx, -g.ny) + 16).toInt
-      val last = Math.ceil(g.inner + 128).toInt
+      val crossLeft = -g.width / 2.0 + body.extent(-g.tx, -g.ty) + 1
+      val crossRight = g.width / 2.0 - body.extent(g.tx, g.ty) - 1
+      val through = crossLeft <= crossRight && ! diagonal &&
+        g.inner - g.outer >= body.extent(-g.nx, -g.ny) + body.extent(g.nx, g.ny)
+      val frontLimit = if (through) g.inner - body.extent(g.nx, g.ny) - 1 else g.inner + body.extent(-g.nx, -g.ny) + 1 + (if (diagonal) 16 else 0)
+      val first = if (diagonal) 0 else Math.ceil(Math.min(frontLimit, g.outer + body.extent(-g.nx, -g.ny) + 16)).toInt
+      val last = Math.ceil(g.inner + 256).toInt
       val step = if (diagonal) 2 else 4
-      val cross = ((-g.width / 2 to g.width / 2 by step).map(_.toDouble) ++ Vector(0.0,
-        -g.width / 2.0 + body.extent(-g.tx, -g.ty), g.width / 2.0 - body.extent(g.tx, g.ty))).distinct
+      // Keep every rank aligned with the entrance, including reinforcements behind it.
+      val cross = if (crossLeft > crossRight) Vector((crossLeft + crossRight) / 2) else
+        ((Math.ceil(crossLeft).toInt to Math.floor(crossRight).toInt by step).map(_.toDouble) ++ Vector(crossLeft, crossRight)).distinct
       // Include exact obstacle contacts as well as the search lattice: a legal
       // inner-mouth seal can have only one pixel of clearance.
       val depths = ((first to last by step).map(_.toDouble) ++ Vector(
-        Math.ceil(g.inner + body.extent(-g.nx, -g.ny)), Math.floor(g.inner - body.extent(g.nx, g.ny))))
+        Math.ceil(g.inner + body.extent(-g.nx, -g.ny) + 1), Math.floor(g.inner - body.extent(g.nx, g.ny) - 1)))
         .filter(d => d >= first && d <= last).distinct
-      depths.flatMap(d => cross.map(c => g.at(c, d))).distinct.filter(p => fits(body, p)).map { p =>
+      depths.flatMap(d => cross.map(c => g.at(c, d))).distinct.filter(p => fits(body, p) && navigationFor(body).reachable(p)).map { p =>
         val b = body.at(p)
         // Count possible Zergling contact positions around the perimeter. Fewer
         // contacts means less exposed surface, including at staggered corners.
         val contacts =
           (b.left to b.right by 8).flatMap(x => Vector(Pixel(x, b.top - ling.down), Pixel(x, b.bottom + ling.up))) ++
           (b.top to b.bottom by 8).flatMap(y => Vector(Pixel(b.left - ling.right, y), Pixel(b.right + ling.left, y)))
-        Slot(p, b, ling.forbidden(b), contacts.count(fits(ling, _)), g.depth(p), Math.abs(g.across(p)))
+        Slot(p, b, ling.forbidden(b), contacts.count(fits(ling, _, 0)), g.depth(p), Math.abs(g.across(p)), g.depth(p) <= frontLimit + 0.5)
       }.toVector.sortBy(s => (s.exposure, s.depth, s.across, s.pixel.x, s.pixel.y))
     })
 
@@ -226,27 +346,60 @@ object WallGapPositions {
       reached.toVector
     }
 
+    private case class Planned(probe: Boolean, body: Body, slot: Slot, gap: Gap)
     private var previousComposition = Vector.empty[(Boolean, Body)]
-    private var plan = Vector.empty[(Boolean, Body, Pixel)]
+    private var plan = Vector.empty[Planned]
+    private var previousIds = Set.empty[Int]
+    private var allocatedGaps = Vector.empty[(Planned, Int)]
 
     def assign(units: Vector[Defender]): Map[Int, Pixel] = {
       val composition = units.map(u => (u.probe, u.body)).sortBy { case (probe, b) => (probe, b.left, b.up, b.right, b.down) }
       if (composition != previousComposition) {
         previousComposition = composition
         plan = allocate(composition)
+        previousIds = Set.empty
       }
+      val ids = units.map(_.id).toSet
       val remaining = mutable.ArrayBuffer(units: _*)
-      plan.map { case (probe, body, pixel) =>
-        val unit = remaining.filter(u => u.probe == probe && u.body == body).minBy(u => (u.pixel.pixelDistanceSquared(pixel), u.id))
-        remaining -= unit
-        unit.id -> pixel
+      // Fill the slots furthest from the arriving group first, so a defender
+      // already at the entrance can lead onward instead of blocking reinforcements.
+      val approach = Pixel(units.map(_.pixel.x).sum / Math.max(1, units.size), units.map(_.pixel.y).sum / Math.max(1, units.size))
+      if (ids != previousIds) {
+        previousIds = ids
+        allocatedGaps = plan.sortBy(p => -p.slot.pixel.pixelDistanceSquared(approach)).map { placement =>
+          val unit = remaining.filter(u => u.probe == placement.probe && u.body == placement.body)
+            .minBy(u => (u.pixel.pixelDistanceSquared(placement.slot.pixel), u.id))
+          remaining -= unit
+          (placement, unit.id)
+        }
+      }
+      val byId = units.map(u => u.id -> u).toMap
+      val nearest = allocatedGaps.map { case (p, id) => (p, byId(id)) }
+      // Within each gap, preserve the defenders' physical order. A new unit
+      // approaching from outside must not be sent through a stationary front rank.
+      nearest.groupBy { case (p, _) => (p.gap, p.probe, p.body) }.values.flatMap { group =>
+        val available = mutable.ArrayBuffer(group.map(_._2): _*)
+        group.map(_._1).sortBy(p => (-p.slot.depth, p.slot.pixel.x, p.slot.pixel.y)).map { p =>
+          def arrivalDepth(u: Defender): Double = {
+            val depth = p.gap.depth(u.pixel)
+            // Units approaching around a building join from that mouth of the gap,
+            // even if their current position is alongside an existing rank.
+            if (Math.abs(p.gap.across(u.pixel)) <= p.gap.width / 2.0) depth
+            else if (depth > p.gap.inner) Double.PositiveInfinity else Double.NegativeInfinity
+          }
+          val unit = available.minBy(u => (-arrivalDepth(u), u.pixel.pixelDistanceSquared(p.slot.pixel), u.id))
+          available -= unit
+          unit.id -> p.slot.pixel
+        }
       }.toMap
     }
 
-    private def allocate(composition: Vector[(Boolean, Body)]): Vector[(Boolean, Body, Pixel)] = {
+    def waypoint(unit: Defender, target: Pixel): Pixel = navigationFor(unit.body).waypoint(unit.id, unit.pixel, target)
+
+    private def allocate(composition: Vector[(Boolean, Body)]): Vector[Planned] = {
       val remaining = mutable.ArrayBuffer(composition: _*)
       val occupied = mutable.ArrayBuffer.empty[Box]
-      val output = mutable.ArrayBuffer.empty[(Boolean, Body, Pixel)]
+      val output = mutable.ArrayBuffer.empty[Planned]
       val placed = mutable.Map.empty[Gap, Vector[(Boolean, Body, Slot)]]
       var progressed = true
       while (remaining.nonEmpty && progressed) {
@@ -267,14 +420,17 @@ object WallGapPositions {
             val options = candidates(g, body)
             // Close remaining lanes before reinforcing an already sealed passage.
             // This also puts a too-large defender at the inner mouth of a tiny gap.
-            val slot = if (sealedAlready) options.find(legal) else (2 to 0 by -1).iterator.flatMap { sides =>
-              options.find(s => legal(s) &&
+            val slot = if (sealedAlready) {
+              // Keep reinforcements together instead of skipping to sheltered cannon pockets.
+              options.filter(legal).sortBy(s => (s.depth, s.exposure, s.across, s.pixel.x, s.pixel.y)).headOption
+            } else (2 to 0 by -1).iterator.flatMap { sides =>
+              options.find(s => (s.front || probe && zealotBack.isDefined) && legal(s) &&
                 (if (fromA.exists(_.touches(s.blocked))) 1 else 0) + (if (fromB.exists(_.touches(s.blocked))) 1 else 0) == sides)
             }.take(1).toVector.headOption
             slot.map(s => (probe, body, s))
           }.take(1).toVector.headOption
           choice.foreach { case (probe, body, s) =>
-            output += ((probe, body, s.pixel))
+            output += Planned(probe, body, s, g)
             occupied += s.box
             placed(g) = previous :+ ((probe, body, s))
             remaining -= ((probe, body))

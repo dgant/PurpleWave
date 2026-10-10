@@ -2,7 +2,9 @@ package bwapi {
   class WallGapTestUnit extends Unit(null, 0, null) {
     var movedTo: Position = _
     var holds: Int = 0
+    var stops: Int = 0
     override def move(to: Position): Boolean = { movedTo = to; true }
+    override def stop(): Boolean = { stops += 1; true }
     override def holdPosition(): Boolean = { holds += 1; true }
   }
 }
@@ -146,6 +148,37 @@ package Micro.Formation {
       buildings(gateway, forge)
       assert(positions(defenders) == before)
     }
+    check("support pylons in the wall template do not create rear wall entrances") {
+      val before = positions(defenders)
+      val pylon = unit(7, Protoss.Pylon, Tile(19, 14))
+      With.placement.index(Fit(pylon.tileTopLeft, new Template().add(Point(0, 0),
+        new TemplatePointRequirement(Protoss.Pylon).withLabels(PlaceLabels.Wall))))
+      buildings(gateway, forge, pylon)
+      assert(positions(defenders) == before)
+      buildings(gateway, forge)
+      placement()
+    }
+    check("wall slots outside the base tile region still defend its zone") {
+      val baseTiles = Array.fill[Option[Base]](With.mapTileArea)(Some(base))
+      baseTiles(gateway.tileTopLeft.i) = None
+      set(With.geography, "_baseByTile", baseTiles)
+      placement()
+      assert(positions(defenders).size == 2)
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(base)))
+      placement()
+    }
+    check("a wall footprint may straddle the natural zone, but must overlap it") {
+      val otherZone = allocate(classOf[Zone])
+      val zones = Array.fill(With.mapTileArea)(zone)
+      zones(gateway.tileTopLeft.i) = otherZone
+      set(With.geography, "_zoneByTile", zones)
+      placement()
+      assert(positions(defenders).size == 2)
+      for (x <- 0 until 4; y <- 0 until 3) zones(gateway.tileTopLeft.add(x, y).i) = otherZone
+      assert(positions(defenders).isEmpty)
+      set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+      placement()
+    }
     check("stationary units explicitly hold, keep holding, and move to the exact gap pixel") {
       val target = positions(defenders)(zealot)
       val action = HoldWallGap(target)
@@ -163,6 +196,20 @@ package Micro.Formation {
       action.perform(zealot)
       assert(api.movedTo == target.bwapi)
       assert(zealot.agent.decision.pixel.contains(target))
+      zealot.sleepUntil = With.frame
+      val approach = target.add(40, 40)
+      HoldWallGap(target, Some(approach)).perform(zealot)
+      assert(api.movedTo == approach.bwapi)
+      assert(zealot.agent.decision.pixel.contains(target))
+      assert(zealot.agent.tryingToMove)
+      zealot.sleepUntil = With.frame
+      set(zealot, "_framesFailingToMove", 30)
+      action.perform(zealot)
+      assert(api.stops == 1)
+      assert(! zealot.seeminglyStuck)
+      zealot.sleepUntil = With.frame
+      action.perform(zealot)
+      assert(api.movedTo == target.bwapi)
     }
     println(s"$passed wall defense integration tests passed")
   }

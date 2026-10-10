@@ -564,10 +564,35 @@ package Tactic.Missions {
       With.blackboard.takeUnownedBases.set(true)
       assert(Tactic.GetDefenseBase.canSecure(Vector(natural)))
     }
-    check("Shuttle support includes its Zealots alongside the Reaver") {
-      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver, 300); val z = unit(Protoss.Zealot)
-      t.agent.addPassenger(z); t.agent.addPassenger(r)
-      assert(Micro.Actions.Protoss.Shuttle.ShuttlePark.exposedPassengers(t).toSet == Set(r, z))
+    check("parking protects only unloaded Reavers, Templar, and Archons") {
+      for (kind <- Vector(Protoss.Reaver, Protoss.HighTemplar, Protoss.DarkTemplar, Protoss.Archon, Protoss.Zealot, Protoss.Dragoon, Protoss.DarkArchon)) {
+        val t = unit(Protoss.Shuttle); val p = unit(kind)
+        t.agent.addPassenger(p)
+        val protects = Vector(Protoss.Reaver, Protoss.HighTemplar, Protoss.DarkTemplar, Protoss.Archon).contains(kind)
+        assert(Micro.Actions.Protoss.Shuttle.ShuttlePark.allowed(t) == protects, s"Unexpected protection for $kind")
+        load(p, Some(t))
+        assert(!Micro.Actions.Protoss.Shuttle.ShuttlePark.allowed(t), "Loaded passengers do not need parking protection")
+      }
+    }
+    check("Hover protects a more endangered passenger beyond its selected quest") {
+      for (kind <- Vector(Protoss.Reaver, Protoss.HighTemplar, Protoss.DarkTemplar, Protoss.Archon)) {
+        val t = unit(Protoss.Shuttle, 800, 800)
+        val r = unit(Protoss.Reaver, 800, 800); val p = unit(kind, 1000, 800)
+        val crew = Vector(r, p) ++ (if (kind.spaceRequired == 2) Vector(unit(Protoss.Zealot, 800, 1000)) else Vector.empty)
+        val m = new MissionProbe(first)
+        m.configure(Vector(t), crew)
+        (Vector(t) ++ crew).foreach(u => u.matchups = new MatchupAnalysis(u) {
+          override def threats = Vector.empty
+          override def enemies = Vector.empty
+          override def pixelsToThreatRange = None
+          override def pixelsEntangled = if (Protoss.Zealot(u)) 200.0 else if (u == p) 100.0 else 0.0
+        })
+        r.agent.perch.set(r.pixel); r.agent.setRideGoal(r.pixel)
+        perform(Micro.Actions.Protoss.Shuttle.BeShuttle, t)
+        assert(t.agent.lastAction.contains("Hover"), "The nearby Reaver must supply the Hover quest")
+        assert(t.agent.decision().pixelDistance(p.pixel) <= 12, s"Hover ignored endangered $kind")
+        assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo != null)
+      }
     }
     check("a threatened Shuttle stays with its nearby grounded Reaver") {
       val previousMapping = With.geography.allTiles.map(_.base).toArray
@@ -584,7 +609,7 @@ package Tactic.Missions {
         override def framesOfSafety = -1.0
         override def withinSafetyMargin = false
       }
-      Micro.Actions.Protoss.Shuttle.ShuttlePark.parkWithPassengers(t, Vector(r))
+      Micro.Actions.Protoss.Shuttle.ShuttlePark(t)
       val command = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
       assert(command != null)
       val destination = Pixel(command.getX, command.getY)
@@ -594,7 +619,7 @@ package Tactic.Missions {
         "Parking must keep moving along the passenger's pickup heading without braking")
       t.sleepUntil = 0
       set(t, "_pixel", Pixel(1200, 960)); set(t, "_tile", Pixel(1200, 960).tile)
-      Micro.Actions.Protoss.Shuttle.ShuttlePark.parkWithPassengers(t, Vector(r))
+      Micro.Actions.Protoss.Shuttle.ShuttlePark(t)
       val distant = t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo
       assert(Pixel(distant.getX, distant.getY).pixelDistance(r.pixel) > t.pixelDistanceCenter(r),
         "Keep retreating when still too far away to support the Reaver")

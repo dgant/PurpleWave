@@ -8,6 +8,16 @@ import java.io.File
 
 object ConfigurationLoader {
 
+  def opponentFixedBuild(text: String, enemyName: String, fallback: String): String = {
+    if (text.trim.isEmpty) return fallback
+    val entries = Json.read(text).asJsonMap().entrySet().iterator()
+    while (entries.hasNext) {
+      val entry = entries.next()
+      if (entry.getKey.equalsIgnoreCase(enemyName)) return entry.getValue.asString()
+    }
+    fallback
+  }
+
   def getOrDefault[T](json: Json, property: String, default: T): T = {
     val value = json.at(property)
     if (value == null) {
@@ -59,7 +69,10 @@ object ConfigurationLoader {
       val frameMsTarget = getOrDefault(config, "framemstarget", With.configuration.frameTargetMs)
       val frameMsLimit  = getOrDefault(config, "framemslimit",  With.configuration.frameLimitMs)
 
-      With.configuration.fixedBuilds = new FileFlag("fixedbuilds.txt").contents
+      With.configuration.fixedBuilds = opponentFixedBuild(
+        new FileFlag("fixedbuilds-by-opponent.json").contents,
+        With.enemy.name,
+        new FileFlag("fixedbuilds.txt").contents)
       With.configuration.frameTargetMs = frameMsTarget
       With.configuration.frameLimitMs = frameMsLimit
       With.configuration.simviz = simviz

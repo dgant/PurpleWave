@@ -22,7 +22,6 @@ New-Item -ItemType Directory -Path $macros -Force | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Wall gap macro compilation failed.' }
 $sources = @(
     (Join-Path $repo 'src/Micro/Formation/WallGapPositions.scala'),
-    (Join-Path $repo 'src/Micro/Actions/Combat/Tactics/HoldWallGap.scala'),
     (Join-Path $repo 'src/Tactic/Squads/SquadDefendBase.scala'),
     (Join-Path $repo 'tests/Micro/WallGapPositionsTest.scala'),
     (Join-Path $repo 'tests/Micro/WallGapDefenseTest.scala')

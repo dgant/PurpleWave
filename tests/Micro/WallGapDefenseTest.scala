@@ -15,18 +15,20 @@ package Micro.Formation {
   import Lifecycle.With
   import Lifecycle.Configure.Configuration
   import Mathematics.Points.{Pixel, Point, Tile}
-  import Micro.Actions.Combat.Tactics.HoldWallGap
+  import Micro.Actions.Idle
+  import Micro.Agency.Intention
   import Performance.{Cache, Latency}
   import Placement.Placement
   import Placement.Access.PlaceLabels
   import Placement.Generation.Fit
   import Placement.Templating.{RequireWalkable, Template, TemplatePointRequirement}
-  import ProxyBwapi.{Orders, ProxyBWAPI}
+  import ProxyBwapi.ProxyBWAPI
   import ProxyBwapi.Players.PlayerInfo
   import ProxyBwapi.Races.Protoss
   import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
   import ProxyBwapi.UnitInfo.FriendlyUnitInfo
   import ProxyBwapi.UnitTracking.{UnitTracker, UnorderedBuffer}
+  import Tactic.Squads.SquadDefendBase
   import bwapi.Race
 
   object WallGapDefenseTest extends App {
@@ -196,37 +198,24 @@ package Micro.Formation {
       set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
       placement()
     }
-    check("stationary units explicitly hold, keep holding, and move to the exact gap pixel") {
-      val target = positions(defenders)(zealot)
-      val action = HoldWallGap(target)
-      val api = zealot.bwapiUnit.asInstanceOf[bwapi.WallGapTestUnit]
-      set(zealot, "_pixel", target)
-      set(zealot, "_order", Orders.PlayerGuard)
-      action.perform(zealot)
-      assert(api.holds == 1)
-      zealot.sleepUntil = With.frame
-      set(zealot, "_order", Orders.HoldPosition)
-      action.perform(zealot)
-      assert(api.holds == 1)
-      zealot.sleepUntil = With.frame
-      set(zealot, "_pixel", target.add(1, 0))
-      action.perform(zealot)
-      assert(api.movedTo == target.bwapi)
-      assert(zealot.agent.decision.pixel.contains(target))
-      zealot.sleepUntil = With.frame
-      val approach = target.add(40, 40)
-      HoldWallGap(target, Some(approach)).perform(zealot)
-      assert(api.movedTo == approach.bwapi)
-      assert(zealot.agent.decision.pixel.contains(target))
-      assert(zealot.agent.tryingToMove)
-      zealot.sleepUntil = With.frame
-      set(zealot, "_framesFailingToMove", 30)
-      action.perform(zealot)
-      assert(api.stops == 1)
-      assert(! zealot.seeminglyStuck)
-      zealot.sleepUntil = With.frame
-      action.perform(zealot)
-      assert(api.movedTo == target.bwapi)
+    check("wall gap defense issues placement intents without commanding units") {
+      val squad = allocate(classOf[SquadDefendBase])
+      positions(defenders).foreach { case (defender, target) =>
+        val api = defender.bwapiUnit.asInstanceOf[bwapi.WallGapTestUnit]
+        Vector(target.add(40, 40), target).foreach { position =>
+          set(defender, "_pixel", position)
+          set(defender, "_intent", new Intention)
+          squad.holdWallGap(defender, target)
+          assert(defender.client == squad)
+          assert(defender.intent.terminus.contains(target))
+          assert(defender.intent.station.contains(target))
+          assert(defender.intent.redoubt.contains(target))
+          assert(! defender.intent.canFlee)
+          assert(defender.intent.canFight)
+          assert(defender.intent.action == Idle)
+          assert(api.movedTo == null && api.holds == 0 && api.stops == 0)
+        }
+      }
     }
     println(s"$passed wall defense integration tests passed")
   }

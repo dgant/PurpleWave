@@ -6,7 +6,7 @@ import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Micro.Actions.Combat.Tactics.{HoldWallGap, Potshot}
+import Micro.Actions.Combat.Tactics.Potshot
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
@@ -147,13 +147,7 @@ class SquadDefendBase(base: Base) extends Squad {
       formations += FormationSimple(FormationStylePlug, formationBastion.placements ++ wallPlugs)
       formations += formationBastion
       SquadAutomation.send(this)
-      wallPlugs.foreach { case (unit, pixel) =>
-        unit.intend(this)
-          .setCanFlee(false)
-          .setRedoubt(pixel)
-          .setTerminus(pixel)
-          .setAction(HoldWallGap(pixel, Some(wallGapPositions.waypoint(unit, pixel))))
-      }
+      wallPlugs.foreach { case (unit, pixel) => holdWallGap(unit, pixel) }
     } else if (plugEdge().isDefined) {
       val plugPixel = plugEdge().get._2.get.pixelCenter
       lastAction = "Plug"
@@ -188,6 +182,14 @@ class SquadDefendBase(base: Base) extends Squad {
       SquadAutomation.send(this)
       units.foreach(_.intent.setCanFlee(false))
     }
+  }
+
+  def holdWallGap(unit: FriendlyUnitInfo, pixel: Pixel): Unit = {
+    unit.intend(this)
+      .setCanFlee(false)
+      .setRedoubt(pixel)
+      .setTerminus(pixel)
+      .setStation(pixel)
   }
 
   def intendScouring(scourer: FriendlyUnitInfo, target: UnitInfo): Unit = {

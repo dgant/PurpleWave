@@ -1,6 +1,6 @@
 package Information.Geography
 
-import Information.Geography.Calculations.{FindBases, Labels, UpdateZones}
+import Information.Geography.Calculations.{FindBases, Labels, MergeMainZones, UpdateZones}
 import Information.Geography.Types.{Base, Edge, LabelGenerator, Metro, Zone}
 import Lifecycle.With
 import Mathematics.Maff
@@ -60,13 +60,34 @@ trait GeographyBuilder {
     _zones = regions.map(r => new Zone(zoneNames.next(), r, regionByTile.indices.filter(regionByTile(_) == r).map(new Tile(_)).toSet)).toVector
     _zoneByTile = allTiles.view.map(tile => zones.find(_.tiles.contains(tile)).get).toArray
 
-    // Build Edges
-    //
+    // Build raw edges and find resource clusters using the original regions.
     _edges = BWTA.getChokepoints.asScala.map(new Edge(_)).toVector
+    val baseTiles = FindBases()
+
+    // Absorb main-base subdivisions before constructing Bases or evaluating lazy Zone/Edge data.
+    val chokes = BWTA.getChokepoints.asScala.toVector
+    val mainRegions = With.geography.startLocations.map(t => regionByTile(t.i)).toSet
+    val regionOwner = MergeMainZones(
+      regions.toVector,
+      mainRegions,
+      baseTiles.map(t => regionByTile(t.i)).toSet,
+      (r: Region) => With.game.getGroundHeight(new Pixel(r.getCenter).tile.bwapi) / 2,
+      chokes.map(c => (c.getRegions.getLeft, c.getRegions.getRight, c.getWidth)))
+    val tilesByOwner = allTiles.groupBy(t => regionOwner(regionByTile(t.i)))
+    _zones = zones.filter(z => regionOwner(z.bwemRegion) == z.bwemRegion).map(z =>
+      if (tilesByOwner(z.bwemRegion).size == z.tiles.size) z
+      else new Zone(z.name, z.bwemRegion, tilesByOwner(z.bwemRegion).toSet))
+    val zoneByRegion = zones.map(z => z.bwemRegion -> z).toMap
+    _zoneByTile = allTiles.map(t => zoneByRegion(regionOwner(regionByTile(t.i)))).toArray
+
+    // Build Edges. Chokes inside a merged zone are no longer geographical boundaries.
+    //
+    _edges = chokes.zip(edges).collect {
+      case (choke, edge) if regionOwner(choke.getRegions.getLeft) != regionOwner(choke.getRegions.getRight) => edge
+    }
 
     // Build Bases
     //
-    val baseTiles = FindBases()
     val baseTilesByZone = baseTiles.groupBy(zoneByValidTile)
     val baseTileSets = baseTilesByZone.flatMap(p => p._2.map(base => (base, p._1.tiles.filter(tile => p._2.filterNot(base==).forall(_.tileDistanceSquared(tile) > base.tileDistanceSquared(tile))))))
     _bases = baseTileSets.map(p => new Base(baseNames.next(), p._1, p._2)).toVector

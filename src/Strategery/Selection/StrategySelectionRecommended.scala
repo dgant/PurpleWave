@@ -3,17 +3,10 @@ package Strategery.Selection
 import Lifecycle.With
 import Strategery.Strategies.{Strategy, StrategyBranch}
 
-class StrategySelectionRecommended(fallback: StrategySelectionPolicy, recommendedBranch: Strategy*) extends StrategySelectionPolicy {
-
-  var duration = 5
+class StrategySelectionRecommended(fallback: StrategySelectionPolicy, val duration: Int, override val targetWinrate: Double, recommendedBranch: Strategy*) extends StrategySelectionPolicy {
 
   override def respectMap     : Boolean = true
   override def respectHistory : Boolean = false
-
-  def this(fallback: StrategySelectionPolicy, duration: Int, recommendedBranch: Strategy*) {
-    this(fallback, recommendedBranch: _*)
-    this.duration = duration
-  }
 
   override def chooseBranch: StrategyBranch = {
     val legalMatchedBranches = With.strategy.strategyBranchesLegal

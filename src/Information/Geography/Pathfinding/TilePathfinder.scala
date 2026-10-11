@@ -144,7 +144,7 @@ trait TilePathfinder {
     val nanosDelta           = Math.max(0, System.nanoTime() - nanosBefore)
     val pathLength           = output.tiles.map(_.length).getOrElse(0)
     aStarPathfinds          += 1
-    aStarExplorationMaxed   += Maff.fromBoolean(tilesExplored >= tilesExploredMax)
+    aStarExplorationMaxed   += Maff.fromBoolean(tilesExplored >= profile.explorationMaximum.map(_.toLong).getOrElse(tilesExploredMax))
     aStarOver1ms            += Maff.fromBoolean(nanosDelta > 1e6)
     aStarNanosMax            = Math.max(aStarNanosMax, nanosDelta)
     aStarNanosTotal         += nanosDelta
@@ -177,6 +177,8 @@ trait TilePathfinder {
     val lengthMinimum         = profile.lengthMinimum.getOrElse(Double.NegativeInfinity)
     val lengthMaximum         = profile.lengthMaximum.getOrElse(Double.PositiveInfinity)
     val threatMaximum         = profile.threatMaximum.getOrElse(Int.MaxValue)
+    val threatAlongPath       = profile.threatMaximumAlongPath.getOrElse(Int.MaxValue)
+    val explorationMaximum    = profile.explorationMaximum.map(_.toLong).getOrElse(tilesExploredMax)
     val repulsion             = profile.repulsors.nonEmpty
     val useDebugGrid          = profile.debug && ShowPathfinding.inUse && With.grids.debugPathfinding.lock()
     val debugTilePath         = (tp: TilePath) => { if (useDebugGrid) { With.grids.debugPathfinding.setPath(tp) }; tp }
@@ -190,7 +192,7 @@ trait TilePathfinder {
     horizon += startTileState
     tilesExplored = 0
 
-    while (horizon.nonEmpty && tilesExplored < tilesExploredMax) {
+    while (horizon.nonEmpty && tilesExplored < explorationMaximum) {
       tilesExplored += 1
       val bestTileState = horizon.dequeue()
       val bestTile      = bestTileState.tile
@@ -201,7 +203,7 @@ trait TilePathfinder {
       val atProfileEnd = endExists && (endI == bestTileState.i || (endDistanceMaxTiles > 0 && endTile.tileDistanceFast(bestTile) <= endDistanceMaxTiles && (profile.crossUnwalkable || endTile.groundPixels(bestTile) <= endDistanceMaxPixels)))
       if (
         (lengthMaximum <= bestTileState.pathLength + 1 && lengthMaximum <= Math.round(bestTileState.pathLength)) // Rounding encourages picking diagonal paths for short maximum lengths
-        || (profile.acceptPartialPath && tilesExplored >= tilesExploredMax)
+        || (profile.acceptPartialPath && tilesExplored >= explorationMaximum)
         || (
           (atProfileEnd || ( ! endExists && (profile.endUnwalkable || bestTile.walkableUnchecked)))
           && lengthMinimum  <= bestTileState.pathLength
@@ -218,6 +220,9 @@ trait TilePathfinder {
         return debugTilePath(output)
       }
 
+      // A unit already inside danger may escape without entering deeper range.
+      val threatLimit = if (profile.threatMaximumAlongPath.isEmpty) Int.MaxValue else
+        Math.max(threatAlongPath, Math.min(profile.threatGrid.getUnchecked(startTile.i), profile.threatGrid.getUnchecked(bestTile.i)))
       val neighborCount = if (profile.allowDiagonals) neighborDeltaX.length else neighborCardinalCount
       var i = 0
       while (i < neighborCount) {
@@ -227,13 +232,18 @@ trait TilePathfinder {
           val neighborI     = neighborX + neighborY * mapTileWidth
           val neighborState = tiles(neighborI)
           val neighborTile  = neighborState.tile
-          if ( ! neighborState.visited && (profile.crossUnwalkable || (neighborTile.walkableUnchecked && ! alsoUnwalkableI.contains(neighborI)))) {
+          if ( ! neighborState.visited
+            && (profile.threatMaximumAlongPath.isEmpty || profile.threatGrid.getUnchecked(neighborI) <= threatLimit)
+            && (profile.crossUnwalkable || (neighborTile.walkableUnchecked && ! alsoUnwalkableI.contains(neighborI)))) {
 
             val neighborCardinal = i < neighborCardinalCount
-            if (profile.crossUnwalkable || (
+            val crossesThreat = profile.threatMaximumAlongPath.isDefined && !neighborCardinal && (
+              profile.threatGrid.getUnchecked(neighborX, bestTile.y) > threatLimit ||
+              profile.threatGrid.getUnchecked(bestTile.x, neighborY) > threatLimit)
+            if (!crossesThreat && (profile.crossUnwalkable || (
                 neighborCardinal
                   || With.grids.walkable.getUnchecked(neighborX,  bestTile.y)
-                  || With.grids.walkable.getUnchecked(bestTile.x, neighborY))) {
+                  || With.grids.walkable.getUnchecked(bestTile.x, neighborY)))) {
 
               val wasEnqueued = neighborState.enqueued
               if (repulsion && ! wasEnqueued) {

@@ -10,6 +10,10 @@ object Transport extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport
   
   override protected def perform(transport: FriendlyUnitInfo): Unit = {
+    transport.squad.foreach {
+      case drop: Tactic.Missions.MissionDrop => drop.accountForCargo(transport)
+      case _ =>
+    }
     val passengers = transport.agent.passengers
     passengers.indices.foreach(i => {
       // Don't get stuck trying to unload a passenger that fails to land

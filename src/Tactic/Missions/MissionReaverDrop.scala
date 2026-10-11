@@ -25,20 +25,25 @@ class MissionReaverDrop extends MissionDrop {
   override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
   protected def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = {
     plannedTargets ++= itinerary.filterNot(plannedTargets.contains)
-    val discovered = MissionReaverDrop.targets(bases, possibleMains).filterNot(plannedTargets.contains)
+    val targets = MissionReaverDrop.targets(bases, possibleMains)
+    val discovered = targets.filterNot(plannedTargets.contains)
     if (discovered.isEmpty) return
     val origin = transports.headOption.map(_.pixel).getOrElse(With.geography.home.center)
     val remaining = itinerary.toVector ++ discovered
     if (clockwise.isEmpty) {
       clockwise = Some(Vector(true, false).minBy(direction => {
-        val stops = origin +: MissionReaverDrop.orderedTargets(remaining, origin, direction).map(_.heart.center)
+        val sight = transports.headOption.map(_.sightPixels).getOrElse(Protoss.Shuttle.sightPixels)
+        val regions = MissionReaverDrop.sweep(bases, remaining, origin, direction).map(b =>
+          if (b.isEnemy) (b.heart, 0.0) else (b.townHallArea.center.tile, Math.max(0, sight - 112) / 32.0))
+        val stops = origin +: DropRoute.flybys(origin.tile, regions).map(_.center)
         (stops.sliding(2).map(pair => pair.head.pixelDistance(pair.last)).sum,
           Maff.normalize0To2Pi((Points.middle.radiansTo(stops.last) - Points.middle.radiansTo(origin)) * (if (direction) 1 else -1)))
       }))
     }
     val active = if (state == Landing || state == Raiding || state == Evacuating) itinerary.headOption else None
-    val ordered = active.toVector ++ MissionReaverDrop.orderedTargets(
-      remaining.filterNot(active.contains), active.map(_.townHallArea.center).getOrElse(origin), clockwise.get)
+    val ordered = active.toVector ++ MissionReaverDrop.sweep(
+      bases.filterNot(b => plannedTargets.contains(b) && !itinerary.contains(b)),
+      remaining.filterNot(active.contains), active.map(_.townHallArea.center).getOrElse(origin), clockwise.get).filterNot(active.contains)
     val visited = plannedTargets.filterNot(itinerary.contains).toVector
     itinerary.clear()
     itinerary ++= ordered
@@ -48,10 +53,11 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def continueItinerary(from: Base): Boolean = {
     val enemyBases = With.geography.bases.filter(_.isEnemy)
-    if (!With.blackboard.reaverDropContinuePressure() || enemyBases.size < 2 ||
+    if (!With.blackboard.reaverDropContinuePressure() ||
       transports.isEmpty || !passengers.exists(Protoss.Reaver)) return false
     val known = (plannedTargets.toVector ++ MissionReaverDrop.targets(enemyBases)).distinct
-    val next = MissionReaverDrop.reverseTargets(known, from).filter(b => b.isEnemy && !targetCleared(b))
+    val targets = MissionReaverDrop.reverseTargets(known, from).filter(b => b.isEnemy && !targetCleared(b))
+    val next = MissionReaverDrop.sweep(With.geography.bases.filterNot(_ == from), targets, from.townHallArea.center, !clockwise.getOrElse(true))
     if (next.isEmpty) return false
     itinerary.clear()
     itinerary ++= next
@@ -68,12 +74,40 @@ class MissionReaverDrop extends MissionDrop {
   override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
 
   private def workers = destinationBase.toVector.flatMap(_.enemies).filter(u => IsWorker(u) && u.visible)
+  private def approaching(transport: FriendlyUnitInfo): Boolean = destinationBase.exists(base =>
+    base.isEnemy && transport.pixelDistanceCenter(vicinity) <= Math.max(384, transport.sightPixels))
+
+  private def confidentToRaid(transport: FriendlyUnitInfo): Boolean = {
+    val crew = passengersFor(transport)
+    val reavers = crew.filter(Protoss.Reaver).filterNot(_.doomed)
+    val defenders = (destinationBase.toVector.flatMap(_.enemies) ++
+      (crew.flatMap(_.matchups.threats) ++ transport.matchups.threats).filter(_.pixelDistanceCenter(transport) <= transport.sightPixels + 128))
+      .filter(u => u.likelyStillThere && IsWarrior(u) && u.canAttack).distinct
+    reavers.nonEmpty && (defenders.isEmpty || (
+      defenders.forall(d => crew.exists(_.canAttack(d))) &&
+      defenders.map(_.subjectiveValue).sum * (if (workers.size > 2) 1 else 2) < crew.map(_.subjectiveValue).sum &&
+      reavers.exists(_.battle.exists(b => b.judgement.exists(_.shouldFightGround) && defenders.forall(b.enemy.units.contains)))))
+  }
+
+  override protected def rejectApproach(transport: FriendlyUnitInfo): Boolean =
+    passengersFor(transport).exists(requiredPassenger) && approaching(transport) && !confidentToRaid(transport)
+
   override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
-    destinationBase.exists(base => base.isEnemy && passengersFor(transport).exists(Protoss.Reaver) && (
-      transport.matchups.threatsInRange.nonEmpty || threatenedOnApproach(transport, routeWaypoint(transport, landingGoal(transport).tile))
-      || transport.pixelDistanceCenter(vicinity) <= 32))
+    approaching(transport) && confidentToRaid(transport)
+
+  override protected def routeArrivalRange(transport: FriendlyUnitInfo): Double =
+    if (destinationBase.exists(b => !b.isEnemy)) Math.max(0, transport.sightPixels - 112) / 32.0 else 10
+
+  override protected def routeFollowing(transport: FriendlyUnitInfo): Vector[(Tile, Double)] = {
+    if (!destinationBase.exists(b => !b.isEnemy)) return Vector.empty
+    val remaining = itinerary.drop(1).toVector
+    val scouts = remaining.takeWhile(b => !b.isEnemy)
+    scouts.map(b => (b.townHallArea.center.tile, Math.max(0, transport.sightPixels - 112) / 32.0)) ++
+      remaining.drop(scouts.size).headOption.map(b => (b.heart, 0.0))
+  }
 
   override protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {
+    destinationBase.foreach(base => vicinity = base.heart.center)
     val reavers = passengersFor(transport).filter(Protoss.Reaver)
     combatProgress(transport) = RaidProgress(With.frame, distanceToWorkers(transport),
       reavers.filterNot(_.loaded).map(_.id).toSet, Maff.max(reavers.map(_.lastFrameStartingAttack)).getOrElse(0))
@@ -100,13 +134,14 @@ class MissionReaverDrop extends MissionDrop {
   }
   override protected def requireWorkers: Boolean = true
   override protected def targetCleared(base: Base): Boolean =
-    requireWorkers && MissionReaverDrop.workersCleared(base, _.visible)
+    if (!base.isEnemy) base.townHallArea.tiles.forall(_.visible) && !With.units.all.exists(u =>
+      u.isEnemy && u.likelyStillThere && u.unitClass.isTownHall && !u.flying && u.tileTopLeft.tileDistanceFast(base.townHallTile) < 12)
+    else requireWorkers && MissionReaverDrop.workersCleared(base, _.visible)
 
   override protected def missionTimeout: Int = Minutes(3)()
   override protected def approachTimeout: Int = Minutes(2)()
   override protected def isScoutingTarget(base: Base): Boolean =
-    MissionReaverDrop.unscoutedNatural(base) ||
-      (!base.owner.isFriendly && !base.scoutedByUs && With.scouting.possibleEnemyMains.contains(base))
+    !base.owner.isFriendly && !base.isEnemy && !targetCleared(base)
   override protected def canLandAt(base: Base): Boolean = base.isEnemy
   override protected def additionalItineraryConditions(base: Base): Boolean = base.isEnemy || isScoutingTarget(base)
 
@@ -118,7 +153,7 @@ class MissionReaverDrop extends MissionDrop {
     plannedTargets.clear()
     clockwise = None
     // If the ground scout died, locate an unscouted enemy start from the air.
-    // Passengers stay aboard until ownership is confirmed; empty expansions are not targets.
+    // Scout every perimeter base along the way with passengers aboard.
     appendTargets(With.geography.bases, With.scouting.possibleEnemyMains)
     With.logger.debug(s"$this target: ${itinerary.headOption.map(_.heart)}")
   }
@@ -135,8 +170,9 @@ class MissionReaverDrop extends MissionDrop {
     val doomed = passengers.filter(Protoss.Reaver).forall(_.doomed)
     val stalled = combatStalled
     val unableToLand = state == Landing && raidingTransports.isEmpty && approachStalled
-    if (doomed || stalled || unableToLand) {
-      With.logger.debug(s"$this recovering crew: doomed=$doomed combatStalled=$stalled landingTimedOut=$unableToLand")
+    val defended = transports.exists(rejectApproach)
+    if (doomed || stalled || unableToLand || defended) {
+      With.logger.debug(s"$this recovering crew: doomed=$doomed combatStalled=$stalled landingTimedOut=$unableToLand defended=$defended")
       true
     } else false
   }
@@ -153,8 +189,10 @@ class MissionReaverDrop extends MissionDrop {
     val reavers = reaverManifest
     if (reavers.isEmpty) { terminate("Waiting for a transportable Reaver"); return }
     val selectedTransports = reavers.values.toVector.distinct.sortBy(_.id)
+    // The cap limits recruitment; Reavers already aboard a selected Shuttle stay with it.
+    val aboard = selectedTransports.flatMap(_.loadedUnits).filter(p => p.alive && Protoss.Reaver(p))
     val filler = available.filter(smallLock.matcher) ++ available.filter(bigLock.matcher)
-    val manifest = DropManifest.fill(selectedTransports, reavers.keys.toVector ++ filler, reavers, nearby = true)
+    val manifest = DropManifest.fill(selectedTransports, (reavers.keys.toVector ++ aboard).distinct ++ filler, reavers, nearby = true)
 
     def reserve(lock: LockUnits, units: Iterable[FriendlyUnitInfo]): Unit = {
       lock.setCounter(CountUpTo(units.size))
@@ -178,6 +216,14 @@ private[Missions] object MissionReaverDrop {
     val origin = Points.middle.radiansTo(from)
     bases.sortBy(base => Maff.normalize0To2Pi(
       (Points.middle.radiansTo(base.townHallArea.center) - origin) * (if (clockwise) 1 else -1))).toVector
+  }
+
+  def sweep(bases: Seq[Base], targets: Seq[Base], from: Pixel, clockwise: Boolean): Vector[Base] = {
+    val perimeter = bases.filter(b => !b.owner.isFriendly && (targets.contains(b) ||
+      Seq(b.townHallTile.x, b.townHallTile.y, With.mapTileWidth - b.townHallTile.x,
+        With.mapTileHeight - b.townHallTile.y).min <= Math.min(With.mapTileWidth, With.mapTileHeight) / 4))
+    val ordered = orderedTargets((perimeter ++ targets).distinct, from, clockwise)
+    ordered.take(ordered.lastIndexWhere(targets.contains) + 1)
   }
 
   def reverseTargets(planned: Seq[Base], from: Base): Vector[Base] = {

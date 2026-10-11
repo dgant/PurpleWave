@@ -7,7 +7,6 @@ import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
 import Micro.Actions.Basic.DoNothing
 import Micro.Actions.Combat.Maneuvering.Retreat
-import Micro.Actions.Commands.Travel
 import Micro.Actions.Protoss.ReloadScarabs
 import Micro.Actions.{Action, Idle}
 import Micro.Agency.Commander
@@ -53,6 +52,9 @@ abstract class MissionDrop extends Mission {
   protected def landingGoal(transport: FriendlyUnitInfo): Pixel = vicinity
   protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = false
   protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {}
+  protected def rejectApproach(transport: FriendlyUnitInfo): Boolean = false
+  protected def routeArrivalRange(transport: FriendlyUnitInfo): Double = 0
+  protected def routeFollowing(transport: FriendlyUnitInfo): Vector[(Tile, Double)] = Vector.empty
   protected final def threatenedOnApproach(transport: FriendlyUnitInfo, waypoint: => Option[Pixel]): Boolean =
     transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin &&
       !waypoint.exists(MicroPathing.isSafeMove(transport, _))
@@ -60,6 +62,7 @@ abstract class MissionDrop extends Mission {
   protected def missionTimeout: Int = Seconds(90)()
   protected def approachTimeout: Int = Seconds(45)()
   protected val transportLock: LockUnits = new LockUnits(this, u => u.isTransport && recruitable(u)).setCounter(CountOne).setInterruptible(false)
+  private val cargoLock = new LockUnits(this).setInterruptible(false)
 
   val itinerary                             = new mutable.Queue[Base]
   val transports                            = new ArrayBuffer[FriendlyUnitInfo]
@@ -162,19 +165,19 @@ abstract class MissionDrop extends Mission {
     With.logger.debug(f"$this itinerary: ${itinerary.view.map(_.toString).mkString(" -> ")}")
   }
 
-  private def allAboard: Boolean = passengers.forall(_.transport.exists(transports.contains))
+  private def unassignedCargo(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = transport.loadedUnits.filter(p => p.alive && !passengers.contains(p))
+  private def allAboard: Boolean = passengers.forall(_.transport.exists(transports.contains)) && transports.forall(unassignedCargo(_).isEmpty)
   private def allLanded: Boolean = passengers.forall(initiallyLanded.contains)
   private def allHome: Boolean = units.forall(_.base.exists(_.owner.isUs))
   final override def run(): Unit = {
     transports --= transports.filterNot(u => u.alive && u.squad.contains(this))
     passengers --= passengers.filterNot(u => u.alive && u.squad.contains(this))
-    if (passengers.isEmpty && (!defaultCombatLanding || transports.isEmpty)) { terminate("No passengers left"); return }
+    if (passengers.isEmpty && (!defaultCombatLanding || transports.isEmpty)) { finishDrop("No passengers left"); return }
     if (transports.isEmpty) {
-      if (Seq(Raiding, Evacuating).contains(state)) { passengers.filter(_.base.exists(_.owner.isEnemy)).foreach(_.agent.commit = true) } // Godspeed you poor souls
-      terminate("No transports left"); return
+      finishDrop("No transports left"); return
     }
     updateManifest()
-    if (passengers.isEmpty && !defaultCombatLanding) { terminate("No transportable passengers left"); return }
+    if (passengers.isEmpty && !defaultCombatLanding) { finishDrop("No transportable passengers left"); return }
     refreshItinerary()
     while (itinerary.headOption.exists(skipBase)) {
       With.logger.debug(f"$this: Leaving target ${itinerary.head.heart}. Next target: ${itinerary.drop(1).headOption.map(_.heart)}")
@@ -182,16 +185,9 @@ abstract class MissionDrop extends Mission {
     }
     val expired = With.framesSince(Math.max(launchFrame, itineraryFrame)) > missionTimeout ||
       (With.framesSince(Math.max(launchFrame, destinationFrame)) > approachTimeout && state != Raiding && state != Evacuating)
-    val renewed = !returningHome && !shouldGoHome && (itinerary.isEmpty || expired) && destinationBase.exists(continueItinerary)
-    if (renewed) itineraryFrame = With.frame
+    val renewed = renewItinerary(expired)
     updateState(shouldGoHome || (expired && !renewed))
-    if (state == Escaping && allHome) { terminate("Escaped!"); return }
-    transports.filter(t => state == Assembling || (state == Escaping && t.base.exists(_.owner.isUs))).foreach(t => {
-      t.loadedUnits.view.filterNot(passengers.contains).foreach(p => {
-        With.logger.micro(f"Drop transport $t ditching rider $p")
-        Commander.unload(t, p)
-      })
-    })
+    if (finishWithdrawal()) return
     transports.foreach(_.intend(this).setStation(None))
     state match {
       case Assembling => assemble()
@@ -202,7 +198,24 @@ abstract class MissionDrop extends Mission {
       case Escaping   => escape()
     }
   }
+  // Keep Reavers already aboard during assembly, even above the recruitment cap.
+  // Any passenger carried into a raid must remain part of the recovery plan.
+  final def accountForCargo(transport: FriendlyUnitInfo): Unit = {
+    if (!transports.contains(transport)) return
+    val cargo = unassignedCargo(transport).filter(p => state != Assembling || Protoss.Reaver(p)).toVector
+    if (cargo.isEmpty) return
+    passengers ++= cargo
+    With.recruiter.lockTo(cargoLock, cargo)
+    cargo.foreach(p => {
+      With.logger.debug(s"$this retaining carried passenger $p aboard $transport")
+      p.setSquad(Some(this))
+      transport.agent.addPassenger(p)
+      p.intend(this).setTerminus(vicinity).setAction(if (state == Raiding || raidingTransports(transport)) Idle else DoNothing)
+    })
+  }
+
   private def updateManifest(): Unit = {
+    transports.foreach(accountForCargo)
     val current = passengers.flatMap(p => assignedTransport(p).map(p -> _)).toMap
     val assigned = DropManifest.fill(transports, passengers, current)
     transports.foreach(t => t.agent.passengers.filterNot(p => assigned.get(p).contains(t)).foreach(t.agent.removePassenger))
@@ -224,10 +237,15 @@ abstract class MissionDrop extends Mission {
         }
       })
       stranded.foreach(p => {
-        if (!p.loaded && p.order == Orders.EnterTransport) Commander.stop(p)
+        if (!p.loaded) Commander.stop(p)
         p.agent.ride.foreach(_.agent.removePassenger(p))
         p.agent.commit = false
-        p.intend(this).setAction(Idle)
+        p.agent.toBoard = None
+        p.agent.wantsPickup = false
+        p.setSquad(None)
+        val intent = p.intend(this).setAction(Idle).setTerminus(p.agent.defaultHome).setStation(None).setRedoubt(None).setBoard(None).setAttack(None)
+        intent.targets = None
+        p.agent.resetDestinations()
       })
       passengers --= stranded
     }
@@ -242,13 +260,43 @@ abstract class MissionDrop extends Mission {
     onDestinationChanged()
     destinationBase.foreach(base => {
       vicinity =
-        if (base.owner.isEnemy || isScoutingTarget(base)) base.heart.center
+        if (base.owner.isEnemy) base.heart.center
+        else if (isScoutingTarget(base)) base.townHallArea.center
         else if (itinerary.size > 1) base.townHallArea.center.project(itinerary(1).townHallArea.center, Maff.max(transports.view.map(_.sightPixels)).getOrElse(0).toDouble)
         else base.heart.center
     })
   }
 
+  private def renewItinerary(expired: Boolean = false): Boolean = {
+    val renewed = !returningHome && !shouldGoHome && (itinerary.isEmpty || expired) && destinationBase.exists(continueItinerary)
+    if (renewed) itineraryFrame = With.frame
+    renewed
+  }
+
+  private def finishDrop(reason: String): Unit = {
+    releasePassengers(passengers.filter(p => !requiredPassenger(p) && !p.loaded).toSet)
+    // Releasing a recruitment lock does not replace an installed micro action.
+    // Clear drop orders immediately, including when no squad orders a transport.
+    (transports ++ passengers).filter(u => u.client == this || u.squad.contains(this)).foreach(u => {
+      u.agent.commit = false
+      u.agent.toBoard = None
+      u.setSquad(None)
+      val intent = u.intend(this).setAction(Idle).setTerminus(u.agent.defaultHome).setStation(None).setRedoubt(None).setBoard(None)
+      intent.targets = None
+      u.agent.resetDestinations()
+    })
+    terminate(reason)
+  }
+
+  private def finishWithdrawal(): Boolean = {
+    if (state != Escaping || !allAboard || (!allHome && transports.exists(t => destinationBase.exists(t.base.contains)))) return false
+    finishDrop("Recovered crew and left final target")
+    true
+  }
+
   private def updateState(goHome: Boolean): Unit = {
+    // Micro can finish or reject the final stop between squad updates, too.
+    if (!goHome) renewItinerary()
     returningHome ||= goHome || itinerary.isEmpty
     if (destinationBase.isEmpty && !returningHome) beginDestination()
     // Keep the old vicinity throughout pickup; a new destination never orders
@@ -258,10 +306,16 @@ abstract class MissionDrop extends Mission {
     }
     if (state == Assembling && allAboard) transition(Travelling)
     if (state == Travelling && !allAboard) transition(Evacuating)
-    if (state == Travelling && transports.exists(_.base.exists(b => destinationBase.contains(b) && canLandAt(b)))) transition(Landing)
+    if ((state == Travelling || state == Landing) && transports.exists(rejectApproach)) {
+      if (itinerary.headOption == destinationBase && itinerary.nonEmpty) itinerary.dequeue()
+      renewItinerary()
+      returningHome ||= itinerary.isEmpty
+      transition(Evacuating)
+    }
+    if (state == Travelling && transports.exists(t => t.base.exists(b => destinationBase.contains(b) && canLandAt(b)) || (defaultCombatLanding && readyToRaid(t)))) transition(Landing)
     if (state == Landing) {
       if (defaultCombatLanding) {
-        transports.filterNot(raidingTransports).filter(readyToRaid).foreach(t => {
+        transports.filterNot(raidingTransports).filterNot(rejectApproach).filter(readyToRaid).foreach(t => {
           raidingTransports += t
           onRaidHandoff(t)
           With.logger.debug(s"$this handing $t and its crew to default combat at ${t.pixel}")
@@ -284,7 +338,8 @@ abstract class MissionDrop extends Mission {
   private def assemble(): Unit = {
     transports.foreach(t => {
       val pickup = pickupTarget(t, assembling = true)
-      if (pickup.exists(t.pixelDistanceCenter(_) > 384)) intendRoute(t, pickup.get.tile)
+      if (unassignedCargo(t).nonEmpty) t.intend(this).setAction(ActionAssembleTransport)
+      else if (pickup.exists(t.pixelDistanceCenter(_) > 384)) intendRoute(t, pickup.get.tile)
       else t.intend(this).setAction(ActionAssembleTransport)
     })
     passengers.foreach(_.intend(this).setAction(ActionAssemblePassenger))
@@ -298,7 +353,7 @@ abstract class MissionDrop extends Mission {
     passengers.foreach(_.agent.commit = commitWhileRaiding)
     passengers.foreach(_.intend(this).setTerminus(vicinity))
     transports.foreach(t => {
-      if (defaultCombatLanding && raidingTransports(t)) t.intend(this).setAction(raidTransportAction)
+      if (defaultCombatLanding && raidingTransports(t)) t.intend(this).setTerminus(vicinity).setAction(raidTransportAction)
       else if (defaultCombatLanding && !passengersFor(t).exists(requiredPassenger)) intendRoute(t, t.agent.defaultHome.tile)
       else if (defaultCombatLanding || !t.base.exists(destinationBase.contains)) intendRoute(t, landingGoal(t).tile)
       else t.intend(this).setAction(ActionLandTransport)
@@ -311,7 +366,7 @@ abstract class MissionDrop extends Mission {
     SquadAutomation.targetRaid(this)
     transports.foreach(t => {
       if (defaultCombatLanding && !passengersFor(t).exists(requiredPassenger)) intendRoute(t, t.agent.defaultHome.tile)
-      else t.intend(this).setAction(raidTransportAction)
+      else t.intend(this).setTerminus(vicinity).setAction(raidTransportAction)
     })
     passengers.foreach(_.intend(this).setAction(Idle).setTerminus(vicinity))
     passengers.foreach(_.agent.commit = commitWhileRaiding)
@@ -335,6 +390,7 @@ abstract class MissionDrop extends Mission {
     !Protoss.Reaver(passenger) || passenger.scarabs + passenger.trainingQueue.size >= 2
 
   private def pickupTarget(transport: FriendlyUnitInfo, assembling: Boolean): Option[FriendlyUnitInfo] = pickupTargets.synchronized {
+    if (assembling && unassignedCargo(transport).nonEmpty) return None
     val unloaded = passengersFor(transport).filterNot(_.loaded)
       .filter(p => !assembling || readyForPickup(p))
     val required = Maff.orElse(unloaded.filter(requiredPassenger), unloaded).toVector
@@ -354,8 +410,29 @@ abstract class MissionDrop extends Mission {
     })
   }
 
+  private def unloadUnassignedCargo(transport: FriendlyUnitInfo): Boolean = {
+    accountForCargo(transport)
+    val cargo = unassignedCargo(transport).headOption
+    if (cargo.isEmpty) return false
+    if (!transport.base.exists(_.owner.isUs) || !transport.tile.adjacent9.exists(_.walkable)) {
+      intendRoute(transport, transport.agent.defaultHome.tile)
+      return false
+    }
+    // Keep unload and movement in the same micro controller. A squad-issued
+    // unload was immediately overwritten by assembly's subsequent orders.
+    Commander.unload(transport, cargo.get)
+    Commander.sleep(transport, 8)
+    true
+  }
+
   object ActionAssembleTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
+      accountForCargo(transport)
+      transport.agent.passengers.filterNot(passengers.contains).foreach(transport.agent.removePassenger)
+      if (unassignedCargo(transport).nonEmpty) {
+        if (!unloadUnassignedCargo(transport)) ActionTravelTransport.delegate(transport)
+        return
+      }
       val pickup = pickupTarget(transport, assembling = true)
       if (pickup.isEmpty) {
         Commander.hold(transport)
@@ -388,29 +465,59 @@ abstract class MissionDrop extends Mission {
 
   protected final def routeWaypoint(transport: FriendlyUnitInfo, destination: Tile): Option[Pixel] = {
     val route = routes.getOrElseUpdate(transport, new DropRoute)
-    route.next(transport.tile, destination, itinerary.filter(_.isEnemy).toSet).map(route.waypoint(transport.pixel, _))
+    val approaching = (state == Travelling || state == Landing) && passengersFor(transport).exists(requiredPassenger)
+    val arrivalRange = if (approaching) routeArrivalRange(transport) else 0.0
+    val following = if (approaching) routeFollowing(transport) else Vector.empty
+    route.next(transport.tile, destination, arrivalRange, following).flatMap(route.waypoint(transport, _))
   }
 
   private def intendRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
-    val intent = transport.intend(this).setTerminus(destination.center)
-    val waypoint = routeWaypoint(transport, destination)
-    if (threatenedOnApproach(transport, waypoint)) {
-      intent.setAction(Retreat)
-      return
-    }
-    val route = routes(transport)
-    waypoint match {
-      case Some(pixel) => intent.setStation(pixel).setAction(Travel)
-      case None =>
-        if (route.stalled) returningHome = true
-        intent.setRedoubt(transport.agent.defaultHome).setAction(ActionAwaitRoute)
-    }
+    transport.intend(this).setTerminus(destination.center).setAction(ActionTravelTransport)
   }
 
-  private object ActionAwaitRoute extends Action {
+  object ActionTravelTransport extends Action {
     override protected def perform(transport: FriendlyUnitInfo): Unit = {
-      Retreat.delegate(transport)
-      Commander.hold(transport)
+      if (state == Assembling && unloadUnassignedCargo(transport)) return
+      accountForCargo(transport)
+      With.grids.enemyRangeAir.update()
+      // Squad updates are slower than micro. Recheck both the raid decision and
+      // the live route here, before issuing another movement command.
+      if ((state == Travelling || state == Landing) && (rejectApproach(transport) ||
+        destinationBase.exists(b => !b.isEnemy && targetCleared(b)))) {
+        if (itinerary.headOption == destinationBase && itinerary.nonEmpty) itinerary.dequeue()
+        updateState(goHome = false)
+        if (state == Evacuating) evacuate() else if (state == Escaping) escape() else travel()
+      } else if (defaultCombatLanding && (state == Travelling || state == Landing) && readyToRaid(transport)) {
+        raidingTransports += transport
+        onRaidHandoff(transport)
+        if (transports.forall(t => raidingTransports(t) || !passengersFor(t).exists(requiredPassenger))) transition(Raiding)
+        else transition(Landing)
+        land()
+        transport.agent.resetDestinations()
+        raidTransportAction.delegate(transport)
+        return
+      }
+      finishWithdrawal()
+      if (transport.intent.action != this) {
+        transport.agent.resetDestinations()
+        transport.intent.action.delegate(transport)
+        return
+      }
+      val destination = transport.intent.terminus.getOrElse(transport.agent.defaultHome).tile
+      val waypoint = routeWaypoint(transport, destination)
+      if (!threatenedOnApproach(transport, waypoint) && waypoint.nonEmpty) {
+        transport.agent.decision.set(waypoint.get)
+        Commander.move(transport)
+      } else {
+        if (routes.get(transport).exists(_.stalled)) {
+          if (state == Travelling || state == Landing) {
+            if (passengersFor(transport).exists(requiredPassenger) && itinerary.headOption == destinationBase && itinerary.nonEmpty) itinerary.dequeue()
+          } else if (state != Raiding) returningHome = true
+        }
+        transport.agent.redoubt.set(transport.agent.defaultHome)
+        Retreat.delegate(transport)
+        Commander.hold(transport)
+      }
     }
   }
 
@@ -456,7 +563,11 @@ abstract class MissionDrop extends Mission {
       if (pickup.isEmpty) {
         if (transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin) Retreat.delegate(transport)
         Commander.hold(transport)
+      } else if (transport.pixelDistanceCenter(pickup.get) > 384) {
+        intendRoute(transport, pickup.get.tile)
+        ActionTravelTransport.delegate(transport)
       } else {
+        // A nearby rescue takes priority over the Shuttle's own safety margin.
         Commander.rightClick(transport, pickup.get)
       }
     }

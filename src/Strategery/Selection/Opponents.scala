@@ -18,12 +18,13 @@ object Opponents {
   }
 
   val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvP: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvZ: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvR: StrategySelectionPolicy = StrategySelectionGreedy()
+  val defaultPvP: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
+  val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
+  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
 
   // COG 2026
 
+  /*
   // P
   add("BananaBrain",     .65, new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPDT))
   add("Stardust",        .65, new StrategySelectionRecommended(StrategySelectionGreedy(), 10, PvPGateCore, PvPDT))
@@ -39,6 +40,6 @@ object Opponents {
   add("Pluto",           .55,  defaultPvR)
   add("Steamhammer",     .8,   defaultPvR, "Randomhammer")
   add("UAlbertaBot",     .9,   StrategySelectionFixed(PvR2Gate4Gate), "Dave Churchill")
-
+*/
   val all: Vector[Opponent] = allKnown
 }

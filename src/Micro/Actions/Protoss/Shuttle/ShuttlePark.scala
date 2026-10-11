@@ -6,7 +6,6 @@ import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
 import Micro.Coordination.Pathing.MicroPathing
-import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.FriendlyUnitInfo
 
 import scala.collection.mutable.ArrayBuffer
@@ -16,11 +15,11 @@ object ShuttlePark extends Action {
   override def allowed(shuttle: FriendlyUnitInfo): Boolean = BeShuttle.allowed(shuttle) && exposedPassengers(shuttle).nonEmpty
 
   def exposedPassengers(shuttle: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = {
-    shuttle.agent.passengersPrioritized.filter(p => ! p.airborne && p.isAny(Protoss.Reaver, Protoss.HighTemplar, Protoss.DarkTemplar, Protoss.Archon))
+    shuttle.agent.passengersPrioritized.filterNot(_.airborne)
   }
 
   override protected def perform(shuttle: FriendlyUnitInfo): Unit = {
-    val exposed   = exposedPassengers(shuttle).sortBy(-_.matchups.pixelsEntangled)
+    val exposed   = shuttle.agent.passengersPrioritized.filterNot(_.airborne).sortBy(-_.matchups.pixelsEntangled)
     val centroid  = Maff.centroid(Maff.orElse(exposed.map(_.pixel), Seq(shuttle.pixel)))
     val threat    = Maff.minBy(shuttle.matchups.threats)(t => t.pixelDistanceCenter(centroid) - t.pixelRangeAgainst(shuttle))
     val goals     = new ArrayBuffer[Pixel]
@@ -35,7 +34,6 @@ object ShuttlePark extends Action {
   def park(shuttle: FriendlyUnitInfo, goals: Seq[Pixel]): Unit = {
     val to = MicroPathing.pullTowards(12, goals: _*) // TODO: The leash length should ideally be the edge-to-edge pickup radius (32) minus the diameter of a spinning Shuttle (unclear) to ensure that the Shuttle doesn't get out of range
     shuttle.agent.decision.set(to)
-    // Stay close enough to collect exposed passengers before retreating.
     if (shuttle.pixelDistanceCenter(to) > 32.0 * 12.0 && shuttle.matchups.framesOfSafety < shuttle.unitClass.framesToTurn180) {
       Retreat.delegate(shuttle)
     }

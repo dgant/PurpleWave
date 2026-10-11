@@ -10,57 +10,57 @@ object Ray {
   }
 
   case class Generator(from: Pixel, to: Pixel) extends Iterator[Pixel] {
-    val signX             = Maff.signum101(to.x - from.x)
-    val signY             = Maff.signum101(to.y - from.y)
-    val dx                = to.x - from.x
-    val dy                = to.y - from.y
-    val velocityX         = dx.toDouble
-    val velocityY         = dy.toDouble
-    val invVelocityX      = 1.0 / velocityX
-    val invVelocityY      = 1.0 / velocityY
-    val tileCount         = 1 + from.tile.tileDistanceManhattan(to.tile)
-    val lengthSquaredGoal = dx * dx + dy * dy
-    var lengthSquaredNow  = 0
-    var x                 = from.x
-    var y                 = from.y
-    var at                = from
+    private val dx = to.x - from.x
+    private val dy = to.y - from.y
+    private val signX = Maff.signum101(dx)
+    private val signY = Maff.signum101(dy)
+    private var tileX = Maff.div32(from.x)
+    private var tileY = Maff.div32(from.y)
+    private val deltaX = if (dx == 0) Double.PositiveInfinity else 32.0 / Math.abs(dx)
+    private val deltaY = if (dy == 0) Double.PositiveInfinity else 32.0 / Math.abs(dy)
+    private var nextX = if (dx == 0) Double.PositiveInfinity else
+      (32 * (tileX + (if (dx > 0) 1 else 0)) - from.x).toDouble / dx
+    private var nextY = if (dy == 0) Double.PositiveInfinity else
+      (32 * (tileY + (if (dy > 0) 1 else 0)) - from.y).toDouble / dy
+    private var pending = List(from)
+    private var finished = from == to
 
-    var cornerSkip: Option[Pixel] = None
+    private def inTile(time: Double, x: Int, y: Int): Pixel = Pixel(
+      Maff.clamp(Math.floor(from.x + time * dx).toInt, 32 * x, 32 * x + 31),
+      Maff.clamp(Math.floor(from.y + time * dy).toInt, 32 * y, 32 * y + 31))
 
-    override def hasNext: Boolean = cornerSkip.isDefined || lengthSquaredNow < lengthSquaredGoal
+    override def hasNext: Boolean = pending.nonEmpty
 
     override def next(): Pixel = {
-      if (cornerSkip.isDefined) {
-        val output = cornerSkip.get
-        cornerSkip = None
-        return output
-      }
-      val output = Pixel(x, y)
-      if (hasNext) {
-        val nextXCrossing   = x + signX * Math.abs(32 - Maff.mod32(Math.abs(x)))
-        val nextYCrossing   = y + signY * Math.abs(32 - Maff.mod32(Math.abs(y)))
-        val timeToNextX     = (nextXCrossing - x) * invVelocityX
-        val timeToNextY     = (nextYCrossing - y) * invVelocityY
-        val deltaTime       = Math.min(timeToNextX, timeToNextY)
-        x                   = Math.ceil(x + velocityX * deltaTime).toInt
-        y                   = Math.ceil(y + velocityY * deltaTime).toInt
-        lengthSquaredNow    = Maff.squared(x - from.x) + Maff.squared(y - from.y)
-        if (Maff.mod32(x) == 0 && Maff.mod32(y) == 0) {
-          // We landed right on the corner of the grid, which would cause us to skip a corner tile.
-          cornerSkip = Some(Pixel(x, y - signY))
+      if (!hasNext) throw new NoSuchElementException("Ray exhausted")
+      val output = pending.head
+      pending = pending.tail
+      if (pending.isEmpty && !finished) {
+        val time = Math.min(nextX, nextY)
+        if (time >= 1) {
+          pending = List(to)
+          finished = true
+        } else if (Math.abs(nextX - nextY) < 1e-12) {
+          // At a corner, include both side tiles as well as the diagonal tile.
+          pending = List(inTile(time, tileX + signX, tileY), inTile(time, tileX, tileY + signY))
+          tileX += signX
+          tileY += signY
+          pending :+= inTile(time, tileX, tileY)
+          nextX += deltaX
+          nextY += deltaY
+        } else if (nextX < nextY) {
+          tileX += signX
+          pending = List(inTile(time, tileX, tileY))
+          nextX += deltaX
+        } else {
+          tileY += signY
+          pending = List(inTile(time, tileX, tileY))
+          nextY += deltaY
         }
       }
       output
     }
   }
   
-  @inline final def apply(from: Pixel, to: Pixel): Iterator[Pixel] = {
-    if (to.x == from.x) {
-      if (to.y == from.y) return Iterator(to)
-      return (Maff.div32(from.y) to Maff.div32(to.y) by Maff.signum101(to.y - from.y)).iterator.map(tileY => Pixel(to.x, Maff.x32(tileY)))
-    } else  if (to.y == from.y) {
-      return (Maff.div32(from.x) to Maff.div32(to.x) by Maff.signum101(to.x - from.x)).iterator.map(tileX => Pixel(Maff.x32(tileX), to.y))
-    }
-    Generator(from, to)
-  }
+  @inline final def apply(from: Pixel, to: Pixel): Iterator[Pixel] = Generator(from, to)
 }

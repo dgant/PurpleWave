@@ -7,4 +7,5 @@ trait StrategySelectionPolicy extends SimpleString {
   def chooseBranch: StrategyBranch
   def respectMap      : Boolean = true
   def respectHistory  : Boolean = true
+  def targetWinrate   : Double  = 0.75
 }

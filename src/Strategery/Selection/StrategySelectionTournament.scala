@@ -18,8 +18,6 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
       With.logger.warn("Didn't find opponent plan for " + enemyName)
     }
 
-    opponent.map(_.targetWinrate).foreach(winrate => With.configuration.targetWinrate = winrate)
-
     var default: StrategySelectionPolicy = StrategySelectionGreedy()
     if (With.self.raceCurrent == Race.Protoss) {
       if (With.enemy.raceInitial == Race.Terran)        default = Opponents.defaultPvT
@@ -29,6 +27,8 @@ object StrategySelectionTournament extends StrategySelectionPolicy {
     }
 
     val policy = opponent.map(_.policy).getOrElse(default)
+    With.configuration.targetWinrate = policy.targetWinrate
+
     With.logger.debug(f"Choosing tournament policy $policy")
     policy.chooseBranch
   }

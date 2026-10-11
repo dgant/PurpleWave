@@ -25,13 +25,12 @@ final class Edge(choke: Chokepoint) {
           sidePixels(0).x - sidePixels(1).x)
         + m * Math.PI / 2,
         32))
+  // Tile ownership includes every BWEM region absorbed into a logical main zone.
   lazy val zones: Vector[Zone] =
     Vector(
       choke.getRegions.getLeft,
       choke.getRegions.getRight)
-    .map(region => With.geography.zones.minBy(
-      _.centroid.center.pixelDistanceSquared(
-        new Pixel(region.getCenter))))
+    .map(region => With.geography.zoneByTile(new Pixel(region.getCenter).tile))
   val distanceGrid: GridGroundDistance = new GridGroundDistance(tiles: _*)
 
   private lazy val endsWalkable = endPixels.map(_.tile).forall(With.grids.walkableTerrain.get)

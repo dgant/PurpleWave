@@ -55,7 +55,6 @@ object BeShuttle extends Action {
       || p.matchups.enemies.exists(e => Protoss.Shuttle(e) && e.pixelDistanceEdge(p) < fightRadius))
     val anyoneFighting = passengersFighting.nonEmpty
 
-    val exposed = ShuttlePark.exposedPassengers(shuttle)
     val quests = new ArrayBuffer[ShuttleQuest]
     supported.foreach(p => {
       val goal = p.agent.rideGoal
@@ -74,9 +73,9 @@ object BeShuttle extends Action {
         add(g => ShuttleQuest(p, Pickup, m, shuttle.pixelDistanceEdge(p), () => pickup(shuttle, p)))
 
       // Hover over passenger
-      } else if (exposed.contains(p) && (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320))) {
+      } else if (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
 
-        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark(shuttle)))
+        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark.park(shuttle, Seq(p.pixel))))
 
       }
     })

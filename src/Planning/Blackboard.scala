@@ -40,7 +40,7 @@ class Blackboard {
   val acePilots               : Property[Boolean]           = add(new Property(true))
   val darkTemplarSquad        : Property[Boolean]           = add(new Property(true))
   val makeDarkArchons         : Property[Boolean]           = add(new Property(false))
-  val reaverDrop              : Property[Boolean]           = add(new Property(false))
+  val reaverDrop              : Property[Boolean]           = add(new Property(true))
   val reaverDropMaxReavers    : Property[Int]               = add(new Property(2))
   val reaverDropContinuePressure: Property[Boolean]         = add(new Property(true))
   val maximumArchonEnergy     : Property[Int]               = add(new Property(50))

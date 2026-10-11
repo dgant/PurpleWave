@@ -90,6 +90,7 @@ class PvPLateGame extends GameplanImperative {
     shouldHarass = Protoss.PsionicStorm()
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
+    shouldHarass ||= Protoss.ShuttleSpeed()
     shouldAttack = enemyMiningBases > miningBases
     shouldAttack ||= bases > 2
     shouldAttack ||= bases > miningBases

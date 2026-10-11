@@ -155,7 +155,7 @@ class PvTDoubleRobo extends PvTOpeners {
     if (shouldAttack) {
       attack()
     }
-    if (Protoss.PsionicStorm() && unitsComplete(Protoss.HighTemplar) > 2) {
+    if (enemyProximity < 0.5) {
       harass()
     }
     gasLimitCeiling(Math.max(1, miningBases) * 300)

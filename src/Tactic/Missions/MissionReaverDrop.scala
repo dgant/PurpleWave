@@ -54,7 +54,7 @@ class MissionReaverDrop extends MissionDrop {
 
   override protected def continueItinerary(from: Base): Boolean = {
     val enemyBases = With.geography.bases.filter(_.isEnemy)
-    if (!With.blackboard.reaverDropContinuePressure() ||
+    if (!With.blackboard.wantToHarass() || !With.blackboard.reaverDropContinuePressure() ||
       transports.isEmpty || !passengers.exists(Protoss.Reaver)) return false
     val known = (plannedTargets.toVector ++ MissionReaverDrop.targets(enemyBases)).distinct
     val targets = MissionReaverDrop.reverseTargets(known, from).filter(b => b.isEnemy && !targetCleared(b))

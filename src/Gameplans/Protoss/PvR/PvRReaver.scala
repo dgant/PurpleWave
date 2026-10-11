@@ -2,6 +2,8 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPLateGame
+import Gameplans.Protoss.PvT.PvTDoubleRobo
+import Gameplans.Protoss.PvZ.PvZ1GateCoreExpand
 import Lifecycle.With
 import Placement.Access.PlaceLabels
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
@@ -11,7 +13,16 @@ import Utilities.UnitFilters.IsWarrior
 
 class PvRReaver extends GameplanImperative {
 
+  var transition: Option[GameplanImperative] = None
+
   override def executeBuild(): Unit = {
+    if (transition.isEmpty && With.frame > Minutes(10)()) {
+      transition = Some(?(enemyIsTerran, new PvTDoubleRobo, ?(enemyIsProtoss, new PvPLateGame, new PvZ1GateCoreExpand)))
+    }
+    if (transition.isDefined) {
+      transition.get.executeBuild()
+      return
+    }
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(10, Protoss.Probe)
@@ -28,25 +39,31 @@ class PvRReaver extends GameplanImperative {
     once(Protoss.Dragoon)
     once(16, Protoss.Probe)
     if (enemyIsZerg)  {
+      if ( ! haveEver(Protoss.Corsair)) {
+        gasWorkerCeiling(1)
+      }
       once(Protoss.Forge)
       once(18, Protoss.Probe)
+      once(3, Protoss.Zealot)
       buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
+      once(3, Protoss.Pylon)
       once(20, Protoss.Probe)
+      once(4, Protoss.Zealot)
       if ( ! haveEver(Protoss.Stargate)) {
         cancel(Protoss.RoboticsFacility)
       }
       get(Protoss.Stargate)
       once(22, Protoss.Probe)
       once(Protoss.Corsair)
-      once(2, Protoss.Zealot)
-      once(3, Protoss.Pylon)
+      once(5, Protoss.Zealot)
+      once(4, Protoss.Pylon)
       once(23, Protoss.Probe)
       once(Protoss.RoboticsFacility)
       once(25, Protoss.Probe)
       once(3, Protoss.Zealot)
       once(Protoss.RoboticsSupportBay)
       once(Protoss.Shuttle)
-      once(4, Protoss.Pylon)
+      once(5, Protoss.Pylon)
       once(27, Protoss.Probe)
       get(Protoss.ShuttleSpeed)
       once(Protoss.Reaver)
@@ -80,9 +97,13 @@ class PvRReaver extends GameplanImperative {
 
   var shouldHarass: Boolean = false
   override def executeMain(): Unit = {
-    if (enemyIsTerran) terranMain()
+    if (transition.isDefined) {
+      transition.get.executeMain()
+      return
+    }
+    if (enemyIsTerran)  terranMain()
     if (enemyIsProtoss) protossMain()
-    if (enemyIsZerg) zergMain()
+    if (enemyIsZerg)    zergMain()
     With.blackboard.reaverDrop.set(With.blackboard.wantToHarass())
     With.blackboard.reaverDropMaxReavers.set(Math.max(1, unitsComplete(Protoss.Reaver) / 2))
   }
@@ -90,7 +111,7 @@ class PvRReaver extends GameplanImperative {
   def terranMain(): Unit = {
     val needDetection = enemyHasTech(Terran.SpiderMinePlant, Terran.WraithCloak)
     harass(enemyBases > 1 || With.scouting.ourProximity < 0.6 || (unitsComplete(Protoss.Reaver) >= 3 && unitsComplete(Protoss.Shuttle) >= 2))
-    attack(safeSkirmishing && Protoss.DragoonRange())
+    attack(safeSkirmishing && haveEverComplete(Protoss.Reaver))
     pump(Protoss.Observer, ?(needDetection, 2, 1))
     pumpShuttleAndReavers(shuttleFirst = true)
     pump(Protoss.Dragoon, enemies(Terran.Wraith))
@@ -112,11 +133,6 @@ class PvRReaver extends GameplanImperative {
 
   lazy val pvpLateGame = new PvPLateGame
   def protossMain(): Unit = {
-    if (With.frame > Minutes(10)()) {
-      harass(true)
-      pvpLateGame.executeMain()
-      return
-    }
     var shouldAttack: Boolean =false
     shouldAttack ||= enemyIsZerg && haveEverComplete(Protoss.Reaver)
     shouldAttack ||= Protoss.DragoonRange() && unitsComplete(IsWarrior) >= 8

@@ -179,6 +179,9 @@ class SquadDefendBase(base: Base) extends Squad {
       }
       formations += formationGuard
       SquadAutomation.send(this)
+      if (blockZerglings) {
+        units.foreach(_.intent.setCanFlee(false))
+      }
     } else {
       lastAction = "Hold"
       formations += formationBastion

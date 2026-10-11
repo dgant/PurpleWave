@@ -619,6 +619,32 @@ package Tactic.Missions {
       m.transports.clear()
       assert(!m.continueNow(b))
     }
+    check("disabling harassment finishes the sweep and recovers the crew instead of reversing") {
+      val previousMapping = With.geography.allTiles.map(_.base).toArray
+      val a = base(20); val b = base(90)
+      set(With.geography, "_bases", Vector(a, b))
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      var cleared = false
+      val m = new MissionProbe(b) { override protected def targetCleared(base: Base): Boolean = cleared && base == b }
+      m.continuePressure = true; m.configure(Vector(t), Vector(r)); m.launched = true
+      m.itinerary.clear(); m.appendTargets(Vector(a, b)); m.itinerary.clear(); m.itinerary += b
+      m.updateState(false); m.state = m.Raiding
+      With.recruiter.lockTo(m.lock, Vector(t, r))
+      With.blackboard.wantToHarass.set(false)
+      m.run()
+      assert(m.launched && m.state == m.Raiding, "Disabling harassment does not interrupt the current stop")
+      cleared = true; m.run()
+      assert(m.itinerary.isEmpty && m.state == m.Evacuating && m.launched)
+      assert(r.intent.action == m.ActionEvacuatePassenger, "Recover the grounded Reaver before terminating")
+      load(r, Some(t)); m.run()
+      assert(m.state == m.Escaping && m.launched)
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(None))
+      m.run()
+      assert(!m.launched && With.recruiter.lockedBy(m).isEmpty)
+      assert(Vector(t, r).forall(u => u.squad.isEmpty && u.intent.action == Idle))
+      With.blackboard.wantToHarass.set(true)
+      set(With.geography, "_baseByTile", previousMapping)
+    }
     check("continued pressure renews the mission and gives the next approach its own clock") {
       With.geography.home = Tile(0, 5)
       val a = base(20); val b = base(90)

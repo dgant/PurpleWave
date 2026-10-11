@@ -11,9 +11,7 @@ import Utilities.Time.Minutes
 object UpdateZones {
   
   def apply(): Unit = {
-    // Precalculate these
-    With.geography.zones.foreach(_.distanceGrid)
-    With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
+    updatePaths()
     With.geography.zones.foreach(_.units.clear())
     With.units.all.foreach(u => if (u.likelyStillThere) u.zone.units.add(u))
     With.geography.zones.foreach(updateZone)
@@ -50,11 +48,26 @@ object UpdateZones {
       .getOrElse(With.geography.home)
   }
 
+  private[Geography] def updatePaths(): Unit = {
+    // Precalculate these
+    With.geography.zones.foreach(_.distanceGrid)
+    With.geography.zones.foreach(_.edges.foreach(_.distanceGrid))
+    if (With.paths.updateGroundTopology()) {
+      With.grids.unwalkableUnits.update()
+      With.paths.invalidateZonePaths()
+      val distances = With.geography.zones.map(_.distanceGrid) ++ With.geography.edges.map(_.distanceGrid) ++
+        Vector(With.grids.scoutingPathsBases, With.grids.scoutingPathsStartLocations)
+      distances.foreach(_.invalidate())
+      // All distances must be ready before rebuilding any dependent flow field.
+      distances.foreach(_.initialize())
+      With.geography.zones.foreach(_.flowField.invalidate())
+    }
+  }
+
   private val wallBuildingThresholdDistanceSquared = Math.pow(32 * 12, 2)
   private def updateZone(zone: Zone): Unit = {
     zone.distanceGrid.initialize()
     zone.edges.foreach(_.distanceGrid.initialize())
-    zone.flowField.initialize()
     zone.bases.foreach(UpdateBase(_))
   
     val exitBuildings = zone.exitOriginal.map(exit =>

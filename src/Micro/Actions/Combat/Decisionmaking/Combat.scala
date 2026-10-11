@@ -424,7 +424,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         && ! unit.formationEngage.exists(_.flanking)
         // Maintain formation until battle breaks out
         && ( ! formationHelpsEngage || squadEngagedUpon))
-      breakFormationToAttack ||= target.exists(unit.pixelsToGetInRange(_) < Math.max(0, 128 * unit.confidence11))
+      breakFormationToAttack ||= ! unit.formationEngage.exists(_.flanking) && target.exists(unit.pixelsToGetInRange(_) < Math.max(0, 128 * unit.confidence11))
       breakFormationToAttack ||= With.yolo.active
 
       if ( ! breakFormationToAttack) {

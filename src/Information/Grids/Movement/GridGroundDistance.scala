@@ -11,54 +11,37 @@ class GridGroundDistance(initialOrigins: Tile*) extends AbstractGridArray[Int] {
   final override val defaultValue: Int = 256 * 256
   final override val values: Array[Int] = Array.fill(length)(defaultValue)
 
+  @inline final override def getUnchecked(i: Int): Int = values(i)
+  override def reset(): Unit = java.util.Arrays.fill(values, defaultValue)
+
   def origins: Seq[Tile] = initialOrigins
 
   @inline final def walkable(tile: Tile): Boolean = walkable(tile.i)
-  @inline final def walkable(iTile: Int): Boolean = (
-    With.grids.walkable.get(iTile)
-    || (With.grids.walkableTerrain.get(iTile) && With.frame < 9 && With.units.ours.exists(_.tileArea.tiles.exists(_.i == iTile))))
+  @inline final def walkable(iTile: Int): Boolean = With.paths.groundWalkable(iTile)
 
   override def onInitialization(): Unit = {
-    var distance = 0
-    var openSize = 0
-    val tilesA = new Array[Int](tiles.size * 100)
-    val tilesB = new Array[Int](tiles.size * 100)
-    var open = tilesA
+    // Mark on enqueue: each tile occupies the queue at most once.
+    val open = new Array[Int](length)
+    var head = 0
+    var tail = 0
     val width = With.mapTileWidth
-    def expand(iTile: Int): Unit = {
-      if (iTile % width > 0) {
-        open(openSize) = iTile - 1
-        openSize += 1
-      }
-      if (iTile % width < width - 1) {
-        open(openSize) = iTile + 1
-        openSize += 1
-      }
-      if (iTile >= width) {
-        open(openSize) = iTile - width
-        openSize+= 1
-      }
-      if (iTile + width < tiles.size) {
-        open(openSize) = iTile + width
-        openSize+= 1
-      }
-    }
-    def explore(iTile: Int): Unit = {
-      if (get(iTile) == defaultValue && valid(iTile) && walkable(iTile)) {
-        set(iTile, distance)
-        expand(iTile)
+    def explore(iTile: Int, distance: Int): Unit = {
+      if (valid(iTile) && getUnchecked(iTile) == defaultValue && walkable(iTile)) {
+        values(iTile) = distance
+        open(tail) = iTile
+        tail += 1
       }
     }
 
-    Maff.orElse(origins.filter(walkable), origins.flatMap(seed => Spiral(20).map(seed.add).filter(_.valid).find(walkable))).foreach(seed => explore(seed.i))
-    distance = 1
-    while(openSize > 0) {
-      val next = open
-      val nextSize = openSize
-      open = if (open.eq(tilesA)) tilesB else tilesA
-      openSize = 0
-      for (nextTile <- 0 until nextSize) explore(next(nextTile))
-      distance += 1
+    Maff.orElse(origins.filter(walkable), origins.flatMap(seed => Spiral(20).map(seed.add).filter(_.valid).find(walkable))).foreach(seed => explore(seed.i, 0))
+    while (head < tail) {
+      val here = open(head)
+      head += 1
+      val distance = getUnchecked(here) + 1
+      if (here % width > 0)         explore(here - 1, distance)
+      if (here % width < width - 1) explore(here + 1, distance)
+      if (here >= width)           explore(here - width, distance)
+      if (here + width < length)   explore(here + width, distance)
     }
   }
 }

@@ -43,6 +43,8 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   val vanguardOrigin      : Pixel                 = if (style == FormationStyleEngage || style == FormationStyleDisengage) threatOrigin else goal
   val vanguardUnits       : Seq[FriendlyUnitInfo] = Maff.takePercentile(0.5, keyUnits)(Ordering.by(_.pixelDistanceTravelling(vanguardOrigin)))
   val vanguardCentroid    : Pixel                 = Maff.weightedExemplar(vanguardUnits.view.map(u => (u.pixel, u.subjectiveValue))).walkablePixel
+  private val goalRoute = findGoalRoute
+  override val flanking: Boolean = goalRoute.flanking
   val goalPath            : TilePath              = findGoalPath
   val targetPath          : TilePath              = findTargetPath
   val goalPathTiles       : Seq[Tile]             = goalPath.tiles.getOrElse(Seq.empty).view
@@ -73,29 +75,34 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   var stepTiles           : Int                   = 0
   var minAltitude         : Int                   = -1
 
-  private var _flanking: Boolean = false
-  override def flanking: Boolean = _flanking
-
   val slots       : Map[UnitClass, Seq[Pixel]]    = slotsByClass()
   val unassigned  : UnassignedFormation           = UnassignedFormation(style, slots, group)
   val placements  : Map[FriendlyUnitInfo, Pixel]  = unassigned.outwardFromCentroid
 
-  private def findGoalPath: TilePath = {
+  private def findGoalRoute: FormationFlanking.Route = {
     val zonePathStart   = vanguardCentroid.zone
     val zonePathEnd     = goal.zone
     val zonePathToGoal  = With.paths.zonePath(zonePathStart, zonePathEnd)
-    var zonePathToMarch = zonePathToGoal
-    val choke           = zonePathToGoal.flatMap(_.steps.find(_.to == zonePathEnd))
 
-    // Prefer flanking the enemy over attacking them through a nasty choke
-    if (choke.exists(c => c.to == threatOrigin.zone && c.edge.badness2(group, vanguardCentroid.zone) > 1.5)) {
-      val paths = zonePathEnd.edges.flatMap(e => With.paths.zonePath(zonePathStart, zonePathEnd, Seq(e))).filter(_.steps.nonEmpty)
-      val best  = Maff.minBy(paths)(p => p.length * p.steps.last.edge.badness2(group, p.steps.last.from))
-      if (best.exists(b => zonePathToMarch.exists(_.length < b.length))) {
-        _flanking = true
-      }
-      zonePathToMarch = best
+    // Only penalize the approach to the enemy, and only if they can fire on the crossing.
+    // Harmless narrow passages elsewhere in the route are just travel distance.
+    def approachCost(step: ZonePathNode): Double = {
+      if (step.to == threatOrigin.zone && step.edge.tiles.exists(_.enemyRangeGround >= With.grids.enemyRangeGround.margin)) {
+        step.edge.badness2(group, step.from)
+      } else 1.0
     }
+    val route = FormationFlanking.choose(
+      zonePathToGoal,
+      zonePathEnd.edges.flatMap(e => With.paths.zonePath(zonePathStart, zonePathEnd, Seq(e))),
+      approachCost)
+    if (With.configuration.auditFormationPaths && style == FormationStyleMarch) {
+      Debugging.FormationPathAudit.log(group, vanguardCentroid, goal, threatOrigin, zonePathToGoal, route)
+    }
+    route
+  }
+
+  private def findGoalPath: TilePath = {
+    val zonePathToMarch = goalRoute.path
 
     //val waypoint = zonePathToMarch.flatMap(_.steps.headOption.map(_.to.centroid)).getOrElse(goal.walkableTile)
     // TODO: Extract this new waypointing logic

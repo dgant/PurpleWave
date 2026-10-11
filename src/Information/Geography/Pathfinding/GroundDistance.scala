@@ -48,10 +48,12 @@ trait GroundDistance {
     var best = Int.MaxValue
     var i = 0
     while (i < edges.length) {
-      val grid = edges(i).distanceGrid
-      best = Math.min(best, grid.getUnchecked(destination) + grid.getUnchecked(origin))
+      if (edges(i).isOpen) {
+        val grid = edges(i).distanceGrid
+        best = Math.min(best, grid.getUnchecked(destination) + grid.getUnchecked(origin))
+      }
       i += 1
     }
-    best
+    if (best == Int.MaxValue) impossiblyLargeDistanceTiles else best
   }
 }

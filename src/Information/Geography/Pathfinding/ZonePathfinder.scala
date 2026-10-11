@@ -10,6 +10,8 @@ import scala.collection.mutable
 trait ZonePathfinder {
   private val paths = new mutable.HashMap[(Zone, Zone, Seq[Edge]), Option[ZonePath]]
 
+  final def invalidateZonePaths(): Unit = paths.clear()
+
   def zonePath(from: Zone, to: Zone, through: Seq[Edge] = Seq.empty): Option[ZonePath] = {
     paths((from, to, through)) = paths.getOrElse((from, to, through), zonePathfind(from, to, through))
     paths((from, to, through))
@@ -32,6 +34,7 @@ trait ZonePathfinder {
     }
 
     val edges = from.edges
+      .filter(_.isOpen)
       .filterNot(e => pathHere.exists(_.from == e.otherSideof(from)))
       .sortBy(_.distanceGrid.get(tileTo))
 

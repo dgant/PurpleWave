@@ -167,7 +167,8 @@ final class Simulation(val collisionEnabled: Boolean = true) {
    battle.simulationDeaths = simulacra.count(u => u.dead && u.isOurs)
     if (battle.logSimulation) {
       battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
-      battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame)
+      battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame).toVector
+      battle.simulationLog = battle.simulationEvents.map(_.toString).mkString("\n")
       // Diagnostics
       try {
         val rFramesLimit = battle.simulationFrames >= With.configuration.simulationFrames

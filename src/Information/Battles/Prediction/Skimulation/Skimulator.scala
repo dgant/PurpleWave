@@ -14,7 +14,7 @@ object Skimulator {
   @inline private def distanceToEngage(unit: UnitInfo, team: Team): Double = {
     val targets = ?(Terran.Medic(unit),
       team.units.view.filter(_.isAny(Terran.Marine, Terran.Firebat, Terran.Ghost)),
-      Maff.orElse(unit.presumptiveTarget, team.opponent.units))
+      Maff.orElse(unit.presumptiveTarget.filter(team.opponent.units.contains), team.opponent.units))
 
     unit.skimTarget = None
     var output = LightYear().toDouble

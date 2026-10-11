@@ -35,7 +35,7 @@ class Battles extends TimedTask {
   val clustering          = new BattleClustering
   val estimationRuntimes  = new mutable.Queue[Int]
 
-  def nextBattles: Seq[Battle] = nextBattlesLocal ++ Seq(
+  def nextBattles: Seq[Battle] = nextBattlesLocal.flatMap(_.combatForecasts) ++ Seq(
     nextBattleGlobalDefend,
     nextBattleGlobalAttack,
     nextBattleGlobalSlug,

@@ -40,7 +40,7 @@ object FightOrFlee extends Action {
     decide(true,  "Detonated",  () => u.unitClass.suicides && u.matchups.targetsInRange.exists(_.canAttack(u)))
     decide(true,  "HugTank",    () => ! u.flying && u.agent.ride.isEmpty && With.enemies.exists(_.isTerran) && u.matchups.targetsInRange.exists(t => Terran.SiegeTankSieged(t) && t.visible && t.canAttack(u)))
     decide(true,  "Archon",     () => Protoss.Archon(u) && u.matchups.targetsInRange.exists(_.unitClass.attacksOrCastsOrDetectsOrTransports))
-    decide(true,  "CoverFire",  () => u.unitClass.supportsAnchor && u.matchups.allies.exists(ally => ally.unitClass.isAnchor && u.matchups.threatDeepest.exists(enemy => u.canAttack(enemy) && ally.canAttack(enemy) && enemy.pixelsToGetInRange(ally) <= Math.min(32 * 8, 16 + u.pixelsToGetInRange(enemy)) && u.pixelDistanceEdge(ally) < 32 * 10)))
+    decide(true,  "CoverFire",  () => u.unitClass.supportsAnchor && u.combatAllies.exists(ally => ! ally.loaded && ally.unitClass.isAnchor && u.matchups.threatDeepest.exists(enemy => u.canAttack(enemy) && ally.canAttack(enemy) && enemy.pixelsToGetInRange(ally) <= Math.min(32 * 8, 16 + u.pixelsToGetInRange(enemy)) && u.pixelDistanceEdge(ally) < 32 * 10)))
     decide(true,  "Berzerk",    () => With.frame < berzerkCutoff && u.isAny(Protoss.Zealot, IsSlowling) && ! u.team.exists(_.catchesGround) && u.matchups.threatDeepest.exists(td => Terran.Vulture(td) && td.matchups.targetNearest.exists(tn => td.pixelsToGetInRange(tn) < 32 && tn.unitClass == u.unitClass)))
     decide(true,  "Cloaked",    () => u.effectivelyCloaked && u.isAny(Terran.Wraith, Protoss.DarkTemplar) && ( ! Terran.Wraith(u) || u.energy > 10))
     decide(true,  "Cloakable",  () => Terran.Wraith(u) && Terran.WraithCloak() && u.energy >= 50  && u.matchups.groupVs.detectors.isEmpty)
@@ -74,12 +74,12 @@ object FightOrFlee extends Action {
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo): Unit = {
-    if (unit.battle.isEmpty) {
+    if (unit.combatForecast.isEmpty) {
       // Important for things which care about unit willingness to trot around
       unit.agent.shouldFight = true
       unit.agent.fightReason = ""
     } else {
-      unit.agent.shouldFight = unit.battle.get.judgement.get.unitShouldFight(unit)
+      unit.agent.shouldFight = unit.combatForecast.get.judgement.get.unitShouldFight(unit)
       unit.agent.fightReason = ?(unit.agent.shouldFight, "Yes", "No")
     }
   }

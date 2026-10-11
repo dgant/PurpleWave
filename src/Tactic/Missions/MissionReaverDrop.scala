@@ -34,7 +34,7 @@ class MissionReaverDrop extends MissionDrop {
     .filter(Protoss.Reaver)
     .forall(reaver =>
       reaver.doomed
-      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.battle.exists(_.judgement.exists( ! _.shouldFightGround)))
+      || (reaver.matchups.threatsInRange.exists(IsWarrior) && ! reaver.combatJudgment.exists( ! _.shouldFightGround))
       || itinerary.headOption.exists(_.enemies.filter(IsWarrior).filter(_.canAttackGround).map(_.subjectiveValue).sum
         * ?(reaver.matchups.targetsInRange.count(IsWorker) > 2, 1, 2)
         >= passengers.view.map(_.subjectiveValue).sum))

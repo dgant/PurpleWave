@@ -34,6 +34,7 @@ class BattleProcessPredict extends BattleProcessState {
 
         // For visualizing skim strength, we only want to record the local strength (as the global strength is uninteresting)
         if ( ! battle.isGlobal) {
+          battle.skimulationReport = battle.units.map(u => u -> (u.skimStrength, u.skimPresence)).toMap
           battle.units.foreach(u => {
             u.skimStrengthDisplay = u.skimStrength
             u.skimPresenceDisplay = u.skimPresence

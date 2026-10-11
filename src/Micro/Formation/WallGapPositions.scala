@@ -325,7 +325,7 @@ object WallGapPositions {
       val first = if (diagonal) 0 else Math.ceil(Math.min(frontLimit, g.outer + body.extent(-g.nx, -g.ny) + 16)).toInt
       val last = Math.ceil(g.inner + 256).toInt
       val step = if (diagonal) 2 else 4
-      // Keep every rank aligned with the entrance, including reinforcements behind it.
+      // Keep sealing candidates aligned with the entrance.
       val cross = if (crossLeft > crossRight) Vector((crossLeft + crossRight) / 2) else
         ((Math.ceil(crossLeft).toInt to Math.floor(crossRight).toInt by step).map(_.toDouble) ++ Vector(crossLeft, crossRight)).distinct
       // Include exact obstacle contacts as well as the search lattice: a legal
@@ -343,6 +343,40 @@ object WallGapPositions {
         Slot(p, b, ling.forbidden(b), contacts.count(fits(ling, _, 0)), g.depth(p), Math.abs(g.across(p)), g.depth(p) <= frontLimit + 0.5)
       }.toVector.sortBy(s => (s.exposure, s.depth, s.across, s.pixel.x, s.pixel.y))
     })
+
+    private val reserves = mutable.Map.empty[(Gap, Body, Vector[Pixel]), Vector[Slot]]
+    private def reinforcementCandidates(g: Gap, body: Body, front: Vector[Slot]): Vector[Slot] =
+      reserves.getOrElseUpdate((g, body, front.map(_.pixel)), {
+        val frontDepth = front.map(_.depth).min
+        def open(p: Pixel): Boolean = g.depth(p) >= frontDepth && fits(body, p)
+        val distance = mutable.Map.empty[Pixel, Int]
+        val queue = mutable.Queue.empty[Pixel]
+        val offsets = (for (x <- -32 to 32 by 4; y <- -32 to 32 by 4) yield (x, y))
+          .sortBy { case (x, y) => Math.abs(x) + Math.abs(y) }
+        front.foreach { s =>
+          // Probes may need a wider starting point than the Zealot they back up.
+          offsets.map { case (x, y) => s.pixel.add(x, y) }.find(p => open(p) && navigationFor(body).reachable(p)).foreach { p =>
+            val d = Math.abs(p.x - s.pixel.x) + Math.abs(p.y - s.pixel.y)
+            if (d < distance.getOrElse(p, Int.MaxValue)) { distance(p) = d; queue.enqueue(p) }
+          }
+        }
+        // Flood inward and sideways from the sealing units. Walking distance keeps
+        // reserves near a replacement route instead of behind an intervening cannon.
+        while (queue.nonEmpty) {
+          val p = queue.dequeue()
+          val d = distance(p) + 4
+          if (d <= 256) Vector(p.add(-4, 0), p.add(4, 0), p.add(0, -4), p.add(0, 4)).foreach { next =>
+            if (d < distance.getOrElse(next, Int.MaxValue) && open(next)) {
+              distance(next) = d
+              queue.enqueue(next)
+            }
+          }
+        }
+        distance.keys.toVector.sortBy(p => (distance(p), g.depth(p), Math.abs(g.across(p)), p.x, p.y)).map { p =>
+          val box = body.at(p)
+          Slot(p, box, ling.forbidden(box), 0, g.depth(p), Math.abs(g.across(p)), front = false)
+        }
+      })
 
     private def connectedTo(start: Box, blockers: Vector[Box]): Vector[Box] = {
       val reached = mutable.ArrayBuffer(start)
@@ -390,12 +424,13 @@ object WallGapPositions {
       // approaching from outside must not be sent through a stationary front rank.
       nearest.groupBy { case (p, _) => (p.gap, p.probe, p.body) }.values.flatMap { group =>
         val available = mutable.ArrayBuffer(group.map(_._2): _*)
+        val settledPixels = group.map(_._1.slot.pixel).toSet
         group.map(_._1).sortBy(p => (-p.slot.depth, p.slot.pixel.x, p.slot.pixel.y)).map { p =>
           def arrivalDepth(u: Defender): Double = {
             val depth = p.gap.depth(u.pixel)
             // Units approaching around a building join from that mouth of the gap,
             // even if their current position is alongside an existing rank.
-            if (Math.abs(p.gap.across(u.pixel)) <= p.gap.width / 2.0) depth
+            if (settledPixels.contains(u.pixel) || Math.abs(p.gap.across(u.pixel)) <= p.gap.width / 2.0) depth
             else if (depth > p.gap.inner) Double.PositiveInfinity else Double.NegativeInfinity
           }
           val unit = available.minBy(u => (-arrivalDepth(u), u.pixel.pixelDistanceSquared(p.slot.pixel), u.id))
@@ -412,6 +447,7 @@ object WallGapPositions {
       val occupied = mutable.ArrayBuffer.empty[Box]
       val output = mutable.ArrayBuffer.empty[Planned]
       val placed = mutable.Map.empty[Gap, Vector[(Boolean, Body, Slot)]]
+      val fronts = mutable.Map.empty[Gap, Vector[Slot]]
       var progressed = true
       while (remaining.nonEmpty && progressed) {
         progressed = false
@@ -432,8 +468,7 @@ object WallGapPositions {
             // Close remaining lanes before reinforcing an already sealed passage.
             // This also puts a too-large defender at the inner mouth of a tiny gap.
             val slot = if (sealedAlready) {
-              // Keep reinforcements together instead of skipping to sheltered cannon pockets.
-              options.filter(legal).sortBy(s => (s.depth, s.exposure, s.across, s.pixel.x, s.pixel.y)).headOption
+              reinforcementCandidates(g, body, fronts.getOrElseUpdate(g, previous.map(_._3))).find(legal)
             } else (2 to 0 by -1).iterator.flatMap { sides =>
               options.find(s => (s.front || probe && zealotBack.isDefined) && legal(s) &&
                 (if (fromA.exists(_.touches(s.blocked))) 1 else 0) + (if (fromB.exists(_.touches(s.blocked))) 1 else 0) == sides)

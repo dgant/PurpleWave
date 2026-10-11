@@ -130,7 +130,7 @@ object WallGapPositionsTest extends App {
     assert(geometry(terrain = (_, _) => false).assign(Vector(defender(1))).isEmpty)
   }
   check("empty squad and exhausted gap capacity terminate safely") {
-    val g = geometry()
+    val g = geometry(terrain = (x, y) => x * 8 >= 96 && x * 8 < 144 && y * 8 >= 96 && y * 8 < 256)
     assert(g.assign(Vector.empty).isEmpty)
     val units = (1 to 100).map(defender(_)).toVector
     val result = g.assign(units)
@@ -167,6 +167,42 @@ object WallGapPositionsTest extends App {
     assert(result.values.exists(p => p.y > 2969 && p.y < 3028), result)
     assert(result.values.exists(p => p.y > 3061 && p.y < 3080), result)
     assert(! crosses(front ++ result.values.map(zealot.at), Box(480, 3061, 600, 3080), _.x == 599, _.x == 480), result)
+  }
+  check("reserves spread beside the front instead of queuing beyond a cannon") {
+    val front = Vector(Box(3376, 3056, 3473, 3129), Box(3404, 2888, 3477, 2933), Box(3408, 2996, 3441, 3029))
+    val cannons = Vector(Box(3500, 2896, 3541, 2929), Box(3500, 3024, 3541, 3057), Box(3500, 3088, 3541, 3121))
+    val g = new Geometry(front.map(_ -> true) ++ cannons.map(_ -> false), Pixel(3808, 2992), Some(Pixel(3407, 2959)), (_, _) => true, ling)
+    val first = g.assign((1 to 3).map(defender(_)).toVector).values.toVector
+    val units = ((1 to 7).map(defender(_)) ++ (8 to 11).map(defender(_, true))).toVector
+    val result = g.assign(units)
+    assert(result.size == units.size, result)
+    assert(first.forall(result.values.toSet), result)
+    assert(result.values.forall(p => first.exists(_.pixelDistance(p) <= 96)), result)
+    assert(units.forall(u => g.fits(u.body, result(u.id))), result)
+    disjoint(result, units)
+    val settled = units.map(u => u.copy(pixel = result(u.id)))
+    assert(g.assign(settled) == result)
+    val plugs = result.filter { case (_, p) => first.contains(p) }
+    val casualty = plugs.maxBy(_._2.y)._1
+    val survivors = settled.filterNot(_.id == casualty)
+    val after = g.assign(survivors)
+    assert(plugs.filterNot(_._1 == casualty).forall { case (id, p) => after(id) == p }, (result, after))
+    val replacement = after.find(_._2 == result(casualty)).get._1
+    assert(result(replacement).pixelDistance(result(casualty)) <= 40, (result, after))
+  }
+  check("a nearby Zealot replaces a dead front defender") {
+    val g = geometry(Vector(Box(0, 100, 100, 220), Box(118, 100, 218, 220)), Pixel(109, 500), None)
+    val units = ((1 to 5).map(defender(_)) ++ (6 to 7).map(defender(_, true))).toVector
+    val front = g.assign(Vector(defender(1)))(1)
+    val before = g.assign(units)
+    val victim = before.find(_._2 == front).get._1
+    val survivors = units.filterNot(_.id == victim).map(u => u.copy(pixel = before(u.id)))
+    val after = g.assign(survivors)
+    val replacement = after.find(_._2 == front).get._1
+    assert(before(replacement).pixelDistance(front) <= 32, (before, after))
+    assert(! survivors.find(_.id == replacement).get.probe)
+    assert(after.size == survivors.size)
+    disjoint(after, survivors)
   }
   check("spaces behind the wall between cannon rows are not wall entrances") {
     val front = Vector(Box(0, 100, 100, 220), Box(140, 100, 240, 220))

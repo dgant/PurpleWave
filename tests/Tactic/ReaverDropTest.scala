@@ -1279,6 +1279,25 @@ package Tactic.Missions {
         assert(r.loaded && z.loaded && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
       }
     }
+    check("raids use the drop forecast instead of the shared army judgment") {
+      for (fight <- Vector(false, true)) {
+        val (m, t, r, z, _) = combatMission(approaching = true)
+        defend(m, t, r, 1, Some(!fight))
+        m.launched = true
+        val original = With.battles.byUnit(r)
+        val army = unit(Protoss.Dragoon, t.pixel.x, t.pixel.y)
+        val physical = new Information.Battles.Types.Battle(Vector(t, r, z, army), original.enemy.units, isGlobal = false)
+        physical.judgement = original.judgement
+        val drop = physical.combatForecastByUnit(r)
+        assert((drop ne physical) && !drop.us.units.contains(army))
+        val judgment = allocate(classOf[Information.Battles.Types.BattleJudgment])
+        set(judgment, "shouldFightGround", fight)
+        drop.judgement = Some(judgment)
+        With.battles.byUnit += r -> physical
+        m.run()
+        assert(m.state == (if (fight) m.Raiding else m.Escaping))
+      }
+    }
     check("an overwhelming base is rejected even with a favorable local judgment") {
       val (m, t, r, z, _) = combatMission(approaching = true)
       defend(m, t, r, 12, Some(true))

@@ -168,6 +168,29 @@ object WallGapPositionsTest extends App {
     assert(result.values.exists(p => p.y > 3061 && p.y < 3080), result)
     assert(! crosses(front ++ result.values.map(zealot.at), Box(480, 3061, 600, 3080), _.x == 599, _.x == 480), result)
   }
+  check("a narrow gap gets one backup before reserves fill its side pocket") {
+    val front = Vector(Box(528, 2896, 625, 2969), Box(528, 3028, 561, 3061), Box(524, 3080, 597, 3125))
+    val cannons = Vector(Box(460, 3024, 501, 3057), Box(460, 3088, 501, 3121))
+    val g = new Geometry(front.map(_ -> true) ++ cannons.map(_ -> false), Pixel(288, 2992), Some(Pixel(527, 2991)), (_, _) => true, ling)
+    val plug = g.assign((1 to 3).map(defender(_)).toVector).values.maxBy(_.y)
+    val backed = g.assign((1 to 5).map(defender(_)).toVector)
+    assert(backed.values.exists(p => p.y == plug.y && p.x < plug.x && p.x >= plug.x - 24), backed)
+    val units = (1 to 7).map(defender(_)).toVector
+    val result = g.assign(units)
+    assert(backed.values.toSet.subsetOf(result.values.toSet), (backed, result))
+    assert(result.values.exists(p => Math.abs(p.x - plug.x) <= 4 && p.y <= plug.y - 20 && p.y > 3028), result)
+    assert(! result.values.exists(p => p.y == plug.y && p.x < plug.x - 24), result)
+    assert(units.forall(u => g.fits(u.body, result(u.id))), result)
+    disjoint(result, units)
+    val settled = units.map(u => u.copy(pixel = result(u.id)))
+    assert(g.assign(settled) == result)
+    val casualties = Set(result.find(_._2 == plug).get._1, result.find(_._2 == Pixel(540, 2975)).get._1)
+    val backup = result.find { case (_, p) => p.y == plug.y && p.x < plug.x }.get._1
+    val flank = result.find { case (_, p) => Math.abs(p.x - plug.x) <= 4 && p.y <= plug.y - 20 && p.y > 3028 }.get._1
+    val after = g.assign(settled.filterNot(u => casualties(u.id)))
+    assert(after(backup) == result(backup), (result, after))
+    assert(after(flank) == plug, (result, after))
+  }
   check("reserves spread beside the front instead of queuing beyond a cannon") {
     val front = Vector(Box(3376, 3056, 3473, 3129), Box(3404, 2888, 3477, 2933), Box(3408, 2996, 3441, 3029))
     val cannons = Vector(Box(3500, 2896, 3541, 2929), Box(3500, 3024, 3541, 3057), Box(3500, 3088, 3541, 3121))
@@ -182,6 +205,17 @@ object WallGapPositionsTest extends App {
     disjoint(result, units)
     val settled = units.map(u => u.copy(pixel = result(u.id)))
     assert(g.assign(settled) == result)
+    val arriving = new Geometry(front.map(_ -> true) ++ cannons.map(_ -> false), Pixel(3808, 2992), Some(Pixel(3407, 2959)), (_, _) => true, ling)
+    assert(arriving.assign(units) == result)
+    val upper = result.find(_._2 == Pixel(3480, 3012)).get._1
+    val lower = result.find(_._2 == Pixel(3480, 3036)).get._1
+    val crowded = settled.map(u => if (u.id == upper) u.copy(pixel = Pixel(3479, 3013))
+      else if (u.id == lower) u.copy(pixel = Pixel(3502, 3009)) else u)
+    val cleared = arriving.assign(crowded)
+    assert(cleared(upper) == result(lower) && cleared(lower) == result(upper), cleared)
+    val almostSettled = settled.map(u => if (u.id == upper) u.copy(pixel = result(upper).add(-1, 1))
+      else if (u.id == lower) u.copy(pixel = result(lower).add(3, 0)) else u)
+    assert(g.assign(almostSettled) == result)
     val plugs = result.filter { case (_, p) => first.contains(p) }
     val casualty = plugs.maxBy(_._2.y)._1
     val survivors = settled.filterNot(_.id == casualty)
@@ -189,6 +223,15 @@ object WallGapPositionsTest extends App {
     assert(plugs.filterNot(_._1 == casualty).forall { case (id, p) => after(id) == p }, (result, after))
     val replacement = after.find(_._2 == result(casualty)).get._1
     assert(result(replacement).pixelDistance(result(casualty)) <= 40, (result, after))
+    g.assign(settled)
+    val casualties = Set(casualty, plugs.minBy(_._2.y)._1)
+    val backup = result.find(_._2 == Pixel(3452, 3036)).get._1
+    val flank = result.find(_._2 == Pixel(3456, 3016)).get._1
+    val reduced = g.assign(settled.filterNot(u => casualties(u.id)))
+    assert(reduced(backup) == result(casualty) && reduced(flank) == result(backup), reduced)
+    assert(settled.filter(_.probe).forall(u => reduced(u.id) == result(u.id)), reduced)
+    val onlyProbes = g.assign(settled.filter(_.probe))
+    assert(onlyProbes.values.exists(_.x < 3452), onlyProbes)
   }
   check("a nearby Zealot replaces a dead front defender") {
     val g = geometry(Vector(Box(0, 100, 100, 220), Box(118, 100, 218, 220)), Pixel(109, 500), None)

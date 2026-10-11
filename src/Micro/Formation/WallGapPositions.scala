@@ -347,7 +347,8 @@ object WallGapPositions {
     private val reserves = mutable.Map.empty[(Gap, Body, Vector[Pixel]), Vector[Slot]]
     private def reinforcementCandidates(g: Gap, body: Body, front: Vector[Slot]): Vector[Slot] =
       reserves.getOrElseUpdate((g, body, front.map(_.pixel)), {
-        val frontDepth = front.map(_.depth).min
+        // A side pocket behind the shorter building can sit ahead of an inner-mouth plug.
+        val frontDepth = Math.min(front.map(_.depth).min, g.inner + body.extent(-g.nx, -g.ny) + 1)
         def open(p: Pixel): Boolean = g.depth(p) >= frontDepth && fits(body, p)
         val distance = mutable.Map.empty[Pixel, Int]
         val queue = mutable.Queue.empty[Pixel]
@@ -364,9 +365,11 @@ object WallGapPositions {
         // reserves near a replacement route instead of behind an intervening cannon.
         while (queue.nonEmpty) {
           val p = queue.dequeue()
-          val d = distance(p) + 4
-          if (d <= 256) Vector(p.add(-4, 0), p.add(4, 0), p.add(0, -4), p.add(0, 4)).foreach { next =>
-            if (d < distance.getOrElse(next, Int.MaxValue) && open(next)) {
+          for (dx <- -1 to 1; dy <- -1 to 1 if dx != 0 || dy != 0) {
+            val next = p.add(4 * dx, 4 * dy)
+            val d = distance(p) + (if (dx == 0 || dy == 0) 4 else 6)
+            if (d <= 256 && d < distance.getOrElse(next, Int.MaxValue) && open(next) &&
+              (dx == 0 || dy == 0 || (1 to 3).forall(i => open(p.add(i * dx, i * dy))))) {
               distance(next) = d
               queue.enqueue(next)
             }
@@ -396,12 +399,25 @@ object WallGapPositions {
     private var plan = Vector.empty[Planned]
     private var previousIds = Set.empty[Int]
     private var allocatedGaps = Vector.empty[(Planned, Int)]
+    private val arrived = mutable.Map.empty[Int, Gap]
 
     def assign(units: Vector[Defender]): Map[Int, Pixel] = {
+      val byId = units.map(u => u.id -> u).toMap
+      arrived.retain((id, _) => byId.contains(id))
       val composition = units.map(u => (u.probe, u.body)).sortBy { case (probe, b) => (probe, b.left, b.up, b.right, b.down) }
       if (composition != previousComposition) {
+        val next = allocate(composition)
+        val probes = plan.filter(_.probe)
+        val zealots = next.filterNot(_.probe)
+        // After casualties, leave reserves clear of the Zealots advancing to seal the wall.
+        val keepProbes = composition.count(! _._1) < previousComposition.count(! _._1) &&
+          composition.filter(_._1) == previousComposition.filter(_._1) &&
+          probes.groupBy(_.gap).map { case (g, ps) => g -> ps.size } ==
+            next.filter(_.probe).groupBy(_.gap).map { case (g, ps) => g -> ps.size } &&
+          gaps.forall(g => connectedTo(ling.forbidden(g.first), zealots.filter(_.gap == g).map(_.slot.blocked))
+            .exists(_.touches(ling.forbidden(g.second))))
+        plan = if (keepProbes) zealots ++ probes else next
         previousComposition = composition
-        plan = allocate(composition)
         previousIds = Set.empty
       }
       val ids = units.map(_.id).toSet
@@ -418,23 +434,28 @@ object WallGapPositions {
           (placement, unit.id)
         }
       }
-      val byId = units.map(u => u.id -> u).toMap
       val nearest = allocatedGaps.map { case (p, id) => (p, byId(id)) }
       // Within each gap, preserve the defenders' physical order. A new unit
       // approaching from outside must not be sent through a stationary front rank.
       nearest.groupBy { case (p, _) => (p.gap, p.probe, p.body) }.values.flatMap { group =>
         val available = mutable.ArrayBuffer(group.map(_._2): _*)
-        val settledPixels = group.map(_._1.slot.pixel).toSet
+        val rankBoxes = group.map(_._1.slot.box)
         group.map(_._1).sortBy(p => (-p.slot.depth, p.slot.pixel.x, p.slot.pixel.y)).map { p =>
           def arrivalDepth(u: Defender): Double = {
             val depth = p.gap.depth(u.pixel)
             // Units approaching around a building join from that mouth of the gap,
             // even if their current position is alongside an existing rank.
-            if (settledPixels.contains(u.pixel) || Math.abs(p.gap.across(u.pixel)) <= p.gap.width / 2.0) depth
+            if (arrived.get(u.id).contains(p.gap) || rankBoxes.exists(_.intersects(u.body.at(u.pixel))) ||
+              Math.abs(p.gap.across(u.pixel)) <= p.gap.width / 2.0) depth
             else if (depth > p.gap.inner) Double.PositiveInfinity else Double.NegativeInfinity
           }
-          val unit = available.minBy(u => (-arrivalDepth(u), u.pixel.pixelDistanceSquared(p.slot.pixel), u.id))
+          // Keep single-file replacements in order, but do not cross neighbors in a row.
+          val tolerance = if (group.count { case (q, _) => Math.abs(q.slot.depth - p.slot.depth) <= 8 } > 1) 8 else 0
+          val inward = available.map(arrivalDepth).max
+          val unit = available.filter(u => arrivalDepth(u) >= inward - tolerance)
+            .minBy(u => (u.pixel.pixelDistanceSquared(p.slot.pixel), u.id))
           available -= unit
+          if (unit.pixel == p.slot.pixel) arrived(unit.id) = p.gap
           unit.id -> p.slot.pixel
         }
       }.toMap
@@ -468,7 +489,15 @@ object WallGapPositions {
             // Close remaining lanes before reinforcing an already sealed passage.
             // This also puts a too-large defender at the inner mouth of a tiny gap.
             val slot = if (sealedAlready) {
-              reinforcementCandidates(g, body, fronts.getOrElseUpdate(g, previous.map(_._3))).find(legal)
+              val front = fronts.getOrElseUpdate(g, previous.map(_._3))
+              val reserves = reinforcementCandidates(g, body, front)
+              val unbacked = front.filterNot(f => previous.drop(front.size).exists { case (_, _, s) =>
+                Math.abs(g.across(s.pixel) - g.across(f.pixel)) <= 2
+              })
+              // Back each sealing unit once, then spread into the nearby side pockets.
+              val backup = if (unbacked.isEmpty) None else reserves.find(s => legal(s) && unbacked.exists(f =>
+                s.depth > f.depth && Math.abs(g.across(s.pixel) - g.across(f.pixel)) <= 2))
+              backup.orElse(reserves.find(legal))
             } else (2 to 0 by -1).iterator.flatMap { sides =>
               options.find(s => (s.front || probe && zealotBack.isDefined) && legal(s) &&
                 (if (fromA.exists(_.touches(s.blocked))) 1 else 0) + (if (fromB.exists(_.touches(s.blocked))) 1 else 0) == sides)

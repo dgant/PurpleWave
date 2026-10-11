@@ -53,6 +53,7 @@ abstract class MissionDrop extends Mission {
   protected def landingGoal(transport: FriendlyUnitInfo): Pixel = vicinity
   protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = false
   protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {}
+  def requestsUnload(passenger: FriendlyUnitInfo): Boolean = false
   protected def rejectApproach(transport: FriendlyUnitInfo): Boolean = false
   protected def routeArrivalRange(transport: FriendlyUnitInfo): Double = 0
   protected def routeFollowing(transport: FriendlyUnitInfo): Vector[(Tile, Double)] = Vector.empty

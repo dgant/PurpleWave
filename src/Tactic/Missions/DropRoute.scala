@@ -79,6 +79,20 @@ private[Missions] class DropRoute {
 }
 
 private[Missions] object DropRoute {
+  def hasSafePathShorterThan(from: Pixel, to: Pixel, maximumDistance: Double): Boolean = {
+    if (!from.valid || !to.valid || from.pixelDistance(to) >= maximumDistance) return false
+    if (Ray(from, to).forall(p => With.grids.enemyRangeAir.get(p.tile) == 0)) return true
+    if (With.grids.enemyRangeAir.get(to.tile) > 0) return false
+    // Measure the shortest safe route, not the vision/perimeter penalties of the preferred flight.
+    val shortest = new PathfindProfile(from.tile, Some(to.tile),
+      threatMaximum = Some(0), canCrossUnwalkable = Some(true), canEndUnwalkable = Some(true),
+      threatMaximumAlongPath = Some(0), explorationMaximum = Some(With.mapTileArea)).find
+    shortest.tiles.exists(tiles => {
+      val points = from +: tiles.drop(1).dropRight(1).map(_.center) :+ to
+      points.sliding(2).map(pair => pair.head.pixelDistance(pair.last)).sum < maximumDistance
+    })
+  }
+
   // Tighten a polyline through sight discs, keeping the following raid as an
   // anchor. Each adjustment minimizes the two adjacent legs. Repeated forward
   // and backward passes also remove bends across several scouting stops.

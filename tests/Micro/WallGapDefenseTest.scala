@@ -217,6 +217,39 @@ package Micro.Formation {
         }
       }
     }
+    check("a built natural wall anchors only defense squads in its own metro") {
+      val remote = new Base("Expansion", Tile(48, 6), Set.empty)
+      val homeBases = Vector(main, base)
+      val homeMetro = new Information.Geography.Types.Metro(homeBases) {
+        override lazy val bases = homeBases
+      }
+      val remoteMetro = new Information.Geography.Types.Metro(Vector(remote)) {
+        override lazy val bases = Vector(remote)
+      }
+      set(With.geography, "_metros", Vector(homeMetro, remoteMetro))
+      set(With.geography, "ourMainCache", new Cache(() => main))
+      set(With.geography, "ourFoyerCache", new Cache(() => base))
+      val cannon = unit(8, Protoss.PhotonCannon, Tile(16, 38))
+      val wall = new _root_.Placement.Walls.Wall
+      wall.buildings += cannon.tileTopLeft -> Protoss.PhotonCannon
+      wall.gap = Some(Tile(21, 40))
+      With.placement.restoreCachedWall(Some(wall))
+      buildings(cannon)
+      val mainDefense = new SquadDefendBase(main)
+      val naturalDefense = new SquadDefendBase(base)
+      val expansionDefense = new SquadDefendBase(remote)
+      assert(mainDefense.plugWall().contains(wall.defensePoint))
+      assert(naturalDefense.plugWall().contains(wall.defensePoint))
+      assert(expansionDefense.plugWall().isEmpty)
+      expansionDefense.run()
+      assert(expansionDefense.vicinity == remote.heart.center)
+      buildings()
+      With.frame += 1
+      assert(mainDefense.plugWall().isEmpty)
+      assert(naturalDefense.plugWall().isEmpty)
+      With.placement.restoreCachedWall(None)
+      buildings(gateway, forge)
+    }
     println(s"$passed wall defense integration tests passed")
   }
 }

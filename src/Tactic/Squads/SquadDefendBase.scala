@@ -32,6 +32,7 @@ class SquadDefendBase(base: Base) extends Squad {
   val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.metro.contains(base.metro), CountEverything)
 
   val plugWall = new Cache(() => With.placement.wall
+    .filter(_ => base.metro == With.geography.ourFoyer.metro)
     .filter(wall => With.units.ours.filter(IsBuilding).map(_.tileTopLeft).exists(t => wall.buildings.exists(_._1 == t)))
     .map(_.defensePoint))
 
@@ -134,8 +135,9 @@ class SquadDefendBase(base: Base) extends Squad {
       } else formationBastion
     }
 
+    val blockZerglings  = With.enemies.exists(_.isZerg) && ! enemies.exists(_.isAny(Zerg.Hydralisk, Zerg.Lurker)) && guardChoke.exists(c => base.metro.ourUnits.exists(u => u.unitClass.isStaticDefense && u.pixelDistanceEdge(c.pixelCenter) < 8 * 32))
     val canWithdraw     = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
-    val canGuard        = guardChoke.isDefined && (units.size > 5 || ! With.enemies.exists(_.isZerg) || With.geography.ourBases.length > 1)
+    val canGuard        = guardChoke.isDefined && (units.size > 5 || blockZerglings || ! With.enemies.exists(_.isZerg) || With.geography.ourBases.length > 1)
     val targetsUnranked =
       if        (canScour)    scourables
       else if   (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector

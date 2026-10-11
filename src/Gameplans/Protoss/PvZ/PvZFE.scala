@@ -31,11 +31,6 @@ class PvZFE extends GameplanImperative {
     // FFE: Scout on pylon
     // GFE: Scout with Zealot or just on gate
     // GFE: Can attack with first Zealot unless Zerg made 6 Zerglings
-    if (With.geography.startLocations.length >= ?(With.geography.mains.count(_.scoutedByUs) >= 2, 4, 5)) {
-      scoutOn(Protoss.Pylon, scouts = 2)
-    } else {
-      scoutOn(Protoss.Pylon)
-    }
 
     // Via https://www.youtube.com/watch?v=OgLBP6y_CQU
     // - GFE: Vs. 6 lings: 3 Zealot 23 Nexus
@@ -45,55 +40,85 @@ class PvZFE extends GameplanImperative {
     // FFE: Khala: "When you fail to scout Zerg at first try do 12 forge because you can block 9 pool with sim city)" Not sure if map-specific: https://youtu.be/Zm-t_mpHWG0?t=102
     // FFE: Khala: Can send second scout if first one misses to catch 4/5 pool
 
-    if (With.fingerprints.fourPool() && units(IsWarrior) < 9) {
-      cancel(Protoss.Nexus, Protoss.Assimilator, Protoss.CyberneticsCore)
-      once(Protoss.Forge)
-      pump(Protoss.Probe,  3)
-      pump(Protoss.Zealot, 2)
-      pump(Protoss.Probe)
-      pump(Protoss.Zealot)
-      get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).requireLabelYes(PlaceLabels.DefendHall))
-      get(3, Protoss.PhotonCannon,  new PlacementQuery(Protoss.PhotonCannon).requireBase(With.geography.ourMain).preferLabelYes(PlaceLabels.DefendHall, PlaceLabels.DefendAir))
-      get(1, Protoss.Forge,         new PlacementQuery(Protoss.Forge)       .requireBase(With.geography.ourMain))
-      get(2, Protoss.Gateway,       new PlacementQuery(Protoss.Gateway)     .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes())
-      get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes(PlaceLabels.GroundProduction))
-      oneBase.executeBuild()
-      oneBase.executeMain()
-      return
-    }
-
-    get(8, Protoss.Probe)
+    once(8, Protoss.Probe)
     buildInWall(1, Protoss.Pylon)
-    if (With.fingerprints.hatchFirst()) {
-      once(12, Protoss.Probe)
-      naturalNexus()
-      once(13, Protoss.Probe)
-      if (With.fingerprints.tenHatch() || With.fingerprints.twoHatchMain() || Python()) {
-        once(15, Protoss.Probe)
-        buildInWall(1, Protoss.Gateway)
-        buildInWall(1, Protoss.Forge)
-        once(Protoss.Zealot)
-        buildInWall(2, Protoss.PhotonCannon)
-      } else {
-        if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
-          cancel(Protoss.Forge, Protoss.PhotonCannon)
-        }
-        once(14, Protoss.Probe) // Should really be 15 gate but this gates gate ~6 seconds earlier which helps vs 6th ling
-        buildInWall(1, Protoss.Gateway)
-        once(15, Protoss.Probe)
-        buildInWall(1, Protoss.Forge)
-        once(Protoss.Zealot)
-        once(16, Protoss.Probe)
+    if (PvZFFE()) {
+      scoutOn(Protoss.Pylon, scouts = ?(With.geography.startLocations.length >= ?(With.geography.mains.count(_.scoutedByUs) >= 2, 4, 5), 2, 1))
+      if (With.fingerprints.fourPool() && unitsEver(IsWarrior) < 9) {
+        cancel(Protoss.Nexus, Protoss.Assimilator, Protoss.CyberneticsCore)
+        once(Protoss.Forge)
+        pump(Protoss.Probe,  3)
+        pump(Protoss.Zealot, 2)
+        pump(Protoss.Probe)
+        pump(Protoss.Zealot)
+        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).requireLabelYes(PlaceLabels.DefendHall))
+        get(3, Protoss.PhotonCannon,  new PlacementQuery(Protoss.PhotonCannon).requireBase(With.geography.ourMain).preferLabelYes(PlaceLabels.DefendHall, PlaceLabels.DefendAir))
+        get(1, Protoss.Forge,         new PlacementQuery(Protoss.Forge)       .requireBase(With.geography.ourMain))
+        get(2, Protoss.Gateway,       new PlacementQuery(Protoss.Gateway)     .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes())
+        get(1, Protoss.Pylon,         new PlacementQuery(Protoss.Pylon)       .requireBase(With.geography.ourMain).preferTile(With.geography.home).preferLabelYes(PlaceLabels.GroundProduction))
+        oneBase.executeBuild()
+        oneBase.executeMain()
+        return
       }
-    } else if (With.fingerprints.twelvePool()) { // Overpool can do this too IF we probe block the gap. Probably not worth attempting
-      once(13, Protoss.Probe)
-      naturalNexus()
-      buildInWall(1, Protoss.Forge)
+      if (With.fingerprints.hatchFirst()) {
+        once(12, Protoss.Probe)
+        naturalNexus()
+        once(13, Protoss.Probe)
+        if (With.fingerprints.tenHatch() || With.fingerprints.twoHatchMain() || Python()) {
+          once(15, Protoss.Probe)
+          buildInWall(1, Protoss.Gateway)
+          buildInWall(1, Protoss.Forge)
+          once(Protoss.Zealot)
+          buildInWall(2, Protoss.PhotonCannon)
+        } else {
+          if (units(Protoss.Gateway, Protoss.Nexus) < 3) {
+            cancel(Protoss.Forge, Protoss.PhotonCannon)
+          }
+          once(14, Protoss.Probe) // Should really be 15 gate but this gates gate ~6 seconds earlier which helps vs 6th ling
+          buildInWall(1, Protoss.Gateway)
+          once(15, Protoss.Probe)
+          buildInWall(1, Protoss.Forge)
+          once(Protoss.Zealot)
+          once(16, Protoss.Probe)
+        }
+      } else if (With.fingerprints.twelvePool()) { // Overpool can do this too IF we probe block the gap. Probably not worth attempting
+        once(13, Protoss.Probe)
+        naturalNexus()
+        buildInWall(1, Protoss.Forge)
+      } else {
+        once(12, Protoss.Probe)
+        buildInWall(1, Protoss.Forge)
+        once(14, Protoss.Probe)
+        buildInWall(2, Protoss.PhotonCannon)
+      }
     } else {
+      once(10, Protoss.Probe)
+      buildInWall(1, Protoss.Gateway)
+      scoutOn(Protoss.Gateway)
+
+      if (With.fingerprints.fourPool() && unitsEver(IsWarrior) < 9) {
+        pump(Protoss.Probe, 6)
+        pump(Protoss.Zealot, 2)
+        pump(Protoss.Probe)
+        pump(Protoss.Zealot)
+        tryBuildInWall(1, Protoss.Forge)
+        get(1, Protoss.Pylon, new PlacementQuery(Protoss.Pylon).preferLabelYes(DefendHall))
+        buildCannonsAtMain(2, PlaceLabels.DefendHall)
+        get(2, Protoss.Pylon)
+        get(2, Protoss.Gateway)
+      }
+
       once(12, Protoss.Probe)
+      get(2,Protoss.Pylon)
+      once(13, Protoss.Probe)
+      once(Protoss.Zealot)
+      once(15, Protoss.Probe)
+      once(2, Protoss.Zealot)
+      once(17, Protoss.Probe)
+      naturalNexus()
+      once(3, Protoss.Zealot)
+      once(18, Protoss.Probe)
       buildInWall(1, Protoss.Forge)
-      once(14, Protoss.Probe)
-      buildInWall(2, Protoss.PhotonCannon)
     }
 
     once(13, Protoss.Probe)
@@ -116,10 +141,6 @@ class PvZFE extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
-    // Disabling because it's bugged
-    With.blackboard.acePilots.set(true)
-
-    if (wallOption.isEmpty) return
 
     // Cannons vs. ling/hydra bust
     // Cannons vs. muta

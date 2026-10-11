@@ -10,15 +10,14 @@ object Transport extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = unit.isTransport
   
   override protected def perform(transport: FriendlyUnitInfo): Unit = {
-    transport.squad.foreach {
-      case drop: Tactic.Missions.MissionDrop => drop.accountForCargo(transport)
-      case _ =>
-    }
+    val drop = transport.squad.collect { case mission: Tactic.Missions.MissionDrop => mission }
+    drop.foreach(_.accountForCargo(transport))
     val passengers = transport.agent.passengers
     passengers.indices.foreach(i => {
       // Don't get stuck trying to unload a passenger that fails to land
       // and do save some frames for microing the transport itself
-      if (passengers(i).agent.wantsUnload && i == transport.agent.run % (passengers.length + 1) && transport.tile.adjacent9.exists(_.walkable)) {
+      if (i == transport.agent.run % (passengers.length + 1) && transport.tile.adjacent9.exists(_.walkable)
+        && (passengers(i).agent.wantsUnload || drop.exists(_.requestsUnload(passengers(i))))) {
         Commander.unload(transport, passengers(i))
       }
     })

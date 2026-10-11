@@ -107,6 +107,7 @@ package Tactic.Missions {
     var availableMinerals = 300
     With.self = new PlayerInfo(null) {
       override def getUpgradeLevel(upgrade: ProxyBwapi.Upgrades.Upgrade): Int = 0
+      override def isZerg: Boolean = false
       override def minerals: Int = availableMinerals
       override lazy val isNeutral = false
       override lazy val isAlly = false
@@ -167,7 +168,7 @@ package Tactic.Missions {
       set(u, "_pixelObserved", Pixel(x, y)); set(u, "_visibility", ProxyBwapi.UnitTracking.Visibility.Visible)
       set(u, "_hitPoints", kind.maxHitPoints); set(u, "_shieldPoints", kind.maxShields)
       set(u, "_alive", true); set(u, "_complete", true); set(u, "_powered", true)
-      set(u, "_flying", kind == Protoss.Shuttle); set(u, "_transport", None)
+      set(u, "_flying", kind.isFlyer); set(u, "_transport", None)
       set(u, "_scarabs", 3); set(u, "_trainingQueue", Vector.empty[UnitClass])
       set(u, "_squad", None); set(u, "friendly", Some(u)); set(u, "damageQueue", ArrayBuffer.empty)
       set(u, "_intent", new Intention)
@@ -1043,6 +1044,65 @@ package Tactic.Missions {
       m.configure(Vector(t), Vector(r, z)); load(r, Some(t)); load(z, Some(t))
       (m, t, r, z, worker)
     }
+    check("the Polypoid arrival stays loaded along its clear route to the mineral line") {
+      world(128)
+      val target = base(4, 116)
+      target.heart; set(target, "heart", Tile(5, 117))
+      val start = Pixel(46, 3407)
+      val t = unit(Protoss.Shuttle, start.x, start.y); val r = unit(Protoss.Reaver, start.x, start.y)
+      val m = new MissionProbe(target); m.autonomousLanding = true
+      m.configure(Vector(t), Vector(r)); load(r, Some(t)); m.run()
+      assert(!m.controlsCombat(t), "An undefended mineral line 376 pixels away is not arrival")
+      var steps = 0
+      while (!m.controlsCombat(t) && steps < 120) {
+        With.frame += 2; t.sleepUntil = 0
+        m.run()
+        if (!m.controlsCombat(t)) {
+          performIntent(t)
+          val next = t.pixel.project(movement(t), 8)
+          Vector(t, r).foreach(u => { set(u, "_pixel", next); set(u, "_tile", next.tile) })
+        }
+        assert(r.loaded && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
+        steps += 1
+      }
+      assert(m.controlsCombat(t) && t.pixelDistanceCenter(target.heart.center) <= 32,
+        s"Flight must reach the mineral line before handing over at ${t.pixel}")
+    }
+    check("arrival uses the 32-pixel boundary rather than Shuttle sight range") {
+      val (m, t, r, z, _) = combatMission()
+      def at(distance: Int): Unit = Vector(t, r, z).foreach(u => {
+        val p = m.target.heart.center.add(-distance, 0)
+        set(u, "_pixel", p); set(u, "_tile", p.tile)
+      })
+      at(33); m.run()
+      assert(!m.controlsCombat(t) && r.loaded && z.loaded)
+      at(32); m.run()
+      assert(m.controlsCombat(t) && Vector(t, r, z).forall(_.intent.action == Idle))
+    }
+    check("nearby anti-air outside weapon range cannot interrupt a clear arrival") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      val marine = unit(ProxyBwapi.Races.Terran.Marine, t.pixel.x, t.pixel.y + 500)
+      set(marine, "_player", enemy)
+      t.matchups = new MatchupAnalysis(t) {
+        override def threats = Vector(marine)
+        override def threatsInRange = Vector.empty
+        override def withinSafetyMargin = false
+      }
+      With.grids.enemyRangeAir.tiles(t.tile.i).maxDepth = 1 // Safety margin, with a clear escape toward the goal.
+      m.run()
+      assert(!m.controlsCombat(t) && r.loaded && z.loaded)
+    }
+    check("only blocked approaches or safe detours beyond three times direct distance hand off early") {
+      for ((wallLength, shouldHandoff) <- Vector((8, false), (17, true), (128, true))) {
+        val (m, t, r, z, _) = combatMission(approaching = true)
+        val wallX = t.tile.x + 5
+        With.grids.enemyRangeAir.tiles.foreach(cell =>
+          cell.maxDepth = if (cell.tile.x == wallX && cell.tile.y <= t.tile.y + wallLength) 1 else 0)
+        m.run()
+        assert(m.controlsCombat(t) == shouldHandoff, s"Wrong handoff for wall length $wallLength")
+        assert(r.loaded && z.loaded)
+      }
+    }
     check("perimeter sweeps include unowned and previously scouted bases before their raid target") {
       world(128)
       val top = base(62, 4); val right = base(120, 62); val bottom = base(62, 120); val left = base(4, 62)
@@ -1178,6 +1238,10 @@ package Tactic.Missions {
       m.run()
       assert(m.itinerary.head == target && m.state == m.Travelling && r.loaded)
       target.owner = enemy; target.units = Vector(nexus); m.run()
+      assert(m.state == m.Landing && !m.controlsCombat(t) && t.intent.terminus.contains(target.heart.center),
+        "Discovering ownership must finish the flight to the mineral line")
+      Vector(t, r).foreach(u => { set(u, "_pixel", target.heart.center); set(u, "_tile", target.heart) })
+      m.run()
       assert(m.state == m.Raiding && m.vicinity == target.heart.center && t.intent.terminus.contains(m.vicinity))
       assert(r.loaded && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
       set(With.units, "bufferFriendly", new ProxyBwapi.UnitTracking.UnorderedBuffer(previous))
@@ -1206,10 +1270,14 @@ package Tactic.Missions {
       With.grids.enemyRangeAir.tiles.foreach(t => t.maxDepth = if (t.tile.x == 64) 1 else 0)
       assert(new DropRoute().next(Tile(10, 10), Tile(110, 10)).isEmpty)
     }
-    def defend(m: MissionProbe, t: FriendlyUnitInfo, r: FriendlyUnitInfo, count: Int, judgment: Option[Boolean]): Unit = {
-      val defenders = Vector.fill(count)(unit(Protoss.Dragoon, t.pixel.x + 128, t.pixel.y))
-      defenders.foreach(set(_, "_player", enemy)); m.target.units ++= defenders
+    def defend(m: MissionProbe, t: FriendlyUnitInfo, r: FriendlyUnitInfo, count: Int, judgment: Option[Boolean], kind: UnitClass = Protoss.Dragoon): Unit = {
+      val defenders = Vector.fill(count)(unit(kind, t.pixel.x + 128, t.pixel.y))
+      defenders.foreach(d => {
+        set(d, "_player", enemy)
+        With.grids.enemyRangeAir.updateUnit(d); With.grids.enemyRangeAirGround.updateUnit(d)
+      }); m.target.units ++= defenders
       t.matchups = new MatchupAnalysis(t) {
+        override def enemies = defenders
         override def threats = defenders
         override def threatsInRange = defenders
         override def withinSafetyMargin = false
@@ -1246,6 +1314,10 @@ package Tactic.Missions {
       val m = new MissionProbe(target); m.assessDefense = true; m.autonomousLanding = true
       m.configure(Vector(t), Vector(r)); load(r, Some(t)); m.updateState(false)
       defend(m, t, r, 12, None)
+      target.units.filter(_.canAttack).foreach(d => {
+        set(d, "_pixel", target.heart.center.add(128, 0)); set(d, "_tile", d.pixel.tile)
+        With.grids.enemyRangeAir.updateUnit(d); With.grids.enemyRangeAirGround.updateUnit(d)
+      })
       assert(t.base.contains(target) && !m.mustLeave && !m.controlsCombat(t))
       set(t, "_pixel", target.heart.center.add(0, 320)); set(t, "_tile", t.pixel.tile)
       assert(m.mustLeave, "Defense is evaluated when the crew actually approaches the destination")
@@ -1269,20 +1341,44 @@ package Tactic.Missions {
       assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].movedTo == null,
         "Nearby rescue cannot be overridden by a Shuttle retreat")
     }
-    check("defended approaches require a favorable prediction before default combat receives the crew") {
+    check("Gladiator's newly revealed third stays on the itinerary despite the pessimistic army forecast") {
+      world(128)
+      val target = base(118, 77)
+      target.heart; set(target, "heart", Tile(123, 77))
+      val t = unit(Protoss.Shuttle, 3712, 2760)
+      val r = unit(Protoss.Reaver, t.x, t.y); val d = unit(Protoss.Dragoon, t.x, t.y)
+      val drone = unit(ProxyBwapi.Races.Zerg.Drone, 3911, 2548)
+      val defenders = Vector(unit(ProxyBwapi.Races.Zerg.Mutalisk, 3847, 2988)) ++
+        Vector((3910, 2972), (3936, 2972), (3944, 2836), (3960, 2900)).map { case (x, y) => unit(ProxyBwapi.Races.Zerg.Zergling, x, y) }
+      (defenders :+ drone).foreach(e => {
+        set(e, "_player", enemy)
+        With.grids.enemyRangeAir.updateUnit(e); With.grids.enemyRangeAirGround.updateUnit(e)
+      })
+      target.units = defenders :+ drone
+      val m = new MissionProbe(target); m.autonomousLanding = true; m.assessDefense = true; m.launched = true
+      m.configure(Vector(t), Vector(r, d)); load(r, Some(t)); load(d, Some(t))
+      val battle = new Information.Battles.Types.Battle(Vector(t, r, d), defenders, isGlobal = false)
+      val judgment = allocate(classOf[Information.Battles.Types.BattleJudgment]); set(judgment, "shouldFightGround", false)
+      battle.judgement = Some(judgment); With.battles.byUnit += r -> battle
+      m.run()
+      assert(m.itinerary.headOption.contains(target) && m.state == m.Landing && !m.mustLeave && r.loaded)
+      set(t, "_pixel", target.heart.center); set(t, "_tile", target.heart)
+      m.run()
+      assert(m.state == m.Raiding && m.controlsCombat(t), "The mineral line must receive the crew once reached")
+    }
+    check("a weaker local defense permits a raid even without an optimistic forecast") {
       for (judgment <- Vector(None, Some(false), Some(true))) {
         val (m, t, r, z, _) = combatMission(approaching = true)
         defend(m, t, r, 1, judgment)
         m.run()
-        if (judgment.contains(true)) assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle), s"Favorable approach became ${m.state}")
-        else assert(m.state == m.Escaping && !m.controlsCombat(t) && Vector(r, z).forall(_.intent.action == Micro.Actions.Basic.DoNothing), s"Unsafe approach became ${m.state} with $judgment")
+        assert(m.state == m.Raiding && Vector(t, r, z).forall(_.intent.action == Idle), s"Weaker defense became ${m.state} with $judgment")
         assert(r.loaded && z.loaded && t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
       }
     }
     check("raids use the drop forecast instead of the shared army judgment") {
       for (fight <- Vector(false, true)) {
         val (m, t, r, z, _) = combatMission(approaching = true)
-        defend(m, t, r, 1, Some(!fight))
+        defend(m, t, r, 12, Some(!fight), Protoss.Zealot)
         m.launched = true
         val original = With.battles.byUnit(r)
         val army = unit(Protoss.Dragoon, t.pixel.x, t.pixel.y)
@@ -1298,7 +1394,13 @@ package Tactic.Missions {
         assert(m.state == (if (fight) m.Raiding else m.Escaping))
       }
     }
-    check("an overwhelming base is rejected even with a favorable local judgment") {
+    check("an optimistic drop forecast permits stronger ground defense") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 12, Some(true), Protoss.Zealot)
+      m.run()
+      assert(m.state == m.Raiding && m.controlsCombat(t) && r.loaded && z.loaded)
+    }
+    check("an optimistic ground forecast cannot override lethal air exposure") {
       val (m, t, r, z, _) = combatMission(approaching = true)
       defend(m, t, r, 12, Some(true))
       m.run()
@@ -1309,10 +1411,78 @@ package Tactic.Missions {
       Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-700, 0)); set(u, "_tile", u.pixel.tile) })
       m.run(); assert(!m.controlsCombat(t))
       Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center.add(-320, 0)); set(u, "_tile", u.pixel.tile) })
-      defend(m, t, r, 1, Some(false))
+      defend(m, t, r, 12, Some(false), Protoss.Zealot)
       With.frame += 6; t.sleepUntil = 0; performIntent(t)
       assert(m.state == m.Escaping && !m.controlsCombat(t) && r.loaded && z.loaded)
       assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == null)
+    }
+    check("local strength uses the remaining health of both armies") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 4, Some(false), Protoss.Zealot)
+      m.run(); assert(m.state == m.Raiding)
+      set(r, "_hitPoints", r.unitClass.maxHitPoints / 2); set(r, "_shieldPoints", r.unitClass.maxShields / 2)
+      assert(m.mustLeave, "A damaged crew cannot count as full-strength")
+      m.target.units.filter(Protoss.Zealot).foreach(d => {
+        set(d, "_hitPoints", d.unitClass.maxHitPoints / 2); set(d, "_shieldPoints", d.unitClass.maxShields / 2)
+      })
+      assert(!m.mustLeave, "Damaged defenders count at their remaining strength too")
+    }
+    check("landed troops still evaluate local defense when their Shuttle leaves the approach radius") {
+      val (m, t, r, z, _) = combatMission()
+      defend(m, t, r, 4, Some(false), Protoss.Zealot)
+      m.run(); assert(m.state == m.Raiding)
+      load(r, None)
+      set(t, "_pixel", m.target.heart.center.add(-600, 0)); set(t, "_tile", t.pixel.tile)
+      set(r, "_hitPoints", 20); set(r, "_shieldPoints", 0)
+      assert(m.mustLeave, "Grounded troops cannot lose the defense check when the Shuttle moves away")
+    }
+    check("a large distant army and mineral-line workers do not veto a local raid") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 12, Some(false))
+      m.target.units.filter(_.canAttack).foreach(d => {
+        set(d, "_pixel", m.target.heart.center.add(900, 0)); set(d, "_tile", d.pixel.tile)
+        With.grids.enemyRangeAir.updateUnit(d); With.grids.enemyRangeAirGround.updateUnit(d)
+      })
+      val workers = Vector.fill(20)(unit(ProxyBwapi.Races.Zerg.Drone, m.target.heart.center.x, m.target.heart.center.y))
+      workers.foreach(set(_, "_player", enemy)); m.target.units ++= workers
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.target.heart.center); set(u, "_tile", u.pixel.tile) })
+      m.run()
+      assert(m.state == m.Raiding && !m.mustLeave)
+    }
+    check("anti-air exposure can veto a weaker defense and tightens as Shuttle health falls") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 1, Some(false))
+      m.run(); assert(m.state == m.Raiding)
+      set(t, "_hitPoints", 20); set(t, "_shieldPoints", 0)
+      assert(m.mustLeave, "The flight budget must use remaining Shuttle health")
+    }
+    check("anti-air outside the flight corridor does not spend the Shuttle health budget") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 2, Some(false), ProxyBwapi.Races.Terran.MissileTurret)
+      m.target.units.filter(_.canAttack).foreach(d => {
+        set(d, "_pixel", m.target.heart.center.add(32, 300)); set(d, "_tile", d.pixel.tile)
+        With.grids.enemyRangeAir.updateUnit(d); With.grids.enemyRangeAirGround.updateUnit(d)
+        assert(d.pixelDistanceEdge(m.target.heart.center) > d.pixelRangeAir + t.unitClass.dimensionMax)
+      })
+      m.run()
+      assert(m.state == m.Raiding && !m.mustLeave, "Off-route anti-air cannot veto a harmless flight")
+    }
+    check("flight risk charges at least one full hit from an interceptor") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 1, Some(false), ProxyBwapi.Races.Zerg.Scourge)
+      m.run()
+      assert(m.state == m.Escaping && !m.controlsCombat(t), "A 110-damage interception exceeds half a healthy Shuttle's health")
+    }
+    check("air attackers approaching during deployment count before entering weapon range") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      defend(m, t, r, 1, Some(true), ProxyBwapi.Races.Zerg.Scourge)
+      val scourge = m.target.units.find(ProxyBwapi.Races.Zerg.Scourge).get
+      set(scourge, "_pixel", m.target.heart.center.add(0, 240)); set(scourge, "_tile", scourge.pixel.tile)
+      With.grids.enemyRangeAir.updateUnit(scourge); With.grids.enemyRangeAirGround.updateUnit(scourge)
+      assert(scourge.pixelDistanceEdge(m.target.heart.center) > scourge.pixelRangeAir + t.unitClass.dimensionMax)
+      m.run()
+      assert(m.state == m.Escaping && !m.controlsCombat(t) && r.loaded,
+        "A Scourge that can arrive during unloading must not be treated as stationary")
     }
     check("reaching the target hands a loaded crew to default combat before the first unload") {
       val (m, t, r, z, _) = combatMission()
@@ -1323,6 +1493,60 @@ package Tactic.Missions {
       load(r, None); m.run(); load(r, Some(t)); m.run()
       assert(m.state == m.Raiding && t.intent.action == Idle && z.loaded,
         "A recovered Reaver cannot restart initial landing to deploy filler")
+    }
+    check("a fighting grounded Reaver requests both Zealots through normal Shuttle unloading") {
+      val (m, t, r, z, _) = combatMission()
+      val other = unit(Protoss.Zealot, t.pixel.x, t.pixel.y)
+      m.passengers += other; other.setSquad(Some(m)); t.agent.addPassenger(other); load(other, Some(t))
+      m.run(); load(r, None); r.agent.shouldFight = true
+      for (passenger <- Vector(z, other)) {
+        passenger.agent.wantsUnload = false // Passenger micro clears transient requests every update.
+        t.agent.run = t.agent.passengers.indexOf(passenger); t.sleepUntil = With.frame + 10
+        perform(Transport, t)
+        assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == passenger.bwapiUnit,
+          "The mission must request each Zealot without requiring its own attack or delivery goal")
+        load(passenger, None)
+      }
+      assert(t.intent.action == Idle && Vector(r, z, other).forall(_.intent.action == Idle))
+    }
+    check("mission Zealot unloading stops when the Reaver boards, retreats, or the mission recovers") {
+      val (m, t, r, z, _) = combatMission(); m.run()
+      def unloadAttempt(): Boolean = {
+        t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded = null
+        z.agent.wantsUnload = false; t.agent.run = t.agent.passengers.indexOf(z); t.sleepUntil = With.frame + 10
+        perform(Transport, t)
+        t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == z.bwapiUnit
+      }
+      r.agent.shouldFight = true
+      assert(!unloadAttempt(), "A loaded Reaver does not deploy its escorts")
+      load(r, None); r.agent.shouldFight = false
+      assert(!unloadAttempt(), "A retreating Reaver does not deploy its escorts")
+      r.agent.shouldFight = true
+      assert(unloadAttempt())
+      load(r, Some(t)); assert(!unloadAttempt(), "A previous mission request cannot survive boarding")
+      load(r, None)
+      for (phase <- Vector(m.Assembling, m.Travelling, m.Evacuating, m.Escaping)) {
+        m.state = phase
+        assert(!unloadAttempt(), s"No escort deployment during $phase")
+      }
+    }
+    check("a landed crew deploys its Zealot while another Shuttle keeps its own crew aboard") {
+      val (m, t, r, z, _) = combatMission()
+      val other = unit(Protoss.Shuttle, 1800, 3280)
+      val otherReaver = unit(Protoss.Reaver, 1800, 3280); val otherZealot = unit(Protoss.Zealot, 1800, 3280)
+      m.transports += other; m.passengers ++= Vector(otherReaver, otherZealot)
+      Vector(other, otherReaver, otherZealot).foreach(_.setSquad(Some(m)))
+      Vector(otherReaver, otherZealot).foreach(p => { other.agent.addPassenger(p); load(p, Some(other)) })
+      m.run(); load(r, None); r.agent.shouldFight = true
+      assert(m.state == m.Landing && m.controlsCombat(t) && !m.controlsCombat(other))
+      for (phase <- Vector(m.Landing, m.Raiding)) {
+        m.state = phase
+        Vector(t -> z, other -> otherZealot).foreach { case (shuttle, zealot) =>
+          shuttle.agent.run = shuttle.agent.passengers.indexOf(zealot); shuttle.sleepUntil = With.frame + 10
+          perform(Transport, shuttle)
+          assert((shuttle.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].unloaded == zealot.bwapiUnit) == (shuttle == t))
+        }
+      }
     }
     check("default Shuttle combat honors a loaded Zealot ride goal beside a grounded Reaver") {
       val (m, t, r, z, worker) = combatMission(); m.run(); load(r, None)

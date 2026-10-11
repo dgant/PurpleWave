@@ -17,10 +17,10 @@ object Opponents {
     add(new Opponent(name, other))
   }
 
-  val defaultPvT: StrategySelectionPolicy = StrategySelectionGreedy()
-  val defaultPvP: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
-  val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
-  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 4, 0.75, PvPGateCore, PvPDT)
+  val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvT1BaseReaver, PvTDoubleRobo)
+  val defaultPvP: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvPGateCore, PvPDT)
+  val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvZFFE)
+  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvRReaver)
 
   // COG 2026
 

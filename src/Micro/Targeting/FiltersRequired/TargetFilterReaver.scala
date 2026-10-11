@@ -10,6 +10,18 @@ object TargetFilterReaver extends TargetFilter {
   override def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = {
 
     if (actor.agent.ride.isDefined) {
+      val worthAttacking = (
+        target.proxied
+          || target.unitClass.attacksOrCastsOrDetectsOrTransports
+          || target.base.exists(b => b.workerCount == 0 && b.resources.forall(u => u.tile.visible)))
+
+      if ( ! worthAttacking) return false
+
+      // Problems with the "don't get shot by a siege tank" filter
+      // - risk is predicated on firing pixel which we don't have yet
+      // - we can be shot by targets other than the tank
+      return true
+
       // Don't try to snipe tanks that will kill us first
       if (actor.loaded
         && Terran.SiegeTankSieged(target)
@@ -17,14 +29,6 @@ object TargetFilterReaver extends TargetFilter {
         && target.matchups.targetsInRange.forall(actor==)) {
         return false
       }
-
-      // Don't hit eg. random buildings in bases
-      val worthAttacking = (
-        target.proxied
-        || target.unitClass.attacksOrCastsOrDetectsOrTransports
-        || target.base.exists(b => b.workerCount == 0 && b.resources.forall(u => u.tile.visible)))
-
-      if ( ! worthAttacking) return false
 
       val safeToAttack = (
         ! target.canAttack(actor)

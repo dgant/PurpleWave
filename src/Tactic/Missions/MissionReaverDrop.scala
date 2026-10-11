@@ -4,8 +4,9 @@ import Information.Geography.Types.Base
 import Lifecycle.With
 import Mathematics.Maff
 import Mathematics.Points.{Pixel, Points, Tile}
+import Mathematics.Shapes.Ray
 import Micro.Actions.{Action, Idle}
-import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
 import Utilities.Time.{Minutes, Seconds}
@@ -73,30 +74,69 @@ class MissionReaverDrop extends MissionDrop {
   override protected def defaultCombatLanding: Boolean = true
   override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
 
+  override def requestsUnload(passenger: FriendlyUnitInfo): Boolean =
+    Protoss.Zealot(passenger) && passenger.loaded && assignedTransport(passenger).exists(t =>
+      (state == Raiding || (state == Landing && raidingTransports(t))) &&
+      passengersFor(t).exists(r => Protoss.Reaver(r) && r.alive && !r.loaded && r.agent.shouldFight))
+
   private def workers = destinationBase.toVector.flatMap(_.enemies).filter(u => IsWorker(u) && u.visible)
   private def approaching(transport: FriendlyUnitInfo): Boolean = destinationBase.exists(base =>
     base.isEnemy && transport.pixelDistanceCenter(vicinity) <= Math.max(384, transport.sightPixels))
 
   private def confidentToRaid(transport: FriendlyUnitInfo): Boolean = {
-    val crew = passengersFor(transport)
+    val crew = passengersFor(transport).filter(_.alive)
     val reavers = crew.filter(Protoss.Reaver).filterNot(_.doomed)
-    val defenders = (destinationBase.toVector.flatMap(_.enemies) ++
-      (crew.flatMap(_.matchups.threats) ++ transport.matchups.threats).filter(_.pixelDistanceCenter(transport) <= transport.sightPixels + 128))
-      .filter(u => u.likelyStillThere && IsWarrior(u) && u.canAttack).distinct
-    reavers.nonEmpty && (defenders.isEmpty || (
-      defenders.forall(d => crew.exists(_.canAttack(d))) &&
-      defenders.map(_.subjectiveValue).sum * (if (workers.size > 2) 1 else 2) < crew.map(_.subjectiveValue).sum &&
-      reavers.exists(_.combatForecast.exists(b => b.judgement.exists(_.shouldFightGround) && defenders.forall(b.enemy.units.contains)))))
+    if (reavers.isEmpty) return false
+    val optimistic = reavers.exists(_.combatForecast.exists(_.judgement.exists(_.shouldFightGround)))
+
+    val goal = landingGoal(transport)
+    val path = Ray(transport.pixel, goal).toVector
+    val nearby = destinationBase.toVector.flatMap(_.enemies) ++ crew.flatMap(_.matchups.threats) ++ transport.matchups.threats
+    val defenders = (path.flatMap(p => With.grids.enemyRangeAirGround.unitsNear(p.tile).filter(e =>
+      e.pixelDistanceEdge(p) <= e.pixelRangeMax + transport.unitClass.dimensionMax)) ++ nearby.filter(e =>
+      crew.exists(p => e.pixelDistanceEdge(if (p.loaded) goal else p.pixel) <=
+        Math.max(p.pixelRangeAgainst(e), e.pixelRangeAgainst(p)) + p.unitClass.dimensionMax)))
+      .filter(u => u.likelyStillThere && IsWarrior(u) && !IsWorker(u)).distinct
+    def strength(u: UnitInfo): Double =
+      u.subjectiveValue * Math.min(1.0, u.totalHealth.toDouble / u.unitClass.maxTotalHealth)
+    val ours = crew.map(strength).sum
+    val theirs = defenders.map(strength).sum
+    val antiAir = (path.flatMap(p => With.grids.enemyRangeAir.unitsNear(p.tile)) ++ nearby).distinct
+      .filter(u => u.likelyStillThere && u.canAttackAir)
+    // Integrate exposure in frames, reserving two seconds at the landing spot for unloading and pickup.
+    // Allow flying attackers to close during deployment; ground defenses keep their actual range.
+    // Charge at least one volley; a suicide attacker can hit only once.
+    val deploymentFrames = Seconds(2)()
+    val damage = antiAir.map(e => {
+      def exposed(p: Pixel): Double = if (e.pixelDistanceEdge(p) <= e.pixelRangeAir + transport.unitClass.dimensionMax + (if (e.flying) e.topSpeed * deploymentFrames else 0)) 1.0 else 0.0
+      val frames = path.sliding(2).filter(_.size == 2).map(pair =>
+        (exposed(pair.head) + exposed(pair.last)) * 0.5 * pair.head.pixelDistance(pair.last) / Math.max(1.0, transport.topSpeed)).sum +
+        deploymentFrames * exposed(goal)
+      val hit = e.damageOnHitAir * e.attacksAgainstAir
+      if (frames <= 0) 0.0 else if (e.unitClass.suicides) hit.toDouble else Math.max(hit, e.dpfAir * frames)
+    }).sum
+    val safe = (optimistic || theirs < ours) && damage < 0.5 * transport.totalHealth
+    if (!safe) With.logger.debug(f"$this rejecting raid at $goal: optimistic=$optimistic crew=$ours%.1f defenders=$theirs%.1f flightDamage=$damage%.1f health=${transport.totalHealth}")
+    safe
   }
 
   override protected def rejectApproach(transport: FriendlyUnitInfo): Boolean =
-    passengersFor(transport).exists(requiredPassenger) && approaching(transport) && !confidentToRaid(transport)
+    passengersFor(transport).exists(requiredPassenger) &&
+      (approaching(transport) || raidingTransports(transport)) && !confidentToRaid(transport)
 
-  override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean =
-    approaching(transport) && confidentToRaid(transport)
+  override protected def landingGoal(transport: FriendlyUnitInfo): Pixel =
+    destinationBase.filter(_.isEnemy).map(_.heart.center).getOrElse(vicinity)
+
+  override protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = {
+    val goal = landingGoal(transport)
+    destinationBase.exists(_.isEnemy) && passengersFor(transport).exists(requiredPassenger) && (
+      transport.pixelDistanceCenter(goal) <= 32
+      || transport.matchups.threatsInRange.nonEmpty
+      || !DropRoute.hasSafePathShorterThan(transport.pixel, goal, 3 * transport.pixelDistanceCenter(goal))) && confidentToRaid(transport)
+  }
 
   override protected def routeArrivalRange(transport: FriendlyUnitInfo): Double =
-    if (destinationBase.exists(b => !b.isEnemy)) Math.max(0, transport.sightPixels - 112) / 32.0 else 10
+    if (destinationBase.exists(b => !b.isEnemy)) Math.max(0, transport.sightPixels - 112) / 32.0 else 0
 
   override protected def routeFollowing(transport: FriendlyUnitInfo): Vector[(Tile, Double)] = {
     if (!destinationBase.exists(b => !b.isEnemy)) return Vector.empty

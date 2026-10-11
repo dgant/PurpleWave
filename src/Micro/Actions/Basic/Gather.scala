@@ -29,6 +29,7 @@ object Gather extends Action {
     resourceThreatened(resource)
     && resource.base.exists(_.enemies.exists(e =>
       e.canAttackGround
+      && (Zerg.Lurker(e) || ! e.burrowed)
       && e.isNone(IsWorker, Terran.Wraith, Protoss.Arbiter, Protoss.Scout, Zerg.Mutalisk)
       && e.pixelsToGetInRange(miner, resource.pixel) < defenseRadiusPixels)))
   
@@ -84,7 +85,7 @@ object Gather extends Action {
       }
 
       // Escape dangerous melee units
-      lazy val stabbers        = unit.matchups.threatsInRange.filter(_.unitClass.melee)
+      lazy val stabbers        = unit.matchups.threatsInRange.filter(t => t.unitClass.melee && ! t.burrowed)
       lazy val stabbingLethal  = stabbers.map(e => ?(e.presumptiveTarget.contains(unit), 3, 2) * e.damageOnNextHitAgainst(unit)).sum >= unit.totalHealth
       if (unit.tile.enemyRangeGround > 0 && unit.base.isDefined && stabbingLethal) {
         val drillGoal = (unit.base.get.resources ++ unit.base.flatMap(_.townHall))

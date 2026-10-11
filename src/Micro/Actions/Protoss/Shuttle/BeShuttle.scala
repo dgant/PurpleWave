@@ -23,7 +23,11 @@ object BeShuttle extends Action {
   object Pickup   extends QuestType
 
   case class ShuttleQuest(passenger: FriendlyUnitInfo, quest: QuestType, multiplier: Double, baseCost: Double, perform: () => Unit) {
-    val finalCost: Double = baseCost * multiplier
+    private val passengerScore = ?(
+      passenger.isAny(Protoss.Reaver, Protoss.HighTemplar, Protoss.Archon) && (passenger.proximity < 0.7 || passenger.matchups.pixelsToThreatRange.exists(_ < 320)),
+      0.0001,
+      1.0)
+    val finalCost: Double = baseCost * multiplier * passengerScore
   }
 
   protected def perform(shuttle: FriendlyUnitInfo): Unit = {
@@ -62,21 +66,12 @@ object BeShuttle extends Action {
 
       def add(transform: Pixel => ShuttleQuest): Unit = { quests ++= goal.map(transform) }
 
-      // Deliver passenger
-      if (p.loaded) {
-
-        add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g), () => deliver(shuttle, g)))
-
-      // Pickup passenger
-      } else if (goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)) {
-
-        add(g => ShuttleQuest(p, Pickup, m, shuttle.pixelDistanceEdge(p), () => pickup(shuttle, p)))
-
-      // Hover over passenger
-      } else if (p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)) {
-
-        add(g => ShuttleQuest(p, Hover, m, shuttle.pixelDistanceEdge(p) + 160, () => ShuttlePark.park(shuttle, Seq(p.pixel))))
-
+      lazy val doDeliver  = p.loaded
+      lazy val doPickup   = goal.exists(g => p.framesToTravelTo(g) > 24 + ?(p.canAttack, p.unitClass.cooldownOnDrop, 0)) && p.agent.toAttack.forall(t => Math.min(p.pixelsToGetInRange(t), p.pixelsToGetInRange(t, t.projectFrames(p.unitClass.cooldownOnDrop))) > 32)
+      lazy val doHover    = p.agent.toAttack.isDefined || p.agent.perch.isDefined || p.team.exists(_.engagedUpon) || p.matchups.pixelsToThreatRange.exists(_ < 320)
+              if (doDeliver)  { add(g => ShuttleQuest(p, Deliver, m, shuttle.pixelDistanceCenter(g),      () => deliver(shuttle, g)))
+      } else  if (doPickup)   { add(g => ShuttleQuest(p, Pickup,  m, shuttle.pixelDistanceEdge(p),        () => pickup(shuttle, p)))
+      } else  if (doHover)    { add(g => ShuttleQuest(p, Hover,   m, shuttle.pixelDistanceEdge(p) + 160,  () => ShuttlePark.park(shuttle, Seq(p.pixel))))
       }
     })
 

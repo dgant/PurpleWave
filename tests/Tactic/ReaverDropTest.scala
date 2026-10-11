@@ -548,6 +548,8 @@ package Tactic.Missions {
       val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
       natural.owner = neutral; main.natural = Some(natural); natural.naturalOf = Some(main)
       With.scouting = allocate(classOf[Information.Scouting.Scouting])
+      set(With.scouting, "_tugStart", new Performance.Cache(() => Tile(0, 5)))
+      set(With.scouting, "_tugEnd", new Performance.Cache(() => Tile(110, 5)))
       set(With.scouting, "_firstEnemyMain", Some(main))
       val targets = Vector(main, natural)
       assert(MissionReaverDrop.targets(targets) == targets, "An unseen natural is a scouting stop, not an empty expansion")

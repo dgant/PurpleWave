@@ -86,7 +86,7 @@ class MissionReaverDrop extends MissionDrop {
     reavers.nonEmpty && (defenders.isEmpty || (
       defenders.forall(d => crew.exists(_.canAttack(d))) &&
       defenders.map(_.subjectiveValue).sum * (if (workers.size > 2) 1 else 2) < crew.map(_.subjectiveValue).sum &&
-      reavers.exists(_.battle.exists(b => b.judgement.exists(_.shouldFightGround) && defenders.forall(b.enemy.units.contains)))))
+      reavers.exists(_.combatForecast.exists(b => b.judgement.exists(_.shouldFightGround) && defenders.forall(b.enemy.units.contains)))))
   }
 
   override protected def rejectApproach(transport: FriendlyUnitInfo): Boolean =

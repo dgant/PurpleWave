@@ -21,6 +21,15 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val teams        : Vector[Team]  = Vector(us, enemy)
   lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
+  // Forced during clustering; squad changes take effect in the next battle cycle.
+  lazy val combatForecasts: Vector[Battle] = {
+    val groups = us.units.groupBy(_.friendly.flatMap(_.squad).filter(_.fightsIndependently)).values.toVector
+    if (groups.size <= 1) Vector(this)
+    else groups.map(units => new Battle(units, enemy.units, isGlobal = false))
+  }
+  lazy val combatForecastByUnit: Map[UnitInfo, Battle] = combatForecasts.flatMap(b =>
+    (if (combatForecasts.size == 1) b.units else b.us.units).map(_ -> b)).toMap
+
   def predictionComplete: Boolean = simulationComplete && skimulationComplete
 
   def units: Seq[UnitInfo] = us.units.view ++ enemy.units
@@ -57,10 +66,11 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   ////////////////////////
 
   var judgement: Option[BattleJudgment] = None
+  var skimulationReport: Map[UnitInfo, (Double, Double)] = Map.empty
   var simulationFrames = 0
   var simulationDeaths = 0.0
   var simulationReport                                                  = new mutable.HashMap[UnitInfo, ReportCard]
-  def simulationLog         : String                                    = simulationEvents.map(_.toString).mkString("\n")
+  var simulationLog         : String                                    = ""
   var simulationEvents      : Iterable[SimulationEvent]                 = Iterable.empty
   val simulationCheckpoints : mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]
 
@@ -93,7 +103,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   def auditSim: Vector[SimulationEvent] = simulationEvents.filter(e =>
     // Only units which are trying to fight
-    (e.simulacrum.damageDealt > 0 || e.simulacrum.damageReceived > 0 || e.simulacrum.target.exists(_.isEnemyOf(e.simulacrum.realUnit)))
+    simulationReport.get(e.simulacrum.realUnit).exists(r => r.damageDealt > 0 || r.damageReceived > 0 || r.attackingEnemy)
     // Only events which communicate action
     && (e.isInstanceOf[SimulationEventAttack]
       || e.isInstanceOf[SimulationEventDeath]

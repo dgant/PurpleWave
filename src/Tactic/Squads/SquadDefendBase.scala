@@ -90,6 +90,7 @@ class SquadDefendBase(base: Base) extends Squad {
     .getOrElse(vicinity))
 
   private var formationReturn: Formation = FormationEmpty
+  private val wallGapPositions = new WallGapPositions(base)
 
   override def run(): Unit = {
     vicinity = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
@@ -141,7 +142,14 @@ class SquadDefendBase(base: Base) extends Squad {
       else                    enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker))
 
-    if (plugEdge().isDefined) {
+    val wallPlugs = wallGapPositions(units)
+    if (wallPlugs.nonEmpty) {
+      lastAction = "Wall"
+      formations += FormationSimple(FormationStylePlug, formationBastion.placements ++ wallPlugs)
+      formations += formationBastion
+      SquadAutomation.send(this)
+      wallPlugs.foreach { case (unit, pixel) => holdWallGap(unit, pixel) }
+    } else if (plugEdge().isDefined) {
       val plugPixel = plugEdge().get._2.get.pixelCenter
       lastAction = "Plug"
       formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
@@ -175,6 +183,14 @@ class SquadDefendBase(base: Base) extends Squad {
       SquadAutomation.send(this)
       units.foreach(_.intent.setCanFlee(false))
     }
+  }
+
+  def holdWallGap(unit: FriendlyUnitInfo, pixel: Pixel): Unit = {
+    unit.intend(this)
+      .setCanFlee(false)
+      .setRedoubt(pixel)
+      .setTerminus(pixel)
+      .setStation(pixel)
   }
 
   def intendScouring(scourer: FriendlyUnitInfo, target: UnitInfo): Unit = {

@@ -16,6 +16,7 @@ import Utilities.?
 import scala.collection.mutable.ArrayBuffer
 
 abstract class Squad extends Tactic with FriendlyUnitGroup {
+  def fightsIndependently: Boolean = false
   var batchId           : Int                           = Int.MinValue
   var targets           : Option[IndexedSet[UnitInfo]]  = None
   var formations        : ArrayBuffer[Formation]        = ArrayBuffer.empty

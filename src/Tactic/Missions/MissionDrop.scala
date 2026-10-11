@@ -24,6 +24,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 abstract class MissionDrop extends Mission {
+  override def fightsIndependently: Boolean = launched
   trait DropState   extends SimpleString
   object Assembling extends DropState
   object Travelling extends DropState

@@ -25,8 +25,8 @@ object ShowBattles extends DebugView {
   }
 
   def localBattle: Option[Battle] = {
-    val battlesSelected = With.units.ours.filter(_.selected).flatMap(_.battle)
-    val battlesToShow = if (battlesSelected.isEmpty) With.battles.local else battlesSelected
+    val battlesSelected = With.units.ours.filter(_.selected).flatMap(_.combatForecast)
+    val battlesToShow = if (battlesSelected.isEmpty) With.battles.local.flatMap(_.combatForecasts) else battlesSelected
     Maff.minBy(battlesToShow)(_.focus.pixelDistanceSquared(With.viewport.center))
   }
 
@@ -96,10 +96,10 @@ object ShowBattles extends DebugView {
   }
 
   def renderSkimulationMap(battle: Battle): Unit = {
-    battle.units.foreach(u => DrawMap.labelDot(
-      format(u.skimStrengthDisplay),
+    battle.skimulationReport.foreach { case (u, (strength, presence)) => DrawMap.labelDot(
+      format(strength),
       u.pixel,
-      Colors.hsv(u.player.hue, 255, Maff.clamp(64 + (128 * u.skimPresence).toInt, 64, 192))))
+      Colors.hsv(u.player.hue, 255, Maff.clamp(64 + (128 * presence).toInt, 64, 192))) }
   }
 
   def renderBattleMap(battle: Battle): Unit = {
@@ -109,12 +109,11 @@ object ShowBattles extends DebugView {
     if ( ! battle.simulated) return
 
     val shouldFight = battle.judgement.get.shouldFight
-    battle.units.view.filter(_.simulacrum.initialized).foreach(unit => {
-      val sim = unit.simulacrum
-      val color = if (sim.player.isUs == shouldFight) sim.player.colorNeon else sim.player.colorDark
+    battle.simulationReport.foreach { case (unit, sim) =>
+      val color = if (unit.player.isUs == shouldFight) unit.player.colorNeon else unit.player.colorDark
       val distanceTotal = sim.events.view.map(e => e.from.pixelDistance(e.to)).sum
       val distanceToTraverse = distanceTotal * (With.frame % 8) / 7.0
-      var pixelAnimation = sim.realUnit.pixel
+      var pixelAnimation = unit.pixel
       var distanceTraveled = 0.0
       sim.events.foreach(event => {
         val distanceRemaining = distanceToTraverse - distanceTraveled
@@ -126,9 +125,9 @@ object ShowBattles extends DebugView {
       })
       sim.events.foreach(_.draw())
       DrawMap.circle(pixelAnimation, 3, solid = true, color = color)
-      if (sim.dead) {
-        val dark = sim.realUnit.player.colorMidnight
-        val skullColor = sim.realUnit.player.colorBright
+      if ( ! sim.alive) {
+        val dark = unit.player.colorMidnight
+        val skullColor = unit.player.colorBright
         DrawMap.box(sim.pixel.add(-3, 0), sim.pixel.add(4, 8), dark, solid = false)
         DrawMap.circle(sim.pixel, 5, skullColor,  solid = true)
         DrawMap.circle(sim.pixel, 5, dark,        solid = false)
@@ -138,7 +137,7 @@ object ShowBattles extends DebugView {
         DrawMap.line(sim.pixel.add(-1, 3), sim.pixel.add(-2, 9), dark)
         DrawMap.line(sim.pixel.add(1,  3), sim.pixel.add(2,  9), dark)
       }
-    })
+    }
   }
 }
 

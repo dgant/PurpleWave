@@ -46,6 +46,7 @@ def main():
     parser.add_argument('--runtime-bot', default='PurpleProtoss')
     parser.add_argument('--workers', type=int, default=3)
     parser.add_argument('--frames', type=int, default=96)
+    parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--filter', default='', help='Optional map-name regular expression')
     args = parser.parse_args()
     repo = Path(__file__).resolve().parents[1]
@@ -82,7 +83,7 @@ def main():
     (output / 'sources.json').write_text(json.dumps({
         'jar': str(args.jar.resolve()), 'classes': str(args.classes.resolve()),
         'frames': args.frames, 'maps': 'aiide plus sscai/Andromeda', 'filter': args.filter,
-        'signature': signature,
+        'signature': signature, 'seed': args.seed,
     }, indent=2))
     maps = sorted(p for p in (args.scbw_root / 'maps/aiide').iterdir() if p.suffix.lower() in ('.scx', '.scm'))
     maps.append(args.scbw_root / 'maps/sscai/(4)Andromeda.scx')
@@ -100,7 +101,7 @@ def main():
         index, map_path = item
         destination = saved / map_path.stem
         receipt = destination / 'result.json'
-        map_signature = hashlib.sha256((signature + hashlib.sha256(map_path.read_bytes()).hexdigest()).encode()).hexdigest()
+        map_signature = hashlib.sha256((signature + str(args.seed) + hashlib.sha256(map_path.read_bytes()).hexdigest()).encode()).hexdigest()
         if receipt.exists():
             prior = json.loads(receipt.read_text())
             prior['pass'] = game_passed(Path(prior['result']), Path(prior['snapshot']) if prior['snapshot'] else None, args.frames)
@@ -122,7 +123,7 @@ def main():
                        '--map', str(map_path.relative_to(args.scbw_root / 'maps')),
                        '--map_dir', str(args.scbw_root / 'maps'), '--bot_dir', str(bots),
                        '--game_dir', str(games), '--game_name', name, '--game_speed', '0',
-                       '--seed_override', '42', '--timeout_at_frame', str(args.frames), '--timeout', '180',
+                       '--seed_override', str(args.seed), '--timeout_at_frame', str(args.frames), '--timeout', '180',
                        '--bwapi_data_bwta_dir', str(args.scbw_root / 'bwapi-data/BWTA'),
                        '--bwapi_data_bwta2_dir', str(args.scbw_root / 'bwapi-data/BWTA2')]
             with (output / (name + '.log')).open('w') as log:

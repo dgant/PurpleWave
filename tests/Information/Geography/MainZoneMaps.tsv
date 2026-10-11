@@ -1785,9 +1785,9 @@ CHOKE	4	22	297.6172038038124
 CHOKE	6	25	280.0
 MAP	(4)KatrinaSE_2.0.scx	444b805a88f971c6b2c5f8d2a467de3c1fb2f001
 REGION	0	0	false	false	0
-REGION	1	1	false	true	1
-REGION	2	1	false	true	2
-REGION	3	1	false	true	3
+REGION	1	1	false	true	8
+REGION	2	1	false	true	7
+REGION	3	1	false	true	6
 REGION	4	1	true	true	4
 REGION	5	1	false	true	5
 REGION	6	1	true	true	6

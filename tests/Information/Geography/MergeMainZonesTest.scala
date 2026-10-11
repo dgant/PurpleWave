@@ -13,7 +13,7 @@ object MergeMainZonesTest {
       val result = MergeMainZones(regions, mains, bases, (r: Int) => heights.getOrElse(r, 1), chokes)
       assert(result == MergeMainZones(regions.reverse, mains, bases, (r: Int) => heights.getOrElse(r, 1), chokes.reverse),
         "Merging must be independent of region/choke iteration order")
-      bases.foreach(r => assert(result(r) == r, "Never merge another base"))
+      mains.foreach(r => assert(result(r) == r, "Never merge another main"))
       result
     }
 
@@ -32,7 +32,16 @@ object MergeMainZonesTest {
     assert(merge(Vector.empty)(0) == 0, "Leave isolated mains alone")
     assert(merge(Vector((0, 1, 150d), (0, 1, 150d), (1, 3, 80d)))(1) == 1,
       "Parallel narrow chokes are not one broad connection")
-    println("MergeMainZones: 14 cases passed (including reversed graph order).")
+    assert(merge(Vector((0, 1, 448d)), bases = Set(0, 1))(1) == 0, "Broad same-height backyard natural")
+    assert(merge(Vector((0, 1, 80d)), bases = Set(0, 1))(1) == 1, "Preserve a natural behind a real choke")
+    assert(merge(Vector((0, 1, 0d)), bases = Set(0, 1))(1) == 1, "Preserve a mineral-blocked expansion")
+    assert(merge(Vector((0, 1, 448d)), bases = Set(0, 1), heights = Map(1 -> 0))(1) == 1,
+      "Preserve a backyard on a different terrain level")
+    assert(merge(Vector((0, 1, 448d)), bases = Set(0, 1), mains = Set(0, 1))(1) == 1,
+      "Never absorb another starting location")
+    assert(merge(Vector((0, 1, 400d), (1, 2, 448d)), bases = Set(0, 2))(2) == 0,
+      "Backyard natural after a base-free subdivision is contracted")
+    println("MergeMainZones: 20 cases passed (including reversed graph order).")
     if (args.nonEmpty) testMaps(args(0))
   }
 

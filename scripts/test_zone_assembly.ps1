@@ -24,7 +24,13 @@ if (!$UseJarImplementation) {
         'src/Information/Geography/Calculations/MergeMainZones.scala',
         'src/Information/Geography/GeographyBuilder.scala',
         'src/Information/Geography/Types/Edge.scala',
-        'tests/Information/Geography/MergeMainZonesTest.scala'
+        'src/Information/Geography/Types/Geo.scala',
+        'src/Information/Geography/Types/Base.scala',
+        'src/Information/Geography/Types/Zone.scala',
+        'src/Information/Geography/Types/Metro.scala',
+        'src/Information/Geography/Calculations/UpdateBase.scala',
+        'tests/Information/Geography/MergeMainZonesTest.scala',
+        'tests/Information/Geography/SharedMainZoneTest.scala'
     ) | ForEach-Object { Join-Path $repo $_ }
 }
 & $Java -cp (($compiler + $BotJar + $macros) -join ';') scala.tools.nsc.Main -usejavacp -feature -language:postfixOps -d $output @sources
@@ -32,5 +38,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Zone assembly test compilation failed.' }
 if (!$UseJarImplementation) {
     & $Java -cp "$output;$BotJar" Information.Geography.MergeMainZonesTest (Join-Path $repo 'tests/Information/Geography/MainZoneMaps.tsv')
     if ($LASTEXITCODE -ne 0) { throw 'Zone assembly regression tests failed.' }
+    & $Java -cp "$output;$BotJar" Information.Geography.SharedMainZoneTest
+    if ($LASTEXITCODE -ne 0) { throw 'Shared-main-zone regression tests failed.' }
 }
 Write-Output "Diagnostic classes: $output"

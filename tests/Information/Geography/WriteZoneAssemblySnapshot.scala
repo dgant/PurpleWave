@@ -18,6 +18,7 @@ object WriteMapCSV {
     val out = new PrintWriter(new File(With.bwapiData.write + "zone-assembly.tsv"))
     def row(values: Any*): Unit = out.println(values.mkString("\t"))
     row("MAP", With.mapFileName, With.game.mapHash, With.mapTileWidth, With.mapTileHeight)
+    row("START", With.self.startTile.x, With.self.startTile.y)
     regions.zipWithIndex.foreach { case (r, i) =>
       row("REGION", i, r.getCenter.getX, r.getCenter.getY)
     }
@@ -37,9 +38,13 @@ object WriteMapCSV {
     require(geo.zones.map(_.tiles.size).sum == geo.allTiles.size, "Zone partition mismatch")
     geo.bases.foreach { b =>
       row("BASE", b.townHallTile.x, b.townHallTile.y, geo.zones.indexOf(b.zone), b.isMain,
-        b.natural.map(_.townHallTile.x).getOrElse(-1), b.natural.map(_.townHallTile.y).getOrElse(-1), b.tiles.size)
+        b.natural.map(_.townHallTile.x).getOrElse(-1), b.natural.map(_.townHallTile.y).getOrElse(-1), b.tiles.size, b.isBackyard)
       require(b.tiles.forall(_.zone == b.zone), "Base tile lookup mismatch")
       require(b.zone.bases.contains(b), "Missing zone base")
+      b.naturalOf.filter(_.zone == b.zone).foreach(main => {
+        require(b.isBackyard, "Shared-zone natural must be a backyard")
+        require( ! main.isBackyard && ! b.zone.isBackyard, "Do not classify the main or shared zone as a backyard")
+      })
     }
     geo.edges.foreach { e =>
       row("EDGE", geo.zones.indexOf(e.zones.head), geo.zones.indexOf(e.zones.last),

@@ -22,7 +22,9 @@ trait Geo {
   lazy val isCross          : Boolean           = ! With.geography.mains.sortBy(With.geography.ourMain.groundPixels).exists(bases.contains)
   lazy val island           : Boolean           = With.geography.mains.map(_.heart).count(With.paths.groundPathExists(_, centroid)) < 2
   lazy val isInterior       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z))))
-  lazy val isBackyard       : Boolean           = zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin))
+  lazy val isBackyard       : Boolean           = (
+    ( ! isMain && bases.exists(b => b.naturalOf.exists(_.zone == b.zone)))
+      || zones.forall(z => z.metro.exists(m => ! m.exits.exists(_.zones.contains(z)) && z.rushDistanceMin > m.rushDistanceMin)))
   lazy val isPocket         : Boolean           = isInterior && ! isMain && ! island
   lazy val maxAltitude      : Int               = Maff.max(tiles.view.map(_.altitude)).getOrElse(0)
   lazy val radians          : Double            = Points.middle.radiansTo(heart.center)

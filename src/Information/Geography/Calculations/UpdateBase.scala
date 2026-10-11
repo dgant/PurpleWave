@@ -68,7 +68,8 @@ object UpdateBase {
           With.logger.debug(f"Assuming ${base.owner} owns $base as implicit starting location")
         }
 
-        if (framesSinceScouting > hiddenNaturalDelay && enemyCanAffordBase) {
+        // Buildings in a shared main zone do not establish ownership of its natural.
+        if (framesSinceScouting > hiddenNaturalDelay && enemyCanAffordBase && base.naturalOf.forall(_.zone != base.zone)) {
           val building = base.zone.units.find(u => u.isEnemy && ! u.flying && u.unitClass.isBuilding)
           if (building.isDefined && With.frame > base.lastFrameScoutedByUs + hiddenNaturalDelay) {
             base.owner = building.get.player

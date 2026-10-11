@@ -21,7 +21,7 @@ private[Geography] object MergeMainZones {
     var changed = true
     while (changed) {
       // Decide a whole round before assigning owners, so region iteration order cannot matter.
-      val additions = regions.filter(r => owner(r) == r && ! bases(r) && ! mains(r)).flatMap(r => {
+      val additions = regions.filter(r => owner(r) == r && ! mains(r)).flatMap(r => {
         val links = adjacent(r).map { case (other, width) => (owner(other), width) }
         val neighboringMains = links.map(_._1).filter(mains).distinct
         if (neighboringMains.size != 1) None else {
@@ -30,8 +30,11 @@ private[Geography] object MergeMainZones {
           // An enclosed back pocket belongs to the main even behind a mineral-blocked choke.
           // A passage must have a broad join, and cannot be a junction into the rest of the map.
           val enclosed = outside.isEmpty
-          val passage = outside.map(_._1).distinct.size == 1 && inside.exists(_._2 >= broadConnectionPixels)
-          if (altitude(r) == altitude(main) && (enclosed || passage)) Some(r -> main) else None
+          val broadJoin = inside.exists(_._2 >= broadConnectionPixels)
+          val passage = outside.map(_._1).distinct.size == 1 && broadJoin
+          // An expansion can share the main's zone only in an enclosed, broadly connected backyard.
+          val absorb = if (bases(r)) enclosed && broadJoin else enclosed || passage
+          if (altitude(r) == altitude(main) && absorb) Some(r -> main) else None
         }
       })
       additions.foreach { case (region, main) => owner(region) = main }

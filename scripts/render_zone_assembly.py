@@ -1,6 +1,6 @@
 """Validate real-game zone snapshots and render every extended main before/after."""
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 import html
 import json
@@ -68,13 +68,21 @@ def validate(before, after):
     assert all(len(zones) == 1 for zones in contraction.values()), f'{name}: split original zone'
     for xy, (_, main, _) in before.bases.items():
         assert after.bases[xy][1] == main, f'{name}: main identity changed'
+        assert after.bases[xy][2] == before.bases[xy][2], f'{name}: natural association changed'
     expected_edges = {}
+    expected_owners = Counter()
     for choke in after.rows['CHOKE']:
         a, b = (after.owner[int(r)] for r in choke[:2])
         if a != b:
-            expected_edges[tuple(map(int, choke[3:]))] = (a, b)
+            expected_owners[a, b] += 1
+            # Edge expands point-like mineral-blocked chokes to terrain cross-sections.
+            # Their owner pairs/counts must match; real chokes also retain exact geometry.
+            if float(choke[2]) > 0:
+                expected_edges[tuple(map(int, choke[3:]))] = (a, b)
     actual_edges = {tuple(map(int, e[2:])): tuple(map(int, e[:2])) for e in after.rows['EDGE']}
-    assert expected_edges == actual_edges, f'{name}: external edge ownership mismatch'
+    actual_owners = Counter(tuple(map(int, e[:2])) for e in after.rows['EDGE'])
+    assert expected_owners == actual_owners, f'{name}: external edge ownership mismatch'
+    assert all(actual_edges.get(geometry) == owners for geometry, owners in expected_edges.items()), f'{name}: external choke geometry changed'
     changes = []
     for xy, (old_zone, is_main, _) in sorted(before.bases.items()):
         if not is_main:
@@ -86,9 +94,10 @@ def validate(before, after):
         added = new_tiles - old_tiles
         if added:
             added_regions = sorted({before.tiles[t][0] for t in added})
-            assert not any(t in added for t in before.bases), f'{name}: absorbed another base'
+            absorbed_bases = [t for t in before.bases if t in added]
+            assert all(t == before.bases[xy][2] for t in absorbed_bases), f'{name}: absorbed a base other than the natural'
             changes.append({'main': xy, 'before_tiles': len(old_tiles), 'after_tiles': len(new_tiles),
-                            'added_tiles': len(added), 'added_regions': added_regions})
+                            'added_tiles': len(added), 'added_regions': added_regions, 'absorbed_bases': absorbed_bases})
     main_zones = {zone for zone, is_main, _ in after.bases.values() if is_main}
     merged = defaultdict(list)
     for old_zone, new_zones in contraction.items():
@@ -215,7 +224,8 @@ def main():
                 '<h1>Main zone assembly &mdash; before / after</h1><p>' + summary + '</p>'
                 '<p>Rule: absorb base-free areas at the main terrain level when they are enclosed pockets, '
                 'or unbranched passages joined by a seam at least eight build tiles wide. '
-                'Keep other bases, narrow chokes, junctions, and shared approaches separate. '
+                'An expansion may also join when it is enclosed and its join is at least eight tiles wide. '
+                'Keep narrow expansion chokes, shared approaches, junctions and terrain-level boundaries separate. '
                 'Whole BWEM tile sets are united; internal chokes disappear and external chokes retain their geometry.</p>'
                 '<p>Purple is the main zone. Teal and amber identify absorbed BWEM areas in the before view. '
                 'The after view colors their complete tile sets purple and removes internal edges. Dark cells show unwalkable terrain.</p>'

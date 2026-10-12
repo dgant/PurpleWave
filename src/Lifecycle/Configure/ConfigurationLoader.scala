@@ -77,6 +77,7 @@ object ConfigurationLoader {
       With.configuration.frameLimitMs = frameMsLimit
       With.configuration.simviz = simviz
       With.configuration.auditFormationPaths = getOrDefault(config, "auditFormationPaths", false)
+      With.configuration.logCombatForecasts = getOrDefault(config, "logCombatForecasts", false)
 
       if (tournament    && ladder)      With.logger.warn("Both tournament and ladder modes are enabled")
       if (tournament    && livestream)  With.logger.warn("Both tournament and livestream modes are enabled")

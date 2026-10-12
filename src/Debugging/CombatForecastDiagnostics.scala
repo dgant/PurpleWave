@@ -5,7 +5,7 @@ import Lifecycle.With
 import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 import Tactic.Missions.MissionDrop
 
-// Gameplay-validation instrumentation; intentionally absent from the master-based PR.
+// Opt-in gameplay diagnostics; per-unit logging is too expensive for normal tournament games.
 object CombatForecastDiagnostics {
   private var lastCycle = -1000
   private val lastUnit = scala.collection.mutable.Map.empty[Int, Int]
@@ -13,6 +13,7 @@ object CombatForecastDiagnostics {
   private def parentId(b: Battle): Int = System.identityHashCode(b)
   private def group(u: UnitInfo): String = u.friendly.flatMap(_.squad).filter(_.fightsIndependently).map(_.toString).getOrElse("Army")
   def cycle(): Unit = {
+    if ( ! With.configuration.logCombatForecasts) return
     if (With.frame - lastCycle < 24) return
     val mixed = With.battles.local.filter(_.combatForecasts.size > 1)
     if (mixed.isEmpty) return
@@ -30,6 +31,7 @@ object CombatForecastDiagnostics {
     }
   }
   def decision(u: FriendlyUnitInfo): Unit = synchronized {
+    if ( ! With.configuration.logCombatForecasts) return
     if (With.frame - lastUnit.getOrElse(u.id, -1000) < 24) return
     u.battle.filter(_.combatForecasts.size > 1).foreach { parent =>
       lastUnit(u.id) = With.frame

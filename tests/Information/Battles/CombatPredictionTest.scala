@@ -1196,6 +1196,65 @@ object CombatPredictionTest extends App {
     assert(reference.get == null, "The unit's unused matchup cache retained the retired battle")
     assert(worker.matchups.groupOf eq With.battles.byUnit(worker).us)
   }
+  check("inactive unit groups do not retain retired battles or opposing teams") {
+    val worker = positioned(Protoss.Probe, 64)
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    val group = Tactic.Squads.GenericUnitGroup(Vector(worker))
+    val previousTracker = With.units
+    With.units = allocate(classOf[ProxyBwapi.UnitTracking.UnitTracker])
+    set(With.units, "_enemyGroup", new Cache(() => Tactic.Squads.GenericUnitGroup(Vector.empty)))
+    try {
+      def retireBattle(): java.lang.ref.WeakReference[Battle] = {
+        val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+        With.battles.byUnit = Map(worker -> retired, foe -> retired)
+        assert(group.battles == Set(retired))
+        assert(group.consensusPrimaryFoes eq retired.enemy)
+        val reference = new java.lang.ref.WeakReference(retired)
+        val current = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+        With.battles.byUnit = Map(worker -> current, foe -> current)
+        reference
+      }
+      val reference = retireBattle()
+      var attempts = 0
+      while (reference.get != null && attempts < 10) {
+        System.gc()
+        Thread.sleep(10)
+        attempts += 1
+      }
+      assert(reference.get == null, "An idle unit group's battle caches retained the retired forecast")
+      assert(group.battles == Set(With.battles.byUnit(worker)))
+      assert(group.consensusPrimaryFoes eq With.battles.byUnit(worker).enemy)
+    } finally { With.units = previousTracker }
+  }
+  check("weak caches reuse live values, refresh, invalidate, and recompute collected values") {
+    val originalFrame = With.frame
+    var evaluations = 0
+    val cache = new Performance.WeakCache(() => { evaluations += 1; new Object }, refreshPeriod = 10)
+    try {
+      def useCache(): java.lang.ref.WeakReference[Object] = {
+        val value = cache()
+        assert(cache() eq value)
+        assert(evaluations == 1)
+        With.frame += 10
+        val refreshed = cache()
+        assert(refreshed ne value)
+        assert(evaluations == 2)
+        cache.invalidate()
+        assert(cache() ne refreshed)
+        assert(evaluations == 3)
+        new java.lang.ref.WeakReference(cache())
+      }
+      val reference = useCache()
+      var attempts = 0
+      while (reference.get != null && attempts < 10) {
+        System.gc()
+        Thread.sleep(10)
+        attempts += 1
+      }
+      assert(reference.get == null)
+      assert(cache() != null && evaluations == 4)
+    } finally { With.frame = originalFrame }
+  }
   check("matchup groups follow a replaced physical battle in the same frame") {
     val worker = positioned(Protoss.Probe, 64)
     set(worker, "_tile", worker.pixel.tile)

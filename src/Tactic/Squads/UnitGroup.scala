@@ -6,7 +6,7 @@ import Lifecycle.With
 import Macro.Facts.MacroFacts
 import Mathematics.Maff
 import Mathematics.Points.Pixel
-import Performance.Cache
+import Performance.{Cache, WeakCache}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
@@ -97,7 +97,7 @@ trait UnitGroup {
   private val _arbiters                   = new Cache(() => groupOrderable.filter(u => u.aliveAndComplete && Protoss.Arbiter(u)).toVector)
   private val _repairables                = new Cache(() => groupOrderable.filter(_.unitClass.repairThreshold > 0))
   private val _repairableVIPs             = new Cache(() => repairables.filter(_.isAny(Terran.Battlecruiser, IsTank, Terran.Valkyrie)))
-  private val _battles                    = new Cache(() => groupUnits.flatMap(_.battle).toSet)
+  private val _battles                    = new WeakCache(() => groupUnits.flatMap(_.battle).toSet)
   private val _battleEnemies              = new Cache(() => battles.flatMap(_.enemy.units))
   private val _roadblocks                 = new Cache(() => battleEnemies.filter(e => Math.max(keyDistanceTo(e.pixel), e.pixelDistanceTravelling(destinationFinal)) < destinationFinalDistance))
   private val _warriorsCastersCount       = new Cache(() => warriorsCasters.size)
@@ -149,7 +149,7 @@ trait UnitGroup {
   private val _combatValueGround          = new Cache(() => warriorsCasters.filterNot(_.flying).map(_.subjectiveValue).sum)
   private val _combatGroundFraction       = new Cache(() => Maff.nanToZero(_combatValueGround() / (_combatValueGround() + _combatValueAir())))
   private val _airToAirStrength           = new Cache(() => attackers.filterNot(Protoss.Interceptor).filterNot(Zerg.Guardian).map(u => u.friendly.filter(Protoss.Carrier).map(_.interceptorCount).getOrElse(u.unitClass.supplyRequired400)).sum)
-  private val _consensusPrimaryFoes       = new Cache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.warriorsCastersCount * 4 >= With.units.groupVs(u).warriorsCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
+  private val _consensusPrimaryFoes       = new WeakCache(() => Maff.modeOpt(groupUnits.map(u => u.team.map(_.opponent).filter(_.warriorsCastersCount * 4 >= With.units.groupVs(u).warriorsCastersCount).getOrElse(With.units.groupVs(u)))).getOrElse(?(isInstanceOf[TFriendlyUnitGroup], With.units.enemyGroup, With.units.ourGroup)))
 
   protected def isAttacker(unit: UnitInfo): Boolean = unit.unitClass.canAttack && ! unit.unitClass.isWorker
   protected def centroidUnits(units: Iterable[UnitInfo]): Iterable[UnitInfo] = Maff.orElse(

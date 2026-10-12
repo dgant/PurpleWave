@@ -75,6 +75,8 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
   var stepTiles           : Int                   = 0
   var minAltitude         : Int                   = -1
 
+  private val guardGeometry: Option[GuardGeometry] = if (style == FormationStyleGuard) edge.map(e => new GuardGeometry(e.pixelCenter, e.pixelTowards(zone), e.radiusPixels, With.units.ours)) else None
+
   val slots       : Map[UnitClass, Seq[Pixel]]    = slotsByClass()
   val unassigned  : UnassignedFormation           = UnassignedFormation(style, slots, group)
   val placements  : Map[FriendlyUnitInfo, Pixel]  = unassigned.outwardFromCentroid
@@ -137,10 +139,10 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
 
   private def parameterize(): Unit = {
     if (style == FormationStyleGuard) {
-      val guardDepth  = 32 * expectRangeTiles
-      val guardRadius = guardDepth + edge.map(_.radiusPixels).getOrElse(32d)
-      apex = edge.map(e => e.pixelCenter.project(e.endPixels.minBy(p => p.groundPixels(zone.centroid) + 0.01 * p.pixelDistance(zone.centroid.center)), guardDepth)).getOrElse(apex)
-      face = apex.project(face, guardRadius) // Extend the face outwards to broaden our arc
+      guardGeometry.foreach(geometry => {
+        apex = geometry.apex(32 * expectRangeTiles)
+        face = geometry.face
+      })
     } else if (goalPath.pathExists) {
       // Engage:    Walk far enough to be in range
       // March:     Walk far enough to advance our army
@@ -201,7 +203,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       // We have failed to produce an acceptable guard formatio , likely because the choke has been breached.
       // Let's back up one choke and try again
       val alternateFaces = goalPathTiles.takeWhile(_.zone != face.zone).lastOption
-      alternateFaces.map(_.center).foreach(alternateFace => {
+      alternateFaces.map(_.center).filter(p => guardGeometry.forall(_.facesOutward(p))).foreach(alternateFace => {
         val alternateClassSlotsArc    = arcSlots(alternateFace, classCount, 32 + apex.pixelDistance(alternateFace))
         val alternateArcSlotsProduced = alternateClassSlotsArc.view.map(_._2.length).sum
         if (alternateArcSlotsProduced > arcSlotsProduced) {
@@ -212,7 +214,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       })
     }
     val groundExemplar      = Maff.exemplarOpt(classSlotsArc.values.view.flatten).getOrElse(apex)
-    val classSlotsAir       = airUnits.groupBy(_.unitClass.baseClass).map(u => (u._1, u._2.map(x => groundExemplar)))
+    val classSlotsAir       = airUnits.groupBy(_.unitClass.baseClass).map(u => (u._1, u._2.map(x => groundExemplar).filter(p => guardGeometry.forall(_.covered(p)))))
     val output              = classSlotsOverlook ++ classSlotsArc ++ classSlotsAir
     output
   }
@@ -296,7 +298,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
                 val p = toFace.radiateRadians(angleCenter + angleDelta, radius)
                 if (rowSlot == 0) { arcZone = p.zone }
                 if (p.walkable) {
-                  p.altitude < minAltitude || p.tile.enemyRangeGround > maxThreat || ! With.grids.formationSlots.tryPlace(unitClass, p)
+                  p.altitude < minAltitude || p.tile.enemyRangeGround > maxThreat || guardGeometry.exists(g => ! g.covered(p)) || ! With.grids.formationSlots.tryPlace(unitClass, p)
                 } else if ( ! p.walkableTerrain && p.zone != arcZone) {
                   haltNegative ||= s < 0
                   haltPositive ||= s > 0

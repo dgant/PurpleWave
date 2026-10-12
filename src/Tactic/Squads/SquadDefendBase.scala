@@ -121,7 +121,7 @@ class SquadDefendBase(base: Base) extends Squad {
 
     lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
     lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
-    lazy val formationGuard     = plugWall().map(_.center).orElse(guardChoke.map(_.pixelCenter)).map(pixel => new FormationStandard(this, FormationStyleGuard, pixel, Some(guardZone))).getOrElse(formationBastion)
+    lazy val formationGuard     = guardChoke.map(_.pixelCenter).orElse(plugWall().map(_.center)).map(pixel => new FormationStandard(this, FormationStyleGuard, pixel, Some(guardZone))).getOrElse(formationBastion)
     lazy val formationBastion   = {
       val enemyTopSpeed         = Maff.max(enemies.view.filter(u => u.canAttack && ! IsWorker(u)).map(_.topSpeed)).getOrElse(2 * Terran.Vulture.topSpeed)
       val formationBastion      = Formations.march(this, bastion())
@@ -179,6 +179,7 @@ class SquadDefendBase(base: Base) extends Squad {
       }
       formations += formationGuard
       SquadAutomation.send(this)
+      guardWithoutTargets()
       if (blockZerglings) {
         units.foreach(_.intent.setCanFlee(false))
       }
@@ -222,7 +223,7 @@ class SquadDefendBase(base: Base) extends Squad {
     val antiGround  = new UnorderedBuffer[FriendlyUnitInfo](units.view.filter(_.canAttackGround))
     Seq(3, 6, 9).foreach(multiplier => {
       targets.get.foreach(target => {
-        val antiTarget = ?(target.flying, antiAir, antiGround)
+        val antiTarget = ?(target.flying, antiAir, antiGround).view.filter(_.canAttack(target))
         assigned.clear()
         var valueAssigned: Double = 0
         while (antiTarget.nonEmpty && valueAssigned < multiplier * target.subjectiveValue) {
@@ -238,7 +239,32 @@ class SquadDefendBase(base: Base) extends Squad {
         assigned.foreach(intendScouring(_, target))
       })
     })
-    (antiAir.view ++ antiGround).distinct.foreach(intendScouring(_, targets.get.head))
+    (antiAir.view ++ antiGround).distinct.foreach(unit =>
+      targets.get.find(unit.canAttack).foreach(intendScouring(unit, _)))
+    guardWithoutTargets()
+  }
+
+  private[Squads] def guardWithoutTargets(): Unit = {
+    val excluded = units.filter(unit => targets.flatMap(_.headOption).exists(t => ! unit.canAttack(t))).toSet
+    if (excluded.isEmpty) return
+    // The engage formation pursues the first target and supersedes intent destinations.
+    // Units unable to hit it must pursue their own compatible target or keep guarding.
+    formations.indices.dropRight(1).foreach(i => {
+      val formation = formations(i)
+      formations(i) = new Formation {
+        override def style: FormationStyle = formation.style
+        override def flanking: Boolean = formation.flanking
+        override val placements: Map[FriendlyUnitInfo, Pixel] = formation.placements.filterNot(p => excluded(p._1))
+      }
+    })
+    excluded.filterNot(unit => targets.get.exists(unit.canAttack)).foreach(unit => {
+      val where = formationDisengage.flatMap(_(unit)).getOrElse(SquadAutomation.getReturn(unit, this))
+      unit.intend(this)
+        .setTargets(Vector.empty)
+        .setTerminus(where)
+        .setRedoubt(where)
+        .setStation(where)
+    })
   }
 
   private def isBreaching(enemy: UnitInfo): Boolean = (

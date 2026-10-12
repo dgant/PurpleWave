@@ -211,7 +211,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       if (hitPoints <= 0) {
         alive = false
         simulation.grid.remove(this)
-        if (simulation.battle.logSimulation) addEvent(SimulationEventDeath(this))
+        addEvent(SimulationEventDeath(this))
       } else {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)
         cooldownMoving    = Math.max(0, cooldownMoving    - 1)
@@ -230,14 +230,14 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {
-    if (simulation.battle.logSimulation) addEvent(SimulationEventBehavior(this, behavior, newBehavior))
+    addEvent(SimulationEventBehavior(this, behavior, newBehavior))
     behavior = newBehavior
     act()
   }
 
   @inline def setTarget(targetNew: Option[Simulacrum]): Unit = {
     if (target != targetNew) {
-      if (simulation.battle.logSimulation) addEvent(SimulationEventSwitchTarget(this, target, targetNew))
+      addEvent(SimulationEventSwitchTarget(this, target, targetNew))
     }
     target = targetNew
   }
@@ -253,7 +253,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       moveGoalDistanceSquared = goalDistance * goalDistance
       cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(destination) - goalDistance) / topSpeed).toInt)
     }
-    if (simulation.battle.logSimulation) addEvent(SimulationEventMove(this, destination, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
+    addEvent(SimulationEventMove(this, destination, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
 
   @inline def recalculateInjury(): Unit = {
@@ -261,7 +261,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def sleep(frames: Int, reason: => Option[String] = None): Unit = {
-    if (simulation.battle.logSimulation) addEvent(SimulationEventSleep(this, frames, reason))
+    addEvent(SimulationEventSleep(this, frames, reason))
     cooldownLeft = Math.max(cooldownLeft, frames)
     cooldownMoving = Math.max(cooldownMoving, frames)
   }
@@ -288,7 +288,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       valueDealt += credit * valueKill
       victim.valueReceived += valueKill
     }
-    if (simulation.battle.logSimulation) addEvent(SimulationEventAttack(
+    addEvent(SimulationEventAttack(
       this,
       victim,
       damageTotal,
@@ -307,9 +307,11 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     total
   }
 
-  @inline private def addEvent(event: SimulationEvent): Unit = {
-    if (recordedEvents == null) recordedEvents = ArrayBuffer.empty
-    recordedEvents += event
+  @inline private def addEvent(event: => SimulationEvent): Unit = {
+    if (simulation.battle.logSimulation) {
+      if (recordedEvents == null) recordedEvents = ArrayBuffer.empty
+      recordedEvents += event
+    }
   }
 
   def describe: String = f"${?(isFriendly, "F", "E")} ${unitClass.toString} #${realUnit.id}"

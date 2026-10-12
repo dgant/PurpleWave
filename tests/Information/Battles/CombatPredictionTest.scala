@@ -24,7 +24,7 @@ import ProxyBwapi.Upgrades.{Upgrade, UpgradeTypes}
 import bwapi.{BulletType, WeaponType}
 import ProxyBwapi.Races.{Protoss, Terran, Zerg}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
-import ProxyBwapi.UnitInfo.{DamageDealt, DamageVolley, FriendlyUnitInfo}
+import ProxyBwapi.UnitInfo.{DamageDealt, DamageVolley, FriendlyUnitInfo, UnitInfo}
 import Utilities.Property
 
 import scala.collection.mutable.{ArrayBuffer, HashMap}
@@ -1181,6 +1181,133 @@ object CombatPredictionTest extends App {
     sim.grid.relocateUnit(overlord.simulacrum, Pixel(100, 256))
     sim.interactions.observeProximity()
     assert(sim.interactions.components == Vector(Vector(corsair, observer, ling, overlord)))
+  }
+  // Original sim2026 traversal/range rule, with set merging independent of production union-find.
+  class OriginalProximity(sim: Simulation) {
+    private var groups = sim.realUnits.map(u => Set[UnitInfo](u)).toVector
+    private val cutoff = Math.max(0, With.configuration.simulationProximityFrames)
+    def components: Set[Set[UnitInfo]] = groups.toSet
+    def damage(a: UnitInfo, b: UnitInfo): Unit = {
+      if (groups.exists(_.contains(a)) && groups.exists(_.contains(b))) {
+        val (joined, rest) = groups.partition(g => g.contains(a) || g.contains(b))
+        groups = rest :+ joined.flatten.toSet
+      }
+    }
+    def observe(): Unit = {
+      if (sim.battle.simulationFrames > cutoff) return
+      sim.realUnits.foreach { real =>
+        val unit = real.simulacrum
+        if (unit.alive) {
+          val rangeTiles = Math.ceil((unit.effectiveRangePixels + 64.0 + 128.0) / 32.0).toInt
+          val tile = unit.pixel.tile.clip
+          sim.grid.populatedTiles.foreach { gridTile =>
+            if (Math.abs(gridTile.tile.x - tile.x) <= rangeTiles && Math.abs(gridTile.tile.y - tile.y) <= rangeTiles) {
+              val tileUnits = gridTile.units
+              var i = 0
+              while (i < tileUnits.length) {
+                val other = tileUnits(i)
+                if (other != unit && other.alive && unit.isEnemyOf(other.realUnit)
+                  && (unit.pixelDistanceEdge(other) <= unit.effectiveRangePixels + 64.0
+                    || other.pixelDistanceEdge(unit) <= other.effectiveRangePixels + 64.0)) {
+                  damage(unit.realUnit, other.realUnit)
+                }
+                i += 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  check("optimized proximity matches original components during movement, deaths, damage and reset") {
+    val kinds = Vector(Protoss.Zealot, Terran.Marine, Protoss.Corsair, Zerg.Overlord,
+      Protoss.Observer, Terran.SiegeTankSieged, Protoss.PhotonCannon, Zerg.Hatchery)
+    for (seed <- 0 until 20) {
+      val random = new scala.util.Random(seed)
+      val members = (0 until 12).map { i =>
+        val u = positioned(kinds((seed + i) % kinds.size), 64, enemy = i % 2 == 1)
+        set(u, "hashCode", i + 1)
+        val corner = i / 3
+        set(u, "_pixel", Pixel(if (corner % 2 == 0) 64 else 960, if (corner < 2) 64 else 960))
+        u
+      }
+      val (enemies, ours) = members.partition(_.isEnemy)
+      val sim = componentSimulation(ours, enemies)
+      sim.interactions.reset(sim.realUnits)
+      val reference = new OriginalProximity(sim)
+      for (frame <- 0 to 128 by 8) {
+        sim.battle.simulationFrames = frame
+        members.foreach { u =>
+          val s = u.simulacrum
+          if (s.alive && frame > 0) {
+            val x = Math.max(0, Math.min(1023, s.pixel.x + random.nextInt(129) - 64))
+            val y = Math.max(0, Math.min(1023, s.pixel.y + random.nextInt(129) - 64))
+            sim.grid.relocateUnit(s, Pixel(x, y))
+          }
+        }
+        if (frame == 40) {
+          val victim = members(seed % members.size).simulacrum
+          victim.alive = false
+          sim.grid.remove(victim)
+        }
+        if (frame == 64) {
+          members.filter(_.simulacrum.alive).take(2).foreach(u => sim.grid.relocateUnit(u.simulacrum, Pixel(512, 512)))
+        }
+        if (frame == 88 || frame == 128) {
+          val a = members(seed % members.size)
+          val b = members((seed + 5) % members.size)
+          sim.interactions.observeDamage(a, b)
+          reference.damage(a, b)
+        }
+        sim.interactions.observeProximity()
+        reference.observe()
+        assert(sim.interactions.components.map(_.toSet).toSet == reference.components, s"seed=$seed frame=$frame")
+      }
+      // Reset must restore all singleton roots even after earlier proximity/damage unions.
+      sim.interactions.reset(sim.realUnits)
+      val resetReference = new OriginalProximity(sim)
+      sim.battle.simulationFrames = 0
+      sim.interactions.observeProximity()
+      resetReference.observe()
+      assert(sim.interactions.components.map(_.toSet).toSet == resetReference.components)
+    }
+  }
+  check("cached proximity distance preserves mixed-range and footprint boundaries") {
+    val kinds = Vector(Protoss.Zealot, Protoss.Dragoon, Terran.SiegeTankSieged, Protoss.Corsair,
+      Protoss.Observer, Zerg.Overlord, Protoss.PhotonCannon, Zerg.Hatchery)
+    for (kindA <- kinds; kindB <- kinds) {
+      val a = positioned(kindA, 96)
+      val b = positioned(kindB, 800, enemy = true)
+      val sim = componentSimulation(Vector(a), Vector(b))
+      val sa = a.simulacrum
+      val sb = b.simulacrum
+      if (kindA == Protoss.Dragoon) sa.pixelRangeGroundCached = 192 // Upgraded range.
+      sim.grid.relocateUnit(sa, Pixel(96, 96))
+      val range = Math.max(sa.effectiveRangePixels, sb.effectiveRangePixels).toInt + 64
+      for (delta <- -1 to 1; vertical <- Vector(false, true)) {
+        val to = if (vertical) Pixel(96, sa.pixelBottomExclusive + kindB.dimensionUp + range + delta)
+          else Pixel(sa.pixelRightExclusive + kindB.dimensionLeft + range + delta, 96)
+        sim.grid.relocateUnit(sb, to)
+        near(sa.pixelDistanceEdgeSimulation(sb), sa.pixelDistanceEdge(sb))
+        near(sa.pixelDistanceEdgeSimulation(sb), sb.pixelDistanceEdge(sa))
+        sim.interactions.reset(sim.realUnits)
+        val reference = new OriginalProximity(sim)
+        sim.interactions.observeProximity()
+        reference.observe()
+        assert(sim.interactions.components.map(_.toSet).toSet == reference.components)
+        assert((sim.interactions.components.size == 1) == (delta <= 0))
+      }
+      // Diagonal separation, overlap and map-edge footprints exercise the other box-distance branches.
+      for (to <- Vector(Pixel(0, 0), Pixel(96, 96), Pixel(31, 700), Pixel(700, 31), Pixel(1023, 1023))) {
+        sim.grid.relocateUnit(sb, to)
+        near(sa.pixelDistanceEdgeSimulation(sb), sa.pixelDistanceEdge(sb))
+        sim.interactions.reset(sim.realUnits)
+        val reference = new OriginalProximity(sim)
+        sim.interactions.observeProximity()
+        reference.observe()
+        assert(sim.interactions.components.map(_.toSet).toSet == reference.components)
+      }
+    }
   }
   check("proximity cutoff is configurable and inclusive, while late damage still joins components") {
     val previous = With.configuration.simulationProximityFrames

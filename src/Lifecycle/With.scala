@@ -165,7 +165,7 @@ object With {
 
     // Live debugging: prepare combat visualizer IO and launch
     try {
-      if (configuration != null && configuration.simviz) {
+      if (configuration != null && configuration.debugging && configuration.simviz) {
         Debugging.CombatVisIO.ensureDirs()
         Debugging.CombatVisIO.exportMapData()
         Debugging.CombatVisIO.prepareEmptySimFile()

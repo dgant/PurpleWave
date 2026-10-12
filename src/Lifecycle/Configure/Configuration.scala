@@ -25,6 +25,7 @@ class Configuration {
   var debugging         = false
   var simviz            = false
   var auditFormationPaths = false
+  var logCombatForecasts = false
   var detectBreakpoints = false
   var camera            = false
 

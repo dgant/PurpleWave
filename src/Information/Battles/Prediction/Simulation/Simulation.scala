@@ -23,7 +23,7 @@ final class Simulation(val collisionEnabled: Boolean = true) {
   var engaged         : Boolean               = false
   var shouldReset     : Boolean               = true
   // Frames log for visualizer (only when SimViz is enabled)
-  private val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
+  private lazy val framesLog: ArrayBuffer[String]  = new ArrayBuffer(4096)
   private var simulationStartGameFrame: Int = 0
   private case class PendingDamage(frame: Int, target: Simulacrum, volley: DamageVolley,
     sourceIsFriendly: Boolean, source: UnitInfo, origin: Pixel)
@@ -180,13 +180,6 @@ final class Simulation(val collisionEnabled: Boolean = true) {
       battle.simulationReport ++= simulacra.map(simulacrum => (simulacrum.realUnit, new ReportCard(simulacrum, battle)))
       battle.simulationEvents = simulacra.flatMap(_.events).sortBy(_.frame).toVector
       battle.simulationLog = battle.simulationEvents.map(_.toString).mkString("\n")
-      // Diagnostics
-      try {
-        val rFramesLimit = battle.simulationFrames >= With.configuration.simulationFrames
-        val rNoOurs      = ! simulacraOurs.exists(_.alive)
-        val rNoEnemy     = ! simulacraEnemy.exists(_.alive)
-        val rNoFighting  = ! simulacra.exists(s => s.alive && s.behavior.fighting)
-      } catch { case _: Throwable => }
       // Write simulation frames for visualizer (async to avoid blocking main thread)
       try { CombatVisIO.writeSimulationLogAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
       // Disabled because we don't want -- and never wanted -- separate files for each simulation.

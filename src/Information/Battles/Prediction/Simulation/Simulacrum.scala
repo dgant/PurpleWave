@@ -90,7 +90,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var valueDealt              : Double  = _
   var damageReceived          : Double  = _
   var valueReceived           : Double  = _
-  var events                  : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
+  private var recordedEvents  : ArrayBuffer[SimulationEvent] = _
+  def events: Seq[SimulationEvent] = if (recordedEvents == null) Vector.empty else recordedEvents
+  private[Simulation] def clearEvents(): Unit = if (recordedEvents != null) recordedEvents.clear()
 
   def reset(newSimulation: Simulation): Unit = {
     initialized             = true
@@ -160,7 +162,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     valueDealt              = 0
     damageReceived          = 0
     valueReceived           = 0
-    events.clear()
+    clearEvents()
     simulation.grid.populate(this)
   }
 
@@ -240,7 +242,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     target = targetNew
   }
 
-  @inline def move(goal: => Pixel, reason: Option[String], goalDistance: Double = 0): Unit = {
+  @inline def move(goal: => Pixel, reason: => Option[String], goalDistance: Double = 0): Unit = {
     if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
     val destination = if (ableToMove || simulation.battle.logSimulation) goal else null
@@ -258,7 +260,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     injury = _calculateInjury
   }
 
-  @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
+  @inline def sleep(frames: Int, reason: => Option[String] = None): Unit = {
     addEvent(SimulationEventSleep(this, frames, reason))
     cooldownLeft = Math.max(cooldownLeft, frames)
     cooldownMoving = Math.max(cooldownMoving, frames)
@@ -307,7 +309,8 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
 
   @inline private def addEvent(event: => SimulationEvent): Unit = {
     if (simulation.battle.logSimulation) {
-      events += event
+      if (recordedEvents == null) recordedEvents = ArrayBuffer.empty
+      recordedEvents += event
     }
   }
 

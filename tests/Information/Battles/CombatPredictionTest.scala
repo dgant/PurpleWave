@@ -105,6 +105,67 @@ object CombatPredictionTest extends App {
   }
   val shot = DamageVolley(5, 1, 0, 0, 0.5)
 
+  check("new combat forecast diagnostics require debugging") {
+    With.configuration.debugging = false
+    With.configuration.logCombatForecasts = true
+    Debugging.CombatForecastDiagnostics.cycle()
+    Debugging.CombatForecastDiagnostics.decision(null)
+    With.configuration.logCombatForecasts = false
+  }
+
+  check("established logging and stories operate with debugging disabled") {
+    With.configuration.debugging = false
+    With.configuration.logstd = false
+    val previousLogger = With.logger
+    val logger = new Debugging.Logger
+    With.logger = logger
+    logger.debug("ordinary debug message")
+    logger.performance("ordinary performance message")
+    logger.debugCircuitBreaker("ordinary circuit breaker message")
+    def messages(name: String): Seq[String] = {
+      val field = classOf[Debugging.Logger].getDeclaredFields.find(_.getName.endsWith(name)).get
+      field.setAccessible(true)
+      field.get(logger).asInstanceOf[scala.collection.mutable.Buffer[String]].toVector
+    }
+    assert(messages("logMessages").exists(_.contains("ordinary debug message")))
+    assert(messages("logMessages").exists(_.contains("ordinary circuit breaker message")))
+    assert(messages("performanceMessages").exists(_.contains("ordinary performance message")))
+    val storyteller = new Debugging.Storyteller
+    var value = 1
+    val story = new storyteller.Story[Int]("test story", () => value)
+    story.update()
+    value = 2
+    story.update()
+    assert(storyteller.tales.map(_.tale) == Seq("test story: 1", "test story changed from 1 to 2"))
+    assert(messages("logMessages").exists(_.contains("test story changed from 1 to 2")))
+    With.logger = previousLogger
+  }
+
+  check("simulation event payloads require debugging as well as simviz") {
+    With.configuration.simviz = true
+    With.configuration.debugging = false
+    val u = unit()
+    val sim = simulation(u)
+    sim.battle = new Battle(Seq(u), isGlobal = false)
+    assert( ! sim.battle.logSimulation)
+    var evaluated = 0
+    def reason: Option[String] = { evaluated += 1; Some("expensive reason") }
+    u.simulacrum.sleep(8, reason)
+    u.simulacrum.setTarget(Some(u.simulacrum))
+    assert(evaluated == 0 && u.simulacrum.events.isEmpty)
+    val storage = classOf[Simulacrum].getDeclaredFields.find(_.getName.endsWith("recordedEvents")).get
+    storage.setAccessible(true)
+    assert(storage.get(u.simulacrum) == null, "ordinary play allocated event storage")
+    With.configuration.debugging = true
+    sim.battle = new Battle(Seq(u), isGlobal = false)
+    u.simulacrum.sleep(8, reason)
+    assert(evaluated == 1 && u.simulacrum.events.size == 1)
+    assert(u.simulacrum.events.head.isInstanceOf[SimulationEventSleep])
+    With.configuration.simviz = false
+    assert( ! new Battle(Seq(u), isGlobal = false).logSimulation)
+    With.configuration.debugging = false
+  }
+
   check("fractional damage and per-hit minimum survive size/armor/hit chance") {
     near(shot(0).total, 2.5)
     near(DamageVolley(1, 2, 10, 0, 1)(0).total, 1.0)
@@ -1018,7 +1079,7 @@ object CombatPredictionTest extends App {
       s.target = None
       s.threat = None
       s.gridTile = None
-      s.events.clear()
+      s.clearEvents()
       s.setPixel(Pixel(64, 64))
       sim.grid.populate(s)
       s.behavior = new SimulacrumBehavior {
@@ -1168,6 +1229,107 @@ object CombatPredictionTest extends App {
     }
     scoring.simulationCheckpoints ++= battle.simulationCheckpoints
     new BattleJudgment(scoring)
+  }
+  check("inactive unit matchup caches do not retain retired battle forecasts") {
+    val worker = positioned(Protoss.Probe, 64)
+    set(worker, "_tile", worker.pixel.tile)
+    set(worker, "_intent", new Micro.Agency.Intention)
+    set(zone, "units", new ProxyBwapi.UnitTracking.UnorderedBuffer[UnitInfo])
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    def retireBattle(): java.lang.ref.WeakReference[Battle] = {
+      val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> retired, foe -> retired)
+      assert(worker.matchups.groupOf eq retired.us)
+      assert(worker.matchups.groupVs eq retired.enemy)
+      val reference = new java.lang.ref.WeakReference(retired)
+      val current = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> current, foe -> current)
+      reference
+    }
+    val reference = retireBattle()
+    // Keep the unit alive without querying its caches again, like a completed building or former builder.
+    var attempts = 0
+    while (reference.get != null && attempts < 10) {
+      System.gc()
+      Thread.sleep(10)
+      attempts += 1
+    }
+    assert(reference.get == null, "The unit's unused matchup cache retained the retired battle")
+    assert(worker.matchups.groupOf eq With.battles.byUnit(worker).us)
+  }
+  check("inactive unit groups do not retain retired battles or opposing teams") {
+    val worker = positioned(Protoss.Probe, 64)
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    val group = Tactic.Squads.GenericUnitGroup(Vector(worker))
+    val previousTracker = With.units
+    With.units = allocate(classOf[ProxyBwapi.UnitTracking.UnitTracker])
+    set(With.units, "_enemyGroup", new Cache(() => Tactic.Squads.GenericUnitGroup(Vector.empty)))
+    try {
+      def retireBattle(): java.lang.ref.WeakReference[Battle] = {
+        val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+        With.battles.byUnit = Map(worker -> retired, foe -> retired)
+        assert(group.battles == Set(retired))
+        assert(group.consensusPrimaryFoes eq retired.enemy)
+        val reference = new java.lang.ref.WeakReference(retired)
+        val current = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+        With.battles.byUnit = Map(worker -> current, foe -> current)
+        reference
+      }
+      val reference = retireBattle()
+      var attempts = 0
+      while (reference.get != null && attempts < 10) {
+        System.gc()
+        Thread.sleep(10)
+        attempts += 1
+      }
+      assert(reference.get == null, "An idle unit group's battle caches retained the retired forecast")
+      assert(group.battles == Set(With.battles.byUnit(worker)))
+      assert(group.consensusPrimaryFoes eq With.battles.byUnit(worker).enemy)
+    } finally { With.units = previousTracker }
+  }
+  check("weak caches reuse live values, refresh, invalidate, and recompute collected values") {
+    val originalFrame = With.frame
+    var evaluations = 0
+    val cache = new Performance.WeakCache(() => { evaluations += 1; new Object }, refreshPeriod = 10)
+    try {
+      def useCache(): java.lang.ref.WeakReference[Object] = {
+        val value = cache()
+        assert(cache() eq value)
+        assert(evaluations == 1)
+        With.frame += 10
+        val refreshed = cache()
+        assert(refreshed ne value)
+        assert(evaluations == 2)
+        cache.invalidate()
+        assert(cache() ne refreshed)
+        assert(evaluations == 3)
+        new java.lang.ref.WeakReference(cache())
+      }
+      val reference = useCache()
+      var attempts = 0
+      while (reference.get != null && attempts < 10) {
+        System.gc()
+        Thread.sleep(10)
+        attempts += 1
+      }
+      assert(reference.get == null)
+      assert(cache() != null && evaluations == 4)
+    } finally { With.frame = originalFrame }
+  }
+  check("matchup groups follow a replaced physical battle in the same frame") {
+    val worker = positioned(Protoss.Probe, 64)
+    set(worker, "_tile", worker.pixel.tile)
+    set(worker, "_intent", new Micro.Agency.Intention)
+    set(zone, "units", new ProxyBwapi.UnitTracking.UnorderedBuffer[UnitInfo])
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    val before = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+    With.battles.byUnit = Map(worker -> before, foe -> before)
+    assert(worker.matchups.groupOf eq before.us)
+    assert(worker.matchups.groupVs eq before.enemy)
+    val after = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+    With.battles.byUnit = Map(worker -> after, foe -> after)
+    assert(worker.matchups.groupOf eq after.us)
+    assert(worker.matchups.groupVs eq after.enemy)
   }
   check("sim2026 effective-range proximity preserves nearby groups without joining remote targets") {
     val corsair = positioned(Protoss.Corsair, 64)

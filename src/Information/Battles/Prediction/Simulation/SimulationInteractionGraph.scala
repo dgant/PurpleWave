@@ -1,14 +1,13 @@
 package Information.Battles.Prediction.Simulation
 
 import Lifecycle.With
-import Mathematics.Maff
 import ProxyBwapi.UnitInfo.UnitInfo
 
 import scala.collection.mutable
 
 final class SimulationInteractionGraph(simulation: Simulation) {
   private final val ProximityBufferPixels = 64.0
-  private var maxUnitExtent = 0
+  private final val SearchPaddingPixels   = 128.0
   private var proximityFrames = 0
 
   private var units   : Array[UnitInfo] = Array.empty
@@ -18,7 +17,6 @@ final class SimulationInteractionGraph(simulation: Simulation) {
 
   def reset(newUnits: Seq[UnitInfo]): Unit = {
     units = newUnits.toArray
-    maxUnitExtent = units.map(_.simulacrum.unitClass.dimensionMax).foldLeft(0)(Math.max)
     proximityFrames = Math.max(0, With.configuration.simulationProximityFrames)
     parent = new Array[Int](units.length)
     size = Array.fill(units.length)(1)
@@ -58,32 +56,28 @@ final class SimulationInteractionGraph(simulation: Simulation) {
   }
 
   private def observeProximity(unit: Simulacrum): Unit = {
-    if (unit.attacksAgainstAir <= 0 && unit.attacksAgainstGround <= 0) return
-    // Search grid cells by weapon reach and footprints, never detector sight range.
-    val reach = Math.max(unit.pixelRangeAir, unit.pixelRangeGround) + ProximityBufferPixels
-    val radius = Math.ceil(reach + unit.unitClass.dimensionMax + maxUnitExtent).toInt
-    val xMin = Maff.clamp(Maff.div32(unit.pixel.x - radius), 0, With.mapTileWidth - 1)
-    val xMax = Maff.clamp(Maff.div32(unit.pixel.x + radius), 0, With.mapTileWidth - 1)
-    val yMin = Maff.clamp(Maff.div32(unit.pixel.y - radius), 0, With.mapTileHeight - 1)
-    val yMax = Maff.clamp(Maff.div32(unit.pixel.y + radius), 0, With.mapTileHeight - 1)
-    var y = yMin
-    while (y <= yMax) {
-      var x = xMin
-      while (x <= xMax) {
-        val tileUnits = simulation.grid.tiles(x + y * With.mapTileWidth).units
+    val rangePixels = unit.effectiveRangePixels + ProximityBufferPixels + SearchPaddingPixels
+    val rangeTiles = Math.ceil(rangePixels / 32.0).toInt
+    val tile = unit.pixel.tile.clip
+
+    simulation.grid.populatedTiles.foreach(gridTile => {
+      if (Math.abs(gridTile.tile.x - tile.x) <= rangeTiles && Math.abs(gridTile.tile.y - tile.y) <= rangeTiles) {
+        val tileUnits = gridTile.units
         var i = 0
         while (i < tileUnits.length) {
           val other = tileUnits(i)
-          if (other.alive && unit.isFriendlyCached != other.isFriendlyCached && unit.canAttack(other)
-            && unit.pixelDistanceEdgeSimulation(other) <= unit.pixelRangeAgainst(other) + ProximityBufferPixels) {
+          if (other != unit && other.alive && unit.isEnemyOf(other.realUnit) && proximal(unit, other)) {
             union(unit.realUnit, other.realUnit)
           }
           i += 1
         }
-        x += 1
       }
-      y += 1
-    }
+    })
+  }
+
+  @inline private def proximal(unit: Simulacrum, other: Simulacrum): Boolean = {
+    unit.pixelDistanceEdge(other)  <= unit.effectiveRangePixels  + ProximityBufferPixels ||
+    other.pixelDistanceEdge(unit)  <= other.effectiveRangePixels + ProximityBufferPixels
   }
 
   @inline private def union(unitA: UnitInfo, unitB: UnitInfo): Unit = {

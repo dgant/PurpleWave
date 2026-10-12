@@ -1169,7 +1169,7 @@ object CombatPredictionTest extends App {
     scoring.simulationCheckpoints ++= battle.simulationCheckpoints
     new BattleJudgment(scoring)
   }
-  check("proximity requires an applicable weapon and target selection cannot join remote fights") {
+  check("sim2026 effective-range proximity preserves nearby groups without joining remote targets") {
     val corsair = positioned(Protoss.Corsair, 64)
     val ling = positioned(Zerg.Zergling, 80, enemy = true)
     val overlord = positioned(Zerg.Overlord, 800, enemy = true)
@@ -1177,11 +1177,10 @@ object CombatPredictionTest extends App {
     val sim = componentSimulation(Vector(corsair, observer), Vector(ling, overlord))
     corsair.simulacrum.setTarget(Some(overlord.simulacrum))
     sim.interactions.observeProximity()
-    assert(sim.interactions.components.size == 4)
+    assert(sim.interactions.components.map(_.toSet).toSet == Set(Set(corsair, ling), Set(observer, overlord)))
     sim.grid.relocateUnit(overlord.simulacrum, Pixel(100, 256))
     sim.interactions.observeProximity()
-    assert(sim.interactions.components.map(_.toSet).contains(Set(corsair, overlord)))
-    assert(sim.interactions.components.size == 3)
+    assert(sim.interactions.components == Vector(Vector(corsair, observer, ling, overlord)))
   }
   check("proximity cutoff is configurable and inclusive, while late damage still joins components") {
     val previous = With.configuration.simulationProximityFrames

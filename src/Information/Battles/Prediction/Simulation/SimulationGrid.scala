@@ -90,7 +90,13 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
                 armorHealth = victim.armorHealth, armorShield = victim.armorShield,
                 healthMultiplier = SimulationSplash.healthMultiplier(weapon, victim.unitClass.size))
               val damage = splash(victim.shieldPoints)
-              if (attacker == null) victim.receiveDamage(damage) else attacker.applyAttackDamage(victim, damage)
+              if (attacker == null) {
+                if (victim.receiveDamage(damage) > 0) {
+                  victim.simulation.interactions.observeDamage(source, victim.realUnit)
+                  // A committed projectile can outlive its source's membership in the battle.
+                  victim.simulation.interactions.observeDamage(primary.realUnit, victim.realUnit)
+                }
+              } else attacker.applyAttackDamage(victim, damage)
             }
           }
           i += 1

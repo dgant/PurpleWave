@@ -105,36 +105,40 @@ object CombatPredictionTest extends App {
   }
   val shot = DamageVolley(5, 1, 0, 0, 0.5)
 
-  check("ordinary play never evaluates verbose messages or diagnostic scans") {
-    val logger = new Debugging.Logger
+  check("new combat forecast diagnostics require debugging") {
     With.configuration.debugging = false
-    With.configuration.logstd = true
     With.configuration.logCombatForecasts = true
-    With.configuration.auditFormationPaths = true
-    var evaluated = 0
-    def message: String = { evaluated += 1; "expensive diagnostic" }
-    logger.debug(message)
-    logger.micro(message)
-    logger.performance(message)
-    logger.debugCircuitBreaker(message)
     Debugging.CombatForecastDiagnostics.cycle()
     Debugging.CombatForecastDiagnostics.decision(null)
-    Debugging.FormationPathAudit.log(null, null, null, null, null, null)
-    val storyteller = new Debugging.Storyteller
-    storyteller.onFrame()
-    storyteller.onEnd()
-    assert(evaluated == 0)
-    assert(storyteller.tales.isEmpty)
-    With.configuration.debugging = true
-    With.configuration.logstd = false
-    logger.debug(message)
-    logger.micro(message)
-    logger.performance(message)
-    logger.debugCircuitBreaker(message)
-    assert(evaluated == 4)
-    With.configuration.debugging = false
     With.configuration.logCombatForecasts = false
-    With.configuration.auditFormationPaths = false
+  }
+
+  check("established logging and stories operate with debugging disabled") {
+    With.configuration.debugging = false
+    With.configuration.logstd = false
+    val previousLogger = With.logger
+    val logger = new Debugging.Logger
+    With.logger = logger
+    logger.debug("ordinary debug message")
+    logger.performance("ordinary performance message")
+    logger.debugCircuitBreaker("ordinary circuit breaker message")
+    def messages(name: String): Seq[String] = {
+      val field = classOf[Debugging.Logger].getDeclaredFields.find(_.getName.endsWith(name)).get
+      field.setAccessible(true)
+      field.get(logger).asInstanceOf[scala.collection.mutable.Buffer[String]].toVector
+    }
+    assert(messages("logMessages").exists(_.contains("ordinary debug message")))
+    assert(messages("logMessages").exists(_.contains("ordinary circuit breaker message")))
+    assert(messages("performanceMessages").exists(_.contains("ordinary performance message")))
+    val storyteller = new Debugging.Storyteller
+    var value = 1
+    val story = new storyteller.Story[Int]("test story", () => value)
+    story.update()
+    value = 2
+    story.update()
+    assert(storyteller.tales.map(_.tale) == Seq("test story: 1", "test story changed from 1 to 2"))
+    assert(messages("logMessages").exists(_.contains("test story changed from 1 to 2")))
+    With.logger = previousLogger
   }
 
   check("simulation event payloads require debugging as well as simviz") {

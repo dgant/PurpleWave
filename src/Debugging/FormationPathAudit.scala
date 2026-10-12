@@ -12,7 +12,6 @@ object FormationPathAudit {
   private val lastFrame = new mutable.WeakHashMap[FriendlyUnitGroup, Int]
 
   def log(group: FriendlyUnitGroup, origin: Pixel, goal: Pixel, threat: Pixel, direct: Option[ZonePath], route: FormationFlanking.Route): Unit = {
-    if ( ! With.configuration.debugging || ! With.configuration.auditFormationPaths) return
     if (With.frame - lastFrame.getOrElse(group, -240) < 240) return
     lastFrame(group) = With.frame
     def describe(path: Option[ZonePath]): String = path.map(p =>

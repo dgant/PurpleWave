@@ -59,7 +59,7 @@ class Storyteller extends MacroCounting {
   private lazy val interestingTechs = Techs.all.filterNot(defaultTechs.contains)
 
   lazy val rushDistance = f"Rush distances on ${With.mapCleanName}"
-  lazy val stories: Seq[IStory] = Seq(
+  val stories: Seq[IStory] = Seq(
     new Story                           ("Frame 0 (secs)",      () => With.frame0ms / 1000),
     new Story[Iterable[PlayerInfo]]     ("Opponents",           () => With.enemies.filter(_.isEnemy),                                                                               _.map(_.name).mkString(", ")),
     new Story[Iterable[Int]]            ("Rush distances",      () => With.geography.rushDistances,                                                                                 _.map(_.toString).mkString(", ")),
@@ -114,7 +114,6 @@ class Storyteller extends MacroCounting {
     (Minutes(10), 24),
     (Minutes(15), 24 * 10))
   def onFrame(): Unit = {
-    if ( ! With.configuration.debugging) return
     if (firstLog) {
       firstLog = false
       logEnvironment()
@@ -299,7 +298,6 @@ class Storyteller extends MacroCounting {
   }
 
   def onEnd(): Unit = {
-    if ( ! With.configuration.debugging) return
     tell(f"Supply block: ${formatPercentage(With.efficiency.framesSupplyBlocked.toFloat / With.frame)}")
     logPerformance()
     logMemoryUsage()

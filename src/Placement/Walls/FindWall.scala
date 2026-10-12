@@ -14,7 +14,7 @@ object FindWall {
       else if (With.self.isTerran)  terran(zone)
       else                          zerg(zone)
 
-    if (With.configuration.debugging) wallFinderOption.foreach(wallFinder => {
+    wallFinderOption.foreach(wallFinder => {
       With.logger.debug(f"$zone: ${if (wallFinder.wall.isDefined) "CREATED WALL" else "FAILED to create wall"}")
       With.logger.debug(f"Permutations:       ${wallFinder.metrics.permutations}")
       With.logger.debug(f"Tiles considered:   ${wallFinder.metrics.tilesConsidered}")

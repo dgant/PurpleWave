@@ -95,7 +95,7 @@ final class FormationStandard(val group: FriendlyUnitGroup, var style: Formation
       zonePathToGoal,
       zonePathEnd.edges.flatMap(e => With.paths.zonePath(zonePathStart, zonePathEnd, Seq(e))),
       approachCost)
-    if (With.configuration.debugging && With.configuration.auditFormationPaths && style == FormationStyleMarch) {
+    if (With.configuration.auditFormationPaths && style == FormationStyleMarch) {
       Debugging.FormationPathAudit.log(group, vanguardCentroid, goal, threatOrigin, zonePathToGoal, route)
     }
     route

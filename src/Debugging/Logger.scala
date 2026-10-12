@@ -16,7 +16,6 @@ class Logger {
   private var errorOcurred = false
   
   def flush(): Unit = {
-    if (logMessages.isEmpty && microMessages.isEmpty && performanceMessages.isEmpty) return
     var opponents: String = ""
     try {
       opponents = With.enemies.map(_.name).mkString("-")
@@ -45,12 +44,12 @@ class Logger {
     quietlyOnException(exception)
   }
 
-  @inline final def micro(message: => String): Unit = {
-    if (With.configuration.debugging) log(f"MICRO | $message", chat = false, target = microMessages)
+  def micro(message: String): Unit = {
+    log(f"MICRO | $message", chat = false, target = microMessages)
   }
   
-  @inline final def debug(message: => String): Unit = {
-    if (With.configuration.debugging) log(f"DEBUG | $message", chat = false)
+  def debug(message: String): Unit = {
+    log(f"DEBUG | $message", chat = false)
   }
   
   def warn(message: String): Unit = {
@@ -62,8 +61,8 @@ class Logger {
     log(f"ERROR | $message")
   }
 
-  @inline final def performance(message: => String): Unit = {
-    if (With.configuration.debugging) log(f"SPEED | $message", chat = false, logstd = false, target = performanceMessages)
+  def performance(message: String): Unit = {
+    log(f"SPEED | $message", chat = false, logstd = false, target = performanceMessages)
   }
 
   private def canRelog(message: String, sleepFrames: Int): Boolean = {
@@ -74,11 +73,9 @@ class Logger {
 
   private val defaultSleepFrames = Seconds(15)()
 
-  @inline final def debugCircuitBreaker(message: => String, sleepFrames: Int = defaultSleepFrames): Unit = {
-    if (With.configuration.debugging) {
-      val evaluated = message
-      if (canRelog(evaluated, sleepFrames)) { debug(evaluated) }
-    }
+  def debugCircuitBreaker(message: String, sleepFrames: Int = defaultSleepFrames): Unit = {
+    if (canRelog(message, sleepFrames)) { debug(message) }
+    lastInstance(message) = With.frame
   }
 
   def warnCircuitBreaker(message: String, sleepFrames: Int = defaultSleepFrames): Unit = {

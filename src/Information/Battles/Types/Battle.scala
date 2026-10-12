@@ -22,13 +22,55 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val focus        : Pixel         = Maff.centroid(teams.map(_.vanguardAll()))
 
   // Forced during clustering; squad changes take effect in the next battle cycle.
-  lazy val combatForecasts: Vector[Battle] = {
+  private lazy val squadForecasts: Vector[Battle] = {
     val groups = us.units.groupBy(_.friendly.flatMap(_.squad).filter(_.fightsIndependently)).values.toVector
     if (groups.size <= 1) Vector(this)
     else groups.map(units => new Battle(units, enemy.units, isGlobal = false))
   }
-  lazy val combatForecastByUnit: Map[UnitInfo, Battle] = combatForecasts.flatMap(b =>
-    (if (combatForecasts.size == 1) b.units else b.us.units).map(_ -> b)).toMap
+  private var componentForecasts: Option[Vector[Battle]] = None
+  private var componentForecastByUnit: Map[UnitInfo, Battle] = Map.empty
+  private lazy val squadForecastByUnit: Map[UnitInfo, Battle] = forecastByUnit(squadForecasts)
+
+  def combatForecasts: Vector[Battle] = componentForecasts.getOrElse(squadForecasts)
+  def combatForecastByUnit: Map[UnitInfo, Battle] =
+    if (componentForecasts.isDefined) componentForecastByUnit else squadForecastByUnit
+
+  private def forecastByUnit(forecasts: Vector[Battle]): Map[UnitInfo, Battle] = forecasts.flatMap(b =>
+    (if (squadForecasts.size == 1) b.units else b.us.units).map(_ -> b)).toMap
+
+  // Called on the game thread after prediction, before judgment and publication. Physical membership stays intact.
+  def partitionCombatForecasts(): Boolean = {
+    if (componentForecasts.isDefined) return false
+    val forecasts = squadForecasts.flatMap(_.partitionSimulation())
+    componentForecastByUnit = forecastByUnit(forecasts)
+    componentForecasts = Some(forecasts)
+    forecasts != squadForecasts
+  }
+
+  private def partitionSimulation(): Vector[Battle] = {
+    if ( ! simulated || simulationComponents.size <= 1) return Vector(this)
+    val simulatedUnits = simulationComponents.flatten.toSet
+    // Stasis, invincibility and other exclusions must not remove units from the forecast lookup.
+    val components = simulationComponents ++ units.filterNot(simulatedUnits).map(Vector(_))
+    val ours = us.units.toSet
+    val source = this
+    components.map { component =>
+      val (componentUs, componentEnemy) = component.partition(ours)
+      val forecast = new Battle(componentUs, componentEnemy, isGlobal = false) {
+        override lazy val frameCreated: Int = source.frameCreated
+        override lazy val skimWeight: Double = source.skimWeight
+      }
+      forecast.simulationFrames = simulationFrames
+      forecast.simulationCheckpoints ++= simulationCheckpoints.map(_.subset(componentUs, componentEnemy))
+      forecast.simulationDeaths = forecast.simulationCheckpoints.lastOption.map(_.deaths(componentUs).toDouble).getOrElse(0.0)
+      forecast.simulationReport ++= simulationReport.filter { case (unit, _) => component.contains(unit) }
+      forecast.simulationEvents = simulationEvents.filter(e => component.contains(e.simulacrum.realUnit)).toVector
+      forecast.simulationLog = forecast.simulationEvents.map(_.toString).mkString("\n")
+      forecast.simulationComplete = true
+      // The normal prediction pass recomputes any skim contribution for this component.
+      forecast
+    }
+  }
 
   def predictionComplete: Boolean = simulationComplete && skimulationComplete
 
@@ -67,6 +109,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
 
   var judgement: Option[BattleJudgment] = None
   var skimulationReport: Map[UnitInfo, (Double, Double)] = Map.empty
+  var simulationComponents: Vector[Seq[UnitInfo]] = Vector.empty
   var simulationFrames = 0
   var simulationDeaths = 0.0
   var simulationReport                                                  = new mutable.HashMap[UnitInfo, ReportCard]

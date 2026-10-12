@@ -945,6 +945,7 @@ object CombatPredictionTest extends App {
     val primary = splashVictim(sim, 256)
     val nearby = splashVictim(sim, 260)
     sim.realUnits ++= Seq(primary.realUnit, nearby.realUnit)
+    sim.interactions.reset(sim.realUnits) // The dead projectile source is not a simulated participant.
     With.frame = 1000
     primary.realUnit.addDamage(reaver, 2, true, false, Some(reaver.damageVolleyAgainst(primary)), Some(900))
     val reset = classOf[Simulation].getDeclaredMethods.find(_.getName.endsWith("resetPendingDamage")).get
@@ -955,6 +956,7 @@ object CombatPredictionTest extends App {
     assert(primary.hitPoints == 500 && nearby.hitPoints == 500)
     sim.step()
     assert(primary.hitPoints == 400 && nearby.hitPoints == 400)
+    assert(sim.interactions.components.size == 1)
   }
   // Combat ownership is sampled once per physical battle, during clustering.
   class ForecastSquad extends Squad {
@@ -1133,6 +1135,191 @@ object CombatPredictionTest extends App {
     near(actual, defender.pixelDistanceEdge(armyUnit))
     assert(actual > defender.pixelDistanceEdge(dropUnit))
     assert(defender.skimTarget.contains(armyUnit))
+  }
+  // Keep the spatial battle and prediction loop real; scripted exchanges isolate partition/scoring behavior.
+  def componentSimulation(ours: Seq[FriendlyUnitInfo], enemies: Seq[FriendlyUnitInfo]): Simulation = {
+    val sim = new Simulation
+    sim.shouldReset = false
+    sim.battle = new Battle(ours, enemies, isGlobal = false)
+    sim.realUnits ++= ours ++ enemies
+    sim.realUnitsOurs ++= ours
+    sim.realUnitsEnemy ++= enemies
+    sim.realUnits.foreach { u =>
+      val s = u.simulacrum
+      s.simulation = sim
+      s.setPixel(u.pixel)
+      s.flying = s.unitClass.isFlyer
+      sim.grid.populate(s)
+    }
+    sim.interactions.reset(sim.realUnits)
+    sim.interactions.observeProximity()
+    sim
+  }
+  def positioned(kind: UnitClass, x: Int, enemy: Boolean = false): FriendlyUnitInfo = {
+    val u = forecastUnit(kind.maxHitPoints, kind, enemy)
+    set(u, "_pixel", Pixel(x, 256))
+    set(u, "_flying", kind.isFlyer)
+    u
+  }
+  def neutralJudgment(battle: Battle): BattleJudgment = {
+    val scoring = new Battle(isGlobal = false) {
+      override lazy val skimWeight = 0.0
+      override lazy val judgmentModifiers = Vector.empty
+    }
+    scoring.simulationCheckpoints ++= battle.simulationCheckpoints
+    new BattleJudgment(scoring)
+  }
+  check("proximity requires an applicable weapon and target selection cannot join remote fights") {
+    val corsair = positioned(Protoss.Corsair, 64)
+    val ling = positioned(Zerg.Zergling, 80, enemy = true)
+    val overlord = positioned(Zerg.Overlord, 800, enemy = true)
+    val observer = positioned(Protoss.Observer, 816)
+    val sim = componentSimulation(Vector(corsair, observer), Vector(ling, overlord))
+    corsair.simulacrum.setTarget(Some(overlord.simulacrum))
+    sim.interactions.observeProximity()
+    assert(sim.interactions.components.size == 4)
+    sim.grid.relocateUnit(overlord.simulacrum, Pixel(100, 256))
+    sim.interactions.observeProximity()
+    assert(sim.interactions.components.map(_.toSet).contains(Set(corsair, overlord)))
+    assert(sim.interactions.components.size == 3)
+  }
+  check("proximity cutoff is configurable and inclusive, while late damage still joins components") {
+    val previous = With.configuration.simulationProximityFrames
+    assert(previous == 120)
+    With.configuration.simulationProximityFrames = 10
+    try {
+      val a = positioned(Protoss.Dragoon, 64)
+      val b = positioned(Terran.Marine, 800, enemy = true)
+      val c = positioned(Protoss.Dragoon, 960)
+      val sim = componentSimulation(Vector(a, c), Vector(b))
+      assert(sim.interactions.components.size == 2) // b and c begin in range.
+      sim.battle.simulationFrames = 11
+      sim.grid.relocateUnit(b.simulacrum, Pixel(100, 256))
+      sim.interactions.observeProximity()
+      assert(sim.interactions.components.size == 2)
+      b.simulacrum.applyAttackDamage(a.simulacrum, DamageDealt(1, 0))
+      assert(sim.interactions.components.size == 1)
+      sim.interactions.reset(sim.realUnits)
+      sim.battle.simulationFrames = 10
+      sim.interactions.observeProximity()
+      assert(sim.interactions.components.map(_.toSet).contains(Set(a, b)))
+    } finally With.configuration.simulationProximityFrames = previous
+  }
+  check("early deaths stay in their component after grid removal and graph reset forgets the last battle") {
+    val a = positioned(Protoss.Dragoon, 64)
+    val b = positioned(Terran.Marine, 100, enemy = true)
+    val sim = componentSimulation(Vector(a), Vector(b))
+    a.simulacrum.applyAttackDamage(b.simulacrum, DamageDealt(1000, 0))
+    b.simulacrum.update()
+    assert(b.simulacrum.gridTile.isEmpty)
+    sim.battle.simulationFrames = 120
+    sim.interactions.observeProximity()
+    assert(sim.interactions.components == Vector(Vector(a, b)))
+    sim.interactions.reset(Vector(a))
+    assert(sim.interactions.components == Vector(Vector(a)))
+  }
+  check("splash joins secondary victims and friendly fire even after the proximity cutoff") {
+    val sim = simulation()
+    val tank = armed(sim, Terran.SiegeTankSieged, Pixel(64, 256), 70)
+    val primary = splashVictim(sim, 256)
+    val collateral = splashVictim(sim, 260)
+    collateral.isFriendlyCached = true
+    sim.interactions.reset(Vector(tank.realUnit, primary.realUnit, collateral.realUnit))
+    sim.battle.simulationFrames = 121
+    tank.dealDamageTo(primary)
+    assert(sim.interactions.components.size == 1 && collateral.hitPoints < 500)
+  }
+  check("remote army victory cannot mask a Corsair loss and component snapshots survive simulacrum reuse") {
+    val corsair = positioned(Protoss.Corsair, 64)
+    val hydra = positioned(Zerg.Hydralisk, 160, enemy = true)
+    val army = positioned(Protoss.Dragoon, 800)
+    val ling = positioned(Zerg.Zergling, 880, enemy = true)
+    ling.simulacrum.subjectiveValue = 1000
+    val sim = componentSimulation(Vector(corsair, army), Vector(hydra, ling))
+    val physical = sim.battle
+    With.battles.byUnit = physical.units.map(_ -> physical).toMap
+    assert(physical.combatForecasts == Vector(physical))
+    assert(corsair.combatForecast.contains(physical)) // Force the old lookup before partitioning.
+    sim.realUnits.foreach { u =>
+      u.simulacrum.behavior = new SimulacrumBehavior {
+        val fighting = true
+        def act(actor: Simulacrum): Unit = {
+          if (actor.realUnit == army && physical.simulationFrames == 0)
+            actor.applyAttackDamage(ling.simulacrum, DamageDealt(1000, 0))
+          if (actor.realUnit == hydra && physical.simulationFrames == 220)
+            actor.applyAttackDamage(corsair.simulacrum, DamageDealt(1000, 0))
+        }
+      }
+    }
+    while (!physical.simulationComplete) sim.step()
+    assert(physical.simulationFrames == With.configuration.simulationFrames)
+    assert(neutralJudgment(physical).shouldFightAir)
+    assert(physical.simulationComponents.map(_.toSet).toSet == Set(Set(corsair, hydra), Set(army, ling)))
+    // A subsequent independent forecast can reset all the shared simulacra before partitioning.
+    sim.realUnits.foreach { u => u.simulacrum.alive = true; u.simulacrum.hitPoints = 999; u.simulacrum.subjectiveValue = 9999 }
+    val global = new Battle(isGlobal = true)
+    global.skimulationComplete = true
+    With.battles.nextBattleGlobalDefend = global
+    With.battles.nextBattleGlobalAttack = global
+    With.battles.nextBattleGlobalSlug = global
+    With.battles.nextBattleGlobalSkirmish = global
+    With.battles.nextBattlesLocal = Vector(physical)
+    new Information.Battles.ProcessingStates.BattleProcessPredict().step()
+    assert(With.battles.nextBattles.take(2) == physical.combatForecasts)
+    val air = corsair.combatForecast.get
+    val ground = army.combatForecast.get
+    assert(air.us.units == Vector(corsair) && air.enemy.units == Vector(hydra))
+    assert(ground.us.units == Vector(army) && ground.enemy.units == Vector(ling))
+    assert(!neutralJudgment(air).shouldFightAir && neutralJudgment(ground).shouldFightGround)
+    assert(air.simulationDeaths == 1 && ground.simulationDeaths == 0)
+    assert(physical.combatForecasts.forall(_.predictionComplete))
+    assert(corsair.battle.contains(physical) && army.battle.contains(physical))
+    assert(!physical.partitionCombatForecasts())
+  }
+  check("component normalization excludes unrelated initial value and keeps snapshot aggression") {
+    val a = positioned(Protoss.Dragoon, 64)
+    val b = positioned(Terran.Marine, 100, enemy = true)
+    val remote = positioned(Protoss.Dragoon, 800)
+    remote.simulacrum.subjectiveValue = 10000
+    val sim = componentSimulation(Vector(a, remote), Vector(b))
+    b.simulacrum.receiveDamage(DamageDealt(1, 0))
+    val full = new SimulationCheckpoint(sim, None)
+    val subset = full.subset(Vector(a), Vector(b))
+    val expected = componentSimulation(Vector(a), Vector(b))
+    near(subset.totalScore, new SimulationCheckpoint(expected, None).totalScore)
+    assert(subset.totalScore > full.totalScore)
+    set(With.blackboard, "aggressionRatio", new Property(2.0))
+    near(full.subset(Vector(a), Vector(b)).totalScore, subset.totalScore)
+    set(With.blackboard, "aggressionRatio", new Property(1.0))
+  }
+  check("component partition preserves independent squads, excluded units, and skim-only fallback") {
+    val a = positioned(Protoss.Dragoon, 64)
+    val b = positioned(Protoss.Reaver, 800)
+    b.setSquad(Some(forecastSquad(independent = true)))
+    val enemy = positioned(Terran.Marine, 100, enemy = true)
+    val parent = new Battle(Vector(a, b), Vector(enemy), isGlobal = false)
+    parent.combatForecasts.foreach { f =>
+      f.simulationComplete = true
+      f.simulationComponents = Vector(f.us.units, f.enemy.units)
+    }
+    assert(parent.partitionCombatForecasts())
+    assert(parent.combatForecastByUnit(a) ne parent.combatForecastByUnit(b))
+    assert(parent.combatForecastByUnit.get(enemy).isEmpty)
+    val excluded = positioned(Protoss.Observer, 960)
+    val mixed = new Battle(Vector(a, excluded), Vector(enemy), isGlobal = false) {
+      override lazy val skimWeight = 0.5
+    }
+    mixed.simulationComplete = true
+    mixed.skimulationComplete = true
+    mixed.simulationComponents = Vector(Vector(a), Vector(enemy))
+    assert(mixed.partitionCombatForecasts())
+    assert(mixed.combatForecastByUnit.keySet == Set(a, excluded, enemy))
+    assert(mixed.combatForecasts.forall(f => f.simulationComplete && !f.skimulationComplete && f.skimWeight == 0.5))
+    val skimOnly = new Battle(Vector(a), Vector(enemy), isGlobal = false) {
+      override lazy val skimWeight = 1.0
+    }
+    assert(!skimOnly.partitionCombatForecasts())
+    assert(skimOnly.combatForecasts == Vector(skimOnly))
   }
   println(s"$passed combat prediction checks passed")
 }

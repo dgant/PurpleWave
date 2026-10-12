@@ -18,6 +18,7 @@ final class Simulation(val collisionEnabled: Boolean = true) {
   val realUnitsOurs   : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val realUnitsEnemy  : ArrayBuffer[UnitInfo] = new ArrayBuffer(100)
   val grid            : SimulationGrid        = new SimulationGrid(collisionEnabled)
+  val interactions    : SimulationInteractionGraph = new SimulationInteractionGraph(this)
   var enemyVanguard   : Pixel                 = Points.middle
   var engaged         : Boolean               = false
   var shouldReset     : Boolean               = true
@@ -58,6 +59,8 @@ final class Simulation(val collisionEnabled: Boolean = true) {
         engaged           = false
         grid.reset()
         simulacra.foreach(_.reset(this))
+        interactions.reset(realUnits)
+        interactions.observeProximity()
         resetPendingDamage(With.coordinator.damageTracker.updatedFrame)
         if (battle.logSimulation) {
           framesLog.clear()
@@ -77,7 +80,10 @@ final class Simulation(val collisionEnabled: Boolean = true) {
     // Resolve incoming shots after actions and before end-of-frame deaths, just like other damage.
     while (nextPendingDamage < pendingDamage.size && pendingDamage(nextPendingDamage).frame <= battle.simulationFrames) {
       val damage = pendingDamage(nextPendingDamage)
-      if (damage.target.alive) damage.target.receiveDamage(damage.volley(damage.target.shieldPoints))
+      if (damage.target.alive) {
+        val applied = damage.target.receiveDamage(damage.volley(damage.target.shieldPoints))
+        if (applied > 0) interactions.observeDamage(damage.source, damage.target.realUnit)
+      }
       grid.applySplash(damage.target, damage.volley, damage.sourceIsFriendly, damage.source, damage.origin)
       nextPendingDamage += 1
     }
@@ -87,6 +93,9 @@ final class Simulation(val collisionEnabled: Boolean = true) {
       simulacrumIndex += 1
     }
     battle.simulationFrames += 1
+    if (battle.simulationFrames % resolution == 0 || battle.simulationFrames == With.configuration.simulationProximityFrames) {
+      interactions.observeProximity()
+    }
     if (battle.logSimulation) {
       val sb = new StringBuilder(1024)
       sb.append(battle.simulationFrames).append('|')
@@ -144,14 +153,16 @@ final class Simulation(val collisionEnabled: Boolean = true) {
       }
       framesLog += sb.toString()
     }
-    battle.simulationComplete ||= battle.simulationFrames >= With.configuration.simulationFrames
+    var complete = battle.simulationFrames >= With.configuration.simulationFrames
     if (nextPendingDamage >= pendingDamage.size) {
-      battle.simulationComplete ||= ! simulacraOurs.exists(_.alive)
-      battle.simulationComplete ||= ! simulacraEnemy.exists(_.alive)
-      battle.simulationComplete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
+      complete ||= ! simulacraOurs.exists(_.alive)
+      complete ||= ! simulacraEnemy.exists(_.alive)
+      complete ||= ! simulacra.exists(s => s.alive && s.behavior.fighting)
     }
-    if (battle.simulationComplete) {
+    if (complete) {
       cleanup()
+      // Publish only after the final snapshots and components are ready for the game thread.
+      battle.simulationComplete = true
     } else if (battle.simulationFrames - battle.simulationCheckpoints.lastOption.map(_.framesIn).getOrElse(0) >= With.configuration.simulationResolution) {
       checkpoint()
     }
@@ -182,6 +193,7 @@ final class Simulation(val collisionEnabled: Boolean = true) {
       //try { CombatVisIO.writeCompressedSimDumpIfNeededAsync(battle, framesLog, simulationStartGameFrame) } catch { case exception: Exception => With.logger.quietlyOnException(exception) }
     }
     checkpoint()
+    battle.simulationComponents = interactions.components
   }
 
   private def checkpoint(): Unit = {

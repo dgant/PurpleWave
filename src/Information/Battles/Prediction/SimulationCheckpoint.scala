@@ -3,9 +3,37 @@ package Information.Battles.Prediction
 import Information.Battles.Prediction.Simulation.{Simulacrum, Simulation}
 import Lifecycle.With
 import Mathematics.Maff
+import ProxyBwapi.UnitInfo.UnitInfo
 import Utilities.?
 
-class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCheckpoint]) {
+object SimulationCheckpoint {
+  // Immutable because each UnitInfo's simulacrum is reused by subsequent forecasts.
+  private case class Snapshot(valueMax: Double, valueLeft: Double, healthMax: Double, healthLeft: Double, dead: Boolean)
+  private def capture(simulation: Simulation): Map[UnitInfo, Snapshot] = simulation.realUnits.map { unit =>
+    val s = unit.simulacrum
+    val value = if (s.shouldScoreIfOurs || s.isEnemy) s.subjectiveValue else 0.0
+    val healthMax = if (s.measureHealth) value * (s.hitPointsInitial + s.shieldPointsInitial) / Math.max(1, s.unitClass.maxTotalHealth) else 0.0
+    val healthLeft = if (s.measureHealth && s.alive) value * (s.hitPoints + s.shieldPoints) / Math.max(1, s.unitClass.maxTotalHealth) else 0.0
+    unit -> Snapshot(value, if (s.alive) value else 0.0, healthMax, healthLeft, s.dead)
+  }.toMap
+}
+
+class SimulationCheckpoint private (
+  snapshots: Map[UnitInfo, SimulationCheckpoint.Snapshot],
+  us: Seq[UnitInfo], foe: Seq[UnitInfo],
+  val framesIn: Int, val aggression: Double) {
+
+  def this(simulation: Simulation, previous: Option[SimulationCheckpoint]) = this(
+    SimulationCheckpoint.capture(simulation), simulation.realUnitsOurs.toVector, simulation.realUnitsEnemy.toVector,
+    simulation.battle.simulationFrames, With.blackboard.aggressionRatio())
+
+  def subset(ours: Seq[UnitInfo], enemies: Seq[UnitInfo]): SimulationCheckpoint =
+    new SimulationCheckpoint(snapshots, ours, enemies, framesIn, aggression)
+
+  def deaths(units: Seq[UnitInfo]): Int = units.count(u => snapshots.get(u).exists(_.dead))
+
+  private def count(units: Seq[UnitInfo], extract: SimulationCheckpoint.Snapshot => Double): Double =
+    units.iterator.flatMap(snapshots.get).map(extract).sum
 
   @inline final def valueMax            (simulacrum: Simulacrum)  : Double  = simulacrum.subjectiveValue
   @inline final def valueLeft           (simulacrum: Simulacrum)  : Double  = ?(simulacrum.dead, 0.0, simulacrum.subjectiveValue)
@@ -15,22 +43,17 @@ class SimulationCheckpoint(simulation: Simulation, previous: Option[SimulationCh
   val weightSurvival = 0.25
   val weightHealth   = 1.0 - weightSurvival
 
-  private val us  = simulation.realUnitsOurs
-  private val foe = simulation.realUnitsEnemy
-
-  val framesIn                  : Int    = simulation.battle.simulationFrames
-  val aggression                : Double = With.blackboard.aggressionRatio()
-  val valueTotalUs              : Double = CPCount(us,   valueMax)
-  val valueTotalEnemy           : Double = CPCount(foe,  valueMax)
-  val valueLeftUs               : Double = CPCount(us,   valueLeft)
-  val valueLeftEnemy            : Double = CPCount(foe,  valueLeft)
+  val valueTotalUs              : Double = count(us, _.valueMax)
+  val valueTotalEnemy           : Double = count(foe, _.valueMax)
+  val valueLeftUs               : Double = count(us, _.valueLeft)
+  val valueLeftEnemy            : Double = count(foe, _.valueLeft)
   val valueLostUs               : Double =  valueTotalUs    - valueLeftUs
   val valueLostEnemy            : Double = (valueTotalEnemy - valueLeftEnemy) * aggression
   val valueLostRatio            : Double = Maff.nanToZero(2 * valueLostEnemy / (valueLostUs + valueLostEnemy) - 1)
-  val healthValueMaxUs          : Double = CPCount(us,   unitHealthValueMax)
-  val healthValueMaxEnemy       : Double = CPCount(foe,  unitHealthValueMax)
-  val healthValueLeftUs         : Double = CPCount(us,   unitHealthValueLeft)
-  val healthValueLeftEnemy      : Double = CPCount(foe,  unitHealthValueLeft)
+  val healthValueMaxUs          : Double = count(us, _.healthMax)
+  val healthValueMaxEnemy       : Double = count(foe, _.healthMax)
+  val healthValueLeftUs         : Double = count(us, _.healthLeft)
+  val healthValueLeftEnemy      : Double = count(foe, _.healthLeft)
   val healthValueLostUs         : Double =  healthValueMaxUs    - healthValueLeftUs
   val healthValueLostEnemy      : Double = (healthValueMaxEnemy - healthValueLeftEnemy) * aggression
   val healthValueLostRatio      : Double = Maff.nanToZero(2 * healthValueLostEnemy / (healthValueLostUs + healthValueLostEnemy) - 1)

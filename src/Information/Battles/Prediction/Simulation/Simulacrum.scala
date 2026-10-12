@@ -90,7 +90,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   var valueDealt              : Double  = _
   var damageReceived          : Double  = _
   var valueReceived           : Double  = _
-  var events                  : ArrayBuffer[SimulationEvent] = ArrayBuffer.empty
+  private var recordedEvents  : ArrayBuffer[SimulationEvent] = _
+  def events: Seq[SimulationEvent] = if (recordedEvents == null) Vector.empty else recordedEvents
+  private[Simulation] def clearEvents(): Unit = if (recordedEvents != null) recordedEvents.clear()
 
   def reset(newSimulation: Simulation): Unit = {
     initialized             = true
@@ -160,7 +162,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     valueDealt              = 0
     damageReceived          = 0
     valueReceived           = 0
-    events.clear()
+    clearEvents()
     simulation.grid.populate(this)
   }
 
@@ -209,7 +211,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       if (hitPoints <= 0) {
         alive = false
         simulation.grid.remove(this)
-        addEvent(SimulationEventDeath(this))
+        if (simulation.battle.logSimulation) addEvent(SimulationEventDeath(this))
       } else {
         cooldownLeft      = Math.max(0, cooldownLeft      - 1)
         cooldownMoving    = Math.max(0, cooldownMoving    - 1)
@@ -228,19 +230,19 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   }
 
   @inline def doBehavior(newBehavior: SimulacrumBehavior): Unit = {
-    addEvent(SimulationEventBehavior(this, behavior, newBehavior))
+    if (simulation.battle.logSimulation) addEvent(SimulationEventBehavior(this, behavior, newBehavior))
     behavior = newBehavior
     act()
   }
 
   @inline def setTarget(targetNew: Option[Simulacrum]): Unit = {
     if (target != targetNew) {
-      addEvent(SimulationEventSwitchTarget(this, target, targetNew))
+      if (simulation.battle.logSimulation) addEvent(SimulationEventSwitchTarget(this, target, targetNew))
     }
     target = targetNew
   }
 
-  @inline def move(goal: => Pixel, reason: Option[String], goalDistance: Double = 0): Unit = {
+  @inline def move(goal: => Pixel, reason: => Option[String], goalDistance: Double = 0): Unit = {
     if (cooldownMoving > 0) return
     val ableToMove = canMove && topSpeed > 0
     val destination = if (ableToMove || simulation.battle.logSimulation) goal else null
@@ -251,15 +253,15 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       moveGoalDistanceSquared = goalDistance * goalDistance
       cooldownMoving          = Maff.clamp(0, With.configuration.simulationResolution, (0.999 + (pixelDistanceCenter(destination) - goalDistance) / topSpeed).toInt)
     }
-    addEvent(SimulationEventMove(this, destination, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
+    if (simulation.battle.logSimulation) addEvent(SimulationEventMove(this, destination, ?(ableToMove, reason, Some("(Stuck due to immobility)"))))
   }
 
   @inline def recalculateInjury(): Unit = {
     injury = _calculateInjury
   }
 
-  @inline def sleep(frames: Int, reason: Option[String] = None): Unit = {
-    addEvent(SimulationEventSleep(this, frames, reason))
+  @inline def sleep(frames: Int, reason: => Option[String] = None): Unit = {
+    if (simulation.battle.logSimulation) addEvent(SimulationEventSleep(this, frames, reason))
     cooldownLeft = Math.max(cooldownLeft, frames)
     cooldownMoving = Math.max(cooldownMoving, frames)
   }
@@ -286,7 +288,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
       valueDealt += credit * valueKill
       victim.valueReceived += valueKill
     }
-    addEvent(SimulationEventAttack(
+    if (simulation.battle.logSimulation) addEvent(SimulationEventAttack(
       this,
       victim,
       damageTotal,
@@ -305,10 +307,9 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
     total
   }
 
-  @inline private def addEvent(event: => SimulationEvent): Unit = {
-    if (simulation.battle.logSimulation) {
-      events += event
-    }
+  @inline private def addEvent(event: SimulationEvent): Unit = {
+    if (recordedEvents == null) recordedEvents = ArrayBuffer.empty
+    recordedEvents += event
   }
 
   def describe: String = f"${?(isFriendly, "F", "E")} ${unitClass.toString} #${realUnit.id}"

@@ -63,9 +63,11 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
       forecast.simulationFrames = simulationFrames
       forecast.simulationCheckpoints ++= simulationCheckpoints.map(_.subset(componentUs, componentEnemy))
       forecast.simulationDeaths = forecast.simulationCheckpoints.lastOption.map(_.deaths(componentUs).toDouble).getOrElse(0.0)
-      forecast.simulationReport ++= simulationReport.filter { case (unit, _) => component.contains(unit) }
-      forecast.simulationEvents = simulationEvents.filter(e => component.contains(e.simulacrum.realUnit)).toVector
-      forecast.simulationLog = forecast.simulationEvents.map(_.toString).mkString("\n")
+      if (logSimulation) {
+        forecast.simulationReport ++= simulationReport.filter { case (unit, _) => component.contains(unit) }
+        forecast.simulationEvents = simulationEvents.filter(e => component.contains(e.simulacrum.realUnit)).toVector
+        forecast.simulationLog = forecast.simulationEvents.map(_.toString).mkString("\n")
+      }
       forecast.simulationComplete = true
       // The normal prediction pass recomputes any skim contribution for this component.
       forecast
@@ -93,7 +95,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   lazy val simWeight        : Double                = 1.0 - skimWeight
   lazy val simulated        : Boolean               = simWeight > 0 && ! isGlobal
   lazy val skimulated       : Boolean               = skimWeight > 0
-  lazy val logSimulation    : Boolean               = With.configuration.simviz
+  lazy val logSimulation    : Boolean               = With.configuration.debugging && With.configuration.simviz
   lazy val speedMultiplier  : Double                = ?(isGlobal, 1.0      , judgmentModifiers.map(_.speedMultiplier).product)
   lazy val judgmentModifiers: Seq[JudgmentModifier] = ?(isGlobal, Seq.empty, JudgmentModifiers(this))
   lazy val differentialSkim : Double                = us.skimStrengthTotal - enemy.skimStrengthTotal
@@ -112,7 +114,7 @@ class Battle(unitsUs: Seq[UnitInfo] = Vector.empty, unitsEnemy: Seq[UnitInfo] = 
   var simulationComponents: Vector[Seq[UnitInfo]] = Vector.empty
   var simulationFrames = 0
   var simulationDeaths = 0.0
-  var simulationReport                                                  = new mutable.HashMap[UnitInfo, ReportCard]
+  lazy val simulationReport                                                  = new mutable.HashMap[UnitInfo, ReportCard]
   var simulationLog         : String                                    = ""
   var simulationEvents      : Iterable[SimulationEvent]                 = Iterable.empty
   val simulationCheckpoints : mutable.ArrayBuffer[SimulationCheckpoint] = new mutable.ArrayBuffer[SimulationCheckpoint]

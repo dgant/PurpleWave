@@ -71,7 +71,7 @@ object FightOrFlee extends Action {
     } else {
       applyEstimation(u)
     }
-    Debugging.CombatForecastDiagnostics.decision(u)
+    if (With.configuration.debugging && With.configuration.logCombatForecasts) Debugging.CombatForecastDiagnostics.decision(u)
   }
   
   private def applyEstimation(unit: FriendlyUnitInfo): Unit = {

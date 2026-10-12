@@ -100,7 +100,7 @@ object ConfigurationLoader {
       if (randomStrategy)       { With.configuration.forcedPlaybook = Some(new TestingPlaybook) }
       With.configuration.simulationAsynchronous = multiCPU
 
-      Seq(
+      if (With.configuration.debugging) Seq(
         ("Human",           human.toString),
         ("Ladder",          ladder.toString),
         ("Livestream",      livestream),

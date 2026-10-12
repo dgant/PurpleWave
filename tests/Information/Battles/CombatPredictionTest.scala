@@ -105,6 +105,63 @@ object CombatPredictionTest extends App {
   }
   val shot = DamageVolley(5, 1, 0, 0, 0.5)
 
+  check("ordinary play never evaluates verbose messages or diagnostic scans") {
+    val logger = new Debugging.Logger
+    With.configuration.debugging = false
+    With.configuration.logstd = true
+    With.configuration.logCombatForecasts = true
+    With.configuration.auditFormationPaths = true
+    var evaluated = 0
+    def message: String = { evaluated += 1; "expensive diagnostic" }
+    logger.debug(message)
+    logger.micro(message)
+    logger.performance(message)
+    logger.debugCircuitBreaker(message)
+    Debugging.CombatForecastDiagnostics.cycle()
+    Debugging.CombatForecastDiagnostics.decision(null)
+    Debugging.FormationPathAudit.log(null, null, null, null, null, null)
+    val storyteller = new Debugging.Storyteller
+    storyteller.onFrame()
+    storyteller.onEnd()
+    assert(evaluated == 0)
+    assert(storyteller.tales.isEmpty)
+    With.configuration.debugging = true
+    With.configuration.logstd = false
+    logger.debug(message)
+    logger.micro(message)
+    logger.performance(message)
+    logger.debugCircuitBreaker(message)
+    assert(evaluated == 4)
+    With.configuration.debugging = false
+    With.configuration.logCombatForecasts = false
+    With.configuration.auditFormationPaths = false
+  }
+
+  check("simulation event payloads require debugging as well as simviz") {
+    With.configuration.simviz = true
+    With.configuration.debugging = false
+    val u = unit()
+    val sim = simulation(u)
+    sim.battle = new Battle(Seq(u), isGlobal = false)
+    assert( ! sim.battle.logSimulation)
+    var evaluated = 0
+    def reason: Option[String] = { evaluated += 1; Some("expensive reason") }
+    u.simulacrum.sleep(8, reason)
+    u.simulacrum.setTarget(Some(u.simulacrum))
+    assert(evaluated == 0 && u.simulacrum.events.isEmpty)
+    val storage = classOf[Simulacrum].getDeclaredFields.find(_.getName.endsWith("recordedEvents")).get
+    storage.setAccessible(true)
+    assert(storage.get(u.simulacrum) == null, "ordinary play allocated event storage")
+    With.configuration.debugging = true
+    sim.battle = new Battle(Seq(u), isGlobal = false)
+    u.simulacrum.sleep(8, reason)
+    assert(evaluated == 1 && u.simulacrum.events.size == 1)
+    assert(u.simulacrum.events.head.isInstanceOf[SimulationEventSleep])
+    With.configuration.simviz = false
+    assert( ! new Battle(Seq(u), isGlobal = false).logSimulation)
+    With.configuration.debugging = false
+  }
+
   check("fractional damage and per-hit minimum survive size/armor/hit chance") {
     near(shot(0).total, 2.5)
     near(DamageVolley(1, 2, 10, 0, 1)(0).total, 1.0)
@@ -1018,7 +1075,7 @@ object CombatPredictionTest extends App {
       s.target = None
       s.threat = None
       s.gridTile = None
-      s.events.clear()
+      s.clearEvents()
       s.setPixel(Pixel(64, 64))
       sim.grid.populate(s)
       s.behavior = new SimulacrumBehavior {

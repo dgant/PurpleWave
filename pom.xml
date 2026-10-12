@@ -138,6 +138,7 @@
                                 <arg>-opt:inline</arg>
                                 <arg>-opt:l:default,inline</arg>
                                 <arg>-opt-inline-from:Micro.Targeting.**</arg>
+                                <arg>-opt-inline-from:Debugging.Logger</arg>
                                 <arg>-Ymacro-classpath</arg>
                                 <arg>${project.build.directory}/${project.artifactId}-macros.jar</arg>
                                 <arg>-opt-warnings</arg>

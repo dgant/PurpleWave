@@ -33,7 +33,7 @@ object Spot extends Action {
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
     // TODO: This logic is sloppy and doesn't handle our various use cases well
-    if (unit.matchups.pixelsEntangled > -96 && unit.totalHealth < 400
+    if (unit.matchups.threats.exists(shouldRetreatFrom(unit, _)) && unit.totalHealth < 400
         && ( ! Protoss.Observer(unit)
         || unit.matchups.enemyDetectorDeepest.exists(d => d.canMove || d.pixelsToSightRange(unit) < 64)
         || With.units.existsEverEnemy(Terran.Academy, Terran.Comsat, Terran.SpellScannerSweep))) {
@@ -69,8 +69,18 @@ object Spot extends Action {
       goals += Maff.minBy(group.battleEnemies.filterNot(_.visible).map(_.pixel))(_.pixelDistanceSquared(unit.pixel)).getOrElse(group.destinationNext)
     }
 
-    unit.agent.decision.set(MicroPathing.pullTowards(unit.sightPixels, goals: _*))
+    unit.agent.decision.set(spottingPosition(unit, spooky, goals))
     Commander.move(unit)
+  }
+
+  private[Micro] def shouldRetreatFrom(unit: FriendlyUnitInfo, threat: UnitInfo): Boolean =
+    unit.pixelDistanceCenter(threat) < Math.min(unit.sightPixels - 32, threat.pixelRangeAgainst(unit) + 96)
+
+  private[Micro] def spottingPosition(unit: FriendlyUnitInfo, spooky: Option[UnitInfo], goals: Seq[Pixel]): Pixel = {
+    val preferred = MicroPathing.pullTowards(unit.sightPixels, goals: _*)
+    // Keep current detection even when prediction or secondary goals pull us away.
+    // Leave 16px between the desired coverage boundary and the capped retreat trigger.
+    spooky.map(t => t.pixel.projectUpTo(preferred, Math.max(0, unit.detectionRangePixels - 16))).getOrElse(preferred)
   }
 
   def enemiesToConsider(unit: FriendlyUnitInfo): Seq[Iterable[UnitInfo]] = Seq(

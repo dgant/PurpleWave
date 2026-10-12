@@ -24,6 +24,7 @@ class Blackboard {
   val wantToAttack            : Property[Boolean]           = add(new Property(false))
   val wantToHarass            : Property[Boolean]           = add(new Property(false))
   val scoutExpansions         : Property[Boolean]           = add(new Property(true))
+  val ralph                   : Property[Boolean]           = add(new Property(true))
   val stealGas                : Property[Boolean]           = add(new Property(false))
   val droneWarfare            : Property[Boolean]           = add(new Property(false))
   val maximumScouts           : Property[Int]               = add(new Property(0))

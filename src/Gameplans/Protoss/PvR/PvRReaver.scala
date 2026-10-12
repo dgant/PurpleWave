@@ -2,7 +2,7 @@ package Gameplans.Protoss.PvR
 
 import Gameplans.All.GameplanImperative
 import Gameplans.Protoss.PvP.PvPLateGame
-import Gameplans.Protoss.PvT.PvTDoubleRobo
+import Gameplans.Protoss.PvT.PvTArbiter
 import Gameplans.Protoss.PvZ.PvZ1GateCoreExpand
 import Lifecycle.With
 import Placement.Access.PlaceLabels
@@ -17,7 +17,7 @@ class PvRReaver extends GameplanImperative {
 
   override def executeBuild(): Unit = {
     if (transition.isEmpty && With.frame > Minutes(10)()) {
-      transition = Some(?(enemyIsTerran, new PvTDoubleRobo, ?(enemyIsProtoss, new PvPLateGame, new PvZ1GateCoreExpand)))
+      transition = Some(?(enemyIsTerran, new PvTArbiter, ?(enemyIsProtoss, new PvPLateGame, new PvZ1GateCoreExpand)))
     }
     if (transition.isDefined) {
       transition.get.executeBuild()
@@ -69,6 +69,7 @@ class PvRReaver extends GameplanImperative {
       once(Protoss.Reaver)
       once(4, Protoss.Zealot)
     } else {
+      With.blackboard.ralph.set(false)
       once(Protoss.RoboticsFacility)
       once(18, Protoss.Probe)
       once(2, Protoss.Dragoon)
@@ -138,7 +139,7 @@ class PvRReaver extends GameplanImperative {
     shouldAttack ||= Protoss.DragoonRange() && unitsComplete(IsWarrior) >= 8
     shouldAttack &&= ! (enemiesHave(Protoss.DarkTemplar, Zerg.Lurker) || enemyHasShown(Terran.SpiderMine)) || haveComplete(Protoss.Observer)
     shouldAttack &&= safePushing
-    shouldHarass = true
+    shouldHarass = safeDefending || (unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 2)
     harass(shouldHarass)
     attack(shouldAttack)
     maintainMiningBases(unitsComplete(IsWarrior) / 6)

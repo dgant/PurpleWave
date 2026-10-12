@@ -25,6 +25,7 @@ class TacticRalph extends Tactic with MacroActions {
     val workerScout = With.tactics.workerScout
     val attackSquad = With.tactics.attackSquad
 
+    if ( ! With.blackboard.ralph())                                                                 return
     if (With.framesSince(lastDeath) < Seconds(10)())                                                return
     if (With.scouting.ourProximity < 0.5)                                                           return
     if (With.self.supplyUsed200 < 30)                                                               return

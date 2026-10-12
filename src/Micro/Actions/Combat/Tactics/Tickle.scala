@@ -86,8 +86,8 @@ object Tickle extends Action {
     if (target.isDefined
       && ! Terran.SCV(tickler)
       && target.exists(Terran.SCV)
-      && ! tickler.readyForAttackOrder
-      && tickler.framesToConnectDamage(target.get) > tickler.framesToBeReadyForAttackOrder) {
+      && ! tickler.readyForAttackOrder(target.get)
+      && tickler.framesToConnectDamage(target.get) > tickler.framesToBeReadyForAttackOrder(target.get)) {
       flee(tickler)
     }
     Commander.attack(tickler)

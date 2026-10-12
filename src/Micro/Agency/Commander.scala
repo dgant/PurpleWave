@@ -118,7 +118,7 @@ object Commander {
     }
 
     // When a ground unit attacks a Carrier, have it attack-move when off cooldown to ensure we burn off Interceptors even if we can't find a route to the Carrier
-    if (Protoss.Carrier(target) && unit.readyForAttackOrder && ! unit.inRangeToAttack(target) && ! unit.flying) {
+    if (Protoss.Carrier(target) && unit.readyForAttackOrder(target) && ! unit.inRangeToAttack(target) && ! unit.flying) {
       attackMove(unit, attackFrom); return
     }
 
@@ -132,10 +132,10 @@ object Commander {
     }
 
     // If we should be attack-commanding
-    var useAttackCommand    = unit.readyForAttackOrder || unit.inRangeToAttack(target) // Allow deliberate repositioning between shots
+    var useAttackCommand    = unit.readyForAttackOrder(target) || unit.inRangeToAttack(target) // Allow deliberate repositioning between shots
     useAttackCommand      ||= unit.unitClass.melee
     useAttackCommand      ||= ! unit.canMove
-    useAttackCommand      ||= unit.flying && unit.readyForAttackOrder // Flying units can attack directly but if repositioning between shots need a move command
+    useAttackCommand      ||= unit.flying && unit.readyForAttackOrder(target) // Flying units can attack directly but if repositioning between shots need a move command
     useAttackCommand      ||= unit.framesToGetInRange(target) <= With.latency.latencyFrames + Math.max(unit.cooldownLeft, With.reaction.agencyAverage)
     useAttackCommand      &&= target.visible
     if (useAttackCommand) {

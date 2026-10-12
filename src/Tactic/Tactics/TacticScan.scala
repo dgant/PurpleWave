@@ -39,7 +39,7 @@ class TacticScan extends Tactic {
       && u.matchups.threatDeepest.exists(t =>
         Terran.SiegeTankSieged(t)
         && t.inRangeToAttack(u)
-        && t.readyForAttackOrder))
+        && t.readyForAttackOrder(u)))
     val tankTarget = Maff.maxBy(tankTargets)(t => t.matchups.dpfReceiving)
   
     if (tankTarget.isDefined && scans > 1) {

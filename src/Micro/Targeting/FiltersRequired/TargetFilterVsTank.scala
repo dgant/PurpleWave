@@ -25,7 +25,7 @@ object TargetFilterVsTank extends TargetFilter {
       // Do target anti-air when we have Carriers
       || (target.canAttackAir && actor.matchups.groupOf.count(Protoss.Carrier) > 0)
       // Do target anything that's in the way
-      || (actor.readyForAttackOrder && ! target.flying && actor.pixelDistanceEdge(target) < 12)
+      || (actor.readyForAttackOrder(target) && ! target.flying && actor.pixelDistanceEdge(target) < 12)
       // If we're cloaked it doesn't matter
       || (actor.effectivelyCloaked && Protoss.DarkTemplar(actor) && ! firingPixel.tile.enemyDetected)
       // Do target things we can hit without eating tank fire

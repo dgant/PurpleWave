@@ -112,7 +112,7 @@ object BeRushingZealot extends Action {
               .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || zealot.pixelsToGetInRange(t) < 16)
             if (targets.nonEmpty) {
               val target = targets.minBy(t => t.totalHealth + 1.0 * zealot.pixelsToGetInRange(t))
-              if (zealot.readyForAttackOrder || ! target.canMove) {
+              if (zealot.readyForAttackOrder(target) || ! target.canMove) {
                 attack(zealot, target)
               } else if (target.isAny(Protoss.Zealot, Zerg.Zergling, IsWorker) && target.presumptiveTarget.contains(zealot) && target.inRangeToAttack(zealot)) {
                 retreat(zealot)

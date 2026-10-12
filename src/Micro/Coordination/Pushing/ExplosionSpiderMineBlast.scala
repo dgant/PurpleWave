@@ -39,7 +39,7 @@ class ExplosionSpiderMineBlast(mine: UnitInfo) extends CircularPush(TrafficPrior
     } else if(
       // We can defuse the mine
       recipient.canAttack(mine)
-      && recipient.readyForAttackOrder
+      && recipient.readyForAttackOrder(mine)
       && recipient.pixelRangeAgainst(mine) > SpiderMineMath.radius) {
       None
     } else if(

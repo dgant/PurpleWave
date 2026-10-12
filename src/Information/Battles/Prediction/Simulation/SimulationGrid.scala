@@ -73,7 +73,7 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
         var i = 0
         while (i < units.size) {
           val victim = units(i)
-          if ((victim ne primary) && (victim.realUnit ne source) && victim.alive && victim.hitPoints > 0
+          if ((victim != primary) && (victim.realUnit != source) && victim.alive && victim.hitPoints > 0
             && ! victim.invincible && ! victim.stasised
             && (friendlyFire || victim.isFriendlyCached != sourceIsFriendly)
             && (if (victim.flying) weapon.targetsAir else weapon.targetsGround)
@@ -199,7 +199,7 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
 
   @inline private def eligibleGlaveTarget(victim: Simulacrum, previous: Simulacrum, primary: Simulacrum,
     sourceIsFriendly: Boolean, source: UnitInfo): Boolean = (
-    (victim ne primary) && (victim ne previous) && (victim.realUnit ne source)
+    (victim != primary) && (victim != previous) && (victim.realUnit != source)
       && victim.alive && victim.hitPoints > 0 && ! victim.invincible && ! victim.stasised
       && victim.isFriendlyCached != sourceIsFriendly
       && (victim.detected || ( ! victim.cloaked && ! victim.burrowed)))

@@ -10,8 +10,9 @@ final case class DamageVolley(
   hitChance: Double = 1.0,
   weapon: bwapi.WeaponType = bwapi.WeaponType.None) {
 
-  @inline def apply(shields: Double): DamageDealt =
+  @inline def apply(shields: Double): DamageDealt = {
     apply(shields, damagePerHit, armorHealth, armorShield, healthMultiplier)
+  }
 
   // Reuse the volley for secondary victims without allocating a copied attack description.
   @inline def apply(shields: Double, damagePerHit: Double, armorHealth: Double, armorShield: Double, healthMultiplier: Double): DamageDealt = {

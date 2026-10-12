@@ -9,6 +9,7 @@ import Utilities.?
 object SimulationCheckpoint {
   // Immutable because each UnitInfo's simulacrum is reused by subsequent forecasts.
   private case class Snapshot(valueMax: Double, valueLeft: Double, healthMax: Double, healthLeft: Double, dead: Boolean)
+  private val emptySnapshot = Snapshot(0.0, 0.0, 0.0, 0.0, dead = false)
   private def capture(simulation: Simulation): Map[UnitInfo, Snapshot] = simulation.realUnits.map { unit =>
     val s = unit.simulacrum
     val value = if (s.shouldScoreIfOurs || s.isEnemy) s.subjectiveValue else 0.0
@@ -24,7 +25,7 @@ class SimulationCheckpoint private (
   val framesIn: Int, val aggression: Double) {
 
   def this(simulation: Simulation, previous: Option[SimulationCheckpoint]) = this(
-    SimulationCheckpoint.capture(simulation), simulation.realUnitsOurs.toVector, simulation.realUnitsEnemy.toVector,
+    SimulationCheckpoint.capture(simulation), simulation.realUnitsOurs, simulation.realUnitsEnemy,
     simulation.battle.simulationFrames, With.blackboard.aggressionRatio())
 
   def subset(ours: Seq[UnitInfo], enemies: Seq[UnitInfo]): SimulationCheckpoint =
@@ -32,8 +33,19 @@ class SimulationCheckpoint private (
 
   def deaths(units: Seq[UnitInfo]): Int = units.count(u => snapshots.get(u).exists(_.dead))
 
-  private def count(units: Seq[UnitInfo], extract: SimulationCheckpoint.Snapshot => Double): Double =
-    units.iterator.flatMap(snapshots.get).map(extract).sum
+  // Resolve each unit once per checkpoint/subset, instead of looking it up in every aggregate.
+  private def select(units: Seq[UnitInfo]): Array[SimulationCheckpoint.Snapshot] = {
+    val output = new Array[SimulationCheckpoint.Snapshot](units.size)
+    val iterator = units.iterator
+    var i = 0
+    while (iterator.hasNext) {
+      output(i) = snapshots.getOrElse(iterator.next(), SimulationCheckpoint.emptySnapshot)
+      i += 1
+    }
+    output
+  }
+  private val snapshotsUs = select(us)
+  private val snapshotsEnemy = select(foe)
 
   @inline final def valueMax            (simulacrum: Simulacrum)  : Double  = simulacrum.subjectiveValue
   @inline final def valueLeft           (simulacrum: Simulacrum)  : Double  = ?(simulacrum.dead, 0.0, simulacrum.subjectiveValue)
@@ -43,17 +55,17 @@ class SimulationCheckpoint private (
   val weightSurvival = 0.25
   val weightHealth   = 1.0 - weightSurvival
 
-  val valueTotalUs              : Double = count(us, _.valueMax)
-  val valueTotalEnemy           : Double = count(foe, _.valueMax)
-  val valueLeftUs               : Double = count(us, _.valueLeft)
-  val valueLeftEnemy            : Double = count(foe, _.valueLeft)
+  val valueTotalUs              : Double = CPCount(snapshotsUs)(_.valueMax)
+  val valueTotalEnemy           : Double = CPCount(snapshotsEnemy)(_.valueMax)
+  val valueLeftUs               : Double = CPCount(snapshotsUs)(_.valueLeft)
+  val valueLeftEnemy            : Double = CPCount(snapshotsEnemy)(_.valueLeft)
   val valueLostUs               : Double =  valueTotalUs    - valueLeftUs
   val valueLostEnemy            : Double = (valueTotalEnemy - valueLeftEnemy) * aggression
   val valueLostRatio            : Double = Maff.nanToZero(2 * valueLostEnemy / (valueLostUs + valueLostEnemy) - 1)
-  val healthValueMaxUs          : Double = count(us, _.healthMax)
-  val healthValueMaxEnemy       : Double = count(foe, _.healthMax)
-  val healthValueLeftUs         : Double = count(us, _.healthLeft)
-  val healthValueLeftEnemy      : Double = count(foe, _.healthLeft)
+  val healthValueMaxUs          : Double = CPCount(snapshotsUs)(_.healthMax)
+  val healthValueMaxEnemy       : Double = CPCount(snapshotsEnemy)(_.healthMax)
+  val healthValueLeftUs         : Double = CPCount(snapshotsUs)(_.healthLeft)
+  val healthValueLeftEnemy      : Double = CPCount(snapshotsEnemy)(_.healthLeft)
   val healthValueLostUs         : Double =  healthValueMaxUs    - healthValueLeftUs
   val healthValueLostEnemy      : Double = (healthValueMaxEnemy - healthValueLeftEnemy) * aggression
   val healthValueLostRatio      : Double = Maff.nanToZero(2 * healthValueLostEnemy / (healthValueLostUs + healthValueLostEnemy) - 1)

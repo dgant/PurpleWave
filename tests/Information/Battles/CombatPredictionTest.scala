@@ -1,7 +1,7 @@
 package Information.Battles.Prediction.Simulation
 
 import Information.Battles.Battles
-import Information.Battles.Prediction.SimulationCheckpoint
+import Information.Battles.Prediction.{CPCount, SimulationCheckpoint}
 import Information.Battles.Types.{Battle, BattleJudgment, Hysteresis, JudgmentModifiers}
 import Tactic.Squads.Squad
 import Lifecycle.With
@@ -1274,6 +1274,68 @@ object CombatPredictionTest extends App {
     assert(physical.combatForecasts.forall(_.predictionComplete))
     assert(corsair.battle.contains(physical) && army.battle.contains(physical))
     assert(!physical.partitionCombatForecasts())
+  }
+  check("snapshot aggregation matches CPCount for eligibility, deaths, shields and health measurement") {
+    val members = for {
+      enemy <- Vector(false, true)
+      shouldScore <- Vector(false, true)
+      alive <- Vector(false, true)
+      measure <- Vector(false, true)
+    } yield {
+      val u = positioned(Protoss.Dragoon, if (enemy) 800 else 64, enemy)
+      val s = u.simulacrum
+      s.subjectiveValue = 123.0
+      s.shouldScoreIfOurs = shouldScore
+      s.alive = alive
+      s.measureHealth = measure
+      s.hitPointsInitial = 80
+      s.shieldPointsInitial = 60
+      s.hitPoints = if (alive) 45 else 0
+      s.shieldPoints = if (alive) 20 else 0
+      u
+    }
+    val (enemies, ours) = members.partition(_.isEnemy)
+    val sim = componentSimulation(ours, enemies)
+    val checkpoint = new SimulationCheckpoint(sim, None)
+    near(checkpoint.valueTotalUs, CPCount(sim.realUnitsOurs, checkpoint.valueMax))
+    near(checkpoint.valueTotalEnemy, CPCount(sim.realUnitsEnemy, checkpoint.valueMax))
+    near(checkpoint.valueLeftUs, CPCount(sim.realUnitsOurs, checkpoint.valueLeft))
+    near(checkpoint.valueLeftEnemy, CPCount(sim.realUnitsEnemy, checkpoint.valueLeft))
+    near(checkpoint.healthValueMaxUs, CPCount(sim.realUnitsOurs, checkpoint.unitHealthValueMax))
+    near(checkpoint.healthValueMaxEnemy, CPCount(sim.realUnitsEnemy, checkpoint.unitHealthValueMax))
+    near(checkpoint.healthValueLeftUs, CPCount(sim.realUnitsOurs, checkpoint.unitHealthValueLeft))
+    near(checkpoint.healthValueLeftEnemy, CPCount(sim.realUnitsEnemy, checkpoint.unitHealthValueLeft))
+    val baseline = checkpoint.subset(ours, enemies)
+    // Reused simulator buffers and scoring flags must not change an earlier checkpoint or its subsets.
+    sim.realUnitsOurs.clear()
+    sim.realUnitsEnemy.clear()
+    members.foreach { u =>
+      val s = u.simulacrum
+      s.alive = !s.alive
+      s.shouldScoreIfOurs = !s.shouldScoreIfOurs
+      s.measureHealth = !s.measureHealth
+      s.subjectiveValue = 9999
+      s.hitPoints = 1
+      s.shieldPoints = 0
+      s.hitPointsInitial = 1
+      s.shieldPointsInitial = 0
+    }
+    val replayed = checkpoint.subset(ours, enemies)
+    near(replayed.lossUs, baseline.lossUs)
+    near(replayed.lossEnemy, baseline.lossEnemy)
+    near(replayed.totalScore, baseline.totalScore)
+    near(replayed.cumulativeTotalDecisiveness, baseline.cumulativeTotalDecisiveness)
+    assert(replayed.deaths(ours) == ours.size / 2)
+    val excluded = positioned(Protoss.Observer, 960)
+    val absent = checkpoint.subset(Vector(excluded), Vector.empty)
+    near(absent.valueTotalUs, 0)
+    near(absent.lossUs, 0)
+    near(absent.lossEnemy, 0)
+    near(absent.totalScore, 0)
+    assert(absent.deaths(Vector(excluded)) == 0)
+    val empty = checkpoint.subset(Vector.empty, Vector.empty)
+    near(empty.totalScore, 0)
+    near(empty.cumulativeTotalDecisiveness, 0)
   }
   check("component normalization excludes unrelated initial value and keeps snapshot aggression") {
     val a = positioned(Protoss.Dragoon, 64)

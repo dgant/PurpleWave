@@ -1169,6 +1169,48 @@ object CombatPredictionTest extends App {
     scoring.simulationCheckpoints ++= battle.simulationCheckpoints
     new BattleJudgment(scoring)
   }
+  check("inactive unit matchup caches do not retain retired battle forecasts") {
+    val worker = positioned(Protoss.Probe, 64)
+    set(worker, "_tile", worker.pixel.tile)
+    set(worker, "_intent", new Micro.Agency.Intention)
+    set(zone, "units", new ProxyBwapi.UnitTracking.UnorderedBuffer[UnitInfo])
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    def retireBattle(): java.lang.ref.WeakReference[Battle] = {
+      val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> retired, foe -> retired)
+      assert(worker.matchups.groupOf eq retired.us)
+      assert(worker.matchups.groupVs eq retired.enemy)
+      val reference = new java.lang.ref.WeakReference(retired)
+      val current = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> current, foe -> current)
+      reference
+    }
+    val reference = retireBattle()
+    // Keep the unit alive without querying its caches again, like a completed building or former builder.
+    var attempts = 0
+    while (reference.get != null && attempts < 10) {
+      System.gc()
+      Thread.sleep(10)
+      attempts += 1
+    }
+    assert(reference.get == null, "The unit's unused matchup cache retained the retired battle")
+    assert(worker.matchups.groupOf eq With.battles.byUnit(worker).us)
+  }
+  check("matchup groups follow a replaced physical battle in the same frame") {
+    val worker = positioned(Protoss.Probe, 64)
+    set(worker, "_tile", worker.pixel.tile)
+    set(worker, "_intent", new Micro.Agency.Intention)
+    set(zone, "units", new ProxyBwapi.UnitTracking.UnorderedBuffer[UnitInfo])
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    val before = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+    With.battles.byUnit = Map(worker -> before, foe -> before)
+    assert(worker.matchups.groupOf eq before.us)
+    assert(worker.matchups.groupVs eq before.enemy)
+    val after = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+    With.battles.byUnit = Map(worker -> after, foe -> after)
+    assert(worker.matchups.groupOf eq after.us)
+    assert(worker.matchups.groupVs eq after.enemy)
+  }
   check("sim2026 effective-range proximity preserves nearby groups without joining remote targets") {
     val corsair = positioned(Protoss.Corsair, 64)
     val ling = positioned(Zerg.Zergling, 80, enemy = true)

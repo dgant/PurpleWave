@@ -9,6 +9,7 @@ import ProxyBwapi.UnitInfo.{DamageVolley, UnitInfo}
 import bwapi.{ExplosionType, WeaponType}
 
 import scala.collection.mutable
+import java.util.concurrent.ThreadLocalRandom
 
 final class SimulationGrid(val collisionEnabled: Boolean = true) {
   val occupancyMax: Int = Protoss.Dragoon.area
@@ -41,9 +42,14 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
   // Cells store centers, so expand the search for large footprints before testing exact splash distance.
   def applySplash(primary: Simulacrum, volley: DamageVolley, sourceIsFriendly: Boolean,
     source: UnitInfo, origin: Pixel, attacker: Simulacrum = null): Unit = {
+    if ( ! collisionEnabled) return
     val weapon = volley.weapon
+    if (weapon == WeaponType.Glave_Wurm || weapon == WeaponType.Glave_Wurm_Kukulza) {
+      applyGlaveBounces(primary, volley, sourceIsFriendly, source, attacker)
+      return
+    }
     val explosion = weapon.explosionType
-    if ( ! collisionEnabled || weapon.outerSplashRadius <= 0
+    if (weapon.outerSplashRadius <= 0
       || (explosion != ExplosionType.Radial_Splash && explosion != ExplosionType.Enemy_Splash && explosion != ExplosionType.Air_Splash)) return
     val airSplash = explosion == ExplosionType.Air_Splash
     val friendlyFire = explosion == ExplosionType.Radial_Splash
@@ -106,6 +112,97 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
       y += 1
     }
   }
+
+  private def applyGlaveBounces(primary: Simulacrum, volley: DamageVolley, sourceIsFriendly: Boolean,
+    source: UnitInfo, attacker: Simulacrum): Unit = {
+    var previous = primary
+    var divisor = 3
+    while (divisor <= 9) {
+      val chosen = sampleGlaveTarget(previous, primary, sourceIsFriendly, source)
+      if (chosen == null) return
+      val damage = volley(chosen.shieldPoints, volley.damagePerHit / divisor, chosen.armorHealth, chosen.armorShield, 1.0)
+      if (attacker == null) {
+        if (chosen.receiveDamage(damage) > 0) {
+          chosen.simulation.interactions.observeDamage(source, chosen.realUnit)
+          chosen.simulation.interactions.observeDamage(primary.realUnit, chosen.realUnit)
+        }
+      } else attacker.applyAttackDamage(chosen, damage)
+      previous = chosen
+      divisor *= 3
+    }
+  }
+
+  private def sampleGlaveTarget(previous: Simulacrum, primary: Simulacrum,
+    sourceIsFriendly: Boolean, source: UnitInfo): Simulacrum = {
+    val width = With.mapTileWidth
+    val tileX = Maff.div32(previous.pixel.x)
+    val tileY = Maff.div32(previous.pixel.y)
+    val xMin = Math.max(0, tileX - 1)
+    val xMax = Math.min(width - 1, tileX + 1)
+    val yMin = Math.max(0, tileY - 1)
+    val yMax = Math.min(With.mapTileHeight - 1, tileY + 1)
+    var total = 0
+    var y = yMin
+    while (y <= yMax) {
+      var x = xMin
+      while (x <= xMax) {
+        total += tiles(x + y * width).units.size
+        x += 1
+      }
+      y += 1
+    }
+    if (total == 0) return null
+    val random = ThreadLocalRandom.current()
+    var attempt = 0
+    // Sample storage slots first: dense enemy stacks usually need no per-unit scan.
+    while (attempt < 4) {
+      var selected = if (total == 1) 0 else random.nextInt(total)
+      y = yMin
+      var victim: Simulacrum = null
+      while (y <= yMax && victim == null) {
+        var x = xMin
+        while (x <= xMax && victim == null) {
+          val units = tiles(x + y * width).units
+          if (selected < units.size) victim = units(selected)
+          else selected -= units.size
+          x += 1
+        }
+        y += 1
+      }
+      if (eligibleGlaveTarget(victim, previous, primary, sourceIsFriendly, source)) return victim
+      if (total == 1) return null
+      attempt += 1
+    }
+    var chosen: Simulacrum = null
+    var candidates = 0
+    y = yMin
+    // Reservoir fallback bounds work when most units are ineligible and preserves uniform sampling.
+    while (y <= yMax) {
+      var x = xMin
+      while (x <= xMax) {
+        val units = tiles(x + y * width).units
+        var i = 0
+        while (i < units.size) {
+          val victim = units(i)
+          if (eligibleGlaveTarget(victim, previous, primary, sourceIsFriendly, source)) {
+            candidates += 1
+            if (candidates == 1 || random.nextInt(candidates) == 0) chosen = victim
+          }
+          i += 1
+        }
+        x += 1
+      }
+      y += 1
+    }
+    chosen
+  }
+
+  @inline private def eligibleGlaveTarget(victim: Simulacrum, previous: Simulacrum, primary: Simulacrum,
+    sourceIsFriendly: Boolean, source: UnitInfo): Boolean = (
+    (victim ne primary) && (victim ne previous) && (victim.realUnit ne source)
+      && victim.alive && victim.hitPoints > 0 && ! victim.invincible && ! victim.stasised
+      && victim.isFriendlyCached != sourceIsFriendly
+      && (victim.detected || ( ! victim.cloaked && ! victim.burrowed)))
 
   @inline def remove(unit: Simulacrum): Unit = {
     unit.gridTile.foreach(tile => {

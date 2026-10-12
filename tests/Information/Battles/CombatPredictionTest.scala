@@ -988,6 +988,124 @@ object CombatPredictionTest extends App {
     devourer.dealDamageTo(airPrimary)
     assert(airPrimary.hitPoints == 475 && airNearby.hitPoints == 500)
   }
+  check("Mutalisk glaves chain through neighboring cells for 9/3/1 damage and join combat components") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val second = splashVictim(sim, 288, kind = Protoss.Scout)
+    val third = splashVictim(sim, 320)
+    sim.interactions.reset(Vector(mutalisk.realUnit, primary.realUnit, second.realUnit, third.realUnit))
+    sim.battle.simulationFrames = 121
+    mutalisk.dealDamageTo(primary)
+    assert(Seq(primary, second, third).map(_.hitPoints) == Seq(491, 497, 499))
+    assert(mutalisk.damageDealt == 13 && sim.interactions.components.size == 1)
+  }
+  check("Mutalisk bounces select only two distinct victims from a crowded neighborhood") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val candidates = (0 until 9).map(i => splashVictim(sim, 240 + i % 3 * 16, 240 + i / 3 * 16))
+    for (_ <- 0 until 32) {
+      candidates.foreach(_.hitPoints = 500)
+      mutalisk.dealDamageTo(primary)
+      assert(candidates.map(500 - _.hitPoints).sorted == Seq(0, 0, 0, 0, 0, 0, 0, 1, 3))
+    }
+    assert(primary.hitPoints == 500 - 32 * 9)
+  }
+  check("Mutalisk bounces use upgraded damage and each victim's own armor and shields") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 12)
+    val primary = splashVictim(sim, 256)
+    primary.armorHealth = 8
+    val second = splashVictim(sim, 288)
+    second.armorHealth = 2
+    val third = splashVictim(sim, 320)
+    third.shieldPoints = 5
+    third.armorShield = 1
+    third.armorHealth = 9
+    mutalisk.dealDamageTo(primary)
+    assert(primary.hitPoints == 496 && second.hitPoints == 498)
+    assert(third.hitPoints == 500 && third.shieldPoints == 4)
+  }
+  check("Mutalisk bounces reject ineligible units, clip map edges, and stop without a new target") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(128, 128), 9)
+    val primary = splashVictim(sim, 0, 0)
+    val second = splashVictim(sim, 32, 32)
+    second.cloaked = true
+    second.detected = true
+    val ignored = (0 until 7).map(_ => splashVictim(sim, 0, 0))
+    ignored(0).isFriendlyCached = true
+    ignored(1).alive = false
+    ignored(2).hitPoints = 0
+    ignored(3).invincible = true
+    ignored(4).stasised = true
+    ignored(5).cloaked = true
+    ignored(6).burrowed = true
+    val outside = splashVictim(sim, 96, 0)
+    val oppositeEdge = splashVictim(sim, With.mapPixelWidth - 1, 0)
+    mutalisk.dealDamageTo(primary)
+    assert(primary.hitPoints == 491 && second.hitPoints == 497)
+    assert(ignored.map(_.hitPoints) == Seq(500, 500, 0, 500, 500, 500, 500))
+    assert(outside.hitPoints == 500 && oppositeEdge.hitPoints == 500)
+    second.alive = false
+    mutalisk.dealDamageTo(primary)
+    assert(primary.hitPoints == 482 && second.hitPoints == 497)
+  }
+  check("Mutalisk sampling finds the sole eligible victim among many allies") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val second = splashVictim(sim, 288)
+    val allies = (0 until 128).map(_ => splashVictim(sim, 260))
+    allies.foreach(_.isFriendlyCached = true)
+    for (_ <- 0 until 16) mutalisk.dealDamageTo(primary)
+    assert(primary.hitPoints == 500 - 16 * 9 && second.hitPoints == 500 - 16 * 3)
+    assert(allies.forall(_.hitPoints == 500))
+  }
+  check("Mutalisk bounces continue after killing each preceding target and credit each kill once") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val second = splashVictim(sim, 288)
+    val third = splashVictim(sim, 320)
+    primary.hitPoints = 9
+    second.hitPoints = 3
+    third.hitPoints = 1
+    mutalisk.dealDamageTo(primary)
+    assert(Seq(primary, second, third).forall(_.hitPoints == 0))
+    assert(mutalisk.kills == 3 && mutalisk.damageDealt == 13)
+  }
+  check("collision off keeps Mutalisk attacks single-target") {
+    val sim = new Simulation(collisionEnabled = false)
+    sim.battle = simulation().battle
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val nearby = splashVictim(sim, 260)
+    mutalisk.dealDamageTo(primary)
+    assert(primary.hitPoints == 491 && nearby.hitPoints == 500)
+  }
+  check("committed Mutalisk glaves use current neighbors after the source leaves the battle") {
+    val sim = simulation()
+    val mutalisk = armed(sim, Zerg.Mutalisk, Pixel(64, 256), 9)
+    val primary = splashVictim(sim, 256)
+    val second = splashVictim(sim, 800)
+    val third = splashVictim(sim, 320)
+    sim.realUnits ++= Seq(primary.realUnit, second.realUnit, third.realUnit)
+    sim.interactions.reset(sim.realUnits)
+    With.frame = 1000
+    primary.realUnit.addDamage(mutalisk, 2, true, false, Some(mutalisk.damageVolleyAgainst(primary)), Some(901))
+    val reset = classOf[Simulation].getDeclaredMethods.find(_.getName.endsWith("resetPendingDamage")).get
+    reset.setAccessible(true)
+    reset.invoke(sim, Int.box(With.frame))
+    mutalisk.alive = false
+    sim.step()
+    assert(Seq(primary, second, third).forall(_.hitPoints == 500))
+    sim.grid.relocateUnit(second, Pixel(288, 256))
+    sim.step()
+    assert(Seq(primary, second, third).map(_.hitPoints) == Seq(491, 497, 499))
+    assert(sim.interactions.components.size == 1)
+  }
   check("Lurker splash follows the firing line, hits once, and excludes units beside or behind it") {
     val sim = simulation()
     val lurker = armed(sim, Zerg.Lurker, Pixel(128, 256), 20)

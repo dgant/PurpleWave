@@ -46,6 +46,7 @@ class Configuration {
 
   var simulationAsynchronous        = true
   var simulationFrames              = Seconds(15)()
+  var simulationProximityFrames     = Seconds(5)() // Stop adding proximity edges; actual damage still joins components.
   var simulationResolution          = 8
   var simulationDamageValueRatio    = 0.1
   var simulationRecordingPeriod     = 240

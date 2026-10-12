@@ -276,6 +276,7 @@ final class Simulacrum(val realUnit: UnitInfo) extends CombatUnit {
   private[Simulation] def applyAttackDamage(victim: Simulacrum, damage: DamageDealt): Unit = {
     val victimWasAlive = victim.hitPoints > 0
     val damageTotal = victim.receiveDamage(damage)
+    if (damageTotal > 0) simulation.interactions.observeDamage(realUnit, victim.realUnit)
     val credit = if (isFriendlyCached == victim.isFriendlyCached) -1 else 1
     valueDealt += credit * damageTotal * victim.valuePerDamage * With.configuration.simulationDamageValueRatio
     damageDealt += credit * damageTotal

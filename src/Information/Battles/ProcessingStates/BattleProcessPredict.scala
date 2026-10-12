@@ -45,6 +45,9 @@ class BattleProcessPredict extends BattleProcessState {
       return
     }
 
+    val partitioned = With.battles.nextBattlesLocal.map(_.partitionCombatForecasts()).exists(identity)
+    if (partitioned) return
+
     transitionTo(new BattleProcessJudge)
   }
 }

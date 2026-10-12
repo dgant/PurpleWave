@@ -25,7 +25,7 @@ object FightWithZealot extends Action {
       && (t.matchups.threatsInPixels(16).exists(Protoss.Zealot) || t.totalHealth < 10))
 
     val target = Maff.minBy(targets)(t => t.totalHealth + 2 * probe.pixelsToGetInRange(t))
-    if (probe.readyForAttackOrder && target.isDefined && ! probe.matchups.threatsInPixels(64).filterNot(target.contains).exists(_.presumptiveTarget.contains(probe))) {
+    if (target.exists(probe.readyForAttackOrder) && ! probe.matchups.threatsInPixels(64).filterNot(target.contains).exists(_.presumptiveTarget.contains(probe))) {
       probe.agent.toAttack = target
       Commander.attack(probe)
     } else{

@@ -45,7 +45,7 @@ object BeDragoonVsSlowlot extends Action {
     if (marginDelta >= 0) {
       Target.choose(unit)
       if (unit.agent.toAttack.isDefined) {
-        if (unit.readyForAttackOrder) {
+        if (unit.readyForAttackOrder(unit.agent.toAttack.get)) {
           Commander.attack(unit)
         } else if (marginDelta > 32 && ! unit.matchups.threatsInPixels(160).exists(_.presumptiveTarget.contains(unit))) {
           unit.agent.forces.put(Forces.target, Potential.towards(unit, unit.pixelToFireAtExhaustive(unit.agent.toAttack.get)))

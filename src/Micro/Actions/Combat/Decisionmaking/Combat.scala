@@ -165,7 +165,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   protected def readyToApproachTarget: Boolean = {
     if (target.isEmpty) return false
     if (unit.unitClass.melee) return true
-    if (?(unit.airlifted, 0, unit.framesToBeReadyForAttackOrder) > unit.framesToGetInRange(target.get) + 4) return false
+    if (?(unit.airlifted, 0, unit.framesToBeReadyForAttackOrder(target.get)) > unit.framesToGetInRange(target.get) + 4) return false
     true
   }
 
@@ -272,7 +272,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def attackIfReady(): Boolean = {
-    if (unit.ready && unit.readyForAttackOrder && readyToApproachTarget) {
+    if (unit.ready && target.exists(unit.readyForAttackOrder) && readyToApproachTarget) {
       Commander.attack(unit)
     }
     unit.unready
@@ -288,13 +288,13 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
   }
 
   protected def potshot(): Boolean = {
-    if (unit.ready && unit.readyForAttackOrder) {
+    if (unit.ready) {
       val potshotTarget = Maff.orElseFiltered(
           Maff.minBy(unit.matchups.threats)(_.pixelDistanceEdge(unit)).filter(TargetFilterPotshot.legal(unit, _)),
           target.filter(TargetFilterPotshot.legal(unit, _)),
           Target.best(unit, TargetFilterPotshot))(unit.canAttack).headOption
-      unit.agent.toAttack = potshotTarget.orElse(target)
-      if (potshotTarget.exists(TargetFilterPotshot.legal(unit, _))) {
+      if (potshotTarget.exists(t => unit.readyForAttackOrder(t) && TargetFilterPotshot.legal(unit, t))) {
+        unit.agent.toAttack = potshotTarget
         unit.agent.act("Potshot")
         Commander.attack(unit)
       }
@@ -364,7 +364,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
         minimumSpace = Math.min(minimumSpace, rangeDifferential / 2)
       }
     })
-    if (unit.readyForAttackOrder) {
+    if (target.map(unit.readyForAttackOrder).getOrElse(unit.readyForAttackOrder)) {
       minimumSpace = Math.min(minimumSpace, target.map(unit.pixelRangeAgainst).getOrElse(unit.pixelRangeMax) - 24)
     }
 
@@ -385,7 +385,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     target.foreach(t => {
       var kite  = false
       var chase = false
-      if (unit.readyForAttackOrder) {
+      if (unit.readyForAttackOrder(t)) {
         if (unit.framesToGetInRange(t) < With.game.getRemainingLatencyFrames) {
           if (unit.orderTarget.contains(t)) {
             kite = true

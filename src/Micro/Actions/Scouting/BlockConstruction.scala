@@ -36,7 +36,7 @@ object BlockConstruction extends Action {
     } else if (unit.framesToGetInRange(builder) > With.reaction.agencyAverage) {
       Commander.move(unit)
 
-    } else if (unit.readyForAttackOrder
+    } else if (unit.readyForAttackOrder(builder)
       || unit.totalHealth >= builder.totalHealth + ?(unit.cooldownLeft == builder.cooldownLeft, 0, ?(unit.cooldownLeft < builder.cooldownLeft, 5, -5))
       || unit.pixelsToGetInRange(builder) > 0) {
 

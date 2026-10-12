@@ -154,7 +154,6 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
     val radians   = unit.agent.forces.sum.radians
     val forceGoal = MicroPathing.getWaypointInDirection(unit, radians).orElse(unit.agent.destinationNext.pixel)
     unit.agent.forced.set(forceGoal)
-    if (forceGoal.isEmpty) { With.logger.micro(f"$unit found no waypoint towards ${Math.toDegrees(radians)} degrees.") }
     move()
   }
 

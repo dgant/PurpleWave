@@ -15,7 +15,6 @@ object ShuttleDitchPassengers extends Action {
       .filter(p => p.isNone(Protoss.Reaver, Protoss.HighTemplar) && ! p.squad.exists(shuttle.squad.contains))
       .toVector
     if (hitchhikers.nonEmpty) {
-      With.logger.micro(f"$shuttle ${shuttle.squad.map(_.toString).getOrElse("(No squad)")} ditching ${hitchhikers.map(h => f"$h ${h.squad.map(_.toString).getOrElse("(No squad)")}").mkString(", ")}")
       hitchhikers.foreach(shuttle.agent.removePassenger)
       hitchhikers.foreach(Commander.unload(shuttle, _))
     }

@@ -12,7 +12,6 @@ class Logger {
   
   private val logMessages = new ListBuffer[String]
   private val performanceMessages = new ListBuffer[String]
-  private val microMessages = new ListBuffer[String]
   private var errorOcurred = false
   
   def flush(): Unit = {
@@ -25,7 +24,6 @@ class Logger {
     val file = new File(filename)
     val printWriter = new PrintWriter(file)
     printWriter.write(logMessages.mkString("\r\n"))
-    printWriter.write(microMessages.mkString("\r\n"))
     printWriter.write(performanceMessages.mkString("\r\n"))
     printWriter.close()
   }
@@ -44,10 +42,6 @@ class Logger {
     quietlyOnException(exception)
   }
 
-  def micro(message: String): Unit = {
-    log(f"MICRO | $message", chat = false, target = microMessages)
-  }
-  
   def debug(message: String): Unit = {
     log(f"DEBUG | $message", chat = false)
   }

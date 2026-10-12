@@ -97,7 +97,7 @@ package Tactic.Missions {
     set(With.latency, "_remainingFrames", 1)
     With.reaction = new ReactionTimes { override def sluggishness: Int = 0; override def agencyMax: Int = 1; override def agencyAverage: Int = 1 }
     With.configuration = new Configuration
-    With.logger = new Logger { override def debug(message: String): Unit = {}; override def micro(message: String): Unit = {} }
+    With.logger = new Logger { override def debug(message: String): Unit = {} }
     With.battles = allocate(classOf[Battles])
     With.battles.byUnit = Map.empty
     With.matchups = allocate(classOf[Micro.Matchups.MatchupGraph])

@@ -1,6 +1,5 @@
 package Micro.Actions.Transportation
 
-import Lifecycle.With
 import Micro.Actions.Action
 import Micro.Actions.Combat.Maneuvering.Retreat
 import Micro.Agency.Commander
@@ -13,7 +12,6 @@ object Evacuate extends Action {
   )
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    With.logger.micro(f"$unit evacuating passengers ${unit.loadedUnits.map(_.toString).mkString(", ")}")
     unit.loadedUnits.headOption.foreach(Commander.unload(unit, _))
     Retreat.delegate(unit)
   }

@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvP
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst}
+import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst => PvPNexusFirstStrategy}
 import Utilities.Time.{GameTime, Seconds}
 
 class PvPOpeningVsFE extends GameplanImperative {
@@ -15,7 +15,7 @@ class PvPOpeningVsFE extends GameplanImperative {
   var response: Option[Response] = None
 
   override def activated: Boolean = {
-    if (PvPNexusFirst()) return false
+    if (PvPNexusFirstStrategy()) return false
     if (PvPCoreExpand()) return false
     if ( ! enemyStrategy(With.fingerprints.nexusFirst, With.fingerprints.forgeFe)) return false
 

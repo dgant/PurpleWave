@@ -21,10 +21,25 @@ class WallGapPositions(base: Base) {
   def waypoint(unit: FriendlyUnitInfo, target: Pixel): Pixel = geometry
     .map(_.waypoint(Defender(unit.id, body(unit.unitClass), Protoss.Probe(unit), unit.pixel), target)).getOrElse(target)
 
+  // Minimum Zealots the current placement plan needs to seal every detected entrance.
+  // None means no active wall, or the planner cannot seal it.
+  def minimumDefenders: Option[Int] = updateGeometry().flatMap(_.minimumDefenders)
+
   def apply(units: Iterable[FriendlyUnitInfo]): Map[FriendlyUnitInfo, Pixel] = {
-    if (! base.isNatural || ! With.enemies.exists(_.isZerg)) return Map.empty
     val defenders = units.filter(u => u.alive && u.complete && ! u.loaded && u.isAny(Protoss.Zealot, Protoss.Probe)).toVector
     if (defenders.isEmpty) return Map.empty
+    val currentGeometry = updateGeometry()
+    if (currentGeometry.isEmpty) return Map.empty
+    val byId = defenders.map(u => u.id -> u).toMap
+    currentGeometry.get.assign(defenders.map(u => Defender(u.id, body(u.unitClass), Protoss.Probe(u), u.pixel)))
+      .map { case (id, pixel) => byId(id) -> pixel }
+  }
+
+  private def updateGeometry(): Option[Geometry] = {
+    if ( ! base.isNatural || ! With.enemies.exists(_.isZerg)) {
+      geometry = None
+      return None
+    }
     // A wall may stand beyond the natural's zone; its hallway connects it to the base.
     val baseWall = With.placement.wall.filter(_.hallway.exists(_.zone == base.zone))
     val foundations = With.placement.get(PlaceLabels.Wall).flatMap(f => With.placement.get(f.tile)).distinct.filter(f =>
@@ -33,8 +48,11 @@ class WallGapPositions(base: Base) {
           new TileRectangle(f.tile, f.point.requirement.width, f.point.requirement.height).tiles.exists(_.zone == base.zone)))
     val wall = With.units.ours.filter(u => u.alive && ! u.flying && u.unitClass.isBuilding && foundations.exists(f =>
       f.tile == u.tileTopLeft && f.point.requirement.dimensions == ((u.unitClass.tileWidth, u.unitClass.tileHeight)))).toVector
-    if (! wall.exists(u => u.unitClass.tileWidth == 4 && u.unitClass.tileHeight == 3)
-      || ! wall.exists(u => u.unitClass.tileWidth == 3 && u.unitClass.tileHeight == 2)) return Map.empty
+    if ( ! wall.exists(u => u.unitClass.tileWidth == 4 && u.unitClass.tileHeight == 3)
+      || ! wall.exists(u => u.unitClass.tileWidth == 3 && u.unitClass.tileHeight == 2)) {
+      geometry = None
+      return None
+    }
 
     val wallBoxes = wall.filterNot(_.unitClass.isStaticDefense).map(u => body(u.unitClass).at(u.pixel))
     val vicinity = Box(wallBoxes.map(_.left).min, wallBoxes.map(_.top).min,
@@ -53,9 +71,7 @@ class WallGapPositions(base: Base) {
           requirement.walkableAfter && ! requirement.buildableAfter
         }))
     }
-    val byId = defenders.map(u => u.id -> u).toMap
-    geometry.get.assign(defenders.map(u => Defender(u.id, body(u.unitClass), Protoss.Probe(u), u.pixel)))
-      .map { case (id, pixel) => byId(id) -> pixel }
+    geometry
   }
 }
 
@@ -392,6 +408,30 @@ object WallGapPositions {
         next += 1
       }
       reached.toVector
+    }
+
+    // Count hypothetical assignments without changing unit identities or arrival order.
+    lazy val minimumDefenders: Option[Int] = countMinimumDefenders()
+
+    private def countMinimumDefenders(): Option[Int] = {
+      val zealot = body(Protoss.Zealot)
+      var count = 0
+      var stalled = 0
+      var previousFront = Set.empty[(Gap, Box)]
+      while (stalled < Math.max(1, gaps.size)) {
+        val placements = allocate(Vector.fill(count)((false, zealot)))
+        val sealedWall = gaps.forall(g => connectedTo(ling.forbidden(g.first), placements.map(_.slot.blocked))
+          .exists(_.touches(ling.forbidden(g.second))))
+        if (sealedWall) return Some(count)
+        if (placements.size < count) return None
+        val front = placements.filter(_.slot.front).map(p => (p.gap, p.slot.box)).toSet
+        // Allocation visits every gap once per pass. If a whole pass adds only
+        // reserves, additional Zealots cannot fill the remaining front openings.
+        stalled = if (count > 0 && front == previousFront) stalled + 1 else 0
+        previousFront = front
+        count += 1
+      }
+      None
     }
 
     private case class Planned(probe: Boolean, body: Body, slot: Slot, gap: Gap)

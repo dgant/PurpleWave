@@ -192,6 +192,11 @@ final class Tactician extends TimedTask {
           .toSeq))
     }
 
+    // Pull defense workers after army assignment, before gathering claims the remainder.
+    (With.squads.next.collect { case squad: SquadDefendBase => squad } ++
+      With.geography.ourBasesAndSettlements.map(GetDefenseBase(_)).distinct.map(defenseSquads))
+      .distinct.foreach(_.launch())
+
     // SCVs for Terran attacks
     if (With.self.isTerran) {
       val workers = MacroCounter.countOursComplete(Terran.SCV)

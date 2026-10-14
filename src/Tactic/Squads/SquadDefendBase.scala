@@ -34,13 +34,11 @@ class SquadDefendBase(base: Base) extends Squad {
     // Recruitment precedes prepareToRun; inspect this cycle's incoming assignments.
     val defenders       = unitsNext.filterNot(IsWorker)
     val (zone, choke)   = zoneAndChokeFor(defenders)
-    val breached        = invaders.exists(isBreaching(_, zone, choke))
-    val defensePoint    = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
-    val withdrawing     = defenders.exists(u => ! u.metro.contains(base.metro) && u.pixelDistanceTravelling(defensePoint) > 32 * 15)
+    val defense         = new DefenseState(defenders, invaders, zone, choke)
     lazy val wallMinimum = wallGapPositions.minimumDefenders
     val workersRequired =
-      if (breached
-        && ! withdrawing
+      if (defense.breached
+        && defense.withdrawingUnits == 0
         && (defenders.isEmpty || GenericFriendlyUnitGroup(defenders).confidence11 < -0.2)
         && invaders.exists(_.isAny(Terran.Marine, IsTank, Protoss.Dragoon, Zerg.Zergling, Zerg.Hydralisk))
         && ! invaders.exists(_.isAny(Terran.Firebat, Terran.Vulture, Protoss.DarkTemplar, Protoss.Archon, Protoss.Reaver, Zerg.Lurker, Zerg.Ultralisk))) {
@@ -118,37 +116,45 @@ class SquadDefendBase(base: Base) extends Squad {
   }
   private def guardZone: Zone = zoneAndChoke()._1
   private def guardChoke: Option[Edge] = zoneAndChoke()._2
-  val bastion: Cache[Pixel] = new Cache(() =>
+  private def defensePoint: Pixel = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
+
+  val bastion: Cache[Pixel] = new Cache(() => bastionFor(guardChoke))
+  private def bastionFor(choke: Option[Edge]): Pixel = {
     Maff.minBy(
       base.metro.zones
         .flatMap(_.units.view.filter(_.isOurs))
         .filter(u => u.unitClass.isBuilding && (u.unitClass.canAttack || Protoss.ShieldBattery(u) || (u.complete && u.totalHealth < 300)))
-        .map(_.pixel))
-    (_.groundPixels(
-      guardChoke
-        .map(_.pixelCenter)
-        .getOrElse(vicinity)))
-    .getOrElse(vicinity))
+        .map(_.pixel))(_.groundPixels(choke.map(_.pixelCenter).getOrElse(defensePoint)))
+    .getOrElse(defensePoint)
+  }
+
+  private class DefenseState(defenders: Seq[FriendlyUnitInfo], invaders: Seq[UnitInfo], zone: Zone, choke: Option[Edge]) {
+    private lazy val breaching            = invaders.filter(isBreaching(_, zone, choke))
+    private lazy val enemyCanAttackGround = invaders.exists(_.canAttackGround)
+    // Recruitment must detect invasions even before defenders can scour them.
+    lazy val breached         = breaching.nonEmpty
+    lazy val scourables       = invaders.filter(isScourable(_, defenders, enemyCanAttackGround))
+    lazy val canScour         = scourables.nonEmpty && (
+      With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack() || scourables.exists(breaching.contains))
+    lazy val travelGoal       = ?(canScour, defensePoint, choke.map(_.pixelCenter).getOrElse(bastionFor(choke)))
+    lazy val withdrawingUnits = defenders.count(u =>
+      ! u.metro.contains(base.metro)
+      && u.pixelDistanceTravelling(defensePoint) + 32 * 15 > travelGoal.travelPixelsFor(defensePoint, u)
+      && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
+  }
 
   private var formationReturn: Formation = FormationEmpty
   private val wallGapPositions = new WallGapPositions(base)
 
   override def run(): Unit = {
-    vicinity = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)
+    vicinity = defensePoint
     if (units.isEmpty) return
     if (emergencyDTHugs()) return
 
-    val canWander         = With.geography.ourBases.size > 2 || ! With.enemies.exists(_.isZerg) || With.blackboard.wantToAttack()
-    val scourables        = enemies.filter(isScourable)
-    val breached          = scourables.exists(isBreaching)
-    val canScour          = scourables.nonEmpty && (canWander || breached)
-    val travelGoal        = ?(canScour, vicinity, guardChoke.map(_.pixelCenter).getOrElse(bastion()))
-    val withdrawingUnits  = units.count(u =>
-      ! u.metro.contains(base.metro)
-      && u.pixelDistanceTravelling(vicinity) + 32 * 15 > travelGoal.travelPixelsFor(vicinity, u)
-      && u.pixelDistanceTravelling(travelGoal) > 32 * 15)
+    val defense  = new DefenseState(units, enemies, guardZone, guardChoke)
+    val canScour = defense.canScour
 
-    lazy val formationWithdraw  = Formations.disengage(this, Some(travelGoal))
+    lazy val formationWithdraw  = Formations.disengage(this, Some(defense.travelGoal))
     lazy val formationScour     = Formations.march(this, targets.get.headOption.map(_.pixel).getOrElse(vicinity))
     lazy val formationGuard     = guardChoke.map(_.pixelCenter).orElse(plugWall().map(_.center)).map(pixel => new FormationStandard(this, FormationStyleGuard, pixel, Some(guardZone))).getOrElse(formationBastion)
     lazy val formationBastion   = {
@@ -165,31 +171,16 @@ class SquadDefendBase(base: Base) extends Squad {
     }
 
     val blockZerglings  = With.enemies.exists(_.isZerg) && ! enemies.exists(_.isAny(Zerg.Hydralisk, Zerg.Lurker)) && guardChoke.exists(c => base.metro.ourUnits.exists(u => u.unitClass.isStaticDefense && u.pixelDistanceEdge(c.pixelCenter) < 8 * 32))
-    val canWithdraw     = withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
+    val canWithdraw     = defense.withdrawingUnits >= Math.max(2, 0.25 * units.size) && formationWithdraw.placements.size > units.size * .75
     val canGuard        = guardChoke.isDefined && (units.size > 5 || blockZerglings || ! With.enemies.exists(_.isZerg) || With.geography.ourBases.length > 1)
     val targetsUnranked =
-      if        (canScour)    scourables
+      if        (canScour)    defense.scourables
       else if   (canWithdraw) SquadAutomation.unrankedEnRouteTo(this, vicinity).toVector
       else                    enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker))
 
     val wallPlugs = wallGapPositions(units)
-    if (wallPlugs.nonEmpty && ! canWithdraw && ! canScour) {
-      lastAction = "Wall"
-      formations += FormationSimple(FormationStylePlug, formationBastion.placements ++ wallPlugs)
-      formations += formationBastion
-      SquadAutomation.send(this)
-      wallPlugs.foreach { case (unit, pixel) => holdWallGap(unit, pixel) }
-    } else if (plugEdge().isDefined && ! canWithdraw && ! canScour) {
-      val plugPixel = plugEdge().get._2.get.pixelCenter
-      lastAction = "Plug"
-      formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
-      units.foreach(_.intend(this)
-        .setCanFlee(false)
-        .setRedoubt(plugPixel)
-        .setTerminus(plugPixel)
-        .setAction(Plug(plugPixel)))
-    } else if (canWithdraw) {
+    if (canWithdraw) {
       lastAction = "Withdraw"
       if (canScour) {
         formations += formationScour
@@ -201,6 +192,21 @@ class SquadDefendBase(base: Base) extends Squad {
       formations += formationScour
       formations += formationGuard
       scour()
+    } else if (wallPlugs.nonEmpty) {
+      lastAction = "Wall"
+      formations += FormationSimple(FormationStylePlug, formationBastion.placements ++ wallPlugs)
+      formations += formationBastion
+      SquadAutomation.send(this)
+      wallPlugs.foreach { case (unit, pixel) => holdWallGap(unit, pixel) }
+    } else if (plugEdge().isDefined) {
+      val plugPixel = plugEdge().get._2.get.pixelCenter
+      lastAction = "Plug"
+      formations += FormationSimple(FormationStylePlug, units.map((_, plugPixel)).toMap)
+      units.foreach(_.intend(this)
+        .setCanFlee(false)
+        .setRedoubt(plugPixel)
+        .setTerminus(plugPixel)
+        .setAction(Plug(plugPixel)))
     } else if (canGuard) {
       lastAction = "Guard"
       if (targets.exists(_.nonEmpty)) {
@@ -296,7 +302,6 @@ class SquadDefendBase(base: Base) extends Squad {
     })
   }
 
-  private def isBreaching(enemy: UnitInfo): Boolean = isBreaching(enemy, guardZone, guardChoke)
   private def isBreaching(enemy: UnitInfo, zone: Zone, choke: Option[Edge]): Boolean = (
     enemy.canAttackGround
       && (enemy.base.exists(b => b == base || b.owner.isUs)
@@ -305,14 +310,13 @@ class SquadDefendBase(base: Base) extends Squad {
       && (With.fingerprints.workerRush() || ! IsWorker(enemy))
       && ! zone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
 
-  private val enemyCanAttackGround = new Cache(() => enemies.exists(_.canAttackGround))
-  private def isScourable(enemy: UnitInfo): Boolean = (
+  private def isScourable(enemy: UnitInfo, defenders: Seq[FriendlyUnitInfo], enemyCanAttackGround: Boolean): Boolean = (
     // Don't get baited by 4-pool scouts
     ! (With.frame < Minutes(4)() && Zerg.Drone(enemy) && With.fingerprints.fourPool())
     // Don't scour what we can't kill
-    && (units.exists(_.canAttack(enemy)) || ((enemy.cloaked || enemy.burrowed) && units.exists(_.unitClass.isDetector)))
+    && (defenders.exists(_.canAttack(enemy)) || ((enemy.cloaked || enemy.burrowed) && defenders.exists(_.unitClass.isDetector)))
     // Don't chase Overlords or floating buildings when there are actual threats nearby
-    && ((enemy.unitClass.attacksOrCastsOrDetectsOrTransports && ! Zerg.Overlord(enemy)) || ! enemyCanAttackGround())
+    && ((enemy.unitClass.attacksOrCastsOrDetectsOrTransports && ! Zerg.Overlord(enemy)) || ! enemyCanAttackGround)
     // If we don't really want to fight, wait until they push into the base
     && (enemy.flying || With.blackboard.wantToAttack() || enemy.metro.contains(base.metro)))
 

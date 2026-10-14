@@ -17,7 +17,7 @@ package bwapi {
 
 package Micro.Formation {
   import Information.Geography.Geography
-  import Information.Geography.Types.{Base, Zone}
+  import Information.Geography.Types.{Base, Edge, Zone}
   import Lifecycle.With
   import Lifecycle.Configure.Configuration
   import Mathematics.Points.{Pixel, Point, Tile}
@@ -259,6 +259,7 @@ package Micro.Formation {
     // Exercise recruitment, gathering and the actual squad batch swap together.
     With.self = player(Race.Protoss)
     set(With.self, "bwapiPlayer", allocate(classOf[bwapi.WorkerRecruitmentPlayer]))
+    With.blackboard = new Planning.Blackboard
     With.performance = new Performance.PerformanceMonitor
     With.fingerprints = new Information.Fingerprinting.Fingerprints
     With.battles = allocate(classOf[Information.Battles.Battles])
@@ -280,6 +281,7 @@ package Micro.Formation {
     set(With.geography, "_edges", Vector.empty)
     set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(recruitmentBase)))
     set(With.geography, "ourMainCache", new Cache(() => recruitmentBase))
+    set(With.geography, "ourBasesCache", new Cache(() => Vector(recruitmentBase)))
     set(With.geography, "ourFoyerCache", new Cache(() => recruitmentBase))
     set(zone, "zones", Vector(zone))
     set(zone, "_exitCache", new Cache(() => None))
@@ -287,9 +289,12 @@ package Micro.Formation {
       val u = unit(id, kind, Tile(14, 18))
       set(u, "_player", With.self)
       set(u, "_powered", true)
+      set(u, "_flying", kind.isFlyer)
       set(u, "_squad", None)
       set(u, "_intent", new Intention)
       set(u, "canAttackCache", new Cache(() => kind.rawCanAttack))
+      set(u, "canBeAttackedCache", new Cache(() => true))
+      set(u, "_effectivelyCloaked", new Cache(() => false))
       set(u, "attacksAgainstGroundCache", new Cache(() => if (kind.attacksGround) 1 else 0))
       set(u, "_confidence", new Cache(() => -0.5))
       u
@@ -359,6 +364,45 @@ package Micro.Formation {
       set(fighter, "_confidence", new Cache(() => -0.5))
       squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.size == 2)
+    }
+    check("withdrawal uses the guard choke or breached base according to the incoming army's targets") {
+      val center = recruitmentBase.heart.center
+      val choke = allocate(classOf[Edge])
+      set(choke, "pixelCenter", center.add(640, 0))
+      set(choke, "bitmap$0", (-1).toByte)
+      val outside = allocate(classOf[Zone])
+      def move(defender: FriendlyUnitInfo, distance: Int): Unit = {
+        val pixel = center.add(distance, 0)
+        set(defender, "_pixel", pixel)
+        set(defender, "_tile", pixel.tile)
+        val zones = Array.fill(With.mapTileArea)(zone)
+        zones(pixel.tile.i) = outside
+        set(With.geography, "_zoneByTile", zones)
+      }
+      try {
+        Vector(Protoss.Corsair, ProxyBwapi.Races.Zerg.Mutalisk).foreach(kind => {
+          val (squad, _) = resetRecruitment()
+          set(zone, "_exitCache", new Cache(() => Some(choke)))
+          val defender = recruit(34, kind)
+          move(defender, 704)
+          squad.addUnit(defender)
+          squad.recruitWorkers(Vector(marine))
+          // The Corsair is at its guard choke. The Mutalisk can scour the Marine,
+          // so it must travel back to the breached base before workers assist.
+          assert(squad.workerLock.units.size == (if (Protoss.Corsair(defender)) 2 else 0))
+          nextCycle()
+          move(defender, 1280)
+          squad.recruitWorkers(Vector(marine))
+          assert(squad.workerLock.units.isEmpty)
+          nextCycle()
+          move(defender, 320)
+          squad.recruitWorkers(Vector(marine))
+          assert(squad.workerLock.units.size == 2)
+        })
+      } finally {
+        set(zone, "_exitCache", new Cache(() => None))
+        set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+      }
     }
     check("pure Zealot invasions and Firebats retain the existing no-pull policy") {
       Vector(Vector(enemyZealot), Vector(marine, firebat)).foreach(invaders => {

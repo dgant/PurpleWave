@@ -195,7 +195,7 @@ final class Tactician extends TimedTask {
     // Pull defense workers after army assignment, before gathering claims the remainder.
     (With.squads.next.collect { case squad: SquadDefendBase => squad } ++
       With.geography.ourBasesAndSettlements.map(GetDefenseBase(_)).distinct.map(defenseSquads))
-      .distinct.foreach(_.launch())
+      .distinct.foreach(squad => squad.launch(squadsDefending.filter(_._2 == squad).flatMap(_._1.enemiesOuter).distinct))
 
     // SCVs for Terran attacks
     if (With.self.isTerran) {

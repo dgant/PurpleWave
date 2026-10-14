@@ -24,14 +24,15 @@ import Utilities.UnitFilters._
 
 class SquadDefendBase(base: Base) extends Squad {
 
-  override def launch(): Unit = {
+  override def launch(): Unit = launch(Vector.empty)
+
+  def launch(invaders: Seq[UnitInfo]): Unit = {
     if (With.frame >= Minutes(8)()) {
       workerLock.release()
       return
     }
     // Recruitment precedes prepareToRun; inspect this cycle's incoming assignments.
     val defenders       = unitsNext.filterNot(IsWorker)
-    val invaders        = enemiesNext
     val (zone, choke)   = zoneAndChokeFor(defenders)
     val breached        = invaders.exists(isBreaching(_, zone, choke))
     val defensePoint    = plugWall().map(_.center).getOrElse(?(base.metro == With.geography.ourMain.metro, With.geography.ourMain, base).heart.center)

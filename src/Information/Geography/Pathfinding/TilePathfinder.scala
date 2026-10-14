@@ -82,8 +82,12 @@ trait TilePathfinder {
       val diff = toState.repulsion - fromState.get.repulsion
       profile.costRepulsion * 0.5 * (Maff.fastSigmoid01(diff) + 0.5 + 0.5 * Maff.signum101(diff)) * Math.max(toState.repulsion, fromState.get.repulsion)
     }
-    val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * Math.max(0, profile.threatGrid.getUnchecked(i) - profile.threatGrid.getUnchecked(fromTile.i)) // Max?
-    val output = costSoFar + costDistance + costEnemyVision + costImmobility + costOccupancy + costRepulsion + costThreat
+    // Charge for remaining inside danger, even when moving sideways or outward.
+    val costThreat: Double  = if (profile.costThreat == 0) 0 else profile.costThreat * costDistance *
+      Math.max(profile.threatGrid.getUnchecked(i), profile.threatGrid.getUnchecked(fromTile.i))
+    // Optional route preferences can be disabled locally without relaxing threat avoidance.
+    val preferenceCost = if (profile.useVisionAndRepulsion(toTile)) costEnemyVision + costRepulsion else 0.0
+    val output = costSoFar + costDistance + preferenceCost + costImmobility + costOccupancy + costThreat
     output
   }
 

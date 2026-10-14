@@ -9,6 +9,7 @@ final class GridEnemyRangeAir extends AbstractGridFloody {
 
   override protected def range(unit: UnitInfo): Int = Maff.div32(unit.pixelRangeAir.toInt)
 
-  override val margin: Int = 3
+  // Allow for flyer size while pathfinding checks only the center line.
+  override val margin: Int = 4
 }
 

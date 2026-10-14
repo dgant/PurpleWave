@@ -24,13 +24,16 @@ final class FriendlyUnitInfo(base: bwapi.Unit, id: Int) extends BWAPICachedUnitP
   override val friendly: Option[FriendlyUnitInfo] = Some(this)
 
   var lastSetRally                    : Int = 0
+  var lastFrameUnloaded               : Int = - Forever()
   private var _lastFrameOccupied      : Int = - Forever()
   private var _framesFailingToMove    : Int = 0
   private var _framesFailingToAttack  : Int = 0
   private var _framesIdle             : Int = 0
   private var _framesIdleConsecutive  : Int = 0
   override def update(): Unit = {
+    val wasLoaded = loaded
     if (frameDiscovered <  With.frame) readProxy()
+    if (wasLoaded && !loaded) lastFrameUnloaded = With.frame
     if (frameDiscovered == With.frame && ! unitClass.isTwoUnitsInOneEgg) {
       With.tactics.produce.queue.find(_.expectTrainee(this)).foreach(setProducer)
     }

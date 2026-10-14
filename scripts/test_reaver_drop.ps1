@@ -19,6 +19,7 @@ New-Item -ItemType Directory -Path $output -Force | Out-Null
 $classpath = (@($classes, $macros) + $compiler) -join ';'
 $sources = @(
     'src/ProxyBwapi/UnitInfo/UnitInfo.scala',
+    'src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala',
     'src/Planning/Blackboard.scala',
     'src/Tactic/Squads/Squads.scala',
     'src/Tactic/GetDefenseBase.scala',
@@ -31,6 +32,7 @@ $sources = @(
     'src/Micro/Coordination/Pathing/MicroPathing.scala',
     'src/Micro/Actions/Transportation/Transport.scala',
     'src/Tactic/Missions/DropManifest.scala',
+    'src/Information/Grids/Floody/GridEnemyRangeAir.scala',
     'src/Information/Geography/Pathfinding/PathfindProfile.scala',
     'src/Information/Geography/Pathfinding/TilePathfinder.scala',
     'src/Information/Geography/Pathfinding/Paths.scala',
@@ -38,6 +40,7 @@ $sources = @(
     'src/Tactic/Missions/MissionDrop.scala',
     'src/Tactic/Missions/MissionReaverDrop.scala',
     'src/Micro/Actions/Protoss/Shuttle/ShuttleAdoptPassenger.scala',
+    'src/Micro/Agency/Agent.scala',
     'src/Micro/Agency/Commander.scala',
     'tests/Tactic/ReaverDropTest.scala'
 ) | ForEach-Object { Join-Path $repo $_ }

@@ -1,7 +1,7 @@
 package Micro.Formation
 
 import Mathematics.Points.Pixel
-import Micro.Formation.WallGapPositions._
+import Micro.Formation.WallGaps._
 
 object WallGapPositionsTest extends App {
   def body(kind: bwapi.UnitType): Body = Body(kind.dimensionLeft, kind.dimensionUp, kind.dimensionRight + 1, kind.dimensionDown + 1)
@@ -19,6 +19,45 @@ object WallGapPositionsTest extends App {
     assert(bodies.indices.forall(i => bodies.indices.forall(j => i == j || ! bodies(i).intersects(bodies(j)))))
   }
 
+  check("minimum defenders counts Zealots needed to seal narrow, centered and wide gaps") {
+    for ((width, expected) <- Vector((10, 0), (18, 1), (40, 1), (50, 1), (60, 2), (90, 6))) {
+      val bs = Vector(Box(0, 100, 100, 220), Box(100 + width, 100, 200 + width, 220))
+      val g = geometry(bs, Pixel(100 + width / 2, 500), None)
+      assert(g.minimumDefenders.contains(expected), (width, g.minimumDefenders))
+      val units = (1 to expected).map(defender(_)).toVector
+      val result = g.assign(units)
+      val region = Box(80, 80, 120 + width, 270)
+      assert(! crosses(bs ++ result.values.map(zealot.at), region, _.y == 80, _.y == 269), (width, result))
+      if (expected > 0) {
+        val fewer = geometry(bs, Pixel(100 + width / 2, 500), None).assign(units.dropRight(1))
+        assert(crosses(bs ++ fewer.values.map(zealot.at), region, _.y == 80, _.y == 269), (width, fewer))
+      }
+    }
+  }
+  check("minimum defenders seals all gaps with the actual allocation order") {
+    val g = geometry()
+    val count = g.minimumDefenders.get
+    assert(count > g.gaps.size, count)
+    val units = (1 to count).map(defender(_)).toVector
+    val result = g.assign(units)
+    val fewer = g.assign(units.dropRight(1))
+    val region = Box(80, 80, 412, 270)
+    assert(! crosses(buildings ++ result.values.map(zealot.at), region, _.y == 80, _.y == 269), result)
+    assert(crosses(buildings ++ fewer.values.map(zealot.at), region, _.y == 80, _.y == 269), fewer)
+  }
+  check("querying minimum defenders does not alter existing assignments") {
+    val g = geometry()
+    val units = (1 to 7).map(defender(_)).toVector
+    val before = g.assign(units)
+    assert(g.minimumDefenders.nonEmpty)
+    assert(g.assign(units) == before)
+  }
+  check("minimum defenders reports an entrance that Zealots cannot occupy") {
+    val g = geometry(Vector(Box(0, 100, 100, 220), Box(118, 100, 218, 220)), Pixel(109, 500), None,
+      (x, _) => x * 8 >= 96 && x * 8 < 120)
+    assert(g.gaps.nonEmpty)
+    assert(g.minimumDefenders.isEmpty)
+  }
   check("walking path before wider gaps; remaining gaps widest first") {
     val g = geometry()
     assert(g.gaps.map(_.width) == Vector(40, 60, 32), g.gaps)
@@ -39,6 +78,88 @@ object WallGapPositionsTest extends App {
     val wide = result.values.filter(p => p.x > 220 && p.x < 280).toVector.sortBy(_.x)
     assert(wide.size == 2 && wide.head.y == wide.last.y && wide.last.x - wide.head.x >= 23, result)
     disjoint(result, units)
+  }
+  check("a lone defender centers a two-Zealot opening and recenters after a casualty") {
+    for (width <- Vector(50, 60); reverse <- Vector(false, true)) {
+      val bs = Vector(Box(0, 100, 100, 220), Box(100 + width, 100, 200 + width, 220))
+      val g = geometry(bs, Pixel(100 + width / 2, if (reverse) -300 else 500), None)
+      val unit = defender(1)
+      val one = g.assign(Vector(unit))
+      val box = zealot.at(one(1))
+      assert(Math.abs((box.left - 100) - (100 + width - box.right)) <= 1, one)
+      assert(g.fits(zealot, one(1)))
+      val units = Vector(unit.copy(pixel = one(1)), defender(2))
+      val two = g.assign(units)
+      if (width == 60) assert(two(1).y == two(2).y && two(1).x != two(2).x, two)
+      disjoint(two, units)
+      assert(! crosses(bs ++ two.values.map(zealot.at), Box(80, 80, 120 + width, 250), _.y == 80, _.y == 249), two)
+      val survivor = unit.copy(pixel = two(1))
+      assert(g.assign(Vector(survivor)) == one)
+      assert(g.assign(Vector(unit.copy(pixel = one(1)))) == one)
+      if (width == 50) assert(! crosses(bs ++ one.values.map(zealot.at), Box(80, 80, 170, 250), _.y == 80, _.y == 249), one)
+    }
+  }
+  check("single defenders center horizontally using Zealot capacity even for a Probe") {
+    for (worker <- Vector(false, true); reverse <- Vector(false, true)) {
+      val g = geometry(Vector(Box(100, 0, 220, 100), Box(100, 140, 220, 240)),
+        Pixel(if (reverse) -300 else 500, 120), None)
+      val unit = defender(1, worker)
+      val result = g.assign(Vector(unit))
+      val box = unit.body.at(result(1))
+      assert(Math.abs((box.top - 100) - (140 - box.bottom)) <= 1, result)
+      assert(g.fits(unit.body, result(1)))
+    }
+  }
+  check("centering depends on each gap's occupancy rather than squad size") {
+    val g = geometry()
+    val units = Vector(defender(1), defender(2), defender(3))
+    val result = g.assign(units)
+    val wide = result.values.find(p => p.x > 220 && p.x < 280).get
+    assert(Math.abs(wide.x - 250) <= 1, result)
+    assert(g.assign(units.reverse) == result)
+    disjoint(result, units)
+  }
+  check("a lone backup centers while paired frontline defenders keep their slots") {
+    val g = geometry(Vector(Box(0, 100, 100, 220), Box(160, 100, 260, 220)), Pixel(130, 500), None)
+    val units = (1 to 4).map(defender(_)).toVector
+    val pair = g.assign(units.take(2)).values.toSet
+    val three = g.assign(units.take(3))
+    assert(pair.subsetOf(three.values.toSet), three)
+    val backup = three.values.maxBy(_.y)
+    assert(Math.abs(backup.x - 130) <= 1, three)
+    val four = g.assign(units)
+    assert(pair.subsetOf(four.values.toSet), four)
+    assert(four.values.count(_.y == four.values.map(_.y).max) == 2, four)
+    disjoint(three, units.take(3))
+    disjoint(four, units)
+    val mixed = g.assign(Vector(defender(1), defender(2, true)))
+    val mixedBoxes = Vector(zealot.at(mixed(1)), probe.at(mixed(2)))
+    val front = Vector(Box(0, 100, 100, 220), Box(160, 100, 260, 220))
+    assert(! crosses(front ++ mixedBoxes, Box(80, 80, 180, 250), _.y == 80, _.y == 249), mixed)
+    assert(zealot.at(mixed(1)).bottom <= probe.at(mixed(2)).top, mixed)
+  }
+  check("offset corners center lone defenders without reopening an existing seal") {
+    for ((x, y) <- Vector((124, 248), (148, 264))) {
+      val front = Vector(Box(0, 100, 100, 200), Box(x, y, x + 100, y + 100))
+      val g = geometry(front, Pixel(-100, 500), None)
+      assert(g.gaps.size == 1, g.gaps)
+      val gap = g.gaps.head
+      val one = g.assign(Vector(defender(1)))
+      val box = zealot.at(one(1))
+      if (x == 148) assert(Math.abs(gap.across(box.center)) <= 1, one)
+      else assert(! crosses(front :+ box, Box(40, 140, 184, 308), p => gap.depth(p) <= -60, p => gap.depth(p) >= 60), one)
+      assert(g.fits(zealot, one(1)))
+      val two = g.assign(Vector(defender(1), defender(2)))
+      disjoint(two, Vector(defender(1), defender(2)))
+    }
+  }
+  check("centering never puts a lone defender inside a blocker") {
+    val front = Vector(Box(0, 100, 100, 220), Box(190, 100, 290, 220))
+    val blocker = Box(140, 100, 150, 220)
+    val g = new Geometry(front.map(_ -> true) :+ (blocker -> false), Pixel(145, 500), None, (_, _) => true, ling)
+    val result = g.assign(Vector(defender(1)))
+    assert(result.size == 1 && g.fits(zealot, result(1)), result)
+    assert(! zealot.at(result(1)).intersects(blocker), result)
   }
   check("Zealots always take the outside and Probes the inside, independent of input order") {
     val g = geometry()
@@ -177,7 +298,8 @@ object WallGapPositionsTest extends App {
     assert(backed.values.exists(p => p.y == plug.y && p.x < plug.x && p.x >= plug.x - 24), backed)
     val units = (1 to 7).map(defender(_)).toVector
     val result = g.assign(units)
-    assert(backed.values.toSet.subsetOf(result.values.toSet), (backed, result))
+    // Keep the narrow-gap backups fixed; the lone wide-gap backup moves aside for its partner.
+    assert(backed.values.filter(_.y > 3061).toSet.subsetOf(result.values.toSet), (backed, result))
     assert(result.values.exists(p => Math.abs(p.x - plug.x) <= 4 && p.y <= plug.y - 20 && p.y > 3028), result)
     assert(! result.values.exists(p => p.y == plug.y && p.x < plug.x - 24), result)
     assert(units.forall(u => g.fits(u.body, result(u.id))), result)

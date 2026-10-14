@@ -20,7 +20,7 @@ object Opponents {
   val defaultPvT: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvT1BaseReaver, PvTDoubleRobo)
   val defaultPvP: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvPGateCore, PvPDT)
   val defaultPvZ: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvZFFE)
-  val defaultPvR: StrategySelectionPolicy = new StrategySelectionRecommended(StrategySelectionGreedy(), 5, 0.75, PvRReaver)
+  val defaultPvR: StrategySelectionPolicy = StrategySelectionFixed(PvR2Gate4Gate)
 
   // COG 2026
 

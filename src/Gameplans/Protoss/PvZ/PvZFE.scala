@@ -41,7 +41,6 @@ class PvZFE extends GameplanImperative {
     // FFE: Khala: Can send second scout if first one misses to catch 4/5 pool
 
     once(8, Protoss.Probe)
-    buildInWall(1, Protoss.Pylon)
     if (PvZFFE()) {
       scoutOn(Protoss.Pylon, scouts = ?(With.geography.startLocations.length >= ?(With.geography.mains.count(_.scoutedByUs) >= 2, 4, 5), 2, 1))
       if (With.fingerprints.fourPool() && unitsEver(IsWarrior) < 9) {
@@ -60,6 +59,7 @@ class PvZFE extends GameplanImperative {
         oneBase.executeMain()
         return
       }
+      buildInWall(1, Protoss.Pylon)
       if (With.fingerprints.hatchFirst()) {
         once(12, Protoss.Probe)
         naturalNexus()
@@ -92,10 +92,6 @@ class PvZFE extends GameplanImperative {
         buildInWall(2, Protoss.PhotonCannon)
       }
     } else {
-      once(10, Protoss.Probe)
-      buildInWall(1, Protoss.Gateway)
-      scoutOn(Protoss.Gateway)
-
       if (With.fingerprints.fourPool() && unitsEver(IsWarrior) < 9) {
         pump(Protoss.Probe, 6)
         pump(Protoss.Zealot, 2)
@@ -107,6 +103,10 @@ class PvZFE extends GameplanImperative {
         get(2, Protoss.Pylon)
         get(2, Protoss.Gateway)
       }
+      buildInWall(1, Protoss.Pylon)
+      once(10, Protoss.Probe)
+      buildInWall(1, Protoss.Gateway)
+      scoutOn(Protoss.Gateway)
 
       once(12, Protoss.Probe)
       get(2,Protoss.Pylon)

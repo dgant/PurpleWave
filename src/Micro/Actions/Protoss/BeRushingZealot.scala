@@ -109,7 +109,7 @@ object BeRushingZealot extends Action {
             val targets = zealot.matchups.targets
               .filter(_.canAttack(zealot))
               .filter(_.visible)
-              .filter(t => ! IsWorker(t) || t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering || zealot.pixelsToGetInRange(t) < 16)
+              .filter(t => ! IsWorker(t) || (t.metro.exists(zealot.agent.destinationFinal.pixel.get.metro.contains) && (t.matchups.targetsInRange.nonEmpty || t.constructing || t.gathering) || zealot.pixelsToGetInRange(t) < 16))
             if (targets.nonEmpty) {
               val target = targets.minBy(t => t.totalHealth + 1.0 * zealot.pixelsToGetInRange(t))
               if (zealot.readyForAttackOrder(target) || ! target.canMove) {

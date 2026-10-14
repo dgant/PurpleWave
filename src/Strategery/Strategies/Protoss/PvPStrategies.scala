@@ -29,6 +29,7 @@ object PvPGateCore extends PvPStrategy {
 }
 
 object PvP1012 extends PvPStrategy {
+  addSelectionRequirement(() => With.fingerprints.twoGate.recently || With.fingerprints.oneGateCore.recently || With.fingerprints.nexusFirst.recently || ! PvPGateCore.legal)
   addChoice(PvP3Zealot, PvP5Zealot)
   addChoice(PvPDT, PvP3GateGoon, PvP4GateGoon)
 }
@@ -43,7 +44,6 @@ object PvPNexusFirst extends PvPStrategy {
 object PvP3Zealot extends PvPStrategy {
   // You're advantaged when arriving with 3 zealots vs fewer than 3 combat units, which ideally is NZCore but is probably okay vs coreZ too
   whitelistVs(With.fingerprints.coreBeforeZ)
-  // This blacklist essentially bans it, at time of writing
   blacklistVs(With.fingerprints.twoGate)
 }
 object PvP5Zealot extends PvPStrategy

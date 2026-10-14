@@ -29,7 +29,8 @@ final class PathfindProfile(
   var repulsors           : IndexedSeq[PathfindRepulsor]  = IndexedSeq.empty,
   var unit                : Option[FriendlyUnitInfo]      = None,
   var threatMaximumAlongPath: Option[Int]                 = None, // Above this limit, only equal or decreasing threat is traversable
-  var explorationMaximum  : Option[Int]                   = None) {
+  var explorationMaximum  : Option[Int]                   = None,
+  var useVisionAndRepulsion: Tile => Boolean               = _ => true) {
 
   lazy val crossUnwalkable: Boolean = {
     warnIfUnfinalized()

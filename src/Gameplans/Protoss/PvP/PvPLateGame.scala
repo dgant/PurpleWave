@@ -2,16 +2,15 @@ package Gameplans.Protoss.PvP
 
 import Debugging.SimpleString
 import Gameplans.All.GameplanImperative
+import Gameplans.Protoss.PvP.PvPIdeas._
 import Lifecycle.With
 import Macro.Actions.{Enemy, Flat, Friendly}
 import Mathematics.Maff
 import Placement.Access.PlaceLabels
-import Placement.Access.PlaceLabels.ProxyForwardRobo
-import PvPIdeas._
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
-import Strategery.Strategies.Protoss.{PvP1012, PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT}
+import Strategery.Strategies.Protoss._
 import Utilities.Time.{Minutes, Seconds}
 import Utilities.UnitFilters.{IsDetector, IsWarrior}
 import Utilities._
@@ -30,12 +29,11 @@ class PvPLateGame extends GameplanImperative {
   var shouldAttack        : Boolean = _
   var shouldExpand        : Boolean = _
   var shouldUpgrade       : Boolean = _
-  var shouldReaver        : Boolean = _
   var primaryTech         : Option[PrimaryTech] = None
 
-  private def productionCapacity        : Int = unitsComplete(Protoss.Gateway) + ?(shouldReaver, 2 * unitsComplete(Protoss.RoboticsFacility) * Math.min(1, unitsComplete(Protoss.RoboticsSupportBay)), 0)
+  private def productionCapacity        : Int = unitsComplete(Protoss.Gateway) + 2 * unitsComplete(Protoss.RoboticsFacility) * Maff.fromBoolean(haveComplete(Protoss.RoboticsSupportBay))
   private def targetProductionCapacity  : Int = miningBases * 4
-  private def targetGateways            : Int = targetProductionCapacity - ?(shouldReaver, 2 * units(Protoss.RoboticsFacility), 0)
+  private def targetGateways            : Int = targetProductionCapacity - 2 * units(Protoss.RoboticsFacility)
 
   private def unitsNotStrengthening(player: PlayerInfo): Iterable[UnitInfo] = With.units.ever
     .filter(_.player == player)
@@ -66,7 +64,6 @@ class PvPLateGame extends GameplanImperative {
       .orElse(Some(TemplarTech) .filter(x => commitToTech && units(Protoss.Zealot) >= 5))
       .orElse(Some(TemplarTech) .filter(x => commitToTech && upgradeStarted(Protoss.GroundDamage)))
       .orElse(Some(RoboTech)    .filter(x => commitToTech))
-    shouldReaver = primaryTech.contains(RoboTech) || upgradeStarted(Protoss.ScarabDamage) || enemies(Protoss.PhotonCannon) >= 5
 
     val reaverShuttleCombo = unitsComplete(Protoss.Reaver) >= 2 && unitsComplete(Protoss.Shuttle) >= 1
     fearDeath   = ! safeDefending
@@ -88,9 +85,10 @@ class PvPLateGame extends GameplanImperative {
     - 8 * Maff.fromBoolean(With.battles.globalAttack.judgement.exists(_.confidence01Total > 0.55))
     - 8 * Maff.fromBoolean(With.geography.preferredExpansionsOurs.headOption.exists(_.entranceNow.forall(_.pixelCenter.proximity > With.scouting.ourProximity))))
     shouldHarass = Protoss.PsionicStorm()
+    shouldHarass ||= unitsComplete(Protoss.Reaver) >= 3 && unitsComplete(Protoss.Shuttle) >= 2
     shouldHarass ||= enemyBases > 2
     shouldHarass ||= fearContain && ! fearDeath
-    shouldHarass ||= Protoss.ShuttleSpeed()
+    shouldHarass &&= Protoss.ShuttleSpeed()
     shouldAttack = enemyMiningBases > miningBases
     shouldAttack ||= bases > 2
     shouldAttack ||= bases > miningBases
@@ -100,7 +98,7 @@ class PvPLateGame extends GameplanImperative {
     shouldAttack ||= dtBraveryAbroad && ! enemiesHaveComplete(Protoss.PhotonCannon)
     shouldAttack ||= ! With.geography.enemyBases.exists(_.scoutedByUs)
     shouldAttack ||= estimatedArmyDifferential > 3 * Protoss.Dragoon.skimulationValue
-    shouldAttack ||= With.frame < Minutes(8)() && PvP1012()       && ! With.fingerprints.twoGate()
+    shouldAttack ||= With.frame < Minutes(6)() && PvP1012()       && ! With.fingerprints.twoGate()
     shouldAttack ||= With.frame < Minutes(8)() && PvP3GateGoon()  && ! enemyStrategy(With.fingerprints.threeGateGoon, With.fingerprints.fourGateGoon)
     shouldAttack ||= With.frame < Minutes(8)() && PvP4GateGoon()  && ! With.fingerprints.fourGateGoon()
     shouldAttack &&= PvPIdeas.pvpSafeToMoveOut
@@ -162,7 +160,6 @@ class PvPLateGame extends GameplanImperative {
     status(fearMacro,                       "FearMacro")
     status(fearContain,                     "FearContain")
     status(expectCarriers,                  "ExpectCarriers")
-    status(shouldReaver,                    "Reaver")
     status(shouldSecondaryTech,             "2Tech")
     status(shouldExpand,                    "Expand")
     status(shouldAttack,                    "Attack")
@@ -225,11 +222,12 @@ class PvPLateGame extends GameplanImperative {
   private def doTrainArmy(): Unit = {
 
     if (expectCarriers) {
-      makeDarkArchons()
-      get(Protoss.MindControl)
-      pump(Protoss.DarkTemplar, 2 * enemies(Protoss.Carrier) - 2 * units(Protoss.DarkArchon) + 2)
-      pumpRatio(Protoss.Dragoon, 16, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
-      get(Protoss.DarkArchonEnergy)
+      pumpRatio(Protoss.Scout, 3, 24, Seq(Enemy(Protoss.Carrier, 3.0), Enemy(Protoss.Scout, 1.0), Enemy(Protoss.Corsair, 1.0)))
+      pumpRatio(Protoss.Dragoon, 24, 64, Seq(Enemy(Protoss.Carrier, 6.0)))
+      if (safeDefending) {
+        requireMiningBases(3)
+      }
+      get(2, Protoss.Stargate)
     }
     if ( ! enemiesHave(Protoss.Observer) || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
       safePumpDT()
@@ -249,25 +247,17 @@ class PvPLateGame extends GameplanImperative {
         pump(Protoss.Shuttle, 1)
       }
     }
-    pump(Protoss.Observer, Math.min(3, enemies(Protoss.DarkTemplar)))
-    if (With.units.ours.exists(u => Protoss.RoboticsFacility(u) && u.proxied && With.placement.get(ProxyForwardRobo).exists(_.tile == u.tileTopLeft))) {
-      pump(Protoss.Reaver)
-    } else {
-      if (shouldReaver) {
-        // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
-        if (riskingFirstExpansion || ! shouldAttack) {
-          pump(Protoss.Reaver, 2)
-        }
-        pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
-      }
-      pump(Protoss.Observer, 2)
-      if (shouldReaver) {
-        pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
-      }
-      if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
-        get(Protoss.ShuttleSpeed)
-        get(Protoss.ScarabDamage)
-      }
+    pump(Protoss.Observer, Math.min(3, 1 + enemies(Protoss.DarkTemplar)))
+    // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
+    if (riskingFirstExpansion || ! shouldAttack) {
+      pump(Protoss.Reaver, 2)
+    }
+    pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
+    pump(Protoss.Observer, 2)
+    pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
+    if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
+      get(Protoss.ShuttleSpeed)
+      get(Protoss.ScarabDamage)
     }
 
     if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
@@ -281,7 +271,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doAddProduction(): Unit = {
-    if (have(Protoss.RoboticsFacility) && shouldReaver) {
+    if (have(Protoss.RoboticsFacility)) {
       get(Protoss.RoboticsSupportBay)
     }
     if (have(Protoss.CitadelOfAdun) && ! enemyRobo) {
@@ -314,7 +304,7 @@ class PvPLateGame extends GameplanImperative {
       pumpGasPumps()
     }
     get(Protoss.RoboticsFacility)
-    if (shouldReaver || techStarted(Protoss.PsionicStorm)) {
+    if (techStarted(Protoss.PsionicStorm)) {
       once(Protoss.Shuttle)
     }
 
@@ -328,17 +318,13 @@ class PvPLateGame extends GameplanImperative {
         }
       }
     }
-    if (shouldReaver || Protoss.PsionicStorm()) {
-      get(Protoss.RoboticsSupportBay)
-    }
+    get(Protoss.RoboticsSupportBay)
     if (units(Protoss.Shuttle) >= ?(fearDeath, 1, 2) && (units(Protoss.Reaver) >= ?(fearDeath, 2, 3) || Protoss.PsionicStorm())) {
       get(Protoss.ShuttleSpeed)
     }
-    if (shouldReaver) {
-      pump(Protoss.Reaver, 1)
-      if (Protoss.ShuttleSpeed() && units(Protoss.Reaver) >= 4) {
-        get(Protoss.ScarabDamage)
-      }
+    pump(Protoss.Reaver, 1)
+    if (Protoss.ShuttleSpeed() && units(Protoss.Reaver) >= 4) {
+      get(Protoss.ScarabDamage)
     }
   }
 

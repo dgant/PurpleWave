@@ -1,5 +1,6 @@
 package Tactic.Squads
 
+import Information.Battles.Types.Division
 import Information.Geography.Types.Base
 import Lifecycle.With
 import Macro.Facts.MacroFacts
@@ -36,11 +37,12 @@ class SquadDarkTemplar extends Squad {
       .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy( ! _.owner.isEnemy)
       .sortBy(waitForBackstab && With.scouting.enemyProximity > 0.5 && ! _.naturalOf.exists(_.isEnemy))
-    if (bases.isEmpty) return
+    if (bases.isEmpty && vulnerableDivisions.isEmpty) return
     lock.acquire()
   }
 
   private val bases = new ArrayBuffer[Base]
+  private def vulnerableDivisions: Vector[Division] = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
   private def waitForBackstab: Boolean = With.enemy.isProtoss && With.frame < Minutes(9)() && With.units.enemy.filter(IsMobileDetector).forall(o => With.scouting.proximity(o.pixel) < 0.5)
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile
@@ -54,7 +56,7 @@ class SquadDarkTemplar extends Squad {
       .orElse(With.geography.preferredExpansionsEnemy.filterNot(_.naturalOf.exists(_.isEnemy)).headOption.map(b => b.zone.exitNow.map(_.pixelCenter).getOrElse(b.heart.center)))
      */
     val output = With.geography.preferredExpansionsEnemy.view
-      .filterNot(b => With.scouting.enemyMain.contains(b) || With.scouting.enemyNatural.contains(b))
+      .filterNot(_.metro.bases.exists(With.scouting.enemyMain.contains))
       .headOption
       .map(_.townHallArea.center)
     With.logger.debug(f"Selected DT hidey hole: $output")
@@ -98,8 +100,19 @@ class SquadDarkTemplar extends Squad {
       .setTargets(baseTargets)
   }
 
+  private def intendDTToDivision(dt: FriendlyUnitInfo, divisions: Vector[Division]): Unit = {
+    val division = divisions.minBy(_.keyDistanceTo(dt.pixel))
+    dt.intend(this).setTerminus(division.centroidGround).setTargets(division.enemies)
+  }
+
   def run(): Unit = {
-    if (bases.isEmpty) { lock.release(); return }
+    val divisions = vulnerableDivisions
+    if (bases.isEmpty) {
+      if (divisions.isEmpty) { lock.release(); return }
+      units.foreach(intendDTToDivision(_, divisions))
+      units.headOption.flatMap(_.intent.terminus).foreach(vicinity = _)
+      return
+    }
     val dts = new UnorderedBuffer[FriendlyUnitInfo]
     dts.addAll(units)
     val firstBase = bases.head
@@ -114,8 +127,6 @@ class SquadDarkTemplar extends Squad {
       } else {
         bases -= base
 
-        val divisions = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
-
         if (divisions.isEmpty) {
           if (waitForBackstab) {
             base = With.geography.preferredExpansionsEnemy.view
@@ -125,7 +136,7 @@ class SquadDarkTemplar extends Squad {
           }
           intendDTToBase(dt, base)
         } else {
-          dt.intend(this).setTerminus(base.heart.center).setTargets(base.enemies)
+          intendDTToDivision(dt, divisions)
         }
       }
 

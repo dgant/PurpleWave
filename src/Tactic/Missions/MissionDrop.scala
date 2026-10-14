@@ -56,6 +56,8 @@ abstract class MissionDrop extends Mission {
   def requestsUnload(passenger: FriendlyUnitInfo): Boolean = false
   protected def rejectApproach(transport: FriendlyUnitInfo): Boolean = false
   protected def routeArrivalRange(transport: FriendlyUnitInfo): Double = 0
+  protected def routeProximity: Option[Double] = None
+  protected def safeToRelease(transport: FriendlyUnitInfo): Boolean = true
   protected def routeFollowing(transport: FriendlyUnitInfo): Vector[(Tile, Double)] = Vector.empty
   protected final def threatenedOnApproach(transport: FriendlyUnitInfo, waypoint: => Option[Pixel]): Boolean =
     transport.matchups.threats.nonEmpty && !transport.matchups.withinSafetyMargin &&
@@ -75,9 +77,13 @@ abstract class MissionDrop extends Mission {
   protected val raidingTransports = mutable.Set.empty[FriendlyUnitInfo]
   private val pickupTargets = mutable.Map.empty[FriendlyUnitInfo, FriendlyUnitInfo]
   protected var destinationBase: Option[Base] = None
-  private var returningHome = false
+  protected var returningHome = false
   private var itineraryFrame = 0
   private var destinationFrame = 0
+
+  protected def missionExpired: Boolean =
+    With.framesSince(Math.max(launchFrame, itineraryFrame)) > missionTimeout ||
+      (With.framesSince(Math.max(launchFrame, destinationFrame)) > approachTimeout && state != Raiding && state != Evacuating)
 
   final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] =
     passenger.transport.filter(transports.contains).orElse(passenger.agent.ride.filter(transports.contains))
@@ -180,13 +186,12 @@ abstract class MissionDrop extends Mission {
     }
     updateManifest()
     if (passengers.isEmpty && !defaultCombatLanding) { finishDrop("No transportable passengers left"); return }
-    refreshItinerary()
-    while (itinerary.headOption.exists(skipBase)) {
+    if (!returningHome && !shouldGoHome) refreshItinerary()
+    while (!returningHome && !shouldGoHome && itinerary.headOption.exists(skipBase)) {
       With.logger.debug(f"$this: Leaving target ${itinerary.head.heart}. Next target: ${itinerary.drop(1).headOption.map(_.heart)}")
       itinerary.dequeue()
     }
-    val expired = With.framesSince(Math.max(launchFrame, itineraryFrame)) > missionTimeout ||
-      (With.framesSince(Math.max(launchFrame, destinationFrame)) > approachTimeout && state != Raiding && state != Evacuating)
+    val expired = missionExpired
     val renewed = renewItinerary(expired)
     updateState(shouldGoHome || (expired && !renewed))
     if (finishWithdrawal()) return
@@ -291,7 +296,8 @@ abstract class MissionDrop extends Mission {
   }
 
   private def finishWithdrawal(): Boolean = {
-    if (state != Escaping || !allAboard || (!allHome && transports.exists(t => destinationBase.exists(t.base.contains)))) return false
+    if (state != Escaping || !allAboard || transports.exists(t => !safeToRelease(t)) ||
+      (!allHome && transports.exists(t => destinationBase.exists(t.base.contains)))) return false
     finishDrop("Recovered crew and left final target")
     true
   }
@@ -470,7 +476,8 @@ abstract class MissionDrop extends Mission {
     val approaching = (state == Travelling || state == Landing) && passengersFor(transport).exists(requiredPassenger)
     val arrivalRange = if (approaching) routeArrivalRange(transport) else 0.0
     val following = if (approaching) routeFollowing(transport) else Vector.empty
-    route.next(transport.tile, destination, arrivalRange, following).flatMap(route.waypoint(transport, _))
+    route.next(transport.tile, destination, arrivalRange, following,
+      preferUnseen = DropRoute.preferUnseen(transport), friendlyProximity = routeProximity).flatMap(route.waypoint(transport, _))
   }
 
   private def intendRoute(transport: FriendlyUnitInfo, destination: Tile): Unit = {
@@ -484,10 +491,10 @@ abstract class MissionDrop extends Mission {
       With.grids.enemyRangeAir.update()
       // Squad updates are slower than micro. Recheck both the raid decision and
       // the live route here, before issuing another movement command.
-      if ((state == Travelling || state == Landing) && (rejectApproach(transport) ||
+      if ((state == Travelling || state == Landing) && (shouldGoHome || rejectApproach(transport) ||
         destinationBase.exists(b => !b.isEnemy && targetCleared(b)))) {
-        if (itinerary.headOption == destinationBase && itinerary.nonEmpty) itinerary.dequeue()
-        updateState(goHome = false)
+        if (!shouldGoHome && itinerary.headOption == destinationBase && itinerary.nonEmpty) itinerary.dequeue()
+        updateState(goHome = shouldGoHome)
         if (state == Evacuating) evacuate() else if (state == Escaping) escape() else travel()
       } else if (defaultCombatLanding && (state == Travelling || state == Landing) && readyToRaid(transport)) {
         raidingTransports += transport

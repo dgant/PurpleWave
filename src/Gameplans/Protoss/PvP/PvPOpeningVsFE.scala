@@ -10,7 +10,7 @@ class PvPOpeningVsFE extends GameplanImperative {
 
   trait Response
   object NexusFirst extends Response
-  object RoboAllIn  extends Response
+  object Robo  extends Response
 
   var response: Option[Response] = None
 
@@ -24,14 +24,14 @@ class PvPOpeningVsFE extends GameplanImperative {
         response = Some(NexusFirst)
       } else if (With.fingerprints.forgeFe()) {
         if (unitsComplete(Protoss.Gateway) > 1) {
-          response = Some(RoboAllIn)
+          response = Some(Robo)
         } else if (haveComplete(Protoss.Assimilator)) {
-          response = Some(RoboAllIn)
+          response = Some(Robo)
         } else {
           response = Some(NexusFirst)
         }
       } else if (With.fingerprints.nexusFirst()) {
-        response = Some(RoboAllIn)
+        response = Some(Robo)
       }
     }
     if (enemyRecentStrategy(With.fingerprints.cannonRush) && ! With.scouting.enemyNatural.exists(_.townHall.isDefined)) {
@@ -84,14 +84,21 @@ class PvPOpeningVsFE extends GameplanImperative {
     }
 
     get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility)
-    once(Protoss.Shuttle)
-    pumpShuttleAndReavers()
+    if (enemies(Protoss.PhotonCannon) >= 2) {
+      requireMiningBases(2)
+      once(Protoss.Shuttle)
+    }
+    get(Protoss.Observatory)
+    once(Protoss.Observer)
     get(Protoss.RoboticsSupportBay)
+    once(Protoss.Reaver)
+    get(Protoss.ShuttleSpeed)
     get(Protoss.DragoonRange)
+    pumpShuttleAndReavers()
     pump(Protoss.Dragoon)
-    get(3, Protoss.Gateway)
     requireMiningBases(2)
     get(5, Protoss.Gateway)
+    pumpGasPumps()
     pump(Protoss.Zealot)
   }
 

@@ -99,7 +99,21 @@ package Micro.Formation {
     }
     buildings(gateway, forge)
     placement()
-    val positions = new WallGapPositions(base)
+    val positions = new WallGaps(base)
+    check("minimum defenders is available before assignment and refreshes when the wall changes") {
+      val wallGaps = new WallGaps(base)
+      val minimum = wallGaps.minimumDefenders
+      assert(minimum.exists(_ > 0), minimum)
+      assert(new WallGaps(main).minimumDefenders.isEmpty)
+      buildings(gateway)
+      assert(wallGaps.minimumDefenders.isEmpty)
+      buildings(gateway, forge)
+      assert(wallGaps.minimumDefenders == minimum)
+      With.enemies = Vector(terran)
+      assert(wallGaps.minimumDefenders.isEmpty)
+      With.enemies = Vector(zerg)
+      assert(wallGaps.minimumDefenders == minimum)
+    }
     check("occupied Wall-labelled 4x3 and 3x2 placements enable defense without a Wall object") {
       val result = positions(defenders)
       assert(result.keySet == Set(zealot, probe))
@@ -113,7 +127,7 @@ package Micro.Formation {
       With.enemies = Vector(zerg)
     }
     check("only natural bases activate the mode") {
-      assert(new WallGapPositions(main)(defenders).isEmpty)
+      assert(new WallGaps(main)(defenders).isEmpty)
     }
     check("planned, missing, dead or unlabelled wall buildings do not enable the mode") {
       buildings(gateway)
@@ -142,10 +156,10 @@ package Micro.Formation {
       buildings(gateway, forge, blocker)
       val after = positions(defenders)
       assert(after != before)
-      val obstacle = WallGapPositions.Box(blocker.left, blocker.top, blocker.rightExclusive, blocker.bottomExclusive)
+      val obstacle = WallGaps.Box(blocker.left, blocker.top, blocker.rightExclusive, blocker.bottomExclusive)
       after.foreach { case (u, p) =>
         val kind = u.unitClass
-        assert(! WallGapPositions.Body(kind.dimensionLeft, kind.dimensionUp, kind.dimensionRightExclusive, kind.dimensionDownExclusive).at(p).intersects(obstacle))
+        assert(! WallGaps.Body(kind.dimensionLeft, kind.dimensionUp, kind.dimensionRightExclusive, kind.dimensionDownExclusive).at(p).intersects(obstacle))
       }
       buildings(gateway, forge)
       assert(positions(defenders) == before)
@@ -205,7 +219,7 @@ package Micro.Formation {
         Vector(target.add(40, 40), target).foreach { position =>
           set(defender, "_pixel", position)
           set(defender, "_intent", new Intention)
-          squad.holdWallGap(defender, target)
+          squad.intendHoldWallGap(defender, target)
           assert(defender.client == squad)
           assert(defender.intent.terminus.contains(target))
           assert(defender.intent.station.contains(target))
@@ -238,15 +252,15 @@ package Micro.Formation {
       val mainDefense = new SquadDefendBase(main)
       val naturalDefense = new SquadDefendBase(base)
       val expansionDefense = new SquadDefendBase(remote)
-      assert(mainDefense.plugWall().contains(wall.defensePoint))
-      assert(naturalDefense.plugWall().contains(wall.defensePoint))
-      assert(expansionDefense.plugWall().isEmpty)
+      assert(mainDefense.wallToPlug().contains(wall.defensePoint))
+      assert(naturalDefense.wallToPlug().contains(wall.defensePoint))
+      assert(expansionDefense.wallToPlug().isEmpty)
       expansionDefense.run()
       assert(expansionDefense.vicinity == remote.heart.center)
       buildings()
       With.frame += 1
-      assert(mainDefense.plugWall().isEmpty)
-      assert(naturalDefense.plugWall().isEmpty)
+      assert(mainDefense.wallToPlug().isEmpty)
+      assert(naturalDefense.wallToPlug().isEmpty)
       With.placement.restoreCachedWall(None)
       buildings(gateway, forge)
     }

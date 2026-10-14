@@ -16,7 +16,11 @@ class PvRReaver extends GameplanImperative {
   var transition: Option[GameplanImperative] = None
 
   override def executeBuild(): Unit = {
-    if (transition.isEmpty && With.frame > Minutes(10)()) {
+    if (transition.isEmpty
+      && upgradeStarted(Protoss.DragoonRange)
+      && upgradeStarted(Protoss.ShuttleSpeed)
+      && unitsEver(Protoss.Reaver, Protoss.Shuttle, Protoss.Corsair) >= 3
+      && With.frame > Minutes(10)()) {
       transition = Some(?(enemyIsTerran, new PvTArbiter, ?(enemyIsProtoss, new PvPLateGame, new PvZ1GateCoreExpand)))
     }
     if (transition.isDefined) {
@@ -42,20 +46,20 @@ class PvRReaver extends GameplanImperative {
       if ( ! haveEver(Protoss.Corsair)) {
         gasWorkerCeiling(1)
       }
-      once(Protoss.Forge)
+      get(Protoss.Stargate)
       once(18, Protoss.Probe)
       once(3, Protoss.Zealot)
-      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
       once(3, Protoss.Pylon)
       once(20, Protoss.Probe)
+      once(Protoss.Corsair)
       once(4, Protoss.Zealot)
       if ( ! haveEver(Protoss.Stargate)) {
         cancel(Protoss.RoboticsFacility)
       }
-      get(Protoss.Stargate)
+      once(Protoss.Forge)
       once(22, Protoss.Probe)
-      once(Protoss.Corsair)
       once(5, Protoss.Zealot)
+      buildCannonsAtMain(2, PlaceLabels.DefendEntrance)
       once(4, Protoss.Pylon)
       once(23, Protoss.Probe)
       once(Protoss.RoboticsFacility)
@@ -89,6 +93,7 @@ class PvRReaver extends GameplanImperative {
       once(4, Protoss.Dragoon)
       once(23, Protoss.Probe)
       get(Protoss.DragoonRange)
+      once(2, Protoss.Reaver)
     }
   }
 

@@ -14,14 +14,21 @@ private[Missions] class DropRoute {
   private var destination = Vector.empty[(Tile, Double)]
   private var path: Option[TilePath] = None
   private var values = Vector.empty[(Int, Boolean)]
+  private var avoidingVision = true
+  private var proximityBoundary = Option.empty[Double]
+  private var preferenceTiles = Vector.empty[(Tile, Boolean)]
+  private var concealed = false
   private var progress: Option[Tile] = None
   private var progressFrame = With.frame
   private var failureFrame: Option[Int] = None
 
   def stalled: Boolean = failureFrame.exists(With.framesSince(_) >= Seconds(8)())
-  private def value(tile: Tile): (Int, Boolean) = (With.grids.enemyRangeAir.get(tile), tile.visibleToEnemy)
+  private def indirect(tile: Tile): Boolean = proximityBoundary.forall(tile.proximity < _)
+  private def exposed(tile: Tile): Boolean = tile.visibleToEnemy && indirect(tile)
+  private def value(tile: Tile): (Int, Boolean) = (With.grids.enemyRangeAir.get(tile), avoidingVision && exposed(tile))
 
-  def next(from: Tile, to: Tile, arrivalRange: Double = 0, following: Vector[(Tile, Double)] = Vector.empty): Option[TilePath] = {
+  def next(from: Tile, to: Tile, arrivalRange: Double = 0, following: Vector[(Tile, Double)] = Vector.empty,
+    preferUnseen: Boolean = true, friendlyProximity: Option[Double] = None): Option[TilePath] = {
     val stops = (to, arrivalRange) +: following
     if (destination != stops) {
       destination = stops
@@ -33,26 +40,48 @@ private[Missions] class DropRoute {
       progress = Some(from)
       progressFrame = With.frame
     }
+    val proximityModeChanged = proximityBoundary.isDefined != friendlyProximity.isDefined
+    proximityBoundary = friendlyProximity
+    if (avoidingVision != preferUnseen || proximityModeChanged ||
+      preferenceTiles.exists { case (tile, applied) => indirect(tile) != applied }) {
+      avoidingVision = preferUnseen
+      path = None
+    }
     val changed = path.exists(p => p.tiles.get.map(value).toVector != values)
     val offPath = path.exists(_.tiles.get.forall(_.tileDistanceFast(from) > 3))
     if (path.isEmpty || changed || offPath) {
       // Choose the sight-region contact using both legs, not the nearest point
       // on the inbound leg. The shared pathfinder still owns threat evasion.
       val contact = if (following.isEmpty) to else DropRoute.flybys(from, stops).head
-      def find(goal: Tile, range: Double): Option[TilePath] = Some(new PathfindProfile(from, Some(goal),
+      def find(goal: Tile, range: Double, visionCost: Double): Option[TilePath] = Some(new PathfindProfile(from, Some(goal),
         endDistanceMaximum = range,
         threatMaximum = Some(0),
         canCrossUnwalkable = Some(true), canEndUnwalkable = Some(true),
-        costEnemyVision = 10, costRepulsion = 5, costThreat = 10,
+        costEnemyVision = visionCost, costRepulsion = 5, costThreat = 10,
         repulsors = Vector(PathfindRepulsor(Points.middle, 1, Math.min(With.mapPixelWidth, With.mapPixelHeight))),
-        threatMaximumAlongPath = Some(0), explorationMaximum = Some(With.mapTileArea)).find).filter(_.pathExists)
-      path = if (following.isEmpty) find(to, arrivalRange) else {
-        val preferred = if (With.grids.enemyRangeAir.get(contact) == 0 && !contact.visibleToEnemy) find(contact, 0) else None
+        threatMaximumAlongPath = Some(0), explorationMaximum = Some(With.mapTileArea),
+        useVisionAndRepulsion = indirect).find).filter(_.pathExists)
+      def findRoute(visionCost: Double): Option[TilePath] = if (following.isEmpty) find(to, arrivalRange, visionCost) else {
+        val preferred = if (With.grids.enemyRangeAir.get(contact) == 0 && (visionCost == 0 || !exposed(contact))) find(contact, 0, visionCost) else None
         // A geometric contact can be blocked. Any safe point in the original
         // sight region is preferable to abandoning an otherwise reachable peek.
-        preferred.orElse(find(to, arrivalRange))
+        preferred.orElse(find(to, arrivalRange, visionCost))
       }
+      def unseen(route: TilePath): Boolean = route.tiles.get.forall(t => !exposed(t))
+      def length(route: TilePath): Double = route.tiles.get.sliding(2).filter(_.size == 2)
+        .map(pair => Math.sqrt(pair.head.tileDistanceSquared(pair.last).toDouble)).sum
+      // Preserve the perimeter preference, but only pay extra for actual concealment.
+      // Fewer visible tiles provide no surprise once the enemy sees the flight anyway.
+      path = findRoute(0).map(normal => {
+        if (!preferUnseen || exposed(from) || (arrivalRange == 0 && exposed(to)) || unseen(normal)) normal else
+          findRoute(10).filter(p => unseen(p) && length(p) <= 1.25 * length(normal)).getOrElse(normal)
+      })
+      concealed = preferUnseen && path.exists(unseen)
       values = path.map(_.tiles.get.map(value).toVector).getOrElse(Vector.empty)
+      // Watch both the current route and its direct shortcut as the army advances.
+      // Small proximity changes that cross no tiles need not rerun A* every frame.
+      preferenceTiles = if (proximityBoundary.isEmpty) Vector.empty else path.map(p =>
+        (p.tiles.get ++ Ray(from.center, to.center).map(_.tile)).distinct.map(t => t -> indirect(t)).toVector).getOrElse(Vector.empty)
     }
     if (path.isEmpty || With.framesSince(progressFrame) >= Seconds(8)()) {
       failureFrame = failureFrame.orElse(Some(With.frame))
@@ -68,17 +97,25 @@ private[Missions] class DropRoute {
   def waypoint(transport: FriendlyUnitInfo, route: TilePath): Option[Pixel] = {
     val tiles = route.tiles.get
     val index = tiles.indices.minBy(i => tiles(i).center.pixelDistanceSquared(transport.pixel))
-    val end = Math.min(index + 16, tiles.size - 1)
-    (end to Math.min(index + 1, end) by -1).iterator.map(tiles(_).center).find(pixel => {
+    // Finish the escape leg before looking ahead toward the raid.
+    val escapeEnd = if (transport.tile.enemyRangeAgainst(transport) == 0) tiles.size - 1 else
+      (index until tiles.size).find(i => tiles(i).enemyRangeAgainst(transport) == 0).getOrElse(tiles.size - 1)
+    val end = Math.min(index + 16, escapeEnd)
+    val candidates = (end to Math.min(index + 1, end) by -1).iterator.map(tiles(_).center).filter(pixel => {
       val flight = Ray(transport.pixel, Commander.adjustDestination(transport, pixel)).map(_.tile.enemyRangeAgainst(transport)).toVector
-      MicroPathing.isSafeMove(transport, pixel) && flight.sliding(2).forall(p => p.last <= p.head) &&
-        (transport.tile.visibleToEnemy || !Ray(transport.pixel, pixel).exists(_.tile.visibleToEnemy) ||
-          tiles.slice(index, end + 1).exists(_.visibleToEnemy))
-    })
+      MicroPathing.isSafeMove(transport, pixel) && flight.sliding(2).forall(p => p.last <= p.head)
+    }).toStream
+    if (!concealed || !DropRoute.preferUnseen(transport)) candidates.headOption else
+      // Concealment is optional: an accelerated turn that reveals us must not stall a safe flight.
+      candidates.find(pixel => Ray(transport.pixel, Commander.adjustDestination(transport, pixel))
+        .forall(p => !exposed(p.tile))).orElse(candidates.headOption)
   }
 }
 
 private[Missions] object DropRoute {
+  def preferUnseen(transport: FriendlyUnitInfo): Boolean =
+    !transport.visibleToOpponents && With.framesSince(transport.lastFrameVisibleToOpponents) >= Seconds(15)()
+
   def hasSafePathShorterThan(from: Pixel, to: Pixel, maximumDistance: Double): Boolean = {
     if (!from.valid || !to.valid || from.pixelDistance(to) >= maximumDistance) return false
     if (Ray(from, to).forall(p => With.grids.enemyRangeAir.get(p.tile) == 0)) return true

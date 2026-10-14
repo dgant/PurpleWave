@@ -1,6 +1,7 @@
 package Tactic.Tactics
 
 import Lifecycle.With
+import Macro.Facts.MacroFacts
 import Mathematics.Points.Tile
 import Planning.ResourceLocks.LockUnits
 import ProxyBwapi.Races.Protoss
@@ -33,7 +34,9 @@ class TacticScoutForCannonRush extends Tactic {
         && ! With.fingerprints.gatewayFirst()
         && With.frame > GameTime(1, 30)()
         && With.frame < GameTime(6, 0)())
+
     shouldScout ||=  (gettingCannonRushed && With.frame < GameTime(10, 0)())
+    shouldScout &&= ! MacroFacts.enemiesHaveComplete(Protoss.PhotonCannon)
 
     if ( ! shouldScout) return
 

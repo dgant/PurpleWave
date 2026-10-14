@@ -17,7 +17,7 @@ class SquadRazeProxies(assignments: Map[FriendlyUnitInfo, UnitInfo]) extends Squ
     units.foreach(unit => {
       val assignee = assignments.get(unit)
       val attackTarget = ?(With.units.existsEnemy(IsWarrior), None, assignee)
-      unit.intend(this)
+      unit.intend(this)W
         .setCanFlee(unit.matchups.threats.exists(u => u.complete && u.canAttack && ! IsWorker(u)))
         .setTerminus(assignee.map(_.pixel).getOrElse(centroidUnit))
         .setAttack(attackTarget)

@@ -153,6 +153,10 @@ package Tactic.Missions {
       set(With.game, "regions", Array(region)); set(With.game, "regionSet", Vector(region).asJava)
       set(With.game, "mapTileRegionID", Array.ofDim[Short](size, mapHeight))
       With.paths = new Paths
+      With.scouting = allocate(classOf[Information.Scouting.Scouting])
+      set(With.scouting, "_tugStart", new Cache(() => Tile(0, 5)))
+      set(With.scouting, "_tugEnd", new Cache(() => Tile(size - 1, 5)))
+      set(With.scouting, "_ourProximity", new Cache(() => 1.0))
       With.coordinator = new Micro.Coordination.Coordinator
     }
     world(128)
@@ -168,6 +172,8 @@ package Tactic.Missions {
       set(u, "_pixelObserved", Pixel(x, y)); set(u, "_visibility", ProxyBwapi.UnitTracking.Visibility.Visible)
       set(u, "_hitPoints", kind.maxHitPoints); set(u, "_shieldPoints", kind.maxShields)
       set(u, "_alive", true); set(u, "_complete", true); set(u, "_powered", true)
+      set(u, "lastFrameVisibleToOpponents", -Utilities.Time.Forever())
+      u.lastFrameUnloaded = -Utilities.Time.Forever()
       set(u, "_flying", kind.isFlyer); set(u, "_transport", None)
       set(u, "_scarabs", 3); set(u, "_trainingQueue", Vector.empty[UnitClass])
       set(u, "_squad", None); set(u, "friendly", Some(u)); set(u, "damageQueue", ArrayBuffer.empty)
@@ -199,6 +205,7 @@ package Tactic.Missions {
       u
     }
     def load(p: FriendlyUnitInfo, t: Option[FriendlyUnitInfo]): Unit = {
+      if (p.loaded && t.isEmpty) p.lastFrameUnloaded = With.frame
       set(p, "_loaded", t.isDefined); set(p, "_transport", t)
     }
     def fits(manifest: DropManifest.Manifest): Boolean = manifest.groupBy(_._2).forall { case (t, crew) =>
@@ -272,6 +279,8 @@ package Tactic.Missions {
         method.invoke(this, java.lang.Boolean.valueOf(goHome))
       }
       def approach(t: FriendlyUnitInfo): Pixel = landingGoal(t)
+      def firstLanding(t: FriendlyUnitInfo): Option[Pixel] = closestLandingPoint(t)
+      def expiredNow: Boolean = missionExpired
       override def appendTargets(bases: Seq[Base], possibleMains: Seq[Base] = Vector.empty): Unit = super.appendTargets(bases, possibleMains)
       def controlsCombat(t: FriendlyUnitInfo): Boolean = raidingTransports(t)
 
@@ -550,6 +559,7 @@ package Tactic.Missions {
       With.scouting = allocate(classOf[Information.Scouting.Scouting])
       set(With.scouting, "_tugStart", new Performance.Cache(() => Tile(0, 5)))
       set(With.scouting, "_tugEnd", new Performance.Cache(() => Tile(110, 5)))
+      set(With.scouting, "_ourProximity", new Cache(() => 1.0))
       set(With.scouting, "_firstEnemyMain", Some(main))
       val targets = Vector(main, natural)
       assert(MissionReaverDrop.targets(targets) == targets, "An unseen natural is a scouting stop, not an empty expansion")
@@ -645,7 +655,8 @@ package Tactic.Missions {
       With.blackboard.wantToHarass.set(true)
       set(With.geography, "_baseByTile", previousMapping)
     }
-    check("continued pressure renews the mission and gives the next approach its own clock") {
+    check("reversal preserves the sixty-second deadline from mission launch") {
+      world(128)
       With.geography.home = Tile(0, 5)
       val a = base(20); val b = base(90)
       set(With.geography, "_bases", Vector(a, b))
@@ -654,14 +665,104 @@ package Tactic.Missions {
       m.continuePressure = true; m.configure(Vector(t), Vector(r))
       m.itinerary.clear(); m.appendTargets(Vector(a, b)); m.itinerary.clear(); m.itinerary += b
       m.updateState(false); m.state = m.Raiding
-      With.frame += Seconds(181)()
-      m.run()
-      assert(m.itinerary.toVector == Vector(a) && m.state == m.Evacuating)
+      With.frame += Seconds(40)()
+      assert(m.continueNow(b) && m.itinerary.toVector == Vector(a))
       load(r, Some(t)); m.run()
-      assert(m.state == m.Travelling && m.vicinity == a.heart.center)
-      With.frame += Seconds(60)()
-      m.run()
-      assert(m.state == m.Travelling, "The original mission age cannot end the renewed approach")
+      With.frame += Seconds(20)() - 1; m.run()
+      assert(m.state == m.Travelling)
+      With.frame += 1; m.run()
+      assert(m.state == m.Escaping && !m.continueNow(a), "Expiry must withdraw even with another uncleared enemy base")
+    }
+    check("each actual unload replaces the launch deadline with twenty seconds from that unload") {
+      world(128)
+      val ts = Vector.fill(2)(unit(Protoss.Shuttle))
+      val r = unit(Protoss.Reaver); val z = unit(Protoss.Zealot)
+      val m = new MissionProbe(base(110)); m.configure(ts, Vector(r, z))
+      load(r, Some(ts.head)); load(z, Some(ts.last))
+      With.frame += Seconds(45)()
+      load(r, None); load(r, Some(ts.head)) // Even a drop/reload between squad updates counts.
+      With.frame += Seconds(15)()
+      assert(!m.expiredNow, "An actual unload can extend the deadline beyond sixty seconds")
+      With.frame += Seconds(4)()
+      load(z, None)
+      assert(!m.expiredNow, "Filler unloading from another Shuttle also resets the deadline")
+      With.frame += Seconds(20)() - 1
+      assert(!m.expiredNow)
+      With.frame += 1
+      assert(m.expiredNow, "Remaining on the ground must not continuously renew the deadline")
+      load(z, Some(ts.last)); load(z, None)
+      assert(!m.expiredNow, "A subsequent actual unload starts a fresh twenty-second allowance")
+    }
+    check("an early unload shortens the deadline and an attempted unload cannot renew it") {
+      world(128)
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(base(110)); m.configure(Vector(t), Vector(r)); load(r, Some(t))
+      With.frame += Seconds(5)(); load(r, None); load(r, Some(t))
+      With.frame += Seconds(19)()
+      Micro.Agency.Commander.unload(t, r)
+      assert(r.loaded && !m.expiredNow)
+      With.frame += Seconds(1)()
+      assert(m.expiredNow, "A command without an observed unload must not reset the deadline")
+    }
+    check("an unload during withdrawal cannot restart pressure or add new destinations") {
+      world(128)
+      val a = base(20); val b = base(90)
+      set(With.geography, "_bases", Vector(a, b))
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(b) {
+        override protected def refreshItinerary(): Unit = appendTargets(With.geography.bases)
+      }
+      m.continuePressure = true; m.configure(Vector(t), Vector(r)); load(r, Some(t)); m.run()
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(m.itinerary.headOption))
+      With.frame += Seconds(60)(); m.run()
+      assert(m.state == m.Escaping)
+      val destinations = m.itinerary.toVector
+      val discovered = base(60); set(With.geography, "_bases", Vector(a, b, discovered))
+      load(r, None); m.run()
+      assert(m.state == m.Evacuating && !m.expiredNow && !m.continueNow(b))
+      assert(m.itinerary.toVector == destinations, "Withdrawal cannot discover a new trip")
+    }
+    check("army-side scout stops disappear but an enemy discovered there can be raided immediately") {
+      world(128)
+      var frontier = 0.5
+      set(With.scouting, "_ourProximity", new Cache(() => frontier, refreshPeriod = 0))
+      With.geography.home = Tile(0, 5)
+      val nearby = base(20); val distantScout = base(80); val target = base(115)
+      val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
+      nearby.owner = neutral; distantScout.owner = neutral
+      val bases = Vector(nearby, distantScout, target)
+      val t = unit(Protoss.Shuttle, 160, 160); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(target); m.configure(Vector(t), Vector(r)); load(r, Some(t))
+      m.appendTargets(bases)
+      assert(!m.itinerary.contains(nearby) && m.itinerary.contains(distantScout))
+      frontier = 0.1; m.appendTargets(bases)
+      assert(m.itinerary.toVector == Vector(target), "An advancing army removes pending scout stops")
+      nearby.owner = enemy; m.state = m.Travelling
+      set(t, "_pixel", nearby.heart.center); set(t, "_tile", nearby.heart)
+      m.appendTargets(bases)
+      assert(m.itinerary.toVector == Vector(nearby, target), "Enemy ownership overrides the proximity filter")
+      m.autonomousLanding = true; m.run()
+      assert(m.vicinity == nearby.heart.center && m.state == m.Raiding)
+    }
+    check("discoveries and reversal cannot rebuild a neutral tour around the map") {
+      world(128)
+      With.geography.home = Tile(115, 80)
+      val main = base(116, 110); val expansion = base(110, 70)
+      val scouts = Vector(base(60, 120), base(6, 60), base(60, 5))
+      val neutral = new PlayerInfo(null) { override lazy val isNeutral = true; override lazy val isAlly = false; override lazy val isUs = false; override lazy val isEnemy = false }
+      scouts.foreach(_.owner = neutral)
+      val t = unit(Protoss.Shuttle, With.geography.home.center.x, With.geography.home.center.y)
+      val r = unit(Protoss.Reaver); val m = new MissionProbe(main)
+      m.configure(Vector(t), Vector(r)); m.appendTargets(scouts :+ main)
+      assert(m.itinerary.toVector == Vector(main))
+      m.state = m.Raiding
+      val bases = scouts ++ Vector(main, expansion)
+      m.appendTargets(bases)
+      assert(m.itinerary.toVector == Vector(main, expansion), "A discovery behind the angular origin must not wrap the sweep")
+      set(With.geography, "_bases", bases); m.continuePressure = true
+      assert(m.continueNow(main) && m.itinerary.toVector == Vector(expansion))
+      m.appendTargets(bases)
+      assert(m.itinerary.toVector == Vector(expansion), "Refreshing the return pass must not add neutral scouting stops")
     }
     check("a visible base heart cannot clear workers hidden beyond the approach") {
       val target = base(5)
@@ -1013,6 +1114,134 @@ package Tactic.Missions {
       }
       assert(from == to)
     }
+    def routeLength(route: Information.Geography.Pathfinding.Types.TilePath): Double =
+      route.tiles.get.sliding(2).filter(_.size == 2).map(p => Math.sqrt(p.head.tileDistanceSquared(p.last).toDouble)).sum
+    check("army control removes center and vision detours and invalidates an existing route") {
+      world(128)
+      val from = Tile(10, 64); val to = Tile(118, 64)
+      With.grids.enemyVision.tiles.foreach(_.maxDepth = 5)
+      val route = new DropRoute
+      val perimeter = route.next(from, to, friendlyProximity = Some(1.0)).get
+      val direct = route.next(from, to, friendlyProximity = Some(0.0)).get
+      assert(!(perimeter eq direct) && direct.tiles.get.exists(_.tileDistanceFast(Points.tileMiddle) < 3))
+      assert(routeLength(direct) <= 108.01 && routeLength(perimeter) > routeLength(direct) + 10)
+      With.grids.enemyRangeAir.tiles.foreach(t => t.maxDepth = if (t.tile.x == 64) 1 else 0)
+      assert(route.next(from, to, friendlyProximity = Some(0.0)).isEmpty,
+        "Our side of the army is not permission to fly through actual anti-air")
+    }
+    check("friendly-side vision is ignored while the enemy-side leg still seeks concealment") {
+      world(128)
+      val from = Tile(10, 2); val to = Tile(118, 2)
+      With.grids.enemyVision.tiles.foreach(t => t.maxDepth =
+        if ((t.tile.x >= 20 && t.tile.x <= 24) || (t.tile.x >= 88 && t.tile.x <= 92 && t.tile.y <= 5)) 5 else 0)
+      val route = new DropRoute
+      val chosen = route.next(from, to, friendlyProximity = Some(0.5)).get
+      assert(chosen.tiles.get.exists(t => t.visibleToEnemy && t.proximity >= 0.5))
+      assert(chosen.tiles.get.forall(t => !t.visibleToEnemy || t.proximity >= 0.5),
+        "Friendly-side sightings must not disqualify useful concealment beyond the army")
+      val t = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      val waypoint = route.waypoint(t, chosen).get
+      assert(Mathematics.Shapes.Ray(t.pixel, Micro.Agency.Commander.adjustDestination(t, waypoint))
+        .exists(p => p.tile.visibleToEnemy && p.tile.proximity >= 0.5), "Waypoints also allow crossing friendly-side vision")
+      val nudged = route.next(from, to, friendlyProximity = Some(0.500001)).get
+      assert(nudged eq chosen, "Tiny army movements that cross no route tiles must preserve the cached path")
+      val advanced = route.next(from, to, friendlyProximity = Some(0.0)).get
+      assert(!(advanced eq chosen) && advanced.tiles.get.exists(p => p.visibleToEnemy && p.x >= 88))
+      assert(routeLength(advanced) < routeLength(chosen))
+    }
+    check("vision detours require full concealment and a bounded increase in distance") {
+      for (visionShape <- Vector("small", "excessive", "unavoidable")) {
+        world(128)
+        val from = Tile(10, 2); val to = Tile(118, 2)
+        With.grids.enemyVision.tiles.foreach(t => t.maxDepth = (if (visionShape == "small") {
+          if (t.tile.x >= 60 && t.tile.x <= 68 && t.tile.y <= 5) 5 else 0
+        } else if (visionShape == "excessive") {
+          if (t.tile.x >= 24 && t.tile.x <= 104 && t.tile.y <= 100) 5 else 0
+        } else if (t.tile.x >= 60 && t.tile.x <= 68) 5 else 0))
+        val normal = new DropRoute().next(from, to, preferUnseen = false).get
+        val chosen = new DropRoute().next(from, to).get
+        assert(normal.tiles.get.exists(_.visibleToEnemy))
+        assert(routeLength(chosen) <= 1.25 * routeLength(normal))
+        if (visionShape == "small") assert(chosen.tiles.get.forall(t => !t.visibleToEnemy))
+        else assert(chosen.tiles == normal.tiles, s"No useful concealment: $visionShape")
+      }
+    }
+    check("recent sightings disable vision detours and cached shortcuts for fifteen seconds per Shuttle") {
+      world(128)
+      val from = Tile(10, 2); val to = Tile(118, 2)
+      With.grids.enemyVision.tiles.foreach(t => t.maxDepth = if (t.tile.x >= 60 && t.tile.x <= 68 && t.tile.y <= 5) 5 else 0)
+      val t = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      val other = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      val route = new DropRoute
+      val hidden = route.next(from, to, preferUnseen = DropRoute.preferUnseen(t)).get
+      assert(hidden.tiles.get.forall(tile => !tile.visibleToEnemy))
+      t.lastFrameVisibleToOpponents = With.frame
+      assert(!DropRoute.preferUnseen(t) && DropRoute.preferUnseen(other))
+      val exposed = route.next(from, to, preferUnseen = DropRoute.preferUnseen(t)).get
+      assert(!(exposed eq hidden) && exposed.tiles.get.exists(_.visibleToEnemy))
+      val at = Tile(54, 2)
+      set(t, "_pixel", at.center); set(t, "_tile", at)
+      val waypoint = route.waypoint(t, exposed).get
+      assert(Mathematics.Shapes.Ray(t.pixel, Micro.Agency.Commander.adjustDestination(t, waypoint)).exists(_.tile.visibleToEnemy))
+      t.lastFrameVisibleToOpponents = With.frame - Seconds(15)() + 1
+      assert(!DropRoute.preferUnseen(t))
+      With.frame += 1
+      assert(DropRoute.preferUnseen(t))
+      val hiddenAgain = route.next(from, to, preferUnseen = DropRoute.preferUnseen(t)).get
+      assert(!(hiddenAgain eq exposed) && hiddenAgain.tiles.get.forall(tile => !tile.visibleToEnemy))
+      With.grids.enemyVision.tiles(at.i).maxDepth = 5
+      assert(!DropRoute.preferUnseen(t), "Current visibility must disable concealment before the next observation update")
+    }
+    check("the Circuit Breaker Zergling and Overlord do not cause a cosmetic vision detour") {
+      world(128)
+      val from = Pixel(3295, 360).tile; val to = Tile(122, 10)
+      val ling = unit(ProxyBwapi.Races.Zerg.Zergling, 3376, 496)
+      val overlord = unit(ProxyBwapi.Races.Zerg.Overlord, 3582, 412)
+      Vector(ling, overlord).foreach(e => {
+        set(e, "_player", enemy)
+        With.grids.enemyVision.updateUnit(e)
+        With.grids.enemyRangeAir.updateUnit(e)
+      })
+      val t = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      val normal = new DropRoute().next(from, to, preferUnseen = false).get
+      val route = new DropRoute
+      val chosen = route.next(from, to, preferUnseen = DropRoute.preferUnseen(t)).get
+      assert(With.grids.enemyRangeAir.units.isEmpty, "Neither the Zergling nor Overlord can threaten the Shuttle")
+      assert(chosen.tiles == normal.tiles)
+      assert(chosen.tiles.get.forall(_.y >= from.y - 1), "Do not loop north around harmless spotters")
+      assert(route.waypoint(t, chosen).exists(_.x > t.pixel.x + 288), "Keep a long eastward flight command")
+    }
+    check("unavoidable vision beyond a short waypoint cannot stall a safe Shuttle") {
+      world(128)
+      val from = Tile(10, 10); val to = Tile(12, 10)
+      With.grids.enemyVision.tiles.foreach(t => t.maxDepth = if (t.tile.x >= 14) 5 else 0)
+      val t = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      val route = new DropRoute
+      val path = route.next(from, to).get
+      assert(path.tiles.get.forall(tile => !tile.visibleToEnemy))
+      val waypoint = route.waypoint(t, path).get
+      assert(Mathematics.Shapes.Ray(t.pixel, Micro.Agency.Commander.adjustDestination(t, waypoint)).exists(_.tile.visibleToEnemy))
+    }
+    check("dropping vision avoidance never relaxes anti-air avoidance") {
+      world(128)
+      val from = Tile(10, 10); val to = Tile(110, 10)
+      val turret = unit(ProxyBwapi.Races.Terran.MissileTurret, Tile(64, 10).center.x, Tile(64, 10).center.y)
+      set(turret, "_player", enemy)
+      With.grids.enemyRangeAir.updateUnit(turret)
+      With.grids.enemyVision.updateUnit(turret)
+      val t = unit(Protoss.Shuttle, from.center.x, from.center.y)
+      t.lastFrameVisibleToOpponents = With.frame
+      val route = new DropRoute
+      val path = route.next(from, to, preferUnseen = DropRoute.preferUnseen(t)).get
+      assert(path.tiles.get.forall(With.grids.enemyRangeAir.get(_) == 0))
+      for (tile <- path.tiles.get.dropRight(1)) {
+        set(t, "_pixel", tile.center); set(t, "_tile", tile)
+        route.waypoint(t, path).foreach(point => assert(Mathematics.Shapes.Ray(t.pixel,
+          Micro.Agency.Commander.adjustDestination(t, point)).forall(_.tile.enemyRangeAgainst(t) == 0)))
+      }
+      With.grids.enemyRangeAir.tiles.foreach(tile => tile.maxDepth = if (tile.tile.x == 64) 1 else 0)
+      assert(new DropRoute().next(from, to, preferUnseen = false).isEmpty)
+    }
     check("clear flight legs get long waypoints while turns preserve the safe route") {
       world(128)
       val route = new DropRoute
@@ -1056,6 +1285,49 @@ package Tactic.Missions {
         }
       }
     }
+    check("drop routes leave a threat buffer promptly before continuing toward the target") {
+      world(128)
+      With.grids.enemyRangeAir.tiles.foreach(cell => cell.maxDepth =
+        if (cell.tile.x >= 8 && cell.tile.x <= 30 && cell.tile.y >= 10 && cell.tile.y <= 12) 1 else 0)
+      val from = Tile(10, 11).center
+      val t = unit(Protoss.Shuttle, from.x, from.y)
+      val route = new DropRoute
+      val path = new Information.Geography.Pathfinding.PathfindProfile(t.tile, Some(Tile(100, 11)),
+        threatMaximum = Some(0), threatMaximumAlongPath = Some(0), costThreat = 10,
+        canCrossUnwalkable = Some(true), canEndUnwalkable = Some(true)).find
+      val escape = path.tiles.get.takeWhile(_.enemyRangeAir > 0)
+      assert(escape.last.center.pixelDistance(from) <= 64,
+        "Do not follow the long side of the buffer merely because it approaches the raid")
+      val to = Micro.Agency.Commander.adjustDestination(t, route.waypoint(t, path).get)
+      assert(from.project(to, 96).tile.enemyRangeAir == 0,
+        "A long waypoint must preserve the path's early exit from danger")
+    }
+    check("the Circuit Breaker Shuttle clears the Dragoon buffer before turning north") {
+      val snapshots = Vector(
+        (Pixel(281, 1054), Vector(Pixel(403, 720), Pixel(343, 791))),
+        (Pixel(226, 1097), Vector(Pixel(319, 795), Pixel(232, 846))),
+        (Pixel(378, 1137), Vector(Pixel(231, 851), Pixel(233, 914))),
+        (Pixel(438, 1116), Vector(Pixel(262, 827), Pixel(252, 925))))
+      snapshots.foreach { case (from, enemyPixels) =>
+        world(128)
+        val t = unit(Protoss.Shuttle, from.x, from.y)
+        val dragoons = enemyPixels.map(p => unit(Protoss.Dragoon, p.x, p.y))
+        dragoons.foreach(d => {
+          set(d, "_player", enemy)
+          set(d, "pixelRangeAirCache", new Cache(() => 192.0))
+          With.grids.enemyRangeAir.updateUnit(d)
+        })
+        assert(t.tile.enemyRangeAir > 0, s"The buffer must flag this close approach at $from")
+        val route = new DropRoute
+        val path = route.next(t.tile, Tile(5, 10), preferUnseen = false).get
+        val to = Micro.Agency.Commander.adjustDestination(t, route.waypoint(t, path).get)
+        val clear = from.project(to, 96)
+        assert(clear.tile.enemyRangeAir == 0, s"Clear the pursuing Dragoons before rounding them: $from -> $to")
+        assert(dragoons.forall(d => d.pixelDistanceEdge(t, clear) > d.pixelRangeAgainst(t) + 32),
+          s"Preserve clearance beyond weapon range at $clear")
+        assert(Mathematics.Shapes.Ray(from, to).map(_.tile.enemyRangeAir).sliding(2).forall(p => p.last <= p.head))
+      }
+    }
     def combatMission(approaching: Boolean = false): (MissionProbe, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo, FriendlyUnitInfo) = {
       world(128)
       val target = base(100, 100)
@@ -1071,6 +1343,67 @@ package Tactic.Missions {
       m.autonomousLanding = true; m.assessDefense = true; m.launched = true
       m.configure(Vector(t), Vector(r, z)); load(r, Some(t)); load(z, Some(t))
       (m, t, r, z, worker)
+    }
+    check("raid feasibility uses the closest walkable landing in range of any mineral") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      m.run()
+      val landing = m.firstLanding(t).get
+      assert(m.target.minerals.exists(r.inRangeToAttackFrom(_, landing)))
+      assert(landing.pixelDistance(t.pixel) < m.target.heart.center.pixelDistance(t.pixel))
+      val candidates = With.geography.allTiles.filter(_.walkable).map(_.center).filter(p =>
+        m.target.minerals.exists(mineral => r.inRangeToAttackFrom(mineral, p) && r.hasScarabPathTo(mineral, p)))
+      assert(!candidates.exists(_.pixelDistanceSquared(t.pixel) < landing.pixelDistanceSquared(t.pixel)))
+      With.grids.unwalkableUnits.stamp(landing.tile)
+      assert(m.firstLanding(t).exists(p => p != landing && p.walkable))
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", m.firstLanding(t).get); set(u, "_tile", u.pixel.tile) })
+      assert(m.firstLanding(t).contains(t.pixel), "A usable current position needs no additional approach")
+    }
+    check("an unreachable mineral cannot admit a landing across a terrain barrier") {
+      val (m, t, r, _, _) = combatMission(approaching = true)
+      m.run()
+      val boundary = m.target.heart.center.x
+      import Information.Geography.Pathfinding.{BroodWarGroundDistance => Ground}
+      val distance = new Ground(Array(
+        Ground.Region(t.pixel, 1, walkable = true, Vector.empty),
+        Ground.Region(m.target.minerals.head.pixel, 2, walkable = true, Vector.empty)), p => if (p.x < boundary) 0 else 1)
+      set(With.paths, "broodWarGroundDistance", distance)
+      val landing = m.firstLanding(t).get
+      assert(landing.x >= boundary && m.target.minerals.exists(r.hasScarabPathTo(_, landing)))
+      With.grids.walkableTerrain.indices.foreach(With.grids.walkableTerrain.set(_, false))
+      assert(m.firstLanding(t).isEmpty)
+      m.run()
+      assert(m.state == m.Escaping && r.loaded, "No usable landing must reject the approach")
+    }
+    check("a turret over the mineral-line center permits a damaged Shuttle's safe standoff raid") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      m.run()
+      m.target.minerals.foreach(mineral => {
+        set(mineral, "_pixel", mineral.pixel.add(-224, 0)); set(mineral, "_tile", mineral.pixel.tile)
+      })
+      val turret = unit(ProxyBwapi.Races.Terran.MissileTurret, m.target.heart.center.x, m.target.heart.center.y)
+      set(turret, "_player", enemy); m.target.units :+= turret
+      With.grids.enemyRangeAir.updateUnit(turret); With.grids.enemyRangeAirGround.updateUnit(turret)
+      set(t, "_hitPoints", 16); set(t, "_shieldPoints", 60)
+      assert(m.firstLanding(t).contains(t.pixel))
+      assert(turret.pixelDistanceEdge(t.pixel) > turret.pixelRangeAir + t.unitClass.dimensionMax)
+      assert(m.approach(t) == t.pixel, "Crossing the standoff point would exceed half the Shuttle's 76 health")
+      m.run()
+      assert(m.state == m.Raiding && !m.mustLeave && m.controlsCombat(t) && r.loaded && z.loaded)
+    }
+    check("continuing beyond mineral range uses the live Shuttle damage budget") {
+      val (m, t, r, z, _) = combatMission(approaching = true)
+      m.run()
+      val first = m.firstLanding(t).get
+      val marine = unit(ProxyBwapi.Races.Terran.Marine, m.target.heart.center.x, m.target.heart.center.y)
+      set(marine, "_player", enemy); m.target.units :+= marine
+      Vector(t, r, z).foreach(u => { set(u, "_pixel", first); set(u, "_tile", first.tile) })
+      assert(m.approach(t) == m.target.heart.center, "A healthy Shuttle can continue along the mineral line")
+      m.run(); assert(!m.controlsCombat(t) && r.loaded)
+      set(t, "_hitPoints", 20); set(t, "_shieldPoints", 0)
+      assert(m.approach(t) == first, "A damaged Shuttle must deploy before crossing the useful landing point")
+      With.frame += 6; t.sleepUntil = With.frame + 1; perform(m.ActionTravelTransport, t)
+      assert(m.controlsCombat(t) && !m.mustLeave && r.loaded,
+        "Micro must hand off at the damage boundary without waiting for the next mission update")
     }
     check("the Polypoid arrival stays loaded along its clear route to the mineral line") {
       world(128)
@@ -1748,15 +2081,18 @@ package Tactic.Missions {
       Micro.Actions.Combat.Maneuvering.Retreat(t)
       avoidsThreat(t, turret, movement(t))
     }
-    check("an empty Shuttle returns to normal retreat after losing its crew") {
+    check("an empty Shuttle finishes escaping anti-air before releasing to normal squads") {
       val (t, turret) = turretEscape()
       val m = new MissionProbe(base(5)); m.autonomousLanding = true; m.launched = true
       set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(None))
       m.configure(Vector(t), Vector.empty); m.run()
+      assert(m.launched && m.state == m.Escaping && t.squad.contains(m))
+      performIntent(t)
+      val escaped = movement(t)
+      avoidsThreat(t, turret, escaped)
+      set(t, "_pixel", escaped); set(t, "_tile", escaped.tile)
+      With.frame += 1; m.run()
       assert(!m.launched && t.intent.action == Idle && t.squad.isEmpty)
-      set(t.agent, "_defaultHome", new Cache(() => Pixel(464, 448)))
-      Retreat(t)
-      avoidsThreat(t, turret, movement(t))
     }
     check("post-pickup mission travel clears anti-air before following the next target") {
       val (t, turret) = turretEscape()

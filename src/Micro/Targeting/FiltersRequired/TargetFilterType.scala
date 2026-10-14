@@ -7,5 +7,5 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object TargetFilterType extends TargetFilter {
   def legal(actor: FriendlyUnitInfo, target: UnitInfo): Boolean = (
     (Protoss.Reaver(actor) || target.isNone(Zerg.Larva, Zerg.Egg)) &&
-    ( ! Protoss.Interceptor(target) || actor.isAny(Terran.Marine, Protoss.Archon, Protoss.Dragoon, Zerg.Hydralisk)))
+    ( ! Protoss.Interceptor(target) || actor.isAny(Terran.Marine, Protoss.Archon, Zerg.Hydralisk)))
 }

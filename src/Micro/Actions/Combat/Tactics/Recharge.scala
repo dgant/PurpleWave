@@ -12,7 +12,8 @@ object Recharge extends Action {
   // Note: Recharge Shields range is 2
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
-    unit.canMove
+    With.self.isProtoss
+    && unit.canMove
     && unit.shieldPoints < unit.unitClass.maxShields
     && With.units.existsOurs(Protoss.ShieldBattery)
     && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight || unit.matchups.pixelsToTargetRange.forall(_ > 320))

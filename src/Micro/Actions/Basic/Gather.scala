@@ -76,6 +76,7 @@ object Gather extends Action {
             ! target.unitClass.isWorker
             && ! target.unitClass.isFlyer
             && target.unitClass.attacksOrCastsOrDetectsOrTransports
+            && ( ! target.burrowed || Zerg.Lurker(target))
             && target.pixelDistanceCenter(resource) < defenseRadiusPixels
             && unit.base.map(_.heart.center).forall(target.pixelDistanceCenter(_) < defenseRadiusPixels))))
 

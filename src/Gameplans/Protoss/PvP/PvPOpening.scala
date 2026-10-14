@@ -220,20 +220,6 @@ class PvPOpening extends GameplanImperative {
         ?(units(Protoss.Gateway) > 1, PvP3GateGoon, PvPCoreExpand).swapIn()
       }
     }
-    // If we catch them going Robo or Forge against our DT, abandon ship
-    lazy val earlyForge = enemyStrategy(With.fingerprints.earlyForge, With.fingerprints.forgeFe, With.fingerprints.gatewayFe)
-    if (PvPDT() && ! haveEverComplete(Protoss.TemplarArchives) && (enemyRobo || earlyForge)) {
-      PvPDT.swapOut()
-      if (With.fingerprints.dtRush() && ! PvPIdeas.preferObserverForDetection && roll("CannonExpand", 0.75)) {
-        cannonExpand = true
-      } else if (roll("SwapDTIntoExpand", 0.6)) {
-        PvPCoreExpand.swapIn()
-      } else if (roll("SwapDTInto4Gate", 0.3)) {
-        PvP4GateGoon.swapIn()
-      } else {
-        PvP3GateGoon.swapIn()
-      }
-    }
     // Consider swapping out of DT if we've been caught, or if we scout them going DT first
     if (PvPDT() && scoutCleared && ! haveEverComplete(Protoss.Dragoon)) {
       val caught            = With.units.ours.filter(u => u.isAny(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && u.knownToOpponents && ! u.visibleToOpponents).toVector

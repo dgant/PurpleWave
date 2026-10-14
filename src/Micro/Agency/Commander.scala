@@ -230,7 +230,10 @@ object Commander {
     if (unit.unready) return
     val to = adjustDestination(unit, destination)
     if (autoUnburrowUnlessLurkerInRangeOf(unit, to)) return
-    val alreadyAttackMovingThere = unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)
+    // Auto-acquiring a target changes AttackMove to AttackUnit; retain the original movement goal.
+    val alreadyAttackMovingThere = (unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)) || (
+      unit.order == Orders.AttackUnit && Option(unit.bwapiUnit.getLastCommand).exists(command =>
+        command.getType == bwapi.UnitCommandType.Attack_Move && ! command.isQueued && new Pixel(command.getTargetPosition).pixelDistance(to) < 128))
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
       unit.bwapiUnit.attack(to.bwapi)
     }

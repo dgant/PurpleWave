@@ -1,7 +1,7 @@
 package Placement
 
 import Information.Geography.Geography
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Metro, Zone}
 import Information.Grids.{Grids, GridUnits}
 import Information.Grids.Construction._
 import Information.Grids.Movement._
@@ -9,7 +9,7 @@ import Lifecycle.With
 import Mathematics.Points.{Point, Tile}
 import Placement.Access.PlaceLabels._
 import Placement.Access.PlacementQuery
-import Placement.Generation.{Fit, TemplatesGeneric, TemplatesProtoss, TemplatesTerran, TemplatesZerg}
+import Placement.Generation.{Fit, TemplatesGeneric, TemplatesProtoss, TemplatesTerran, TemplatesZerg, TileGenerator}
 import Placement.Templating._
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Players.{PlayerInfo, PlayerProxy}
@@ -57,6 +57,7 @@ object PlacementReservationTest extends App {
   With.geography = allocate(classOf[Geography])
   val zone = allocate(classOf[Zone])
   set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+  set(With.geography, "_metros", Vector.empty[Metro])
   val hallTile = Tile(32, 32)
   val base = new Base("Fixture", hallTile, Set.empty)
   set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(base)))
@@ -98,6 +99,28 @@ object PlacementReservationTest extends App {
       set(With.grids, "units", new GridUnits)
       With.grids.unwalkableUnits.reset()
     }
+  }
+
+  def withMainMetroTiles(tiles: Tile*)(test: => Unit): Unit = {
+    val mainMetro = allocate(classOf[Metro])
+    val mainZone = allocate(classOf[Zone])
+    set(mainMetro, "main", Some(base))
+    set(mainZone, "metro", Some(mainMetro))
+    for (obj <- Seq(mainMetro, mainZone); field <- obj.getClass.getDeclaredFields if field.getName.startsWith("bitmap$")) {
+      field.setAccessible(true)
+      if (field.getType == java.lang.Long.TYPE) field.setLong(obj, -1L)
+      else if (field.getType == java.lang.Integer.TYPE) field.setInt(obj, -1)
+    }
+    val mapping = Array.fill(With.mapTileArea)(zone)
+    tiles.foreach(t => mapping(t.i) = mainZone)
+    set(With.geography, "_zoneByTile", mapping)
+    try test finally { set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone)) }
+  }
+
+  def candidates(tiles: Tile*): Template => TileGenerator = _ => new TileGenerator {
+    private val iterator = tiles.iterator
+    override def next(): Tile = iterator.next()
+    override def hasNext: Boolean = iterator.hasNext
   }
 
   check("occupied starting Nexus anchors a usable main defense layout") {
@@ -270,6 +293,68 @@ object PlacementReservationTest extends App {
       assert(placement.foundations.exists(!_.point.requirement.isTownHall))
     }
   }
+  check("building-tile requirements cover unlabeled footprints and compose") {
+    for (unitClass <- Seq(Protoss.Pylon, Protoss.Gateway, Terran.Barracks);
+         dx <- 0 until unitClass.tileWidth; dy <- 0 until unitClass.tileHeight) {
+      val blocked = hallTile.add(dx, dy)
+      val layout = template(new TemplatePointRequirement(unitClass))
+        .requireBuildingTiles(_ != blocked).requireBuildingTiles(_ => true)
+      assert(!new Placement().fitsAt(layout, hallTile))
+      assert(new Placement().fitsAt(layout, Tile(10, 10)))
+    }
+  }
+  check("all ground-proxy templates declare main-metro exclusion") {
+    for (layout <- TemplatesProtoss.proxy2 ++ TemplatesProtoss.proxy4 ++ TemplatesProtoss.proxyBase ++ TemplatesTerran.proxy2) {
+      val origin = layout.points.find(_.requirement.isTownHall)
+        .map(p => hallTile.subtract(p.point.x, p.point.y)).getOrElse(Tile(10, 10))
+      assert(new Placement().fitsAt(layout, origin))
+      for (point <- layout.points if point.requirement.buildableBefore && !point.requirement.buildableAfter) {
+        val lastTile = origin.add(point.point).add(point.requirement.width - 1, point.requirement.height - 1)
+        withMainMetroTiles(lastTile) { assert(!new Placement().fitsAt(layout, origin)) }
+      }
+    }
+  }
+  check("an offset proxy in a main is rejected before strategy-visible indexing") {
+    // Neo Ground Zero: proxy4(1) at (97,100) put its Pylon at (102,104).
+    val origin = Tile(10, 10)
+    With.grids.walkableTerrain.set(origin, false)
+    With.grids.buildableTerrain.set(origin, false)
+    try {
+      withMainMetroTiles(origin.add(5, 4)) {
+        val placement = new Placement
+        assert(placement.fitAndIndex(1, 1, Seq(TemplatesProtoss.proxy4(1)), candidates(origin)).isEmpty)
+        assert(placement.fitsIndexOrder.isEmpty)
+        assert(placement.foundations.isEmpty)
+        assert(placement.get(Proxy2Gate).isEmpty) // PvEProxy2Gate's selection requirement.
+      }
+    } finally {
+      With.grids.walkableTerrain.set(origin, true)
+      With.grids.buildableTerrain.set(origin, true)
+    }
+  }
+  check("rejecting a proxy candidate still permits a valid fallback") {
+    val origin = Tile(10, 10)
+    val fallback = Tile(40, 10)
+    withMainMetroTiles(origin.add(5, 4)) {
+      val placement = new Placement
+      val fits = placement.fitAndIndex(1, 1, Seq(TemplatesProtoss.proxy4(1)), candidates(origin, fallback))
+      assert(fits.map(_.origin) == Seq(fallback))
+      assert(placement.get(origin.add(5, 4)).isEmpty)
+      assert(placement.get(Proxy2Gate).nonEmpty)
+    }
+  }
+  check("building-tile requirements leave walkways and unconstrained templates unchanged") {
+    withMainMetroTiles(hallTile) {
+      assert(new Placement().fitsAt(template(pylon.withLabels(ProxyGround)), hallTile))
+      assert(new Placement().fitsAt(template(pylon.withLabels(AnyProxy, CannonRush)), hallTile))
+      assert(new Placement().fitsAt(template(new RequireWalkable).requireBuildingTiles(_ => false), hallTile))
+    }
+  }
+  check("an existing building cannot bypass its template's tile requirement") {
+    withBuilding(Protoss.Pylon) {
+      assert(!new Placement().fitsAt(template(pylon).requireBuildingTiles(_ != hallTile.add(1, 1)), hallTile))
+    }
+  }
   check("placement cache replay preserves local offsets, label unions and fit order") {
     val placement = new Placement
     placement.index(Fit(hallTile, TemplatesGeneric.townhall))
@@ -277,6 +362,7 @@ object PlacementReservationTest extends App {
     val labelledTile = Tile(10, 10)
     placement.index(Fit(labelledTile, template(pylon.withLabels(DefendHall)), 3))
     placement.index(Fit(labelledTile, template(pylon.withLabels(DefendAir)), 1))
+    assert(placement.fitAndIndex(1, 1, Seq(TemplatesProtoss.proxy4(1)), candidates(Tile(40, 10))).nonEmpty)
     val keyConstructor = Class.forName("Placement.PlacementCache$CacheKey").getDeclaredConstructors.head
     keyConstructor.setAccessible(true)
     val key = keyConstructor.newInstance("fixture", Int.box(2), Int.box(0), Int.box(hallTile.x), Int.box(hallTile.y)).asInstanceOf[AnyRef]
@@ -303,8 +389,16 @@ object PlacementReservationTest extends App {
       assert(restored.get(DefendHall).exists(_.tile == labelledTile))
       assert(restored.fitsIndexOrder.map(_.order) == placement.fitsIndexOrder.map(_.order))
       assert(restored.fitsAt(template(hall), hallTile))
+      assert(restored.get(Proxy2Gate).map(_.tile) == placement.get(Proxy2Gate).map(_.tile))
       val stale = cacheCall("read", file, "different-revision", key).asInstanceOf[Product]
       assert(stale.productPrefix == "Stale")
+      val input = new java.util.zip.GZIPInputStream(new java.io.FileInputStream(file))
+      val bytes = try Iterator.continually(input.read()).takeWhile(_ >= 0).map(_.toByte).toArray finally input.close()
+      bytes(4) = 4 // Old fits were generated without building-tile requirements.
+      val output = new java.util.zip.GZIPOutputStream(new java.io.FileOutputStream(file))
+      try output.write(bytes) finally output.close()
+      val legacy = cacheCall("read", file, "reservation-test", key).asInstanceOf[Product]
+      assert(legacy.productPrefix == "Invalid", "Legacy proxy placements must be regenerated")
     } finally { assert(file.delete(), "Could not remove temporary test cache") }
   }
 

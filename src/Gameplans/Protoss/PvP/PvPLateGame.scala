@@ -194,6 +194,9 @@ class PvPLateGame extends GameplanImperative {
     if (units(Protoss.Zealot) >= 4) {
       upgradeContinuously(Protoss.ZealotSpeed)
     }
+    if (productionCapacity < 3 * miningBases) {
+      trainArmy()
+    }
     if (fearDeath) {
       trainArmy()
       addProduction()
@@ -254,6 +257,7 @@ class PvPLateGame extends GameplanImperative {
     }
     pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     pump(Protoss.Observer, 2)
+    tryBuildInWall(1, Protoss.ShieldBattery)
     pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
     if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
       get(Protoss.ShuttleSpeed)
@@ -292,6 +296,7 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doSecondaryTech(): Unit = {
+    pumpGasPumps()
     if (primaryTech.contains(RoboTech)) {
       doTemplar()
     } else if (primaryTech.contains(TemplarTech)) {
@@ -332,7 +337,11 @@ class PvPLateGame extends GameplanImperative {
     if ( ! have(Protoss.Observer, Protoss.Observatory)) {
       get(Protoss.Forge)
     }
-    get(Protoss.CitadelOfAdun, Protoss.TemplarArchives)
+    get(Protoss.CitadelOfAdun)
+    if (units(Protoss.Zealot) >= 4) {
+      get(Protoss.ZealotSpeed)
+    }
+    get(Protoss.TemplarArchives)
     val gasThreshold = 250
     if (gas < gasThreshold) {
       pumpGasPumps()

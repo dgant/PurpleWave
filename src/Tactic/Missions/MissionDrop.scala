@@ -43,6 +43,7 @@ abstract class MissionDrop extends Mission {
   protected def targetCleared(base: Base): Boolean = requireWorkers && base.heart.visible && base.units.forall(u => !u.isEnemy || !IsWorker(u))
   protected def shouldStopRaiding                         : Boolean = false
   protected def shouldGoHome                              : Boolean = false
+  protected def canContinueAfterLeaving                   : Boolean = true
   protected def recruited(unit: UnitInfo)                 : Boolean = With.recruiter.lockedBy(this).exists(_ == unit)
   protected def recruitable(unit: UnitInfo)               : Boolean = unit.complete && (recruited(unit) || ! unit.team.exists(_.engagedUpon))
   protected def recruitablePassenger(unit: UnitInfo)      : Boolean = recruitable(unit) && (recruited(unit) || Maff.orElse(transportLock.units, With.recruiter.available.filter(transportLock.matcher)).exists(_.pixelDistanceCenter(unit) < 640))
@@ -54,6 +55,7 @@ abstract class MissionDrop extends Mission {
   protected def readyToRaid(transport: FriendlyUnitInfo): Boolean = false
   protected def onRaidHandoff(transport: FriendlyUnitInfo): Unit = {}
   def requestsUnload(passenger: FriendlyUnitInfo): Boolean = false
+  def allowsPickup(transport: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Boolean = true
   protected def rejectApproach(transport: FriendlyUnitInfo): Boolean = false
   protected def routeArrivalRange(transport: FriendlyUnitInfo): Double = 0
   protected def routeProximity: Option[Double] = None
@@ -88,6 +90,12 @@ abstract class MissionDrop extends Mission {
   final def assignedTransport(passenger: FriendlyUnitInfo): Option[FriendlyUnitInfo] =
     passenger.transport.filter(transports.contains).orElse(passenger.agent.ride.filter(transports.contains))
   protected final def passengersFor(transport: FriendlyUnitInfo): Seq[FriendlyUnitInfo] = passengers.filter(p => assignedTransport(p).contains(transport))
+
+  final def abandonUnsafePickups(): Unit = {
+    val abandoned = passengers.filter(p => !p.loaded && assignedTransport(p).exists(t => !allowsPickup(t, p))).toSet
+    transports.filter(t => abandoned.exists(t.orderTarget.contains)).foreach(Commander.stop)
+    releasePassengers(abandoned)
+  }
 
   override def reset(): Unit = {
     itinerary.clear()
@@ -185,6 +193,7 @@ abstract class MissionDrop extends Mission {
       finishDrop("No transports left"); return
     }
     updateManifest()
+    abandonUnsafePickups()
     if (passengers.isEmpty && !defaultCombatLanding) { finishDrop("No transportable passengers left"); return }
     if (!returningHome && !shouldGoHome) refreshItinerary()
     while (!returningHome && !shouldGoHome && itinerary.headOption.exists(skipBase)) {
@@ -336,6 +345,7 @@ abstract class MissionDrop extends Mission {
     }
     if (state == Escaping && !allAboard) transition(Evacuating)
     if (state == Evacuating && allAboard) {
+      returningHome ||= !canContinueAfterLeaving
       if (returningHome) transition(Escaping) else {
         beginDestination()
         transition(Travelling)
@@ -398,6 +408,7 @@ abstract class MissionDrop extends Mission {
     !Protoss.Reaver(passenger) || passenger.scarabs + passenger.trainingQueue.size >= 2
 
   private def pickupTarget(transport: FriendlyUnitInfo, assembling: Boolean): Option[FriendlyUnitInfo] = pickupTargets.synchronized {
+    abandonUnsafePickups()
     if (assembling && unassignedCargo(transport).nonEmpty) return None
     val unloaded = passengersFor(transport).filterNot(_.loaded)
       .filter(p => !assembling || readyForPickup(p))
@@ -411,6 +422,7 @@ abstract class MissionDrop extends Mission {
   }
 
   private def boardSelected(passenger: FriendlyUnitInfo, assembling: Boolean): Unit = {
+    abandonUnsafePickups()
     assignedTransport(passenger).foreach(t => {
       if (pickupTarget(t, assembling).contains(passenger)) Commander.rightClick(passenger, t)
       else if (passenger.order == Orders.EnterTransport) Commander.stop(passenger)

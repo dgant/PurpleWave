@@ -167,7 +167,6 @@ object JudgmentModifiers {
     val stickiness   =   recentEngage * paidPrice
     val staticThreat =   Maff.fromBoolean(unit.matchups.threatDeepest.exists(t => t.unitClass.isBuilding || Terran.SiegeTankSieged(t) || (t.canSiege && With.framesSince(t.lastSeen) > 24)))
     val obscurity    =   unit.presumptiveTarget.filter(_.isEnemyOf(unit)).map(target => Math.min(1, With.framesSince(target.lastSeen).toDouble / Seconds(60)())).getOrElse(0d)
-    val pace         =   unit.squad.map(_.pace01).getOrElse(0)
     val patience     =   1 - Maff.clamp01(unit.hysteresis.bloodlustFrames.toDouble / Seconds(15)())
     val displacement =   Math.max(0, Maff.clamp01(Math.abs(unit.matchups.pixelsToTargetRange.flatMap(distance => unit.squad.map(_.meanAttackerTargetDistance - distance)).getOrElse(0d)) / speed / Seconds(15)()) - 0.333)
     val tankLock     =   Maff.or0(Maff.or0(.333, unit.matchups.inTankRange) + Maff.or0(0.666, unit.matchups.inRangeOfTank), With.enemies.exists(_.isTerran))
@@ -179,12 +178,11 @@ object JudgmentModifiers {
     } else {
       amount  += .10  * staticThreat
       amount  += .03  * obscurity
-      //amount  +=  0   * pace
       amount  += .10  * patience
       amount  += .10  * displacement
     }
     if (With.frame < 0) {
-      With.logger.debug(f"$fighting $speed $entanglement $stickiness $staticThreat $obscurity $pace $patience $displacement $tankLock")
+      With.logger.debug(f"$fighting $speed $entanglement $stickiness $staticThreat $obscurity $patience $displacement $tankLock")
     }
     (amount, unit.subjectiveValue * ?(fighting, 5, 1))
   }

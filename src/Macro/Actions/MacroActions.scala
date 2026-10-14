@@ -120,6 +120,15 @@ trait MacroActions extends MacroCounting {
     val gasToRequest        = Math.min(quantity, eligibleGas.size)
     get(gasToRequest, pumpType)
   }
+  def takeOurGas(): Unit = {
+    get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(With.geography.ourBases: _*))
+  }
+  def stealGas(): Unit = {
+    With.scouting.enemyMain
+      .filter(main => main.gas.length == 1 && main.gas.forall(_.isNeutral))
+      .foreach(main => get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(main)))
+  }
+
   def microSlush(minerals: Int): Unit = {
     get(RequestMicroSlush(minerals))
   }

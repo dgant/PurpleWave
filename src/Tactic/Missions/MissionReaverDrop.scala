@@ -87,7 +87,7 @@ class MissionReaverDrop extends MissionDrop {
   override protected def continueItinerary(from: Base): Boolean = {
     val enemyBases = With.geography.bases.filter(_.isEnemy)
     if (returningHome || missionExpired || !With.blackboard.wantToHarass() || !With.blackboard.reaverDropContinuePressure() ||
-      transports.isEmpty || !passengers.exists(Protoss.Reaver)) return false
+      transports.isEmpty || !canContinueAfterLeaving || !passengers.exists(Protoss.Reaver)) return false
     val known = (plannedTargets.toVector ++ MissionReaverDrop.targets(enemyBases)).distinct
     val next = MissionReaverDrop.reverseTargets(known, from).filter(b => b.isEnemy && !targetCleared(b))
     if (next.isEmpty) return false
@@ -105,6 +105,12 @@ class MissionReaverDrop extends MissionDrop {
   override protected def commitWhileRaiding: Boolean = false
   override protected def defaultCombatLanding: Boolean = true
   override protected def requiredPassenger(passenger: FriendlyUnitInfo): Boolean = Protoss.Reaver(passenger)
+
+  override def allowsPickup(transport: FriendlyUnitInfo, passenger: FriendlyUnitInfo): Boolean =
+    passenger.loaded || Protoss.Reaver(passenger) || !(
+      With.grids.enemyRangeAir.unitsNear(transport.tile) ++ With.grids.enemyRangeAir.unitsNear(passenger.tile))
+      .exists(e => e.likelyStillThere && e.canAttackAir &&
+        (e.inRangeToAttack(transport) || e.inRangeToAttack(transport, passenger.pixel)))
 
   override def requestsUnload(passenger: FriendlyUnitInfo): Boolean =
     Protoss.Zealot(passenger) && passenger.loaded && assignedTransport(passenger).exists(t =>
@@ -264,9 +270,13 @@ class MissionReaverDrop extends MissionDrop {
 
   private def reaverManifest: DropManifest.Manifest = {
     val available = With.recruiter.available.toVector
-    val shuttles = available.filter(u => Protoss.Shuttle(u) && transportLock.matcher(u))
+    val shuttles = available.filter(u => Protoss.Shuttle(u) && transportLock.matcher(u) && u.shieldPoints >= u.unitClass.maxShields)
       .sortBy(u => (u.pixelDistanceSquared(vicinity), u.id))
-    DropManifest.reavers(shuttles, available.filter(reaverLock.matcher), With.blackboard.reaverDropMaxReavers())
+    val reavers = available.filter(reaverLock.matcher)
+    val maximum = With.blackboard.reaverDropMaxReavers()
+    if (With.blackboard.reaverDropMultiShuttle()) DropManifest.reavers(shuttles, reavers, maximum)
+    else shuttles.map(t => DropManifest.reavers(Vector(t), reavers, maximum))
+      .sortBy(m => -m.size).headOption.getOrElse(Map.empty)
   }
 
   override protected def shouldStopRaiding: Boolean = {
@@ -281,6 +291,8 @@ class MissionReaverDrop extends MissionDrop {
     } else false
   }
   override protected def shouldGoHome: Boolean = !passengers.exists(Protoss.Reaver) || missionExpired
+  override protected def canContinueAfterLeaving: Boolean =
+    transports.forall(t => 2 * t.totalHealth > t.unitClass.maxTotalHealth)
 
   val reaverLock  : LockUnits = new LockUnits(this, u => Protoss.Reaver(u) && recruitablePassenger(u))
   val smallLock   : LockUnits = new LockUnits(this, u => u.isAny(Protoss.Zealot, Protoss.DarkTemplar) && recruitablePassenger(u)).setCounter(CountUpTo(2))

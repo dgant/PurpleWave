@@ -230,6 +230,8 @@ package Micro.Formation {
           assert(defender.intent.terminus.contains(target))
           assert(defender.intent.station.contains(target))
           assert(defender.intent.redoubt.contains(target))
+          assert(defender.intent.targets.exists(_.isEmpty))
+          assert(! defender.intent.shouldAdjustXY)
           assert(! defender.intent.canFlee)
           assert(defender.intent.canFight)
           assert(defender.intent.action == Idle)

@@ -464,6 +464,7 @@ object TemplatesProtoss {
         "-----xxxx---",
         "------------"))
     .map(_.addLabels(AnyProxy, ProxyGround, Proxy2Gate))
+    .map(_.requireBuildingTiles(_.zone.metro.forall(_.main.isEmpty)))
 
   val proxy4: Seq[Template] = Seq(
     new Template()
@@ -498,6 +499,7 @@ object TemplatesProtoss {
         "xxxxxxx-xx-xxxxxxx",
         "xxxxxxx----xxxxxxxx"))
     .map(_.addLabels(AnyProxy, ProxyGround, Proxy4Gate, Proxy2Gate))
+    .map(_.requireBuildingTiles(_.zone.metro.forall(_.main.isEmpty)))
 
   val proxy2: Seq[Template] = Seq(
     new Template()
@@ -559,6 +561,7 @@ object TemplatesProtoss {
         "--xxxx",
         "------"))
     .map(_.addLabels(AnyProxy, ProxyGround, Proxy2Gate))
+    .map(_.requireBuildingTiles(_.zone.metro.forall(_.main.isEmpty)))
 
   val proxyForwardRobo: Seq[Template] = Seq(
     new Template()

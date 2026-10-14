@@ -263,4 +263,5 @@ object TemplatesTerran {
         "-xxxx-",
         "------"))
     .map(_.addLabels(AnyProxy, ProxyGround))
+    .map(_.requireBuildingTiles(_.zone.metro.forall(_.main.isEmpty)))
 }

@@ -90,6 +90,7 @@ package Tactic.Missions {
     With.recruiter = new Recruiter
     With.blackboard = allocate(classOf[Blackboard])
     set(With.blackboard, "reaverDropMaxReavers", new Utilities.Property(1))
+    set(With.blackboard, "reaverDropMultiShuttle", new Utilities.Property(false))
     set(With.blackboard, "reaverDrop", new Utilities.Property(true))
     set(With.blackboard, "wantToHarass", new Utilities.Property(true))
     set(With.blackboard, "reaverDropContinuePressure", new Utilities.Property(true))
@@ -108,6 +109,7 @@ package Tactic.Missions {
     With.self = new PlayerInfo(null) {
       override def getUpgradeLevel(upgrade: ProxyBwapi.Upgrades.Upgrade): Int = 0
       override def isZerg: Boolean = false
+      override def isProtoss: Boolean = true
       override def minerals: Int = availableMinerals
       override lazy val isNeutral = false
       override lazy val isAlly = false
@@ -175,6 +177,7 @@ package Tactic.Missions {
       set(u, "lastFrameVisibleToOpponents", -Utilities.Time.Forever())
       u.lastFrameUnloaded = -Utilities.Time.Forever()
       set(u, "_flying", kind.isFlyer); set(u, "_transport", None)
+      set(u, "_orderTarget", None)
       set(u, "_scarabs", 3); set(u, "_trainingQueue", Vector.empty[UnitClass])
       set(u, "_squad", None); set(u, "friendly", Some(u)); set(u, "damageQueue", ArrayBuffer.empty)
       set(u, "_intent", new Intention)
@@ -418,6 +421,89 @@ package Tactic.Missions {
       With.blackboard.wantToHarass.set(true)
       assert(m.canFormNow)
     }
+    check("recruitment waits for full Shuttle shields without requiring full hull health") {
+      for (alreadyLoaded <- Vector(false, true)) {
+        val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+        if (alreadyLoaded) load(r, Some(t))
+        set(t, "_shieldPoints", t.unitClass.maxShields - 1)
+        With.recruiter = new Recruiter
+        set(With.recruiter, "unlockedUnits", mutable.Set(t, r))
+        With.blackboard.reaverDropMaxReavers.set(1)
+        val m = new MissionProbe(first)
+        assert(!m.canFormNow)
+        m.recruitNow()
+        assert(m.transports.isEmpty && With.recruiter.lockedBy(m).isEmpty)
+        set(t, "_shieldPoints", t.unitClass.maxShields); set(t, "_hitPoints", 1)
+        assert(m.canFormNow)
+        m.recruitNow()
+        assert(m.transports.toVector == Vector(t) && m.passengers.toVector == Vector(r))
+        set(t, "_shieldPoints", 0)
+        With.recruiter.renew(m); With.recruiter.update()
+        assert(With.recruiter.lockedBy(m).toSet == Set(t, r), "Damage after recruitment must not release the Shuttle")
+      }
+    }
+    check("single and multi-Shuttle recruitment exclude partially shielded Shuttles") {
+      for (multiple <- Vector(false, true)) {
+        val ts = Vector.fill(2)(unit(Protoss.Shuttle))
+        val rs = Vector.fill(2)(unit(Protoss.Reaver))
+        rs.zip(ts).foreach { case (r, t) => load(r, Some(t)) }
+        set(ts.head, "_shieldPoints", ts.head.unitClass.maxShields - 1)
+        With.recruiter = new Recruiter
+        set(With.recruiter, "unlockedUnits", mutable.Set((ts ++ rs): _*))
+        With.blackboard.reaverDropMaxReavers.set(4)
+        With.blackboard.reaverDropMultiShuttle.set(multiple)
+        val m = new MissionProbe(first)
+        assert(m.canFormNow)
+        m.recruitNow()
+        assert(m.transports.toVector == Vector(ts.last) && m.passengers.toVector == Vector(rs.last))
+        assert(With.recruiter.available.toSet == Set(ts.head, rs.head))
+      }
+      With.blackboard.reaverDropMultiShuttle.reset()
+    }
+    check("default drop recruitment uses one Shuttle even with a larger Reaver cap") {
+      val previousBlackboard = With.blackboard
+      With.blackboard = new Blackboard
+      With.blackboard.wantToHarass.set(true)
+      assert(With.blackboard.reaverDropMaxReavers() == 2 && !With.blackboard.reaverDropMultiShuttle())
+      for (maximum <- Vector(2, 6)) {
+        val ts = Vector.fill(2)(unit(Protoss.Shuttle))
+        val rs = Vector.fill(2)(unit(Protoss.Reaver))
+        rs.zip(ts).foreach { case (r, t) => load(r, Some(t)) }
+        With.recruiter = new Recruiter
+        set(With.recruiter, "unlockedUnits", mutable.Set((ts ++ rs): _*))
+        With.blackboard.reaverDropMaxReavers.set(maximum)
+        val m = new MissionProbe(first)
+        assert(m.canFormNow)
+        m.recruitNow()
+        assert(m.transports.size == 1 && m.passengers.size == 1)
+        assert(With.recruiter.available.count(Protoss.Shuttle) == 1)
+        assert(With.recruiter.available.count(Protoss.Reaver) == 1)
+      }
+      With.blackboard = previousBlackboard
+    }
+    check("single-Shuttle recruitment chooses the fullest feasible crew over a closer Shuttle") {
+      for (nearbyReavers <- Vector(0, 1)) {
+        val near = unit(Protoss.Shuttle, first.heart.center.x, first.heart.center.y)
+        val far = unit(Protoss.Shuttle, 2500, 2500)
+        val nearCrew = Vector.fill(nearbyReavers)(unit(Protoss.Reaver, near.pixel.x, near.pixel.y))
+        val farCrew = Vector.fill(2)(unit(Protoss.Reaver, far.pixel.x, far.pixel.y))
+        nearCrew.foreach(load(_, Some(near))); farCrew.foreach(load(_, Some(far)))
+        With.recruiter = new Recruiter
+        set(With.recruiter, "unlockedUnits", mutable.Set((Vector(near, far) ++ nearCrew ++ farCrew): _*))
+        With.blackboard.reaverDropMaxReavers.set(2)
+        val m = new MissionProbe(first)
+        assert(m.canFormNow)
+        m.recruitNow()
+        assert(m.transports.toVector == Vector(far) && m.passengers.toSet == farCrew.toSet)
+        assert(With.recruiter.available.exists(_ == near))
+      }
+    }
+    check("blackboard reset restores the single-Shuttle default") {
+      val board = new Blackboard
+      board.reaverDropMultiShuttle.set(true)
+      board.reset()
+      assert(!board.reaverDropMultiShuttle())
+    }
     check("a cap of one recruits only one of two completed Reavers on separate Shuttles") {
       val ts = Vector.fill(2)(unit(Protoss.Shuttle))
       val rs = Vector.fill(2)(unit(Protoss.Reaver))
@@ -628,6 +714,71 @@ package Tactic.Missions {
       b.owner = enemy; c.owner = enemy
       m.transports.clear()
       assert(!m.continueNow(b))
+    }
+    check("leaving a base requires strictly more than half Shuttle health for forward and reverse trips") {
+      val half = Protoss.Shuttle.maxTotalHealth / 2
+      val shields = Protoss.Shuttle.maxShields
+      for (reverse <- Vector(false, true); (hp, sp) <- Vector((half - 1, 0), (half, 0), (half + 1, 0),
+        (half - shields, shields), (half - shields + 1, shields))) {
+        world(128)
+        val a = base(20); val b = base(90)
+        set(With.geography, "_bases", Vector(a, b))
+        val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+        var cleared = false
+        val m = new MissionProbe(b) { override protected def targetCleared(base: Base): Boolean = cleared && base == b }
+        m.continuePressure = true; m.configure(Vector(t), Vector(r)); m.launched = true
+        m.itinerary.clear(); m.appendTargets(Vector(a, b)); m.itinerary.clear()
+        m.itinerary ++= (if (reverse) Vector(b) else Vector(b, a))
+        m.updateState(false); m.state = m.Raiding
+        With.recruiter = new Recruiter; With.recruiter.lockTo(m.lock, Vector(t, r))
+        set(t, "_hitPoints", hp); set(t, "_shieldPoints", sp)
+        m.run()
+        assert(m.state == m.Raiding && m.launched, "The departure threshold must not interrupt the current raid")
+        cleared = true; m.run()
+        assert(m.state == m.Evacuating && m.launched && r.intent.action == m.ActionEvacuatePassenger)
+        load(r, Some(t)); m.run()
+        if (hp + sp > half) {
+          assert(m.state == m.Travelling && m.vicinity == a.heart.center && m.launched)
+        } else {
+          assert(m.state == m.Escaping && m.launched && r.loaded)
+          assert(!m.continueNow(b), "Low health must not start another sweep")
+          set(t, "_hitPoints", t.unitClass.maxHitPoints); set(t, "_shieldPoints", t.unitClass.maxShields)
+          m.run()
+          assert(m.state == m.Escaping, "Withdrawal stays committed even if shields recover")
+          set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(None))
+          m.run()
+          assert(!m.launched && With.recruiter.lockedBy(m).isEmpty)
+          assert(Vector(t, r).forall(u => u.squad.isEmpty && u.intent.action == Idle))
+        }
+      }
+    }
+    check("damage during pickup prevents departure to the next base") {
+      world(128)
+      val a = base(20); val b = base(90)
+      val t = unit(Protoss.Shuttle); val r = unit(Protoss.Reaver)
+      val m = new MissionProbe(b) { override protected def targetCleared(base: Base): Boolean = base == b }
+      m.configure(Vector(t), Vector(r)); m.itinerary += a; m.launched = true
+      m.updateState(false); m.state = m.Raiding
+      m.run()
+      assert(m.state == m.Evacuating && m.itinerary.head == a)
+      set(t, "_hitPoints", t.unitClass.maxTotalHealth / 2); set(t, "_shieldPoints", 0)
+      load(r, Some(t)); m.run()
+      assert(m.state == m.Escaping && m.launched && r.loaded)
+    }
+    check("every Shuttle must pass the departure health threshold") {
+      world(128)
+      val a = base(20); val b = base(90)
+      val ts = Vector.fill(2)(unit(Protoss.Shuttle))
+      val rs = Vector.fill(4)(unit(Protoss.Reaver))
+      val m = new MissionProbe(b) { override protected def targetCleared(base: Base): Boolean = base == b }
+      m.configure(ts, rs); m.itinerary += a; m.launched = true
+      m.updateState(false); m.state = m.Raiding
+      set(ts.last, "_hitPoints", ts.last.unitClass.maxTotalHealth / 2); set(ts.last, "_shieldPoints", 0)
+      m.run()
+      assert(m.state == m.Evacuating)
+      rs.foreach(r => load(r, m.assignedTransport(r)))
+      m.run()
+      assert(m.state == m.Escaping && m.launched && rs.forall(_.loaded))
     }
     check("disabling harassment finishes the sweep and recovers the crew instead of reversing") {
       val previousMapping = With.geography.allTiles.map(_.base).toArray
@@ -907,6 +1058,7 @@ package Tactic.Missions {
       With.recruiter = new Recruiter
       set(With.recruiter, "unlockedUnits", mutable.Set((ts ++ rs ++ zs): _*))
       With.blackboard.reaverDropMaxReavers.set(5)
+      With.blackboard.reaverDropMultiShuttle.set(true)
       val mission = new MissionProbe(first)
       mission.recruitNow()
       assert(mission.transports.size == 3 && mission.passengers.count(Protoss.Reaver) == 5)
@@ -915,6 +1067,7 @@ package Tactic.Missions {
       With.recruiter.renew(mission)
       With.recruiter.update()
       assert(mission.reaverLock.units.size == 5 && With.recruiter.lockedBy(mission).size == 10)
+      With.blackboard.reaverDropMultiShuttle.reset()
     }
     check("raid intents use normal micro with stable, separate Shuttle crews") {
       val ts = Vector.fill(2)(unit(Protoss.Shuttle))
@@ -2006,6 +2159,89 @@ package Tactic.Missions {
       assert(m.passengers.contains(z) && m.state == m.Evacuating)
       load(z, Some(t)); m.run()
       assert(m.state == m.Escaping)
+    }
+    check("unsafe filler pickups are released during assembly, combat, and evacuation") {
+      for (phase <- Vector("assembly", "combat", "evacuation"); exposed <- Vector("shuttle", "passenger")) {
+        world(128)
+        val t = unit(Protoss.Shuttle, 1000, 1000)
+        val r = unit(Protoss.Reaver, 1000, 1000); load(r, Some(t))
+        val z = unit(Protoss.Zealot, 1300, 1000)
+        val m = new MissionProbe(base(110)); m.configure(Vector(t), Vector(r, z)); m.launched = true
+        With.recruiter.lockTo(m.lock, Vector(t, r, z))
+        if (phase != "assembly") { load(z, Some(t)); m.run(); load(z, None) }
+        if (phase == "combat") m.state = m.Raiding
+        if (phase == "evacuation") m.itinerary.clear()
+        z.intend(m).setBoard(t).setTerminus(m.target.heart.center)
+        z.agent.toBoard = Some(t); z.agent.wantsPickup = true
+        set(z, "_order", ProxyBwapi.Orders.EnterTransport)
+        set(t, "_orderTarget", Some(z))
+        val turret = unit(ProxyBwapi.Races.Terran.MissileTurret, if (exposed == "shuttle") 850 else 1450, 1000)
+        set(turret, "_player", enemy); With.grids.enemyRangeAir.updateUnit(turret)
+        assert(!m.allowsPickup(t, z) && m.allowsPickup(t, r))
+        m.run()
+        assert(!m.passengers.contains(z) && m.passengers.contains(r))
+        assert(z.squad.isEmpty && z.agent.ride.isEmpty && !t.agent.passengers.contains(z))
+        assert(!With.recruiter.lockedBy(m).exists(_ == z) && With.recruiter.available.exists(_ == z))
+        assert(z.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].stopped && !z.agent.wantsPickup)
+        assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].stopped, "Cancel the Shuttle's old pickup order too")
+        assert(z.agent.toBoard.isEmpty && z.intent.toBoard.isEmpty && z.intent.action == Idle)
+        assert(m.state != m.Assembling && m.state != m.Evacuating, "Abandoned filler must not delay departure")
+      }
+    }
+    check("both sides of a pickup reject newly exposed filler between mission updates") {
+      for (passengerOrders <- Vector(false, true); missionAction <- Vector(false, true)) {
+        world(128)
+        val t = unit(Protoss.Shuttle, 1000, 1000)
+        val r = unit(Protoss.Reaver, 1000, 1000); load(r, Some(t))
+        val z = unit(Protoss.Zealot, 1100, 1000)
+        val m = new MissionProbe(base(110)); m.configure(Vector(t), Vector(r, z))
+        m.run()
+        val turret = unit(ProxyBwapi.Races.Terran.MissileTurret, 1300, 1000)
+        set(turret, "_player", enemy); With.grids.enemyRangeAir.updateUnit(turret)
+        if (missionAction) {
+          if (passengerOrders) perform(m.ActionAssemblePassenger, z) else perform(m.ActionAssembleTransport, t)
+        } else if (passengerOrders) Micro.Agency.Commander.rightClick(z, t)
+        else Micro.Agency.Commander.rightClick(t, z)
+        assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+        assert(z.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+        assert(!m.passengers.contains(z) && z.agent.ride.isEmpty && !z.agent.wantsPickup)
+      }
+    }
+    check("combat retreat tolerates abandoning an unsafe filler pickup immediately") {
+      world(128)
+      val t = unit(Protoss.Shuttle, 1000, 1000)
+      val r = unit(Protoss.Reaver, 1000, 1000); load(r, Some(t))
+      val z = unit(Protoss.Zealot, 1040, 1000)
+      val m = new MissionProbe(base(110)); m.configure(Vector(t), Vector(r, z))
+      val cannon = unit(Protoss.PhotonCannon, 1200, 1000)
+      set(cannon, "_player", enemy); With.grids.enemyRangeAir.updateUnit(cannon)
+      z.agent.shouldFight = false
+      val retreat = Retreat.getRetreat(z)
+      assert(z.agent.ride.isEmpty && !m.passengers.contains(z) && retreat.to == z.pixel)
+      assert(z.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == null)
+    }
+    check("pickup safety uses air range at both endpoints and retains loaded filler") {
+      world(128)
+      val t = unit(Protoss.Shuttle, 1000, 1000)
+      val r = unit(Protoss.Reaver, 1000, 1000)
+      val z = unit(Protoss.Zealot, 1100, 1000)
+      val m = new MissionProbe(base(110)); m.configure(Vector(t), Vector(r, z))
+      val turret = unit(ProxyBwapi.Races.Terran.MissileTurret, 1420, 1000)
+      set(turret, "_player", enemy); With.grids.enemyRangeAir.updateUnit(turret)
+      assert(z.tile.enemyRangeAir > 0 && m.allowsPickup(t, z), "The pathfinding buffer alone must not forbid a pickup")
+      Micro.Agency.Commander.rightClick(z, t)
+      assert(z.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == t.bwapiUnit)
+      set(turret, "_pixel", Pixel(1250, 1000)); set(turret, "_tile", turret.pixel.tile)
+      With.grids.enemyRangeAir.updateUnit(turret)
+      assert(!m.allowsPickup(t, z), "Air-only threats count even though they cannot shoot the grounded passenger")
+      load(z, Some(t)); m.abandonUnsafePickups()
+      assert(m.passengers.contains(z) && m.allowsPickup(t, z))
+      t.sleepUntil = 0; r.sleepUntil = 0
+      Micro.Agency.Commander.rightClick(t, r); Micro.Agency.Commander.rightClick(r, t)
+      assert(t.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == r.bwapiUnit)
+      assert(r.bwapiUnit.asInstanceOf[bwapi.DropTestUnit].clicked == t.bwapiUnit)
+      set(turret, "_alive", false); load(z, None)
+      assert(m.allowsPickup(t, z), "Destroyed anti-air cannot strand filler")
     }
     check("mission pickup approaches are planned as intentions for assembly and recovery") {
       for (recovering <- Vector(false, true)) {

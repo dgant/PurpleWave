@@ -33,7 +33,8 @@ class Intention {
   var canFlee           : Boolean                       = true
   var canSneak          : Boolean                       = false
   var shouldMeld        : Boolean                       = false
-  var shouldLiftoff     : Boolean                       = false
+  var shouldLiftoff: Boolean = false
+  var shouldAdjustXY    : Boolean                       = true
   var targets           : Option[IndexedSet[UnitInfo]]  = None
 
   def setTerminus         (value: Pixel)                    : Intention = { terminus          = Some(value); this }
@@ -71,6 +72,7 @@ class Intention {
   def setCanSneak         (value: Boolean = true)           : Intention = { canSneak          = value; this }
   def setShouldMeld       (value: Boolean = true)           : Intention = { shouldMeld        = value; this }
   def setShouldLiftoff    (value: Boolean = true)           : Intention = { shouldLiftoff     = value; this }
+  def setShouldCorrectXY  (value: Boolean = true)           : Intention = { shouldAdjustXY   = value; this }
   def setTargets          (value: Iterable[UnitInfo])       : Intention = { targets           = Some(new IndexedSet[UnitInfo](value)); this }
   def setTargets          (value: UnitInfo*)                : Intention = setTargets(value)
 

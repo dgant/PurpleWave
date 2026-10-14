@@ -10,6 +10,7 @@ import Utilities.?
 import scala.collection.mutable.ArrayBuffer
 
 class Template extends TemplateFilter {
+  private var buildingTileRequirements = Vector.empty[Tile => Boolean]
   val points  : ArrayBuffer[TemplatePoint]  = new ArrayBuffer
   val left    : Cache[Int]                  = new CacheForever(() => Maff.min(points.view.map(_.point.x)).getOrElse(0))
   val right   : Cache[Int]                  = new CacheForever(() => Maff.max(points.view.map(p => p.point.x + p.requirement.width)).getOrElse(0))
@@ -99,6 +100,22 @@ class Template extends TemplateFilter {
       y += 1
     }
     this
+  }
+
+  def requireBuildingTiles(requirement: Tile => Boolean): Template = {
+    buildingTileRequirements :+= requirement
+    this
+  }
+
+  override def accept(origin: Tile): Boolean = {
+    super.accept(origin) && (buildingTileRequirements.isEmpty || points.forall { point =>
+      val requirement = point.requirement
+      ! requirement.buildableBefore || requirement.buildableAfter ||
+        (0 until requirement.width).forall(dx => (0 until requirement.height).forall { dy =>
+          val tile = origin.add(point.point).add(dx, dy)
+          tile.valid && buildingTileRequirements.forall(_(tile))
+        })
+    })
   }
 
   def addLabels(placeLabels: PlaceLabel*): Template = {

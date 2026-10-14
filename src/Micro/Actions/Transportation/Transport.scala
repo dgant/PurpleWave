@@ -11,7 +11,10 @@ object Transport extends Action {
   
   override protected def perform(transport: FriendlyUnitInfo): Unit = {
     val drop = transport.squad.collect { case mission: Tactic.Missions.MissionDrop => mission }
-    drop.foreach(_.accountForCargo(transport))
+    drop.foreach(mission => {
+      mission.accountForCargo(transport)
+      mission.abandonUnsafePickups()
+    })
     val passengers = transport.agent.passengers
     passengers.indices.foreach(i => {
       // Don't get stuck trying to unload a passenger that fails to land

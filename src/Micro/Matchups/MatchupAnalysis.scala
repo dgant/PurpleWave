@@ -49,6 +49,7 @@ case class MatchupAnalysis(me: UnitInfo) {
   def threatSoonest               : Option[UnitInfo]  = _threatSoonest()
   def threatNearest               : Option[UnitInfo]  = _threatNearest()
   def targetsInRange              : Seq[UnitInfo]     = targets.filter(target => target.visible && me.pixelRangeAgainst(target) >= target.pixelDistanceEdge(me) && (me.unitClass.groundMinRangeRaw <= 0 || me.pixelDistanceEdge(target) > 32.0 * 3.0))
+  def targetsInPixels(p: Double)  : Seq[UnitInfo]     = targets.filter(me.pixelsToGetInRange(_) <= p)
   def targetNearest               : Option[UnitInfo]  = _targetNearest()
   def targetNearestInRange        : Option[UnitInfo]  = _targetNearestInRange()
   def enemyDetectorDeepest        : Option[UnitInfo]  = _enemyDetectorDeepest()

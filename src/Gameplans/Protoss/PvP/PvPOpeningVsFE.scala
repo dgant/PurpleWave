@@ -4,6 +4,7 @@ import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
 import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst => PvPNexusFirstStrategy}
+import Utilities.DoQueue
 import Utilities.Time.{GameTime, Seconds}
 
 class PvPOpeningVsFE extends GameplanImperative {
@@ -74,6 +75,12 @@ class PvPOpeningVsFE extends GameplanImperative {
     attackTrigger ||= unitsEver(u => Protoss.Reaver(u) && u.complete) >= 2
     attack(attackTrigger)
 
+    val doArmy = new DoQueue(() => {
+      pump(Protoss.Observer, 1)
+      pumpShuttleAndReavers()
+      pump(Protoss.Dragoon)
+    })
+
     if (PvPIdeas.enemyDarkTemplarLikely) {
       takeOurGas()
       get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory)
@@ -89,12 +96,14 @@ class PvPOpeningVsFE extends GameplanImperative {
       requireMiningBases(2)
       once(Protoss.Shuttle)
     }
+
+    doArmy()
+    get(Protoss.DragoonRange)
     get(Protoss.Observatory)
     once(Protoss.Observer)
     get(Protoss.RoboticsSupportBay)
     once(Protoss.Reaver)
     get(Protoss.ShuttleSpeed)
-    get(Protoss.DragoonRange)
     pumpShuttleAndReavers()
     pump(Protoss.Dragoon)
     requireMiningBases(2)

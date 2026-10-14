@@ -141,6 +141,8 @@ class PvPOpening extends GameplanImperative {
         zBeforeCore &&= ! enemyStrategy(With.fingerprints.forgeFe, With.fingerprints.oneGateCore)
         zBeforeCore ||= With.fingerprints.twoGate()
         zBeforeCore ||= gcgate
+        // AIIDE 2026: Trying disabling this
+        zBeforeCore = false
       }
       if ( ! haveEverComplete(Protoss.CyberneticsCore)) {
         zAfterCore = true
@@ -759,7 +761,9 @@ class PvPOpening extends GameplanImperative {
 
     if (gasCapsUntouched) {
       gasLimitCeiling(350)
-      if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
+      if (PvP1012()) {
+        gasWorkerCeiling(3)
+      } else if (zBeforeCore && units(Protoss.CyberneticsCore) < 1) {
         gasWorkerCeiling(1)
       } else if (zBeforeCore && unitsComplete(Protoss.CyberneticsCore) < 1) {
         gasWorkerCeiling(2)
@@ -768,8 +772,9 @@ class PvPOpening extends GameplanImperative {
         gasLimitCeiling(250)
       }
       if (PvPCoreExpand() && (upgradeStarted(Protoss.DragoonRange) || gas >= 200)) {
-        gasWorkerCeiling(1)
-        gasLimitCeiling(100)
+        val need = Math.max(1, units(Protoss.Gateway))
+        gasWorkerCeiling(need)
+        gasLimitCeiling(100 * need)
       }
     }
 
@@ -915,10 +920,12 @@ class PvPOpening extends GameplanImperative {
       if (shouldExpand) {
         expand()
       }
+      trainRoboUnits()
       trainGatewayUnits()
       once(3, Protoss.Dragoon)
       expand()
-      get(3, Protoss.Gateway)
+      get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer, Protoss.RoboticsSupportBay)
+      get(2, Protoss.Gateway)
 
     ///////////////////
     // 3/4-Gate Goon //
@@ -927,6 +934,9 @@ class PvPOpening extends GameplanImperative {
     } else {
       get(Protoss.DragoonRange)
       if (With.scouting.ourProximity < 0.5 && safePushing && ! With.fingerprints.robo() && With.sense.netDamage > 400) {
+        get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
+      }
+      if (enemyDarkTemplarLikely) {
         get(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       }
       if (shouldExpand) {

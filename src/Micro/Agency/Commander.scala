@@ -207,6 +207,7 @@ object Commander {
   def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = adjustDestination(unit, argTo, remember = false)
 
   private[Micro] def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel, remember: Boolean): Pixel = {
+    if ( ! unit.intent.shouldAdjustXY) return argTo
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
@@ -342,6 +343,18 @@ object Commander {
   }
 
   def rightClick(unit: FriendlyUnitInfo, target: UnitInfo): Unit = {
+    // Boarding from either side can pull the Shuttle into range between mission updates.
+    val pickup = target.friendly.flatMap(other =>
+      if (unit.isTransport) Some((unit, other)) else if (other.isTransport) Some((other, unit)) else None)
+    if (pickup.exists { case (transport, passenger) => transport.squad.exists {
+      case mission: Tactic.Missions.MissionDrop if !mission.allowsPickup(transport, passenger) =>
+        mission.abandonUnsafePickups()
+        true
+      case _ => false
+    }}) {
+      stop(unit)
+      return
+    }
     leadFollower(unit, rightClick(_, target))
     unit.agent.tryingToMove = unit.pixelDistanceEdge(target) > tryingToMoveThreshold
     if (unit.agent.ride.contains(target)) {

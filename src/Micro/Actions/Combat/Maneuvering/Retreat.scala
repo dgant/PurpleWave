@@ -66,7 +66,7 @@ object Retreat extends Action {
 
     if ( ! unit.agent.shouldFight && unit.agent.ride.exists(_.pixelDistanceEdge(unit) <= Shuttling.pickupRadiusEdge + 32) && unit.matchups.targetsInRange.isEmpty) {
       Commander.rightClick(unit, unit.agent.ride.get)
-      return RetreatPlan(unit, unit.agent.ride.get.pixel, "Hail")
+      return RetreatPlan(unit, unit.agent.ride.map(_.pixel).getOrElse(unit.pixel), "Hail")
     }
 
     // Against melee rush: Retreat directly to heart so workers can help

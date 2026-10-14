@@ -26,7 +26,7 @@ object Gather extends Action {
   private def resourceThreatened(resource: UnitInfo): Boolean = resource.tile.enemyRangeGround > 0 || resource.tile.add(1, 0).enemyRangeGround > 0 || resource.returnTile.enemyRangeGround > 0
 
   private def minerThreatenedAt(miner: FriendlyUnitInfo, resource: UnitInfo): Boolean = (
-    resourceThreatened(resource)
+    (resourceThreatened(resource) || resource.base.exists(_.enemies.exists(e => Protoss.DarkTemplar(e) && e.pixelsToGetInRange(resource) < 32 * 6)))
     && resource.base.exists(_.enemies.exists(e =>
       e.canAttackGround
       && (Zerg.Lurker(e) || ! e.burrowed)
@@ -75,8 +75,9 @@ object Gather extends Action {
           && base.enemies.exists(target =>
             ! target.unitClass.isWorker
             && ! target.unitClass.isFlyer
+            && ! target.effectivelyCloaked
+            && ! target.isAny(Protoss.Reaver, Protoss.DarkTemplar, Zerg.Lurker, Zerg.InfestedTerran)
             && target.unitClass.attacksOrCastsOrDetectsOrTransports
-            && ( ! target.burrowed || Zerg.Lurker(target))
             && target.pixelDistanceCenter(resource) < defenseRadiusPixels
             && unit.base.map(_.heart.center).forall(target.pixelDistanceCenter(_) < defenseRadiusPixels))))
 

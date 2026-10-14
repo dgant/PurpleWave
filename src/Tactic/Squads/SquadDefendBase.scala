@@ -242,6 +242,8 @@ class SquadDefendBase(base: Base) extends Squad {
 
   def intendHoldWallGap(unit: FriendlyUnitInfo, pixel: Pixel): Unit = {
     unit.intend(this)
+      .setTargets(Vector.empty)
+      .setShouldCorrectXY(false)
       .setCanFlee(false)
       .setRedoubt(pixel)
       .setTerminus(pixel)
@@ -344,8 +346,8 @@ class SquadDefendBase(base: Base) extends Squad {
     shouldHug     &&= enemyNearest.forall(Protoss.DarkTemplar) || dtApproaching
 
     if (shouldHug) {
-      val inOurMain = dts.filter(_.base.contains(With.geography.ourMain))
-      val target    = Maff.minBy(inOurMain.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(With.geography.ourMain.zone.exitNowOrHeart.center)
+      val inOurBase = dts.filter(_.base.exists(_.isOurs))
+      val target    = Maff.minBy(inOurBase.map(_.pixel))(_.groundPixels(With.geography.home)).getOrElse(Maff.orElse(With.geography.ourBases, Seq(With.geography.ourMain)).map(_.zone.exitNowOrHeart.center).minBy(_.proximity))
       val pixels    = With.units.ours.filter(u => u.unitClass.isDetector && ! u.flying).map(_.pixel).toSeq ++ Seq(target)
       val pixel     = pixels.minBy(p => dts.map(_.pixelDistanceTravelling(p)).min)
       units.foreach(_.intend(this).setAction(HugAt(pixel)))

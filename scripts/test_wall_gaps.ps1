@@ -21,6 +21,7 @@ New-Item -ItemType Directory -Path $macros -Force | Out-Null
 & $Java -cp (($compiler + $BotJar) -join ';') scala.tools.nsc.Main -usejavacp -d $macros (Join-Path $repo 'src-macros/Utilities/TernaryMacros.scala') (Join-Path $repo 'src-macros/Mathematics/Functions/ReduceMacros.scala')
 if ($LASTEXITCODE -ne 0) { throw 'Wall gap macro compilation failed.' }
 $sources = @(
+    (Join-Path $repo 'src/Micro/Agency/Intention.scala'),
     (Join-Path $repo 'src/Micro/Formation/WallGaps.scala'),
     (Join-Path $repo 'src/Tactic/Squads/SquadDefendBase.scala'),
     (Join-Path $repo 'tests/Micro/WallGapPositionsTest.scala'),

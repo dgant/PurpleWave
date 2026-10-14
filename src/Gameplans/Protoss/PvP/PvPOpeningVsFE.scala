@@ -75,6 +75,7 @@ class PvPOpeningVsFE extends GameplanImperative {
     attack(attackTrigger)
 
     if (PvPIdeas.enemyDarkTemplarLikely) {
+      takeOurGas()
       get(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.RoboticsFacility, Protoss.Observatory)
       once(Protoss.Observer)
     }

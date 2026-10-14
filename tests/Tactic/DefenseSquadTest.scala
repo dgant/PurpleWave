@@ -32,6 +32,8 @@ object DefenseSquadTest extends App {
     assert(fields.nonEmpty, name)
     fields.foreach(f => { f.setAccessible(true); f.set(obj, value.asInstanceOf[AnyRef]) })
   }
+  val guardWithoutTargets = classOf[SquadDefendBase].getDeclaredMethods.find(_.getName.endsWith("guardWithoutTargets")).get
+  guardWithoutTargets.setAccessible(true)
   var passed = 0
   def check(name: String)(body: => Unit): Unit = { body; passed += 1; println("PASS " + name) }
   With.frame = 100
@@ -154,7 +156,7 @@ object DefenseSquadTest extends App {
     val dragoon = unit(Protoss.Dragoon)
     val s = squad(Vector(zealot, dragoon), unit(Zerg.Overlord))
     zealot.intent.setTerminus(pursuit)
-    s.guardWithoutTargets()
+    guardWithoutTargets.invoke(s)
     staysAtPost(zealot)
     assert(dragoon.stationEngage.contains(pursuit))
   }
@@ -173,7 +175,7 @@ object DefenseSquadTest extends App {
     staysAtPost(zealot, s.homeConsensus)
     s.setTargets(Vector.empty)
     zealot.intent.setTerminus(post)
-    s.guardWithoutTargets()
+    guardWithoutTargets.invoke(s)
     assert(zealot.intent.terminus.contains(post))
   }
   println(s"$passed defense squad tests passed")

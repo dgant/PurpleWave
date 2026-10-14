@@ -1,8 +1,14 @@
 package bwapi {
+  class WorkerRecruitmentPlayer extends Player(null, 0, null) {
+    override def isAlly(player: Player): Boolean = false
+    override def isEnemy(player: Player): Boolean = false
+    override def isNeutral: Boolean = false
+  }
   class WallGapTestUnit extends Unit(null, 0, null) {
     var movedTo: Position = _
     var holds: Int = 0
     var stops: Int = 0
+    override def getRemainingBuildTime: Int = 0
     override def move(to: Position): Boolean = { movedTo = to; true }
     override def stop(): Boolean = { stops += 1; true }
     override def holdPosition(): Boolean = { holds += 1; true }
@@ -11,7 +17,7 @@ package bwapi {
 
 package Micro.Formation {
   import Information.Geography.Geography
-  import Information.Geography.Types.{Base, Zone}
+  import Information.Geography.Types.{Base, Edge, Zone}
   import Lifecycle.With
   import Lifecycle.Configure.Configuration
   import Mathematics.Points.{Pixel, Point, Tile}
@@ -263,6 +269,209 @@ package Micro.Formation {
       assert(naturalDefense.wallToPlug().isEmpty)
       With.placement.restoreCachedWall(None)
       buildings(gateway, forge)
+    }
+    // Exercise recruitment, gathering and the actual squad batch swap together.
+    With.self = player(Race.Protoss)
+    set(With.self, "bwapiPlayer", allocate(classOf[bwapi.WorkerRecruitmentPlayer]))
+    With.blackboard = new Planning.Blackboard
+    With.performance = new Performance.PerformanceMonitor
+    With.fingerprints = new Information.Fingerprinting.Fingerprints
+    With.battles = allocate(classOf[Information.Battles.Battles])
+    With.battles.byUnit = Map.empty
+    With.matchups = new Micro.Matchups.MatchupGraph
+    With.scouting = allocate(classOf[Information.Scouting.Scouting])
+    set(With.scouting, "_enemyMuscleOrigin", new Cache(() => base.townHallTile))
+    set(With.game, "startLocations", new java.util.ArrayList[bwapi.TilePosition]())
+    set(With.latency, "_remainingFrames", 2)
+    val recruitmentBase = new Base("Recruitment", base.townHallTile, Set.empty)
+    recruitmentBase.naturalOf = Some(main)
+    recruitmentBase.owner = With.self
+    val recruitmentMetro = new Information.Geography.Types.Metro(Vector(recruitmentBase)) {
+      override lazy val bases = Vector(recruitmentBase)
+      override lazy val zones = Vector(zone)
+    }
+    set(With.geography, "_metros", Vector(recruitmentMetro))
+    set(With.geography, "_bases", Vector(recruitmentBase))
+    set(With.geography, "_edges", Vector.empty)
+    set(With.geography, "_baseByTile", Array.fill[Option[Base]](With.mapTileArea)(Some(recruitmentBase)))
+    set(With.geography, "ourMainCache", new Cache(() => recruitmentBase))
+    set(With.geography, "ourBasesCache", new Cache(() => Vector(recruitmentBase)))
+    set(With.geography, "ourFoyerCache", new Cache(() => recruitmentBase))
+    set(zone, "zones", Vector(zone))
+    set(zone, "_exitCache", new Cache(() => None))
+    def recruit(id: Int, kind: UnitClass = Protoss.Probe): FriendlyUnitInfo = {
+      val u = unit(id, kind, Tile(14, 18))
+      set(u, "_player", With.self)
+      set(u, "_powered", true)
+      set(u, "_flying", kind.isFlyer)
+      set(u, "_squad", None)
+      set(u, "_intent", new Intention)
+      set(u, "canAttackCache", new Cache(() => kind.rawCanAttack))
+      set(u, "canBeAttackedCache", new Cache(() => true))
+      set(u, "_effectivelyCloaked", new Cache(() => false))
+      set(u, "attacksAgainstGroundCache", new Cache(() => if (kind.attacksGround) 1 else 0))
+      set(u, "_confidence", new Cache(() => -0.5))
+      u
+    }
+    val miners = (20 until 30).map(recruit(_)).toVector
+    val fighter = recruit(30, Protoss.Zealot)
+    val marine = recruit(31, ProxyBwapi.Races.Terran.Marine)
+    val enemyZealot = recruit(32, Protoss.Zealot)
+    val firebat = recruit(33, ProxyBwapi.Races.Terran.Firebat)
+    class RecruitmentSquad extends SquadDefendBase(recruitmentBase) {
+      override def run(): Unit = units.foreach(_.intend(this).setTerminus(recruitmentBase.townHallTile.center))
+    }
+    val squadsRun = classOf[Tactic.Squads.Squads].getDeclaredMethods.find(_.getName == "onRun").get
+    squadsRun.setAccessible(true)
+    def resetRecruitment(wall: Boolean = false): (RecruitmentSquad, Planning.ResourceLocks.LockUnits) = {
+      With.frame = 5000
+      With.priorities = new Macro.Allocation.Priorities
+      With.recruiter = new Macro.Allocation.Recruiter
+      With.squads = new Tactic.Squads.Squads
+      placement()
+      buildings((miners ++ Vector(fighter) ++ (if (wall) Vector(gateway, forge) else Vector.empty)): _*)
+      With.recruiter.update()
+      With.priorities.update()
+      val gather = new Tactic.Tactics.TacticGather
+      (new RecruitmentSquad, gather.workerLock)
+    }
+    def nextCycle(): Unit = {
+      With.frame += 1
+      With.recruiter.update()
+      With.priorities.update()
+    }
+    check("recruitment after gathering cannot take miners, but recruitment before gathering can") {
+      val (squad, gather) = resetRecruitment()
+      squad.setEnemies(Vector(marine))
+      gather.acquire()
+      squad.recruitWorkers(Vector(marine))
+      assert(squad.workerLock.units.isEmpty)
+      nextCycle()
+      squad.recruitWorkers(Vector(marine))
+      assert(squad.workerLock.units.size == 2)
+      val pulled = squad.workerLock.units.toSet
+      gather.acquire()
+      assert(pulled.intersect(gather.units.toSet).isEmpty)
+      squadsRun.invoke(With.squads, Long.box(1000))
+      assert(squad.units.toSet == pulled)
+      assert(squad.enemies == Vector(marine))
+      assert(pulled.forall(u => u.squad.contains(squad) && u.client == squad && u.intent.frameCreated == With.frame))
+    }
+    check("defense recruitment respects workers already claimed by priority tactics") {
+      val (squad, _) = resetRecruitment()
+      val priority = new Tactic.Tactics.TacticGather
+      priority.workerLock.setCounter(Utilities.UnitCounters.CountUpTo(1)).acquire()
+      val reserved = priority.workerLock.units.toSet
+      squad.setEnemies(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
+      assert(squad.workerLock.units.size == 2)
+      assert(squad.workerLock.units.toSet.intersect(reserved).isEmpty)
+      assert(priority.workerLock.units.toSet == reserved)
+    }
+    check("invasion recruitment reads pending defenders instead of the previous roster") {
+      val (squad, _) = resetRecruitment()
+      squad.setEnemies(Vector(marine))
+      set(fighter, "_confidence", new Cache(() => 0.5))
+      squad.addUnit(fighter)
+      squad.recruitWorkers(Vector(marine))
+      assert(squad.workerLock.units.isEmpty)
+      set(fighter, "_confidence", new Cache(() => -0.5))
+      squad.recruitWorkers(Vector(marine))
+      assert(squad.workerLock.units.size == 2)
+    }
+    check("withdrawal uses the guard choke or breached base according to the incoming army's targets") {
+      val center = recruitmentBase.heart.center
+      val choke = allocate(classOf[Edge])
+      set(choke, "pixelCenter", center.add(640, 0))
+      set(choke, "bitmap$0", (-1).toByte)
+      val outside = allocate(classOf[Zone])
+      def move(defender: FriendlyUnitInfo, distance: Int): Unit = {
+        val pixel = center.add(distance, 0)
+        set(defender, "_pixel", pixel)
+        set(defender, "_tile", pixel.tile)
+        val zones = Array.fill(With.mapTileArea)(zone)
+        zones(pixel.tile.i) = outside
+        set(With.geography, "_zoneByTile", zones)
+      }
+      try {
+        Vector(Protoss.Corsair, ProxyBwapi.Races.Zerg.Mutalisk).foreach(kind => {
+          val (squad, _) = resetRecruitment()
+          set(zone, "_exitCache", new Cache(() => Some(choke)))
+          val defender = recruit(34, kind)
+          move(defender, 704)
+          squad.addUnit(defender)
+          squad.recruitWorkers(Vector(marine))
+          // The Corsair is at its guard choke. The Mutalisk can scour the Marine,
+          // so it must travel back to the breached base before workers assist.
+          assert(squad.workerLock.units.size == (if (Protoss.Corsair(defender)) 2 else 0))
+          nextCycle()
+          move(defender, 1280)
+          squad.recruitWorkers(Vector(marine))
+          assert(squad.workerLock.units.isEmpty)
+          nextCycle()
+          move(defender, 320)
+          squad.recruitWorkers(Vector(marine))
+          assert(squad.workerLock.units.size == 2)
+        })
+      } finally {
+        set(zone, "_exitCache", new Cache(() => None))
+        set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
+      }
+    }
+    check("pure Zealot invasions and Firebats retain the existing no-pull policy") {
+      Vector(Vector(enemyZealot), Vector(marine, firebat)).foreach(invaders => {
+        val (squad, _) = resetRecruitment()
+        squad.setEnemies(invaders)
+        squad.recruitWorkers(invaders)
+        assert(squad.workerLock.units.isEmpty)
+      })
+    }
+    check("an FFE wall can recruit its first Probes without a standing army") {
+      val (squad, gather) = resetRecruitment(wall = true)
+      val minimum = new WallGaps(recruitmentBase).minimumDefenders.get
+      assert(minimum > 0)
+      squad.recruitWorkers(Vector.empty)
+      assert(squad.workerLock.units.size == minimum)
+      val pulled = squad.workerLock.units.toSet
+      gather.acquire()
+      squadsRun.invoke(With.squads, Long.box(1000))
+      nextCycle()
+      squad.recruitWorkers(Vector.empty)
+      assert(squad.workerLock.units.toSet == pulled)
+      gather.acquire()
+      squadsRun.invoke(With.squads, Long.box(1000))
+      assert(squad.units.toSet == pulled)
+    }
+    check("reinforcing Zealots release unneeded Probes for gathering in the same cycle") {
+      val (squad, gather) = resetRecruitment(wall = true)
+      squad.recruitWorkers(Vector.empty)
+      assert(squad.workerLock.units.nonEmpty)
+      squadsRun.invoke(With.squads, Long.box(1000))
+      nextCycle()
+      val minimum = new WallGaps(recruitmentBase).minimumDefenders.get
+      Vector.fill(minimum)(()).zipWithIndex.foreach { case (_, i) => squad.addUnit(recruit(40 + i, Protoss.Zealot)) }
+      squad.recruitWorkers(Vector.empty)
+      assert(squad.workerLock.units.isEmpty)
+      gather.acquire()
+      assert(miners.forall(gather.units.contains))
+    }
+    check("workers return to mining when an invasion ends or the time limit expires") {
+      Vector(false, true).foreach(expire => {
+        val (squad, gather) = resetRecruitment()
+        squad.setEnemies(Vector(marine))
+        squad.recruitWorkers(Vector(marine))
+        assert(squad.workerLock.units.nonEmpty)
+        squadsRun.invoke(With.squads, Long.box(1000))
+        nextCycle()
+        if (expire) {
+          With.frame = Utilities.Time.Minutes(8)()
+          squad.setEnemies(Vector(marine))
+        }
+        squad.recruitWorkers(if (expire) Vector(marine) else Vector.empty)
+        assert(squad.workerLock.units.isEmpty)
+        gather.acquire()
+        assert(miners.forall(gather.units.contains))
+      })
     }
     println(s"$passed wall defense integration tests passed")
   }

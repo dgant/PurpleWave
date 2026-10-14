@@ -37,7 +37,8 @@ final class MacroSim {
   val redundant = new ArrayBuffer[RequestBuildable]() // We don't need this for bot operation; it's just here for debugging
   val denied    = new ArrayBuffer[(RequestBuildable, InsertionResult)]()
   val steps     = new mutable.ArrayBuffer[MacroStep]()
-  val minInsert = new mutable.OpenHashMap[RequestBuildable, Int]()
+  // OpenHashMap retains deleted slots across clear(), growing with fresh requests each frame.
+  val minInsert = new mutable.HashMap[RequestBuildable, Int]()
 
   private def _queue: Seq[(RequestBuildable, Int)] = steps.view.filter(_.request.isDefined).map(s => (s.request.get, s.event.dFrames))
   def queue: Seq[(RequestBuildable, Int)] = _queue.filter(_._1.specificTrainee.isDefined) ++ _queue.filter(_._1.specificTrainee.isEmpty)

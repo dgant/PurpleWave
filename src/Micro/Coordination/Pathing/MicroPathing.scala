@@ -65,13 +65,15 @@ object MicroPathing {
 
   def getWaypointToPixel(unit: UnitInfo, goal: Pixel): Pixel = ?(unit.flying, goal, getGroundWaypointToPixel(unit.pixel, goal))
 
-  def getGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Pixel = {
-    if (from.pixelDistance(rawGoal) < 32) return rawGoal
+  def getGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Pixel = tryGetGroundWaypointToPixel(from, rawGoal).getOrElse(rawGoal.walkablePixel)
+
+  def tryGetGroundWaypointToPixel(from: Pixel, rawGoal: Pixel): Option[Pixel] = {
+    if (from.pixelDistance(rawGoal) < 32) return Some(rawGoal)
     val goal              = rawGoal.walkablePixel
     val lineWaypoint      = SomeIf(Ray(from, goal).forall(_.walkable), from.project(goal, Math.min(from.pixelDistance(goal), waypointDistancePixels)))
     lazy val hillPath     = DownhillPathfinder.decend(from.tile, goal.tile)
     lazy val hillWaypoint = hillPath.map(path => path.last.center.add(from.offsetFromTileCenter))
-    lineWaypoint.orElse(hillWaypoint).getOrElse(goal)
+    lineWaypoint.orElse(hillWaypoint)
   }
 
   def getWaypointAlongTilePath(unit: FriendlyUnitInfo, path: TilePath): Option[Pixel] = {

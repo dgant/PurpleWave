@@ -24,7 +24,7 @@ import Utilities.UnitFilters._
 
 class SquadDefendBase(base: Base) extends Squad {
 
-  override def launch(): Unit = {}
+  override def launch(): Unit = { /* This squad is given its recruits externally */ }
 
   def recruitWorkers(invaders: Seq[UnitInfo]): Unit = {
     if (With.frame >= Minutes(8)()) {

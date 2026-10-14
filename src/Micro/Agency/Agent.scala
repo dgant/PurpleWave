@@ -25,6 +25,7 @@ class Agent(val unit: FriendlyUnitInfo) extends DestinationStack with AgencySort
   var lastCloak     : Int = 0
   var run           : Int = 0
   var tryingToMove  : Boolean = false // TODO: Can we infer this from destinations?
+  var waypointFallback: Option[(Pixel, Double)] = None // (Destination pixel before waypoint substitution, remaining ground-distance threshold for retrying)
 
   ///////////////
   // Decisions //

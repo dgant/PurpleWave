@@ -160,10 +160,53 @@ object Commander {
     move(unit, attackFrom)
   }
 
+  // Return the waypoint or a nearby point with collision clearance, or None if none fits.
+  // BW treats touching outer collision boxes as a unit destination. Keep a pixel of clearance.
+  private[Micro] def findGroundWaypointWithClearance(unit: FriendlyUnitInfo, waypoint: Pixel): Option[Pixel] = {
+    val kind = unit.unitClass
+    def hasClearance(p: Pixel): Boolean = {
+      val topLeft = p.add(kind.topLeft)
+      val bottomRight = p.add(kind.bottomRightInclusive)
+      val from = topLeft.subtract(1, 1).tile
+      val to = bottomRight.add(1, 1).tile
+      if ( ! from.valid || ! to.valid) return false
+      val innerFrom = topLeft.tile
+      val innerTo = bottomRight.tile
+      var y = from.y
+      while (y <= to.y) {
+        var x = from.x
+        while (x <= to.x) {
+          val i = x + y * With.mapTileWidth
+          if (With.grids.unwalkableUnits.isSetUnchecked(i) || (x >= innerFrom.x && x <= innerTo.x && y >= innerFrom.y && y <= innerTo.y && ! With.grids.walkableTerrain.getUnchecked(i))) return false
+          x += 1
+        }
+        y += 1
+      }
+      true
+    }
+    if (hasClearance(waypoint)) return Some(waypoint)
+    val center = waypoint.walkableTile.center
+    if (hasClearance(center)) return Some(center)
+    var dy = -1
+    while (dy <= 1) {
+      var dx = -1
+      while (dx <= 1) {
+        val candidate = center.add(dx, dy)
+        if (hasClearance(candidate)) return Some(candidate)
+        dx += 1
+      }
+      dy += 1
+    }
+    None
+  }
+
   /**
     * Adjust the unit's destination to ensure successful execution of the move.
     */
-  def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = {
+  // Planning queries leave fallback state unchanged; command methods record it when ready.
+  def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel): Pixel = adjustDestination(unit, argTo, remember = false)
+
+  private[Micro] def adjustDestination(unit: FriendlyUnitInfo, argTo: Pixel, remember: Boolean): Pixel = {
     var to: Pixel = argTo
 
     // Send some units past their destination to maximize acceleration
@@ -185,9 +228,22 @@ object Commander {
 
     if (unit.airborne) return to
 
-    // Path around terrain (if we haven't already)
-    if (unit.pixelDistanceTravelling(to) >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {
-      to = MicroPathing.getWaypointToPixel(unit, to)
+    // If no collision-safe local waypoint exists, keep the farther destination as the
+    // order target (subject to the corrections below). BW computes the path to that target.
+    val distance = unit.pixelDistanceTravelling(to)
+    if (distance >= 2 * MicroPathing.waypointDistancePixels && With.reaction.sluggishness < 2 && unit.zone != to.zone) {
+      // Each unit stores (destination pixel, estimated ground distance on entry minus 128 pixels).
+      // Recompute distance from its current position on each call. Retain fallback only when
+      // the destination coordinates match exactly and distance exceeds the saved threshold.
+      // Otherwise retry local waypointing; movement back and forth does not accumulate progress.
+      val fallback = unit.agent.waypointFallback.filter { case (goal, resumeAt) => goal == to && distance > resumeAt }
+      if (fallback.isEmpty) {
+        val waypoint = MicroPathing.tryGetGroundWaypointToPixel(unit.pixel, to).flatMap(findGroundWaypointWithClearance(unit, _))
+        if (remember) unit.agent.waypointFallback = if (waypoint.isDefined) None else Some((to, distance - MicroPathing.waypointDistancePixels))
+        to = waypoint.getOrElse(to.walkablePixel)
+      }
+    } else if (remember) {
+      unit.agent.waypointFallback = None
     }
 
     // Even slight intersection with a non-walkable tile can cause a unit to refuse movement
@@ -228,7 +284,7 @@ object Commander {
     leadFollower(unit, attackMove(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
-    val to = adjustDestination(unit, destination)
+    val to = adjustDestination(unit, destination, remember = true)
     if (autoUnburrowUnlessLurkerInRangeOf(unit, to)) return
     val alreadyAttackMovingThere = unit.order == Orders.AttackMove && unit.orderTargetPixel.exists(_.pixelDistance(to) < 128)
     if ( ! alreadyAttackMovingThere || unit.seeminglyStuck) {
@@ -243,7 +299,7 @@ object Commander {
     leadFollower(unit, patrol(_, destination))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(destination) > tryingToMoveThreshold
     if (unit.unready) return
-    val to = adjustDestination(unit, destination)
+    val to = adjustDestination(unit, destination, remember = true)
     if (autoUnburrowUnlessLurkerInRangeOf(unit, to)) return
     unit.bwapiUnit.patrol(to.bwapi)
     sleepAttack(unit)
@@ -251,7 +307,8 @@ object Commander {
 
   def move(unit: FriendlyUnitInfo): Unit = move(unit, unit.agent.destinationNext())
   private def move(unit: FriendlyUnitInfo, destination: Pixel): Unit = {
-    val to = adjustDestination(unit, destination)
+    // Adjust even while unready: transport coordination below still needs the destination.
+    val to = adjustDestination(unit, destination, remember = unit.ready)
     unit.agent.setRideGoal(to)
     leadFollower(unit, move(_, to))
     unit.agent.tryingToMove = unit.pixelDistanceCenter(to) > tryingToMoveThreshold

@@ -256,7 +256,7 @@ package Micro.Formation {
       With.placement.restoreCachedWall(None)
       buildings(gateway, forge)
     }
-    // Exercise launch, recruitment, gathering and the actual squad batch swap together.
+    // Exercise recruitment, gathering and the actual squad batch swap together.
     With.self = player(Race.Protoss)
     set(With.self, "bwapiPlayer", allocate(classOf[bwapi.WorkerRecruitmentPlayer]))
     With.performance = new Performance.PerformanceMonitor
@@ -321,14 +321,14 @@ package Micro.Formation {
       With.recruiter.update()
       With.priorities.update()
     }
-    check("recruitment after gathering cannot take miners, but launch before gathering can") {
+    check("recruitment after gathering cannot take miners, but recruitment before gathering can") {
       val (squad, gather) = resetRecruitment()
       squad.setEnemies(Vector(marine))
       gather.acquire()
-      squad.launch(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.isEmpty)
       nextCycle()
-      squad.launch(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.size == 2)
       val pulled = squad.workerLock.units.toSet
       gather.acquire()
@@ -344,7 +344,7 @@ package Micro.Formation {
       priority.workerLock.setCounter(Utilities.UnitCounters.CountUpTo(1)).acquire()
       val reserved = priority.workerLock.units.toSet
       squad.setEnemies(Vector(marine))
-      squad.launch(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.size == 2)
       assert(squad.workerLock.units.toSet.intersect(reserved).isEmpty)
       assert(priority.workerLock.units.toSet == reserved)
@@ -354,17 +354,17 @@ package Micro.Formation {
       squad.setEnemies(Vector(marine))
       set(fighter, "_confidence", new Cache(() => 0.5))
       squad.addUnit(fighter)
-      squad.launch(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.isEmpty)
       set(fighter, "_confidence", new Cache(() => -0.5))
-      squad.launch(Vector(marine))
+      squad.recruitWorkers(Vector(marine))
       assert(squad.workerLock.units.size == 2)
     }
     check("pure Zealot invasions and Firebats retain the existing no-pull policy") {
       Vector(Vector(enemyZealot), Vector(marine, firebat)).foreach(invaders => {
         val (squad, _) = resetRecruitment()
         squad.setEnemies(invaders)
-        squad.launch(invaders)
+        squad.recruitWorkers(invaders)
         assert(squad.workerLock.units.isEmpty)
       })
     }
@@ -372,13 +372,13 @@ package Micro.Formation {
       val (squad, gather) = resetRecruitment(wall = true)
       val minimum = new WallGapPositions(recruitmentBase).minimumDefenders.get
       assert(minimum > 0)
-      squad.launch()
+      squad.recruitWorkers(Vector.empty)
       assert(squad.workerLock.units.size == minimum)
       val pulled = squad.workerLock.units.toSet
       gather.acquire()
       squadsRun.invoke(With.squads, Long.box(1000))
       nextCycle()
-      squad.launch()
+      squad.recruitWorkers(Vector.empty)
       assert(squad.workerLock.units.toSet == pulled)
       gather.acquire()
       squadsRun.invoke(With.squads, Long.box(1000))
@@ -386,13 +386,13 @@ package Micro.Formation {
     }
     check("reinforcing Zealots release unneeded Probes for gathering in the same cycle") {
       val (squad, gather) = resetRecruitment(wall = true)
-      squad.launch()
+      squad.recruitWorkers(Vector.empty)
       assert(squad.workerLock.units.nonEmpty)
       squadsRun.invoke(With.squads, Long.box(1000))
       nextCycle()
       val minimum = new WallGapPositions(recruitmentBase).minimumDefenders.get
       Vector.fill(minimum)(()).zipWithIndex.foreach { case (_, i) => squad.addUnit(recruit(40 + i, Protoss.Zealot)) }
-      squad.launch()
+      squad.recruitWorkers(Vector.empty)
       assert(squad.workerLock.units.isEmpty)
       gather.acquire()
       assert(miners.forall(gather.units.contains))
@@ -401,7 +401,7 @@ package Micro.Formation {
       Vector(false, true).foreach(expire => {
         val (squad, gather) = resetRecruitment()
         squad.setEnemies(Vector(marine))
-        squad.launch(Vector(marine))
+        squad.recruitWorkers(Vector(marine))
         assert(squad.workerLock.units.nonEmpty)
         squadsRun.invoke(With.squads, Long.box(1000))
         nextCycle()
@@ -409,7 +409,7 @@ package Micro.Formation {
           With.frame = Utilities.Time.Minutes(8)()
           squad.setEnemies(Vector(marine))
         }
-        squad.launch(if (expire) Vector(marine) else Vector.empty)
+        squad.recruitWorkers(if (expire) Vector(marine) else Vector.empty)
         assert(squad.workerLock.units.isEmpty)
         gather.acquire()
         assert(miners.forall(gather.units.contains))

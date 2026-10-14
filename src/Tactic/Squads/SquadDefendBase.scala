@@ -24,9 +24,9 @@ import Utilities.UnitFilters._
 
 class SquadDefendBase(base: Base) extends Squad {
 
-  override def launch(): Unit = launch(Vector.empty)
+  override def launch(): Unit = {}
 
-  def launch(invaders: Seq[UnitInfo]): Unit = {
+  def recruitWorkers(invaders: Seq[UnitInfo]): Unit = {
     if (With.frame >= Minutes(8)()) {
       workerLock.release()
       return

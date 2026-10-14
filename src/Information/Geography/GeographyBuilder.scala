@@ -28,6 +28,7 @@ trait GeographyBuilder {
   @inline final def zones   : Vector[Zone]  = _zones
   @inline final def metros  : Vector[Metro] = _metros
 
+  @inline final def zoneByTile      (i: Int)      : Zone          = _zoneByTile(Maff.clamp(i, 0, _zoneByTile.length - 1))
   @inline final def zoneByTile      (tile: Tile)  : Zone          = _zoneByTile(Maff.clamp(tile.i, 0, _zoneByTile.length - 1))
   @inline final def zoneByValidTile (i: Int)      : Zone          = _zoneByTile(i)
   @inline final def zoneByValidTile (tile: Tile)  : Zone          = _zoneByTile(tile.i)

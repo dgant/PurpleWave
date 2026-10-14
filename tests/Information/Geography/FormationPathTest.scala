@@ -127,6 +127,18 @@ object FormationPathTest extends App {
   }
 
   val neutralUnits = loadMap("(2)Destination.scx")
+  check("pixel zone lookup matches tile conversion at boundaries and out-of-map coordinates") {
+    val coordinates = Vector(Int.MinValue, -4097, -33, -32, -31, -1, 0, 1, 31, 32, 4095, 4096, Int.MaxValue)
+    coordinates.foreach(x => coordinates.foreach(y => {
+      val pixel = Pixel(x, y)
+      assert(pixel.zone eq pixel.tile.zone, pixel)
+    }))
+    val random = new scala.util.Random(42)
+    (0 until 10000).foreach(_ => {
+      val pixel = Pixel(random.nextInt(), random.nextInt())
+      assert(pixel.zone eq pixel.tile.zone, pixel)
+    })
+  }
   val blockerTile = Tile(40, 120)
   val backExit = With.geography.edges.find(_.pixelCenter == Pixel(1312, 3856)).get
   val main = Tile(66, 119).zone

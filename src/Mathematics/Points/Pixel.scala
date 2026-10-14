@@ -101,7 +101,7 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
     Point(x, y)
   }
   @inline def zone: Zone = {
-    tile.zone
+    With.geography.zoneByTile(Maff.div32(x) + With.mapTileWidth * Maff.div32(y))
   }
   @inline def base: Option[Base] = {
     tile.base

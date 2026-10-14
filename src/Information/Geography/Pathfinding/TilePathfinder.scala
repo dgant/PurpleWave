@@ -31,7 +31,7 @@ trait TilePathfinder {
 
   def profileDistance(start: Tile, end: Tile): PathfindProfile = new PathfindProfile(start, Some(end), employGroundDist = true)
   private var tiles: Array[TileState] = Array.empty
-  private val horizon = new mutable.PriorityQueue[TileState]()(Ordering.by(t => - t.costToEndFloor))
+  private val horizon = new mutable.PriorityQueue[TileState]()(TileStateOrdering)
 
   private val neighborCardinalCount = 4
   private val neighborDeltaX        = Array( 0, 0, -1, 1, -1,  1, -1, 1)

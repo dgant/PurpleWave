@@ -13,6 +13,7 @@ import Micro.Agency.{DestinationStack, Intention}
 import Micro.Matchups.MatchupAnalysis
 import Planning.Blackboard
 import Planning.ResourceLocks.LockUnits
+import Performance.Cache
 import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Races.{Protoss, Terran}
@@ -75,6 +76,8 @@ object DarkTemplarSquadTest extends App {
     nextId += 1
     set(u, "id", nextId); set(u, "hashCode", nextId)
     set(u, "_unitClass", kind); set(u, "_pixel", at); set(u, "_tile", at.tile); set(u, "_flying", kind.isFlyer)
+    set(u, "_alive", true); set(u, "_complete", true)
+    set(u, "canMoveCache", new Cache(() => kind.canMove && kind.topSpeed > 0 && u.aliveAndComplete))
     set(u, "_orderTarget", None); set(u, "_orderTargetPixel", None)
     set(u, "_squad", None); set(u, "_intent", new Intention)
     u.matchups = new MatchupAnalysis(u) {

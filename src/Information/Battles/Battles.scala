@@ -16,7 +16,14 @@ class Battles extends TimedTask {
   withSkipsMax(3)
   withWeight(TaskQueueGlobalWeights.Battles)
 
-  var byUnit                    : Map[UnitInfo, Battle] = Map.empty
+  private var _byUnit: Map[UnitInfo, Battle] = Map.empty
+  def byUnit: Map[UnitInfo, Battle] = _byUnit
+  def byUnit_=(value: Map[UnitInfo, Battle]): Unit = {
+    // Clear the previous members, including units absent from the new map.
+    _byUnit.keysIterator.foreach(_.matchups.invalidateBattle())
+    _byUnit = value
+  }
+
   var local                     : Vector[Battle]        = Vector.empty
   var divisions                 : Vector[Division]      = Vector.empty
   var globalDefend              : Battle                = new Battle(isGlobal = true)

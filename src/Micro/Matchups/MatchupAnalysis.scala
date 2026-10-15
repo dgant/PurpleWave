@@ -2,7 +2,6 @@ package Micro.Matchups
 
 import Information.Battles.BattleFilters
 import Information.Battles.Types.{Battle, Team}
-import java.lang.ref.WeakReference
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.{Cache, KeyedCache}
@@ -18,26 +17,14 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemyOf(me) && BattleFilters.local(u)) else Seq.empty.view
 
-  // Reuse a physical team's lookup until the immutable membership map or allegiance changes.
-  // Both references are weak so inactive units cannot retain a retired prediction cycle.
-  private var teamMap = new WeakReference[Map[UnitInfo, Battle]](null)
-  private var teamValue = new WeakReference[Team](null)
-  private var teamFriendly = false
+  private var cachedBattle: Battle = _
+  // Battles clears this on publication, including for inactive units and departing members.
+  def invalidateBattle(): Unit = { cachedBattle = null }
   private def battleTeam: Team = {
-    val currentMap = With.battles.byUnit
-    val friendly = me.isFriendly
-    val cached = teamValue.get
-    if (cached != null && (teamMap.get eq currentMap) && teamFriendly == friendly) return cached
-    currentMap.get(me) match {
-      case Some(battle) =>
-        val team = if (friendly) battle.us else battle.enemy
-        teamMap = new WeakReference(currentMap)
-        teamValue = new WeakReference(team)
-        teamFriendly = friendly
-        team
-      // Entrants change independently of byUnit; keep their lookup live.
-      case None => me.team.orNull
-    }
+    if (cachedBattle == null) cachedBattle = With.battles.byUnit.getOrElse(me, null)
+    // Entrants change independently of physical membership; keep their lookup live.
+    if (cachedBattle == null) me.team.orNull
+    else if (me.isFriendly) cachedBattle.us else cachedBattle.enemy
   }
   def groupOf: UnitGroup = { val team = battleTeam; if (team == null) _groupOf() else team }
   def groupVs: UnitGroup = { val team = battleTeam; if (team == null) _groupVs() else team.opponent }

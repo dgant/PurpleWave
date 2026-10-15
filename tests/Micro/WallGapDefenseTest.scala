@@ -279,7 +279,7 @@ package Micro.Formation {
     With.performance = new Performance.PerformanceMonitor
     With.fingerprints = new Information.Fingerprinting.Fingerprints
     With.battles = allocate(classOf[Information.Battles.Battles])
-    With.battles.byUnit = Map.empty
+    set(With.battles, "_byUnit", Map.empty)
     With.matchups = new Micro.Matchups.MatchupGraph
     With.scouting = allocate(classOf[Information.Scouting.Scouting])
     set(With.scouting, "_enemyMuscleOrigin", new Cache(() => base.townHallTile))

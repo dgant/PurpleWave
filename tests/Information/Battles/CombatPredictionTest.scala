@@ -54,7 +54,7 @@ object CombatPredictionTest extends App {
   With.blackboard = allocate(classOf[Blackboard])
   set(With.blackboard, "aggressionRatio", new Property(1.0))
   With.battles = allocate(classOf[Battles])
-  With.battles.byUnit = Map.empty
+  set(With.battles, "_byUnit", Map.empty)
 
   def setWeapons(s: Simulacrum): Unit = {
     s.attacksAgainstAirCached    = s.unitClass.airDamageFactorRaw * s.unitClass.maxAirHitsRaw
@@ -1375,6 +1375,29 @@ object CombatPredictionTest extends App {
     assert(reference.get == null, "The unit's unused matchup cache retained the retired battle")
     assert(worker.matchups.groupOf eq With.battles.byUnit(worker).us)
   }
+  check("publishing empty membership releases battles cached by both previous teams") {
+    val worker = positioned(Protoss.Probe, 64)
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    def retireBattle(): java.lang.ref.WeakReference[Battle] = {
+      val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> retired, foe -> retired)
+      assert(worker.matchups.groupOf eq retired.us)
+      assert(foe.matchups.groupOf eq retired.enemy)
+      val reference = new java.lang.ref.WeakReference(retired)
+      With.battles.byUnit = Map.empty
+      reference
+    }
+    val reference = retireBattle()
+    var attempts = 0
+    while (reference.get != null && attempts < 10) {
+      System.gc()
+      Thread.sleep(10)
+      attempts += 1
+    }
+    assert(reference.get == null, "A departing member retained the retired battle")
+    assert(worker.matchups.me eq worker)
+    assert(foe.matchups.me eq foe)
+  }
   check("inactive unit groups do not retain retired battles or opposing teams") {
     val worker = positioned(Protoss.Probe, 64)
     val foe = positioned(Terran.Marine, 100, enemy = true)
@@ -1471,7 +1494,7 @@ object CombatPredictionTest extends App {
     set(worker, "_player", foe.player)
     assert(worker.matchups.groupOf eq battle.enemy)
     assert(worker.matchups.groupVs eq battle.us)
-    assert(lookups == 2)
+    assert(lookups == 1, "Changing allegiance should reuse the cached physical battle")
     set(worker, "_player", owner)
     assert(worker.matchups.groupOf eq battle.us)
   }
@@ -1482,8 +1505,11 @@ object CombatPredictionTest extends App {
     try {
       val worker = positioned(Protoss.Probe, 64)
       val foe = positioned(Terran.Marine, 100, enemy = true)
+      val physical = new Battle(Vector(worker), Vector(foe), isGlobal = false)
       val before = new Battle(Vector.empty, Vector(foe), isGlobal = false)
       val after = new Battle(Vector.empty, Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(worker -> physical, foe -> physical)
+      assert(worker.matchups.groupOf eq physical.us)
       With.battles.byUnit = Map(foe -> before)
       With.matchups.entrants(before) = ArrayBuffer(worker)
       assert(worker.matchups.groupOf eq before.us)

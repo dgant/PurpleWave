@@ -4,7 +4,7 @@ import Information.Battles.Battles
 import Information.Battles.Types.Division
 import Information.Geography.Geography
 import Information.Geography.Pathfinding.Paths
-import Information.Geography.Types.{Base, Zone}
+import Information.Geography.Types.{Base, Edge, Zone}
 import Information.Grids.Grids
 import Information.Grids.Movement.{GridUnwalkableUnits, GridWalkable, GridWalkableTerrain}
 import Lifecycle.With
@@ -17,8 +17,8 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.ProxyBWAPI
 import ProxyBwapi.Races.{Protoss, Terran}
 import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
-import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
-import ProxyBwapi.UnitTracking.UnitTracker
+import ProxyBwapi.UnitInfo.{ForeignUnitInfo, FriendlyUnitInfo, UnitInfo}
+import ProxyBwapi.UnitTracking.{UnitTracker, UnorderedBuffer}
 import Utilities.Property
 import Utilities.UnitCounters.CountEverything
 
@@ -201,6 +201,35 @@ object DarkTemplarSquadTest extends App {
     val (s, lock) = squad(Vector.empty)
     s.run()
     assert(!lock.released)
+  }
+  check("a natural's detector can disqualify the neighboring main's entrance") {
+    val zone = allocate(classOf[Zone])
+    set(zone, "zones", Vector(zone))
+    set(With.geography, "_zoneByTile", Array.fill[Zone](4096)(zone))
+    set(With.geography, "_edges", Vector.empty[Edge])
+    zone.edges // Initialize the lazy field before supplying fixed entrance geometry.
+    val choke = allocate(classOf[bwta.Chokepoint])
+    set(choke, "width", 56.0)
+    set(choke, "center", Pixel(476, 1836).bwapi)
+    set(choke, "sides", new bwapi.Pair(Pixel(448, 1840).bwapi, Pixel(504, 1832).bwapi))
+    set(zone, "edges", Vector(new Edge(choke)))
+    val main = base(enemy = true)
+    val cannon = allocate(classOf[ForeignUnitInfo])
+    set(cannon, "_unitClass", Protoss.PhotonCannon)
+    set(cannon, "_pixel", Pixel(640, 2112))
+    set(cannon, "_complete", true)
+    set(cannon, "sightRangePixelsCache", new Performance.Cache(() => Protoss.PhotonCannon.sightPixels))
+    val enemies = new UnorderedBuffer[ForeignUnitInfo]
+    enemies.add(cannon)
+    set(With.units, "bufferEnemy", enemies)
+    val s = new SquadDarkTemplar
+    assert(main.enemies.isEmpty)
+    assert(s.entranceDetected(main))
+    set(cannon, "_complete", false)
+    assert(!s.entranceDetected(main))
+    set(cannon, "_complete", true)
+    set(cannon, "_pixel", Pixel(192, 1312))
+    assert(!s.entranceDetected(main))
   }
   println(s"$passed dark templar squad tests passed")
 }

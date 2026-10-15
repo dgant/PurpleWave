@@ -1,7 +1,6 @@
 package Micro.Actions.Combat.Tactics
 
 import Lifecycle.With
-import Mathematics.Maff
 import Micro.Actions.Action
 import Micro.Agency.Commander
 import ProxyBwapi.Races.Protoss
@@ -10,48 +9,51 @@ import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
 object Recharge extends Action {
   
   // Note: Recharge Shields range is 2
+
+  lazy val priorityClasses = Seq(Protoss.Reaver, Protoss.Shuttle, Protoss.Carrier, Protoss.Arbiter, Protoss.Scout, Protoss.Corsair)
   
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.self.isProtoss
     && unit.canMove
     && unit.shieldPoints < unit.unitClass.maxShields
     && With.units.existsOurs(Protoss.ShieldBattery)
-    && (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight || unit.matchups.pixelsToTargetRange.forall(_ > 320))
-    && ( ! unit.readyForAttackOrder || unit.matchups.targetsInRange.isEmpty) // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
-  )
+    && unit.pixel.metro.exists(m => unit.agent.destinationFinal.pixel.forall(_.metro.contains(m)))
+    && (unit.isAny(priorityClasses: _*) || ! priorityClasses.exists(c => With.units.existsOurs(c))))
   
   protected def validBattery(unit: UnitInfo): Boolean = (
     unit.isOurs
     && unit.complete
     && Protoss.ShieldBattery(unit)
-    && unit.energy > 20 // 2 shield per energy
-  )
+    && unit.energy > 0)
   
   override protected def perform(unit: FriendlyUnitInfo): Unit = {
-    var batteries: Iterable[UnitInfo] = unit.alliesBattle.filter(b => validBattery(b) && unit.pixelDistanceTravelling(b.pixel) < 32 * 30)
-    if (batteries.isEmpty) batteries = unit.zone.units.filter(validBattery)
+    val missingShields = unit.unitClass.maxShields - unit.shieldPoints
+    val batteries = unit.metro.toSeq.flatMap(_.ourUnits.filter(validBattery)).filter(b =>
+      b.energy * 2 >= missingShields
+      || ! unit.flying && b.pixelDistanceEdge(unit) < 64)
 
-    val battery = Maff.minBy(batteries)(_.pixelDistanceEdge(unit))
-    if (battery.isEmpty) return
-    
-    unit.agent.decision.set(battery.map(_.pixel.project(unit.pixel, 40)))
+    if (batteries.isEmpty) return
+
+    val battery = batteries.minBy(unit.pixelDistanceEdge)
+    val distance = battery.pixelDistanceEdge(unit)
+
+    if (unit.flying) {
+      if (With.units.enemy.forall(e => distance < unit.pixelDistanceEdge(e))) {
+        Commander.rightClick(unit, battery)
+      }
+      return
+    }
+
+    if ( ! (unit.totalHealth < unit.unitClass.maxTotalHealth / 3.0 || ! unit.agent.shouldFight || unit.matchups.pixelsToTargetRange.forall(_ > 320))) return
+    if (unit.readyForAttackOrder && unit.matchups.targetsInRange.nonEmpty) return // Particularly to ensure that ramp-holders don't get stuck trying to get to a battery
+
+    unit.agent.decision.set(battery.pixel.project(unit.pixel, 40))
   
-    // Shield battery range is 2 tiles.
     // Don't right click it from too far -- that gets you killed en route.
-    val inRangeToRecharge   = unit.pixelDistanceEdge(battery.get) < 32.0 * 3.0
-    lazy val safeToRecharge = unit.matchups.threats.forall(threat => {
-      val distanceMeThreat      = unit.pixelDistanceEdge(threat) + threat.pixelRangeAgainst(unit)
-      val distanceMeBattery     = unit.pixelDistanceEdge(battery.get)
-      val distanceThreatBattery = threat.pixelDistanceEdge(battery.get)
-      val safe =
-        distanceMeBattery < distanceThreatBattery ||
-        distanceMeBattery < distanceMeThreat
-      safe
-    })
-
-    lazy val badlyNeedToRecharge = unit.shieldPoints * 3 < unit.unitClass.maxShields
-    if (inRangeToRecharge || safeToRecharge && (inRangeToRecharge || badlyNeedToRecharge)) {
-      battery.foreach(Commander.rightClick(unit, _))
+    lazy val safeToRecharge       = unit.matchups.threats.forall(threat => distance < Math.max(threat.pixelDistanceEdge(battery), unit.pixelDistanceEdge(threat) + threat.pixelRangeAgainst(unit)))
+    lazy val badlyNeedToRecharge  = unit.shieldPoints * 3 < unit.unitClass.maxShields
+    if (distance < 96 || (safeToRecharge && badlyNeedToRecharge)) {
+      Commander.rightClick(unit, battery)
     }
 
     Potshot.delegate(unit)

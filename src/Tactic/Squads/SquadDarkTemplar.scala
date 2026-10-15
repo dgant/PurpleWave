@@ -29,10 +29,7 @@ class SquadDarkTemplar extends Squad {
       .filterNot(_.zone.island)
       .filterNot(_.owner.isUs)
       .filterNot(_.metro.units.exists(u => u.isEnemy && IsMobileDetector(u)))
-      .filterNot(_.enemies.exists(u =>
-        u.complete
-        && u.unitClass.isDetector
-        && u.zone.edges.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64))))
+      .filterNot(entranceDetected)
       .sortBy(_.heart.center.groundPixels(centroidGround))
       .sortBy(base => - With.scouting.baseIntrigue.getOrElse(base, 0.0))
       .sortBy( ! _.owner.isEnemy)
@@ -42,7 +39,11 @@ class SquadDarkTemplar extends Squad {
   }
 
   private val bases = new ArrayBuffer[Base]
-  private def vulnerableDivisions: Vector[Division] = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && ! d.enemies.exists(_.unitClass.isDetector))
+  private[Squads] def entranceDetected(base: Base): Boolean = With.units.enemy.exists(u =>
+    u.complete
+    && u.unitClass.isDetector
+    && base.zone.edges.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))
+  private def vulnerableDivisions: Vector[Division] = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && d.mobileDetectors.isEmpty)
   private def waitForBackstab: Boolean = With.enemy.isProtoss && With.frame < Minutes(9)() && With.units.enemy.filter(IsMobileDetector).forall(o => With.scouting.proximity(o.pixel) < 0.5)
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile

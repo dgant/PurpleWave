@@ -20,11 +20,14 @@ New-Item -ItemType Directory -Path $macros -Force | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Movement macro compilation failed.' }
 $sources = @(
     'src/Micro/Agency/Commander.scala',
+    'src/Micro/Agency/Intention.scala',
     'src/Micro/Agency/Agent.scala',
     'src/ProxyBwapi/UnitInfo/FriendlyUnitInfo.scala',
     'src/Micro/Coordination/Pathing/MicroPathing.scala',
     'src/Micro/Actions/Combat/Maneuvering/DownhillPathfinder.scala',
     'src/Mathematics/Shapes/Ray.scala',
+    'src/Mathematics/Points/Pixel.scala',
+    'src/Utilities/UnitPreferences/PreferClose.scala',
     'tests/Micro/MovementWaypointTest.scala'
 ) | ForEach-Object { Join-Path $repo $_ }
 & $Java -cp (($compiler + $BotJar) -join ';') scala.tools.nsc.Main -usejavacp -Ymacro-classpath "$macros;$BotJar" -d $output @sources

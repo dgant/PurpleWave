@@ -13,15 +13,20 @@ package Micro {
   import Information.Grids.Grids
   import Information.Grids.Movement.{GridUnwalkableUnits, GridWalkable, GridWalkableTerrain}
   import Lifecycle.With
+  import Lifecycle.Configure.Configuration
+  import Macro.Allocation.Prioritized
   import Mathematics.Points.{Pixel, Tile}
   import Micro.Actions.Combat.Maneuvering.DownhillPathfinder
-  import Micro.Agency.Commander
+  import Micro.Agency.{Commander, Intention}
   import Performance.{Cache, ReactionTimes}
+  import Planning.ResourceLocks.LockUnits
   import ProxyBwapi.ProxyBWAPI
   import ProxyBwapi.Races.Protoss
   import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
   import ProxyBwapi.UnitInfo.FriendlyUnitInfo
   import ProxyBwapi.UnitTracking.UnitTracker
+  import Utilities.UnitCounters.CountOne
+  import Utilities.UnitPreferences.PreferClose
 
   object MovementWaypointTest extends App {
     val unsafeField = classOf[sun.misc.Unsafe].getDeclaredField("theUnsafe")
@@ -38,6 +43,8 @@ package Micro {
     def check(name: String)(body: => Unit): Unit = { body; passed += 1; println("PASS " + name) }
 
     With.frame = 96 // Together with unit id zero, disables the existing +/- 1 destination noise.
+    With.configuration = new Configuration
+    With.performance = new Performance.PerformanceMonitor
     With.mapTileWidth = 128; With.mapTileHeight = 128; With.mapTileArea = 128 * 128
     With.mapPixelWidth = 4096; With.mapPixelHeight = 4096
     With.proxy = allocate(classOf[ProxyBWAPI])
@@ -80,6 +87,7 @@ package Micro {
       set(u, "_flying", kind.isFlyer)
       set(u, "_transport", None); set(u, "friendly", Some(u))
       set(u, "_loadedUnitsCache", new Cache(() => Vector.empty[FriendlyUnitInfo]))
+      set(u, "_intent", new Intention)
       u
     }
     def building(x: Int, y: Int, width: Int, height: Int): Unit = {
@@ -196,6 +204,33 @@ package Micro {
         assert(Commander.adjustDestination(u, goal, remember = true) == goal)
         assert(u.agent.waypointFallback.isDefined)
       }
+    }
+    check("recruitment keeps ground-path proximity when the performance alarm is set") {
+      val destination = Tile(100, 90).center
+      val acrossBoundary = unit(Protoss.Dragoon, Tile(100, 100).center)
+      val approaching = unit(Protoss.Dragoon, Tile(80, 90).center)
+      val lock = new LockUnits(new Prioritized {}).setCounter(CountOne).setPreference(PreferClose(destination))
+      assert(acrossBoundary.pixelDistanceCenter(destination) < approaching.pixelDistanceCenter(destination))
+      assert(acrossBoundary.pixelDistanceTravelling(destination) > approaching.pixelDistanceTravelling(destination))
+      for (slowFrames <- Seq(0, 160)) {
+        With.performance.framesOverShort = slowFrames
+        assert(lock.offerUnits(Vector(approaching, acrossBoundary), dryRun = true).get.head eq approaching)
+      }
+    }
+    check("walkable pixels stay inside the selected tile on every side of a blocker") {
+      With.grids.unwalkableUnits.reset()
+      val blocked = Tile(120, 3)
+      for (open <- blocked.adjacent4) {
+        blocked.adjacent9.foreach(terrain.set(_, false))
+        terrain.set(open, true)
+        for (x <- 0 until 32; y <- 0 until 32) {
+          val source = blocked.topLeftPixel.add(x, y)
+          val projected = source.walkablePixel
+          assert(projected.walkable, s"$source projected outside $open to $projected")
+          assert(projected.tile == open && projected.walkablePixel == projected)
+        }
+      }
+      blocked.adjacent9.foreach(terrain.set(_, true))
     }
     println(s"$passed movement waypoint checks passed")
   }

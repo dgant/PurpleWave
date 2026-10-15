@@ -75,7 +75,7 @@ class PvPLateGame extends GameplanImperative {
     fearContain = With.scouting.enemyProximity > 0.6 && ! dtBraveryAbroad
     fearContain ||= enemyDarkTemplarLikely && ! haveComplete(Protoss.Observer)
     shouldExpand = productionCapacity >= targetProductionCapacity
-    shouldExpand ||= unitsComplete(Protoss.Reaver) >= 4  && unitsComplete(Protoss.Shuttle) >= 2
+    shouldExpand ||= unitsComplete(Protoss.Reaver) >= 3  && unitsComplete(Protoss.Shuttle) >= 2
     shouldExpand &&= ! fearDeath || (fearMacro && miningBases < 3)
     shouldExpand &&= ! fearContain || With.geography.safeExpansions.nonEmpty
     shouldExpand &&= With.geography.ourBases.forall(With.scouting.weControl)
@@ -246,7 +246,9 @@ class PvPLateGame extends GameplanImperative {
     pump(Protoss.Observer, 2)
     pumpShuttleAndReavers(6)
     pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
-    pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-4), Friendly(IsWarrior, 1.0 / 4.0)))
+    if (techStarted(Protoss.PsionicStorm)) {
+      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-4), Friendly(IsWarrior, 1.0 / 4.0)))
+    }
   }
   private def doTrainArmyLow(): Unit = {
     tryBuildInWall(1, Protoss.ShieldBattery)

@@ -43,7 +43,7 @@ class SquadDarkTemplar extends Squad {
     u.complete
     && u.unitClass.isDetector
     && base.zone.edges.exists(_.sidePixels.exists(u.pixelDistanceCenter(_) <= u.sightPixels + 64)))
-  private def vulnerableDivisions: Vector[Division] = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && d.mobileDetectors.isEmpty)
+  private def vulnerableDivisions: Vector[Division] = With.battles.divisions.filter(d => d.enemies.exists( ! _.flying) && d.mobileDetectors.isEmpty && d.centroidGround.proximity > 0.3 && ! d.centroidGround.base.exists(_.isEnemy))
   private def waitForBackstab: Boolean = With.enemy.isProtoss && With.frame < Minutes(9)() && With.units.enemy.filter(IsMobileDetector).forall(o => With.scouting.proximity(o.pixel) < 0.5)
   private lazy val backstabTargetBase     = With.scouting.enemyNatural.getOrElse(Maff.orElse(With.geography.bases.filter(_.naturalOf.isDefined), With.geography.bases).minBy(_.heart.groundTiles(With.scouting.enemyHome)))
   private lazy val backstabTarget         = backstabTargetBase.zone.exitOriginal.map(_.pixelCenter).getOrElse(Points.middle.midpoint(backstabTargetBase.heart.center)).walkableTile

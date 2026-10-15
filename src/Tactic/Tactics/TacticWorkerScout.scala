@@ -68,7 +68,7 @@ class TacticWorkerScout extends Tactic {
     val scoutCount = Maff.vmin(
       With.blackboard.maximumScouts(),
       With.units.countOurs(IsWorker) - 3,
-      basesToScout.size)
+      basesToScout.map(_.metro).distinct.size)
     if (lock.units.size > scoutCount) { lock.release() }
 
     scouts = lock

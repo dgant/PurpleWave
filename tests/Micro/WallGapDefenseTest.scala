@@ -32,7 +32,7 @@ package Micro.Formation {
   import ProxyBwapi.Players.PlayerInfo
   import ProxyBwapi.Races.Protoss
   import ProxyBwapi.UnitClasses.{UnitClass, UnitTypes}
-  import ProxyBwapi.UnitInfo.FriendlyUnitInfo
+  import ProxyBwapi.UnitInfo.{FriendlyUnitInfo, UnitInfo}
   import ProxyBwapi.UnitTracking.{UnitTracker, UnorderedBuffer}
   import Tactic.Squads.SquadDefendBase
   import bwapi.Race
@@ -64,6 +64,7 @@ package Micro.Formation {
     With.latency = allocate(classOf[Latency])
     With.geography = allocate(classOf[Geography])
     val zone = allocate(classOf[Zone])
+    set(zone, "units", new UnorderedBuffer[UnitInfo])
     set(With.geography, "_zoneByTile", Array.fill(With.mapTileArea)(zone))
     val base = new Base("Natural", Tile(12, 20), Set.empty)
     val main = new Base("Main", Tile(12, 40), Set.empty)

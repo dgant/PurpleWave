@@ -323,7 +323,9 @@ class SquadDefendBase(base: Base) extends Squad {
         || With.geography.ourBases.exists(_.townHall.exists(th => enemy.inRangeToAttack(th) && th.injury > 0.5))
         || choke.exists(c => enemy.metro.exists(_.bases.contains(base)) && enemy.pixel.walkableTile.groundPixels(base.heart) < c.pixelCenter.walkableTile.groundPixels(base.heart)))
       && (With.fingerprints.workerRush() || ! IsWorker(enemy))
-      && ! zone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels))
+      && (
+        zone.ourUnits.exists(u => u.unitClass.isBuilding && enemy.pixelsToGetInRange(u) < 64) ||
+        ! zone.edges.exists(edge => enemy.pixelDistanceCenter(edge.pixelCenter) < 64 + edge.radiusPixels)))
 
   private def isScourable(enemy: UnitInfo, defenders: Seq[FriendlyUnitInfo], enemyCanAttackGround: Boolean): Boolean = (
     // Don't get baited by 4-pool scouts

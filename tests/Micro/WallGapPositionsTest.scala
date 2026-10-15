@@ -20,7 +20,7 @@ object WallGapPositionsTest extends App {
   }
 
   check("minimum defenders counts Zealots needed to seal narrow, centered and wide gaps") {
-    for ((width, expected) <- Vector((10, 0), (18, 1), (40, 1), (50, 1), (60, 2), (90, 6))) {
+    for ((width, expected) <- Vector((10, 0), (18, 1), (40, 1), (50, 1), (60, 2), (90, 3))) {
       val bs = Vector(Box(0, 100, 100, 220), Box(100 + width, 100, 200 + width, 220))
       val g = geometry(bs, Pixel(100 + width / 2, 500), None)
       assert(g.minimumDefenders.contains(expected), (width, g.minimumDefenders))
@@ -179,6 +179,26 @@ object WallGapPositionsTest extends App {
     result.values.map(zealot.at).foreach(b => assert(b.left >= 1109 && b.right <= 1168 && b.top >= 3016 && b.bottom <= 3061, result))
     assert(! crosses(front ++ result.values.map(zealot.at), Box(1109, 2990, 1168, 3080), _.y == 2990, _.y == 3079))
     disjoint(result, units)
+  }
+  check("Vermeer entrances stay sealed when rear cannons are removed or moved") {
+    val front = Vector(Box(2928, 432, 3025, 505), Box(3084, 392, 3157, 437), Box(2864, 436, 2897, 469))
+    val cannons = Vector(Box(2988, 368, 3029, 401), Box(2924, 368, 2965, 401), Box(2860, 368, 2901, 401), Box(2796, 368, 2837, 401))
+    for (mask <- 0 until (1 << cannons.size); shift <- Vector(0, -64)) {
+      val remaining = cannons.zipWithIndex.collect { case (b, i) if (mask & (1 << i)) != 0 => b.copy(top = b.top + shift, bottom = b.bottom + shift) }
+      val g = new Geometry(front.map(_ -> true) ++ remaining.map(_ -> false), Pixel(3008, 272), Some(Pixel(3056, 432)), (_, _) => true, ling)
+      assert(g.gaps.map(_.width) == Vector(59, 31), (mask, shift, g.gaps))
+      assert(g.minimumDefenders.contains(3), (mask, shift, g.minimumDefenders))
+      for (worker <- Vector(false, true)) {
+        val units = (1 to 3).map(i => defender(i, worker).copy(pixel = Pixel(3008, 340))).toVector
+        val body = if (worker) probe else zealot
+        val result = g.assign(units)
+        assert(result.size == units.size && result.values.forall(g.fits(body, _)), (mask, shift, worker, result))
+        disjoint(result, units)
+        val sealedWall = front ++ result.values.map(body.at)
+        assert(! crosses(sealedWall, Box(3025, 360, 3084, 500), _.y == 499, _.y == 360), (mask, shift, worker, result))
+        assert(! crosses(sealedWall, Box(2897, 410, 2928, 490), _.y == 489, _.y == 410), (mask, shift, worker, result))
+      }
+    }
   }
   check("seven Zealots and four Probes form compact ranks in the Eclipse entrance") {
     val front = Vector(Box(1036, 3016, 1109, 3061), Box(1168, 2992, 1265, 3065))

@@ -560,7 +560,10 @@ object WallGaps {
                 s.depth > f.depth && Math.abs(g.across(s.pixel) - g.across(f.pixel)) <= 2))
               backup.orElse(reserves.find(legal))
             } else (2 to 0 by -1).iterator.map(sides => {
-              options.find(s => (s.front || probe && zealotBack.isDefined) && legal(s) &&
+              // Build an incomplete seal from the sides of the opening; a sheltered
+              // central slot can leave no room for the next defender beside it.
+              val ordered = if (sides == 1) options.sortBy(s => (s.depth, -s.across, s.exposure, s.pixel.x, s.pixel.y)) else options
+              ordered.find(s => (s.front || probe && zealotBack.isDefined) && legal(s) &&
                 (if (fromA.exists(_.touches(s.blocked))) 1 else 0) + (if (fromB.exists(_.touches(s.blocked))) 1 else 0) == sides)
             }).collectFirst { case Some(candidate) => candidate }
             slot.map(s => Planned(probe, body, s, g))

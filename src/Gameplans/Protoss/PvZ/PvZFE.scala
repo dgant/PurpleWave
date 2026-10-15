@@ -124,18 +124,21 @@ class PvZFE extends GameplanImperative {
     once(13, Protoss.Probe)
     if (With.frame < GameTime(6, 30)() || ! haveComplete(Protoss.DarkTemplar)) {
       val zerglings = enemies(Zerg.Zergling)
-      buildInWall(
-        Math.min(
-          6,
-          Math.max(
-            1 + Seq(
-              With.fingerprints.ninePool(),
-              With.tactics.workerScout.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
-              With.fingerprints.twoHatchMain()).count(_ == true),
-            // Keep two cannons for six lings; add a reserve against committed ling pressure.
-            (2 + zerglings) / 3 + ?(zerglings > 6, 1, 0)
-              - unitsComplete(Protoss.Zealot, Protoss.Dragoon) / 2)),
-        Protoss.PhotonCannon)
+      val cannons = Math.min(
+        8,
+        Math.max(
+          1 + Seq(
+            With.fingerprints.ninePool(),
+            With.tactics.workerScout.scouts.isEmpty || ! With.scouting.enemyMainFullyScouted,
+            With.fingerprints.twoHatchMain()).count(_ == true),
+          // Keep two cannons for six lings; add a reserve against committed ling pressure.
+          (2 + zerglings) / 3 + ?(zerglings > 6, 1, 0)
+            - unitsComplete(Protoss.Zealot, Protoss.Dragoon) / 2))
+
+      buildInWall(Math.min(2, cannons), Protoss.PhotonCannon)
+      buildInWall(1, Protoss.Gateway)
+      pump(Protoss.Zealot, 2 * (cannons - unitsComplete(Protoss.PhotonCannon)))
+      buildInWall(cannons, Protoss.PhotonCannon)
     }
     naturalNexus()
   }
@@ -165,8 +168,11 @@ class PvZFE extends GameplanImperative {
     // High priority //
     ///////////////////
 
-    if (enemyMutalisksLikely) {
+    if (enemyMutalisksLikely || ! enemyHydralisksLikely) {
       pumpRatio(Protoss.Corsair, 6, 36, Seq(Enemy(Zerg.Mutalisk, 1.0)))
+    }
+
+    if (enemyMutalisksLikely) {
       val mutaliskCannons = Maff.clamp(1 + enemies(Zerg.Mutalisk) / 3, 2, 5)
       val cannonTime      = Math.min(With.scouting.expectedArrival(Zerg.Mutalisk), GameTime(7, 0)())
       val pylonTime       = cannonTime - Protoss.Pylon.buildFramesFull
@@ -196,6 +202,7 @@ class PvZFE extends GameplanImperative {
       once(Protoss.RoboticsFacility, Protoss.Observatory, Protoss.Observer)
       pumpGasPumps()
     }
+
 
     maintainMiningBases(3)
     buildCannonsAtExpansions(4)

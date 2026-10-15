@@ -1,7 +1,6 @@
 package Micro.Matchups
 
 import Information.Battles.BattleFilters
-import Information.Battles.Types.{Battle, Team}
 import Lifecycle.With
 import Mathematics.Maff
 import Performance.{Cache, KeyedCache}
@@ -17,17 +16,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemyOf(me) && BattleFilters.local(u)) else Seq.empty.view
 
-  private var cachedBattle: Battle = _
-  // Battles clears this on publication, including for inactive units and departing members.
-  def invalidateBattle(): Unit = { cachedBattle = null }
-  private def battleTeam: Team = {
-    if (cachedBattle == null) cachedBattle = With.battles.byUnit.getOrElse(me, null)
-    // Entrants change independently of physical membership; keep their lookup live.
-    if (cachedBattle == null) me.team.orNull
-    else if (me.isFriendly) cachedBattle.us else cachedBattle.enemy
-  }
-  def groupOf: UnitGroup = { val team = battleTeam; if (team == null) _groupOf() else team }
-  def groupVs: UnitGroup = { val team = battleTeam; if (team == null) _groupVs() else team.opponent }
+  def groupOf: UnitGroup = me.team.getOrElse(_groupOf())
+  def groupVs: UnitGroup = me.team.map(_.opponent).getOrElse(_groupVs())
   private val _groupOf = new Cache(() => me.friendly.flatMap(_.squad).getOrElse(GenericUnitGroup(Seq(me))))
   private val _groupVs = new KeyedCache(
     () => me.friendly.flatMap(_.targetsAssigned).map(GenericUnitGroup)

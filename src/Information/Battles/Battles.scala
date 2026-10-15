@@ -20,7 +20,7 @@ class Battles extends TimedTask {
   def byUnit: Map[UnitInfo, Battle] = _byUnit
   def byUnit_=(value: Map[UnitInfo, Battle]): Unit = {
     // Clear the previous members, including units absent from the new map.
-    _byUnit.keysIterator.foreach(_.matchups.invalidateBattle())
+    _byUnit.keysIterator.foreach(_.invalidateBattle())
     _byUnit = value
   }
 

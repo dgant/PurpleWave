@@ -1354,12 +1354,15 @@ object CombatPredictionTest extends App {
     set(worker, "_intent", new Micro.Agency.Intention)
     set(zone, "units", new ProxyBwapi.UnitTracking.UnorderedBuffer[UnitInfo])
     val foe = positioned(Terran.Marine, 100, enemy = true)
+    val previousAnalysis = worker.matchups
     def retireBattle(): java.lang.ref.WeakReference[Battle] = {
       val retired = new Battle(Vector(worker), Vector(foe), isGlobal = false)
       With.battles.byUnit = Map(worker -> retired, foe -> retired)
       assert(worker.matchups.groupOf eq retired.us)
       assert(worker.matchups.groupVs eq retired.enemy)
       val reference = new java.lang.ref.WeakReference(retired)
+      // MatchupGraph replaces analyses; lazy target views can still refer to the old one.
+      worker.matchups = new MatchupAnalysis(worker)
       val current = new Battle(Vector(worker), Vector(foe), isGlobal = false)
       With.battles.byUnit = Map(worker -> current, foe -> current)
       reference
@@ -1374,6 +1377,7 @@ object CombatPredictionTest extends App {
     }
     assert(reference.get == null, "The unit's unused matchup cache retained the retired battle")
     assert(worker.matchups.groupOf eq With.battles.byUnit(worker).us)
+    assert(previousAnalysis.groupOf eq With.battles.byUnit(worker).us)
   }
   check("publishing empty membership releases battles cached by both previous teams") {
     val worker = positioned(Protoss.Probe, 64)
@@ -1489,6 +1493,10 @@ object CombatPredictionTest extends App {
       assert(worker.matchups.groupOf eq battle.us)
       assert(worker.matchups.groupVs eq battle.enemy)
     }
+    assert(worker.battle.contains(battle))
+    assert(worker.team.contains(battle.us))
+    worker.matchups = new MatchupAnalysis(worker)
+    assert(worker.matchups.groupOf eq battle.us)
     assert(lookups == 1, s"Repeated group queries performed $lookups membership lookups")
     val owner = worker.player
     set(worker, "_player", foe.player)

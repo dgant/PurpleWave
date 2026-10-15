@@ -82,6 +82,7 @@ final class Combat(unit: FriendlyUnitInfo) extends Action {
       else  if (unit.agent.shouldFight && target.isDefined)         Fight
       else  if (safePassage && target.exists(unit.inRangeToAttack)) Fight
       else  if (safePassage)                                        Walk
+      else  if ( ! unit.intent.canFlee)                             Walk
       else                                                          Flee
 
     transition(Aim,       ! unit.canMove)

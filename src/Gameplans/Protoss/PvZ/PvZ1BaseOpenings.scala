@@ -16,6 +16,7 @@ abstract class PvZ1BaseOpenings extends PvZ1BaseBuildOrders {
   protected var opening: Opening = Open1012
 
   protected def open(allowExpanding: Boolean): Unit = {
+    reactVs4Pool()
     if (units(Protoss.Gateway) < 2 && units(Protoss.Nexus) < 2 && ! have(Protoss.Assimilator)) {
       if (opening == Open1012 && enemyRecentStrategy(With.fingerprints.fourPool)) {
         opening = Open910

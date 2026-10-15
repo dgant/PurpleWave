@@ -951,6 +951,7 @@ class PvPOpening extends GameplanImperative {
     else if (zAfterCore || zBeforeCore) once(Protoss.Zealot)
     once(Protoss.Dragoon)
     pump(Protoss.Dragoon)
+    pumpGasPumps()
     if ( ! PvPCoreExpand() || gas < 32) {
       pump(Protoss.Zealot)
     }

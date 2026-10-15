@@ -69,7 +69,8 @@ case class MatchupAnalysis(me: UnitInfo) {
   def framesOfSafety              : Double            = - With.latency.latencyFrames - With.reaction.agencyAverage - Maff.nanToZero(pixelsEntangled / me.topSpeed)
   def pixelsEntangled             : Double            = _pixelsEntangled()
   def pixelsToTargetRange         : Option[Double]    = targetNearest.map(me.pixelsToGetInRange)
-  def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(_.pixelsToGetInRange(me))
+  // Threats include soon-complete buildings; their canAttack-gated distance is infinite until completion.
+  def pixelsToThreatRange         : Option[Double]    = threatDeepest.map(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me))
   def pixelsToDetectionRange      : Option[Double]    = enemyDetectorDeepest.map(d => me.tile.tileDistanceFast(d.tile) * 32 - d.sightPixels)
   private val _threatDeepest        = new Cache(() => Maff.minBy(threats)(t => t.pixelDistanceEdge(me) - t.pixelRangeAgainst(me)))
   private val _threatDeepestInRange = new Cache(() => _threatDeepest().filter(_.inRangeToAttack(me)))

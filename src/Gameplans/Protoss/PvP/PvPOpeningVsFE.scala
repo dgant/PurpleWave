@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvP
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvPCoreExpand, PvPNexusFirst => PvPNexusFirstStrategy}
+import Strategery.Strategies.Protoss.{PvP1012, PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT, PvPNexusFirst, PvPObs, PvPReaver, PvPRobo, PvPNexusFirst => PvPNexusFirstStrategy}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Seconds}
 
@@ -38,6 +38,27 @@ class PvPOpeningVsFE extends GameplanImperative {
     if (enemyRecentStrategy(With.fingerprints.cannonRush) && ! With.scouting.enemyNatural.exists(_.townHall.isDefined)) {
       response = None
     }
+
+    if (response.isDefined) {
+      PvPCoreExpand.swapOut()
+      PvPDT.swapOut()
+      PvP3GateGoon.swapOut()
+      PvP4GateGoon.swapOut()
+
+      if (response.contains(NexusFirst)) {
+        PvPNexusFirst.swapIn()
+      }
+      if (response.contains(Robo)) {
+        PvPRobo.swapIn()
+        PvPReaver.swapIn()
+        PvPObs.swapOut()
+      } else {
+        PvPRobo.swapOut()
+        PvPReaver.swapOut()
+        PvPObs.swapOut()
+      }
+    }
+
     response.isDefined
   }
 
@@ -57,6 +78,7 @@ class PvPOpeningVsFE extends GameplanImperative {
       requireMiningBases(2)
       once(14, Protoss.Probe)
       get(Protoss.Gateway)
+      stealGas()
     } else {
       once(Protoss.Gateway)
       once(12, Protoss.Probe)
@@ -65,6 +87,7 @@ class PvPOpeningVsFE extends GameplanImperative {
       once(Protoss.CyberneticsCore)
       once(14, Protoss.Probe)
       get(2, Protoss.Pylon)
+      stealGas()
       once(16, Protoss.Probe)
       once(Protoss.RoboticsFacility)
     }
@@ -72,8 +95,8 @@ class PvPOpeningVsFE extends GameplanImperative {
 
   var attackTrigger: Boolean = false
   override def executeMain(): Unit = {
-    attackTrigger ||= unitsEver(u => Protoss.Reaver(u) && u.complete) >= 2
-    attack(attackTrigger)
+    //attackTrigger ||= unitsEver(u => Protoss.Reaver(u) && u.complete) >= 2
+    attack(safePushing)
 
     val doArmy = new DoQueue(() => {
       pump(Protoss.Observer, 1)
@@ -111,5 +134,4 @@ class PvPOpeningVsFE extends GameplanImperative {
     pumpGasPumps()
     pump(Protoss.Zealot)
   }
-
 }

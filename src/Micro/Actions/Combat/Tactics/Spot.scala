@@ -73,14 +73,20 @@ object Spot extends Action {
     Commander.move(unit)
   }
 
-  private[Micro] def shouldRetreatFrom(unit: FriendlyUnitInfo, threat: UnitInfo): Boolean =
-    unit.pixelDistanceCenter(threat) < Math.min(unit.sightPixels - 32, threat.pixelRangeAgainst(unit) + 96)
+  private[Micro] def shouldRetreatFrom(unit: FriendlyUnitInfo, threat: UnitInfo): Boolean = {
+    // Only detection justifies closing inside the normal safety buffer.
+    if (unit.unitClass.isDetector && threat.cloakedOrBurrowed) {
+      unit.pixelDistanceCenter(threat) < Math.min(unit.detectionRangePixels - 32, threat.pixelRangeAgainst(unit) + 96)
+    } else {
+      unit.pixelDistanceEdge(threat) < threat.pixelRangeAgainst(unit) + 96
+    }
+  }
 
   private[Micro] def spottingPosition(unit: FriendlyUnitInfo, spooky: Option[UnitInfo], goals: Seq[Pixel]): Pixel = {
     val preferred = MicroPathing.pullTowards(unit.sightPixels, goals: _*)
     // Keep current detection even when prediction or secondary goals pull us away.
     // Leave 16px between the desired coverage boundary and the capped retreat trigger.
-    spooky.map(t => t.pixel.projectUpTo(preferred, Math.max(0, unit.detectionRangePixels - 16))).getOrElse(preferred)
+    spooky.filter(_.cloakedOrBurrowed).map(t => t.pixel.projectUpTo(preferred, Math.max(0, unit.detectionRangePixels - 16))).getOrElse(preferred)
   }
 
   def enemiesToConsider(unit: FriendlyUnitInfo): Seq[Iterable[UnitInfo]] = Seq(

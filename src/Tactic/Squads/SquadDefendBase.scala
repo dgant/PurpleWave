@@ -26,6 +26,12 @@ class SquadDefendBase(base: Base) extends Squad {
 
   override def launch(): Unit = { /* This squad is given its recruits externally */ }
 
+  private var lastAction = "Def"
+  override def toString: String = f"$lastAction ${base.name.take(5)}"
+
+  val workerLock = new LockUnits(this)
+  workerLock.setMatcher((u: UnitInfo) => IsWorker(u) && (u.metro.contains(base.metro) || workerLock.units.exists(_ == u)))
+
   def recruitWorkers(invaders: Seq[UnitInfo]): Unit = {
     if (With.frame >= Minutes(8)()) {
       workerLock.release()
@@ -60,11 +66,6 @@ class SquadDefendBase(base: Base) extends Squad {
       workerLock.release()
     }
   }
-
-  private var lastAction = "Def"
-  override def toString: String = f"$lastAction ${base.name.take(5)}"
-
-  val workerLock = new LockUnits(this, (u: UnitInfo) => IsWorker(u) && u.metro.contains(base.metro))
 
   val wallToPlug = new Cache(() => With.placement.wall
     .filter(_ => base.metro == With.geography.ourFoyer.metro)
@@ -180,6 +181,7 @@ class SquadDefendBase(base: Base) extends Squad {
       else                    enemies.filter(threateningBase)
     setTargets(targetsUnranked.sortBy(_.pixelDistanceTravelling(vicinity)).sortBy(IsWorker).sortBy( ! _.canAttackGround))
 
+    workerLock.setInterruptible(true)
     if (canWithdraw) {
       lastAction = "Withdraw"
       if (canScour) {
@@ -198,6 +200,7 @@ class SquadDefendBase(base: Base) extends Squad {
       formations += formationBastion
       SquadAutomation.send(this)
       wallGaps.foreach { case (unit, pixel) => intendHoldWallGap(unit, pixel) }
+      workerLock.setInterruptible(false)
     } else if (canPlugEdge) {
       val plugPixel = edgeToPlug().get._2.get.pixelCenter
       lastAction = "Plug Edge"
@@ -207,6 +210,7 @@ class SquadDefendBase(base: Base) extends Squad {
         .setRedoubt(plugPixel)
         .setTerminus(plugPixel)
         .setAction(Plug(plugPixel)))
+      workerLock.setInterruptible(false)
     } else if (canGuard) {
       lastAction = "Guard"
       if (targets.exists(_.nonEmpty)) {

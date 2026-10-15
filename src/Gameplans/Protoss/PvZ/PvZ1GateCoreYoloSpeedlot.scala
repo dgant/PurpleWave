@@ -12,6 +12,7 @@ class PvZ1GateCoreYoloSpeedlot extends GameplanImperative {
   override def activated: Boolean = PvZ1GateCoreYoloSpeedlot()
 
   override def executeBuild(): Unit = {
+    Pv4Pool()
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(9, Protoss.Probe)

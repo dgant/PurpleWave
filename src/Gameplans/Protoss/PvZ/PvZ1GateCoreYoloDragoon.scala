@@ -11,6 +11,7 @@ class PvZ1GateCoreYoloDragoon extends GameplanImperative {
   override def activated: Boolean = PvZ1GateCoreYoloDragoon()
 
   override def executeBuild(): Unit = {
+    Pv4Pool()
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     once(9, Protoss.Probe)

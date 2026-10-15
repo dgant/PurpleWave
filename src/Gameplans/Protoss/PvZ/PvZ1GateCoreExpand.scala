@@ -15,6 +15,7 @@ class PvZ1GateCoreExpand extends GameplanImperative {
   override def activated: Boolean = PvZ1GateCoreExpand()
 
   override def executeBuild(): Unit = {
+    Pv4Pool()
     once(8, Protoss.Probe)
     once(Protoss.Pylon)
     //preferWall(1, Protoss.Pylon)

@@ -2,6 +2,7 @@ package Strategery.Strategies.Protoss
 
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
+import Strategery.Destination
 import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
 import bwapi.Race
@@ -49,6 +50,7 @@ abstract class PvZFEOpening extends PvZStrategy {
 
 object PvZFFE extends PvZFEOpening {
   banPersonality(PersonalityCheese)
+  blacklistOn(Destination)
 }
 object PvZGFE extends PvZFEOpening {
   banPersonality(PersonalityCheese)

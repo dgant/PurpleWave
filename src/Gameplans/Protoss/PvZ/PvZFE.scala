@@ -248,14 +248,17 @@ class PvZFE extends GameplanImperative {
     doTech()
     get(15, Protoss.Gateway)
 
+
     if (bases > 2) {
       attack()
     }
-    if (safePushing && ! enemyHasUpgrade(Zerg.ZerglingSpeed) && ! enemyHasUpgrade(Zerg.HydraliskSpeed) && enemiesComplete(Zerg.SunkenColony) < 2) {
-      attack()
-    }
-    if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {
-      attack()
+    if (PvZGFE() || upgradeComplete(Protoss.ZealotSpeed) || unitsEverComplete(IsWarrior) >= 15) {
+      if (safePushing && ! enemyHasUpgrade(Zerg.ZerglingSpeed) && ! enemyHasUpgrade(Zerg.HydraliskSpeed) && enemiesComplete(Zerg.SunkenColony) < 2) {
+        attack()
+      }
+      if (safePushing && upgradeComplete(Protoss.ZealotSpeed) && (haveComplete(Protoss.Observer) || ! enemiesHave(Zerg.Lurker))) {
+        attack()
+      }
     }
   }
 

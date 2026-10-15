@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.{PvRFFECarrier, PvRFFEGateway, PvRGFEComplete, PvRReaver}
+import Gameplans.Protoss.PvR.{PvR2Gate4Gate, PvRFFECarrier, PvRFFEGateway, PvRGFEComplete, PvRReaver}
 import Planning.Plans.Plan
 import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
@@ -12,9 +12,7 @@ abstract class PvRStrategy extends Strategy {
 }
 
 object PvR2Gate4Gate extends PvRStrategy {
-  addChoiceVs(Race.Terran)(PvT4Gate)
-  addChoiceVs(Race.Protoss)(PvP4GateGoon)
-  addChoiceVs(Race.Zerg)(PvZ2Gate4Gate)
+  override def gameplan: Option[Plan] = Some(new PvR2Gate4Gate)
 }
 object PvRDT extends PvRStrategy {
   addChoiceVs(Race.Terran)(PvTDT)

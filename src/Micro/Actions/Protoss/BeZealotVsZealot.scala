@@ -14,6 +14,7 @@ object BeZealotVsZealot extends Action {
   override def allowed(unit: FriendlyUnitInfo): Boolean = (
     With.frame < Minutes(5)()
       && Protoss.Zealot(unit)
+      && With.enemies.exists(_.isProtoss)
       && unit.matchups.threatsInPixels(128).forall(_.isAny(Protoss.Zealot, Protoss.Probe)))
 
   override def perform(unit: FriendlyUnitInfo): Unit = {

@@ -4,26 +4,14 @@ import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.{Protoss, Zerg}
 import Utilities.Time.{Minutes, Seconds}
-import Utilities.UnitFilters.{IsHatchlike, IsWarrior}
+import Utilities.UnitFilters.IsHatchlike
 
 abstract class PvZ1BaseBuildOrders extends GameplanImperative {
 
   protected def reactVs4Pool(): Unit = {
-    if (With.fingerprints.fourPool() && unitsComplete(IsWarrior) < 5) {
-      once(8, Protoss.Probe)
-      once(Protoss.Pylon)
-      once(9, Protoss.Probe)
-      if (have(Protoss.Forge)) {
-        get(3, Protoss.PhotonCannon)
-      }
-      once(Protoss.Gateway)
-      autosupply()
-      pumpWorkers()
-      pump(Protoss.Zealot)
-      cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
-      get(2, Protoss.Gateway)
-    }
+    Pv4Pool()
   }
+
   protected def openVsSpeedlings(): Unit = {
     if (unitsComplete(Protoss.Gateway) < 3) {
       cancel(Protoss.Assimilator, Protoss.CyberneticsCore, Protoss.Nexus)
@@ -71,7 +59,6 @@ abstract class PvZ1BaseBuildOrders extends GameplanImperative {
     once(13, Protoss.Probe)
     once(4, Protoss.Zealot)
     once(14, Protoss.Probe)
-    reactVs4Pool()
     once(3, Protoss.Pylon)
     once(15, Protoss.Probe)
     once(5, Protoss.Zealot)

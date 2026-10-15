@@ -15,7 +15,7 @@ import ProxyBwapi.Techs.Tech
 import ProxyBwapi.UnitClasses.UnitClass
 import ProxyBwapi.Upgrades.Upgrade
 import Utilities.?
-import Utilities.UnitFilters.UnitFilter
+import Utilities.UnitFilters.{IsWorker, UnitFilter}
 
 trait MacroActions extends MacroCounting {
 
@@ -125,7 +125,7 @@ trait MacroActions extends MacroCounting {
   }
   def stealGas(): Unit = {
     With.scouting.enemyMain
-      .filter(main => main.gas.length == 1 && main.gas.forall(_.isNeutral))
+      .filter(main => main.gas.length == 1 && main.gas.forall(_.isNeutral) && main.ourUnits.exists(IsWorker))
       .foreach(main => get(1, Protoss.Assimilator, new PlacementQuery(Protoss.Assimilator).requireBase(main)))
   }
 

@@ -1449,6 +1449,85 @@ object CombatPredictionTest extends App {
     assert(worker.matchups.groupOf eq after.us)
     assert(worker.matchups.groupVs eq after.enemy)
   }
+  check("matchup teams reuse the membership lookup and immediately follow allegiance changes") {
+    val worker = positioned(Protoss.Probe, 64)
+    val foe = positioned(Terran.Marine, 100, enemy = true)
+    val battle = new Battle(Vector(worker), Vector(foe), isGlobal = false)
+    val members = Map[UnitInfo, Battle](worker -> battle, foe -> battle)
+    var lookups = 0
+    val counted = new scala.collection.immutable.AbstractMap[UnitInfo, Battle] {
+      override def get(key: UnitInfo): Option[Battle] = { lookups += 1; members.get(key) }
+      override def iterator: Iterator[(UnitInfo, Battle)] = members.iterator
+      override def +[B1 >: Battle](kv: (UnitInfo, B1)): Map[UnitInfo, B1] = members + kv
+      override def -(key: UnitInfo): Map[UnitInfo, Battle] = members - key
+    }
+    With.battles.byUnit = counted
+    (0 until 10000).foreach { _ =>
+      assert(worker.matchups.groupOf eq battle.us)
+      assert(worker.matchups.groupVs eq battle.enemy)
+    }
+    assert(lookups == 1, s"Repeated group queries performed $lookups membership lookups")
+    val owner = worker.player
+    set(worker, "_player", foe.player)
+    assert(worker.matchups.groupOf eq battle.enemy)
+    assert(worker.matchups.groupVs eq battle.us)
+    assert(lookups == 2)
+    set(worker, "_player", owner)
+    assert(worker.matchups.groupOf eq battle.us)
+  }
+  check("entrant teams remain live when entrants change without replacing the membership map") {
+    val previous = With.matchups
+    With.matchups = allocate(classOf[Micro.Matchups.MatchupGraph])
+    set(With.matchups, "entrants", new HashMap[Battle, ArrayBuffer[UnitInfo]])
+    try {
+      val worker = positioned(Protoss.Probe, 64)
+      val foe = positioned(Terran.Marine, 100, enemy = true)
+      val before = new Battle(Vector.empty, Vector(foe), isGlobal = false)
+      val after = new Battle(Vector.empty, Vector(foe), isGlobal = false)
+      With.battles.byUnit = Map(foe -> before)
+      With.matchups.entrants(before) = ArrayBuffer(worker)
+      assert(worker.matchups.groupOf eq before.us)
+      With.matchups.entrants.clear()
+      With.matchups.entrants(after) = ArrayBuffer(worker)
+      assert(worker.matchups.groupOf eq after.us)
+      assert(worker.matchups.groupVs eq after.enemy)
+    } finally With.matchups = previous
+  }
+  check("threat checks preserve detection decisions and skip group detection for visible victims") {
+    val shooter = positioned(Protoss.Dragoon, 64)
+    val victim = positioned(Terran.Marine, 100, enemy = true)
+    set(victim, "_transport", None)
+    set(victim, "canBeAttackedCache", new Cache(() => true))
+    set(shooter, "canAttackCache", new Cache(() => true))
+    set(shooter, "_complete", true)
+    var hidden = false
+    var detects = true
+    var evaluations = 0
+    set(victim, "_effectivelyCloaked", new Cache(() => hidden))
+    val group = new Tactic.Squads.GenericUnitGroup(Vector(shooter))
+    set(group, "_detectionAvailable", new Cache(() => { evaluations += 1; detects }))
+    val analysis = new MatchupAnalysis(shooter) {
+      override def groupOf = group
+      override def groupVs = group
+      def checkThreat(): Boolean = threatens(shooter, victim)
+    }
+    With.frame += 1
+    (0 until 1000).foreach(_ => assert(analysis.checkThreat()))
+    assert(evaluations == 0)
+    hidden = true
+    With.frame += 1
+    (0 until 1000).foreach(_ => assert(analysis.checkThreat()))
+    assert(evaluations == 1, "Detection should be evaluated once per group per frame")
+    for (cloaked <- Vector(false, true); detection <- Vector(false, true)) {
+      hidden = cloaked
+      detects = detection
+      With.frame += 1
+      // The historical expression, including the incomplete-unit fallback.
+      val expected = shooter.canAttack(victim, assumeDetection = group.detectionAvailable) ||
+        (shooter.unitClass.canAttack(victim) && !shooter.complete && shooter.remainingCompletionFrames < 72)
+      assert(analysis.checkThreat() == expected)
+    }
+  }
   check("sim2026 effective-range proximity preserves nearby groups without joining remote targets") {
     val corsair = positioned(Protoss.Corsair, 64)
     val ling = positioned(Zerg.Zergling, 80, enemy = true)
@@ -1551,6 +1630,80 @@ object CombatPredictionTest extends App {
       resetReference.observe()
       assert(sim.interactions.components.map(_.toSet).toSet == resetReference.components)
     }
+  }
+  check("spatial occupancy follows moves, stacked units, removals and reset") {
+    val a = positioned(Protoss.Dragoon, 64)
+    val b = positioned(Terran.Marine, 64, enemy = true)
+    val sim = componentSimulation(Vector(a), Vector(b))
+    def verify(): Unit = {
+      val expected = sim.grid.populatedTiles.map(_.tile.i).toSet
+      val observed = scala.collection.mutable.Set.empty[Int]
+      sim.grid.populatedColumns.indices.foreach { y =>
+        var x = sim.grid.populatedColumns(y).nextSetBit(0)
+        while (x >= 0) { observed += x + y * With.mapTileWidth; x = sim.grid.populatedColumns(y).nextSetBit(x + 1) }
+      }
+      assert(observed.toSet == expected)
+    }
+    verify()
+    sim.grid.remove(a.simulacrum)
+    verify()
+    assert(sim.grid.populatedColumns.map(_.cardinality()).sum == 1)
+    sim.grid.relocateUnit(b.simulacrum, Pixel(1023, 1023))
+    verify()
+    sim.grid.relocateUnit(b.simulacrum, Pixel(1000, 1000))
+    verify()
+    sim.grid.remove(b.simulacrum)
+    verify()
+    assert(sim.grid.populatedColumns.forall(_.isEmpty))
+    sim.grid.populate(b.simulacrum)
+    verify()
+    sim.grid.reset()
+    verify()
+    assert(sim.grid.populatedColumns.forall(_.isEmpty))
+  }
+  check("spatial proximity preserves ordered groups on dense and sparse randomized layouts") {
+    for (seed <- 0 until 40) {
+      val random = new scala.util.Random(seed)
+      val members = (0 until 60).map { i =>
+        val u = positioned(if (i % 3 == 0) Terran.SiegeTankSieged else Protoss.Dragoon,
+          random.nextInt(1024), enemy = i % 2 == 0)
+        set(u, "hashCode", i + 1)
+        set(u, "_pixel", Pixel(random.nextInt(1024), random.nextInt(1024)))
+        u
+      }
+      val (foes, ours) = members.partition(_.isEnemy)
+      val sim = componentSimulation(ours, foes)
+      sim.interactions.reset(sim.realUnits)
+      val original = new OriginalProximity(sim)
+      for (frame <- 0 until 12) {
+        sim.battle.simulationFrames = frame
+        members.foreach { u =>
+          val s = u.simulacrum
+          if (s.alive) sim.grid.relocateUnit(s, Pixel(random.nextInt(1024), random.nextInt(1024)))
+        }
+        if (frame == 3) {
+          members.take(5).foreach { u => u.simulacrum.alive = false; sim.grid.remove(u.simulacrum) }
+        }
+        sim.interactions.observeProximity()
+        original.observe()
+        val expected = original.components.toVector
+          .sortBy(g => sim.realUnits.indexWhere(g.contains))
+          .map(g => sim.realUnits.filter(g.contains).toVector)
+        assert(sim.interactions.components == expected, s"seed=$seed frame=$frame")
+      }
+    }
+  }
+  check("spatial proximity still observes live ownership changes of the other unit") {
+    val a = positioned(Protoss.Dragoon, 64)
+    val b = positioned(Protoss.Dragoon, 100)
+    val sim = componentSimulation(Vector(a, b), Vector.empty)
+    assert(sim.interactions.components.size == 2)
+    set(b, "_player", player(enemy = true))
+    val reference = new OriginalProximity(sim)
+    reference.observe()
+    sim.interactions.observeProximity()
+    assert(sim.interactions.components.map(_.toSet).toSet == reference.components)
+    assert(sim.interactions.components.size == 1)
   }
   check("cached proximity distance preserves mixed-range and footprint boundaries") {
     val kinds = Vector(Protoss.Zealot, Protoss.Dragoon, Terran.SiegeTankSieged, Protoss.Corsair,

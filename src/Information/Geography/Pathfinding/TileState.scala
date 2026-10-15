@@ -46,3 +46,13 @@ final class TileState(val tile: Tile) {
   @inline def pathLength      : Double        = _pathLength
   @inline def repulsion       : Double        = _repulsion
 }
+
+// Preserve Ordering.by(-_.costToEndFloor), including its Double comparison semantics,
+// without boxed keys for priority-queue comparisons.
+private[Pathfinding] object TileStateOrdering extends Ordering[TileState] {
+  override def compare(a: TileState, b: TileState): Int = java.lang.Double.compare(-a.costToEndFloor, -b.costToEndFloor)
+  override def lt  (a: TileState, b: TileState): Boolean = -a.costToEndFloor <  -b.costToEndFloor
+  override def lteq(a: TileState, b: TileState): Boolean = -a.costToEndFloor <= -b.costToEndFloor
+  override def gt  (a: TileState, b: TileState): Boolean = -a.costToEndFloor >  -b.costToEndFloor
+  override def gteq(a: TileState, b: TileState): Boolean = -a.costToEndFloor >= -b.costToEndFloor
+}

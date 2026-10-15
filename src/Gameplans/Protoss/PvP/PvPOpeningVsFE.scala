@@ -3,7 +3,7 @@ package Gameplans.Protoss.PvP
 import Gameplans.All.GameplanImperative
 import Lifecycle.With
 import ProxyBwapi.Races.Protoss
-import Strategery.Strategies.Protoss.{PvP1012, PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT, PvPNexusFirst, PvPObs, PvPReaver, PvPRobo, PvPNexusFirst => PvPNexusFirstStrategy}
+import Strategery.Strategies.Protoss.{PvP1012, PvP3GateGoon, PvP4GateGoon, PvPCoreExpand, PvPDT, PvPObs, PvPReaver, PvPRobo, PvPNexusFirst => PvPNexusFirstStrategy}
 import Utilities.DoQueue
 import Utilities.Time.{GameTime, Seconds}
 
@@ -46,7 +46,7 @@ class PvPOpeningVsFE extends GameplanImperative {
       PvP4GateGoon.swapOut()
 
       if (response.contains(NexusFirst)) {
-        PvPNexusFirst.swapIn()
+        PvPNexusFirstStrategy.swapIn()
       }
       if (response.contains(Robo)) {
         PvPRobo.swapIn()

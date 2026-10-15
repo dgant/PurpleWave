@@ -1,6 +1,6 @@
 package Strategery.Strategies.Protoss
 
-import Gameplans.Protoss.PvR.{PvR2Gate4Gate, PvRFFECarrier, PvRFFEGateway, PvRGFEComplete, PvRReaver}
+import Gameplans.Protoss.PvR.{PvR2Gate4Gate, PvRFFECarrier => PvRFFECarrierPlan, PvRFFEGateway => PvRFFEGatewayPlan, PvRGFEComplete => PvRGFECompletePlan, PvRReaver => PvRReaverPlan}
 import Planning.Plans.Plan
 import Strategery.Strategies.Personalities.PersonalityCheese
 import Strategery.Strategies.Strategy
@@ -43,19 +43,19 @@ object PvRGFE extends PvRStrategy {
 }
 
 object PvRGFEComplete extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRGFEComplete())
+  override def gameplan: Option[Plan] = Some(new PvRGFECompletePlan())
   banPersonality(PersonalityCheese)
 }
 
 
 object PvRReaver extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRReaver)
+  override def gameplan: Option[Plan] = Some(new PvRReaverPlan)
 }
 
 object PvRFFECarrier extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRFFECarrier)
+  override def gameplan: Option[Plan] = Some(new PvRFFECarrierPlan)
 }
 
 object PvRFFEGateway extends PvRStrategy {
-  override def gameplan: Option[Plan] = Some(new PvRFFEGateway)
+  override def gameplan: Option[Plan] = Some(new PvRFFEGatewayPlan)
 }

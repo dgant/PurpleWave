@@ -16,7 +16,6 @@ case class MatchupAnalysis(me: UnitInfo) {
   // The necessity of this is a good argument for defining battles even if they would have trivial simulation results
   private def defaultUnits: Seq[UnitInfo] = if (me.canAttack) me.zone.units.view.filter(u => u.isEnemyOf(me) && BattleFilters.local(u)) else Seq.empty.view
 
-  // Battle teams belong to the current prediction cycle. Caching them pins retired forecasts on inactive units.
   def groupOf: UnitGroup = me.team.getOrElse(_groupOf())
   def groupVs: UnitGroup = me.team.map(_.opponent).getOrElse(_groupVs())
   private val _groupOf = new Cache(() => me.friendly.flatMap(_.squad).getOrElse(GenericUnitGroup(Seq(me))))
@@ -111,7 +110,7 @@ case class MatchupAnalysis(me: UnitInfo) {
 
   protected def threatens(shooter: UnitInfo, victim: UnitInfo): Boolean = (
     victim.friendly.exists(_.transport.exists(threatens(shooter, _)))
-    || shooter.canAttack(victim, assumeDetection = ?(shooter == me, groupOf, groupVs).detectionAvailable)
+    || shooter.canAttack(victim, assumeDetection = victim.effectivelyCloaked && ?(shooter == me, groupOf, groupVs).detectionAvailable)
     || (shooter.unitClass.canAttack(victim) && ( ! shooter.complete && shooter.remainingCompletionFrames < 72)))
 
   def healers: Seq[UnitInfo] = {

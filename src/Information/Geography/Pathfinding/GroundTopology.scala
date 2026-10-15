@@ -12,6 +12,8 @@ trait GroundTopology {
     With.grids.walkable.get(i)
       || (With.grids.walkableTerrain.get(i) && With.units.ours.exists(_.tileArea.tiles.exists(_.i == i))))
   private val removedNeutralTiles = mutable.Set.empty[Int]
+  private var topologyVersion = 0L
+  final def groundTopologyVersion: Long = topologyVersion
 
   @inline final def groundWalkable(i: Int): Boolean = i >= 0 && i < walkable.length && walkable(i)
 
@@ -33,6 +35,7 @@ trait GroundTopology {
       }
     })
     removedNeutralTiles.clear()
+    if (changed) topologyVersion += 1
     changed
   }
 }

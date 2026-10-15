@@ -62,23 +62,60 @@ final class SimulationInteractionGraph(simulation: Simulation) {
     val rangeTiles = Math.ceil(rangePixels / 32.0).toInt
     val tile = unit.pixel.tile.clip
 
-    simulation.grid.populatedTiles.foreach(gridTile => {
-      if (Math.abs(gridTile.tile.x - tile.x) <= rangeTiles && Math.abs(gridTile.tile.y - tile.y) <= rangeTiles) {
-        val tileUnits = gridTile.units
-        var i = 0
-        while (i < tileUnits.length) {
-          val other = tileUnits(i)
-          if (other != unit && other.alive && unit.isEnemyOf(other.realUnit)) {
-            val otherIndex = indices.getOrElse(other.realUnit, -1)
-            // Existing connections cannot change the partition, regardless of distance.
-            if (otherIndex >= 0 && find(unitIndex) != find(otherIndex) && proximal(unit, other)) {
-              union(unitIndex, otherIndex)
+    val width = With.mapTileWidth
+    val xMin = Math.max(0, tile.x - rangeTiles)
+    val xMax = Math.min(width - 1, tile.x + rangeTiles)
+    val yMin = Math.max(0, tile.y - rangeTiles)
+    val yMax = Math.min(With.mapTileHeight - 1, tile.y + rangeTiles)
+    // The simulated player's allegiance is fixed; the other unit still uses its live owner.
+    val friendly = unit.isFriendly
+    val enemy = unit.isEnemy
+    // A handful of occupied tiles is cheaper to visit directly than one query per row.
+    if (simulation.grid.populatedTiles.size <= yMax - yMin + 1) {
+      simulation.grid.populatedTiles.foreach(gridTile => {
+        if (gridTile.tile.x >= xMin && gridTile.tile.x <= xMax && gridTile.tile.y >= yMin && gridTile.tile.y <= yMax) {
+          val tileUnits = gridTile.units
+          var i = 0
+          while (i < tileUnits.length) {
+            val other = tileUnits(i)
+            if (other != unit && other.alive && unit.isEnemyOf(other.realUnit)) {
+              val otherIndex = indices.getOrElse(other.realUnit, -1)
+              if (otherIndex >= 0 && find(unitIndex) != find(otherIndex) && proximal(unit, other)) {
+                union(unitIndex, otherIndex)
+              }
             }
+            i += 1
           }
-          i += 1
+        }
+      })
+    } else {
+      var y = yMin
+      while (y <= yMax) {
+        val occupied = simulation.grid.populatedColumns(y)
+        var x = occupied.nextSetBit(xMin)
+        while (x >= 0 && x <= xMax) {
+          observeTile(unit, unitIndex, friendly, enemy, simulation.grid.tiles(x + y * width))
+          x = occupied.nextSetBit(x + 1)
+        }
+        y += 1
+      }
+    }
+  }
+
+  @inline private def observeTile(unit: Simulacrum, unitIndex: Int, friendly: Boolean, enemy: Boolean, tile: SimulationGridTile): Unit = {
+    val tileUnits = tile.units
+    var i = 0
+    while (i < tileUnits.length) {
+      val other = tileUnits(i)
+      if (other != unit && other.alive && ((friendly && other.realUnit.isEnemy) || (enemy && other.realUnit.isFriendly))) {
+        val otherIndex = indices.getOrElse(other.realUnit, -1)
+        // Existing connections cannot change the partition, regardless of distance.
+        if (otherIndex >= 0 && find(unitIndex) != find(otherIndex) && proximal(unit, other)) {
+          union(unitIndex, otherIndex)
         }
       }
-    })
+      i += 1
+    }
   }
 
   @inline private def proximal(unit: Simulacrum, other: Simulacrum): Boolean = {

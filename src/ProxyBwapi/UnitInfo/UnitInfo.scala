@@ -241,7 +241,14 @@ abstract class UnitInfo(val bwapiUnit: bwapi.Unit, val id: Int) extends UnitProx
   // Combat //
   ////////////
 
-  @inline final def battle: Option[Battle] = With.battles.byUnit.get(this).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
+  private var cachedBattle: Battle = _
+  // Battles clears this on publication, even for idle units and replaced matchup analyses.
+  final def invalidateBattle(): Unit = { cachedBattle = null }
+  @inline final def battle: Option[Battle] = {
+    if (cachedBattle == null) cachedBattle = With.battles.byUnit.getOrElse(this, null)
+    // Entrants change independently of physical membership; keep their lookup live.
+    Option(cachedBattle).orElse(With.matchups.entrants.find(_._2.contains(this)).map(_._1))
+  }
   @inline final def team: Option[Team] = battle.map(b => ?(isFriendly, b.us, b.enemy))
   @inline final def combatForecast: Option[Battle] = battle.flatMap(_.combatForecastByUnit.get(this))
   @inline final def combatJudgment = combatForecast.flatMap(_.judgement)

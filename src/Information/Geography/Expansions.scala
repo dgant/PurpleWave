@@ -1,6 +1,5 @@
 package Information.Geography
 
-import Information.Geography.Pathfinding.PathfindProfile
 import Information.Geography.Pathfinding.Types.TilePath
 import Information.Geography.Types.Base
 import Lifecycle.With
@@ -14,6 +13,7 @@ import bwapi.Race
 
 trait Expansions {
 
+  private val expansionPaths = new ExpansionPathCache
   private var _maxMiningBasesOurs: Int = 1
   private var _maxMiningBasesEnemy: Int = 1
   private var _safeExpansionPaths: Vector[(Base, Tile, TilePath)] = Vector.empty
@@ -33,18 +33,13 @@ trait Expansions {
   }
 
   protected def updateExpansions(): Unit = {
+    expansionPaths.refresh()
     _maxMiningBasesOurs   = Math.max(_maxMiningBasesOurs, With.geography.ourMiningBases.size)
     _maxMiningBasesEnemy  = Math.max(_maxMiningBasesEnemy, With.geography.enemyMiningBases.size)
     _safeExpansionPaths   = eligibleExpansions(With.self)
       .filter(_.isNeutral)
       .map(b => (b, Maff.orElse(With.geography.ourBases.map(_.heart), Seq(With.geography.home)).minBy(_.groundPixels(b.heart))))
-      .map(bh => (bh._1, bh._2, {
-          val profile = new PathfindProfile(bh._2, Some(bh._1.heart))
-          profile.threatMaximum       = Some(0)
-          profile.employGroundDist    = true
-          profile.lengthMaximum       = Some(64)
-          profile.find
-        }))
+      .map(bh => (bh._1, bh._2, expansionPaths.find(bh._2, bh._1.heart)))
       .toVector
     _safeExpansions = _safeExpansionPaths.filter(p => p._3.pathExists && p._3.end == p._1.heart).map(_._1)
     _preferredOurs  = rankForPlayer(With.self)

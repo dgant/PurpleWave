@@ -139,6 +139,85 @@ object FormationPathTest extends App {
       assert(pixel.zone eq pixel.tile.zone, pixel)
     })
   }
+  set(With.grids, "enemyRangeAirGround", new Information.Grids.Floody.GridEnemyRangeAirGround)
+  set(With.grids, "enemyVision", new Information.Grids.Floody.GridEnemyVision)
+  val expansionCache = new ExpansionPathCache
+  def uncachedExpansion(from: Tile, to: Tile): Information.Geography.Pathfinding.Types.TilePath = {
+    val profile = new Information.Geography.Pathfinding.PathfindProfile(from, Some(to))
+    profile.threatMaximum = Some(0)
+    profile.employGroundDist = true
+    profile.lengthMaximum = Some(64)
+    profile.find
+  }
+  val expansionTiles = With.geography.allTiles.filter(_.walkable)
+  val expansionRandom = new scala.util.Random(42)
+  val expansionRequests = Vector.fill(256)((expansionTiles(expansionRandom.nextInt(expansionTiles.size)), expansionTiles(expansionRandom.nextInt(expansionTiles.size))))
+  check("expansion cache matches every tile, endpoint and distance of fresh searches") {
+    expansionCache.refresh()
+    expansionRequests.foreach { case (from, to) =>
+      assert(expansionCache.find(from, to) == uncachedExpansion(from, to))
+    }
+    val searches = With.paths.aStarPathfinds
+    (0 until 20).foreach { _ =>
+      With.frame += 1
+      expansionCache.refresh()
+      expansionRequests.foreach { case (from, to) => expansionCache.find(from, to) }
+    }
+    assert(With.paths.aStarPathfinds == searches, "Unchanged inputs repeated expansion searches")
+  }
+  check("expansion cache follows endpoint danger while ignoring irrelevant danger elsewhere") {
+    val (from, to) = expansionRequests.find { case (a, b) =>
+      val p = expansionCache.find(a, b)
+      p.pathExists && p.end == b.walkableTile
+    }.get
+    val before = expansionCache.find(from, to)
+    val threat = With.grids.enemyRangeAirGround.tiles(to.walkableTile.i)
+    threat.maxDepth = 5
+    expansionCache.refresh()
+    val searches = With.paths.aStarPathfinds
+    val dangerous = expansionCache.find(from, to)
+    assert(With.paths.aStarPathfinds == searches + 1)
+    assert(dangerous == uncachedExpansion(from, to))
+    threat.maxDepth = 7
+    expansionCache.refresh()
+    assert(expansionCache.find(from, to) eq dangerous)
+    threat.maxDepth = 0
+    val unrelated = With.grids.enemyRangeAirGround.tiles((to.walkableTile.i + 1) % With.mapTileArea)
+    unrelated.maxDepth = 20
+    expansionCache.refresh()
+    assert(expansionCache.find(from, to) eq before)
+    assert(before == uncachedExpansion(from, to))
+    unrelated.maxDepth = 0
+  }
+  check("expansion cache invalidates when buildings block or reopen tiles, including endpoints") {
+    val (from, to) = expansionRequests.find { case (a, b) =>
+      val p = expansionCache.find(a, b)
+      p.tiles.exists(_.length > 5)
+    }.get
+    val middle = expansionCache.find(from, to).tiles.get(3)
+    for (blocked <- Vector(middle, from, to)) {
+      With.grids.unwalkableUnits.stamp(blocked)
+      expansionCache.refresh()
+      val searches = With.paths.aStarPathfinds
+      assert(expansionCache.find(from, to) == uncachedExpansion(from, to))
+      assert(With.paths.aStarPathfinds == searches + 2)
+      With.grids.unwalkableUnits.update()
+      expansionCache.refresh()
+      assert(expansionCache.find(from, to) == uncachedExpansion(from, to))
+    }
+  }
+  check("expansion cache remembers failures and separates starting bases") {
+    val (from, to) = expansionRequests.find { case (a, b) =>
+      val p = expansionCache.find(a, b)
+      !p.pathExists || p.end != b.walkableTile
+    }.get
+    val failed = expansionCache.find(from, to)
+    val searches = With.paths.aStarPathfinds
+    assert(expansionCache.find(from, to) eq failed)
+    assert(With.paths.aStarPathfinds == searches)
+    val other = from.adjacent8.find(t => t.walkable && t != from).get
+    assert(expansionCache.find(other, to) == uncachedExpansion(other, to))
+  }
   val blockerTile = Tile(40, 120)
   val backExit = With.geography.edges.find(_.pixelCenter == Pixel(1312, 3856)).get
   val main = Tile(66, 119).zone
@@ -177,8 +256,14 @@ object FormationPathTest extends App {
     With.paths.onNeutralRemoved(blockers.last.tiles)
     assert(! Tile(41, 120).walkable)
     val started = System.nanoTime()
+    val oldTopologyVersion = With.paths.groundTopologyVersion
     UpdateZones.updatePaths()
+    assert(With.paths.groundTopologyVersion == oldTopologyVersion + 1)
     println(f"Destination topology refresh: ${(System.nanoTime() - started) / 1e6}%.2f ms")
+    expansionCache.refresh()
+    expansionRequests.take(32).foreach { case (from, to) =>
+      assert(expansionCache.find(from, to) == uncachedExpansion(from, to))
+    }
     assert(backExit.isOpen)
     assert(Tile(41, 120).walkable)
     assert(bridgeGrid.get(Tile(41, 120)) == 29, bridgeGrid.get(Tile(41, 120)))

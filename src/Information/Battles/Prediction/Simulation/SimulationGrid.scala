@@ -16,6 +16,7 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
   val tiles: Array[SimulationGridTile] = (0 until With.mapTileArea).map(new SimulationGridTile(_)).toArray
 
   val populatedTiles: mutable.Set[SimulationGridTile] = new mutable.HashSet[SimulationGridTile]
+  private[Simulation] val populatedColumns = Array.fill(With.mapTileHeight)(new java.util.BitSet(With.mapTileWidth))
   private var frame = 0
   private var maxUnitExtent = 0
   private val fallbackTiles = new Array[SimulationGridTile](4)
@@ -27,6 +28,7 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
   def reset(): Unit = {
     populatedTiles.foreach(_.reset())
     populatedTiles.clear()
+    populatedColumns.foreach(_.clear())
     maxUnitExtent = 0
     frame += 2 // Expire requests even on cells that became empty before reset.
   }
@@ -37,6 +39,7 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
     gridTile += unit
     unit.gridTile = Some(gridTile)
     populatedTiles += gridTile
+    populatedColumns(gridTile.tile.y).set(gridTile.tile.x)
   }
 
   // Cells store centers, so expand the search for large footprints before testing exact splash distance.
@@ -207,7 +210,10 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
   @inline def remove(unit: Simulacrum): Unit = {
     unit.gridTile.foreach(tile => {
       tile -= unit
-      if (tile.units.isEmpty) populatedTiles.remove(tile)
+      if (tile.units.isEmpty) {
+        populatedTiles.remove(tile)
+        populatedColumns(tile.tile.y).clear(tile.tile.x)
+      }
     })
     unit.gridTile = None
   }
@@ -370,10 +376,12 @@ final class SimulationGrid(val collisionEnabled: Boolean = true) {
         tileLast -= unit
         if (tileLast.units.isEmpty) {
           populatedTiles.remove(tileLast)
+          populatedColumns(tileLast.tile.y).clear(tileLast.tile.x)
         }
       })
       if (tileTo.units.isEmpty) {
         populatedTiles.add(tileTo)
+        populatedColumns(tileTo.tile.y).set(tileTo.tile.x)
       }
       tileTo += unit
       unit.lastTile = tileFrom.map(_.tile)

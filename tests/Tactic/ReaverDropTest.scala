@@ -100,7 +100,7 @@ package Tactic.Missions {
     With.configuration = new Configuration
     With.logger = new Logger { override def debug(message: String): Unit = {} }
     With.battles = allocate(classOf[Battles])
-    With.battles.byUnit = Map.empty
+    set(With.battles, "_byUnit", Map.empty)
     With.matchups = allocate(classOf[Micro.Matchups.MatchupGraph])
     set(With.matchups, "entrants", mutable.HashMap.empty[Information.Battles.Types.Battle, ArrayBuffer[UnitInfo]])
     With.agents = allocate(classOf[Agency])

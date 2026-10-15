@@ -7,7 +7,6 @@ import Lifecycle.With
 import Mathematics.Points.{Pixel, Points}
 import ProxyBwapi.Races.{Protoss, Zerg}
 import ProxyBwapi.UnitInfo.{DamageVolley, UnitInfo}
-import Utilities.SpinWait
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -203,34 +202,45 @@ final class Simulation(val collisionEnabled: Boolean = true) {
   // Asynchrony //
   ////////////////
 
+  private val wakeup = new Object
   private var thread: Thread = _
   @volatile private var terminateThread: Boolean = _
   @volatile var simulatingAsynchronously = false
-  def runAsynchronously(): Unit = {
+  def runAsynchronously(): Unit = wakeup.synchronized {
+    if (terminateThread) return
     if (thread == null) {
-      thread = new Thread(() =>
+      thread = new Thread(() => {
         while ( ! terminateThread) {
+            wakeup.synchronized {
+              while ( ! simulatingAsynchronously && ! terminateThread) {
+                try { wakeup.wait() } catch { case _: InterruptedException => () }
+              }
+            }
             if (simulatingAsynchronously) {
-              while ( ! battle.simulationComplete) {
+              while ( ! battle.simulationComplete && ! terminateThread) {
                 try {
                   step()
                 } catch { case exception: Exception =>
-                  simulatingAsynchronously = false
+                  // Keep ownership of the battle while retrying; the game thread must not replace it.
                   With.logger.onException(exception)
-                  Thread.sleep(1) // Hopefully whatever caused the problem is gone 1ms later
+                  try { Thread.sleep(1) } catch { case _: InterruptedException => () }
                 }
               }
               simulatingAsynchronously = false
             }
-            SpinWait()
-        })
+        }
+        simulatingAsynchronously = false
+      })
       thread.setName("CombatSimulation")
       thread.setPriority(Thread.currentThread().getPriority)
       thread.start()
     }
+    // Publish the battle before waking the worker. The monitor prevents missed notifications.
     simulatingAsynchronously = true
+    wakeup.notifyAll()
   }
-  def onEnd(): Unit = {
+  def onEnd(): Unit = wakeup.synchronized {
     terminateThread = true
+    wakeup.notifyAll()
   }
 }

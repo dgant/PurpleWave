@@ -53,6 +53,9 @@ object DarkTemplarSquadTest extends App {
   set(With.geography, "_zoneByTile", Array.fill[Zone](4096)(null))
   set(With.geography, "_baseByTile", Array.fill[Option[Base]](4096)(None))
   With.paths = allocate(classOf[Paths])
+  With.scouting = allocate(classOf[Information.Scouting.Scouting])
+  set(With.scouting, "_tugStart", new Cache(() => Tile(0, 0)))
+  set(With.scouting, "_tugEnd", new Cache(() => Tile(63, 63)))
   With.grids = allocate(classOf[Grids])
   set(With.grids, "walkable", new GridWalkable)
   val terrain = new GridWalkableTerrain
@@ -204,6 +207,33 @@ object DarkTemplarSquadTest extends App {
     val (s, lock) = squad(Vector.empty)
     s.run()
     assert(!lock.released)
+  }
+  check("enemy-side divisions leave DTs available for other squads") {
+    val d = division(Pixel(1900, 1900), unit(Protoss.Dragoon))
+    assert(d.centroidGround.proximity <= 0.3)
+    With.battles.divisions = Vector(d)
+    val (s, lock) = squad(Vector(unit(Protoss.DarkTemplar)))
+    s.launch()
+    assert(!lock.acquired)
+    s.run()
+    assert(lock.released)
+  }
+  check("divisions at enemy bases leave DTs available for raids") {
+    val d = division(Pixel(300, 300), unit(Protoss.Dragoon))
+    assert(d.centroidGround.proximity > 0.3)
+    val bases = Array.fill[Option[Base]](4096)(None)
+    bases(d.centroidGround.tile.i) = Some(base(enemy = true))
+    set(With.geography, "_baseByTile", bases)
+    try {
+      With.battles.divisions = Vector(d)
+      val (s, lock) = squad(Vector(unit(Protoss.DarkTemplar)))
+      s.launch()
+      assert(!lock.acquired)
+      s.run()
+      assert(lock.released)
+    } finally {
+      set(With.geography, "_baseByTile", Array.fill[Option[Base]](4096)(None))
+    }
   }
   check("a natural's detector can disqualify the neighboring main's entrance") {
     val zone = allocate(classOf[Zone])

@@ -455,9 +455,11 @@ class WallFinder(zone: Zone, exit: Edge, entrance: Tile, constraints: Seq[WallCo
       val maxFillerPylons = 2 - requiredPylons.length
       val configurations = (0 to Math.max(0, maxFillerPylons)).flatMap(pylonCount => tiles.combinations(pylonCount).flatMap(fillerPylons => {
         val pylons = requiredPylons ++ fillerPylons
-        val requiredPowered = wall.get.buildings.filter(_._2.requiresPsi).forall(b => pylons.exists(p => Pylons.powers(p, b._1, b._2)))
+        // The first reserved pylon must support the initial wall defense on its own.
+        val requiredPowered = pylons.headOption.exists(p => wall.get.buildings.filter(_._2.requiresPsi).forall(b => Pylons.powers(p, b._1, b._2)))
         val poweredCannons = tiles.filterNot(fillerPylons.contains).filter(c => pylons.exists(p => Pylons.powers(p, c, Protoss.PhotonCannon)))
-        Some((fillerPylons, poweredCannons)).filter(_ => requiredPowered && poweredCannons.length >= 6)
+        val initialCannons = pylons.headOption.map(p => poweredCannons.count(c => Pylons.powers(p, c, Protoss.PhotonCannon))).getOrElse(0)
+        Some((fillerPylons, poweredCannons)).filter(_ => requiredPowered && initialCannons >= 4 && poweredCannons.length >= 6)
       }))
       if (configurations.isEmpty) {
         fail(wall.get, InsufficientFiller)

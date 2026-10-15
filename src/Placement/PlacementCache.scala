@@ -21,7 +21,7 @@ import scala.io.Source
 object PlacementCache {
 
   private val Magic = 0x5057504c // PWPL
-  private val FormatVersion = 5 // Regenerate proxies fitted without building-tile requirements.
+  private val FormatVersion = 7 // Regenerate walls lacking four cannons powered by the initial pylon.
   private val MaximumCompressedBytes = 8L * 1024L * 1024L
   private val MaximumDecodedBytes = 32L * 1024L * 1024L
   private val MaximumRequirements = 4096

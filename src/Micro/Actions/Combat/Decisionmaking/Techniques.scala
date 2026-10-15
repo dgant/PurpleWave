@@ -6,7 +6,6 @@ object Techniques {
   abstract class Technique(val transitions: Technique*) extends SimpleString {
     def canTransition(other: Technique): Boolean = transitions.contains(other)
   }
-  object Aim        extends Technique // Stand in place and shoot
   object Dodge      extends Technique // Heed pushes
   object Excuse     extends Technique(Dodge) // Let other units shove through us
   object Walk       extends Technique(Dodge, Excuse) // Just go on our merry way

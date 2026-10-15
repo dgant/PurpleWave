@@ -4,7 +4,7 @@ import Debugging.SimpleString
 import Lifecycle.With
 import Strategery.Selection._
 import Strategery.Strategies.AllRaces.Sandbox
-import Strategery.Strategies.Protoss.{PvECannonRushFE, PvECannonRushMaximum, PvT29Arbiter, PvZGFE}
+import Strategery.Strategies.Protoss.PvZGFE
 import Strategery.Strategies.Strategy
 
 class Playbook extends SimpleString {
@@ -18,10 +18,7 @@ class Playbook extends SimpleString {
 object StrategyGroups {
   val disabled: Vector[Strategy] = Vector[Strategy](
     Sandbox,
-    PvECannonRushMaximum,
-    PvECannonRushFE,
     PvZGFE,
-    PvT29Arbiter
   )
 }
 

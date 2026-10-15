@@ -394,11 +394,14 @@ object PlacementReservationTest extends App {
       assert(stale.productPrefix == "Stale")
       val input = new java.util.zip.GZIPInputStream(new java.io.FileInputStream(file))
       val bytes = try Iterator.continually(input.read()).takeWhile(_ >= 0).map(_.toByte).toArray finally input.close()
-      bytes(4) = 4 // Old fits were generated without building-tile requirements.
-      val output = new java.util.zip.GZIPOutputStream(new java.io.FileOutputStream(file))
-      try output.write(bytes) finally output.close()
-      val legacy = cacheCall("read", file, "reservation-test", key).asInstanceOf[Product]
-      assert(legacy.productPrefix == "Invalid", "Legacy proxy placements must be regenerated")
+      for (version <- Seq(4, 5, 6)) {
+        // Regenerate legacy proxies and walls lacking initial cannon power.
+        bytes(4) = version.toByte
+        val output = new java.util.zip.GZIPOutputStream(new java.io.FileOutputStream(file))
+        try output.write(bytes) finally output.close()
+        val legacy = cacheCall("read", file, "reservation-test", key).asInstanceOf[Product]
+        assert(legacy.productPrefix == "Invalid", s"Legacy version $version placements must be regenerated")
+      }
     } finally { assert(file.delete(), "Could not remove temporary test cache") }
   }
 

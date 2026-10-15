@@ -88,13 +88,13 @@ trait MacroActions extends MacroCounting {
     PumpRatio(unitClass, minimum, maximum, ratios, round)
   }
   def pumpShuttleAndReavers(reavers: Int = 50, shuttleFirst: Boolean = true): Unit = {
-    if (shuttleFirst && ! haveComplete(Protoss.RoboticsSupportBay)) {
+    if (shuttleFirst && ! have(Protoss.RoboticsSupportBay)) {
       once(Protoss.Shuttle)
     }
-    (0 to reavers).foreach(i => {
-      pump(Protoss.Reaver, i)
-      pump(Protoss.Shuttle, Math.min(units(Protoss.Reaver) + 1, (i + 1) / 2))
-    })
+    pump(Protoss.Reaver, Math.min(reavers, Math.max(2, 2 * units(Protoss.Shuttle))))
+    if (have(Protoss.Reaver)) {
+      pump(Protoss.Shuttle, 1 + units(Protoss.Reaver) / 2)
+    }
   }
   def makeDarkArchons(): Unit = {
     With.blackboard.makeDarkArchons.set(true)

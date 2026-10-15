@@ -185,8 +185,8 @@ final case class Pixel(argX: Int, argY: Int) extends AbstractPoint(argX, argY) {
   @inline def walkablePixel: Pixel = ?(walkable, this, {
     val center = walkableTile.center
     Pixel(
-      Maff.clamp(x, center.x - 16, center.x + 16),
-      Maff.clamp(y, center.y - 16, center.y + 16))
+      Maff.clamp(x, center.x - 15, center.x + 16),
+      Maff.clamp(y, center.y - 15, center.y + 16))
   })
   @inline def nearestTraversablePixel(unit: UnitInfo): Pixel = if (unit.flying) this else {
     val center = walkableTile.center

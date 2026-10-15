@@ -11,8 +11,8 @@ import ProxyBwapi.Players.PlayerInfo
 import ProxyBwapi.Races.Protoss
 import ProxyBwapi.UnitInfo.UnitInfo
 import Strategery.Strategies.Protoss._
-import Utilities.Time.{Minutes, Seconds}
-import Utilities.UnitFilters.{IsDetector, IsWarrior}
+import Utilities.Time.Minutes
+import Utilities.UnitFilters.IsWarrior
 import Utilities._
 
 class PvPLateGame extends GameplanImperative {
@@ -127,18 +127,23 @@ class PvPLateGame extends GameplanImperative {
     ///////////////////////////
 
     PvPIdeas.requireTimelyDetection()
+
     if (riskingFirstExpansion) {
       if (PvPCoreExpand()) {
         if (units(Protoss.Gateway) < 3) {
           autosupply()
-          doTrainArmy()
+          doTrainArmyHigh()
+          doTrainArmyLow()
+          get(Protoss.DragoonRange)
           get(3, Protoss.Gateway)
         }
-      } else if (PvPDT() && ! With.fingerprints.dtRush()) {
-        safePumpDT()
-        autosupply()
-        get(Protoss.DragoonRange)
-        get(5, Protoss.Gateway)
+      } else if (PvPDT()) {
+        once(2, Protoss.DarkTemplar)
+        if ( ! With.fingerprints.dtRush()) {
+          autosupply()
+          get(Protoss.DragoonRange)
+          get(5, Protoss.Gateway)
+        }
         shouldAttack = false
       } else {
         get(units(Protoss.RoboticsSupportBay), Protoss.RoboticsFacility)
@@ -146,10 +151,11 @@ class PvPLateGame extends GameplanImperative {
       }
       if ( ! With.scouting.enemyNaturalPossiblyMining && ! With.fingerprints.robo()) {
         autosupply()
-        doTrainArmy()
+        doTrainArmyHigh()
+        doTrainArmyLow()
         get(3, Protoss.Gateway)
         doCannons()
-        get(6, Protoss.Gateway)
+        get(5, Protoss.Gateway)
       }
     }
 
@@ -171,7 +177,8 @@ class PvPLateGame extends GameplanImperative {
   }
 
   override def executeMain(): Unit = {
-    val trainArmy     = new DoQueue(doTrainArmy)
+    val trainArmyHigh = new DoQueue(doTrainArmyHigh)
+    val trainArmyLow  = new DoQueue(doTrainArmyLow)
     val addProduction = new DoQueue(doAddProduction)
     val tech1         = new DoQueue(doPrimaryTech)
     val tech2         = new DoQueue(doSecondaryTech)
@@ -188,41 +195,35 @@ class PvPLateGame extends GameplanImperative {
       maintainMiningBases()
     }
     recordRequestedBases()
-    if (saturated && gas < 500) {
+
+    if (productionCapacity >= 5 && gas < 400) {
       pumpGasPumps()
     }
+
+    trainArmyHigh()
+
     if (units(Protoss.Zealot) >= 4) {
       upgradeContinuously(Protoss.ZealotSpeed)
     }
     if (productionCapacity < 3 * miningBases) {
-      trainArmy()
+      trainArmyLow()
     }
     if (fearDeath) {
-      trainArmy()
+      trainArmyLow()
       addProduction()
     }
     cannons()
-    if (productionCapacity >= 6) {
-      doUpgrades()
-    }
     tech1()
-    if (shouldSecondaryTech) {
-      tech2()
-    }
-    trainArmy()
-    addProduction()
-    expandOnce()
+    doUpgrades()
     tech2()
+    trainArmyLow()
+    addProduction()
+    pumpGasPumps()
+    pump(Protoss.Zealot)
+    expandOnce()
   }
 
-  private def safePumpDT(): Unit = {
-    // Dumb hack fix for seeing DTs getting spammed before AIIDE 2023 deadline
-    if (have(Protoss.TemplarArchives) && ! have(Protoss.DarkTemplar)) {
-      get(Protoss.DarkTemplar)
-    }
-  }
-
-  private def doTrainArmy(): Unit = {
+  private def doTrainArmyHigh(): Unit = {
 
     if (expectCarriers) {
       pumpRatio(Protoss.Scout, 3, 24, Seq(Enemy(Protoss.Carrier, 3.0), Enemy(Protoss.Scout, 1.0), Enemy(Protoss.Corsair, 1.0)))
@@ -232,57 +233,34 @@ class PvPLateGame extends GameplanImperative {
       }
       get(2, Protoss.Stargate)
     }
-    if ( ! enemiesHave(Protoss.Observer) || (With.geography.enemyBases.size > 2 && With.geography.enemyBases.exists( ! _.enemies.exists(IsDetector)))) {
-      safePumpDT()
-      if ( ! haveComplete(Protoss.DarkTemplar)) {
-        once(2, Protoss.DarkTemplar)
-      }
+    if ( ! enemiesHave(Protoss.Observer, Protoss.PhotonCannon)) {
+      once(2, Protoss.DarkTemplar)
     }
     pumpRatio(Protoss.Dragoon, 0, 100, Seq(Enemy(Protoss.Scout, 2.0), Enemy(Protoss.Shuttle, 2.0), Friendly(Protoss.Zealot, 1.0), Friendly(Protoss.Archon, 3.0)))
     if ( ! expectCarriers && ! fearDeath && ( ! fearContain || ! enemyRobo)) {
       pump(Protoss.Observer, 1)
     }
 
-    if (techStarted(Protoss.PsionicStorm) && upgradeStarted(Protoss.ZealotSpeed)) {
-      pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
-      pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-4), Friendly(IsWarrior, 1.0 / 4.0)))
-      if (shouldHarass) {
-        pump(Protoss.Shuttle, 1)
-      }
-    }
     pump(Protoss.Observer, Math.min(3, 1 + enemies(Protoss.DarkTemplar)))
-    // The combined pump will go Reaver-Shuttle-Reaver, but on defense we want Reaver-Reaver-Shuttle
-    if (riskingFirstExpansion || ! shouldAttack) {
-      pump(Protoss.Reaver, 2)
-    }
-    pumpShuttleAndReavers(2, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
+    pumpShuttleAndReavers(2, shuttleFirst = ! have(Protoss.RoboticsSupportBay))
     pump(Protoss.Observer, 2)
+    pumpShuttleAndReavers(6)
+    pumpRatio(Protoss.Dragoon, 8, 24, Seq(Friendly(Protoss.Zealot, 2.0)))
+    pumpRatio(Protoss.HighTemplar, 0, 8, Seq(Flat(-4), Friendly(IsWarrior, 1.0 / 4.0)))
+  }
+  private def doTrainArmyLow(): Unit = {
     tryBuildInWall(1, Protoss.ShieldBattery)
-    pumpShuttleAndReavers(6, shuttleFirst = ! haveComplete(Protoss.RoboticsSupportBay))
-    if (units(Protoss.Reaver) >= 2 && have(Protoss.Shuttle)) {
-      get(Protoss.ShuttleSpeed)
-      get(Protoss.ScarabDamage)
-    }
-
-    if (upgradeComplete(Protoss.ZealotSpeed, 1, withinFrames = Protoss.Zealot.buildFrames + Seconds(10)())) {
-      pumpRatio(Protoss.Zealot, 2, 16, Seq(Friendly(Protoss.Dragoon, 0.5)))
-    }
     pump(Protoss.Dragoon)
-    if (techStarted(Protoss.PsionicStorm)) {
-      pump(Protoss.HighTemplar)
-    }
-    pump(Protoss.Zealot)
   }
 
   private def doAddProduction(): Unit = {
-    if (have(Protoss.RoboticsFacility)) {
-      get(Protoss.RoboticsSupportBay)
+    if (have(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay, Protoss.Observatory)) {
+      get(Protoss.RoboticsFacility, Protoss.RoboticsSupportBay)
     }
     if (have(Protoss.CitadelOfAdun) && ! enemyRobo) {
       get(Protoss.TemplarArchives)
     }
     get(?(have(Protoss.RoboticsSupportBay), 2, 4), Protoss.Gateway)
-    get(?(have(Protoss.RoboticsSupportBay), 2, 0), Protoss.RoboticsFacility)
     get(?(have(Protoss.RoboticsSupportBay), 4, 6), Protoss.Gateway)
     get(targetGateways + miningBases, Protoss.Gateway)
   }
@@ -296,7 +274,6 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doSecondaryTech(): Unit = {
-    pumpGasPumps()
     if (primaryTech.contains(RoboTech)) {
       doTemplar()
     } else if (primaryTech.contains(TemplarTech)) {
@@ -305,15 +282,9 @@ class PvPLateGame extends GameplanImperative {
   }
 
   private def doRobo(): Unit = {
-    if (productionCapacity >= 6 && gas < 250) {
-      pumpGasPumps()
-    }
     get(Protoss.RoboticsFacility)
-    if (techStarted(Protoss.PsionicStorm)) {
-      once(Protoss.Shuttle)
-    }
 
-    if ( ! fearDeath || enemyHasShown(Protoss.Arbiter)) {
+    if ( ! fearDeath || enemyShownCloakedThreat) {
       get(Protoss.Observatory)
       once(Protoss.Observer)
       if (units(IsWarrior) >= 12 && (enemyDarkTemplarLikely || enemyShownCloakedThreat)) {
@@ -324,13 +295,8 @@ class PvPLateGame extends GameplanImperative {
       }
     }
     get(Protoss.RoboticsSupportBay)
-    if (units(Protoss.Shuttle) >= ?(fearDeath, 1, 2) && (units(Protoss.Reaver) >= ?(fearDeath, 2, 3) || Protoss.PsionicStorm())) {
-      get(Protoss.ShuttleSpeed)
-    }
-    pump(Protoss.Reaver, 1)
-    if (Protoss.ShuttleSpeed() && units(Protoss.Reaver) >= 4) {
-      get(Protoss.ScarabDamage)
-    }
+    get(Protoss.ShuttleSpeed)
+    get(Protoss.ScarabDamage)
   }
 
   private def doTemplar(): Unit = {
@@ -346,15 +312,10 @@ class PvPLateGame extends GameplanImperative {
     if (gas < gasThreshold) {
       pumpGasPumps()
     }
-    if (productionCapacity >= 6 && units(IsWarrior) >= 16) {
-      doUpgrades()
-      val readyForStorm = techStarted(Protoss.PsionicStorm) || ((gasPumps > 1 || gas >= gasThreshold) &&(unitsComplete(IsWarrior) >= 30))
-      if (readyForStorm) {
-        status("Ready4Storm")
-        get(Protoss.PsionicStorm)
-        get(2, Protoss.HighTemplar)
-        get(Protoss.HighTemplarEnergy)
-      }
+    if (productionCapacity >= 6 && units(IsWarrior) >= 15) {
+      get(Protoss.PsionicStorm)
+      once(2, Protoss.HighTemplar)
+      get(Protoss.HighTemplarEnergy)
     }
   }
 
@@ -367,10 +328,11 @@ class PvPLateGame extends GameplanImperative {
       get(Protoss.GroundDamage)
       get(Protoss.GroundArmor)
     }
-    if (units(Protoss.Zealot) > 4 || gas < 200) {
-      get(Protoss.CitadelOfAdun)
-      get(Protoss.ZealotSpeed)
-    }
+    get(Protoss.CitadelOfAdun)
+    upgradeContinuously(Protoss.ZealotSpeed)
+    upgradeContinuously(Protoss.ShuttleSpeed)
+    upgradeContinuously(Protoss.ScarabDamage)
+    get(Protoss.TemplarArchives)
   }
 
   private def doCannons(): Unit = {

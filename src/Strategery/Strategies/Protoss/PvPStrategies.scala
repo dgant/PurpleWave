@@ -29,7 +29,15 @@ object PvPGateCore extends PvPStrategy {
 }
 
 object PvP1012 extends PvPStrategy {
-  addSelectionRequirement(() => With.fingerprints.twoGate.recently || With.fingerprints.oneGateCore.recently || With.fingerprints.nexusFirst.recently || ! PvPGateCore.legal)
+  addSelectionRequirement(() => {
+    var legal = With.fingerprints.nexusFirst.recently
+    legal ||= With.fingerprints.oneGateCore.recently
+    legal ||= With.fingerprints.twoGate.recently
+    legal &&= With.strategy.rushDistanceMax < 180
+    legal ||= With.fingerprints.proxyGateway.recently
+    legal ||= ! PvPGateCore.legal
+    legal
+  })
   addChoice(PvP3Zealot, PvP5Zealot)
   addChoice(PvPDT, PvP3GateGoon, PvP4GateGoon)
 }

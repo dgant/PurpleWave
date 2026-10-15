@@ -180,21 +180,11 @@ class PvPOpening extends GameplanImperative {
     // https://tl.net/forum/bw-strategy/526298-pvp-common-builds-and-what-counters-it-t-l
     // has some good details on the metagame rock-paper-scissors.
 
-    // These maps are too long for 2-Gate unless we're failing to hold proxies otherwise
-    if (PvP1012()
-      && ! have(Protoss.Gateway)
-      && ! enemyRecentStrategy(With.fingerprints.proxyGateway)
-      && Stream(Arcadia, Aztec, Benzene, Longinus, MatchPoint, Heartbreak, Roadkill).exists(_())) {
-      PvP1012.swapOut()
-      PvP3Zealot.swapOut()
-      PvP5Zealot.swapOut()
-      sequence = ?(Stream(Heartbreak, Roadkill).exists(_()) || roll("1012ToGateCoreGate", 0.35), GCGate, GCRange)
-    }
     // Goon+Obs is the strongest punishment against badly hidden DT openers.
     // A glimpse of Citadel doesn't sufficiently justify switching into Obs for its own sake,
     // as the Citadel could be a fake and the investment is a lot less than making even one Observer,
     // but a switch into full-blown Robotics at least lets us benefit from the investment if the Citadel was a fake
-    if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && enemiesHave(Protoss.CitadelOfAdun) && units(Protoss.Gateway) < 3) {
+    if (employing(PvPCoreExpand, PvP3GateGoon, PvP4GateGoon) && enemiesHave(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && units(Protoss.Gateway) < 3) {
       if (roll("SwapGateIntoRoboVsCitadel", 0.3)) {
         PvPCoreExpand.swapOut()
         PvP3GateGoon.swapOut()
@@ -203,25 +193,7 @@ class PvPOpening extends GameplanImperative {
         PvPObs.swapIn()
       }
     }
-    // Robo is a very middle-of-the-road build, and has a few pointed weaknesses.
-    // It's good against opponents playing diverse strategies but unimpressive against one-dimensional opponents.
-    if (PvPRobo()
-      && ! haveEverComplete(Protoss.CyberneticsCore)
-      && ! have(Protoss.RoboticsFacility)
-      && ! enemiesHave(Protoss.Forge, Protoss.CitadelOfAdun)) {
 
-      // Core expand is advantaged against most Robo variants.
-      // But we don't want to make this switch too predictably, as it's abusable.
-      if ( ! With.strategy.isFixedOpponent
-        && With.fingerprints.robo.recently
-        && (With.fingerprints.robo() || ! With.fingerprints.dtRush.recently)
-        && roll("SwapRoboIntoExpand", ?(With.fingerprints.robo(), 0.6, 0.25))) {
-        PvPRobo.swapOut()
-        PvPObs.swapOut()
-        PvPReaver.swapOut()
-        ?(units(Protoss.Gateway) > 1, PvP3GateGoon, PvPCoreExpand).swapIn()
-      }
-    }
     // Consider swapping out of DT if we've been caught, or if we scout them going DT first
     if (PvPDT() && scoutCleared && ! haveEverComplete(Protoss.Dragoon)) {
       val caught            = With.units.ours.filter(u => u.isAny(Protoss.CitadelOfAdun, Protoss.TemplarArchives) && u.knownToOpponents && ! u.visibleToOpponents).toVector
